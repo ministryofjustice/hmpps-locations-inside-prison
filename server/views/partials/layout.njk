@@ -1,7 +1,16 @@
 {% extends "govuk/template.njk" %}
 
 {% block head %}
-  <link href="{{ '/assets/css/index.css' | assetMap }}" rel="stylesheet"/>
+  <!--[if !IE 8]><!-->
+  <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet"/>
+  <!--<![endif]-->
+
+  <!--[if lt IE 9]>
+  <link href="/assets/stylesheets/application-ie8.css?{{ version }}" rel="stylesheet"/>
+  <script src="/assets/js/html5shiv-3.7.3.min.js"></script>
+  <![endif]-->
+
+  <script src="/assets/js/jquery.min.js"></script>
 {% endblock %}
 
 {% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
@@ -14,5 +23,8 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  <script type="module" src="{{ '/assets/js/index.js' | assetMap }}"></script>
+  <script src="/assets/govuk/all.js"></script>
+  <script type="module" src="/assets/govukFrontendInit.js"></script>
+  <script src="/assets/moj/all.js"></script>
+  <script src="/assets/mojFrontendInit.js"></script>
 {% endblock %}

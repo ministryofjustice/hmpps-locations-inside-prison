@@ -11,6 +11,7 @@ const applicationInfo = applicationInfoSupplier()
 initialiseAppInsights()
 buildAppInsightsClient(applicationInfo)
 
+import ManageUsersApiClient from './manageUsersApiClient'
 import { createRedisClient } from './redisClient'
 import config from '../config'
 import HmppsAuditClient from './hmppsAuditClient'
@@ -29,9 +30,10 @@ export const dataAccess = () => {
     hmppsAuthClient,
     exampleApiClient: new ExampleApiClient(hmppsAuthClient),
     hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
+    manageUsersApiClient: new ManageUsersApiClient(),
   }
 }
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
-export { AuthenticationClient, HmppsAuditClient, ExampleApiClient }
+export { AuthenticationClient, HmppsAuditClient, ExampleApiClient, ManageUsersApiClient }

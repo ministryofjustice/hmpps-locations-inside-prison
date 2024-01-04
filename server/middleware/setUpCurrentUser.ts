@@ -1,12 +1,13 @@
+import { Router } from 'express'
 import { jwtDecode } from 'jwt-decode'
-import express from 'express'
 import { convertToTitleCase } from '../utils/utils'
 import logger from '../../logger'
+import { Services } from '../services'
 
-export default function setUpCurrentUser() {
-  const router = express.Router()
+export default function setUpCurrentUser({ manageUsersService }: Services): Router {
+  const router = Router({ mergeParams: true })
 
-  router.use((req, res, next) => {
+  router.use(async (req, res, next) => {
     try {
       const {
         name,
@@ -18,12 +19,15 @@ export default function setUpCurrentUser() {
         authorities?: string[]
       }
 
+      const caseloadsData = await manageUsersService.getUserCaseloads(res.locals.user.token)
       res.locals.user = {
         ...res.locals.user,
         userId,
         name,
-        displayName: convertToTitleCase(name),
+        displayName: `${convertToTitleCase(name)}`,
         userRoles: roles.map(role => role.substring(role.indexOf('_') + 1)),
+        activeCaseload: caseloadsData.activeCaseload,
+        caseloads: caseloadsData.caseloads,
       }
 
       if (res.locals.user.authSource === 'nomis') {
