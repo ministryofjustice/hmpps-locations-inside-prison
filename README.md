@@ -1,6 +1,6 @@
-# hmpps-template-typescript
-[![repo standards badge](https://img.shields.io/badge/endpoint.svg?&style=flat&logo=github&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-template-typescript)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#hmpps-template-typescript "Link to report")
-[![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-template-typescript/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/hmpps-template-typescript)
+# hmpps-locations-inside-prison
+[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=flat&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-locations-inside-prison)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#hmpps-locations-inside-prison "Link to report")
+[![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-locations-inside-prison/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/hmpps-locations-inside-prison)
 
 Template github repo used for new Typescript based projects.
 
@@ -12,7 +12,7 @@ see https://github.com/ministryofjustice/hmpps-project-bootstrap. You are able t
 This bootstrap is community managed by the mojdt `#typescript` slack channel. 
 Please raise any questions or queries there. Contributions welcome!
 
-Our security policy is located [here](https://github.com/ministryofjustice/hmpps-template-typescript/security/policy). 
+Our security policy is located [here](https://github.com/ministryofjustice/hmpps-locations-inside-prison/security/policy). 
 
 More information about the template project including features can be found [here](https://dsdmoj.atlassian.net/wiki/spaces/NDSS/pages/3488677932/Typescript+template+project).
 
