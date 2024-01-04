@@ -1,8 +1,8 @@
 {
-  "name": "hmpps-template-typescript",
+  "name": "hmpps-locations-inside-prison",
   "version": "0.0.1",
-  "description": "HMPPS Typescript Template",
-  "repository": "git@github.com:ministryofjustice/hmpps-template-typescript.git",
+  "description": "Hmpps Locations Inside Prison",
+  "repository": "git@github.com:ministryofjustice/hmpps-locations-inside-prison.git",
   "license": "MIT",
   "scripts": {
     "prepare": "husky",
