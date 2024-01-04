@@ -1,18 +1,18 @@
 generic-service:
-  nameOverride: hmpps-template-typescript
-  productId: "UNASSIGNED" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
+  nameOverride: hmpps-locations-inside-prison
+  productId: "DPS037" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
 
   replicaCount: 4
 
   image:
-    repository: quay.io/hmpps/hmpps-template-typescript
+    repository: quay.io/hmpps/hmpps-locations-inside-prison
     tag: app_version # override at deployment time
     port: 3000
 
   ingress:
     enabled: true
     host: app-hostname.local # override per environment
-    tlsSecretName: hmpps-template-typescript-cert
+    tlsSecretName: hmpps-locations-inside-prison-cert
 
   livenessProbe:
     httpGet:
@@ -42,7 +42,7 @@ generic-service:
   #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
 
   namespace_secrets:
-    hmpps-template-typescript:
+    hmpps-locations-inside-prison:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
       API_CLIENT_ID: "API_CLIENT_ID"
       API_CLIENT_SECRET: "API_CLIENT_SECRET"
@@ -58,4 +58,4 @@ generic-service:
       - internal
 
 generic-prometheus-alerts:
-  targetApplication: hmpps-template-typescript
+  targetApplication: hmpps-locations-inside-prison

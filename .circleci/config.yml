@@ -9,12 +9,12 @@ parameters:
     type: string
     # Normally team specific alert channel e.g. hmpps_tech_alerts, syscon-alerts, dps_sed_alerts
     # This is to avoid a general alert dumping ground that no-one then monitors
-    default: PIPELINE_SECURITY_SLACK_CHANNEL
+    default: locations-inside-prison-dev
 
   releases-slack-channel:
     type: string
     # Normally dps-releases for most teams / projects
-    default: SLACK_RELEASES_CHANNEL
+    default: dps-releases
 
   node-version:
     type: string
@@ -159,7 +159,7 @@ workflows:
 #          pipeline_number: <<pipeline.number>>
 #          context:
 #            - hmpps-common-vars
-#            - hmpps-template-typescript-preprod
+#            - hmpps-locations-inside-prison-preprod
 #          requires:
 #            - request-preprod-approval
 #          helm_timeout: 5m
@@ -178,7 +178,7 @@ workflows:
 #          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
 #          context:
 #            - hmpps-common-vars
-#            - hmpps-template-typescript-prod
+#            - hmpps-locations-inside-prison-prod
 #          requires:
 #            - request-prod-approval
 #          helm_timeout: 5m
@@ -186,7 +186,7 @@ workflows:
   security:
     triggers:
       - schedule:
-          cron: "30 5 * * 1-5"
+          cron: "46 6 * * 1-5"
           filters:
             branches:
               only:
@@ -212,7 +212,7 @@ workflows:
   security-weekly:
     triggers:
       - schedule:
-          cron: "0 5 * * 1"
+          cron: "59 6 * * 1"
           filters:
             branches:
               only:
