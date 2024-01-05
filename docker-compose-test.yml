@@ -1,14 +1,27 @@
-version: '3.1'
+# Runs the services needed for integration testing
+# or the subset of services needed by the application if it is connected to `dev` HMPPS APIs
+version: "3.9"
+
 services:
+
+  redis:
+    image: redis:7.0
+    networks:
+      - hmpps
+    container_name: irs-redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
 
   wiremock:
     image: wiremock/wiremock
     networks:
-    - hmpps_int
-    container_name: wiremock
+      - hmpps
+    container_name: irs-wiremock
     restart: always
     ports:
       - "9091:8080"
 
 networks:
-  hmpps_int:
+  hmpps:
