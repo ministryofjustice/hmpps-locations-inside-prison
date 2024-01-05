@@ -15,7 +15,7 @@ generic-service:
   ingress:
     enabled: true
     host: app-hostname.local # override per environment
-    tlsSecretName: hmpps-locations-inside-prison-cert
+    tlsSecretName: locations-inside-prison-cert
 
   livenessProbe:
     httpGet:
