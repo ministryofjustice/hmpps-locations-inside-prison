@@ -1,116 +1,155 @@
-# hmpps-locations-inside-prison
+# HMPPS locations inside prison UI
 [![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=flat&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-locations-inside-prison)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#hmpps-locations-inside-prison "Link to report")
 [![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-locations-inside-prison/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/hmpps-locations-inside-prison)
 
-Template github repo used for new Typescript based projects.
+This application is a front-end application used by staff in HMPPS prisons to view and maintain incident reports.
 
-# Instructions
+It is backed by [hmpps-locations-inside-prison-api](https://github.com/ministryofjustice/hmpps-locations-inside-prison-api).
 
-If this is a HMPPS project then the project will be created as part of bootstrapping - 
-see https://github.com/ministryofjustice/dps-project-bootstrap. You are able to specify a template application using the `github_template_repo` attribute to clone without the need to manually do this yourself within GitHub.
+## Running locally
 
-This bootstrap is community managed by the mojdt `#typescript` slack channel. 
-Please raise any questions or queries there. Contributions welcome!
+The application needs a suite of services to work.
 
-Our security policy is located [here](https://github.com/ministryofjustice/hmpps-locations-inside-prison/security/policy). 
+### Requirements
 
-More information about the template project including features can be found [here](https://dsdmoj.atlassian.net/wiki/spaces/NDSS/pages/3488677932/Typescript+template+project).
+This application is built for Node.js and docker will be needed to run it locally.
+[`nvm`](https://github.com/nvm-sh/nvm) or [`fnm`](https://github.com/Schniz/fnm)
+can be used to install appropriate node versions, e.g.:
 
-## Creating a Cloud Platform namespace
+```shell
+nvm use
+# or
+fnm use
+```
 
-When deploying to a new namespace, you may wish to use this template typescript project namespace as the basis for your new namespace:
+Additional tools are required to manage deployment: `kubectl` and `helm`.
 
-<https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-locations-inside-prison>
+### Using services in `dev` environment
 
-This template namespace includes an AWS elasticache setup - which is required by this template project.
+This is the easiest way to run and develop on your machine: by hooking into services that already exist
+in the `dev` environment.
+A user account is needed in hmpps-auth with the appropriate roles.
 
-Copy this folder, update all the existing namespace references, and submit a PR to the Cloud Platform team. Further instructions from the Cloud Platform team can be found here: <https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide>
+Copy the `.env.sample` file to `.env` following the instructions in the file.
 
-## Renaming from HMPPS Template Typescript - github Actions
+Run the application in development mode, in separate shell sessions:
 
-Once the new repository is deployed. Navigate to the repository in github, and select the `Actions` tab.
-Click the link to `Enable Actions on this repository`.
+```shell
+docker compose -f docker-compose-test.yml up
+npm run start:dev
+```
 
-Find the Action workflow named: `rename-project-create-pr` and click `Run workflow`.  This workflow will
-execute the `rename-project.bash` and create Pull Request for you to review.  Review the PR and merge.
+This will automatically restart it if server code or front-end assets are modified.
 
-Note: ideally this workflow would run automatically however due to a recent change github Actions are not
-enabled by default on newly created repos. There is no way to enable Actions other then to click the button in the UI.
-If this situation changes we will update this project so that the workflow is triggered during the bootstrap project.
-Further reading: <https://github.community/t/workflow-isnt-enabled-in-repos-generated-from-template/136421>
+### Updating dependencies
 
-## Manually branding from template app
-Run the `rename-project.bash` and create a PR.
+It’s prudent to periodically update npm dependencies; continuous integration will occasionally warn when it’s needed.
+Renovate (similar to dependabot) is set up to try to upgrade
+npm packages, base docker images, helm charts and CircleCI orbs
+by raising pull requests.
 
-The rename-project.bash script takes a single argument - the name of the project and calculates from it the project description
-It then performs a search and replace and directory renames so the project is ready to be used.
+## Testing
 
-## Ensuring slack notifications are raised correctly
+Continuous integration on CircleCI will always perform the full suite of tests on pull requests and branches pushed to github,
+but they can be run locally too.
 
-To ensure notifications are routed to the correct slack channels, update the `alerts-slack-channel` and `releases-slack-channel` parameters in `.circle/config.yml` to an appropriate channel.
+### Unit tests
 
-## Filling in the `productId`
+Run unit tests using:
 
-To allow easy identification of an application, the product Id of the overall product should be set in `values.yaml`. The Service Catalogue contains a list of these IDs and is currently in development here https://developer-portal.hmpps.service.justice.gov.uk/products
+```shell
+npm test
+```
 
-## Running the app
-The easiest way to run the app is to use docker compose to create the service and all dependencies. 
+…optionally passing a file path pattern to only run a subset:
 
-`docker compose pull`
+```shell
+npm test -- authorisationMiddleware
+```
 
-`docker compose up`
+### Integration tests
 
-### Dependencies
-The app requires: 
-* hmpps-auth - for authentication
-* redis - session store and token caching
+Run the full set of headless integration tests, in separate shell sessions:
 
-### Running the app for development
+```shell
+docker compose -f docker-compose-test.yml up
+npm run start-feature
+npm run int-test
+```
 
-To start the main services excluding the example typescript template app: 
+Integration tests can also be run in development mode with a UI
+so that assets are rebuilt when modified and tests will re-run:
 
-`docker compose up --scale=app=0`
+```shell
+docker compose -f docker-compose-test.yml up
+npm run start-feature:dev
+npm run int-test-ui
+```
 
-Install dependencies using `npm install`, ensuring you are using `node v18.x` and `npm v9.x`
+### Code style tests
 
-Note: Using `nvm` (or [fnm](https://github.com/Schniz/fnm)), run `nvm install --latest-npm` within the repository folder to use the correct version of node, and the latest version of npm. This matches the `engines` config in `package.json` and the CircleCI build config.
+Type-checking is performed with:
 
-And then, to build the assets and start the app with nodemon:
+```shell
+npm run typecheck
+```
 
-`npm run start:dev`
+Prettier should automatically correct many stylistic errors when changes are committed,
+but the linter can also be run manually:
 
-### Run linter
+```shell
+npm run lint
+```
 
-`npm run lint`
+### Security tests
 
-### Run tests
+Continuous integration will regularly perform security checks using nm security audit, trivy and veracode.
 
-`npm run test`
+The npm audit can be run manually:
 
-### Running integration tests
+```shell
+npx audit-ci --config audit-ci.json
+```
 
-For local running, start a test db and wiremock instance by:
+## Hosting
 
-`docker compose -f docker-compose-test.yml up`
+This application is hosted on [Cloud Platform](https://user-guide.cloud-platform.service.justice.gov.uk/)
+in three environments:
+`dev` (continuously deployed and experimental; for general testing),
+`preprod` (largely matches the live service; for pre-release testing)
+and `prod` (the live service).
 
-Then run the server in test mode by:
+The environments are distinct namespaces defined using a combination of kubernetes resources and terraform templates:
 
-`npm run start-feature` (or `npm run start-feature:dev` to run with nodemon)
+* [`dev`](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-incident-reporting-dev)
+* [`preprod`](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-incident-reporting-preprod)
+* [`prod`](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-incident-reporting-prod)
 
-And then either, run tests in headless mode with:
+A shared HMPPS helm chart forms the basis of releases,
+setting up a deployment, service, ingress and associated policies and monitoring rules.
 
-`npm run int-test`
- 
-Or run tests with the cypress UI:
+See `/helm_deploy/`.
 
-`npm run int-test-ui`
+### Deployment
 
-## Change log
+When the main branch is updated (e.g. when a pull request is merged),
+a new version of the application is released to `dev` automatically by CircleCI.
+This release can be promoted to `preprod` and `prod` using the CircleCI interface.
 
-A changelog for the service is available [here](./CHANGELOG.md)
+See `/helm_deploy/README.md` for manual deployment steps.
 
+### Monitoring
 
-## Dependency Checks
+There is a suite of tools used for monitoring deployed applications:
 
-The template project has implemented some scheduled checks to ensure that key dependencies are kept up to date.
-If these are not desired in the cloned project, remove references to `check_outdated` job from `.circleci/config.yml`
+* [Kibana](https://kibana.cloud-platform.service.justice.gov.uk/_plugin/kibana/app/kibana) – logging
+* [Azure Application Insights](https://portal.azure.com/) – application profiling and introspection
+* [Prometheus](https://prometheus.cloud-platform.service.justice.gov.uk/) – application and request metrics
+* [Alertmanager](https://alertmanager.live.cloud-platform.service.justice.gov.uk/) – alerts based on metrics
+
+## References
+
+The code in this repository uses the MIT licence.
+
+* [MoJ security guidance](https://security-guidance.service.justice.gov.uk/)
+* [MoJ technical guidance](https://technical-guidance.service.justice.gov.uk/)
