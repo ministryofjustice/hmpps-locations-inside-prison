@@ -14,6 +14,7 @@ services:
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
       - DELIUS_ENABLED=false
       - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
+      - NOMIS_ENABLED=true
 
   nomis-user-roles-api:
     image: quay.io/hmpps/nomis-user-roles-api:latest
