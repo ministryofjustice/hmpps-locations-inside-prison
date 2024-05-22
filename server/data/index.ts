@@ -16,12 +16,14 @@ import { createRedisClient } from './redisClient'
 import RedisTokenStore from './tokenStore/redisTokenStore'
 import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
 import config from '../config'
+import FeComponentsClient from './feComponentsClient'
 import HmppsAuditClient from './hmppsAuditClient'
 
 type RestClientBuilder<T> = (token: string) => T
 
 export const dataAccess = () => ({
   applicationInfo,
+  feComponentsClient: new FeComponentsClient(),
   hmppsAuthClient: new HmppsAuthClient(
     config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
   ),
@@ -31,4 +33,4 @@ export const dataAccess = () => ({
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
-export { HmppsAuditClient, HmppsAuthClient, ManageUsersApiClient, RestClientBuilder }
+export { FeComponentsClient, HmppsAuditClient, HmppsAuthClient, ManageUsersApiClient, RestClientBuilder }

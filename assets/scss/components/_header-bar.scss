@@ -141,6 +141,6 @@
 }
 
 .govuk-phase-banner {
-  @include govuk-width-container;
   border: none;
+  margin-left: 12px;
 }

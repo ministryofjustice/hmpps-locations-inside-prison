@@ -30,7 +30,15 @@ describe('GET /', () => {
       .get('/')
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('This site is under construction...')
+        // Check that back link is present instead of breadcrumbs
+        expect(res.text).toContain('class="govuk-back-link"')
+
+        // Test the tiles
+        expect(res.text).toContain('View and update locations')
+        expect(res.text).toContain('View all inactive cells')
+        expect(res.text).toContain('Archived locations')
+        expect(res.text).toContain('Residential location history')
+
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.EXAMPLE_PAGE, {
           who: user.username,
           correlationId: expect.any(String),

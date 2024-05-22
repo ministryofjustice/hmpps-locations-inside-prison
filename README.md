@@ -34,6 +34,8 @@ Copy the `.env.sample` file to `.env` following the instructions in the file.
 
 Run the application in development mode, in separate shell sessions:
 
+TODO: update how to start the service
+
 ```shell
 docker compose -f docker-compose-test.yml up
 npm run start:dev

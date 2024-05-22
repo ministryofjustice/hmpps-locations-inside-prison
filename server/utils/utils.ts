@@ -19,5 +19,5 @@ export const initialiseName = (fullName?: string): string | null => {
   if (!fullName) return null
 
   const array = fullName.split(' ')
-  return `${array[0][0]}. ${array.reverse()[0]}`
+  return `${array[0][0]}. ${array[array.length - 1]}`
 }
