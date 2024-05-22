@@ -8,6 +8,8 @@ import { appInsightsMiddleware } from './utils/azureAppInsights'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import { metricsMiddleware } from './monitoring/metricsApp'
 
+import buildBreadcrumbs from './middleware/buildBreadcrumbs'
+import getFrontendComponents from './middleware/getFeComponents'
 import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpCsrf from './middleware/setUpCsrf'
 import setUpCurrentUser from './middleware/setUpCurrentUser'
@@ -36,9 +38,11 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpAuthentication())
-  app.use(authorisationMiddleware())
+  app.use(authorisationMiddleware(['VIEW_INTERNAL_LOCATION']))
   app.use(setUpCsrf())
+  app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser())
+  app.use(buildBreadcrumbs())
 
   app.use(routes(services))
 

@@ -54,7 +54,7 @@ export default class RestClient {
     responseType = '',
     raw = false,
   }: Request): Promise<Response> {
-    logger.info(`${this.name} GET: ${path}`)
+    logger.info(`${this.name} GET: ${this.apiUrl()}${path}`)
     try {
       const result = await superagent
         .get(`${this.apiUrl()}${path}`)

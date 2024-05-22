@@ -7,10 +7,10 @@
   "scripts": {
     "prepare": "husky install",
     "copy-views": "cp -R server/views dist/server/",
-    "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules/govuk-frontend/dist --load-path=node_modules/@ministryofjustice/frontend --load-path=. assets/scss/application.scss:./assets/stylesheets/application.css  assets/scss/application-ie8.scss:./assets/stylesheets/application-ie8.css --style compressed",
+    "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules/govuk-frontend/dist --load-path=node_modules/@ministryofjustice/frontend --load-path=. assets/scss/application.scss:./assets/stylesheets/application.css --style compressed",
     "watch-ts": "tsc -w",
     "watch-views": "nodemon --watch server/views -e html,njk -x npm run copy-views",
-    "watch-node": "DEBUG=gov-starter-server* nodemon -r dotenv/config --watch dist/ dist/server.js | bunyan -o short",
+    "watch-node": "DEBUG=gov-starter-server* nodemon -r dotenv/config -r source-map-support/register --watch dist/ dist/server.js | bunyan -o short",
     "watch-sass": "npm run compile-sass -- --watch",
     "build": "npm run compile-sass && tsc && npm run copy-views",
     "start": "node $NODE_OPTIONS dist/server.js | bunyan -o short",
@@ -118,6 +118,7 @@
     "passport-oauth2": "^1.8.0",
     "prom-client": "^15.1.2",
     "redis": "^4.6.13",
+    "source-map-support": "^0.5.21",
     "superagent": "^9.0.2",
     "url-value-parser": "^2.2.0",
     "uuid": "^9.0.1"
