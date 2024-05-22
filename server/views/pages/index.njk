@@ -1,12 +1,24 @@
 {% extends "../partials/layout.njk" %}
 
+{% from "../partials/auth-card.njk" import authCard %}
+
 {% set pageTitle = applicationName + " - Home" %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block content %}
 
-  <h1>This site is under construction...</h1>
-  <p>Please check back later when there is content to view.</p>
-  <p id="timestamp">The time is currently {{ currentTime }}</p>
+  <h1>Residential locations</h1>
+
+  <div class="body-tiles">
+    {% for rowIndex in range(0, cards.length / 3) -%}
+      <div class="govuk-grid-row auth-card-group">
+        {% for cardIndex in range(rowIndex *  3, rowIndex * 3 + 3) -%}
+          {% if cardIndex < cards.length %}
+            {{ authCard(cards[cardIndex]) }}
+          {%- endif %}
+        {%- endfor %}
+      </div>
+    {%- endfor %}
+  </div>
 
 {% endblock %}

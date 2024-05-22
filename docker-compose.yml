@@ -121,6 +121,8 @@ services:
       - manage-users-api
       - hmpps-auth
       - locations-inside-prison-api
+    profiles:
+      - include-frontend
     ports:
       - "3000:3000"
     healthcheck:
@@ -139,8 +141,9 @@ services:
       - SESSION_SECRET=somesecretvalue
       - TOKEN_VERIFICATION_API_URL=http://hmpps-auth:8080/auth
       - TOKEN_VERIFICATION_ENABLED=false
-      - TOKEN_VERIFICATION_API_URL=http://localhost:8080
       - INGRESS_URL=http://localhost:3000
+      - COMPONENT_API_URL=http://not-used-in-local-dev
+      - COMMON_COMPONENTS_ENABLED=false
       - NO_HTTPS=true
 
 networks:

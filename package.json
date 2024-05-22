@@ -98,6 +98,7 @@
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
     "redis": "^4.7.0",
+    "source-map-support": "^0.5.21",
     "superagent": "^10.2.0"
   },
   "devDependencies": {
