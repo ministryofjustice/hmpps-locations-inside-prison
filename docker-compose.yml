@@ -98,6 +98,16 @@ services:
       - POSTGRES_USER=locations_inside_prison
       - POSTGRES_DB=locations_inside_prison
 
+  redis:
+    image: 'redis:7.0'
+    networks:
+      - hmpps
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'
+
   app:
     build:
       context: .
@@ -115,12 +125,11 @@ services:
       - "3000:3000"
     environment:
       - PRODUCT_ID=UNASSIGNED
-      - REDIS_HOST=localhost
-      - REDIS_ENABLED=false
+      - REDIS_HOST=redis
+      - REDIS_ENABLED=true
       - HMPPS_AUTH_EXTERNAL_URL=http://localhost:8080/auth
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
       - MANAGE_USERS_API_URL=http://manage-users-api:8080
-      # These will need to match new creds in the seed auth service auth
       - API_CLIENT_ID=hmpps-locations-inside-prison
       - API_CLIENT_SECRET=clientsecret
       - SYSTEM_CLIENT_ID=hmpps-locations-inside-prison-system
