@@ -28,20 +28,31 @@ Additional tools are required to manage deployment: `kubectl` and `helm`.
 
 This is the easiest way to run and develop on your machine: by hooking into services that already exist
 in the `dev` environment.
-A user account is needed in hmpps-auth with the appropriate roles.
 
-Copy the `.env.sample` file to `.env` following the instructions in the file.
+Run the application in development mode:
 
-Run the application in development mode, in separate shell sessions:
-
-TODO: update how to start the service
+* in separate shell sessions, for local development
+  * This will automatically restart it if server code or front-end assets are modified.
 
 ```shell
-docker compose -f docker-compose-test.yml up
+cp .env.sample .env
+docker compose -f docker-compose.yml up
 npm run start:dev
 ```
 
-This will automatically restart it if server code or front-end assets are modified.
+* all in one, for preview:
+
+```shell
+docker compose -f docker-compose.yml --profile include-frontend up
+```
+
+#### Dev logins
+| username          | password       | roles                                                                                   |
+|-------------------|----------------|-----------------------------------------------------------------------------------------|
+| LOCATION_RO       | password123456 | VIEW_INTERNAL_LOCATION                                                                  |
+| LOCATION_CAP      | password123456 | VIEW_INTERNAL_LOCATION<br/>MANAGE_RES_LOCATIONS_OP_CAP                                  |
+| LOCATION_MAINTAIN | password123456 | VIEW_INTERNAL_LOCATION<br/>MANAGE_RES_LOCATIONS_OP_CAP<br/>MANAGE_RESIDENTIAL_LOCATIONS |
+
 
 ### Updating dependencies
 
