@@ -6,7 +6,7 @@ services:
       - hmpps
     container_name: hmpps-auth
     ports:
-      - "9090:8080"
+      - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
     environment:
@@ -30,13 +30,37 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
+  manage-users-api:
+    image: quay.io/hmpps/hmpps-manage-users-api:latest
+    container_name: manage-users-api
+    networks:
+      - hmpps
+    depends_on:
+      - nomis-user-roles-api
+      - hmpps-auth
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - HMPPS_AUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth
+      - HMPPS_AUTH_EXTERNAL_ENDPOINT_URL=http://localhost:8080/auth
+      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
+
   locations-inside-prison-api:
     image: quay.io/hmpps/hmpps-locations-inside-prison-api:latest
     container_name: locations-inside-prison-api
+    depends_on:
+      - manage-users-api
+      - hmpps-auth
+      - locations-inside-prison-db
+      - localstack
     networks:
       - hmpps
     ports:
-      - "8080:8080"
+      - "8090:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
     environment:
@@ -83,6 +107,10 @@ services:
         GIT_BRANCH: main
     networks:
       - hmpps
+    depends_on:
+      - manage-users-api
+      - hmpps-auth
+      - locations-inside-prison-api
     ports:
       - "3000:3000"
     healthcheck:
@@ -91,9 +119,9 @@ services:
       - PRODUCT_ID=UNASSIGNED
       - REDIS_ENABLED=false
       - REDIS_HOST=localhost
-      - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
+      - HMPPS_AUTH_EXTERNAL_URL=http://localhost:8080/auth
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
-      - MANAGE_USERS_API_URL=http://localhost:8080
+      - MANAGE_USERS_API_URL=http://manage-users-api:8080
       # These will need to match new creds in the seed auth service auth
       - AUTH_CODE_CLIENT_ID=hmpps-locations-inside-prison
       - AUTH_CODE_CLIENT_SECRET=clientsecret
