@@ -1,0 +1,58 @@
+{% from "./summaryCard.njk" import summaryCard %}
+
+{% macro miniSummary(miniSummary) %}
+  {%- call summaryCard({title: miniSummary.heading}) -%}
+    <div class="govuk-grid-row card-body {{ 'hmpps-summary-card__no-header' if not miniSummary.heading }}">
+      <div class="govuk-grid-column-full">
+        {% if miniSummary.topLabel %}
+          <h3 class="govuk-body card-label">
+            {{ miniSummary.topLabel }}
+          </h3>
+        {% endif %}
+        {% if miniSummary.topContent !== undefined %}
+          <p
+              class="govuk-body hmpps-mini-card__{{ miniSummary.topClass }} {{ 'hmpps-mini-card__filler' if miniSummary.topClass === 'small' }}"
+          >
+            {{ miniSummary.topContent if miniSummary.topContent !== undefined else '&nbsp;' | safe }}
+          </p>
+        {% endif %}
+        <h3 class="govuk-body card-label">
+          {{ miniSummary.bottomLabel }}
+        </h3>
+        <p
+            class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}"  data-qa="bottom-content-line-1"
+        >
+          {% if miniSummary.bottomContentLine1Href %}
+            <a href="{{ miniSummary.bottomContentLine1Href }}" class="govuk-link govuk-link--no-visited-state">
+              {{ miniSummary.bottomContentLine1 }}
+            </a>
+          {% else %}
+            {{ miniSummary.bottomContentLine1 }}
+          {% endif %}
+        </p>
+        {% if miniSummary.bottomContentLine2 !== undefined %}
+          <p
+              class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}"
+          >
+            {{ miniSummary.bottomContentLine2 }}
+          </p>
+        {% endif %}
+        {% if miniSummary.bottomContentLine3 !== undefined %}
+          <p class="govuk-body hmpps-mini-card__sub-text">
+            {{ miniSummary.bottomContentLine3 }}
+          </p>
+        {%- endif -%}
+        {% if miniSummary.bottomContentError !== undefined %}
+          <p class="govuk-body hmpps-mini-card__error">
+            {{ miniSummary.bottomContentError }}
+          </p>
+        {%- endif -%}
+        <p class="govuk-body hmpps-mini-card__link">
+          <a href="{{ miniSummary.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
+            {{ miniSummary.linkLabel }}
+          </a>
+        </p>
+      </div>
+    </div>
+  {%- endcall -%}
+{% endmacro %}

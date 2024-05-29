@@ -1,24 +1,25 @@
 {% extends "../partials/layout.njk" %}
 
-{% from "../partials/auth-card.njk" import authCard %}
+{% from "../macros/card.njk" import card %}
 
-{% set pageTitle = applicationName + " - Home" %}
-{% set mainClasses = "app-container govuk-body" %}
+{% set title = applicationName %}
+
+{% block head %}
+  {{ super() }}
+
+  <script src="/assets/js/card.js"></script>
+{% endblock %}
 
 {% block content %}
-
-  <h1>Residential locations</h1>
-
   <div class="body-tiles">
-    {% for rowIndex in range(0, cards.length / 3) -%}
-      <div class="govuk-grid-row auth-card-group">
-        {% for cardIndex in range(rowIndex *  3, rowIndex * 3 + 3) -%}
-          {% if cardIndex < cards.length %}
-            {{ authCard(cards[cardIndex]) }}
-          {%- endif %}
+    <div class="govuk-width-container">
+      <div class="card-group govuk-grid-row">
+        {% for cardDetails in cards -%}
+          <div class="govuk-grid-column-one-third card-group__item">
+            {{ card(cardDetails) }}
+          </div>
         {%- endfor %}
       </div>
-    {%- endfor %}
+    </div>
   </div>
-
 {% endblock %}

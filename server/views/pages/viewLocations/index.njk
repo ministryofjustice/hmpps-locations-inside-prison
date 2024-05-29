@@ -1,0 +1,78 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% from "../../macros/miniSummary.njk" import miniSummary %}
+
+{% set title = "View and update locations" %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <h2 class="govuk-heading-m">Overall establishment capacity</h2>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
+        <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
+          <div class="govuk-grid-column-one-quarter" data-qa="working-capacity-card">
+            {{ miniSummary({bottomLabel: "Working capacity", bottomClass: 'big', bottomContentLine1: residentialSummary.prisonSummary.workingCapacity}) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter" data-qa="signed-operational-capacity-card">
+            {{ miniSummary({bottomLabel: "Signed operational capacity", bottomClass: 'big', bottomContentLine1: residentialSummary.prisonSummary.signedOperationalCapacity}) }}
+          </div>
+          <div class="govuk-grid-column-one-quarter" data-qa="maximum-capacity-card">
+            {{ miniSummary({bottomLabel: "Maximum capacity", bottomClass: 'big', bottomContentLine1: residentialSummary.prisonSummary.maxCapacity}) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{ govukDetails({
+      summaryText: "What the different types of capacity mean",
+      html: "<strong>Maximum capacity</strong><br>" +
+      "The maximum capacity is the total number of people an establishment could hold if all potential spaces (including care and separation units and healthcare) are used for residential locations.<br><br>" +
+      "<strong>Signed operational capacity</strong><br>" +
+      "The signed operational capacity is approved by the prison governor. It is the establishment's maximum capacity minus the capacity of cells that are long term out of action or are not typically used for someone to live in permanently (for example care and separation units or healthcare).<br><br>" +
+      "<strong>Working capacity</strong><br>" +
+      "The working capacity is the operational capacity of all normal accommodation cells minus the capacity of any short term out of action normal accommodation cells."
+    }) }}
+
+    {% set rows = [] %}
+
+    {% for item in residentialSummary.subLocations %}
+      {% set rows = (rows.push(
+        [
+          { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + item.pathHierarchy + "</a>" },
+          { text: govukTag({
+            text: item.status | title
+          }) },
+          { text: item.capacity.workingCapacity },
+          { text: item.capacity.maxCapacity },
+          { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "/inactive-cells'>" + item.inactiveCells + "</a>" } if item.inactiveCells > 0 else { text: '0' },
+          { html: item.accommodationTypes | join('<br>') },
+          { html: item.usedFor | join('<br>') }
+        ]
+      ), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      attributes: {
+        "data-qa": "locations-table"
+      },
+      caption: residentialSummary.subLocationName,
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Location" },
+        { text: "Status" },
+        { text: "Working capacity" },
+        { text: "Maximum capacity" },
+        { text: "Inactive cells" },
+        { text: "Accommodation type" },
+        { text: "Used for" }
+      ],
+      rows: rows
+    }) }}
+  </div>
+{% endblock %}

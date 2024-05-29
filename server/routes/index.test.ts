@@ -30,8 +30,8 @@ describe('GET /', () => {
       .get('/')
       .expect('Content-Type', /html/)
       .expect(res => {
-        // Check that back link is present instead of breadcrumbs
-        expect(res.text).toContain('class="govuk-back-link"')
+        // Check that breadcrumbs are present
+        expect(res.text).toContain('govuk-breadcrumbs')
 
         // Test the tiles
         expect(res.text).toContain('View and update locations')
@@ -39,7 +39,7 @@ describe('GET /', () => {
         expect(res.text).toContain('Archived locations')
         expect(res.text).toContain('Residential location history')
 
-        expect(auditService.logPageView).toHaveBeenCalledWith(Page.EXAMPLE_PAGE, {
+        expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
           who: user.username,
           correlationId: expect.any(String),
         })

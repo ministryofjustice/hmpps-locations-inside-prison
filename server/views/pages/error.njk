@@ -1,11 +1,13 @@
 {% extends "../partials/layout.njk" %}
 
-{% set pageTitle = applicationName + " - Error" %}
-{% set mainClasses = "app-container govuk-body" %}
+{% set title = message %}
 
-{% block content %}
+{% block pageTitle %}{{ applicationName }} - Error{% endblock %}
 
-  <h1>{{ message }}</h1>
+{% block beforeContent %}
+
+  {{ super() }}
+
   <h2>{{ status }}</h2>
   <pre>{{ stack }}</pre>
 

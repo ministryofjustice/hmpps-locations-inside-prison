@@ -2,13 +2,11 @@
 
 {% macro breadcrumb(pageTitle, breadcrumbList, displayCurrentPageTitle="true") %}
 
-  {% set rows = [ {
-    text: "Digital Prison Services",
-    href: dpsUrl
-    } ]
-  %}
+  {% set rows = [] %}
 
-  {% for item in breadcrumbList %}
+  {% for itemIndex in range(0, breadcrumbList.length - 1) -%}
+    {% set item = breadcrumbList[itemIndex] %}
+
     {% set rows = (rows.push(
       {
         text: item.title,

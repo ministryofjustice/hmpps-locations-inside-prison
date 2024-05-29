@@ -8,7 +8,7 @@ import { appInsightsMiddleware } from './utils/azureAppInsights'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import { metricsMiddleware } from './monitoring/metricsApp'
 
-import buildBreadcrumbs from './middleware/buildBreadcrumbs'
+import addBreadcrumb from './middleware/addBreadcrumb'
 import getFrontendComponents from './middleware/getFeComponents'
 import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpCsrf from './middleware/setUpCsrf'
@@ -42,7 +42,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser())
-  app.use(buildBreadcrumbs())
+  app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
 
   app.use(routes(services))
 
