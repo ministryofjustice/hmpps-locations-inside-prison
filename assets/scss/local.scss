@@ -1,90 +1,16 @@
-.body-tiles {
-  margin-left: -21.8vw;
-  margin-right: -21.8vw;
-  padding: 30px 21.8vw;
-  background: #f0f4f5;
-  margin-bottom: -60px;
+body {
+  margin: 0;
 }
 
-/** card copied from prison staff hub **/
-.auth-card {
-  margin-bottom: 40px;
-  background: #fff;
-  border: 1px solid #d9dadb;
-  position: relative;
-  width: 100%;
-  padding: 25px;
+.govuk-main-wrapper {
+  min-height: 600px;
+}
 
-  &__heading {
-    margin-top: 0;
-    margin-bottom: 15px;
-  }
-
-  &__description {
-    margin-bottom: 0;
-  }
-
-  &--clickable {
-    border-bottom-width: 5px;
-
-    &:hover, &:active {
-      cursor: pointer;
-      border-color: #b1b4b6;
-
-      &:active {
-        bottom: -1px
-      }
-
-      .auth-card__heading a, .auth-card__link {
-        color: #003078;
-        text-decoration: none;
-
-        &:focus {
-          outline: 3px solid transparent;
-          color: #0b0c0c;
-          background-color: #fd0;
-          box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
-          text-decoration: none;
-        }
-      }
-    }
-  }
-
-  &-group {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 15px;
-    padding: 0;
-
-
-    @media(max-width: 48.0525em) {
-      margin-bottom: 30px
-    }
-
-    &__item {
-      display: flex;
-      list-style-type: none;
-      margin-bottom: 0;
-
-      @media(max-width: 48.0525em) {
-        flex: 0 0 100%;
-      }
-
-      .auth-card {
-        margin-bottom: 25px;
-
-        @media(max-width: 48.0525em) {
-          .auth-card-group__item .auth-card {
-            margin-bottom: 15px
-          }
-        }
-      }
-
-      &:last-child .auth-card {
-        @media(max-width: 48.0525em) {
-          margin-bottom: 0
-        }
-      }
-    }
-  }
+.body-tiles {
+  margin-left: -51.8vw;
+  margin-right: -51.8vw;
+  margin-bottom: -40px;
+  background: #f0f4f5;
+  min-height: 500px;
+  padding: 30px 51.8vw 40px;
 }

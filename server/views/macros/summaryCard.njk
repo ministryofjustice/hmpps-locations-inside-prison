@@ -1,0 +1,12 @@
+{% macro summaryCard(params) %}
+  <div class="hmpps-summary-card {{ params.classes if params.classes }}" id="{{params.id | default('')}}">
+    {% if params.title %}
+      <div class="hmpps-summary-card__header" data-qa="summary-header">
+        <h2>{{ params.title }}</h2>
+      </div>
+    {% endif %}
+    <div class="hmpps-summary-card__body">
+      {{ caller() }}
+    </div>
+  </div>
+{% endmacro %}

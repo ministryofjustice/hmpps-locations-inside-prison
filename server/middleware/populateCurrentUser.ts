@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import { jwtDecode } from 'jwt-decode'
 import logger from '../../logger'
 import { convertToTitleCase } from '../utils/utils'
+import { dataAccess } from '../data'
 
 export default function populateCurrentUser(): RequestHandler {
   return async (req, res, next) => {
@@ -15,13 +16,17 @@ export default function populateCurrentUser(): RequestHandler {
         user_id?: string
         authorities?: string[]
       }
+      const { manageUsersApiClient } = dataAccess()
 
+      const caseloadsData = await manageUsersApiClient.users.me.getCaseloads(res.locals.user.token)
       res.locals.user = {
         ...res.locals.user,
         userId,
         name,
         displayName: `${convertToTitleCase(name)}`,
         userRoles: roles.map(role => role.substring(role.indexOf('_') + 1)),
+        activeCaseload: caseloadsData.activeCaseload,
+        caseloads: caseloadsData.caseloads,
       }
 
       if (res.locals.user.authSource === 'nomis') {

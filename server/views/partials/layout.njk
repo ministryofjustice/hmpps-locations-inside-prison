@@ -1,7 +1,10 @@
 {% extends "govuk/template.njk" %}
 
-{% from "./breadcrumb.njk" import breadcrumb %}
+{% from "../macros/breadcrumb.njk" import breadcrumb %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% set pageTitle = title if title === applicationName else applicationName + ' - ' + title %}
+{% set mainClasses = "app-container govuk-body" %}
 
 {% block head %}
   <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet"/>
@@ -43,15 +46,20 @@
 {% endblock %}
 
 
-{% block beforeContent %}
-  {% if breadcrumbs | length %}
-    {{ breadcrumb('', breadcrumbs, false) }}
-  {% else %}
-    {{ govukBackLink({
-      text: "Digital Prison Services",
-      href: dpsUrl
-    }) }}
-  {% endif %}
+{% block main %}
+  {% block beforeContent %}
+    <div class="govuk-width-container">
+      {{ breadcrumb('', breadcrumbs, false) }}
+    </div>
+  {% endblock %}
+
+  <main class="govuk-main-wrapper" id="main-content" role="main">
+    <div class="govuk-width-container">
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+    </div>
+
+    {% block content %}{% endblock %}
+  </main>
 {% endblock %}
 
 {% block bodyEnd %}

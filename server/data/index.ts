@@ -12,12 +12,13 @@ buildAppInsightsClient(applicationInfo)
 
 import HmppsAuthClient from './hmppsAuthClient'
 import ManageUsersApiClient from './manageUsersApiClient'
-import { createRedisClient } from './redisClient'
-import RedisTokenStore from './tokenStore/redisTokenStore'
-import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
+import { redisClient } from './redisClient'
 import config from '../config'
 import FeComponentsClient from './feComponentsClient'
 import HmppsAuditClient from './hmppsAuditClient'
+import LocationsApiClient from './locationsApiClient'
+import RedisTokenStore from './tokenStore/redisTokenStore'
+import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
 
 type RestClientBuilder<T> = (token: string) => T
 
@@ -25,12 +26,21 @@ export const dataAccess = () => ({
   applicationInfo,
   feComponentsClient: new FeComponentsClient(),
   hmppsAuthClient: new HmppsAuthClient(
-    config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
+    config.redis.enabled ? new RedisTokenStore(redisClient) : new InMemoryTokenStore(),
   ),
   hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
+  locationsApiClient: new LocationsApiClient(redisClient),
   manageUsersApiClient: new ManageUsersApiClient(),
+  redisClient,
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
-export { FeComponentsClient, HmppsAuditClient, HmppsAuthClient, ManageUsersApiClient, RestClientBuilder }
+export {
+  FeComponentsClient,
+  HmppsAuditClient,
+  HmppsAuthClient,
+  LocationsApiClient,
+  ManageUsersApiClient,
+  RestClientBuilder,
+}

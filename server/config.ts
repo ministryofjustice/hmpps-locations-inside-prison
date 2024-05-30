@@ -90,6 +90,14 @@ export default {
       systemClientId: get('SYSTEM_CLIENT_ID', 'clientid', requiredInProduction),
       systemClientSecret: get('SYSTEM_CLIENT_SECRET', 'clientsecret', requiredInProduction),
     },
+    locationsApi: {
+      url: get('LOCATIONS_API_URL', 'http://localhost:9092', requiredInProduction),
+      timeout: {
+        response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 10000))),
+    },
     manageUsersApi: {
       url: get('MANAGE_USERS_API_URL', 'http://localhost:9091', requiredInProduction),
       timeout: {
@@ -111,6 +119,7 @@ export default {
   sqs: {
     audit: auditConfig(),
   },
+  dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
 }

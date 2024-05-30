@@ -20,7 +20,7 @@ context('Sign In', () => {
       Page.verifyOnPage(AuthSignInPage)
     })
 
-    it('User name visible in header', () => {
+    it('Error header is visible', () => {
       cy.signIn({ failOnStatusCode: false })
       cy.get('h1').contains('Authorisation Error')
     })
@@ -30,7 +30,8 @@ context('Sign In', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
-      cy.task('stubManageUser')
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -52,7 +53,7 @@ context('Sign In', () => {
     it('Phase banner visible in header', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
-      indexPage.headerPhaseBanner().should('contain.text', 'dev')
+      indexPage.headerPhaseBanner().should('contain.text', 'TEST')
     })
 
     it('User can sign out', () => {

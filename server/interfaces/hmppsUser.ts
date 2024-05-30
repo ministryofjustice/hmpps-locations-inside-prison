@@ -1,10 +1,14 @@
+import { Caseload } from '../data/manageUsersApiClient'
+
 export type AuthSource = 'nomis' | 'delius' | 'external' | 'azuread'
 
 /**
  * These are the details that all user types share.
  */
 export interface BaseUser {
+  activeCaseload: Caseload
   authSource: AuthSource
+  caseloads: Caseload[]
   username: string
   userId: string
   name: string
