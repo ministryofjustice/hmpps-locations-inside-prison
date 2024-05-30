@@ -1,0 +1,119 @@
+.hmpps-card-heading-background {
+  h2 {
+    margin: 0;
+  }
+  @include govuk-responsive-padding(2, 'top');
+  @include govuk-responsive-padding(2, 'bottom');
+  @include govuk-responsive-padding(3, 'left');
+  @include govuk-responsive-padding(3, 'right');
+}
+
+.card-body {
+  .card-label {
+    @include govuk-responsive-margin(1, 'bottom');
+    @include govuk-font($size: 19, $weight: 'bold');
+  }
+
+  .hmpps-mini-card__big {
+    font-size: 36px;
+    line-height: 36px;
+    margin-bottom: 17px;
+  }
+
+  .hmpps-mini-card__small {
+    margin-bottom: 5px;
+
+    &.hmpps-mini-card__filler {
+      margin-bottom: 28px;
+    }
+  }
+
+  .hmpps-mini-card__sub-text {
+    margin-bottom: 10px;
+    color: govuk-colour('dark-grey');
+  }
+
+  .hmpps-mini-card__error {
+    font-weight: 700;
+    color: $govuk-error-colour;
+    margin-bottom: 10px;
+    margin-top: -5px;
+  }
+
+  .hmpps-mini-card__link {
+    margin-top: auto;
+    margin-bottom: 12px;
+  }
+}
+
+.hmpps-miniSummaryWrapper {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  gap: 23px 0;
+
+  .hmpps-summary-card {
+    height: 100%;
+    margin-bottom: 0;
+
+    &__no-header {
+      padding-top: 10px;
+    }
+
+    &__header {
+      margin-bottom: 10px;
+    }
+
+    &__body {
+      height: calc(100% - 60px);
+
+      &:has(.hmpps-summary-card__no-header) {
+        height: calc(100% - 10px);
+      }
+
+      .card-body {
+        height: 100%;
+      }
+
+      .card-body .govuk-grid-column-full {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: calc(100% + 2px);
+      }
+    }
+  }
+
+}
+
+@media (min-width: 1181px) {
+  .hmpps-miniSummaryWrapper .govuk-grid-column-one-third:nth-of-type(2) .hmpps-summary-card {
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+}
+
+
+@media (max-width: 1180px) {
+  .hmpps-miniSummaryWrapper .govuk-grid-column-one-third {
+    width: 50%;
+  }
+}
+
+@media (max-width: 751px) {
+  .hmpps-miniSummaryWrapper .govuk-grid-column-one-third {
+    width: 100%;
+  }
+}
+
+.hmpps-three-quarters-responsive {
+  @media (max-width: 751px) {
+    .hmpps-miniSummaryWrapper {
+      .govuk-grid-column-three-quarters,
+      .govuk-grid-column-one-quarter {
+        width: 50%;
+      }
+    }
+  }
+}

@@ -144,6 +144,8 @@ services:
       - INGRESS_URL=http://localhost:3000
       - COMPONENT_API_URL=http://not-used-in-local-dev
       - COMMON_COMPONENTS_ENABLED=false
+      - DPS_URL=http://localhost:3000
+      - LOCATIONS_API_URL=http://locations-inside-prison-api:8080
       - NO_HTTPS=true
 
 networks:

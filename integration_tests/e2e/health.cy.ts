@@ -3,7 +3,7 @@ context('Healthcheck', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubAuthPing')
-      cy.task('stubManageUsersPing')
+      cy.task('stubManageHealthPing')
       cy.task('stubTokenVerificationPing')
       cy.task('stubExamplePing')
     })
@@ -25,7 +25,7 @@ context('Healthcheck', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubAuthPing')
-      cy.task('stubManageUsersPing')
+      cy.task('stubManageHealthPing')
       cy.task('stubTokenVerificationPing', 500)
     })
 

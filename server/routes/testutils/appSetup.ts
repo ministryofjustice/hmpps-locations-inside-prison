@@ -22,6 +22,16 @@ export const user: HmppsUser = {
   authSource: 'nomis',
   staffId: 1234,
   userRoles: [],
+  activeCaseload: {
+    id: 'TST',
+    name: 'Test (HMP)',
+  },
+  caseloads: [
+    {
+      id: 'TST',
+      name: 'Test (HMP)',
+    },
+  ],
 }
 
 export const flashProvider = jest.fn()

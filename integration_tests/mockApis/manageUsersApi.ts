@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 
-const stubUser = (name: string = 'john smith') =>
+const stubManageUsersMe = (name: string = 'john smith') =>
   stubFor({
     request: {
       method: 'GET',
@@ -19,7 +19,7 @@ const stubUser = (name: string = 'john smith') =>
     },
   })
 
-const stubUserRoles = () =>
+const stubManageUsersMeRoles = () =>
   stubFor({
     request: {
       method: 'GET',
@@ -34,7 +34,36 @@ const stubUserRoles = () =>
     },
   })
 
-const ping = () =>
+const stubManageUsersMeCaseloads = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/manage-users-api/users/me/caseloads',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        username: 'USER1',
+        active: true,
+        accountType: 'GENERAL',
+        activeCaseload: {
+          id: 'TST',
+          name: 'TEST (HMP)',
+        },
+        caseloads: [
+          {
+            id: 'TST',
+            name: 'TEST (HMP)',
+          },
+        ],
+      },
+    },
+  })
+
+const stubManageHealthPing = () =>
   stubFor({
     request: {
       method: 'GET',
@@ -46,7 +75,8 @@ const ping = () =>
   })
 
 export default {
-  stubManageUser: stubUser,
-  stubManageUsersPing: ping,
-  stubManageUserRoles: stubUserRoles,
+  stubManageHealthPing,
+  stubManageUsersMe,
+  stubManageUsersMeCaseloads,
+  stubManageUsersMeRoles,
 }

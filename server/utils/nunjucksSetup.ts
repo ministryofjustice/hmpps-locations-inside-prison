@@ -14,7 +14,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
-  app.locals.applicationName = 'Locations Inside Prison'
+  app.locals.applicationName = 'Residential locations'
   app.locals.environmentName = config.environmentName
   app.locals.environmentNameColour = config.environmentName === 'PRE-PRODUCTION' ? 'govuk-tag--green' : ''
   let assetManifest: Record<string, string> = {}
@@ -28,7 +28,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
     }
   }
 
-  app.locals.dpsUrl = config.apis.hmppsAuth.url
+  app.locals.dpsUrl = config.dpsUrl
 
   // Cachebusting version string
   if (production) {
