@@ -12,6 +12,7 @@ generic-service:
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api.prison.service.justice.gov.uk"
     COMPONENT_API_URL: "https://frontend-components.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital.prison.service.justice.gov.uk"
+    LOCATIONS_API_URL: "https://locations-inside-prison-api.hmpps.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
 
 generic-prometheus-alerts:
