@@ -1,7 +1,5 @@
 import config from '../config'
-import RestClient from './restClient'
-import logger from '../../logger'
-import { RedisClient } from './redisClient'
+import BaseApiClient from './baseApiClient'
 
 export interface Location {
   id: string
@@ -57,72 +55,53 @@ export interface Location {
   lastModifiedDate: string
   key: string
   isResidential: boolean
+  leafLevel: boolean
+  level: number
+  sortName: string
+  planetFmReference: string
+}
+
+export interface LocationSummary {
+  id: string
+  prisonId: string
+  code: string
+  type: string
+  localName?: string
+  pathHierarchy: string
+  level: number
 }
 
 interface ResidentialSummary {
-  prisonSummary: {
+  prisonSummary?: {
     workingCapacity: number
     signedOperationalCapacity: number
     maxCapacity: number
   }
+  parentLocation?: Location
+  topLevelLocationType: string
   subLocationName: string
   subLocations: Location[]
+  locationHierarchy: LocationSummary[]
 }
 
-export default class LocationsApiClient {
-  constructor(private readonly redisClient: RedisClient) {}
-
-  private static restClient(token: string): RestClient {
-    return new RestClient('Locations Api Client', config.apis.locationsApi, token)
-  }
-
-  private apiCall<ReturnType extends object | string, Parameters extends { [k: string]: string }>({
-    path,
-    requestType,
-    options,
-  }: {
-    path: string
-    requestType: 'get' | 'post'
-    options?: {
-      cacheDuration: number
-    }
-  }) {
-    return async (token: string, parameters: Parameters = {} as never): Promise<ReturnType> => {
-      const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
-
-      const cacheDuration = options?.cacheDuration || 0
-      if (cacheDuration && this.redisClient) {
-        logger.debug(`Getting ${filledPath} from redis`)
-        const cachedResult = await this.redisClient.get(filledPath)
-
-        if (cachedResult) {
-          logger.debug(`Found ${filledPath} in redis, value: ${cachedResult}`)
-
-          if (typeof cachedResult === 'string') {
-            return JSON.parse(cachedResult)
-          }
-
-          return cachedResult as ReturnType
-        }
-      }
-
-      const result = await LocationsApiClient.restClient(token)[requestType]<ReturnType>({
-        path: filledPath,
-      })
-
-      if (cacheDuration && this.redisClient) {
-        logger.debug(`Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)}`)
-
-        await this.redisClient.set(filledPath, JSON.stringify(result), { EX: cacheDuration })
-      }
-
-      return result
-    }
+export default class LocationsApiClient extends BaseApiClient {
+  protected static config() {
+    return config.apis.locationsApi
   }
 
   constants = {
     getAccommodationTypes: this.apiCall<{ accommodationTypes: { key: string; description: string }[] }, null>({
       path: '/constants/accommodation-type',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
+    getDeactivatedReasons: this.apiCall<{ deactivatedReasons: { key: string; description: string }[] }, null>({
+      path: '/constants/deactivated-reason',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
+    getSpecialistCellTypes: this.apiCall<{ specialistCellTypes: { key: string; description: string }[] }, null>({
+      path: '/constants/specialist-cell-type',
       requestType: 'get',
       options: { cacheDuration: 86_400 },
     }),
@@ -134,8 +113,9 @@ export default class LocationsApiClient {
   }
 
   locations = {
-    getResidentialSummary: this.apiCall<ResidentialSummary, { prisonId: string }>({
+    getResidentialSummary: this.apiCall<ResidentialSummary, { prisonId: string; parentLocationId?: string }>({
       path: '/locations/residential-summary/:prisonId',
+      queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
   }

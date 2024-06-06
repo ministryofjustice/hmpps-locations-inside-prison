@@ -7,6 +7,9 @@ import { initialiseName } from './utils'
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import logger from '../../logger'
+import formatDateWithTime from '../formatters/formatDateWithTime'
+import formatDate from '../formatters/formatDate'
+import formatTime from '../formatters/formatTime'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -56,5 +59,8 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   )
 
   njkEnv.addFilter('initialiseName', initialiseName)
+  njkEnv.addFilter('formatDate', formatDate)
+  njkEnv.addFilter('formatTime', formatTime)
+  njkEnv.addFilter('formatDateWithTime', formatDateWithTime)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
 }

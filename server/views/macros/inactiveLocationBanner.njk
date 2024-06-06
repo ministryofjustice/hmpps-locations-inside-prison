@@ -1,0 +1,54 @@
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro inactiveLocationBanner(location) %}
+  {% set locationName = location.localName or location.pathHierarchy %}
+  {% set locationType = location.locationType | title %}
+  {% set inactiveHtml %}
+    <p class="govuk-notification-banner__heading">
+      {{ locationType }} {{ locationName }} is temporarily inactive
+    </p>
+
+    {{ govukSummaryList({rows:[
+      {
+        key: {
+        text: 'Reason'
+      },
+        value: {
+        text: location.deactivatedReason
+      }
+      },
+      {
+        key: {
+        text: 'Estimated reactivation date'
+      },
+        value: {
+        text: location.proposedReactivationDate | formatDate
+      }
+      },
+      {
+        key: {
+        text: 'Planet FM reference number'
+      },
+        value: {
+        text: location.planetFmReference
+      }
+      }
+    ]}) }}
+
+    {% if location.deactivatedDate %}
+      <span class="govuk-caption-s">Deactivated by {{ location.deactivatedBy }} on {{ location.deactivatedDate | formatDateWithTime }}.</span>
+    {% endif  %}
+    {% if location.lastModifiedDate and (location.deactivatedBy != location.lastModifiedBy or location.deactivatedDate != location.lastModifiedDate) %}
+      <span class="govuk-caption-s">Last updated by {{ location.lastModifiedBy }} on {{ location.lastModifiedDate | formatDateWithTime }}.</span>
+    {% endif  %}
+  {% endset %}
+
+  {{ govukNotificationBanner({
+    html: inactiveHtml,
+    classes: 'govuk-notification-banner__headerless',
+    attributes: {
+      'data-qa': 'inactive-location-banner'
+    }
+  }) }}
+{% endmacro %}

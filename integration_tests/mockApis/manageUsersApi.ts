@@ -1,5 +1,24 @@
 import { stubFor } from './wiremock'
 
+const stubManageUsers = (name: string = 'john smith') =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/manage-users-api/users/\\w+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        username: 'USER1',
+        active: true,
+        name,
+      },
+    },
+  })
+
 const stubManageUsersMe = (name: string = 'john smith') =>
   stubFor({
     request: {
@@ -76,6 +95,7 @@ const stubManageHealthPing = () =>
 
 export default {
   stubManageHealthPing,
+  stubManageUsers,
   stubManageUsersMe,
   stubManageUsersMeCaseloads,
   stubManageUsersMeRoles,

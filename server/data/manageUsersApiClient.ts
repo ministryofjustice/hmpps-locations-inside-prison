@@ -1,5 +1,5 @@
 import config from '../config'
-import RestClient from './restClient'
+import BaseApiClient from './baseApiClient'
 
 export interface User {
   username: string
@@ -28,21 +28,26 @@ export interface UserRole {
   roleCode: string
 }
 
-export default class ManageUsersApiClient {
-  constructor() {}
-
-  private static restClient(token: string): RestClient {
-    return new RestClient('Manage Users Api Client', config.apis.manageUsersApi, token)
+export default class ManageUsersApiClient extends BaseApiClient {
+  protected static config() {
+    return config.apis.manageUsersApi
   }
 
   users = {
     me: {
-      get(token: string) {
-        return ManageUsersApiClient.restClient(token).get<User>({ path: '/users/me' })
-      },
-      getCaseloads(token: string) {
-        return ManageUsersApiClient.restClient(token).get<UserCaseloads>({ path: '/users/me/caseloads' })
-      },
+      get: this.apiCall<User, null>({
+        path: '/users/me',
+        requestType: 'get',
+      }),
+      getCaseloads: this.apiCall<UserCaseloads, null>({
+        path: '/users/me/caseloads',
+        requestType: 'get',
+      }),
     },
+    get: this.apiCall<User, { username: string }>({
+      path: '/users/:username',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
   }
 }

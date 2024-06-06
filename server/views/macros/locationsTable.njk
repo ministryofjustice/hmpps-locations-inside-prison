@@ -1,0 +1,47 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% from "./locationStatusTag.njk" import locationStatusTag %}
+
+{% macro locationsTable(locationType, locations) %}
+  {% if locations | length %}
+    {% set rows = [] %}
+    {% set leafLevel = locations[0].leafLevel %}
+
+    {% for item in locations %}
+      {% set rows = (rows.push(
+        [
+          { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
+          { html: locationStatusTag(item) },
+          { text: 'None' if item.status == 'NON_RESIDENTIAL' else (item.capacity.workingCapacity if item.capacity.workingCapacity >= 0 else '-') },
+          { text: 'None' if item.status == 'NON_RESIDENTIAL' else (item.capacity.maxCapacity if item.capacity.maxCapacity >= 0 else '-') },
+          (
+            {
+              html: "<a href='/inactive-cells/" + item.prisonId + "/" + item.id + "'>" + item.inactiveCells + "</a>"
+            } if item.inactiveCells > 0 else { text: '0' }
+          ) if not leafLevel else { html: item.specialistCellTypes | join('<br>') },
+          { html: item.accommodationTypes | join('<br>') } if not leafLevel,
+          { html: item.usedFor | join('<br>') } if not leafLevel
+        ]
+      ), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      attributes: {
+        "data-qa": "locations-table"
+      },
+      caption: locationType,
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Location" },
+        { text: "Status" },
+        { text: "Working capacity" },
+        { text: "Maximum capacity" },
+        { text: "Inactive cells" if not leafLevel else "Cell type" },
+        { text: "Accommodation type" } if not leafLevel,
+        { text: "Used for"  if not leafLevel}
+      ],
+      rows: rows
+    }) }}
+  {% endif %}
+{% endmacro %}
