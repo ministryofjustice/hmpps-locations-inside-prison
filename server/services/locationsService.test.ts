@@ -1,4 +1,4 @@
-import { LocationsApiClient } from '../data'
+import LocationsApiClient from '../data/locationsApiClient'
 import LocationsService from './locationsService'
 
 jest.mock('../data/locationsApiClient')
@@ -10,8 +10,18 @@ describe('Locations service', () => {
   beforeEach(() => {
     locationsApiClient = new LocationsApiClient(null) as jest.Mocked<LocationsApiClient>
     locationsApiClient.constants = {
-      getAccommodationTypes: jest.fn(),
-      getUsedForTypes: jest.fn(),
+      getAccommodationTypes: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getDeactivatedReasons: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getSpecialistCellTypes: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getUsedForTypes: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
     }
     locationsApiClient.locations = {
       getResidentialSummary: jest.fn(),
@@ -19,21 +29,40 @@ describe('Locations service', () => {
     locationsService = new LocationsService(locationsApiClient)
   })
 
-  describe('getAccommodationTypes', () => {
-    it('calls the correct client function', async () => {
-      await locationsService.getAccommodationTypes('token')
+  function testConstantDataGetter(
+    apiCallName: keyof LocationsApiClient['constants'],
+    serviceCallName: keyof LocationsService,
+  ) {
+    describe(serviceCallName, () => {
+      it('calls the correct client function', async () => {
+        await locationsService[serviceCallName]('token', 'TYPE')
 
-      expect(locationsApiClient.constants.getAccommodationTypes).toHaveBeenCalledWith('token')
+        expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledWith('token')
+      })
+
+      it('returns "Unknown" if the type does not exist', async () => {
+        expect(await locationsService[serviceCallName]('token', 'TYPE')).toEqual('Unknown')
+      })
+
+      it('returns the description if the type does exist', async () => {
+        expect(await locationsService[serviceCallName]('token', 'KEY')).toEqual('description')
+      })
+
+      it('only calls the api once per request', async () => {
+        await locationsService[serviceCallName]('token', 'TYPE')
+        await locationsService[serviceCallName]('token', 'TYPE')
+        await locationsService[serviceCallName]('token', 'TYPE')
+
+        expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledWith('token')
+        expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledTimes(1)
+      })
     })
-  })
+  }
 
-  describe('getUsedForTypes', () => {
-    it('calls the correct client function', async () => {
-      await locationsService.getUsedForTypes('token')
-
-      expect(locationsApiClient.constants.getUsedForTypes).toHaveBeenCalledWith('token')
-    })
-  })
+  testConstantDataGetter('getAccommodationTypes', 'getAccommodationType')
+  testConstantDataGetter('getDeactivatedReasons', 'getDeactivatedReason')
+  testConstantDataGetter('getSpecialistCellTypes', 'getSpecialistCellType')
+  testConstantDataGetter('getUsedForTypes', 'getUsedForType')
 
   describe('getResidentialSummary', () => {
     it('calls the correct client function', async () => {

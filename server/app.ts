@@ -41,7 +41,7 @@ export default function createApp(services: Services): express.Application {
   app.use(authorisationMiddleware(['VIEW_INTERNAL_LOCATION']))
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
-  app.use(setUpCurrentUser())
+  app.use(setUpCurrentUser(services))
   app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
 
   app.use(routes(services))

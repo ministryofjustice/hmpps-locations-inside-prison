@@ -14,3 +14,38 @@ body {
   min-height: 500px;
   padding: 30px 51.8vw 40px;
 }
+
+h1.govuk-heading-l .govuk-tag {
+  vertical-align: middle;
+  margin-bottom: 5px;
+  margin-left: 2px;
+}
+
+div.govuk-grid-row {
+  margin-bottom: 24px;
+}
+
+details.govuk-details {
+  margin-top: -24px;
+}
+
+div.govuk-notification-banner.govuk-notification-banner__headerless {
+  .govuk-notification-banner__header {
+    display: none;
+  }
+}
+
+.govuk-caption-s {
+  @include govuk-font($size: 16);
+  display: block;
+  color: $govuk-secondary-text-colour;
+
+  margin-top: 16px;
+}
+
+.govuk-tag--hollow {
+  background: none;
+  border: 2px solid black;
+  color: black;
+  padding: 0 6px 1px;
+}

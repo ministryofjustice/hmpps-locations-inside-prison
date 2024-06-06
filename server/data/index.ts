@@ -30,7 +30,7 @@ export const dataAccess = () => ({
   ),
   hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
   locationsApiClient: new LocationsApiClient(redisClient),
-  manageUsersApiClient: new ManageUsersApiClient(),
+  manageUsersApiClient: new ManageUsersApiClient(redisClient),
   redisClient,
 })
 

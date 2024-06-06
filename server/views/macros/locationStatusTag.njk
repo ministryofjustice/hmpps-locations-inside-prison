@@ -1,0 +1,11 @@
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% macro locationStatusTag(location) %}
+  {{ govukTag({
+    text: location.status | title | replace('_', '-'),
+    classes: ("govuk-tag--grey" if location.status == 'INACTIVE' else ("govuk-tag--yellow" if location.status == 'NON_RESIDENTIAL' )),
+    attributes: {
+      "data-qa": "status-tag"
+    }
+  }) }}
+{% endmacro %}

@@ -1,4 +1,5 @@
 import { Factory } from 'fishery'
+
 import { Location } from '../../data/locationsApiClient'
 
 const LocationFactory = Factory.define<Location>(() => {
@@ -61,6 +62,9 @@ const LocationFactory = Factory.define<Location>(() => {
     lastModifiedDate: '2021-07-05T10:35:17',
     key: 'TST-A-1-001',
     isResidential: true,
+    leafLevel: false,
+    level: 1,
+    sortName: 'A-1-001',
   }
 })
 

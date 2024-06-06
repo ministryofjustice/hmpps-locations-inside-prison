@@ -25,9 +25,12 @@ context('View Locations Index', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
+      cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubLocationsConstantsAccommodationType')
+      cy.task('stubLocationsConstantsDeactivatedReason')
+      cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary')
     })
@@ -48,8 +51,8 @@ context('View Locations Index', () => {
       const expectedRows = [
         {
           location: {
-            text: 'A-1-001',
-            href: 'view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+            text: 'Wing A',
+            href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
           },
           status: {
             text: 'Active',
@@ -73,7 +76,7 @@ context('View Locations Index', () => {
         {
           location: {
             text: 'A-1-002',
-            href: 'view-and-update-locations/TST/7e570000-0000-0000-0000-000000000002',
+            href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000002',
           },
           status: {
             text: 'Inactive',
@@ -86,7 +89,7 @@ context('View Locations Index', () => {
           },
           inactiveCells: {
             text: '1',
-            href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000002/inactive-cells',
+            href: '/inactive-cells/TST/7e570000-0000-0000-0000-000000000002',
           },
           accommodationType: {
             text: 'Test type',
