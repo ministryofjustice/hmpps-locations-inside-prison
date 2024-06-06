@@ -14,7 +14,7 @@ export default function populateCards(): RequestHandler {
       {
         clickable: true,
         heading: 'View all inactive cells',
-        href: '/all-inactive-cells',
+        href: '/inactive-cells',
         description: 'View details of all inactive cells in the establishment and reactivate them.',
         'data-qa': 'inactive-cells-card',
       },

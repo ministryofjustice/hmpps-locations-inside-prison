@@ -1,9 +1,10 @@
 {% extends "govuk/template.njk" %}
 
-{% from "../macros/breadcrumb.njk" import breadcrumb %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
-{% set pageTitle = title if title === applicationName else applicationName + ' - ' + title %}
+{% from "../macros/breadcrumb.njk" import breadcrumb %}
+
+{% set pageTitle = title if title === applicationName else title + ' - ' + applicationName %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block head %}
@@ -55,7 +56,9 @@
 
   <main class="govuk-main-wrapper" id="main-content" role="main">
     <div class="govuk-width-container">
-      <h1 class="govuk-heading-l">{{ title }}</h1>
+      {% block heading %}
+        <h1 class="govuk-heading-l">{{ title }}</h1>
+      {% endblock %}
     </div>
 
     {% block content %}{% endblock %}

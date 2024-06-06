@@ -1,0 +1,66 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% from "../../macros/inactiveLocationBanner.njk" import inactiveLocationBanner %}
+{% from "../../macros/locationDetails.njk" import locationDetails %}
+{% from "../../macros/locationsTable.njk" import locationsTable %}
+{% from "../../macros/locationStatusTag.njk" import locationStatusTag %}
+{% from "../../macros/miniSummary.njk" import miniSummary %}
+
+{% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
+{% set locationType = residentialSummary.location.locationType | title %}
+{% set title = locationType + ' ' + locationName + ' - View and update locations' %}
+
+{% block heading %}
+  <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
+  <h1 class="govuk-heading-l">
+    {{ locationName }}
+    {% if residentialSummary.location.leafLevel and residentialSummary.location.certification and residentialSummary.location.certification.certified %}
+      {{ govukTag({
+        text: 'Certified',
+        classes: "govuk-tag--hollow",
+        attributes: {
+          "data-qa": "certified-tag"
+        }
+      }) }}
+    {% endif %}
+    {{ locationStatusTag(residentialSummary.location) }}
+  </h1>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-three-quarters">
+        {% if residentialSummary.location.status == 'INACTIVE' %}
+          {{ inactiveLocationBanner(residentialSummary.location) }}
+        {% endif %}
+
+        {% if residentialSummary.summaryCards | length %}
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
+              <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
+                {% for summary in residentialSummary.summaryCards %}
+                  <div class="govuk-grid-column-one-third" data-qa="{{ summary.type }}-card">
+                    {{ miniSummary({
+                      bottomLabel: summary.type | title | replace('-', ' '),
+                      bottomClass: 'big',
+                      bottomContentLine1: summary.text,
+                      linkHref: summary.linkHref if summary.linkHref,
+                      linkLabel: summary.linkLabel if summary.linkLabel
+                    }) }}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        {{ locationDetails(residentialSummary.location, residentialSummary.locationDetails, residentialSummary.locationHistory) }}
+      </div>
+    </div>
+
+    {{ locationsTable(residentialSummary.subLocationName, residentialSummary.subLocations) }}
+  </div>
+{% endblock %}

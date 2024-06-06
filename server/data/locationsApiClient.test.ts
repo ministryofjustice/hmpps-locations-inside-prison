@@ -64,6 +64,18 @@ describe('locationsApiClient', () => {
 
           expect(await functionCall()(token.access_token, parameters)).toEqual(cachedResponse)
         })
+      } else {
+        it('should not return data from the cache on the second call', async () => {
+          const cachedResponse = { data: 'cachedData' }
+          const response = { data: 'data' }
+
+          fakeApiClient.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, cachedResponse)
+          expect(await functionCall()(token.access_token, parameters)).toEqual(cachedResponse)
+          expect(redisClient.cache).toEqual({})
+
+          fakeApiClient.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+          expect(await functionCall()(token.access_token, parameters)).toEqual(response)
+        })
       }
     })
   }
@@ -75,6 +87,18 @@ describe('locationsApiClient', () => {
       true,
       () => apiClient.constants.getAccommodationTypes,
     )
+    testCall(
+      'getDeactivatedReasons',
+      '/constants/deactivated-reason',
+      true,
+      () => apiClient.constants.getDeactivatedReasons,
+    )
+    testCall(
+      'getSpecialistCellTypes',
+      '/constants/specialist-cell-type',
+      true,
+      () => apiClient.constants.getSpecialistCellTypes,
+    )
     testCall('getUsedForType', '/constants/used-for-type', true, () => apiClient.constants.getUsedForTypes)
   })
 
@@ -85,6 +109,13 @@ describe('locationsApiClient', () => {
       false,
       () => apiClient.locations.getResidentialSummary,
       { prisonId: 'TST' },
+    )
+    testCall(
+      'getResidentialSummary',
+      '/locations/residential-summary/TST?parentLocationId=parent-id',
+      false,
+      () => apiClient.locations.getResidentialSummary,
+      { prisonId: 'TST', parentLocationId: 'parent-id' },
     )
   })
 })

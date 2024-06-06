@@ -17,7 +17,7 @@
   .hmpps-mini-card__big {
     font-size: 36px;
     line-height: 36px;
-    margin-bottom: 17px;
+    margin-bottom: 8px;
   }
 
   .hmpps-mini-card__small {
@@ -55,7 +55,6 @@
 
   .hmpps-summary-card {
     height: 100%;
-    margin-bottom: 0;
 
     &__no-header {
       padding-top: 10px;
@@ -74,6 +73,7 @@
 
       .card-body {
         height: 100%;
+        margin-bottom: 4px;
       }
 
       .card-body .govuk-grid-column-full {

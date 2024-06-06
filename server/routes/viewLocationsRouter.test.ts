@@ -32,7 +32,7 @@ afterEach(() => {
 })
 
 describe('GET /view-and-update-locations', () => {
-  it('should redirect to /view-and-update-locations/CASELOAD', () => {
+  it('should redirect to /view-and-update-locations/PRISON_ID', () => {
     auditService.logPageView.mockResolvedValue(null)
 
     return request(app)
@@ -42,26 +42,14 @@ describe('GET /view-and-update-locations', () => {
   })
 })
 
-describe('GET /view-and-update-locations/CASELOAD', () => {
+describe('GET /view-and-update-locations/PRISON_ID', () => {
   it('should render index page', () => {
     auditService.logPageView.mockResolvedValue(null)
-    locationsService.getAccommodationTypes.mockResolvedValue({
-      accommodationTypes: [
-        {
-          key: 'TEST_AT',
-          description: 'Test Description',
-        },
-      ],
-    })
-    locationsService.getUsedForTypes.mockResolvedValue({
-      usedForTypes: [
-        {
-          key: 'TEST_UFT',
-          description: 'Test Description',
-        },
-      ],
-    })
+    locationsService.getAccommodationType.mockResolvedValue('Test Description')
+    locationsService.getUsedForType.mockResolvedValue('Test Description')
     locationsService.getResidentialSummary.mockResolvedValue({
+      topLevelLocationType: 'Wings',
+      locationHierarchy: [],
       prisonSummary: {
         workingCapacity: 95,
         signedOperationalCapacity: 102,
@@ -84,7 +72,7 @@ describe('GET /view-and-update-locations/CASELOAD', () => {
         expect(res.text).toMatch(/>\s+102\s+</)
         expect(res.text).toMatch(/>\s+100\s+</)
 
-        expect(auditService.logPageView).toHaveBeenCalledWith(Page.VIEW_LOCATIONS, {
+        expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_INDEX, {
           who: user.username,
           correlationId: expect.any(String),
         })
