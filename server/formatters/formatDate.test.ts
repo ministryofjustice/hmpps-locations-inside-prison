@@ -18,4 +18,16 @@ describe('formatDate', () => {
       expect(formatDate('an invalid date')).toEqual('an invalid date')
     })
   })
+
+  describe('when given undefined', () => {
+    it('returns ""', () => {
+      expect(formatDate(undefined)).toEqual('')
+    })
+  })
+
+  describe('when given null', () => {
+    it('returns ""', () => {
+      expect(formatDate(null)).toEqual('')
+    })
+  })
 })

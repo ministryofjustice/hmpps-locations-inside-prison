@@ -56,4 +56,16 @@ describe('formatDateWithTime', () => {
       expect(formatDateWithTime('an invalid date')).toEqual('an invalid date')
     })
   })
+
+  describe('when given undefined', () => {
+    it('returns ""', () => {
+      expect(formatDateWithTime(undefined)).toEqual('')
+    })
+  })
+
+  describe('when given null', () => {
+    it('returns ""', () => {
+      expect(formatDateWithTime(null)).toEqual('')
+    })
+  })
 })

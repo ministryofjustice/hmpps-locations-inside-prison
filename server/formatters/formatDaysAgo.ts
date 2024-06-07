@@ -4,6 +4,10 @@ export default function formatDaysAgo(dateOrString: string | Date) {
   const date = typeof dateOrString === 'string' ? parseISO(dateOrString) : dateOrString
   const today = new Date()
 
+  if (!date) {
+    return ''
+  }
+
   if (Number.isNaN(date.getTime())) {
     return dateOrString as string
   }
