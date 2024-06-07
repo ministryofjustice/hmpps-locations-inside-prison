@@ -8,6 +8,10 @@ export default function formatDateWithTime(
 ): string {
   const date = typeof dateOrString === 'string' ? parseISO(dateOrString) : dateOrString
 
+  if (!date) {
+    return ''
+  }
+
   if (Number.isNaN(date.getTime())) {
     return dateOrString as string
   }
