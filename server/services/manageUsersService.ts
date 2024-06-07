@@ -5,7 +5,11 @@ export default class ManageUsersService {
 
   async getUser(token: string, username?: string) {
     if (username) {
-      return this.manageUsersApiClient.users.get(token, { username })
+      try {
+        return await this.manageUsersApiClient.users.get(token, { username })
+      } catch (e) {
+        return null
+      }
     }
 
     return this.manageUsersApiClient.users.me.get(token)

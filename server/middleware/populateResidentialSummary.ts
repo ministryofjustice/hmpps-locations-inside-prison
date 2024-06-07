@@ -34,6 +34,7 @@ export default function populateResidentialSummary({
               manageUsersService,
               systemToken: token,
               userToken: res.locals.user.token,
+              limited: true,
             })
           }),
         ),
