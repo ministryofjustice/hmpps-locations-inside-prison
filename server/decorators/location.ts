@@ -8,27 +8,32 @@ export default async function decorateLocation({
   userToken,
   manageUsersService,
   locationsService,
+  limited = false,
 }: {
   location: Location
   systemToken: string
   userToken: string
   manageUsersService: ManageUsersService
   locationsService: LocationsService
+  limited?: boolean
 }) {
   return {
     ...location,
     accommodationTypes: await Promise.all(
       location.accommodationTypes.map(a => locationsService.getAccommodationType(systemToken, a)),
     ),
-    deactivatedBy: location.deactivatedBy
-      ? (await manageUsersService.getUser(userToken, location.deactivatedBy)).name
-      : undefined,
-    deactivatedReason: location.deactivatedReason
-      ? await locationsService.getDeactivatedReason(systemToken, location.deactivatedReason)
-      : undefined,
-    lastModifiedBy: location.lastModifiedBy
-      ? (await manageUsersService.getUser(userToken, location.lastModifiedBy)).name
-      : undefined,
+    deactivatedBy:
+      location.deactivatedBy && !limited
+        ? (await manageUsersService.getUser(userToken, location.deactivatedBy))?.name || location.deactivatedBy
+        : location.deactivatedBy,
+    deactivatedReason:
+      location.deactivatedReason && !limited
+        ? await locationsService.getDeactivatedReason(systemToken, location.deactivatedReason)
+        : location.deactivatedReason,
+    lastModifiedBy:
+      location.lastModifiedBy && !limited
+        ? (await manageUsersService.getUser(userToken, location.lastModifiedBy))?.name || location.lastModifiedBy
+        : location.lastModifiedBy,
     specialistCellTypes: await Promise.all(
       location.specialistCellTypes.map(a => locationsService.getSpecialistCellType(systemToken, a)),
     ),
