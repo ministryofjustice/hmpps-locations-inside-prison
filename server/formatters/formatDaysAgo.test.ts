@@ -55,4 +55,16 @@ describe('formatTime', () => {
       expect(formatDaysAgo('an invalid date')).toEqual('an invalid date')
     })
   })
+
+  describe('when given undefined', () => {
+    it('returns ""', () => {
+      expect(formatDaysAgo(undefined)).toEqual('')
+    })
+  })
+
+  describe('when given null', () => {
+    it('returns ""', () => {
+      expect(formatDaysAgo(null)).toEqual('')
+    })
+  })
 })
