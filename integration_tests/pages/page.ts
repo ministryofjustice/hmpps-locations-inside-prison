@@ -19,7 +19,7 @@ export default abstract class Page {
 
   checkOnPage(): void {
     cy.get('h1').contains(this.title)
-    if (!Cypress.env('SKIP_AXE') || this.skipA11y) {
+    if (!Cypress.env('SKIP_AXE') || !this.skipA11y) {
       cy.injectAxe()
       cy.configureAxe({
         rules: [
