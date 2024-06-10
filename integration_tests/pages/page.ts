@@ -8,7 +8,10 @@ export default abstract class Page {
     return new constructor()
   }
 
-  constructor(private readonly title: string) {
+  constructor(
+    private readonly title: string,
+    private readonly skipA11y = false,
+  ) {
     if (title) {
       this.checkOnPage()
     }
@@ -16,10 +19,7 @@ export default abstract class Page {
 
   checkOnPage(): void {
     cy.get('h1').contains(this.title)
-    let pageUrl: string
-    // eslint-disable-next-line no-return-assign
-    cy.url().then(url => (pageUrl = url))
-    if (!Cypress.env('SKIP_AXE') || pageUrl.includes('oauth/authorize')) {
+    if (!Cypress.env('SKIP_AXE') || this.skipA11y) {
       cy.injectAxe()
       cy.configureAxe({
         rules: [
