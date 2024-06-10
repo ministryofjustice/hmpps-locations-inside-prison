@@ -16,7 +16,10 @@ export default abstract class Page {
 
   checkOnPage(): void {
     cy.get('h1').contains(this.title)
-    if (!Cypress.env('SKIP_AXE')) {
+    let pageUrl: string
+    // eslint-disable-next-line no-return-assign
+    cy.url().then(url => (pageUrl = url))
+    if (!Cypress.env('SKIP_AXE') || pageUrl.includes('oauth/authorize')) {
       cy.injectAxe()
       cy.configureAxe({
         rules: [
