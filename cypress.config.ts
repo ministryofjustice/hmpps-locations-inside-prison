@@ -4,6 +4,7 @@ import auth from './integration_tests/mockApis/auth'
 import locationsApi from './integration_tests/mockApis/locationsApi'
 import manageUsersApi from './integration_tests/mockApis/manageUsersApi'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
+import logAccessibilityViolations from './integration_tests/support/accessibilityViolations'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -23,6 +24,7 @@ export default defineConfig({
         ...locationsApi,
         ...manageUsersApi,
         ...tokenVerification,
+        ...logAccessibilityViolations,
       })
     },
     baseUrl: 'http://localhost:3007',
