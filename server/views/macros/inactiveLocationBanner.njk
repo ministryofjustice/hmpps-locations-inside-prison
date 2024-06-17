@@ -3,7 +3,7 @@
 
 {% macro inactiveLocationBanner(location) %}
   {% set locationName = location.localName or location.pathHierarchy %}
-  {% set locationType = location.locationType | title %}
+  {% set locationType = location.locationType %}
   {% set inactiveHtml %}
     <p class="govuk-notification-banner__heading">
       {{ locationType }} {{ locationName }} is temporarily inactive

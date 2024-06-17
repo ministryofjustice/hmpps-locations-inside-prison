@@ -63,7 +63,9 @@ context('View Locations Show', () => {
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubLocationsConstantsAccommodationType')
+      cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
+      cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
     })
@@ -181,11 +183,27 @@ context('View Locations Show', () => {
         detailsRows += 1
       }
 
-      viewLocationsShowPage
-        .locationDetailsRows()
-        .eq(detailsRows)
-        .find('.govuk-summary-list__key')
-        .contains('Accommodation type')
+      if (location.status !== 'NON_RESIDENTIAL') {
+        if (location.locationType === 'CELL') {
+          viewLocationsShowPage
+            .locationDetailsRows()
+            .eq(detailsRows)
+            .find('.govuk-summary-list__key')
+            .contains('Cell type')
+        } else {
+          viewLocationsShowPage
+            .locationDetailsRows()
+            .eq(detailsRows)
+            .find('.govuk-summary-list__key')
+            .contains('Accommodation type')
+        }
+      } else {
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__key')
+          .contains('Non-residential room')
+      }
       viewLocationsShowPage
         .locationDetailsRows()
         .eq(detailsRows)
@@ -207,17 +225,19 @@ context('View Locations Show', () => {
         detailsRows += 1
       }
 
-      viewLocationsShowPage
-        .locationDetailsRows()
-        .eq(detailsRows)
-        .find('.govuk-summary-list__key')
-        .contains('Last updated')
-      viewLocationsShowPage
-        .locationDetailsRows()
-        .eq(detailsRows)
-        .find('.govuk-summary-list__value')
-        .contains('Today by john smith')
-      detailsRows += 1
+      if (!location.leafLevel) {
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__key')
+          .contains('Last updated')
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__value')
+          .contains('Today by john smith')
+        detailsRows += 1
+      }
 
       viewLocationsShowPage.locationDetailsRows().should('have.length', detailsRows)
 
@@ -407,10 +427,10 @@ context('View Locations Show', () => {
         locationType: 'CELL',
         permanentlyInactive: false,
         accommodationTypes: ['TEST_TYPE'],
-        specialistCellTypes: [],
+        specialistCellTypes: ['TEST_TYPE'],
         usedFor: [],
         status: 'ACTIVE',
-        convertedCellType: 'OFFICE',
+        convertedCellType: 'TEST_TYPE',
         active: true,
         deactivatedByParent: false,
         deactivatedReason: 'TEST_TYPE',

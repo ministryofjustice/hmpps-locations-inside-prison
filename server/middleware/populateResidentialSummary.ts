@@ -5,6 +5,49 @@ import { Location } from '../data/locationsApiClient'
 import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 
+const ignoredAccommodationTypes = ['Care and separation', 'Healthcare inpatients', 'Other', 'Unknown']
+
+type LocationDetails = { key: { text?: string; html?: string }; value: { text?: string; html?: string } }[]
+
+function getLocationDetails(location: Location) {
+  const details: LocationDetails = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
+
+  if (!location.leafLevel) {
+    details.push({ key: { text: 'Local name' }, value: { text: location.localName } })
+  }
+
+  if (location.status === 'NON_RESIDENTIAL') {
+    details.push({ key: { text: 'Non-residential room' }, value: { text: location.convertedCellType } })
+  } else if (location.locationType === 'Cell') {
+    details.push({
+      key: { text: 'Cell type' },
+      value: { text: location.specialistCellTypes.join('<br>') },
+    })
+  } else {
+    if (location.accommodationTypes.filter(type => !ignoredAccommodationTypes.includes(type)).length) {
+      details.push({
+        key: { text: 'Accommodation type' },
+        value: { html: location.accommodationTypes.join('<br>') },
+      })
+    }
+
+    if (location.accommodationTypes.includes('Normal accommodation') && location.usedFor.length) {
+      details.push({ key: { text: 'Used for' }, value: { html: location.usedFor.join('<br>') } })
+    }
+  }
+
+  if (!location.leafLevel) {
+    details.push({
+      key: { text: 'Last updated' },
+      value: {
+        text: `${formatDaysAgo(location.lastModifiedDate)} by ${location.lastModifiedBy}`,
+      },
+    })
+  }
+
+  return details
+}
+
 export default function populateResidentialSummary({
   authService,
   locationsService,
@@ -19,7 +62,7 @@ export default function populateResidentialSummary({
       const apiData = await locationsService.getResidentialSummary(token, prisonId, req.params.locationId)
       const residentialSummary: {
         location?: Location
-        locationDetails?: { key: { text: string }; value: { text?: string; html?: string } }[]
+        locationDetails?: LocationDetails
         locationHistory?: boolean // TODO: change this type when location history tab is implemented
         subLocationName: string
         subLocations: Location[]
@@ -54,26 +97,7 @@ export default function populateResidentialSummary({
           userToken: res.locals.user.token,
         })
 
-        residentialSummary.locationDetails = [
-          { key: { text: 'Location' }, value: { text: residentialSummary.location.pathHierarchy } },
-          ...(!residentialSummary.location.leafLevel
-            ? [{ key: { text: 'Local name' }, value: { text: residentialSummary.location.localName } }]
-            : []),
-          {
-            key: { text: 'Accommodation type' },
-            value: { html: residentialSummary.location.accommodationTypes.join('<br>') },
-          },
-          ...(residentialSummary.location.usedFor.length
-            ? [{ key: { text: 'Used for' }, value: { html: residentialSummary.location.usedFor.join('<br>') } }]
-            : []),
-          {
-            key: { text: 'Last updated' },
-            value: {
-              text: `${formatDaysAgo(residentialSummary.location.lastModifiedDate)} by ${residentialSummary.location.lastModifiedBy}`,
-            },
-          },
-        ]
-
+        residentialSummary.locationDetails = getLocationDetails(residentialSummary.location)
         residentialSummary.locationHistory = true
 
         if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {

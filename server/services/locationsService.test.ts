@@ -13,7 +13,22 @@ describe('Locations service', () => {
       getAccommodationTypes: jest
         .fn()
         .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getConvertedCellTypes: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
       getDeactivatedReasons: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getLocationTypes: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getNonResidentialUsageTypes: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getResidentialAttributeTypes: jest
+        .fn()
+        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
+      getResidentialHousingTypes: jest
         .fn()
         .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
       getSpecialistCellTypes: jest
@@ -60,7 +75,12 @@ describe('Locations service', () => {
   }
 
   testConstantDataGetter('getAccommodationTypes', 'getAccommodationType')
+  testConstantDataGetter('getConvertedCellTypes', 'getConvertedCellType')
   testConstantDataGetter('getDeactivatedReasons', 'getDeactivatedReason')
+  testConstantDataGetter('getLocationTypes', 'getLocationType')
+  testConstantDataGetter('getNonResidentialUsageTypes', 'getNonResidentialUsageType')
+  testConstantDataGetter('getResidentialAttributeTypes', 'getResidentialAttributeType')
+  testConstantDataGetter('getResidentialHousingTypes', 'getResidentialHousingType')
   testConstantDataGetter('getSpecialistCellTypes', 'getSpecialistCellType')
   testConstantDataGetter('getUsedForTypes', 'getUsedForType')
 
