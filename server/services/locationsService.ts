@@ -19,8 +19,32 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getAccommodationTypes'))[key] || 'Unknown'
   }
 
+  async getConvertedCellType(token: string, key: string) {
+    return (await this.getConstantDataMap(token, 'getConvertedCellTypes'))[key] || 'Unknown'
+  }
+
   async getDeactivatedReason(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getDeactivatedReasons'))[key] || 'Unknown'
+  }
+
+  async getLocationType(token: string, key: string) {
+    return (await this.getConstantDataMap(token, 'getLocationTypes'))[key] || 'Unknown'
+  }
+
+  async getNonResidentialUsageType(token: string, key: string) {
+    return (await this.getConstantDataMap(token, 'getNonResidentialUsageTypes'))[key] || 'Unknown'
+  }
+
+  async getResidentialAttributeType(token: string, key: string) {
+    return (await this.getConstantDataMap(token, 'getResidentialAttributeTypes'))[key] || 'Unknown'
+  }
+
+  async getResidentialHousingType(token: string, key: string) {
+    return (await this.getConstantDataMap(token, 'getResidentialHousingTypes'))[key] || 'Unknown'
+  }
+
+  async getResidentialSummary(token: string, prisonId: string, locationId?: string) {
+    return this.locationsApiClient.locations.getResidentialSummary(token, { prisonId, parentLocationId: locationId })
   }
 
   async getSpecialistCellType(token: string, key: string) {
@@ -29,9 +53,5 @@ export default class LocationsService {
 
   async getUsedForType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getUsedForTypes'))[key] || 'Unknown'
-  }
-
-  async getResidentialSummary(token: string, prisonId: string, locationId?: string) {
-    return this.locationsApiClient.locations.getResidentialSummary(token, { prisonId, parentLocationId: locationId })
   }
 }

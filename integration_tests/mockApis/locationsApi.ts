@@ -19,6 +19,23 @@ const stubLocationsConstantsAccommodationType = () =>
     },
   })
 
+const stubLocationsConstantsConvertedCellType = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/constants/converted-cell-type',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        deactivatedReasons: [{ key: 'TEST_TYPE', description: 'Test type' }],
+      },
+    },
+  })
+
 const stubLocationsConstantsDeactivatedReason = () =>
   stubFor({
     request: {
@@ -32,6 +49,80 @@ const stubLocationsConstantsDeactivatedReason = () =>
       },
       jsonBody: {
         deactivatedReasons: [{ key: 'TEST_TYPE', description: 'Test type' }],
+      },
+    },
+  })
+
+const stubLocationsConstantsLocationType = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/constants/location-type',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        locationTypes: [
+          { key: 'WING', description: 'Wing' },
+          { key: 'LANDING', description: 'Landing' },
+          { key: 'SPUR', description: 'Spur' },
+          { key: 'CELL', description: 'Cell' },
+          { key: 'ROOM', description: 'Room' },
+        ],
+      },
+    },
+  })
+
+const stubLocationsConstantsNonResidentialUsageType = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/constants/non-residential-usage-type',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        nonResidentialUsageTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+      },
+    },
+  })
+
+const stubLocationsConstantsResidentialAttributeType = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/constants/residential-attribute-type',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        residentialAttributeTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+      },
+    },
+  })
+
+const stubLocationsConstantsResidentialHousingType = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/constants/residential-housing-type',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        residentialHousingTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
       },
     },
   })
@@ -144,7 +235,12 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
 
 export default {
   stubLocationsConstantsAccommodationType,
+  stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
+  stubLocationsConstantsLocationType,
+  stubLocationsConstantsNonResidentialUsageType,
+  stubLocationsConstantsResidentialAttributeType,
+  stubLocationsConstantsResidentialHousingType,
   stubLocationsConstantsSpecialistCellType,
   stubLocationsConstantsUsedForType,
   stubLocationsLocationsResidentialSummary,
