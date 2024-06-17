@@ -3,7 +3,7 @@
 
 {% macro locationDetails(location, details, history) %}
   {% set detailsHtml %}
-    <h3 class="govuk-heading-m">{{ location.locationType | title }} details</h3>
+    <h3 class="govuk-heading-m">{{ location.locationType }} details</h3>
 
     {{ govukSummaryList({
       rows: details,
@@ -25,7 +25,7 @@
     {{ govukTabs({
       items: [
         {
-          label: (location.locationType | title) + " details",
+          label: location.locationType + " details",
           id: 'location-details',
           panel: {
           html: detailsHtml

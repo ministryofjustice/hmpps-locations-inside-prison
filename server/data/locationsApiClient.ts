@@ -95,11 +95,44 @@ export default class LocationsApiClient extends BaseApiClient {
       requestType: 'get',
       options: { cacheDuration: 86_400 },
     }),
+    getConvertedCellTypes: this.apiCall<{ convertedCellTypes: { key: string; description: string }[] }, null>({
+      path: '/constants/converted-cell-type',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
     getDeactivatedReasons: this.apiCall<{ deactivatedReasons: { key: string; description: string }[] }, null>({
       path: '/constants/deactivated-reason',
       requestType: 'get',
       options: { cacheDuration: 86_400 },
     }),
+    getLocationTypes: this.apiCall<{ locationTypes: { key: string; description: string }[] }, null>({
+      path: '/constants/location-type',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
+    getNonResidentialUsageTypes: this.apiCall<
+      { nonResidentialUsageTypes: { key: string; description: string }[] },
+      null
+    >({
+      path: '/constants/non-residential-usage-type',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
+    getResidentialAttributeTypes: this.apiCall<
+      { residentialAttributeTypes: { key: string; description: string }[] },
+      null
+    >({
+      path: '/constants/residential-attribute-type',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
+    getResidentialHousingTypes: this.apiCall<{ residentialHousingTypes: { key: string; description: string }[] }, null>(
+      {
+        path: '/constants/residential-housing-type',
+        requestType: 'get',
+        options: { cacheDuration: 86_400 },
+      },
+    ),
     getSpecialistCellTypes: this.apiCall<{ specialistCellTypes: { key: string; description: string }[] }, null>({
       path: '/constants/specialist-cell-type',
       requestType: 'get',
