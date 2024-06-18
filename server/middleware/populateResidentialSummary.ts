@@ -21,7 +21,7 @@ function getLocationDetails(location: Location) {
   } else if (location.locationType === 'Cell') {
     details.push({
       key: { text: 'Cell type' },
-      value: { text: location.specialistCellTypes.join('<br>') },
+      value: { html: location.specialistCellTypes.join('<br>') },
     })
   } else {
     if (location.accommodationTypes.filter(type => !ignoredAccommodationTypes.includes(type)).length) {
