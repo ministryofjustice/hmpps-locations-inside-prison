@@ -102,7 +102,7 @@ export default function populateResidentialSummary({
 
         if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
           residentialSummary.summaryCards.push(
-            { type: 'working-capacity', text: residentialSummary.location.capacity.workingCapacity.toString() },
+            { type: 'working-capacity', text: residentialSummary.location.capacity.workingCapacity.toString(), linkHref: `/change-cell-capacity/${req.params.locationId}`, linkLabel: 'Change' },
             { type: 'maximum-capacity', text: residentialSummary.location.capacity.maxCapacity.toString() },
             ...(!residentialSummary.location.leafLevel
               ? [

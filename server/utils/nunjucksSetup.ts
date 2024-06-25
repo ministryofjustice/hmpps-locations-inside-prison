@@ -8,6 +8,7 @@ import config from '../config'
 import formatDateWithTime from '../formatters/formatDateWithTime'
 import formatDate from '../formatters/formatDate'
 import formatTime from '../formatters/formatTime'
+import { isFunction } from 'lodash'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -45,6 +46,19 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
       express: app,
     },
   )
+
+  function callAsMacro(name: string) {
+    const macro = this.ctx[name]
+
+    if (!isFunction(macro)) {
+      console.log(`'${name}' macro does not exist`)
+      return () => ''
+    }
+
+    return macro
+  }
+
+  njkEnv.addGlobal('callAsMacro', callAsMacro)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatDate', formatDate)

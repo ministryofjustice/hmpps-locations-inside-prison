@@ -1,6 +1,7 @@
 import express from 'express'
 
 import createError from 'http-errors'
+import cookieParser from 'cookie-parser'
 
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
@@ -31,6 +32,7 @@ export default function createApp(services: Services): express.Application {
 
   app.use(appInsightsMiddleware())
   app.use(metricsMiddleware)
+  app.use(cookieParser())
   app.use(setUpHealthChecks(services.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())

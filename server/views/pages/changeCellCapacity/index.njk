@@ -1,0 +1,60 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% from "../../macros/locationsTable.njk" import locationsTable %}
+{% from "../../macros/miniSummary.njk" import miniSummary %}
+
+{% set title = "Change cell capacity" %}
+
+{% block content %}
+  {% set formMethod = options.method | default('post') %}
+  {% set formAction = options.action | default('') %}
+  {% set formEnctype = options.enctype | default('') %}
+
+  <div class="govuk-width-container">
+    <h2 class="govuk-heading-m">Change cell capacity</h2>
+  </div>
+
+  <form method="{{ formMethod }}" action="{{ formAction }}"
+  {% if formEnctype %}
+    enctype="{{ formEnctype }}"
+  {% endif %}
+  >
+
+    {% if formMethod == 'post' %}
+      <input type="hidden" name="_csrf" value="blah">
+    {% endif %}
+
+    {% block fields %}
+      {% for key, fieldsOptions in options.fields %}
+        {% if fieldsOptions.component and not fieldsOptions.skip %}
+          {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+        {% endif %}
+      {% endfor %}
+    {% endblock %}
+
+    <div class="govuk-button-group">
+      {% block formActions %}
+        {% block submitAction %}
+          {{ govukButton({
+            text: "Submit",
+            classes: options.buttonClasses,
+            preventDoubleClick: true,
+            type: "submit"
+          }) }}
+        {% endblock %}
+
+        {% block cancelAction %}
+          {% if cancelUrl %}
+            <a href="{{ cancelUrl }}" class="govuk-link">
+              Cancel
+            </a>
+          {% endif %}
+        {% endblock %}
+      {% endblock %}
+    </div>
+  </form>
+{% endblock %}
