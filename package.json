@@ -78,7 +78,7 @@
     "@ministryofjustice/hmpps-auth-clients": "^0.0.1-alpha.4",
     "@ministryofjustice/hmpps-monitoring": "^0.0.1-beta.2",
     "@ministryofjustice/hmpps-rest-client": "^0.0.1-alpha.5",
-    "applicationinsights": "^3.0.1",
+    "applicationinsights": "^2.9.5",
     "axe-core": "^4.7.2",
     "body-parser": "^2.2.0",
     "bunyan": "^1.8.15",
