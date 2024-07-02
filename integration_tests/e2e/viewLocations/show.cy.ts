@@ -190,26 +190,38 @@ context('View Locations Show', () => {
             .eq(detailsRows)
             .find('.govuk-summary-list__key')
             .contains('Cell type')
-        } else {
           viewLocationsShowPage
             .locationDetailsRows()
             .eq(detailsRows)
-            .find('.govuk-summary-list__key')
-            .contains('Accommodation type')
+            .find('.govuk-summary-list__value')
+            .contains('Test type')
+          detailsRows += 1
         }
+
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__key')
+          .contains('Accommodation type')
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__value')
+          .contains('Test type')
+        detailsRows += 1
       } else {
         viewLocationsShowPage
           .locationDetailsRows()
           .eq(detailsRows)
           .find('.govuk-summary-list__key')
           .contains('Non-residential room')
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__value')
+          .contains('Test type')
+        detailsRows += 1
       }
-      viewLocationsShowPage
-        .locationDetailsRows()
-        .eq(detailsRows)
-        .find('.govuk-summary-list__value')
-        .contains('Test type')
-      detailsRows += 1
 
       if (location.usedFor.length) {
         viewLocationsShowPage
