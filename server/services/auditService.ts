@@ -4,6 +4,7 @@ export enum Page {
   INDEX = 'INDEX',
   LOCATIONS_INDEX = 'LOCATIONS_INDEX',
   LOCATIONS_SHOW = 'LOCATIONS_SHOW',
+  INACTIVE_CELLS = 'INACTIVE_CELLS',
 }
 
 export interface PageViewEventDetails {

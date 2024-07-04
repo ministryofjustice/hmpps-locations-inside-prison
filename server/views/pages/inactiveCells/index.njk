@@ -1,0 +1,47 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
+{% set locationType = residentialSummary.location.locationType %}
+{% set title = locationType + ' ' + locationName + ' - Inactive cells - View and update locations' if locationHierarchy else 'View all inactive cells' %}
+
+{% block heading %}
+  <h1 class="govuk-heading-l">
+    Inactive cells
+    <span class="govuk-caption-l">({{ inactiveCells | length }})</span>
+  </h1>
+{% endblock %}
+
+{% set rows = [] %}
+
+{% for cell in inactiveCells %}
+  {% set rows = (rows.push(
+    [
+      { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>" },
+      { text: cell.deactivatedReason },
+      { text: cell.proposedReactivationDate | formatDate },
+      { text: cell.planetFmReference or 'Not provided' },
+      { text: cell.deactivatedBy }
+    ]
+  ), rows) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    {{ govukTable({
+      attributes: {
+        "data-qa": "inactive-cells-table"
+      },
+      firstCellIsHeader: true,
+      head: [
+        { text: "Location" },
+        { text: "Reason" },
+        { text: "Estimated reactivation date" },
+        { text: "Planet FM reference number" },
+        { text: "Deactivated by" }
+      ],
+      rows: rows
+    }) }}
+  </div>
+{% endblock %}

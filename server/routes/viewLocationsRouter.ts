@@ -7,6 +7,7 @@ import { Page } from '../services/auditService'
 import type { Services } from '../services'
 import viewLocationsShow from '../controllers/viewLocations/viewLocationsShow'
 import validateCaseload from '../middleware/validateCaseload'
+import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsForLocation'
 
 const router = express.Router({ mergeParams: true })
 
@@ -17,6 +18,7 @@ const controller = (services: Services) => {
   router.get(
     '/',
     populateResidentialSummary(services),
+    populateBreadcrumbsForLocation,
     logPageView(services.auditService, Page.LOCATIONS_INDEX),
     viewLocationsIndex,
   )
@@ -24,6 +26,7 @@ const controller = (services: Services) => {
   router.get(
     '/:locationId',
     populateResidentialSummary(services),
+    populateBreadcrumbsForLocation,
     logPageView(services.auditService, Page.LOCATIONS_SHOW),
     viewLocationsShow,
   )

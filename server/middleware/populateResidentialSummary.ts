@@ -82,10 +82,9 @@ export default function populateResidentialSummary({
         summaryCards: [],
       }
 
-      res.locals.breadcrumbs.push({
-        title: apiData.topLevelLocationType,
-        href: `/view-and-update-locations/${prisonId}`,
-      })
+      res.locals.topLevelLocationType = apiData.topLevelLocationType
+      res.locals.locationHierarchy = apiData.locationHierarchy
+
       if (apiData.parentLocation) {
         residentialSummary.location = await decorateLocation({
           location: apiData.parentLocation,
@@ -118,12 +117,6 @@ export default function populateResidentialSummary({
               : []),
           )
         }
-
-        res.locals.breadcrumbs.push(
-          ...apiData.locationHierarchy.map(l => {
-            return { title: l.localName || l.code, href: `/view-and-update-locations/${l.prisonId}/${l.id}` }
-          }),
-        )
       } else if (apiData.prisonSummary) {
         residentialSummary.summaryCards.push(
           { type: 'working-capacity', text: apiData.prisonSummary.workingCapacity.toString() },

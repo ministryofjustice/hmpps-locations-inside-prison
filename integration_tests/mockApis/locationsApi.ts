@@ -1,5 +1,6 @@
 import { stubFor } from './wiremock'
 
+import { Location } from '../../server/data/locationsApiClient'
 import LocationFactory from '../../server/testutils/factories/location'
 
 const stubLocationsConstantsAccommodationType = () =>
@@ -233,6 +234,36 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
     },
   })
 
+const stubLocationsPrisonInactiveCells = (locations: Location[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/prison/\\w+/inactive-cells',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: locations,
+    },
+  })
+
+const stubLocationsPrisonInactiveCellsForLocation = (locations: Location[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/prison/\\w+/inactive-cells\\?parentLocationId=[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: locations,
+    },
+  })
+
 export default {
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
@@ -245,4 +276,6 @@ export default {
   stubLocationsConstantsUsedForType,
   stubLocationsLocationsResidentialSummary,
   stubLocationsLocationsResidentialSummaryForLocation,
+  stubLocationsPrisonInactiveCells,
+  stubLocationsPrisonInactiveCellsForLocation,
 }
