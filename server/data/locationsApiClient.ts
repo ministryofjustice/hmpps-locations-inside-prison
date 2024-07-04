@@ -151,5 +151,12 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
+    prison: {
+      getInactiveCells: this.apiCall<Location[], { prisonId: string; parentLocationId?: string }>({
+        path: '/locations/prison/:prisonId/inactive-cells',
+        queryParams: ['parentLocationId'],
+        requestType: 'get',
+      }),
+    },
   }
 }

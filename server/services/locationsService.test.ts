@@ -40,6 +40,9 @@ describe('Locations service', () => {
     }
     locationsApiClient.locations = {
       getResidentialSummary: jest.fn(),
+      prison: {
+        getInactiveCells: jest.fn(),
+      },
     }
     locationsService = new LocationsService(locationsApiClient)
   })
@@ -83,6 +86,14 @@ describe('Locations service', () => {
   testConstantDataGetter('getResidentialHousingTypes', 'getResidentialHousingType')
   testConstantDataGetter('getSpecialistCellTypes', 'getSpecialistCellType')
   testConstantDataGetter('getUsedForTypes', 'getUsedForType')
+
+  describe('getInactiveCells', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getInactiveCells('token', 'TST')
+
+      expect(locationsApiClient.locations.prison.getInactiveCells).toHaveBeenCalledWith('token', { prisonId: 'TST' })
+    })
+  })
 
   describe('getResidentialSummary', () => {
     it('calls the correct client function', async () => {

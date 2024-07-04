@@ -117,5 +117,22 @@ describe('locationsApiClient', () => {
       () => apiClient.locations.getResidentialSummary,
       { prisonId: 'TST', parentLocationId: 'parent-id' },
     )
+
+    describe('prison', () => {
+      testCall(
+        'getInactiveCells',
+        '/locations/prison/TST/inactive-cells',
+        false,
+        () => apiClient.locations.prison.getInactiveCells,
+        { prisonId: 'TST' },
+      )
+      testCall(
+        'getInactiveCells',
+        '/locations/prison/TST/inactive-cells?parentLocationId=parent-id',
+        false,
+        () => apiClient.locations.prison.getInactiveCells,
+        { prisonId: 'TST', parentLocationId: 'parent-id' },
+      )
+    })
   })
 })
