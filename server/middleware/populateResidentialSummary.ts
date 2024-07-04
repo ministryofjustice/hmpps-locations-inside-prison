@@ -5,8 +5,6 @@ import { Location } from '../data/locationsApiClient'
 import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 
-const ignoredAccommodationTypes = ['Care and separation', 'Healthcare inpatients', 'Other', 'Unknown']
-
 type LocationDetails = { key: { text?: string; html?: string }; value: { text?: string; html?: string } }[]
 
 function getLocationDetails(location: Location) {
@@ -18,20 +16,20 @@ function getLocationDetails(location: Location) {
 
   if (location.status === 'NON_RESIDENTIAL') {
     details.push({ key: { text: 'Non-residential room' }, value: { text: location.convertedCellType } })
-  } else if (location.locationType === 'Cell') {
-    details.push({
-      key: { text: 'Cell type' },
-      value: { html: location.specialistCellTypes.join('<br>') },
-    })
   } else {
-    if (location.accommodationTypes.filter(type => !ignoredAccommodationTypes.includes(type)).length) {
+    if (location.locationType === 'Cell') {
       details.push({
-        key: { text: 'Accommodation type' },
-        value: { html: location.accommodationTypes.join('<br>') },
+        key: { text: 'Cell type' },
+        value: { html: location.specialistCellTypes.join('<br>') },
       })
     }
 
-    if (location.accommodationTypes.includes('Normal accommodation') && location.usedFor.length) {
+    details.push({
+      key: { text: 'Accommodation type' },
+      value: { html: location.accommodationTypes.join('<br>') },
+    })
+
+    if (location.usedFor.length) {
       details.push({ key: { text: 'Used for' }, value: { html: location.usedFor.join('<br>') } })
     }
   }
