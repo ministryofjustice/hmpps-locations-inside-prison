@@ -5,9 +5,7 @@ export default function populatePrisonId(): RequestHandler {
     res.locals.prisonId = req.params.prisonId || res.locals.user.activeCaseload.id
 
     if (!req.params.prisonId) {
-      res.redirect(
-        req.originalUrl.replace('/view-and-update-locations', `/view-and-update-locations/${res.locals.prisonId}`),
-      )
+      res.redirect(`${req.originalUrl}/${res.locals.prisonId}`.replace(/\/+/g, '/'))
       return
     }
 

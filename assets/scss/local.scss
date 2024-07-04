@@ -49,3 +49,8 @@ div.govuk-notification-banner.govuk-notification-banner__headerless {
   color: black;
   padding: 0 6px 1px;
 }
+
+h1 .govuk-caption-l {
+  @include govuk-font($size: 36, $weight: bold);
+  display: inline-block;
+}

@@ -27,6 +27,10 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getDeactivatedReasons'))[key] || 'Unknown'
   }
 
+  async getInactiveCells(token: string, prisonId: string, locationId?: string) {
+    return this.locationsApiClient.locations.prison.getInactiveCells(token, { prisonId, parentLocationId: locationId })
+  }
+
   async getLocationType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getLocationTypes'))[key] || 'Unknown'
   }

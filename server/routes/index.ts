@@ -7,6 +7,7 @@ import populateCards from '../middleware/populateCards'
 import viewLocationsRouter from './viewLocationsRouter'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import logPageView from '../middleware/logPageView'
+import inactiveCellsRouter from './inactiveCellsRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -22,6 +23,7 @@ export default function routes(services: Services): Router {
   )
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
+  router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
 
   return router
 }
