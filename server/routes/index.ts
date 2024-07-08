@@ -8,6 +8,7 @@ import viewLocationsRouter from './viewLocationsRouter'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import logPageView from '../middleware/logPageView'
 import inactiveCellsRouter from './inactiveCellsRouter'
+import archivedLocationsRouter from './archivedLocationsRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -21,9 +22,9 @@ export default function routes(services: Services): Router {
       res.render('pages/index')
     }),
   )
-
-  router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
+  router.use('/archived-locations/:prisonId?', archivedLocationsRouter(services))
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
+  router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
 
   return router
 }

@@ -1,0 +1,35 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
+{% set locationType = residentialSummary.location.locationType %}
+{% set title = 'Archived locations' %}
+
+{% set rows = [] %}
+
+{% for location in archivedLocations %}
+  {% set rows = (rows.push(
+    [
+      { text: location.pathHierarchy },
+      { text: location.locationType },
+      { text: location.deactivatedBy + ' on ' + (location.deactivatedDate | formatDate) }
+    ]
+  ), rows) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    {{ govukTable({
+      attributes: {
+        "data-qa": "archived-locations-table"
+      },
+      head: [
+        { text: "Location", classes: "govuk-!-width-one-sixth" },
+        { text: "Location type", classes: "govuk-!-width-one-sixth" },
+        { text: "Deactivated by", classes: "govuk-!-width-four-sixths" }
+      ],
+      rows: rows
+    }) }}
+  </div>
+{% endblock %}

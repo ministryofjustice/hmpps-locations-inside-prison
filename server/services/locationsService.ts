@@ -19,6 +19,10 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getAccommodationTypes'))[key] || 'Unknown'
   }
 
+  async getArchivedLocations(token: string, prisonId: string) {
+    return this.locationsApiClient.locations.prison.getArchivedLocations(token, { prisonId })
+  }
+
   async getConvertedCellType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getConvertedCellTypes'))[key] || 'Unknown'
   }

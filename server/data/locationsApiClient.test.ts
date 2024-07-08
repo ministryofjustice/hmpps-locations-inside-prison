@@ -120,6 +120,13 @@ describe('locationsApiClient', () => {
 
     describe('prison', () => {
       testCall(
+        'getArchivedLocations',
+        '/locations/prison/TST/archived',
+        false,
+        () => apiClient.locations.prison.getArchivedLocations,
+        { prisonId: 'TST' },
+      )
+      testCall(
         'getInactiveCells',
         '/locations/prison/TST/inactive-cells',
         false,
