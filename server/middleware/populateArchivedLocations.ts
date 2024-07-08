@@ -3,7 +3,7 @@ import { Services } from '../services'
 import decorateLocation from '../decorators/location'
 import logger from '../../logger'
 
-export default function populateInactiveCells({
+export default function populateArchivedLocations({
   authService,
   locationsService,
   manageUsersService,
@@ -13,8 +13,8 @@ export default function populateInactiveCells({
 
     try {
       const token = await authService.getSystemClientToken(user.username)
-      res.locals.inactiveCells = await Promise.all(
-        ((await locationsService.getInactiveCells(token, prisonId, req.params.locationId)) || []).map(location =>
+      res.locals.archivedLocations = await Promise.all(
+        ((await locationsService.getArchivedLocations(token, prisonId)) || []).map(location =>
           decorateLocation({
             location,
             systemToken: token,
@@ -27,10 +27,7 @@ export default function populateInactiveCells({
 
       next()
     } catch (error) {
-      logger.error(
-        error,
-        `Failed to populate inactive cells for: prisonId: ${prisonId}, locationId: ${req.params.locationId}`,
-      )
+      logger.error(error, `Failed to populate archived locations for: prisonId: ${prisonId}`)
       next(error)
     }
   }

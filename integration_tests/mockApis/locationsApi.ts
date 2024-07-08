@@ -234,6 +234,21 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
     },
   })
 
+const stubLocationsPrisonArchivedLocations = (locations: Location[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/prison/\\w+/archived',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: locations,
+    },
+  })
+
 const stubLocationsPrisonInactiveCells = (locations: Location[]) =>
   stubFor({
     request: {
@@ -276,6 +291,7 @@ export default {
   stubLocationsConstantsUsedForType,
   stubLocationsLocationsResidentialSummary,
   stubLocationsLocationsResidentialSummaryForLocation,
+  stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
 }

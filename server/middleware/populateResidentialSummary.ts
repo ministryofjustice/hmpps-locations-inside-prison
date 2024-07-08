@@ -128,7 +128,10 @@ export default function populateResidentialSummary({
 
       next()
     } catch (error) {
-      logger.error(error, `Failed to populate residential summary for: ${user?.username}`)
+      logger.error(
+        error,
+        `Failed to populate residential summary for: prisonId: ${prisonId}, locationId: ${req.params.locationId}`,
+      )
       next(error)
     }
   }
