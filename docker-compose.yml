@@ -54,7 +54,6 @@ services:
     image: quay.io/hmpps/hmpps-locations-inside-prison-api:latest
     container_name: locations-inside-prison-api
     depends_on:
-      - manage-users-api
       - hmpps-auth
       - locations-inside-prison-db
       - localstack
@@ -70,6 +69,9 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
       - SPRING_DATASOURCE_URL=jdbc:postgresql://locations-inside-prison-db:5432/locations_inside_prison?sslmode=prefer
       - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
+      - API_BASE_URL_PRISONER_SEARCH=http://prisoner-search:8080
+      - LOCATIONS_INSIDE_PRISON_API_CLIENT_ID=hmpps-locations-inside-prison-system
+      - LOCATIONS_INSIDE_PRISON_API_CLIENT_SECRET=clientsecret
 
   localstack:
     image: localstack/localstack:3
@@ -98,6 +100,16 @@ services:
       - POSTGRES_PASSWORD=locations_inside_prison
       - POSTGRES_USER=locations_inside_prison
       - POSTGRES_DB=locations_inside_prison
+
+  prisoner-search:
+    image: wiremock/wiremock:2.35.0
+    networks:
+      - hmpps
+    container_name: prisoner-search
+    ports:
+      - "8083:8080"
+    volumes:
+      - ./wiremock:/home/wiremock
 
   redis:
     image: 'redis:7.0'
