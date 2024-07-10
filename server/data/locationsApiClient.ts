@@ -38,7 +38,7 @@ export interface Location {
   deactivatedDate: string
   deactivatedReason: string
   deactivatedBy: string
-  proposedReactivationDate: string
+  proposedReactivationDate?: string
   topLevelId: string
   parentId: string
   parentLocation: string

@@ -7,6 +7,10 @@
 {% set title = locationType + ' ' + locationName + ' - Inactive cells - View and update locations' if locationHierarchy else 'View all inactive cells' %}
 
 {% block heading %}
+  {% if locationHierarchy %}
+    <span class="govuk-caption-m" data-qa="location-type">{{ locationName }}</span>
+  {% endif %}
+
   <h1 class="govuk-heading-l">
     Inactive cells
     <span class="govuk-caption-l">({{ inactiveCells | length }})</span>
@@ -20,7 +24,7 @@
     [
       { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>" },
       { text: cell.deactivatedReason },
-      { text: cell.proposedReactivationDate | formatDate },
+      { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
       { text: cell.planetFmReference or 'Not provided' },
       { text: cell.deactivatedBy }
     ]
