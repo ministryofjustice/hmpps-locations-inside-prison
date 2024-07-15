@@ -24,7 +24,11 @@ export default class ChangeCellCapacity extends FormInitialStep {
             type: 'doesNotExceedMaxCap',
             url: '/',
           })
-        } else if (values?.workingCapacity === '0' && accommodationTypes.includes('NORMAL_ACCOMMODATION') && !specialistCellTypes.length) {
+        } else if (
+          values?.workingCapacity === '0' &&
+          accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
+          !specialistCellTypes.length
+        ) {
           validationErrors.workingCapacity = new FormWizard.Controller.Error('workingCapacity', {
             args: {},
             type: 'nonZeroForNormalCell',

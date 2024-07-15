@@ -138,24 +138,19 @@ declare module 'hmpo-form-wizard' {
     }
 
     namespace Controller {
+      type Options = {
+        key?: string
+        errorGroup?: string
+        field?: string
+        type?: string
+        redirect?: string
+        url?: string
+        message?: string
+        headerMessage?: string
+      }
+
       export class Error {
-        constructor(key, options, req?) {
-          options = options || {}
-          this.key = key || options.key
-          this.errorGroup = options.errorGroup
-          this.field = options.field
-          this.type = options.type || 'default'
-          this.redirect = options.redirect
-          this.url = req && req.path
-          this.message = options.message
-          this.headerMessage = options.headerMessage
-
-          this.args = {
-            [options.type]: Array.isArray(options.arguments) ? options.arguments[0] : options.arguments,
-          }
-
-          debug('New form error', this)
-        }
+        constructor(key?: string, options = {}, req?: Request): void
       }
     }
 

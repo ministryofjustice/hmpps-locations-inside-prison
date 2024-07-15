@@ -1,7 +1,5 @@
-import FormWizard from 'hmpo-form-wizard'
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import { Services } from '../../services'
-import { Location } from '../../data/locationsApiClient'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
