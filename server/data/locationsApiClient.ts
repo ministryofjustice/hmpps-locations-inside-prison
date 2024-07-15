@@ -71,7 +71,7 @@ export interface LocationSummary {
   level: number
 }
 
-interface ResidentialSummary {
+export interface ResidentialSummary {
   prisonSummary?: {
     workingCapacity: number
     signedOperationalCapacity: number
@@ -146,6 +146,10 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   locations = {
+    getLocation: this.apiCall<Location, { locationId: string }>({
+      path: '/locations/:locationId',
+      requestType: 'get',
+    }),
     getResidentialSummary: this.apiCall<ResidentialSummary, { prisonId: string; parentLocationId?: string }>({
       path: '/locations/residential-summary/:prisonId',
       queryParams: ['parentLocationId'],
@@ -162,5 +166,9 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'get',
       }),
     },
+    updateCapacity: this.apiCall<Location, { locationId: string }, { maxCapacity?: number; workingCapacity?: number }>({
+      path: '/locations/:locationId/capacity',
+      requestType: 'put',
+    }),
   }
 }

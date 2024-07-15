@@ -35,6 +35,10 @@ export default class LocationsService {
     return this.locationsApiClient.locations.prison.getInactiveCells(token, { prisonId, parentLocationId: locationId })
   }
 
+  async getLocation(token: string, locationId: string) {
+    return this.locationsApiClient.locations.getLocation(token, { locationId })
+  }
+
   async getLocationType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getLocationTypes'))[key] || 'Unknown'
   }
@@ -61,5 +65,9 @@ export default class LocationsService {
 
   async getUsedForType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getUsedForTypes'))[key] || 'Unknown'
+  }
+
+  async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
+    return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
   }
 }

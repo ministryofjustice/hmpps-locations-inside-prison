@@ -55,7 +55,8 @@
             "printWidth": 120,
             "semi": false
           }
-        ]
+        ],
+        "@typescript-eslint/no-explicit-any": "off"
       }
     }
   ],
@@ -99,6 +100,7 @@
         "semi": false
       }
     ],
-    "no-empty-function": ["error", { "allow": ["constructors", "arrowFunctions"] }]
+    "no-empty-function": ["error", { "allow": ["constructors", "arrowFunctions"] }],
+    "prefer-destructuring": ["error", { "object": true, "array": false }]
   }
 }

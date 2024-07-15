@@ -2,6 +2,7 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
+import { isFunction } from 'lodash'
 import { initialiseName } from './utils'
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
@@ -45,6 +46,25 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
       express: app,
     },
   )
+
+  function callAsMacro(name: string) {
+    const macro = this.ctx[name]
+
+    if (!isFunction(macro)) {
+      // eslint-disable-next-line no-console
+      console.log(`'${name}' macro does not exist`)
+      return () => ''
+    }
+
+    return macro
+  }
+
+  function formCsrf() {
+    return this.ctx['csrf-token']
+  }
+
+  njkEnv.addGlobal('callAsMacro', callAsMacro)
+  njkEnv.addGlobal('formCsrf', formCsrf)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('formatDate', formatDate)

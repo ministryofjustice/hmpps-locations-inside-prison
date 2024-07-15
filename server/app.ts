@@ -1,6 +1,7 @@
 import express from 'express'
 
 import createError from 'http-errors'
+import cookieParser from 'cookie-parser'
 
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
@@ -21,6 +22,7 @@ import setUpWebSession from './middleware/setUpWebSession'
 
 import routes from './routes'
 import type { Services } from './services'
+import setCanAccess from './middleware/setCanAccess'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -31,6 +33,7 @@ export default function createApp(services: Services): express.Application {
 
   app.use(appInsightsMiddleware())
   app.use(metricsMiddleware)
+  app.use(cookieParser())
   app.use(setUpHealthChecks(services.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
@@ -42,6 +45,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
+  app.use(setCanAccess())
   app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
 
   app.use(routes(services))
