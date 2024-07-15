@@ -32,6 +32,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     const errorMessages: Record<string, string> = {
       doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
       lessThanOrEqualTo: `${fieldName} cannot be more than ${error.args.lessThanOrEqualTo}`,
+      nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName.toLowerCase()}`,
     }

@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
+import { Location } from '../../data/locationsApiClient'
 
 export default class ChangeCellCapacity extends FormInitialStep {
   getInitialValues(req: FormWizard.Request, res: Response) {
@@ -11,15 +12,25 @@ export default class ChangeCellCapacity extends FormInitialStep {
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
+      const { location } = res.locals
+      const { accommodationTypes, specialistCellTypes }: Location = location
 
       const validationErrors: any = {}
 
-      if (!errors.workingCapacity && Number(values?.workingCapacity) > Number(values?.maxCapacity)) {
-        validationErrors.workingCapacity = new FormWizard.Controller.Error('workingCapacity', {
-          args: {},
-          type: 'doesNotExceedMaxCap',
-          url: '/',
-        })
+      if (!errors.workingCapacity) {
+        if (Number(values?.workingCapacity) > Number(values?.maxCapacity)) {
+          validationErrors.workingCapacity = new FormWizard.Controller.Error('workingCapacity', {
+            args: {},
+            type: 'doesNotExceedMaxCap',
+            url: '/',
+          })
+        } else if (values?.workingCapacity === '0' && accommodationTypes.includes('NORMAL_ACCOMMODATION') && !specialistCellTypes.length) {
+          validationErrors.workingCapacity = new FormWizard.Controller.Error('workingCapacity', {
+            args: {},
+            type: 'nonZeroForNormalCell',
+            url: '/',
+          })
+        }
       }
 
       callback({ ...errors, ...validationErrors })
