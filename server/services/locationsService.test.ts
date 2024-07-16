@@ -39,11 +39,13 @@ describe('Locations service', () => {
         .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
     }
     locationsApiClient.locations = {
+      getLocation: jest.fn(),
       getResidentialSummary: jest.fn(),
       prison: {
         getArchivedLocations: jest.fn(),
         getInactiveCells: jest.fn(),
       },
+      updateCapacity: jest.fn(),
     }
     locationsService = new LocationsService(locationsApiClient)
   })

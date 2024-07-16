@@ -5,6 +5,21 @@ import FormInitialStep from '../base/formInitialStep'
 import { Location } from '../../data/locationsApiClient'
 
 export default class ChangeCellCapacity extends FormInitialStep {
+  middlewareSetup() {
+    super.middlewareSetup()
+    this.use(this.getPrisonersInLocation)
+  }
+
+  async getPrisonersInLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { location, user } = res.locals
+    const token = await req.services.authService.getSystemClientToken(user.username)
+    const [prisonerLocation] = await req.services.locationsService.getPrisonersInLocation(token, location.id)
+
+    res.locals.prisonerLocation = prisonerLocation
+
+    next()
+  }
+
   getInitialValues(req: FormWizard.Request, res: Response) {
     return res.locals.location.capacity
   }
@@ -19,21 +34,21 @@ export default class ChangeCellCapacity extends FormInitialStep {
 
       if (!errors.workingCapacity) {
         if (Number(values?.workingCapacity) > Number(values?.maxCapacity)) {
-          validationErrors.workingCapacity = new FormWizard.Controller.Error('workingCapacity', {
-            args: {},
-            type: 'doesNotExceedMaxCap',
-            url: '/',
-          })
+          validationErrors.workingCapacity = this.formError('workingCapacity', 'doesNotExceedMaxCap')
         } else if (
           values?.workingCapacity === '0' &&
           accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
           !specialistCellTypes.length
         ) {
-          validationErrors.workingCapacity = new FormWizard.Controller.Error('workingCapacity', {
-            args: {},
-            type: 'nonZeroForNormalCell',
-            url: '/',
-          })
+          validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
+        }
+      }
+
+      if (!errors.maxCapacity) {
+        const occupants = res.locals.prisonerLocation.prisoners
+
+        if (Number(values?.maxCapacity) < occupants.length) {
+          validationErrors.maxCapacity = this.formError('maxCapacity', 'isNoLessThanOccupancy')
         }
       }
 
@@ -47,7 +62,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     const { maxCapacity, workingCapacity } = location.capacity
 
     if (Number(newMaxCap) === maxCapacity && Number(newWorkingCap) === workingCapacity) {
-      return res.redirect(`/view-and-update-locations/${location.prisonId}/${location.id}`)
+      return res.redirect(`/location/${location.id}/change-cell-capacity/cancel`)
     }
 
     return next()

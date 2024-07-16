@@ -84,6 +84,27 @@ export interface ResidentialSummary {
   locationHierarchy: LocationSummary[]
 }
 
+export interface PrisonerLocation {
+  cellLocation: string
+  prisoners: {
+    prisonerNumber: string
+    prisonId: string
+    prisonName: string
+    cellLocation: string
+    firstName: string
+    lastName: string
+    gender: string
+    csra: string
+    category: string
+    alerts: {
+      alertType: string
+      alertCode: string
+      active: boolean
+      expired: boolean
+    }[]
+  }[]
+}
+
 export default class LocationsApiClient extends BaseApiClient {
   protected static config() {
     return config.apis.locationsApi
@@ -169,6 +190,13 @@ export default class LocationsApiClient extends BaseApiClient {
     updateCapacity: this.apiCall<Location, { locationId: string }, { maxCapacity?: number; workingCapacity?: number }>({
       path: '/locations/:locationId/capacity',
       requestType: 'put',
+    }),
+  }
+
+  prisonerLocations = {
+    getPrisonersInLocation: this.apiCall<PrisonerLocation[], { locationId: string }>({
+      path: '/prisoner-locations/id/:locationId',
+      requestType: 'get',
     }),
   }
 }

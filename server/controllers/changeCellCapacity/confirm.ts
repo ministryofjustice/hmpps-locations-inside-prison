@@ -30,7 +30,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
       You are ${verbs[0]} the cell’s ${valName} by ${Math.abs(diff)}.
       <br/><br/>
       This will ${verbs[1]} the establishment’s ${valName} from ${overallVal} to ${newOverallVal}.
-    `
+    `.replace(/^\s*|\s*$/gm, '')
   }
 
   locals(req: FormWizard.Request, res: Response): object {
@@ -56,7 +56,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
       ),
     ])
 
-    const changeSummary = changeSummaries.join('<br/><br/>')
+    const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/change-cell-capacity` })
 

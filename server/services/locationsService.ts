@@ -47,6 +47,10 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getNonResidentialUsageTypes'))[key] || 'Unknown'
   }
 
+  async getPrisonersInLocation(token: string, locationId: string) {
+    return this.locationsApiClient.prisonerLocations.getPrisonersInLocation(token, { locationId })
+  }
+
   async getResidentialAttributeType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getResidentialAttributeTypes'))[key] || 'Unknown'
   }

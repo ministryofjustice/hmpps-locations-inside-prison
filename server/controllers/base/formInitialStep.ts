@@ -31,6 +31,7 @@ export default class FormInitialStep extends FormWizard.Controller {
 
     const errorMessages: Record<string, string> = {
       doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
+      isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
       lessThanOrEqualTo: `${fieldName} cannot be more than ${error.args.lessThanOrEqualTo}`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
@@ -63,5 +64,9 @@ export default class FormInitialStep extends FormWizard.Controller {
       fields,
       validationErrors,
     }
+  }
+
+  formError(fieldName: string, type: string): FormWizard.Controller.Error {
+    return new FormWizard.Controller.Error(fieldName, { args: {}, type, url: '/' })
   }
 }

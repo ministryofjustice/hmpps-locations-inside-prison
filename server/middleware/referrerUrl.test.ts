@@ -1,16 +1,18 @@
+import { Request, RequestHandler, Response } from 'express'
 import referrerUrl from './referrerUrl'
 
 describe('Referrer URL', () => {
-  const res = {}
-  let req
-  let next
-  let controller
+  const res: any = {}
+  let req: Request
+  let next: () => void
+  let controller: RequestHandler
 
   beforeEach(() => {
     req = {
       headers: {},
       originalUrl: '/this/page',
       query: {},
+      // @ts-ignore
       session: {},
     }
     next = jest.fn()
