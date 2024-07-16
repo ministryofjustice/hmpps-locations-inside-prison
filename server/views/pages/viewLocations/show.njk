@@ -8,9 +8,10 @@
 {% from "../../macros/locationStatusTag.njk" import locationStatusTag %}
 {% from "../../macros/miniSummary.njk" import miniSummary %}
 
-{% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
 {% set locationType = residentialSummary.location.locationType %}
-{% set title = locationType + ' ' + locationName + ' - View and update locations' %}
+{% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
+{% set prependedLocationName = residentialSummary.location.localName or locationType + " " + residentialSummary.location.pathHierarchy %}
+{% set title = prependedLocationName + ' - View and update locations' %}
 
 {% block heading %}
   <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
