@@ -12,12 +12,12 @@ describe('ChangeCellCapacity', () => {
     req = {
       form: {
         options: {
-          fields
+          fields,
         },
         values: {
           maxCapacity: '2',
           workingCapacity: '1',
-        }
+        },
       },
       session: {
         referrerUrl: '/referrer-url',
@@ -70,7 +70,7 @@ describe('ChangeCellCapacity', () => {
           args: {},
           key: 'workingCapacity',
           type: 'doesNotExceedMaxCap',
-        }
+        },
       })
     })
 
@@ -86,7 +86,7 @@ describe('ChangeCellCapacity', () => {
           args: {},
           key: 'workingCapacity',
           type: 'nonZeroForNormalCell',
-        }
+        },
       })
     })
 
@@ -100,7 +100,7 @@ describe('ChangeCellCapacity', () => {
           args: {},
           key: 'maxCapacity',
           type: 'isNoLessThanOccupancy',
-        }
+        },
       })
     })
   })
@@ -112,7 +112,7 @@ describe('ChangeCellCapacity', () => {
       controller.validate(req, res, jest.fn())
 
       expect(res.redirect).toHaveBeenCalledWith(
-        '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/cancel'
+        '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/cancel',
       )
     })
   })
@@ -139,7 +139,7 @@ describe('ChangeCellCapacity', () => {
           {
             href: '#workingCapacity',
             text: 'Working capacity cannot be more than 99',
-          }
+          },
         ],
       })
     })
