@@ -15,7 +15,11 @@ export default class BaseApiClient {
     return new RestClient(this.name, this.config(), token)
   }
 
-  protected apiCall<ReturnType extends object | string, Parameters extends { [k: string]: string }>({
+  protected apiCall<
+    ReturnType extends object | string,
+    Parameters extends { [k: string]: string },
+    Data extends Record<string, unknown> = undefined,
+  >({
     path,
     queryParams,
     requestType,
@@ -23,12 +27,12 @@ export default class BaseApiClient {
   }: {
     path: string
     queryParams?: string[]
-    requestType: 'get' | 'post'
+    requestType: 'get' | 'post' | 'put'
     options?: {
       cacheDuration: number
     }
   }) {
-    return async (token: string, parameters: Parameters = {} as never): Promise<ReturnType> => {
+    return async (token: string, parameters: Parameters = {} as never, data: Data = undefined): Promise<ReturnType> => {
       const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
       const query = queryParams?.length ? Object.fromEntries(queryParams.map(p => [p, parameters[p]])) : undefined
 
@@ -54,6 +58,7 @@ export default class BaseApiClient {
       const result = await (this.constructor as typeof BaseApiClient).restClient(token)[requestType]<ReturnType>({
         path: filledPath,
         query,
+        data,
       })
 
       if (cacheDuration && this.redisClient) {

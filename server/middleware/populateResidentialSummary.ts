@@ -98,9 +98,23 @@ export default function populateResidentialSummary({
         residentialSummary.locationHistory = true
 
         if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
+          const changeLink: { linkHref?: string; linkLabel?: string } = {}
+          const { capacity, leafLevel } = residentialSummary.location
+          if (capacity && leafLevel && req.canAccess('change_cell_capacity')) {
+            changeLink.linkHref = `/location/${req.params.locationId}/change-cell-capacity`
+            changeLink.linkLabel = 'Change'
+          }
           residentialSummary.summaryCards.push(
-            { type: 'working-capacity', text: residentialSummary.location.capacity.workingCapacity.toString() },
-            { type: 'maximum-capacity', text: residentialSummary.location.capacity.maxCapacity.toString() },
+            {
+              type: 'working-capacity',
+              text: residentialSummary.location.capacity.workingCapacity.toString(),
+              ...changeLink,
+            },
+            {
+              type: 'maximum-capacity',
+              text: residentialSummary.location.capacity.maxCapacity.toString(),
+              ...changeLink,
+            },
             ...(!residentialSummary.location.leafLevel
               ? [
                   {

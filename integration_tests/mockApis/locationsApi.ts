@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 
-import { Location } from '../../server/data/locationsApiClient'
+import { Location, PrisonerLocation } from '../../server/data/locationsApiClient'
 import LocationFactory from '../../server/testutils/factories/location'
 
 const stubLocationsConstantsAccommodationType = () =>
@@ -213,6 +213,11 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
       level: 1,
     },
   ],
+  prisonSummary = {
+    workingCapacity: 8,
+    signedOperationalCapacity: 10,
+    maxCapacity: 9,
+  },
 } = {}) =>
   stubFor({
     request: {
@@ -230,6 +235,7 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
         subLocations,
         topLevelLocationType,
         locationHierarchy,
+        prisonSummary,
       },
     },
   })
@@ -279,7 +285,54 @@ const stubLocationsPrisonInactiveCellsForLocation = (locations: Location[]) =>
     },
   })
 
+const stubGetLocation = (location: Location) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location,
+    },
+  })
+
+const stubGetPrisonersInLocation = (prisonerLocations: PrisonerLocation[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/prisoner-locations/id/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: prisonerLocations,
+    },
+  })
+
+const stubUpdateCapacity = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/capacity',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
+  stubGetLocation,
+  stubGetPrisonersInLocation,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -294,4 +347,5 @@ export default {
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
+  stubUpdateCapacity,
 }

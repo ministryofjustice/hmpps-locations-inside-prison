@@ -39,11 +39,16 @@ describe('Locations service', () => {
         .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
     }
     locationsApiClient.locations = {
+      getLocation: jest.fn(),
       getResidentialSummary: jest.fn(),
       prison: {
         getArchivedLocations: jest.fn(),
         getInactiveCells: jest.fn(),
       },
+      updateCapacity: jest.fn(),
+    }
+    locationsApiClient.prisonerLocations = {
+      getPrisonersInLocation: jest.fn(),
     }
     locationsService = new LocationsService(locationsApiClient)
   })
@@ -111,6 +116,43 @@ describe('Locations service', () => {
       await locationsService.getResidentialSummary('token', 'TST')
 
       expect(locationsApiClient.locations.getResidentialSummary).toHaveBeenCalledWith('token', { prisonId: 'TST' })
+    })
+  })
+
+  describe('getLocation', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getLocation('token', '481fc587-60f8-402b-804d-64462babddcc')
+
+      expect(locationsApiClient.locations.getLocation).toHaveBeenCalledWith('token', {
+        locationId: '481fc587-60f8-402b-804d-64462babddcc',
+      })
+    })
+  })
+
+  describe('getPrisonersInLocation', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getPrisonersInLocation('token', '481fc587-60f8-402b-804d-64462babddcc')
+
+      expect(locationsApiClient.prisonerLocations.getPrisonersInLocation).toHaveBeenCalledWith('token', {
+        locationId: '481fc587-60f8-402b-804d-64462babddcc',
+      })
+    })
+  })
+
+  describe('updateCapacity', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.updateCapacity('token', '481fc587-60f8-402b-804d-64462babddcc', 1, 3)
+
+      expect(locationsApiClient.locations.updateCapacity).toHaveBeenCalledWith(
+        'token',
+        {
+          locationId: '481fc587-60f8-402b-804d-64462babddcc',
+        },
+        {
+          maxCapacity: 1,
+          workingCapacity: 3,
+        },
+      )
     })
   })
 })

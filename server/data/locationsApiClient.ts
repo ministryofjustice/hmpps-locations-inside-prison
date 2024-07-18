@@ -71,7 +71,7 @@ export interface LocationSummary {
   level: number
 }
 
-interface ResidentialSummary {
+export interface ResidentialSummary {
   prisonSummary?: {
     workingCapacity: number
     signedOperationalCapacity: number
@@ -82,6 +82,27 @@ interface ResidentialSummary {
   subLocationName: string
   subLocations: Location[]
   locationHierarchy: LocationSummary[]
+}
+
+export interface PrisonerLocation {
+  cellLocation: string
+  prisoners: {
+    prisonerNumber: string
+    prisonId: string
+    prisonName: string
+    cellLocation: string
+    firstName: string
+    lastName: string
+    gender: string
+    csra: string
+    category: string
+    alerts: {
+      alertType: string
+      alertCode: string
+      active: boolean
+      expired: boolean
+    }[]
+  }[]
 }
 
 export default class LocationsApiClient extends BaseApiClient {
@@ -146,6 +167,10 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   locations = {
+    getLocation: this.apiCall<Location, { locationId: string }>({
+      path: '/locations/:locationId',
+      requestType: 'get',
+    }),
     getResidentialSummary: this.apiCall<ResidentialSummary, { prisonId: string; parentLocationId?: string }>({
       path: '/locations/residential-summary/:prisonId',
       queryParams: ['parentLocationId'],
@@ -162,5 +187,16 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'get',
       }),
     },
+    updateCapacity: this.apiCall<Location, { locationId: string }, { maxCapacity?: number; workingCapacity?: number }>({
+      path: '/locations/:locationId/capacity',
+      requestType: 'put',
+    }),
+  }
+
+  prisonerLocations = {
+    getPrisonersInLocation: this.apiCall<PrisonerLocation[], { locationId: string }>({
+      path: '/prisoner-locations/id/:locationId',
+      requestType: 'get',
+    }),
   }
 }
