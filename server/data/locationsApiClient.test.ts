@@ -1,4 +1,4 @@
-import nock from 'nock'
+import nock, { RequestBodyMatcher } from 'nock'
 
 import { createClient } from 'redis'
 import config from '../config'
@@ -38,16 +38,25 @@ describe('locationsApiClient', () => {
     functionName: string,
     url: string,
     cached: boolean,
-    functionCall: () => (token: string, parameters: { [param: string]: string }) => unknown,
+    functionCall: () => (
+      token: string,
+      parameters: { [param: string]: string },
+      data?: Record<string, unknown>,
+    ) => unknown,
     parameters: { [param: string]: string } = {},
+    method: 'get' | 'put' = 'get',
+    data: Record<string, unknown> = undefined,
   ) {
     describe(functionName, () => {
       it('should return data from api', async () => {
         const response = { data: 'data' }
 
-        fakeApiClient.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+        fakeApiClient
+          .intercept(url, method, data as RequestBodyMatcher)
+          .matchHeader('authorization', `Bearer ${token.access_token}`)
+          .reply(200, response)
 
-        const output = await functionCall()(token.access_token, parameters)
+        const output = await functionCall()(token.access_token, parameters, data)
         expect(output).toEqual(response)
       })
 
@@ -57,24 +66,33 @@ describe('locationsApiClient', () => {
           const response = { data: 'data' }
 
           fakeApiClient.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, cachedResponse)
-          expect(await functionCall()(token.access_token, parameters)).toEqual(cachedResponse)
+          expect(await functionCall()(token.access_token, parameters, data)).toEqual(cachedResponse)
           expect(redisClient.cache).toEqual({ [url]: JSON.stringify(cachedResponse) })
 
-          fakeApiClient.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+          fakeApiClient
+            .intercept(url, method, data as RequestBodyMatcher)
+            .matchHeader('authorization', `Bearer ${token.access_token}`)
+            .reply(200, response)
 
-          expect(await functionCall()(token.access_token, parameters)).toEqual(cachedResponse)
+          expect(await functionCall()(token.access_token, parameters, data)).toEqual(cachedResponse)
         })
       } else {
         it('should not return data from the cache on the second call', async () => {
           const cachedResponse = { data: 'cachedData' }
           const response = { data: 'data' }
 
-          fakeApiClient.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, cachedResponse)
-          expect(await functionCall()(token.access_token, parameters)).toEqual(cachedResponse)
+          fakeApiClient
+            .intercept(url, method, data as RequestBodyMatcher)
+            .matchHeader('authorization', `Bearer ${token.access_token}`)
+            .reply(200, cachedResponse)
+          expect(await functionCall()(token.access_token, parameters, data)).toEqual(cachedResponse)
           expect(redisClient.cache).toEqual({})
 
-          fakeApiClient.get(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
-          expect(await functionCall()(token.access_token, parameters)).toEqual(response)
+          fakeApiClient
+            .intercept(url, method, data as RequestBodyMatcher)
+            .matchHeader('authorization', `Bearer ${token.access_token}`)
+            .reply(200, response)
+          expect(await functionCall()(token.access_token, parameters, data)).toEqual(response)
         })
       }
     })
@@ -104,6 +122,13 @@ describe('locationsApiClient', () => {
 
   describe('locations', () => {
     testCall(
+      'getLocation',
+      '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6',
+      false,
+      () => apiClient.locations.getLocation,
+      { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+    )
+    testCall(
       'getResidentialSummary',
       '/locations/residential-summary/TST',
       false,
@@ -116,6 +141,15 @@ describe('locationsApiClient', () => {
       false,
       () => apiClient.locations.getResidentialSummary,
       { prisonId: 'TST', parentLocationId: 'parent-id' },
+    )
+    testCall(
+      'updateCapacity',
+      '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/capacity',
+      false,
+      () => apiClient.locations.updateCapacity,
+      { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+      'put',
+      { maxCapacity: 2, workingCapacity: 1 },
     )
 
     describe('prison', () => {
@@ -141,5 +175,15 @@ describe('locationsApiClient', () => {
         { prisonId: 'TST', parentLocationId: 'parent-id' },
       )
     })
+  })
+
+  describe('prisonerLocations', () => {
+    testCall(
+      'getPrisonersInLocation',
+      '/prisoner-locations/id/cc639c0e-02c4-4d34-a134-a15a40ae17b6',
+      false,
+      () => apiClient.prisonerLocations.getPrisonersInLocation,
+      { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+    )
   })
 })

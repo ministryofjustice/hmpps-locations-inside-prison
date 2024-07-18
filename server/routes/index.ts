@@ -9,6 +9,8 @@ import addBreadcrumb from '../middleware/addBreadcrumb'
 import logPageView from '../middleware/logPageView'
 import inactiveCellsRouter from './inactiveCellsRouter'
 import archivedLocationsRouter from './archivedLocationsRouter'
+import changeCellCapacityRouter from './changeCellCapacity'
+import addServicesToRequest from '../middleware/addServicesToRequest'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -22,9 +24,15 @@ export default function routes(services: Services): Router {
       res.render('pages/index')
     }),
   )
+
+  router.use(addServicesToRequest(services))
+
   router.use('/archived-locations/:prisonId?', archivedLocationsRouter(services))
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
+
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
+
+  router.use('/location/:cellId/change-cell-capacity', changeCellCapacityRouter)
 
   return router
 }
