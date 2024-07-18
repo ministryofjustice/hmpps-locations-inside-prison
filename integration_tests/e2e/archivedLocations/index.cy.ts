@@ -40,65 +40,88 @@ context('Archived Locations Index', () => {
     })
     let locations: Location[]
 
-    beforeEach(() => {
-      locations = [
-        LocationFactory.build({
-          id: '7e570000-0000-000a-0001-000000000001',
-          pathHierarchy: 'A-1-001',
-          localName: undefined,
-          code: '001',
-          inactiveCells: 1,
-          capacity: { maxCapacity: 3, workingCapacity: 1 },
-          status: 'INACTIVE',
-          deactivatedReason: 'TEST_TYPE',
-          proposedReactivationDate: new Date(2023, 3, 14).toISOString(),
-          planetFmReference: 'FM-1234321',
-        }),
-        LocationFactory.build({
-          id: '7e570000-0000-000a-0001-000000000002',
-          pathHierarchy: 'A-1-002',
-          localName: undefined,
-          code: '002',
-          inactiveCells: 1,
-          capacity: { maxCapacity: 3, workingCapacity: 1 },
-          status: 'INACTIVE',
-          deactivatedReason: 'TEST_TYPE',
-          proposedReactivationDate: new Date(2024, 2, 1).toISOString(),
-          planetFmReference: undefined,
-        }),
-        LocationFactory.build({
-          id: '7e570000-0000-000b-0001-000000000001',
-          pathHierarchy: 'B-1-001',
-          localName: undefined,
-          code: '001',
-          inactiveCells: 1,
-          capacity: { maxCapacity: 3, workingCapacity: 1 },
-          status: 'INACTIVE',
-          deactivatedReason: 'TEST_TYPE',
-          proposedReactivationDate: new Date(2024, 1, 3).toISOString(),
-          planetFmReference: 'FM-1133',
-        }),
-      ]
+    context('When there are archived locations', () => {
+      beforeEach(() => {
+        locations = [
+          LocationFactory.build({
+            id: '7e570000-0000-000a-0001-000000000001',
+            pathHierarchy: 'A-1-001',
+            localName: undefined,
+            code: '001',
+            inactiveCells: 1,
+            capacity: { maxCapacity: 3, workingCapacity: 1 },
+            status: 'INACTIVE',
+            deactivatedReason: 'TEST_TYPE',
+            proposedReactivationDate: new Date(2023, 3, 14).toISOString(),
+            planetFmReference: 'FM-1234321',
+          }),
+          LocationFactory.build({
+            id: '7e570000-0000-000a-0001-000000000002',
+            pathHierarchy: 'A-1-002',
+            localName: undefined,
+            code: '002',
+            inactiveCells: 1,
+            capacity: { maxCapacity: 3, workingCapacity: 1 },
+            status: 'INACTIVE',
+            deactivatedReason: 'TEST_TYPE',
+            proposedReactivationDate: new Date(2024, 2, 1).toISOString(),
+            planetFmReference: undefined,
+          }),
+          LocationFactory.build({
+            id: '7e570000-0000-000b-0001-000000000001',
+            pathHierarchy: 'B-1-001',
+            localName: undefined,
+            code: '001',
+            inactiveCells: 1,
+            capacity: { maxCapacity: 3, workingCapacity: 1 },
+            status: 'INACTIVE',
+            deactivatedReason: 'TEST_TYPE',
+            proposedReactivationDate: new Date(2024, 1, 3).toISOString(),
+            planetFmReference: 'FM-1133',
+          }),
+        ]
 
-      cy.task('stubLocationsPrisonArchivedLocations', locations)
+        cy.task('stubLocationsPrisonArchivedLocations', locations)
+      })
+
+      it('Correctly presents the API data', () => {
+        cy.signIn()
+        const indexPage = Page.verifyOnPage(IndexPage)
+
+        indexPage.cards.archivedLocations().find('a').click()
+        const archivedLocationsIndexPage = Page.verifyOnPage(ArchivedLocationsIndexPage)
+
+        cy.title().should('eq', 'Archived locations - Residential locations')
+
+        archivedLocationsIndexPage.locationsTable().should('exist')
+        archivedLocationsIndexPage.locationsTableRows().each((row, i) => {
+          const location = locations[i]
+          const cells = archivedLocationsIndexPage.locationsTableCells(row as unknown as PageElement)
+
+          cy.wrap(cells.location).contains(location.localName || location.pathHierarchy)
+          cy.wrap(cells.locationType).contains('Cell')
+          cy.wrap(cells.deactivatedBy).contains(`john smith on ${formatDate(location.deactivatedDate)}`)
+        })
+        archivedLocationsIndexPage.emptyStateMessage().should('not.exist')
+      })
     })
 
-    it('Correctly presents the API data', () => {
-      cy.signIn()
-      const indexPage = Page.verifyOnPage(IndexPage)
+    context('When there are no archived locations', () => {
+      beforeEach(() => {
+        cy.task('stubLocationsPrisonArchivedLocations', [])
+      })
 
-      indexPage.cards.archivedLocations().find('a').click()
-      const archivedLocationsIndexPage = Page.verifyOnPage(ArchivedLocationsIndexPage)
+      it('Displays an empty state page', () => {
+        cy.signIn()
+        const indexPage = Page.verifyOnPage(IndexPage)
 
-      cy.title().should('eq', 'Archived locations - Residential locations')
+        indexPage.cards.archivedLocations().find('a').click()
+        const archivedLocationsIndexPage = Page.verifyOnPage(ArchivedLocationsIndexPage)
 
-      archivedLocationsIndexPage.locationsTableRows().each((row, i) => {
-        const location = locations[i]
-        const cells = archivedLocationsIndexPage.locationsTableCells(row as unknown as PageElement)
+        cy.title().should('eq', 'Archived locations - Residential locations')
 
-        cy.wrap(cells.location).contains(location.localName || location.pathHierarchy)
-        cy.wrap(cells.locationType).contains('Cell')
-        cy.wrap(cells.deactivatedBy).contains(`john smith on ${formatDate(location.deactivatedDate)}`)
+        archivedLocationsIndexPage.locationsTable().should('not.exist')
+        archivedLocationsIndexPage.emptyStateMessage().should('exist')
       })
     })
   })
