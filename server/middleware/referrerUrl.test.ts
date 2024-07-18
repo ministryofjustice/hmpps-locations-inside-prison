@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import { Request, RequestHandler } from 'express'
 import referrerUrl from './referrerUrl'
 
 describe('Referrer URL', () => {
