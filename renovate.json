@@ -38,5 +38,6 @@
   ],
   "vulnerabilityAlerts": {
     "stabilityDays": 0
-  }
+  },
+  "rebaseWhen": "conflicted"
 }
