@@ -23,6 +23,10 @@ export default class ViewLocationsShowPage extends Page {
       cy.get('[data-qa=working-capacity-card]').find('[data-qa=bottom-content-line-1]'),
     maximumCapacityText: (): PageElement =>
       cy.get('[data-qa=maximum-capacity-card]').find('[data-qa=bottom-content-line-1]'),
+    workingCapacityChangeLink: (): PageElement =>
+      cy.get('[data-qa=working-capacity-card]').find('.hmpps-mini-card__link a'),
+    maximumCapacityChangeLink: (): PageElement =>
+      cy.get('[data-qa=maximum-capacity-card]').find('.hmpps-mini-card__link a'),
     inactiveCells: (): PageElement => cy.get('[data-qa=inactive-cells-card]'),
     inactiveCellsText: (): PageElement => this.summaryCards.inactiveCells().find('[data-qa=bottom-content-line-1]'),
     inactiveCellsViewLink: (): PageElement => this.summaryCards.inactiveCells().find('a'),

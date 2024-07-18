@@ -41,7 +41,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpAuthentication())
-  app.use(authorisationMiddleware(['VIEW_INTERNAL_LOCATION']))
+  app.use(authorisationMiddleware(['MANAGE_RESIDENTIAL_LOCATIONS', 'VIEW_INTERNAL_LOCATION']))
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
