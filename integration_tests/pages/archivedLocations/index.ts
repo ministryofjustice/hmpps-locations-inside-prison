@@ -18,4 +18,6 @@ export default class ArchivedLocationsIndexPage extends Page {
       deactivatedBy: children.eq(2),
     }
   }
+
+  emptyStateMessage = (): PageElement => cy.get('[data-qa=empty-state-message]')
 }
