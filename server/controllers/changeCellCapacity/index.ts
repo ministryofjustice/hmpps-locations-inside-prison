@@ -45,7 +45,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
       }
 
       if (!errors.maxCapacity) {
-        const occupants = res.locals.prisonerLocation.prisoners
+        const occupants = res.locals.prisonerLocation?.prisoners || []
 
         if (Number(values?.maxCapacity) < occupants.length) {
           validationErrors.maxCapacity = this.formError('maxCapacity', 'isNoLessThanOccupancy')
