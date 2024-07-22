@@ -103,6 +103,14 @@ describe('ChangeCellCapacity', () => {
         },
       })
     })
+
+    it('does not when current occupancy is undefined', () => {
+      res.locals.prisonerLocation = undefined
+      const callback = jest.fn()
+      controller.validateFields(req, res, callback)
+
+      expect(callback).toHaveBeenCalledWith({})
+    })
   })
 
   describe('validate', () => {
