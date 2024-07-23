@@ -73,7 +73,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
       const { locationsService } = req.services
 
       const token = await req.services.authService.getSystemClientToken(user.username)
-      locationsService.updateCapacity(
+      await locationsService.updateCapacity(
         token,
         res.locals.location.id,
         Number(req.sessionModel.get('maxCapacity')),
