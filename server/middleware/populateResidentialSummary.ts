@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import { Request, RequestHandler } from 'express'
 import logger from '../../logger'
 import { Services } from '../services'
 import { Location } from '../data/locationsApiClient'
@@ -6,6 +6,11 @@ import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 
 type LocationDetails = { key: { text?: string; html?: string }; value: { text?: string; html?: string } }[]
+
+function showChangeCapacityLink(location: Location, req: Request) {
+  const { active, capacity, leafLevel } = location
+  return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
+}
 
 function getLocationDetails(location: Location) {
   const details: LocationDetails = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
@@ -99,8 +104,7 @@ export default function populateResidentialSummary({
 
         if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
           const changeLink: { linkHref?: string; linkLabel?: string } = {}
-          const { capacity, leafLevel } = residentialSummary.location
-          if (capacity && leafLevel && req.canAccess('change_cell_capacity')) {
+          if (showChangeCapacityLink(residentialSummary.location, req)) {
             changeLink.linkHref = `/location/${req.params.locationId}/change-cell-capacity`
             changeLink.linkLabel = 'Change'
           }
