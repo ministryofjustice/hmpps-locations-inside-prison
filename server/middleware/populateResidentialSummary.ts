@@ -104,20 +104,27 @@ export default function populateResidentialSummary({
 
         if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
           const changeLink: { linkHref?: string; linkLabel?: string } = {}
+          const workingCapLink: { linkAriaLabel?: string } = {}
+          const maxCapLink: { linkAriaLabel?: string } = {}
+
           if (showChangeCapacityLink(residentialSummary.location, req)) {
             changeLink.linkHref = `/location/${req.params.locationId}/change-cell-capacity`
             changeLink.linkLabel = 'Change'
+            workingCapLink.linkAriaLabel = 'Change working capacity'
+            maxCapLink.linkAriaLabel = 'Change maximum capacity'
           }
           residentialSummary.summaryCards.push(
             {
               type: 'working-capacity',
               text: residentialSummary.location.capacity.workingCapacity.toString(),
               ...changeLink,
+              ...workingCapLink,
             },
             {
               type: 'maximum-capacity',
               text: residentialSummary.location.capacity.maxCapacity.toString(),
               ...changeLink,
+              ...maxCapLink,
             },
             ...(!residentialSummary.location.leafLevel
               ? [

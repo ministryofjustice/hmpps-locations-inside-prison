@@ -49,7 +49,11 @@
         {%- endif -%}
         {% if miniSummary.linkHref %}
           <p class="govuk-body hmpps-mini-card__link">
-            <a href="{{ miniSummary.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print">
+            <a href="{{ miniSummary.linkHref }}" class="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
+              {% if miniSummary.linkAriaLabel %}
+                aria-label="{{ miniSummary.linkAriaLabel }}"
+              {%- endif -%}
+            >
               {{ miniSummary.linkLabel }}
             </a>
           </p>
