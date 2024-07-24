@@ -9,6 +9,8 @@ export default class ViewLocationsIndexPage extends Page {
     working: (): PageElement => cy.get('[data-qa=working-capacity-card]').find('[data-qa=bottom-content-line-1]'),
     signedOperational: (): PageElement =>
       cy.get('[data-qa=signed-operational-capacity-card]').find('[data-qa=bottom-content-line-1]'),
+    signedOperationalChangeLink: (): PageElement =>
+      cy.get('[data-qa=signed-operational-capacity-card]').find('.hmpps-mini-card__link a'),
     maximum: (): PageElement => cy.get('[data-qa=maximum-capacity-card]').find('[data-qa=bottom-content-line-1]'),
   }
 

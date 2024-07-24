@@ -74,4 +74,21 @@ export default class LocationsService {
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
   }
+
+  async getSignedOperationalCapacity(token: string, prisonId: string) {
+    return this.locationsApiClient.signedOperationalCapacity.get(token, { prisonId })
+  }
+
+  async updateSignedOperationalCapacity(
+    token: string,
+    prisonId: string,
+    signedOperationCapacity?: number,
+    updatedBy?: string,
+  ) {
+    return this.locationsApiClient.signedOperationalCapacity.update(
+      token,
+      {},
+      { signedOperationCapacity, prisonId, updatedBy },
+    )
+  }
 }
