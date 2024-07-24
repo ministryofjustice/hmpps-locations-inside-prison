@@ -28,6 +28,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     const { fields } = res.locals.options
     const field = fields[error.key]
     const fieldName: string = field.label.text
+    const errorMessageOverrides = field.errorMessages || {}
 
     const errorMessages: Record<string, string> = {
       doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
@@ -36,9 +37,10 @@ export default class FormInitialStep extends FormWizard.Controller {
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName.toLowerCase()}`,
+      doesNotExceedEstMaxCap: `${fieldName} cannot be more than the establishment's maximum capacity`,
     }
 
-    const errorMessage = errorMessages[error.type] || `${fieldName} is invalid`
+    const errorMessage = errorMessageOverrides[error.type] || errorMessages[error.type] || `${fieldName} is invalid`
     return {
       text: errorMessage,
       href: `#${field.id}`,

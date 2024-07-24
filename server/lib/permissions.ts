@@ -4,7 +4,7 @@ const viewInternalLocationPermissions: string[] = []
 
 const manageResidentialLocationsPermissions: string[] = ['change_cell_capacity']
 
-const manageResLocationsOpCapPermissions: string[] = ['change_cell_capacity']
+const manageResLocationsOpCapPermissions: string[] = ['change_cell_capacity', 'change_signed_operational_capacity']
 
 const permissionsByRole: { [key: string]: string[] } = {
   VIEW_INTERNAL_LOCATION: viewInternalLocationPermissions,

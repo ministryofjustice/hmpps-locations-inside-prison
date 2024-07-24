@@ -10,12 +10,15 @@ describe('rolesToPermissions', () => {
   })
 
   it('returns the correct permissions for MANAGE_RES_LOCATIONS_OP_CAP', () => {
-    expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP'])).toEqual(['change_cell_capacity'])
+    expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP'])).toEqual([
+      'change_cell_capacity',
+      'change_signed_operational_capacity',
+    ])
   })
 
   it('returns the correct permissions for all roles', () => {
     expect(
       rolesToPermissions(['VIEW_INTERNAL_LOCATION', 'MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP']),
-    ).toEqual(['change_cell_capacity'])
+    ).toEqual(['change_cell_capacity', 'change_signed_operational_capacity'])
   })
 })

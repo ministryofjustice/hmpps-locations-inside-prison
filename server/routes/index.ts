@@ -10,6 +10,7 @@ import logPageView from '../middleware/logPageView'
 import inactiveCellsRouter from './inactiveCellsRouter'
 import archivedLocationsRouter from './archivedLocationsRouter'
 import changeCellCapacityRouter from './changeCellCapacity'
+import changeSignedOperationalCapacityRouter from './changeSignedOperationalCapacity'
 import addServicesToRequest from '../middleware/addServicesToRequest'
 
 export default function routes(services: Services): Router {
@@ -33,6 +34,8 @@ export default function routes(services: Services): Router {
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
 
   router.use('/location/:cellId/change-cell-capacity', changeCellCapacityRouter)
+
+  router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
 
   return router
 }

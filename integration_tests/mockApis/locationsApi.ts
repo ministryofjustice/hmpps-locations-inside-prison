@@ -162,7 +162,30 @@ const stubLocationsConstantsUsedForType = () =>
     },
   })
 
-const stubLocationsLocationsResidentialSummary = () =>
+const stubLocationsLocationsResidentialSummary = (
+  returnData = {
+    prisonSummary: {
+      workingCapacity: 8,
+      signedOperationalCapacity: 10,
+      maxCapacity: 9,
+    },
+    subLocationName: 'TestWings',
+    subLocations: [
+      LocationFactory.build(),
+      LocationFactory.build({
+        id: '7e570000-0000-0000-0000-000000000002',
+        pathHierarchy: 'A-1-002',
+        localName: undefined,
+        code: '002',
+        inactiveCells: 1,
+        capacity: { maxCapacity: 3, workingCapacity: 1 },
+        status: 'INACTIVE',
+      }),
+    ],
+    topLevelLocationType: 'Wings',
+    locationHierarchy: [],
+  },
+) =>
   stubFor({
     request: {
       method: 'GET',
@@ -173,28 +196,7 @@ const stubLocationsLocationsResidentialSummary = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: {
-        prisonSummary: {
-          workingCapacity: 8,
-          signedOperationalCapacity: 10,
-          maxCapacity: 9,
-        },
-        subLocationName: 'TestWings',
-        subLocations: [
-          LocationFactory.build(),
-          LocationFactory.build({
-            id: '7e570000-0000-0000-0000-000000000002',
-            pathHierarchy: 'A-1-002',
-            localName: undefined,
-            code: '002',
-            inactiveCells: 1,
-            capacity: { maxCapacity: 3, workingCapacity: 1 },
-            status: 'INACTIVE',
-          }),
-        ],
-        topLevelLocationType: 'Wings',
-        locationHierarchy: [],
-      },
+      jsonBody: returnData,
     },
   })
 
@@ -237,6 +239,43 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
         locationHierarchy,
         prisonSummary,
       },
+    },
+  })
+
+const stubSignedOperationalCapacityGet = (
+  returnData = {
+    signedOperationCapacity: 200,
+    prisonId: 'TST',
+    whenUpdated: '2024-07-05T10:35:17',
+    updatedBy: 'USERNAME',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/signed-op-cap/\\w+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const stubSignedOperationalCapacityUpdate = () =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern: '/locations-api/signed-op-cap/',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
     },
   })
 
@@ -348,4 +387,6 @@ export default {
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
   stubUpdateCapacity,
+  stubSignedOperationalCapacityGet,
+  stubSignedOperationalCapacityUpdate,
 }
