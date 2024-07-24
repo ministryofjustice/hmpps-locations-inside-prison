@@ -37,13 +37,6 @@ describe('ChangeSignedOperationalCapacity', () => {
         options: {
           fields,
         },
-        residentialSummary: {
-          prisonSummary: {
-            maxCapacity: 30,
-            workingCapacity: 20,
-            signedOperationalCapacity: 25,
-          },
-        },
       },
       redirect: jest.fn(),
     }

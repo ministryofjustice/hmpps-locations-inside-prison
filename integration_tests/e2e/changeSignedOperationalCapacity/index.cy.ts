@@ -22,7 +22,7 @@ context('Change signed operational capacity', () => {
   })
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
-    const ResidentialSummary = {
+    const residentialSummary = {
       prisonSummary: {
         workingCapacity: 8,
         signedOperationalCapacity: 12,
@@ -45,7 +45,7 @@ context('Change signed operational capacity', () => {
       locationHierarchy: [],
     }
 
-    const SignedOperationalCapacity = {
+    const signedOperationalCapacity = {
       signedOperationCapacity: 12,
       prisonId: 'TST',
       whenUpdated: '2024-07-05T10:35:17',
@@ -64,8 +64,8 @@ context('Change signed operational capacity', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', ResidentialSummary)
-      cy.task('stubSignedOperationalCapacityGet', SignedOperationalCapacity)
+      cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
+      cy.task('stubSignedOperationalCapacityGet', signedOperationalCapacity)
       cy.task('stubSignedOperationalCapacityUpdate')
       cy.signIn()
     })
@@ -98,7 +98,7 @@ context('Change signed operational capacity', () => {
       cy.get('.current-signed-operational-capacity-summary h2').contains('Current signed operational capacity')
       cy.get('.current-signed-operational-capacity-summary p').contains('12')
       cy.get('.current-signed-operational-capacity-summary p').contains(
-        /Last updated by john smith on Friday 5 July 2024 at 10:35/,
+        'Last updated by john smith on Friday 5 July 2024 at 10:35',
       )
     })
 

@@ -106,7 +106,7 @@ export interface PrisonerLocation {
 }
 
 export interface SignedOperationalCapacity {
-  signedOperationalCapacity: number
+  signedOperationCapacity: number
   prisonId: string
   whenUpdated: string
   updatedBy: string

@@ -14,22 +14,23 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     const { locationsService, manageUsersService } = req.services
 
     const token = await req.services.authService.getSystemClientToken(user.username)
-    res.locals.signedOperationalCapacitySummary = await locationsService.getSignedOperationalCapacity(
+    const signedOperationalCapacitySummary = await locationsService.getSignedOperationalCapacity(
       token,
       res.locals.prisonId,
     )
-    res.locals.currentSignedOperationalCapacity = res.locals.signedOperationalCapacitySummary?.signedOperationCapacity
-    res.locals.whenUpdated = new Date(res.locals.signedOperationalCapacitySummary?.whenUpdated)
-    res.locals.whenUpdatedWeekday = res.locals.whenUpdated.toLocaleString('en', { weekday: 'long' })
-    res.locals.whenUpdatedDay = res.locals.whenUpdated.getDate()
-    res.locals.whenUpdatedMonth = res.locals.whenUpdated.toLocaleString('en', { month: 'long' })
-    res.locals.whenUpdatedYear = res.locals.whenUpdated.toLocaleString('en', { year: 'numeric' })
-    res.locals.whenUpdatedTime = res.locals.whenUpdated.toLocaleString('en', { timeStyle: 'short', hour12: false })
+    res.locals.currentSignedOperationalCapacity = signedOperationalCapacitySummary?.signedOperationCapacity
 
-    res.locals.residentialSummary = await locationsService.getResidentialSummary(token, res.locals.prisonId)
-    res.locals.maxCapacity = res.locals.residentialSummary?.prisonSummary?.maxCapacity
+    const whenUpdated = new Date(signedOperationalCapacitySummary?.whenUpdated)
+    res.locals.whenUpdatedWeekday = whenUpdated.toLocaleString('en', { weekday: 'long' })
+    res.locals.whenUpdatedDay = whenUpdated.getDate()
+    res.locals.whenUpdatedMonth = whenUpdated.toLocaleString('en', { month: 'long' })
+    res.locals.whenUpdatedYear = whenUpdated.toLocaleString('en', { year: 'numeric' })
+    res.locals.whenUpdatedTime = whenUpdated.toLocaleString('en', { timeStyle: 'short', hour12: false })
 
-    const { updatedBy } = res.locals.signedOperationalCapacitySummary || {}
+    const residentialSummary = await locationsService.getResidentialSummary(token, res.locals.prisonId)
+    res.locals.maxCapacity = residentialSummary?.prisonSummary?.maxCapacity
+
+    const { updatedBy } = signedOperationalCapacitySummary || {}
     res.locals.updatedBy = updatedBy
       ? (await manageUsersService.getUser(res.locals.user.token, updatedBy))?.name || updatedBy
       : updatedBy
@@ -46,11 +47,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
 
       if (!errors.newSignedOperationalCapacity) {
         const { newSignedOperationalCapacity } = values
-        if (newSignedOperationalCapacity === undefined || newSignedOperationalCapacity === '') {
-          validationErrors.newSignedOperationalCapacity = this.formError('newSignedOperationalCapacity', 'notBlank')
-        } else if (Number.isNaN(newSignedOperationalCapacity)) {
-          validationErrors.newSignedOperationalCapacity = this.formError('newSignedOperationalCapacity', 'nonNumeric')
-        } else if (Number(newSignedOperationalCapacity) > Number(maxCapacity)) {
+        if (Number(newSignedOperationalCapacity) > Number(maxCapacity)) {
           validationErrors.newSignedOperationalCapacity = this.formError(
             'newSignedOperationalCapacity',
             'doesNotExceedEstMaxCap',
