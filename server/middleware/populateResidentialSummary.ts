@@ -143,9 +143,18 @@ export default function populateResidentialSummary({
           )
         }
       } else if (apiData.prisonSummary) {
+        const changeLink: { linkHref?: string; linkLabel?: string } = {}
+        if (req.canAccess('change_signed_operational_capacity')) {
+          changeLink.linkHref = `/change-signed-operational-capacity/${prisonId}`
+          changeLink.linkLabel = 'Change'
+        }
         residentialSummary.summaryCards.push(
           { type: 'working-capacity', text: apiData.prisonSummary.workingCapacity.toString() },
-          { type: 'signed-operational-capacity', text: apiData.prisonSummary.signedOperationalCapacity.toString() },
+          {
+            type: 'signed-operational-capacity',
+            text: apiData.prisonSummary.signedOperationalCapacity.toString(),
+            ...changeLink,
+          },
           { type: 'maximum-capacity', text: apiData.prisonSummary.maxCapacity.toString() },
         )
       }

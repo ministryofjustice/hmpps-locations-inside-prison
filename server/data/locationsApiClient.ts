@@ -105,6 +105,13 @@ export interface PrisonerLocation {
   }[]
 }
 
+export interface SignedOperationalCapacity {
+  signedOperationCapacity: number
+  prisonId: string
+  whenUpdated: string
+  updatedBy: string
+}
+
 export default class LocationsApiClient extends BaseApiClient {
   protected static config() {
     return config.apis.locationsApi
@@ -197,6 +204,21 @@ export default class LocationsApiClient extends BaseApiClient {
     getPrisonersInLocation: this.apiCall<PrisonerLocation[], { locationId: string }>({
       path: '/prisoner-locations/id/:locationId',
       requestType: 'get',
+    }),
+  }
+
+  signedOperationalCapacity = {
+    get: this.apiCall<SignedOperationalCapacity, { prisonId: string }>({
+      path: '/signed-op-cap/:prisonId',
+      requestType: 'get',
+    }),
+    update: this.apiCall<
+      SignedOperationalCapacity,
+      NonNullable<unknown>,
+      { signedOperationCapacity: number; prisonId: string; updatedBy: string }
+    >({
+      path: '/signed-op-cap/',
+      requestType: 'post',
     }),
   }
 }
