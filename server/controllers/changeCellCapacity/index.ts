@@ -58,11 +58,12 @@ export default class ChangeCellCapacity extends FormInitialStep {
 
   validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
+    const { id: locationId, prisonId } = location
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap } = req.form.values
     const { maxCapacity, workingCapacity } = location.capacity
 
     if (Number(newMaxCap) === maxCapacity && Number(newWorkingCap) === workingCapacity) {
-      return res.redirect(`/location/${location.id}/change-cell-capacity/cancel`)
+      return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
 
     return next()
@@ -80,7 +81,6 @@ export default class ChangeCellCapacity extends FormInitialStep {
     return {
       ...locals,
       backLink,
-      cancelLink: `/location/${locationId}/change-cell-capacity/cancel`,
     }
   }
 }
