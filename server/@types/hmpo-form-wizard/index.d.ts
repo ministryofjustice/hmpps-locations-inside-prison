@@ -216,6 +216,10 @@ declare module 'hmpo-form-wizard' {
         displayFn?: (value: string) => string
         displayAlways?: boolean
       }
+      items?: {
+        text: string
+        value: string
+      }[]
     }
 
     interface Fields {

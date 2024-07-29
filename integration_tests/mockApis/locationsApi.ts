@@ -128,7 +128,9 @@ const stubLocationsConstantsResidentialHousingType = () =>
     },
   })
 
-const stubLocationsConstantsSpecialistCellType = () =>
+const stubLocationsConstantsSpecialistCellType = (
+  specialistCellTypes = [{ key: 'TEST_TYPE', description: 'Test type' }],
+) =>
   stubFor({
     request: {
       method: 'GET',
@@ -140,7 +142,7 @@ const stubLocationsConstantsSpecialistCellType = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {
-        specialistCellTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+        specialistCellTypes,
       },
     },
   })
@@ -369,6 +371,21 @@ const stubUpdateCapacity = () =>
     },
   })
 
+const stubUpdateSpecialistCellTypes = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/specialist-cell-types',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
   stubGetLocation,
   stubGetPrisonersInLocation,
@@ -386,7 +403,8 @@ export default {
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
-  stubUpdateCapacity,
   stubSignedOperationalCapacityGet,
   stubSignedOperationalCapacityUpdate,
+  stubUpdateCapacity,
+  stubUpdateSpecialistCellTypes,
 }

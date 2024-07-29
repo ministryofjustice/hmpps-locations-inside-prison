@@ -4,16 +4,38 @@ import { Services } from '../services'
 import { Location } from '../data/locationsApiClient'
 import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
-
-type LocationDetails = { key: { text?: string; html?: string }; value: { text?: string; html?: string } }[]
+import { SummaryListRow } from '../@types/govuk'
 
 function showChangeCapacityLink(location: Location, req: Request) {
   const { active, capacity, leafLevel } = location
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
+function cellTypesRow(specialistCellTypes: string[], locationId: string): SummaryListRow {
+  const setCellTypeUrl = `/location/${locationId}/set-cell-type`
+  const row: any = { key: { text: 'Cell type' } }
+  if (specialistCellTypes.length) {
+    row.value = {
+      html: specialistCellTypes.join('<br>'),
+    }
+    row.actions = {
+      items: [
+        {
+          href: setCellTypeUrl,
+          text: 'Change',
+        },
+      ],
+    }
+  } else {
+    row.value = {
+      html: `<a href="${setCellTypeUrl}" class="govuk-link">Set specific cell type</a>`,
+    }
+  }
+  return row
+}
+
 function getLocationDetails(location: Location) {
-  const details: LocationDetails = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
+  const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
 
   if (!location.leafLevel) {
     details.push({ key: { text: 'Local name' }, value: { text: location.localName } })
@@ -23,10 +45,7 @@ function getLocationDetails(location: Location) {
     details.push({ key: { text: 'Non-residential room' }, value: { text: location.convertedCellType } })
   } else {
     if (location.locationType === 'Cell') {
-      details.push({
-        key: { text: 'Cell type' },
-        value: { html: location.specialistCellTypes.join('<br>') },
-      })
+      details.push(cellTypesRow(location.specialistCellTypes, location.id))
     }
 
     details.push({
@@ -65,7 +84,7 @@ export default function populateResidentialSummary({
       const apiData = await locationsService.getResidentialSummary(token, prisonId, req.params.locationId)
       const residentialSummary: {
         location?: Location
-        locationDetails?: LocationDetails
+        locationDetails?: SummaryListRow[]
         locationHistory?: boolean // TODO: change this type when location history tab is implemented
         subLocationName: string
         subLocations: Location[]

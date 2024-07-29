@@ -41,11 +41,11 @@ describe('locationsApiClient', () => {
     functionCall: () => (
       token: string,
       parameters: { [param: string]: string },
-      data?: Record<string, unknown>,
+      data?: Record<string, unknown> | string[] | string,
     ) => unknown,
     parameters: { [param: string]: string } = {},
     method: 'get' | 'put' = 'get',
-    data: Record<string, unknown> = undefined,
+    data: Record<string, unknown> | string[] | string = undefined,
   ) {
     describe(functionName, () => {
       it('should return data from api', async () => {
@@ -150,6 +150,15 @@ describe('locationsApiClient', () => {
       { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
       'put',
       { maxCapacity: 2, workingCapacity: 1 },
+    )
+    testCall(
+      'updateSpecialistCellTypes',
+      '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/specialist-cell-types',
+      false,
+      () => apiClient.locations.updateSpecialistCellTypes,
+      { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+      'put',
+      ['CAT_A'],
     )
 
     describe('prison', () => {

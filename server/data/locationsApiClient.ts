@@ -161,7 +161,10 @@ export default class LocationsApiClient extends BaseApiClient {
         options: { cacheDuration: 86_400 },
       },
     ),
-    getSpecialistCellTypes: this.apiCall<{ specialistCellTypes: { key: string; description: string }[] }, null>({
+    getSpecialistCellTypes: this.apiCall<
+      { specialistCellTypes: { key: string; description: string; additionalInformation?: string }[] },
+      null
+    >({
       path: '/constants/specialist-cell-type',
       requestType: 'get',
       options: { cacheDuration: 86_400 },
@@ -196,6 +199,10 @@ export default class LocationsApiClient extends BaseApiClient {
     },
     updateCapacity: this.apiCall<Location, { locationId: string }, { maxCapacity?: number; workingCapacity?: number }>({
       path: '/locations/:locationId/capacity',
+      requestType: 'put',
+    }),
+    updateSpecialistCellTypes: this.apiCall<Location, { locationId: string }, string[]>({
+      path: '/locations/:locationId/specialist-cell-types',
       requestType: 'put',
     }),
   }

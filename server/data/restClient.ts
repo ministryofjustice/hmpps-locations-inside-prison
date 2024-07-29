@@ -18,7 +18,7 @@ interface Request {
 }
 
 interface RequestWithBody extends Request {
-  data?: Record<string, unknown>
+  data?: object | string[] | string
   retry?: boolean
 }
 

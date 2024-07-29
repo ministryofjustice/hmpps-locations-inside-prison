@@ -18,7 +18,7 @@ export default class BaseApiClient {
   protected apiCall<
     ReturnType extends object | string,
     Parameters extends { [k: string]: string },
-    Data extends Record<string, unknown> = undefined,
+    Data extends Record<string, unknown> | string[] | string = undefined,
   >({
     path,
     queryParams,
