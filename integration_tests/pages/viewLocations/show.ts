@@ -36,6 +36,10 @@ export default class ViewLocationsShowPage extends Page {
 
   locationDetailsRows = (): PageElement => this.locationDetails().find('.govuk-summary-list__row')
 
+  setSpecificCellTypeLink = (): PageElement => this.locationDetails().find('a:contains("Set specific cell type")')
+
+  changeSpecificCellTypeLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Change")')
+
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 
   locationsHeader = (): PageElement => this.locationsTable().find('caption')

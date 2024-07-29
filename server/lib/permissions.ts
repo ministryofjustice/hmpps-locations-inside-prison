@@ -2,9 +2,13 @@ import { uniq } from 'lodash'
 
 const viewInternalLocationPermissions: string[] = []
 
-const manageResidentialLocationsPermissions: string[] = ['change_cell_capacity']
+const manageResidentialLocationsPermissions: string[] = ['change_cell_capacity', 'set_cell_type']
 
-const manageResLocationsOpCapPermissions: string[] = ['change_cell_capacity', 'change_signed_operational_capacity']
+const manageResLocationsOpCapPermissions: string[] = [
+  'change_cell_capacity',
+  'change_signed_operational_capacity',
+  'set_cell_type',
+]
 
 const permissionsByRole: { [key: string]: string[] } = {
   VIEW_INTERNAL_LOCATION: viewInternalLocationPermissions,

@@ -47,7 +47,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     }
   }
 
-  locals(_req: FormWizard.Request, res: Response): object {
+  locals(_req: FormWizard.Request, res: Response): Record<string, any> {
     const { fields } = res.locals.options
     const { values } = res.locals
     Object.keys(fields).forEach(fieldName => {
