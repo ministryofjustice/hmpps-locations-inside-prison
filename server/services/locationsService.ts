@@ -63,8 +63,16 @@ export default class LocationsService {
     return this.locationsApiClient.locations.getResidentialSummary(token, { prisonId, parentLocationId: locationId })
   }
 
+  async getSignedOperationalCapacity(token: string, prisonId: string) {
+    return this.locationsApiClient.signedOperationalCapacity.get(token, { prisonId })
+  }
+
   async getSpecialistCellType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getSpecialistCellTypes'))[key] || 'Unknown'
+  }
+
+  async getSpecialistCellTypes(token: string) {
+    return (await this.locationsApiClient.constants.getSpecialistCellTypes(token)).specialistCellTypes
   }
 
   async getUsedForType(token: string, key: string) {
@@ -73,10 +81,6 @@ export default class LocationsService {
 
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
-  }
-
-  async getSignedOperationalCapacity(token: string, prisonId: string) {
-    return this.locationsApiClient.signedOperationalCapacity.get(token, { prisonId })
   }
 
   async updateSignedOperationalCapacity(
@@ -90,5 +94,9 @@ export default class LocationsService {
       {},
       { signedOperationCapacity, prisonId, updatedBy },
     )
+  }
+
+  async updateSpecialistCellTypes(token: string, locationId: string, cellTypes?: string[]) {
+    return this.locationsApiClient.locations.updateSpecialistCellTypes(token, { locationId }, cellTypes)
   }
 }

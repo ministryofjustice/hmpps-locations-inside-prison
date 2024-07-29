@@ -46,6 +46,7 @@ describe('Locations service', () => {
         getInactiveCells: jest.fn(),
       },
       updateCapacity: jest.fn(),
+      updateSpecialistCellTypes: jest.fn(),
     }
     locationsApiClient.prisonerLocations = {
       getPrisonersInLocation: jest.fn(),
@@ -152,6 +153,20 @@ describe('Locations service', () => {
           maxCapacity: 1,
           workingCapacity: 3,
         },
+      )
+    })
+  })
+
+  describe('updateSpecialistCellTypes', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.updateSpecialistCellTypes('token', '481fc587-60f8-402b-804d-64462babddcc', ['CAT_A'])
+
+      expect(locationsApiClient.locations.updateSpecialistCellTypes).toHaveBeenCalledWith(
+        'token',
+        {
+          locationId: '481fc587-60f8-402b-804d-64462babddcc',
+        },
+        ['CAT_A'],
       )
     })
   })

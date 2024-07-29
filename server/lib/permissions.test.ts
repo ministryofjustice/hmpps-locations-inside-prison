@@ -6,19 +6,24 @@ describe('rolesToPermissions', () => {
   })
 
   it('returns the correct permissions for MANAGE_RESIDENTIAL_LOCATIONS', () => {
-    expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS'])).toEqual(['change_cell_capacity'])
+    expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS'])).toEqual(['change_cell_capacity', 'set_cell_type'])
   })
 
   it('returns the correct permissions for MANAGE_RES_LOCATIONS_OP_CAP', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP'])).toEqual([
       'change_cell_capacity',
       'change_signed_operational_capacity',
+      'set_cell_type',
     ])
   })
 
   it('returns the correct permissions for all roles', () => {
     expect(
-      rolesToPermissions(['VIEW_INTERNAL_LOCATION', 'MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP']),
-    ).toEqual(['change_cell_capacity', 'change_signed_operational_capacity'])
+      rolesToPermissions([
+        'VIEW_INTERNAL_LOCATION',
+        'MANAGE_RESIDENTIAL_LOCATIONS',
+        'MANAGE_RES_LOCATIONS_OP_CAP',
+      ]).sort(),
+    ).toEqual(['change_cell_capacity', 'change_signed_operational_capacity', 'set_cell_type'])
   })
 })

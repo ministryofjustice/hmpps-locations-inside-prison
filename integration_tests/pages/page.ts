@@ -9,7 +9,7 @@ export default abstract class Page {
   }
 
   protected constructor(
-    private readonly title: string,
+    private readonly title: string | RegExp,
     private readonly skipA11y = false,
   ) {
     if (title) {
