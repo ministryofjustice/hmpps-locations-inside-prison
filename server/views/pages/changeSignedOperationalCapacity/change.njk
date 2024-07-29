@@ -1,0 +1,113 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% from "../../macros/locationsTable.njk" import locationsTable %}
+{% from "../../macros/miniSummary.njk" import miniSummary %}
+
+{% set title = "Change signed operational capacity" %}
+{% set locationName = location.localName or location.pathHierarchy %}
+
+{% block heading %}
+  <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+  <h1 class="govuk-heading-l">Change signed operational capacity</h1>
+{% endblock %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukBackLink({
+          text: "Back",
+          href: backLink
+        }) }}
+
+        {% if errorlist.length %}
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: validationErrors,
+            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+          }) }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block content %}
+  {% set formMethod = options.method | default('post') %}
+  {% set formAction = options.action | default('') %}
+  {% set formEnctype = options.enctype | default('') %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ govukInsetText({
+          text: "Signed operational capacity is the number of people the prison governor has approved that the establishment can currently safely hold."
+        }) }}
+
+        <form method="{{ formMethod }}" action="{{ formAction }}"
+            {% if formEnctype %}
+              enctype="{{ formEnctype }}"
+            {% endif %}
+        >
+
+          {% if formMethod == 'post' %}
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          {% endif %}
+
+          <div class="govuk-!-padding-bottom-2 current-signed-operational-capacity-summary">
+            <h2 class="govuk-heading-m">Current signed operational capacity</h2>
+            <p>{{ currentSignedOperationalCapacity }}</p>
+            <p class="govuk-body-s">Last updated by {{ updatedBy }}
+              on {{ whenUpdatedWeekday }} {{ whenUpdatedDay }} {{ whenUpdatedMonth }} {{ whenUpdatedYear }}
+              at {{ whenUpdatedTime }}</p>
+          </div>
+
+          {% block fields %}
+            {% for key, fieldsOptions in fields %}
+              {% if fieldsOptions.component and not fieldsOptions.skip %}
+                {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+              {% endif %}
+            {% endfor %}
+          {% endblock %}
+
+          <div class="govuk-button-group">
+            {% block formActions %}
+              {% block submitAction %}
+                {{ govukButton({
+                  text: "Update signed operational capacity",
+                  classes: options.buttonClasses,
+                  preventDoubleClick: true,
+                  type: "submit"
+                }) }}
+              {% endblock %}
+
+              {% block cancelAction %}
+                {% if cancelUrl %}
+                  <a href="{{ cancelUrl }}" class="govuk-link">
+                    Cancel
+                  </a>
+                {% endif %}
+              {% endblock %}
+            {% endblock %}
+          </div>
+        </form>
+
+        <p class="govuk-body">
+          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
+            Cancel
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -64,7 +64,11 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     const { newSignedOperationalCapacity } = req.form.values
     const { currentSignedOperationalCapacity } = res.locals
     if (Number(newSignedOperationalCapacity) === Number(currentSignedOperationalCapacity)) {
-      return res.redirect(`/change-signed-operational-capacity/${prisonId}/cancel`)
+      return res.redirect(
+        backUrl(req, {
+          fallbackUrl: `/view-and-update-locations/${prisonId}`,
+        }),
+      )
     }
 
     return next()
@@ -81,7 +85,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     return {
       ...locals,
       backLink,
-      cancelLink: `/change-signed-operational-capacity/${prisonId}/cancel`,
+      cancelLink: backLink,
     }
   }
 

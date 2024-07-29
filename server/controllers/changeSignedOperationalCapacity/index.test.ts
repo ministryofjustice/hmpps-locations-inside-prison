@@ -65,7 +65,7 @@ describe('ChangeSignedOperationalCapacity', () => {
       res.redirect = jest.fn()
       controller.validate(req, res, jest.fn())
 
-      expect(res.redirect).toHaveBeenCalledWith('/change-signed-operational-capacity/TST/cancel')
+      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST')
     })
   })
 })
