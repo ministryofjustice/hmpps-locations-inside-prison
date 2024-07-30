@@ -102,7 +102,7 @@ services:
       - POSTGRES_DB=locations_inside_prison
 
   prisoner-search:
-    image: wiremock/wiremock:3.9.0
+    image: wiremock/wiremock:3.9.1
     networks:
       - hmpps
     container_name: prisoner-search
