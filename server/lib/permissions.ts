@@ -7,6 +7,7 @@ const manageResidentialLocationsPermissions: string[] = ['change_cell_capacity',
 const manageResLocationsOpCapPermissions: string[] = [
   'change_cell_capacity',
   'change_signed_operational_capacity',
+  'deactivate_temporary',
   'set_cell_type',
 ]
 

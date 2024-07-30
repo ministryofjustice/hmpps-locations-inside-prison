@@ -2,6 +2,7 @@ import { Location } from '../data/locationsApiClient'
 import LocationsService from '../services/locationsService'
 import ManageUsersService from '../services/manageUsersService'
 import logger from '../../logger'
+import { DecoratedLocation } from './decoratedLocation'
 
 export default async function decorateLocation({
   location,
@@ -17,11 +18,12 @@ export default async function decorateLocation({
   manageUsersService: ManageUsersService
   locationsService: LocationsService
   limited?: boolean
-}) {
+}): Promise<DecoratedLocation> {
   logger.debug(`decorate location: ${JSON.stringify(location)}`)
 
   return {
     ...location,
+    raw: location,
     accommodationTypes: await Promise.all(
       location.accommodationTypes.map(a => locationsService.getAccommodationType(systemToken, a)),
     ),

@@ -8,8 +8,28 @@ import type { Services } from '../services'
 import viewLocationsShow from '../controllers/viewLocations/viewLocationsShow'
 import validateCaseload from '../middleware/validateCaseload'
 import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsForLocation'
+import asyncMiddleware from '../middleware/asyncMiddleware'
+import addAction from '../middleware/addAction'
+import { DecoratedLocation } from '../decorators/decoratedLocation'
 
 const router = express.Router({ mergeParams: true })
+
+const addActions = asyncMiddleware(async (req, res, next) => {
+  const { location }: { location: DecoratedLocation } = res.locals.residentialSummary
+
+  if (
+    location.raw.status === 'ACTIVE' &&
+    location.raw.locationType === 'CELL' &&
+    req.canAccess('deactivate_temporary')
+  ) {
+    addAction({
+      title: 'Deactivate cell',
+      href: `/location/${location.id}/deactivate/temporary`,
+    })(req, res, null)
+  }
+
+  next()
+})
 
 const controller = (services: Services) => {
   router.use(populatePrisonId())
@@ -28,6 +48,7 @@ const controller = (services: Services) => {
     populateResidentialSummary(services),
     populateBreadcrumbsForLocation,
     logPageView(services.auditService, Page.LOCATIONS_SHOW),
+    addActions,
     viewLocationsShow,
   )
 

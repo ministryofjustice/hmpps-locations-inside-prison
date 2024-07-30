@@ -3,6 +3,8 @@
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
+{%- from "moj/components/button-menu/macro.njk" import mojButtonMenu -%}
+
 {% from "../../macros/inactiveLocationBanner.njk" import inactiveLocationBanner %}
 {% from "../../macros/locationDetails.njk" import locationDetails %}
 {% from "../../macros/locationsTable.njk" import locationsTable %}
@@ -13,6 +15,14 @@
 {% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
 {% set prependedLocationName = residentialSummary.location.localName or locationType + " " + residentialSummary.location.pathHierarchy %}
 {% set title = prependedLocationName + ' - View and update locations' %}
+
+{% block head %}
+  {{ super() }}
+
+  {% if actions | length %}
+    <script src="/assets/js/buttonMenu.js"></script>
+  {% endif %}
+{% endblock %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -55,6 +65,23 @@
       }) }}
     {% endif %}
     {{ locationStatusTag(residentialSummary.location) }}
+
+    {% if actions | length %}
+      {% set actionItems = [] %}
+
+      {% for action in actions -%}
+        {% set actionItems = (actionItems.push(
+          {
+            text: action.title,
+            href: action.href
+          }
+        ), actionItems) %}
+      {% endfor %}
+
+      <div class="govuk-!-float-right">
+        {{ mojButtonMenu({ items: actionItems }) }}
+      </div>
+    {% endif %}
   </h1>
 {% endblock %}
 

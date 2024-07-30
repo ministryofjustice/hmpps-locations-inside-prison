@@ -1,12 +1,12 @@
 import { Request, RequestHandler } from 'express'
 import logger from '../../logger'
 import { Services } from '../services'
-import { Location } from '../data/locationsApiClient'
 import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
+import { DecoratedLocation } from '../decorators/decoratedLocation'
 
-function showChangeCapacityLink(location: Location, req: Request) {
+function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   const { active, capacity, leafLevel } = location
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
@@ -34,7 +34,7 @@ function cellTypesRow(specialistCellTypes: string[], locationId: string): Summar
   return row
 }
 
-function getLocationDetails(location: Location) {
+function getLocationDetails(location: DecoratedLocation) {
   const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
 
   if (!location.leafLevel) {
@@ -83,12 +83,12 @@ export default function populateResidentialSummary({
 
       const apiData = await locationsService.getResidentialSummary(token, prisonId, req.params.locationId)
       const residentialSummary: {
-        location?: Location
+        location?: DecoratedLocation
         locationDetails?: SummaryListRow[]
         locationHistory?: boolean // TODO: change this type when location history tab is implemented
         subLocationName: string
-        subLocations: Location[]
-        summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string }[]
+        subLocations: DecoratedLocation[]
+        summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string; linkAriaLabel?: string }[]
       } = {
         subLocationName: apiData.subLocationName,
         subLocations: await Promise.all(

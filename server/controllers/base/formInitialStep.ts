@@ -1,7 +1,13 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { flattenConditionalFields, reduceDependentFields, renderConditionalFields } from '../../helpers/field'
 
 export default class FormInitialStep extends FormWizard.Controller {
+  middlewareSetup() {
+    this.use(this.setupConditionalFields)
+    super.middlewareSetup()
+  }
+
   getInitialValues(_req: FormWizard.Request, _res: Response): { [key: string]: any } {
     // Override in subclass to return initial values for form
     return {}
@@ -47,6 +53,20 @@ export default class FormInitialStep extends FormWizard.Controller {
     }
   }
 
+  setupConditionalFields(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { allFields, fields } = req.form.options
+    const stepFieldsArray = Object.entries(fields)
+    const stepFields = stepFieldsArray.map(flattenConditionalFields)
+    const dependentFields = stepFieldsArray.reduce(reduceDependentFields(allFields), {})
+
+    req.form.options.fields = {
+      ...Object.fromEntries(stepFields),
+      ...dependentFields,
+    }
+
+    next()
+  }
+
   locals(_req: FormWizard.Request, res: Response): Record<string, any> {
     const { fields } = res.locals.options
     const { values } = res.locals
@@ -70,5 +90,17 @@ export default class FormInitialStep extends FormWizard.Controller {
 
   formError(fieldName: string, type: string): FormWizard.Controller.Error {
     return new FormWizard.Controller.Error(fieldName, { args: {}, type, url: '/' })
+  }
+
+  render(req, res, next) {
+    const fieldsEntries = Object.entries(req.form.options.fields).map(([key, field], index, obj) =>
+      renderConditionalFields(res, req, [key, field], index, obj),
+    )
+
+    req.form.options.fields = Object.fromEntries(fieldsEntries)
+    console.log(Object.keys(req.form.options.fields))
+    console.dir(req.form.options.fields, {depth: null})
+
+    super.render(req, res, next)
   }
 }
