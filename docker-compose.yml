@@ -112,7 +112,7 @@ services:
       - ./wiremock:/home/wiremock
 
   redis:
-    image: 'redis:7.2'
+    image: 'redis:7.4'
     networks:
       - hmpps
     container_name: redis
