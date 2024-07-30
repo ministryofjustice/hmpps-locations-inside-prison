@@ -37,6 +37,7 @@ describe('ChangeCellCapacity', () => {
             maxCapacity: 2,
             workingCapacity: 2,
           },
+          prisonId: 'MDI',
         },
         options: {
           fields,
@@ -119,9 +120,7 @@ describe('ChangeCellCapacity', () => {
       res.redirect = jest.fn()
       controller.validate(req, res, jest.fn())
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/cancel',
-      )
+      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
     })
   })
 
@@ -141,7 +140,6 @@ describe('ChangeCellCapacity', () => {
 
       expect(result).toEqual({
         backLink: '/referrer-url',
-        cancelLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/cancel',
         fields,
         validationErrors: [
           {

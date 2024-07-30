@@ -2,6 +2,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { isEqual, sortBy } from 'lodash'
 import FormInitialStep from '../base/formInitialStep'
+import backUrl from '../../utils/backUrl'
 
 export default class SetCellType extends FormInitialStep {
   async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -24,10 +25,9 @@ export default class SetCellType extends FormInitialStep {
   locals(req: FormWizard.Request, res: Response): object {
     const locals = super.locals(req, res)
     const { location } = res.locals
+    const { id: locationId, prisonId } = location
 
     const pageTitleText = location.specialistCellTypes.length ? 'Change specific cell type' : 'Set specific cell type'
-
-    const cancelLink = `/location/${location.id}/set-cell-type/cancel`
 
     const fields = { ...locals.fields }
 
@@ -39,10 +39,13 @@ export default class SetCellType extends FormInitialStep {
       fields.specialistCellTypes.items = items
     }
 
+    const backLink = backUrl(req, {
+      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
+    })
+
     return {
       ...locals,
-      backLink: cancelLink,
-      cancelLink,
+      backLink,
       fields,
       pageTitleText,
     }
@@ -50,9 +53,10 @@ export default class SetCellType extends FormInitialStep {
 
   validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
+    const { id: locationId, prisonId } = location
 
     if (isEqual(sortBy(req.form.values.specialistCellTypes), sortBy(location.specialistCellTypes))) {
-      return res.redirect(`/location/${location.id}/set-cell-type/cancel`)
+      return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
 
     return next()

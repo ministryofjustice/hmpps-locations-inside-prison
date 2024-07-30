@@ -75,20 +75,12 @@
               type: "submit"
             }) }}
           {% endblock %}
-
-          {% block cancelAction %}
-            {% if cancelUrl %}
-              <a href="{{ cancelUrl }}" class="govuk-link">
-                Cancel
-              </a>
-            {% endif %}
-          {% endblock %}
         {% endblock %}
       </div>
     </form>
 
     <p class="govuk-body">
-      <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
+      <a href="{{ backLink }}" class="govuk-link govuk-link--no-visited-state">
         Cancel and return to location details
       </a>
     </p>
