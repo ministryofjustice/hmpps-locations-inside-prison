@@ -23,7 +23,7 @@ describe('CheckRemoveCellType', () => {
           areYouSure: 'yes',
         },
       },
-    }
+    } as unknown as FormWizard.Request
     res = {
       locals: {
         errorlist: [],
@@ -44,7 +44,7 @@ describe('CheckRemoveCellType', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as Response
     next = jest.fn()
   })
 

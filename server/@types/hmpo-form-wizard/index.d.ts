@@ -1,6 +1,8 @@
 // Copied from https://github.com/ministryofjustice/hmpps-strengths-based-needs-assessments-ui/blob/c1d2e0ac64ce2be0ea0a27919cd34f8882b2d5c0/server/%40types/hmpo-form-wizard/index.d.ts
 
 /* eslint-disable max-classes-per-file */
+import { NextFunction, Response } from 'express'
+
 declare module 'hmpo-form-wizard' {
   import Express from 'express'
 
@@ -73,13 +75,15 @@ declare module 'hmpo-form-wizard' {
     NotSpecified = 9,
   }
 
-  function FormWizard(steps: Steps, fields: Fields, config: FormWizardConfig)
+  function FormWizard(steps: FormWizard.Steps, fields: FormWizard.Fields, config: FormWizardConfig)
 
   namespace FormWizard {
+    type Conditional = string | string[] | { html?: string; name?: string; id?: string }
     type ConditionFn = (isValidated: boolean, values: Record<string, string | Array<string>>) => boolean
     type SectionProgressRule = { fieldCode: string; conditionFn: ConditionFn }
 
-    interface Request extends Express.Request {
+    interface Request extends Omit<Express.Request, 'flash'> {
+      flash: (type: string, data?: any) => void
       form: {
         values: Record<string, string | string[]>
         options: {
@@ -109,7 +113,7 @@ declare module 'hmpo-form-wizard' {
 
       middlewareSetup(): void
 
-      use(...args: any): any
+      use(...args: ((req: Request, res: Express.Response, next: Express.NextFunction) => any)[]): any
 
       get(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
@@ -123,19 +127,24 @@ declare module 'hmpo-form-wizard' {
 
       validateFields(req: FormWizard.Request, res: Express.Response, callback: (errors: any) => void)
 
-      locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise
+      // eslint-disable-next-line no-underscore-dangle
+      _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise
+
+      locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise | object
 
       getValues(req: Request, res: Express.Response, next: (err: any, values?: any) => void): Promise
 
       saveValues(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
-      successHandler(req: Request, res: Express.Response, next: Express.NextFunction): Promise
+      successHandler(req: Request, res: Express.Response, next: Express.NextFunction): Promise | void
 
       errorHandler(error: Error, req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
       setErrors(error: Error, req: Request, res: Express.Response)
 
       getErrors(req: Request, res: Express.Response)
+
+      render(req: FormWizard.Request, res: Express.Response, next: NextFunction)
     }
 
     namespace Controller {
@@ -151,6 +160,12 @@ declare module 'hmpo-form-wizard' {
       }
 
       export class Error {
+        key: string
+
+        type: string
+
+        args: { [key: string]: any }
+
         constructor(key?: string, options = {}, req?: Request): void
       }
     }
@@ -160,7 +175,7 @@ declare module 'hmpo-form-wizard' {
         text: string
         value: string
         checked?: boolean
-        conditional?: { html: string }
+        conditional?: Conditional
         hint?: { text: string } | { html: string }
         behaviour?: string
         kind: 'option'
@@ -185,23 +200,29 @@ declare module 'hmpo-form-wizard' {
       | { type: FormatterType; arguments?: (string | number)[] }
       | { fn: FormatterFn; arguments?: (string | number)[] }
 
-    type ValidatorFn = (val: AnswerValue) => boolean
+    type ValidatorFn = (val: AnswerValue, ...args: any) => boolean
 
     type Validate =
-      | { type: ValidationType; arguments?: (string | number)[]; message: string }
-      | { fn: ValidatorFn; arguments?: (string | number)[]; message: string }
+      | string
+      | ValidatorFn
+      | { type: ValidationType; arguments?: (string | number | object)[]; message: string }
+      | { fn: ValidatorFn; arguments?: (string | number | object)[]; message?: string }
 
-    type Dependent = { field: string; value: string; displayInline?: boolean }
+    type Dependent = { field: string; value: string | string[]; displayInline?: boolean }
 
-    type Hint = { kind: 'html'; html: string } | { kind: 'text'; text: string }
+    type Hint = { kind?: 'html'; html: string } | { kind?: 'text'; text: string }
 
     interface Field {
+      attributes?: { [attribute: string]: string | number }
       default?: string | number | []
-      text: string
-      code: string
+      name?: string
+      text?: string
+      component?: string
+      prefix?: string
+      code?: string
       id?: string
       hint?: Hint
-      type: FieldType
+      type?: FieldType
       multiple?: boolean
       options?: FormWizard.Field.Options
       formatter?: Formatter[]
@@ -213,17 +234,18 @@ declare module 'hmpo-form-wizard' {
       formGroupClasses?: string
       characterCountMax?: number
       classes?: string
+      items?: {
+        text?: string
+        value: string
+        label?: string
+        conditional?: Conditional
+        id?: string
+        hint?: Hint
+      }[]
       summary?: {
         displayFn?: (value: string) => string
         displayAlways?: boolean
       }
-      items?: {
-        text: string
-        value: string
-        conditional?: {
-          html: string
-        }
-      }[]
     }
 
     interface Fields {
@@ -240,7 +262,7 @@ declare module 'hmpo-form-wizard' {
     }
 
     interface Step {
-      pageTitle: string
+      pageTitle?: string
       reset?: boolean
       entryPoint?: boolean
       template?: string
@@ -249,7 +271,7 @@ declare module 'hmpo-form-wizard' {
       controller?: typeof FormWizard.Controller
       navigationOrder?: number
       backLink?: string
-      section: string
+      section?: string
       sectionProgressRules?: Array<SectionProgressRule>
       noPost?: boolean
       locals?: Record<string, boolean | string>

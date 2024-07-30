@@ -263,7 +263,7 @@ context('View Locations Show', () => {
     let location: Location
 
     context('When the location is a Wing', () => {
-      const locationDetails = {
+      const locationDetails: Partial<Location> = {
         localName: null,
         id: 'b8813f47-4497-4c88-9dee-a8d7ae54ba60',
         prisonId: 'TST',
@@ -342,7 +342,7 @@ context('View Locations Show', () => {
     })
 
     context('When the location is a Landing', () => {
-      const locationDetails = {
+      const locationDetails: Partial<Location> = {
         id: 'b8813f47-4497-4c88-9dee-a8d7ae54ba60',
         prisonId: 'TST',
         code: '1',
@@ -430,7 +430,7 @@ context('View Locations Show', () => {
     })
 
     context('When the location is a Cell', () => {
-      const locationDetails = {
+      const locationDetails: Partial<Location> = {
         localName: null,
         id: 'b8813f47-4497-4c88-9dee-a8d7ae54ba60',
         prisonId: 'LEI',

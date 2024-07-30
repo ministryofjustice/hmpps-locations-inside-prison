@@ -28,7 +28,7 @@ describe('Referrer URL', () => {
     it('should not set a referrerUrl in session by default', async () => {
       await controller(req, res, next)
 
-      expect(req.session.referrerUrl).toEqual(undefined)
+      expect(req.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
   })
@@ -53,7 +53,7 @@ describe('Referrer URL', () => {
 
       await controller(req, res, next)
 
-      expect(req.session.referrerUrl).toEqual(undefined)
+      expect(req.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
 
@@ -64,7 +64,7 @@ describe('Referrer URL', () => {
 
       await controller(req, res, next)
 
-      expect(req.session.referrerUrl).toEqual(undefined)
+      expect(req.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
   })

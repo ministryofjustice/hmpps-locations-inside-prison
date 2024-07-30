@@ -6,7 +6,46 @@ export interface Location {
   prisonId: string
   code: string
   pathHierarchy: string
-  locationType: string
+  locationType:
+    | 'WING'
+    | 'SPUR'
+    | 'LANDING'
+    | 'CELL'
+    | 'ROOM'
+    | 'AREA'
+    | 'HOLDING_AREA'
+    | 'MOVEMENT_AREA'
+    | 'RESIDENTIAL_UNIT'
+    | 'EXTERNAL_GROUNDS'
+    | 'HOLDING_CELL'
+    | 'MEDICAL'
+    | 'GROUP'
+    | 'OFFICE'
+    | 'ADMINISTRATION_AREA'
+    | 'BOOTH'
+    | 'BOX'
+    | 'RETURN_TO_UNIT'
+    | 'CLASSROOM'
+    | 'TRAINING_AREA'
+    | 'TRAINING_ROOM'
+    | 'EXERCISE_AREA'
+    | 'SPORTS'
+    | 'WORKSHOP'
+    | 'INSIDE_PARTY'
+    | 'OUTSIDE_PARTY'
+    | 'FAITH_AREA'
+    | 'ADJUDICATION_ROOM'
+    | 'APPOINTMENTS'
+    | 'VISITS'
+    | 'VIDEO_LINK'
+    | 'ASSOCIATION'
+    | 'INTERNAL_GROUNDS'
+    | 'INTERVIEW'
+    | 'LOCATION'
+    | 'POSITION'
+    | 'SHELF'
+    | 'STORE'
+    | 'TABLE'
   residentialHousingType: string
   localName: string
   comments: string
@@ -30,7 +69,7 @@ export interface Location {
   specialistCellTypes: string[]
   usedFor: string[]
   orderWithinParentLocation: number
-  status: string
+  status: 'ACTIVE' | 'INACTIVE' | 'NON_RESIDENTIAL'
   convertedCellType: string
   otherConvertedCellType: string
   active: boolean
@@ -185,6 +224,21 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/convert-cell-to-non-res-cell',
       requestType: 'put',
     }),
+    deactivate: {
+      temporary: this.apiCall<
+        Location,
+        { locationId: string },
+        {
+          deactivationReason: string
+          deactivationReasonDescription: string
+          proposedReactivationDate: string
+          planetFmReference: string
+        }
+      >({
+        path: '/locations/:locationId/deactivate/temporary',
+        requestType: 'put',
+      }),
+    },
     getLocation: this.apiCall<Location, { locationId: string }>({
       path: '/locations/:locationId',
       requestType: 'get',

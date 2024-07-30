@@ -15,6 +15,7 @@ import setCellTypeRouter from './setCellType'
 import removeCellTypeRouter from './removeCellType'
 import nonResidentialConversionRouter from './nonResidentialConversion'
 import addServicesToRequest from '../middleware/addServicesToRequest'
+import deactivateTemporaryRouter from './deactivateTemporary'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -36,7 +37,8 @@ export default function routes(services: Services): Router {
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
 
-  router.use('/location/:cellId/change-cell-capacity', changeCellCapacityRouter)
+  router.use('/location/:locationId/change-cell-capacity', changeCellCapacityRouter)
+  router.use('/location/:locationId/deactivate/temporary', deactivateTemporaryRouter)
 
   router.use('/location/:cellId/set-cell-type', setCellTypeRouter)
 

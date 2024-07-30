@@ -1,7 +1,15 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { flattenConditionalFields, reduceDependentFields, renderConditionalFields } from '../../helpers/field'
+import validateDateInput from '../../helpers/field/validateDateInput'
+import { FieldEntry } from '../../helpers/field/renderConditionalFields'
 
 export default class FormInitialStep extends FormWizard.Controller {
+  middlewareSetup() {
+    this.use(this.setupConditionalFields)
+    super.middlewareSetup()
+  }
+
   getInitialValues(_req: FormWizard.Request, _res: Response): { [key: string]: any } {
     // Override in subclass to return initial values for form
     return {}
@@ -31,16 +39,27 @@ export default class FormInitialStep extends FormWizard.Controller {
   getErrorDetail(error: { args: any; key: string; type: string }, res: Response): { text: string; href: string } {
     const { fields } = res.locals.options
     const field = fields[error.key]
-    const fieldName: string = field?.label?.text
+    const fieldName: string = field.nameForErrors || field?.label?.text
     const errorMessageOverrides = field?.errorMessages || {}
 
     const errorMessages: Record<string, string> = {
+      dateInFuture: `${fieldName} must be in the future`,
+      dateInvalid: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
+      dateInvalidDay: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
+      dateInvalidMonth: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
+      dateInvalidYear: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
+      dateMissingDay: `${fieldName} must include a day (TEMP COPY, from govuk)`,
+      dateMissingMonth: `${fieldName} must include a month (TEMP COPY, from govuk)`,
+      dateMissingYear: `${fieldName} must include a year (TEMP COPY, from govuk)`,
+      doesNotExceedEstMaxCap: `${fieldName} cannot be more than the establishment's maximum capacity`,
+      doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
-      lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args.lessThanOrEqualTo, fields)}`,
+      lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo, fields)}`,
+      maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
+      minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName?.toLowerCase()}`,
-      doesNotExceedEstMaxCap: `${fieldName} cannot be more than the establishment's maximum capacity`,
     }
 
     const errorMessage = errorMessageOverrides[error.type] || errorMessages[error.type] || `${fieldName} is invalid`
@@ -48,6 +67,22 @@ export default class FormInitialStep extends FormWizard.Controller {
       text: errorMessage,
       href: `#${field?.id}`,
     }
+  }
+
+  setupConditionalFields(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { allFields, fields } = req.form.options
+    const stepFieldsArray = Object.entries(fields)
+    const stepFields = stepFieldsArray.map(flattenConditionalFields)
+    const dependentFields = stepFieldsArray.reduce(reduceDependentFields(allFields), {})
+
+    req.form.options.fields = Object.fromEntries(
+      Object.entries({
+        ...Object.fromEntries(stepFields),
+        ...dependentFields,
+      }).map(([key, field]: FieldEntry, _, obj: FieldEntry[]) => renderConditionalFields(req, [key, field], obj)),
+    )
+
+    next()
   }
 
   locals(_req: FormWizard.Request, res: Response): Record<string, any> {
@@ -77,5 +112,101 @@ export default class FormInitialStep extends FormWizard.Controller {
 
   formError(fieldName: string, type: string): FormWizard.Controller.Error {
     return new FormWizard.Controller.Error(fieldName, { args: {}, type, url: '/' })
+  }
+
+  setupDateInputFields(req: FormWizard.Request, errorlist: FormWizard.Controller.Error[]) {
+    if (!req.form?.options?.fields) {
+      return
+    }
+
+    Object.values(req.form.options.fields)
+      .filter(field => field.component === 'govukDateInput')
+      .forEach(field => {
+        const { value } = field
+        const error = errorlist.find(e => e.key === field.id)
+        const errorFieldMatches = error?.type?.match(/Day|Month|Year$/)
+        const errorField = errorFieldMatches ? errorFieldMatches[0] : '*'
+        const [year, month, day] = value ? (value as string).split('-') : []
+
+        // eslint-disable-next-line no-param-reassign
+        field.items = [
+          {
+            classes: `govuk-input--width-2 ${error && ['*', 'Day'].includes(errorField) ? 'govuk-input--error' : ''}`,
+            label: 'Day',
+            name: `${field.id}-day`,
+            value: day || '',
+          },
+          {
+            classes: `govuk-input--width-2 ${error && ['*', 'Month'].includes(errorField) ? 'govuk-input--error' : ''}`,
+            label: 'Month',
+            name: `${field.id}-month`,
+            value: month || '',
+          },
+          {
+            classes: `govuk-input--width-4 ${error && ['*', 'Year'].includes(errorField) ? 'govuk-input--error' : ''}`,
+            label: 'Year',
+            name: `${field.id}-year`,
+            value: year || '',
+          },
+        ] as any
+      })
+  }
+
+  render(req: FormWizard.Request, res: Response, next: NextFunction) {
+    this.setupDateInputFields(req, res.locals.errorlist)
+
+    return super.render(req, res, next)
+  }
+
+  populateDateInputFieldValues(req: FormWizard.Request) {
+    Object.values(req.form.options.fields)
+      .filter(field => field.component === 'govukDateInput')
+      .map(field => field.id)
+      .forEach(id => {
+        const day = req.body[`${id}-day`]
+        const month = req.body[`${id}-month`]
+        const year = req.body[`${id}-year`]
+        if (!day && !month && !year) {
+          return
+        }
+
+        req.form.values[id] = [
+          year,
+          month !== '' ? month.toString().padStart(2, '0') : '',
+          day !== '' ? day.toString().padStart(2, '0') : '',
+        ].join('-')
+      })
+  }
+
+  validateDateInputFields(req: FormWizard.Request, validationErrors: any) {
+    const { values } = req.form
+
+    Object.values(req.form.options.fields)
+      .filter(field => field.component === 'govukDateInput')
+      .forEach(field => {
+        const { id } = field
+        if (values[id]) {
+          const day = req.body[`${id}-day`]
+          const month = req.body[`${id}-month`]
+          const year = req.body[`${id}-year`]
+          const error = validateDateInput(day, month, year, values[id] as string)
+          if (error) {
+            // eslint-disable-next-line no-param-reassign
+            validationErrors[field.id] = this.formError(field.id, error)
+          }
+        }
+      })
+  }
+
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+    this.populateDateInputFieldValues(req)
+
+    super.validateFields(req, res, errors => {
+      const validationErrors: any = {}
+
+      this.validateDateInputFields(req, validationErrors)
+
+      callback({ ...errors, ...validationErrors })
+    })
   }
 }

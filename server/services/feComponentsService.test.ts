@@ -11,7 +11,7 @@ describe('Components service', () => {
 
   describe('getComponent', () => {
     beforeEach(() => {
-      componentsClient = new FeComponentsClient() as jest.Mocked<FeComponentsClient>
+      componentsClient = jest.mocked(new FeComponentsClient())
       componentsService = new FeComponentsService(componentsClient)
     })
 

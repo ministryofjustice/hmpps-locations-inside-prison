@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import logger from '../../logger'
 import decorateLocation from '../decorators/location'
 
 export default function populateLocation(decorate = false) {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async (req: Request | FormWizard.Request, res: Response, next: NextFunction): Promise<void> => {
     const { locationsService, manageUsersService } = req.services
     const { user } = res.locals
     let { location } = res.locals
@@ -12,7 +13,7 @@ export default function populateLocation(decorate = false) {
       const token = await req.services.authService.getSystemClientToken(user.username)
 
       if (!location) {
-        location = await req.services.locationsService.getLocation(token, req.params.cellId)
+        location = await req.services.locationsService.getLocation(token, req.params.locationId)
       }
 
       if (!decorate) {
