@@ -136,8 +136,7 @@ describe('SetCellType', () => {
       const result = controller.locals(req, res)
 
       expect(result).toEqual({
-        backLink: '/location/7e570000-0000-0000-0000-000000000001/set-cell-type/cancel',
-        cancelLink: '/location/7e570000-0000-0000-0000-000000000001/set-cell-type/cancel',
+        backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         fields,
         pageTitleText: 'Change specific cell type',
         validationErrors: [
@@ -156,7 +155,7 @@ describe('SetCellType', () => {
       res.redirect = jest.fn()
       controller.validate(req, res, jest.fn())
 
-      expect(res.redirect).toHaveBeenCalledWith('/location/7e570000-0000-0000-0000-000000000001/set-cell-type/cancel')
+      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
     })
   })
 

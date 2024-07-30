@@ -22,6 +22,7 @@ describe('ConfirmCellCapacity', () => {
           maxCapacity: 2,
           workingCapacity: 2,
         },
+        prisonId: 'TST',
       },
       residentialSummary: {
         prisonSummary: {
@@ -36,8 +37,8 @@ describe('ConfirmCellCapacity', () => {
     it('formats the change summary correctly', () => {
       const result = controller.locals(req, res)
       expect(result).toEqual({
-        backLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity',
-        cancelLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/cancel',
+        backLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/change',
+        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeSummary: `You are decreasing the cell’s working capacity by 1.
 <br/><br/>
 This will decrease the establishment’s working capacity from 20 to 19.

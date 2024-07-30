@@ -35,6 +35,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
 
   locals(req: FormWizard.Request, res: Response): object {
     const { location } = res.locals
+    const { id: locationId, prisonId } = location
     const { maxCapacity, workingCapacity } = location.capacity
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
@@ -58,11 +59,11 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/change-cell-capacity` })
+    const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/change-cell-capacity/change` })
 
     return {
       backLink,
-      cancelLink: `/location/${location.id}/change-cell-capacity/cancel`,
+      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
     }
   }
