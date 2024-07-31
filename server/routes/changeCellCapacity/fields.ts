@@ -21,6 +21,7 @@ const fields = {
     hint: {
       text: 'The number of people that can currently live in this location based on available beds, furniture and sanitation.',
     },
+    autocomplete: 'off',
   },
   maxCapacity: {
     component: 'govukInput',
@@ -42,6 +43,7 @@ const fields = {
     hint: {
       text: 'The maximum number of people that could potentially live in this location.',
     },
+    autocomplete: 'off',
   },
 }
 
