@@ -26,8 +26,8 @@ context('Change cell capacity', () => {
     const location = LocationFactory.build({
       accommodationTypes: ['NORMAL_ACCOMMODATION'],
       capacity: {
-        maxCapacity: 2,
-        workingCapacity: 2,
+        maxCapacity: 3,
+        workingCapacity: 3,
       },
       leafLevel: true,
       specialistCellTypes: [],
@@ -143,7 +143,7 @@ context('Change cell capacity', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
-        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.maxCapacityInput().clear().type('4')
         changeCellCapacityPage.workingCapacityInput().clear()
         changeCellCapacityPage.continueButton().click()
 
@@ -156,7 +156,7 @@ context('Change cell capacity', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
-        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.maxCapacityInput().clear().type('4')
         changeCellCapacityPage.workingCapacityInput().clear().type('100')
         changeCellCapacityPage.continueButton().click()
 
@@ -169,7 +169,7 @@ context('Change cell capacity', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
-        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.maxCapacityInput().clear().type('4')
         changeCellCapacityPage.workingCapacityInput().clear().type('hello')
         changeCellCapacityPage.continueButton().click()
 
@@ -182,8 +182,8 @@ context('Change cell capacity', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
-        changeCellCapacityPage.maxCapacityInput().clear().type('2')
-        changeCellCapacityPage.workingCapacityInput().clear().type('3')
+        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.workingCapacityInput().clear().type('4')
         changeCellCapacityPage.continueButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
@@ -195,7 +195,7 @@ context('Change cell capacity', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
-        changeCellCapacityPage.maxCapacityInput().clear().type('2')
+        changeCellCapacityPage.maxCapacityInput().clear().type('3')
         changeCellCapacityPage.workingCapacityInput().clear().type('0')
         changeCellCapacityPage.continueButton().click()
 
@@ -209,7 +209,7 @@ context('Change cell capacity', () => {
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
         changeCellCapacityPage.maxCapacityInput().clear()
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
         changeCellCapacityPage.continueButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
@@ -222,7 +222,7 @@ context('Change cell capacity', () => {
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
         changeCellCapacityPage.maxCapacityInput().clear().type('100')
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
         changeCellCapacityPage.continueButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
@@ -235,7 +235,7 @@ context('Change cell capacity', () => {
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
         changeCellCapacityPage.maxCapacityInput().clear().type('hello')
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
         changeCellCapacityPage.continueButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
@@ -243,7 +243,7 @@ context('Change cell capacity', () => {
         cy.get('#maxCapacity-error').contains('Maximum capacity must be a number')
       })
 
-      it('shows the correct validation error when max capacity is less than current occupancy', () => {
+      it('shows the correct validation errors when max capacity is less than current occupancy', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
@@ -255,8 +255,14 @@ context('Change cell capacity', () => {
         cy.get('.govuk-error-summary__list').contains(
           'Maximum capacity cannot be less than the number of people currently occupying the cell',
         )
+        cy.get('.govuk-error-summary__list').contains(
+          'Working capacity cannot be less than the number of people currently occupying the cell',
+        )
         cy.get('#maxCapacity-error').contains(
           'Maximum capacity cannot be less than the number of people currently occupying the cell',
+        )
+        cy.get('#workingCapacity-error').contains(
+          'Working capacity cannot be less than the number of people currently occupying the cell',
         )
       })
 
@@ -264,8 +270,8 @@ context('Change cell capacity', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
-        changeCellCapacityPage.maxCapacityInput().clear().type('2')
-        changeCellCapacityPage.workingCapacityInput().clear().type('2')
+        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.workingCapacityInput().clear().type('3')
         changeCellCapacityPage.continueButton().click()
 
         Page.verifyOnPage(ViewLocationsShowPage)
@@ -276,7 +282,7 @@ context('Change cell capacity', () => {
       it('has a back link to the show location page', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
         changeCellCapacityPage.continueButton().click()
 
         const confirmCellCapacityPage = Page.verifyOnPage(ConfirmCellCapacityPage)
@@ -288,7 +294,7 @@ context('Change cell capacity', () => {
       it('has a change link from the summary list', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
         changeCellCapacityPage.continueButton().click()
 
         const confirmCellCapacityPage = Page.verifyOnPage(ConfirmCellCapacityPage)
@@ -300,22 +306,22 @@ context('Change cell capacity', () => {
       it('shows the correct summary list', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
-        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
+        changeCellCapacityPage.maxCapacityInput().clear().type('4')
         changeCellCapacityPage.continueButton().click()
 
         Page.verifyOnPage(ConfirmCellCapacityPage)
 
         cy.get('.govuk-summary-list__key').eq(0).contains('Working capacity')
-        cy.get('.govuk-summary-list__value').eq(0).contains('1')
+        cy.get('.govuk-summary-list__value').eq(0).contains('2')
         cy.get('.govuk-summary-list__key').eq(1).contains('Maximum capacity')
-        cy.get('.govuk-summary-list__value').eq(1).contains('3')
+        cy.get('.govuk-summary-list__value').eq(1).contains('4')
       })
 
       it('shows the correct change summary when changing one value', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
         changeCellCapacityPage.continueButton().click()
 
         Page.verifyOnPage(ConfirmCellCapacityPage)
@@ -328,8 +334,8 @@ context('Change cell capacity', () => {
       it('shows the correct change summary when changing both values', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
-        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
+        changeCellCapacityPage.maxCapacityInput().clear().type('4')
         changeCellCapacityPage.continueButton().click()
 
         Page.verifyOnPage(ConfirmCellCapacityPage)
@@ -344,7 +350,7 @@ context('Change cell capacity', () => {
       it('has a cancel link', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
         changeCellCapacityPage.continueButton().click()
 
         const confirmCellCapacityPage = Page.verifyOnPage(ConfirmCellCapacityPage)
@@ -356,8 +362,8 @@ context('Change cell capacity', () => {
       it('shows the success banner when the change is complete', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
-        changeCellCapacityPage.workingCapacityInput().clear().type('1')
-        changeCellCapacityPage.maxCapacityInput().clear().type('3')
+        changeCellCapacityPage.workingCapacityInput().clear().type('2')
+        changeCellCapacityPage.maxCapacityInput().clear().type('4')
         changeCellCapacityPage.continueButton().click()
 
         const confirmCellCapacityPage = Page.verifyOnPage(ConfirmCellCapacityPage)
