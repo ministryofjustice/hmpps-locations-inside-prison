@@ -29,6 +29,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
       const { values } = req.form
       const { location } = res.locals
       const { accommodationTypes, specialistCellTypes }: Location = location
+      const occupants = res.locals.prisonerLocation?.prisoners || []
 
       const validationErrors: any = {}
 
@@ -41,12 +42,12 @@ export default class ChangeCellCapacity extends FormInitialStep {
           !specialistCellTypes.length
         ) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
+        } else if (Number(values?.workingCapacity) < occupants.length) {
+          validationErrors.workingCapacity = this.formError('workingCapacity', 'isNoLessThanOccupancy')
         }
       }
 
       if (!errors.maxCapacity) {
-        const occupants = res.locals.prisonerLocation?.prisoners || []
-
         if (Number(values?.maxCapacity) < occupants.length) {
           validationErrors.maxCapacity = this.formError('maxCapacity', 'isNoLessThanOccupancy')
         }
