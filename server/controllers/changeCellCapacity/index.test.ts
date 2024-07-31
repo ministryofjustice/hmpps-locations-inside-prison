@@ -91,12 +91,17 @@ describe('ChangeCellCapacity', () => {
       })
     })
 
-    it('does not allow max capacity lower than current occupancy', () => {
+    it('does not allow max or working capacity lower than current occupancy', () => {
       res.locals.prisonerLocation.prisoners = [{}, {}, {}]
       const callback = jest.fn()
       controller.validateFields(req, res, callback)
 
       expect(callback).toHaveBeenCalledWith({
+        workingCapacity: {
+          args: {},
+          key: 'workingCapacity',
+          type: 'isNoLessThanOccupancy',
+        },
         maxCapacity: {
           args: {},
           key: 'maxCapacity',
@@ -105,7 +110,7 @@ describe('ChangeCellCapacity', () => {
       })
     })
 
-    it('does not when current occupancy is undefined', () => {
+    it('does not break when current occupancy is undefined', () => {
       res.locals.prisonerLocation = undefined
       const callback = jest.fn()
       controller.validateFields(req, res, callback)
