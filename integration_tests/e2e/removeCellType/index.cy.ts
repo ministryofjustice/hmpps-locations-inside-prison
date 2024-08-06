@@ -10,14 +10,38 @@ import ViewLocationsShowPage from '../../pages/viewLocations/show'
 context('Remove cell type', () => {
   context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
+      const location = LocationFactory.build({
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
+        capacity: {
+          maxCapacity: 2,
+          workingCapacity: 1,
+        },
+        leafLevel: true,
+        localName: '1-1-001',
+        specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
+      })
       cy.task('reset')
-      cy.task('stubSignIn')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubLocationsConstantsAccommodationType')
+      cy.task('stubLocationsConstantsConvertedCellType')
+      cy.task('stubLocationsConstantsDeactivatedReason')
+      cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsSpecialistCellType')
+      cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
     })
 
-    it('redirects user to sign in page', () => {
+    it('does not show the remove link on the show location page', () => {
+      cy.signIn()
+      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      viewLocationsShowPage.removeSpecificCellTypeLink().should('not.exist')
+    })
+
+    it('redirects user to sign in page if accessed directly', () => {
       cy.signIn()
       RemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
       Page.verifyOnPage(AuthSignInPage)
