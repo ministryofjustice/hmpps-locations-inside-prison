@@ -1,0 +1,48 @@
+import FormWizard from 'hmpo-form-wizard'
+import { Response } from 'express'
+import FormInitialStep from '../base/formInitialStep'
+import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
+
+export default class ReviewCellCapacity extends FormInitialStep {
+  middlewareSetup() {
+    super.middlewareSetup()
+    this.use(populatePrisonersInLocation())
+  }
+
+  getInitialValues(req: FormWizard.Request, res: Response) {
+    return res.locals.location.capacity
+  }
+
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+    super.validateFields(req, res, errors => {
+      const { values } = req.form
+      const occupants = res.locals.prisonerLocation?.prisoners || []
+
+      const validationErrors: any = {}
+
+      if (!errors.workingCapacity) {
+        if (Number(values?.workingCapacity) < occupants.length) {
+          validationErrors.workingCapacity = this.formError('workingCapacity', 'isNoLessThanOccupancy')
+        }
+      }
+
+      if (!errors.maxCapacity) {
+        if (Number(values?.maxCapacity) < occupants.length) {
+          validationErrors.maxCapacity = this.formError('maxCapacity', 'isNoLessThanOccupancy')
+        }
+      }
+
+      callback({ ...errors, ...validationErrors })
+    })
+  }
+
+  locals(req: FormWizard.Request, res: Response) {
+    const { location } = res.locals
+    const { id: locationId, prisonId } = location
+
+    return {
+      ...super.locals(req, res),
+      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+    }
+  }
+}

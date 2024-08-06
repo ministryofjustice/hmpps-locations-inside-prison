@@ -11,22 +11,30 @@ function showChangeCapacityLink(location: Location, req: Request) {
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
-function cellTypesRow(specialistCellTypes: string[], locationId: string): SummaryListRow {
+function cellTypesRow(specialistCellTypes: string[], locationId: string, req: Request): SummaryListRow {
   const setCellTypeUrl = `/location/${locationId}/set-cell-type`
+  const removeCellTypeUrl = `/location/${locationId}/remove-cell-type`
   const row: any = { key: { text: 'Cell type' } }
   if (specialistCellTypes.length) {
     row.value = {
       html: specialistCellTypes.join('<br>'),
     }
-    row.actions = {
-      items: [
-        {
-          href: setCellTypeUrl,
-          text: 'Change',
-        },
-      ],
+
+    if (req.canAccess('set_cell_type')) {
+      row.actions = {
+        items: [
+          {
+            href: removeCellTypeUrl,
+            text: 'Remove',
+          },
+          {
+            href: setCellTypeUrl,
+            text: 'Change',
+          },
+        ],
+      }
     }
-  } else {
+  } else if (req.canAccess('set_cell_type')) {
     row.value = {
       html: `<a href="${setCellTypeUrl}" class="govuk-link">Set specific cell type</a>`,
     }
@@ -34,7 +42,7 @@ function cellTypesRow(specialistCellTypes: string[], locationId: string): Summar
   return row
 }
 
-function getLocationDetails(location: Location) {
+function getLocationDetails(location: Location, req: Request) {
   const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
 
   if (!location.leafLevel) {
@@ -45,7 +53,7 @@ function getLocationDetails(location: Location) {
     details.push({ key: { text: 'Non-residential room' }, value: { text: location.convertedCellType } })
   } else {
     if (location.locationType === 'Cell') {
-      details.push(cellTypesRow(location.specialistCellTypes, location.id))
+      details.push(cellTypesRow(location.specialistCellTypes, location.id, req))
     }
 
     details.push({
@@ -118,7 +126,7 @@ export default function populateResidentialSummary({
           userToken: res.locals.user.token,
         })
 
-        residentialSummary.locationDetails = getLocationDetails(residentialSummary.location)
+        residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, req)
         residentialSummary.locationHistory = true
 
         if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {

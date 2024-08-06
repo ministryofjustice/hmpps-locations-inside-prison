@@ -3,6 +3,11 @@ import Page, { PageElement } from '../page'
 export default class ViewLocationsShowPage extends Page {
   constructor() {
     super('')
+    this.checkOnPage()
+  }
+
+  checkOnPage() {
+    cy.location('pathname').should('contain', '/view-and-update-locations/')
   }
 
   breadcrumbs = (): PageElement => cy.get('.govuk-breadcrumbs__link')
@@ -39,6 +44,8 @@ export default class ViewLocationsShowPage extends Page {
   setSpecificCellTypeLink = (): PageElement => this.locationDetails().find('a:contains("Set specific cell type")')
 
   changeSpecificCellTypeLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Change")')
+
+  removeSpecificCellTypeLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Remove")')
 
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 

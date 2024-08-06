@@ -1,0 +1,76 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set title = pageTitleText %}
+{% set locationName = location.localName or location.pathHierarchy %}
+
+{% block heading %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+        <h1 class="govuk-heading-l">{{ pageTitleText }}</h1>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukBackLink({
+          text: "Back",
+          href: backLink
+        }) }}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+
+  {% set formMethod = options.method | default('post') %}
+  {% set formAction = options.action | default('') %}
+  {% set formEnctype = options.enctype | default('') %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body govuk-!-margin-bottom-6">
+          <strong>{{ cellTypesLabel }} </strong>{{ cellTypesText }}
+        </p>
+        <form method="{{ formMethod }}" action="{{ formAction }}"
+        {% if formEnctype %}
+          enctype="{{ formEnctype }}"
+        {% endif %}
+        >
+
+          {% if formMethod == 'post' %}
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          {% endif %}
+
+          <div class="govuk-button-group">
+            {% block formActions %}
+              {% block submitAction %}
+                {{ govukButton({
+                  text: buttonText,
+                  classes: "govuk-button--warning",
+                  preventDoubleClick: true,
+                  type: "submit"
+                }) }}
+              {% endblock %}
+            {% endblock %}
+          </div>
+        </form>
+
+        <p class="govuk-body">
+          <a href="{{ backLink }}" class="govuk-link govuk-link--no-visited-state">
+            Cancel and return to location details
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

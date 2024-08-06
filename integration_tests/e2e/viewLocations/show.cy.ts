@@ -194,7 +194,7 @@ context('View Locations Show', () => {
             .locationDetailsRows()
             .eq(detailsRows)
             .find('.govuk-summary-list__value')
-            .contains('Test type')
+            .contains('Accessible cell')
           detailsRows += 1
         }
 
@@ -439,7 +439,7 @@ context('View Locations Show', () => {
         locationType: 'CELL',
         permanentlyInactive: false,
         accommodationTypes: ['TEST_TYPE'],
-        specialistCellTypes: ['TEST_TYPE'],
+        specialistCellTypes: ['ACCESSIBLE_CELL'],
         usedFor: [],
         status: 'ACTIVE',
         convertedCellType: 'TEST_TYPE',

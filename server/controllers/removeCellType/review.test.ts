@@ -1,9 +1,10 @@
 import { Response } from 'express'
-import ChangeCellCapacity from './index'
+import ReviewCellCapacity from './review'
 import fields from '../../routes/changeCellCapacity/fields'
+import LocationFactory from '../../testutils/factories/location'
 
-describe('ChangeCellCapacity', () => {
-  const controller = new ChangeCellCapacity({ route: '/' })
+describe('ReviewCellCapacity', () => {
+  const controller = new ReviewCellCapacity({ route: '/' })
   // @ts-ignore
   let req: FormWizard.Request
   let res: Response
@@ -31,14 +32,15 @@ describe('ChangeCellCapacity', () => {
       // @ts-ignore
       locals: {
         errorlist: [],
-        location: {
+        location: LocationFactory.build({
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           capacity: {
             maxCapacity: 2,
-            workingCapacity: 2,
+            workingCapacity: 0,
           },
           prisonId: 'MDI',
-        },
+        }),
         options: {
           fields,
         },
@@ -61,22 +63,6 @@ describe('ChangeCellCapacity', () => {
   })
 
   describe('validateFields', () => {
-    it('does not allow zero working capacity for non-specialist cells', () => {
-      req.form.values = { maxCapacity: '2', workingCapacity: '0' }
-      res.locals.location.accommodationTypes = ['NORMAL_ACCOMMODATION']
-      res.locals.location.specialistCellTypes = []
-      const callback = jest.fn()
-      controller.validateFields(req, res, callback)
-
-      expect(callback).toHaveBeenCalledWith({
-        workingCapacity: {
-          args: {},
-          key: 'workingCapacity',
-          type: 'nonZeroForNormalCell',
-        },
-      })
-    })
-
     it('does not allow max or working capacity lower than current occupancy', () => {
       res.locals.prisonerLocation.prisoners = [{}, {}, {}]
       const callback = jest.fn()
@@ -105,16 +91,6 @@ describe('ChangeCellCapacity', () => {
     })
   })
 
-  describe('validate', () => {
-    it('redirects to the show location page when there are no changes', () => {
-      req.form.values = { maxCapacity: '2', workingCapacity: '2' }
-      res.redirect = jest.fn()
-      controller.validate(req, res, jest.fn())
-
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
-    })
-  })
-
   describe('locals', () => {
     it('returns the expected locals', () => {
       res.locals.errorlist = [
@@ -130,7 +106,7 @@ describe('ChangeCellCapacity', () => {
       const result = controller.locals(req, res)
 
       expect(result).toEqual({
-        backLink: '/referrer-url',
+        cancelLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields,
         validationErrors: [
           {

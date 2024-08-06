@@ -129,7 +129,22 @@ const stubLocationsConstantsResidentialHousingType = () =>
   })
 
 const stubLocationsConstantsSpecialistCellType = (
-  specialistCellTypes = [{ key: 'TEST_TYPE', description: 'Test type' }],
+  specialistCellTypes = [
+    {
+      key: 'ACCESSIBLE_CELL',
+      description: 'Accessible cell',
+      additionalInformation: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
+    },
+    {
+      key: 'BIOHAZARD_DIRTY_PROTEST',
+      description: 'Biohazard / dirty protest cell',
+      additionalInformation: 'Previously known as a dirty protest cell',
+    },
+    {
+      key: 'CONSTANT_SUPERVISION',
+      description: 'Constant Supervision Cell',
+    },
+  ],
 ) =>
   stubFor({
     request: {
