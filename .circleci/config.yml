@@ -164,7 +164,7 @@ workflows:
             - request-preprod-approval
           helm_timeout: 5m
       - hmpps/deploy_env:
-          name: deploy_preprod
+          name: deploy_train
           env: "train"
           jira_update: false
           pipeline_id: <<pipeline.id>>
