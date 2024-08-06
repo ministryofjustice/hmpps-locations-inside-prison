@@ -167,7 +167,6 @@ workflows:
           name: deploy_preprod
           env: "train"
           jira_update: false
-          jira_env_type: training
           pipeline_id: <<pipeline.id>>
           pipeline_number: <<pipeline.number>>
           context:
