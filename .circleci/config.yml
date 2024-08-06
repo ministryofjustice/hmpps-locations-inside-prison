@@ -163,6 +163,19 @@ workflows:
           requires:
             - request-preprod-approval
           helm_timeout: 5m
+      - hmpps/deploy_env:
+          name: deploy_preprod
+          env: "train"
+          jira_update: false
+          jira_env_type: training
+          pipeline_id: <<pipeline.id>>
+          pipeline_number: <<pipeline.number>>
+          context:
+            - hmpps-common-vars
+            - hmpps-locations-inside-prison-train
+          requires:
+            - request-preprod-approval
+          helm_timeout: 5m
       - request-prod-approval:
           type: approval
           requires:
