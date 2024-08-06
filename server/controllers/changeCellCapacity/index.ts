@@ -3,21 +3,12 @@ import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
 import { Location } from '../../data/locationsApiClient'
+import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 
 export default class ChangeCellCapacity extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(this.getPrisonersInLocation)
-  }
-
-  async getPrisonersInLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location, user } = res.locals
-    const token = await req.services.authService.getSystemClientToken(user.username)
-    const [prisonerLocation] = await req.services.locationsService.getPrisonersInLocation(token, location.id)
-
-    res.locals.prisonerLocation = prisonerLocation
-
-    next()
+    this.use(populatePrisonersInLocation())
   }
 
   getInitialValues(req: FormWizard.Request, res: Response) {
@@ -34,9 +25,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
       const validationErrors: any = {}
 
       if (!errors.workingCapacity) {
-        if (Number(values?.workingCapacity) > Number(values?.maxCapacity)) {
-          validationErrors.workingCapacity = this.formError('workingCapacity', 'doesNotExceedMaxCap')
-        } else if (
+        if (
           values?.workingCapacity === '0' &&
           accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
           !specialistCellTypes.length

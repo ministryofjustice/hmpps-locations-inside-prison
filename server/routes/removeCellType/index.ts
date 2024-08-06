@@ -9,10 +9,10 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('set_cell_type'),
-  populateLocation(),
+  populateLocation(false), // the steps need the undecorated location
   wizard(steps, fields, {
-    name: 'set-cell-type',
-    templatePath: 'pages/setCellType',
+    name: 'remove-cell-type',
+    templatePath: 'pages/removeCellType',
     csrf: false,
   }),
 )
