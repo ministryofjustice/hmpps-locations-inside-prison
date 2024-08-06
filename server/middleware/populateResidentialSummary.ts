@@ -13,6 +13,7 @@ function showChangeCapacityLink(location: Location, req: Request) {
 
 function cellTypesRow(specialistCellTypes: string[], locationId: string): SummaryListRow {
   const setCellTypeUrl = `/location/${locationId}/set-cell-type`
+  const removeCellTypeUrl = `/location/${locationId}/remove-cell-type`
   const row: any = { key: { text: 'Cell type' } }
   if (specialistCellTypes.length) {
     row.value = {
@@ -20,6 +21,10 @@ function cellTypesRow(specialistCellTypes: string[], locationId: string): Summar
     }
     row.actions = {
       items: [
+        {
+          href: removeCellTypeUrl,
+          text: 'Remove',
+        },
         {
           href: setCellTypeUrl,
           text: 'Change',

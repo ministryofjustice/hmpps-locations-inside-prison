@@ -24,6 +24,10 @@ export default class FormInitialStep extends FormWizard.Controller {
     })
   }
 
+  valueOrField(arg: number | { field: string }, fields: Record<string, { label: { text: string } }>) {
+    return typeof arg === 'number' ? arg : `the ${fields[arg?.field]?.label?.text?.toLowerCase()}`
+  }
+
   getErrorDetail(error: { args: any; key: string; type: string }, res: Response): { text: string; href: string } {
     const { fields } = res.locals.options
     const field = fields[error.key]
@@ -31,9 +35,8 @@ export default class FormInitialStep extends FormWizard.Controller {
     const errorMessageOverrides = field.errorMessages || {}
 
     const errorMessages: Record<string, string> = {
-      doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
-      lessThanOrEqualTo: `${fieldName} cannot be more than ${error.args.lessThanOrEqualTo}`,
+      lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrField(error.args.lessThanOrEqualTo, fields)}`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName.toLowerCase()}`,

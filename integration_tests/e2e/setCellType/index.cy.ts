@@ -22,24 +22,6 @@ context('Set cell type', () => {
   })
 
   context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
-    const cellTypeConstants = [
-      {
-        key: 'ACCESSIBLE_CELL',
-        description: 'Accessible cell',
-        additionalInformation:
-          'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
-      },
-      {
-        key: 'BIOHAZARD_DIRTY_PROTEST',
-        description: 'Biohazard / dirty protest cell',
-        additionalInformation: 'Previously known as a dirty protest cell',
-      },
-      {
-        key: 'CONSTANT_SUPERVISION',
-        description: 'Constant Supervision Cell',
-      },
-    ]
-
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
@@ -50,7 +32,7 @@ context('Set cell type', () => {
       cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsSpecialistCellType', cellTypeConstants)
+      cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubUpdateSpecialistCellTypes')
     })

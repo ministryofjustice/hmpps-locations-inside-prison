@@ -6,10 +6,8 @@ const fields = {
     validate: [
       'required',
       'numeric',
-      {
-        fn: lessThanOrEqualTo,
-        arguments: [99],
-      },
+      { fn: lessThanOrEqualTo, arguments: [99] },
+      { fn: lessThanOrEqualTo, arguments: [{ field: 'maxCapacity' }] },
     ],
     id: 'workingCapacity',
     name: 'workingCapacity',
@@ -25,14 +23,7 @@ const fields = {
   },
   maxCapacity: {
     component: 'govukInput',
-    validate: [
-      'required',
-      'numeric',
-      {
-        fn: lessThanOrEqualTo,
-        arguments: [99],
-      },
-    ],
+    validate: ['required', 'numeric', { fn: lessThanOrEqualTo, arguments: [99] }],
     id: 'maxCapacity',
     name: 'maxCapacity',
     classes: 'govuk-input--width-2',
