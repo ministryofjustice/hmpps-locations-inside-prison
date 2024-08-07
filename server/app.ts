@@ -1,4 +1,5 @@
 import express from 'express'
+import 'express-async-errors'
 
 import createError from 'http-errors'
 import cookieParser from 'cookie-parser'
