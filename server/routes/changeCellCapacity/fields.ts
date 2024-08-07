@@ -24,12 +24,7 @@ const fields = {
   },
   maxCapacity: {
     component: 'govukInput',
-    validate: [
-      'required',
-      'numeric',
-      { fn: greaterThan, arguments: [0] },
-      { fn: lessThanOrEqualTo, arguments: [99]},
-    ],
+    validate: ['required', 'numeric', { fn: greaterThan, arguments: [0] }, { fn: lessThanOrEqualTo, arguments: [99] }],
     errorMessages: { greaterThan: 'Maximum capacity cannot be 0' },
     id: 'maxCapacity',
     name: 'maxCapacity',

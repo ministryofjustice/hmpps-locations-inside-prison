@@ -466,6 +466,30 @@ context('Remove cell type', () => {
             cy.get('#maxCapacity-error').contains('Maximum capacity cannot be 0')
           })
 
+          it('shows the correct validation error when max capacity is zero and below occupancy', () => {
+            const location = LocationFactory.build({
+              accommodationTypes: ['NORMAL_ACCOMMODATION'],
+              capacity: {
+                maxCapacity: 3,
+                workingCapacity: 3,
+              },
+              leafLevel: true,
+              specialistCellTypes: ['ACCESSIBLE_CELL'],
+              localName: '1-1-001',
+            })
+            cy.task('stubGetLocation', location)
+
+            const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
+
+            reviewCellCapacityPage.maxCapacityInput().clear().type('0')
+            reviewCellCapacityPage.workingCapacityInput().clear().type('0')
+            reviewCellCapacityPage.continueButton().click()
+
+            cy.get('.govuk-error-summary__title').contains('There is a problem')
+            cy.get('.govuk-error-summary__list').contains('Maximum capacity cannot be 0')
+            cy.get('#maxCapacity-error').contains('Maximum capacity cannot be 0')
+          })
+
           it('shows the correct validation error when max capacity > 99', () => {
             const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 
