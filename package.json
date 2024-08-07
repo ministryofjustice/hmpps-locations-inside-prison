@@ -108,6 +108,7 @@
     "csurf": "^1.11.0",
     "date-fns": "^3.6.0",
     "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
     "express-prom-bundle": "^7.0.0",
     "express-session": "^1.18.0",
     "govuk-frontend": "^5.4.1",
