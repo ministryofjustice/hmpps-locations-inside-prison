@@ -1,3 +1,4 @@
+import greaterThan from '../../validators/greaterThan'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 
 const fields = {
@@ -23,7 +24,13 @@ const fields = {
   },
   maxCapacity: {
     component: 'govukInput',
-    validate: ['required', 'numeric', { fn: lessThanOrEqualTo, arguments: [99] }],
+    validate: [
+      'required',
+      'numeric',
+      { fn: greaterThan, arguments: [0] },
+      { fn: lessThanOrEqualTo, arguments: [99]},
+    ],
+    errorMessages: { greaterThan: 'Maximum capacity cannot be 0' },
     id: 'maxCapacity',
     name: 'maxCapacity',
     classes: 'govuk-input--width-2',

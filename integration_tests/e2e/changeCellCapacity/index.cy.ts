@@ -243,6 +243,32 @@ context('Change cell capacity', () => {
         cy.get('#maxCapacity-error').contains('Maximum capacity must be a number')
       })
 
+      it('shows the correct validation error when max capacity is zero', () => {
+        const location = LocationFactory.build({
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
+          capacity: {
+            maxCapacity: 3,
+            workingCapacity: 3,
+          },
+          leafLevel: true,
+          specialistCellTypes: ['ACCESSIBLE_CELL'],
+          localName: '1-1-001',
+        })
+        cy.task('stubGetLocation', location)
+        cy.task('stubGetPrisonersInLocation', [])
+
+        ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
+        const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
+
+        changeCellCapacityPage.maxCapacityInput().clear().type('0')
+        changeCellCapacityPage.workingCapacityInput().clear().type('0')
+        changeCellCapacityPage.continueButton().click()
+
+        cy.get('.govuk-error-summary__title').contains('There is a problem')
+        cy.get('.govuk-error-summary__list').contains('Maximum capacity cannot be 0')
+        cy.get('#maxCapacity-error').contains('Maximum capacity cannot be 0')
+      })
+
       it('shows the correct validation errors when max capacity is less than current occupancy', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
