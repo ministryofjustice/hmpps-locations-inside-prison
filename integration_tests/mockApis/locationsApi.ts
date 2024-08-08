@@ -281,6 +281,29 @@ const stubSignedOperationalCapacityGet = (
     },
   })
 
+const stubSignedOperationalCapacityGetNotFound = (
+  returnData = {
+    status: 404,
+    userMessage: 'No location found for ID `de91dfa7-821f-4552-a427-bf2f32eafeb0',
+    developerMessage: 'blah',
+    errorCode: 101,
+    moreInfo: 'blahblah',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/signed-op-cap/\\w+',
+    },
+    response: {
+      status: 404,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubSignedOperationalCapacityUpdate = () =>
   stubFor({
     request: {
@@ -419,6 +442,7 @@ export default {
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
   stubSignedOperationalCapacityGet,
+  stubSignedOperationalCapacityGetNotFound,
   stubSignedOperationalCapacityUpdate,
   stubUpdateCapacity,
   stubUpdateSpecialistCellTypes,

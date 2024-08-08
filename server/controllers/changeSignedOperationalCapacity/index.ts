@@ -14,26 +14,36 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     const { locationsService, manageUsersService } = req.services
 
     const token = await req.services.authService.getSystemClientToken(user.username)
-    const signedOperationalCapacitySummary = await locationsService.getSignedOperationalCapacity(
-      token,
-      res.locals.prisonId,
-    )
-    res.locals.currentSignedOperationalCapacity = signedOperationalCapacitySummary?.signedOperationCapacity
-
-    const whenUpdated = new Date(signedOperationalCapacitySummary?.whenUpdated)
-    res.locals.whenUpdatedWeekday = whenUpdated.toLocaleString('en', { weekday: 'long' })
-    res.locals.whenUpdatedDay = whenUpdated.getDate()
-    res.locals.whenUpdatedMonth = whenUpdated.toLocaleString('en', { month: 'long' })
-    res.locals.whenUpdatedYear = whenUpdated.toLocaleString('en', { year: 'numeric' })
-    res.locals.whenUpdatedTime = whenUpdated.toLocaleString('en', { timeStyle: 'short', hour12: false })
+    try {
+      const signedOperationalCapacitySummary = await locationsService.getSignedOperationalCapacity(
+        token,
+        res.locals.prisonId,
+      )
+      const whenUpdated = new Date(signedOperationalCapacitySummary.whenUpdated)
+      const whenUpdatedWeekday = whenUpdated.toLocaleString('en', { weekday: 'long' })
+      const whenUpdatedDay = whenUpdated.getDate()
+      const whenUpdatedMonth = whenUpdated.toLocaleString('en', { month: 'long' })
+      const whenUpdatedYear = whenUpdated.toLocaleString('en', { year: 'numeric' })
+      const { updatedBy: updatedByUsername } = signedOperationalCapacitySummary || {}
+      const updatedBy: string = updatedByUsername
+        ? (await manageUsersService.getUser(res.locals.user.token, updatedByUsername))?.name || updatedByUsername
+        : updatedByUsername
+      res.locals.lastUpdate = {
+        time: whenUpdated.toLocaleString('en', { timeStyle: 'short', hour12: false }),
+        date: `${whenUpdatedWeekday} ${whenUpdatedDay} ${whenUpdatedMonth} ${whenUpdatedYear}`,
+        updatedBy,
+      }
+      res.locals.currentSignedOperationalCapacity = signedOperationalCapacitySummary.signedOperationCapacity
+    } catch (e) {
+      if (e.status === 404) {
+        res.locals.currentSignedOperationalCapacity = 0
+      } else {
+        throw e
+      }
+    }
 
     const residentialSummary = await locationsService.getResidentialSummary(token, res.locals.prisonId)
     res.locals.maxCapacity = residentialSummary?.prisonSummary?.maxCapacity
-
-    const { updatedBy } = signedOperationalCapacitySummary || {}
-    res.locals.updatedBy = updatedBy
-      ? (await manageUsersService.getUser(res.locals.user.token, updatedBy))?.name || updatedBy
-      : updatedBy
 
     next()
   }

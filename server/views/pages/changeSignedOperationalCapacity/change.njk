@@ -67,9 +67,13 @@
           <div class="govuk-!-padding-bottom-2 current-signed-operational-capacity-summary">
             <h2 class="govuk-heading-m">Current signed operational capacity</h2>
             <p>{{ currentSignedOperationalCapacity }}</p>
-            <p class="govuk-body-s">Last updated by {{ updatedBy }}
-              on {{ whenUpdatedWeekday }} {{ whenUpdatedDay }} {{ whenUpdatedMonth }} {{ whenUpdatedYear }}
-              at {{ whenUpdatedTime }}</p>
+            {% if lastUpdate %}
+              <p class="govuk-body-s">
+                Last updated by {{ lastUpdate.updatedBy }}
+                on {{ lastUpdate.date }}
+                at {{ lastUpdate.time }}
+              </p>
+            {% endif %}
           </div>
 
           {% block fields %}
