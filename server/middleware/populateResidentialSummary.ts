@@ -96,7 +96,7 @@ export default function populateResidentialSummary({
         locationHistory?: boolean // TODO: change this type when location history tab is implemented
         subLocationName: string
         subLocations: Location[]
-        summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string }[]
+        summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string; linkAriaLabel?: string }[]
       } = {
         subLocationName: apiData.subLocationName,
         subLocations: await Promise.all(
@@ -170,10 +170,11 @@ export default function populateResidentialSummary({
           )
         }
       } else if (apiData.prisonSummary) {
-        const changeLink: { linkHref?: string; linkLabel?: string } = {}
+        const changeLink: { linkHref?: string; linkLabel?: string; linkAriaLabel?: string } = {}
         if (req.canAccess('change_signed_operational_capacity')) {
           changeLink.linkHref = `/change-signed-operational-capacity/${prisonId}`
           changeLink.linkLabel = 'Change'
+          changeLink.linkAriaLabel = 'Change signed operational capacity'
         }
         residentialSummary.summaryCards.push(
           { type: 'working-capacity', text: apiData.prisonSummary.workingCapacity.toString() },
