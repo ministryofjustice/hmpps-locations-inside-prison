@@ -102,6 +102,16 @@ context('Change signed operational capacity', () => {
       )
     })
 
+    it('shows 0 and no last update row when sign op cap not found', () => {
+      cy.task('stubSignedOperationalCapacityGetNotFound')
+
+      ChangeSignedOperationalCapacityPage.goTo('TST')
+
+      cy.get('.current-signed-operational-capacity-summary h2').contains('Current signed operational capacity')
+      cy.get('.current-signed-operational-capacity-summary p').contains('0')
+      cy.get('.current-signed-operational-capacity-summary p').contains('Last updated by').should('not.exist')
+    })
+
     it('has a cancel link', () => {
       ChangeSignedOperationalCapacityPage.goTo('TST')
       const changeSignedOperationalPage = Page.verifyOnPage(ChangeSignedOperationalCapacityPage)
