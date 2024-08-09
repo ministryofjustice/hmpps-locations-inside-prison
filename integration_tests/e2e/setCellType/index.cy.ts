@@ -137,12 +137,27 @@ context('Set cell type', () => {
         cy.get('.govuk-caption-m').contains('Cell 1-1-001')
       })
 
-      it('can be accessed by clicking the change link on the show location page', () => {
+      it('can be accessed by clicking the set cell type link on the show location page', () => {
         cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.setSpecificCellTypeLink().click()
 
         Page.verifyOnPage(SetCellTypePage)
+      })
+
+      it('does not show the set cell type link when the cell is inactive', () => {
+        const location = LocationFactory.build({
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
+          active: false,
+          leafLevel: true,
+          specialistCellTypes: [],
+          localName: '1-1-001',
+        })
+        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+        cy.task('stubGetLocation', location)
+        cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.setSpecificCellTypeLink().should('not.exist')
       })
 
       it('shows the correct validation error when nothing is selected', () => {
@@ -198,6 +213,21 @@ context('Set cell type', () => {
         viewLocationsShowPage.changeSpecificCellTypeLink().click()
 
         Page.verifyOnPage(SetCellTypePage)
+      })
+
+      it('does not show the change cell type link when the cell is inactive', () => {
+        const location = LocationFactory.build({
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
+          active: false,
+          leafLevel: true,
+          localName: '1-1-001',
+          specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+        })
+        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+        cy.task('stubGetLocation', location)
+        cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.changeSpecificCellTypeLink().should('not.exist')
       })
 
       it('shows the correct validation error when nothing is selected', () => {

@@ -11,16 +11,20 @@ function showChangeCapacityLink(location: Location, req: Request) {
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
-function cellTypesRow(specialistCellTypes: string[], locationId: string, req: Request): SummaryListRow {
-  const setCellTypeUrl = `/location/${locationId}/set-cell-type`
-  const removeCellTypeUrl = `/location/${locationId}/remove-cell-type`
+function showEditCellTypeLinks(location: Location, req: Request) {
+  return location.active && req.canAccess('set_cell_type')
+}
+
+function cellTypesRow(specialistCellTypes: string[], location: Location, req: Request): SummaryListRow {
+  const setCellTypeUrl = `/location/${location.id}/set-cell-type`
+  const removeCellTypeUrl = `/location/${location.id}/remove-cell-type`
   const row: any = { key: { text: 'Cell type' } }
   if (specialistCellTypes.length) {
     row.value = {
       html: specialistCellTypes.join('<br>'),
     }
 
-    if (req.canAccess('set_cell_type')) {
+    if (showEditCellTypeLinks(location, req)) {
       row.actions = {
         items: [
           {
@@ -34,7 +38,7 @@ function cellTypesRow(specialistCellTypes: string[], locationId: string, req: Re
         ],
       }
     }
-  } else if (req.canAccess('set_cell_type')) {
+  } else if (showEditCellTypeLinks(location, req)) {
     row.value = {
       html: `<a href="${setCellTypeUrl}" class="govuk-link">Set specific cell type</a>`,
     }
@@ -53,7 +57,7 @@ function getLocationDetails(location: Location, req: Request) {
     details.push({ key: { text: 'Non-residential room' }, value: { text: location.convertedCellType } })
   } else {
     if (location.locationType === 'Cell') {
-      details.push(cellTypesRow(location.specialistCellTypes, location.id, req))
+      details.push(cellTypesRow(location.specialistCellTypes, location, req))
     }
 
     details.push({
