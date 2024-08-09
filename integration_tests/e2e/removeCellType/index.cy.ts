@@ -112,6 +112,27 @@ context('Remove cell type', () => {
       cy.task('stubGetPrisonersInLocation', prisonerLocations)
     })
 
+    it('does not show the remove cell type link when the cell is inactive', () => {
+      const location = LocationFactory.build({
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
+        active: false,
+        capacity: {
+          maxCapacity: 2,
+          workingCapacity: 1,
+        },
+        leafLevel: true,
+        localName: '1-1-001',
+        specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
+      })
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+      cy.task('stubGetLocation', location)
+      cy.signIn()
+      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+
+      viewLocationsShowPage.removeSpecificCellTypeLink().should('not.exist')
+    })
+
     context('when the working capacity is >= 1', () => {
       beforeEach(() => {
         const location = LocationFactory.build({
