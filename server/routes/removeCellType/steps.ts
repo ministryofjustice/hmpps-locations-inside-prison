@@ -6,8 +6,8 @@ import ReviewCellCapacity from '../../controllers/removeCellType/review'
 import ConfirmRemoveCellType from '../../controllers/removeCellType/confirm'
 
 function mustReviewCapacity(req: FormWizard.Request, res: Response) {
-  const { accommodationTypes, capacity } = res.locals.location
-  return capacity?.workingCapacity === 0 && accommodationTypes.includes('NORMAL_ACCOMMODATION')
+  const { accommodationTypes, active, capacity } = res.locals.location
+  return active && capacity?.workingCapacity === 0 && accommodationTypes.includes('NORMAL_ACCOMMODATION')
 }
 
 const steps = {
