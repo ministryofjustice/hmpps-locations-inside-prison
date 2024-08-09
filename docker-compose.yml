@@ -74,7 +74,7 @@ services:
       - LOCATIONS_INSIDE_PRISON_API_CLIENT_SECRET=clientsecret
 
   localstack:
-    image: localstack/localstack:3
+    image: ghcr.io/ministryofjustice/hmpps-localstack:latest
     networks:
       - hmpps
     container_name: localstack
@@ -102,12 +102,12 @@ services:
       - POSTGRES_DB=locations_inside_prison
 
   prisoner-search:
-    image: wiremock/wiremock:3.9.1
+    image: ghcr.io/ministryofjustice/hmpps-wiremock:latest
     networks:
       - hmpps
     container_name: prisoner-search
     ports:
-      - "8083:8080"
+      - "8083:8090"
     volumes:
       - ./wiremock:/home/wiremock
 

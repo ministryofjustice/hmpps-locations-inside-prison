@@ -18,5 +18,10 @@ generic-service:
     ENVIRONMENT_NAME: TRAINING
     AUDIT_ENABLED: "false"
 
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - prisons
+      
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
