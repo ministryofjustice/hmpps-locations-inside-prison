@@ -1,0 +1,18 @@
+{
+  "totalPages": 0,
+  "totalElements": 0,
+  "first": true,
+  "last": true,
+  "size": 0,
+  "content": [],
+  "number": 0,
+  "numberOfElements": 0,
+  "pageable": {
+    "offset": 0,
+    "pageSize": 0,
+    "paged": true,
+    "pageNumber": 0,
+    "unpaged": true
+  },
+  "empty": true
+}
