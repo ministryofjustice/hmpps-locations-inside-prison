@@ -8,6 +8,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "attribute-search.json"
+    "bodyFileName": "attribute-search-noresult.json"
   }
 }
