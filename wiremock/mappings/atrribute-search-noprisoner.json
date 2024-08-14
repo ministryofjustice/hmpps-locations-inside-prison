@@ -1,7 +1,12 @@
 {
   "request": {
     "method": "POST",
-    "urlPath": "/attribute-search"
+    "urlPath": "/attribute-search",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$.queries[*].matchers[?(@.searchTerm != 'BXI')]"
+      }
+    ]
   },
   "response": {
     "status": 200,
