@@ -4,9 +4,7 @@
     "urlPath": "/attribute-search",
     "bodyPatterns": [
       {
-        "equalToJson": "[ \"A-1-001\" ]",
-        "ignoreArrayOrder": true,
-        "ignoreExtraElements": true
+        "matchesJsonPath": "$.queries[*].matchers[?(@.searchTerm == 'BXI')]"
       }
     ]
   },
