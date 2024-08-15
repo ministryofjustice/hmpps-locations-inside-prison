@@ -31,22 +31,22 @@ export default class FormInitialStep extends FormWizard.Controller {
   getErrorDetail(error: { args: any; key: string; type: string }, res: Response): { text: string; href: string } {
     const { fields } = res.locals.options
     const field = fields[error.key]
-    const fieldName: string = field.label.text
-    const errorMessageOverrides = field.errorMessages || {}
+    const fieldName: string = field?.label?.text
+    const errorMessageOverrides = field?.errorMessages || {}
 
     const errorMessages: Record<string, string> = {
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
       lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args.lessThanOrEqualTo, fields)}`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
-      required: `Enter a ${fieldName.toLowerCase()}`,
+      required: `Enter a ${fieldName?.toLowerCase()}`,
       doesNotExceedEstMaxCap: `${fieldName} cannot be more than the establishment's maximum capacity`,
     }
 
     const errorMessage = errorMessageOverrides[error.type] || errorMessages[error.type] || `${fieldName} is invalid`
     return {
       text: errorMessage,
-      href: `#${field.id}`,
+      href: `#${field?.id}`,
     }
   }
 
@@ -54,7 +54,8 @@ export default class FormInitialStep extends FormWizard.Controller {
     const { fields } = res.locals.options
     const { values } = res.locals
     Object.keys(fields).forEach(fieldName => {
-      fields[fieldName].value = values[fieldName]
+      const value = values[fieldName]
+      fields[fieldName].value = value?.value || value
     })
 
     const validationErrors: { text: string; href: string }[] = []
@@ -62,7 +63,10 @@ export default class FormInitialStep extends FormWizard.Controller {
     res.locals.errorlist.forEach((error: { args: any; key: string; type: string }) => {
       const errorDetail = this.getErrorDetail(error, res)
       validationErrors.push(errorDetail)
-      fields[error.key].errorMessage = errorDetail
+      const field = fields[error.key]
+      if (field) {
+        fields[error.key].errorMessage = errorDetail
+      }
     })
 
     return {

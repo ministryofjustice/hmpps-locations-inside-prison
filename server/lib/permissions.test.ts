@@ -6,13 +6,18 @@ describe('rolesToPermissions', () => {
   })
 
   it('returns the correct permissions for MANAGE_RESIDENTIAL_LOCATIONS', () => {
-    expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS'])).toEqual(['change_cell_capacity', 'set_cell_type'])
+    expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS'])).toEqual([
+      'change_cell_capacity',
+      'convert_non_residential',
+      'set_cell_type',
+    ])
   })
 
   it('returns the correct permissions for MANAGE_RES_LOCATIONS_OP_CAP', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP'])).toEqual([
       'change_cell_capacity',
       'change_signed_operational_capacity',
+      'convert_non_residential',
       'set_cell_type',
     ])
   })
@@ -24,6 +29,11 @@ describe('rolesToPermissions', () => {
         'MANAGE_RESIDENTIAL_LOCATIONS',
         'MANAGE_RES_LOCATIONS_OP_CAP',
       ]).sort(),
-    ).toEqual(['change_cell_capacity', 'change_signed_operational_capacity', 'set_cell_type'])
+    ).toEqual([
+      'change_cell_capacity',
+      'change_signed_operational_capacity',
+      'convert_non_residential',
+      'set_cell_type',
+    ])
   })
 })

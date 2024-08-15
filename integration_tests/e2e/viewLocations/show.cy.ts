@@ -219,7 +219,7 @@ context('View Locations Show', () => {
           .locationDetailsRows()
           .eq(detailsRows)
           .find('.govuk-summary-list__value')
-          .contains('Test type')
+          .contains('Office')
         detailsRows += 1
       }
 
@@ -442,7 +442,7 @@ context('View Locations Show', () => {
         specialistCellTypes: ['ACCESSIBLE_CELL'],
         usedFor: [],
         status: 'ACTIVE',
-        convertedCellType: 'TEST_TYPE',
+        convertedCellType: 'OFFICE',
         active: true,
         deactivatedByParent: false,
         deactivatedReason: 'TEST_TYPE',

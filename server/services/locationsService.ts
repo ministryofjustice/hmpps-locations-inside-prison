@@ -1,3 +1,4 @@
+import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
 
 export default class LocationsService {
@@ -15,6 +16,19 @@ export default class LocationsService {
     return this.constantDataMaps[apiCallName]
   }
 
+  async convertCellToNonResCell(
+    token: string,
+    locationId: string,
+    convertedCellType: string,
+    otherConvertedCellType?: string,
+  ) {
+    const params = pickBy({ convertedCellType, otherConvertedCellType }) as {
+      convertedCellType: string
+      otherConvertedCellType?: string
+    }
+    return this.locationsApiClient.locations.convertCellToNonResCell(token, { locationId }, params)
+  }
+
   async getAccommodationType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getAccommodationTypes'))[key] || 'Unknown'
   }
@@ -25,6 +39,10 @@ export default class LocationsService {
 
   async getConvertedCellType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getConvertedCellTypes'))[key] || 'Unknown'
+  }
+
+  async getConvertedCellTypes(token: string) {
+    return (await this.locationsApiClient.constants.getConvertedCellTypes(token)).convertedCellTypes
   }
 
   async getDeactivatedReason(token: string, key: string) {

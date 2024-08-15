@@ -2,11 +2,16 @@ import { uniq } from 'lodash'
 
 const viewInternalLocationPermissions: string[] = []
 
-const manageResidentialLocationsPermissions: string[] = ['change_cell_capacity', 'set_cell_type']
+const manageResidentialLocationsPermissions: string[] = [
+  'change_cell_capacity',
+  'convert_non_residential',
+  'set_cell_type',
+]
 
 const manageResLocationsOpCapPermissions: string[] = [
   'change_cell_capacity',
   'change_signed_operational_capacity',
+  'convert_non_residential',
   'set_cell_type',
 ]
 
