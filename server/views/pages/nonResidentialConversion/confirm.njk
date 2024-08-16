@@ -1,0 +1,108 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set title = "Confirm conversion to non-residential room" %}
+{% set locationName = location.localName or location.pathHierarchy %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </div>
+{% endblock %}
+
+{% block heading %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+        <h1 class="govuk-heading-l">Confirm conversion to non-residential room</h1>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+
+  {% set formMethod = options.method | default('post') %}
+  {% set formAction = options.action | default('') %}
+  {% set formEnctype = options.enctype | default('') %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukSummaryList({
+          card: {
+            title: {
+              text: "Non-residential details"
+            },
+            actions: {
+              items: [
+                {
+                  href: backLink,
+                  text: "Change"
+                }
+              ]
+            }
+          },
+          rows: [
+            {
+              key: {
+                text: "Non-residential room"
+              },
+              value: {
+                html: convertedCellTypeDetails
+              }
+            }
+          ]
+        }) }}
+
+        <div class="govuk-!-padding-bottom-2 change-summary">
+          <h2 class="govuk-heading-m">Change to establishment capacity</h2>
+
+          {{ govukWarningText({
+            text: "This cell will be decertified",
+            iconFallbackText: "Warning",
+            classes: "govuk-!-margin-bottom-5"
+          }) }}
+
+          <p>{{ changeSummary | safe }}</p>
+        </div>
+
+        <form method="{{ formMethod }}" action="{{ formAction }}"
+        {% if formEnctype %}
+          enctype="{{ formEnctype }}"
+        {% endif %}
+        >
+
+          {% if formMethod == 'post' %}
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          {% endif %}
+
+          <div class="govuk-button-group">
+            {% block formActions %}
+              {% block submitAction %}
+                {{ govukButton({
+                  text: "Confirm conversion",
+                  preventDoubleClick: true,
+                  type: "submit"
+                }) }}
+              {% endblock %}
+            {% endblock %}
+          </div>
+        </form>
+
+        <p class="govuk-body">
+          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
+            Cancel and return to location details
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

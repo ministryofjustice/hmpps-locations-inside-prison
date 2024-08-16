@@ -22,6 +22,11 @@ export default class ViewLocationsShowPage extends Page {
 
   inactiveBannerRows = (): PageElement => this.inactiveBanner().find('.govuk-summary-list__row')
 
+  actionsMenu = (): PageElement => cy.get('button.moj-button-menu__toggle-button')
+
+  convertToNonResAction = (): PageElement =>
+    cy.get('.moj-button-menu__wrapper a:contains("Convert to non-residential room")')
+
   summaryCards = {
     all: (): PageElement => cy.get('.hmpps-summary-card'),
     workingCapacityText: (): PageElement =>
