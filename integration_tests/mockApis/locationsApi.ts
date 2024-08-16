@@ -32,7 +32,20 @@ const stubLocationsConstantsConvertedCellType = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {
-        deactivatedReasons: [{ key: 'TEST_TYPE', description: 'Test type' }],
+        convertedCellTypes: [
+          {
+            key: 'KITCHEN_SERVERY',
+            description: 'Kitchen / Servery',
+          },
+          {
+            key: 'OFFICE',
+            description: 'Office',
+          },
+          {
+            key: 'OTHER',
+            description: 'Other',
+          },
+        ],
       },
     },
   })
@@ -424,7 +437,23 @@ const stubUpdateSpecialistCellTypes = () =>
     },
   })
 
+const stubConvertCellToNonResCell = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/convert-cell-to-non-res-cell',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
+  stubConvertCellToNonResCell,
   stubGetLocation,
   stubGetPrisonersInLocation,
   stubLocationsConstantsAccommodationType,

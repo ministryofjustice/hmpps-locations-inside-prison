@@ -72,3 +72,25 @@ h1 .govuk-caption-l {
     width: 66.666%;
   }
 }
+
+.govuk-panel {
+  p.govuk-body-l {
+    @include govuk-font($size: 24);
+  }
+}
+
+.govuk-panel--left-align {
+  text-align: left;
+}
+
+.govuk-panel--brand-colour {
+  background: $govuk-brand-colour;
+
+  p {
+    color: govuk-colour("white");
+  }
+}
+
+.govuk-\!-float-right {
+  float: right;
+}

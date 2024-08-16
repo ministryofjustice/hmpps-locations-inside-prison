@@ -39,6 +39,7 @@ describe('Locations service', () => {
         .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
     }
     locationsApiClient.locations = {
+      convertCellToNonResCell: jest.fn(),
       getLocation: jest.fn(),
       getResidentialSummary: jest.fn(),
       prison: {
@@ -54,29 +55,33 @@ describe('Locations service', () => {
     locationsService = new LocationsService(locationsApiClient)
   })
 
+  function serviceCall(methodName: keyof LocationsService): (...args: unknown[]) => unknown {
+    return locationsService[methodName].bind(locationsService)
+  }
+
   function testConstantDataGetter(
     apiCallName: keyof LocationsApiClient['constants'],
     serviceCallName: keyof LocationsService,
   ) {
     describe(serviceCallName, () => {
       it('calls the correct client function', async () => {
-        await locationsService[serviceCallName]('token', 'TYPE')
+        await serviceCall(serviceCallName)('token', 'TYPE')
 
         expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledWith('token')
       })
 
       it('returns "Unknown" if the type does not exist', async () => {
-        expect(await locationsService[serviceCallName]('token', 'TYPE')).toEqual('Unknown')
+        expect(await serviceCall(serviceCallName)('token', 'TYPE')).toEqual('Unknown')
       })
 
       it('returns the description if the type does exist', async () => {
-        expect(await locationsService[serviceCallName]('token', 'KEY')).toEqual('description')
+        expect(await serviceCall(serviceCallName)('token', 'KEY')).toEqual('description')
       })
 
       it('only calls the api once per request', async () => {
-        await locationsService[serviceCallName]('token', 'TYPE')
-        await locationsService[serviceCallName]('token', 'TYPE')
-        await locationsService[serviceCallName]('token', 'TYPE')
+        await serviceCall(serviceCallName)('token', 'TYPE')
+        await serviceCall(serviceCallName)('token', 'TYPE')
+        await serviceCall(serviceCallName)('token', 'TYPE')
 
         expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledWith('token')
         expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledTimes(1)
@@ -167,6 +172,23 @@ describe('Locations service', () => {
           locationId: '481fc587-60f8-402b-804d-64462babddcc',
         },
         ['CAT_A'],
+      )
+    })
+  })
+
+  describe('convertCellToNonResCell', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.convertCellToNonResCell(
+        'token',
+        '481fc587-60f8-402b-804d-64462babddcc',
+        'OTHER',
+        'tuck shop',
+      )
+
+      expect(locationsApiClient.locations.convertCellToNonResCell).toHaveBeenCalledWith(
+        'token',
+        { locationId: '481fc587-60f8-402b-804d-64462babddcc' },
+        { convertedCellType: 'OTHER', otherConvertedCellType: 'tuck shop' },
       )
     })
   })

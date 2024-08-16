@@ -90,6 +90,7 @@ declare module 'hmpo-form-wizard' {
           fields: Fields
           steps: Steps
           locals: Record<string, boolean | string>
+          next?: string
         }
         persistedAnswers: Record<string, string | string[]>
       }
@@ -219,6 +220,9 @@ declare module 'hmpo-form-wizard' {
       items?: {
         text: string
         value: string
+        conditional?: {
+          html: string
+        }
       }[]
     }
 

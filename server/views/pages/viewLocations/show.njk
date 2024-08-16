@@ -2,6 +2,7 @@
 
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
 
 {% from "../../macros/inactiveLocationBanner.njk" import inactiveLocationBanner %}
 {% from "../../macros/locationDetails.njk" import locationDetails %}
@@ -13,6 +14,14 @@
 {% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
 {% set prependedLocationName = residentialSummary.location.localName or locationType + " " + residentialSummary.location.pathHierarchy %}
 {% set title = prependedLocationName + ' - View and update locations' %}
+
+{% block head %}
+  {{ super() }}
+
+  {% if actions | length %}
+    <script src="/assets/js/buttonMenu.js"></script>
+  {% endif %}
+{% endblock %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -42,20 +51,32 @@
 {% endblock %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
-  <h1 class="govuk-heading-l">
-    {{ locationName }}
-    {% if residentialSummary.location.leafLevel and residentialSummary.location.certification and residentialSummary.location.certification.certified %}
-      {{ govukTag({
-        text: 'Certified',
-        classes: "govuk-tag--hollow",
-        attributes: {
-          "data-qa": "certified-tag"
-        }
-      }) }}
-    {% endif %}
-    {{ locationStatusTag(residentialSummary.location) }}
-  </h1>
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-three-quarters">
+        <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
+        <h1 class="govuk-heading-l">
+          {{ locationName }}
+          {% if residentialSummary.location.leafLevel and residentialSummary.location.certification and residentialSummary.location.certification.certified %}
+            {{ govukTag({
+              text: 'Certified',
+              classes: "govuk-tag--hollow",
+              attributes: {
+                "data-qa": "certified-tag"
+              }
+            }) }}
+          {% endif %}
+          {{ locationStatusTag(residentialSummary.location) }}
+
+          {% if actions | length %}
+            <div class="govuk-!-float-right">
+              {{ mojButtonMenu({ items: actions }) }}
+            </div>
+          {% endif %}
+        </h1>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block content %}

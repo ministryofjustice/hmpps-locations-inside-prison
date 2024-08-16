@@ -177,6 +177,14 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   locations = {
+    convertCellToNonResCell: this.apiCall<
+      Location,
+      { locationId: string },
+      { convertedCellType: string; otherConvertedCellType?: string }
+    >({
+      path: '/locations/:locationId/convert-cell-to-non-res-cell',
+      requestType: 'put',
+    }),
     getLocation: this.apiCall<Location, { locationId: string }>({
       path: '/locations/:locationId',
       requestType: 'get',

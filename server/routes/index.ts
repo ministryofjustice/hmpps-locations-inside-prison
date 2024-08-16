@@ -13,6 +13,7 @@ import changeCellCapacityRouter from './changeCellCapacity'
 import changeSignedOperationalCapacityRouter from './changeSignedOperationalCapacity'
 import setCellTypeRouter from './setCellType'
 import removeCellTypeRouter from './removeCellType'
+import nonResidentialConversionRouter from './nonResidentialConversion'
 import addServicesToRequest from '../middleware/addServicesToRequest'
 
 export default function routes(services: Services): Router {
@@ -40,6 +41,8 @@ export default function routes(services: Services): Router {
   router.use('/location/:cellId/set-cell-type', setCellTypeRouter)
 
   router.use('/location/:cellId/remove-cell-type', removeCellTypeRouter)
+
+  router.use('/location/:cellId/non-residential-conversion', nonResidentialConversionRouter)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
 

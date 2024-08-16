@@ -334,7 +334,7 @@ context('Change cell capacity', () => {
     })
 
     describe('confirm cell capacity', () => {
-      it('has a back link to the show location page', () => {
+      it('has a back link to the change cell capacity page', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
         changeCellCapacityPage.workingCapacityInput().clear().type('2')
