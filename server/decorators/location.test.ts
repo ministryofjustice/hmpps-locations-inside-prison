@@ -69,7 +69,7 @@ describe('decorateLocation', () => {
       })
 
       expect(decoratedLocation.accommodationTypes).toEqual(location.accommodationTypes.map(s => `Resolved ${s}`))
-      expect(decoratedLocation.convertedCellType).toEqual(location.convertedCellType)
+      expect(decoratedLocation.convertedCellType).toEqual(`Resolved ${location.convertedCellType}`)
       expect(decoratedLocation.deactivatedBy).toEqual(location.deactivatedBy)
       expect(decoratedLocation.deactivatedReason).toEqual(location.deactivatedReason)
       expect(decoratedLocation.lastModifiedBy).toEqual(location.lastModifiedBy)

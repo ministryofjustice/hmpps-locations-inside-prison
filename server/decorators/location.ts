@@ -25,10 +25,9 @@ export default async function decorateLocation({
     accommodationTypes: await Promise.all(
       location.accommodationTypes.map(a => locationsService.getAccommodationType(systemToken, a)),
     ),
-    convertedCellType:
-      location.convertedCellType && !limited
-        ? await locationsService.getConvertedCellType(systemToken, location.convertedCellType)
-        : location.convertedCellType,
+    convertedCellType: location.convertedCellType
+      ? await locationsService.getConvertedCellType(systemToken, location.convertedCellType)
+      : location.convertedCellType,
     deactivatedBy:
       location.deactivatedBy && !limited
         ? (await manageUsersService.getUser(userToken, location.deactivatedBy))?.name || location.deactivatedBy
