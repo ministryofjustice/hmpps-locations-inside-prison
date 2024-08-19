@@ -13,17 +13,27 @@
     {% endif %}
 
     {% for item in locations %}
+      {% set column5Html %}
+        {% if item.status == 'NON_RESIDENTIAL' %}
+          {{ item.convertedCellType if not item.otherConvertedCellType else item.convertedCellType + ' - ' + item.otherConvertedCellType }}
+        {% else %}
+          {% if leafLevel %}
+            {{ item.specialistCellTypes | join('<br>') | safe }}
+          {% elif item.inactiveCells > 0 %}
+            <a href="/inactive-cells/{{ item.prisonId }}/{{ item.id }}">{{ item.inactiveCells }}</a>
+          {% else %}
+            0
+          {% endif %}
+        {% endif %}
+      {% endset %}
+
       {% set rows = (rows.push(
         [
           { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
           { html: locationStatusTag(item) },
           { text: 'None' if item.status == 'NON_RESIDENTIAL' else (item.capacity.workingCapacity if item.capacity.workingCapacity >= 0 else '-') },
           { text: 'None' if item.status == 'NON_RESIDENTIAL' else (item.capacity.maxCapacity if item.capacity.maxCapacity >= 0 else '-') },
-          (
-            {
-              html: "<a href='/inactive-cells/" + item.prisonId + "/" + item.id + "'>" + item.inactiveCells + "</a>"
-            } if item.inactiveCells > 0 else { text: '0' }
-          ) if not leafLevel else { html: item.specialistCellTypes | join('<br>') },
+          { html: column5Html },
           { html: item.accommodationTypes | join('<br>') } if not leafLevel,
           { html: item.usedFor | join('<br>') } if not leafLevel
         ]

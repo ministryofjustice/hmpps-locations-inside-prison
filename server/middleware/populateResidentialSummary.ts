@@ -15,7 +15,8 @@ function showEditCellTypeLinks(location: Location, req: Request) {
   return location.active && req.canAccess('set_cell_type')
 }
 
-function cellTypesRow(specialistCellTypes: string[], location: Location, req: Request): SummaryListRow {
+function cellTypesRow(location: Location, req: Request): SummaryListRow {
+  const { specialistCellTypes } = location
   const setCellTypeUrl = `/location/${location.id}/set-cell-type`
   const removeCellTypeUrl = `/location/${location.id}/remove-cell-type`
   const row: any = { key: { text: 'Cell type' } }
@@ -46,6 +47,13 @@ function cellTypesRow(specialistCellTypes: string[], location: Location, req: Re
   return row
 }
 
+function nonResCellTypeRow(location: Location) {
+  const { convertedCellType, otherConvertedCellType } = location
+  const text = otherConvertedCellType?.length ? `${convertedCellType} - ${otherConvertedCellType}` : convertedCellType
+
+  return { key: { text: 'Non-residential room' }, value: { text } }
+}
+
 function getLocationDetails(location: Location, req: Request) {
   const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
 
@@ -54,10 +62,10 @@ function getLocationDetails(location: Location, req: Request) {
   }
 
   if (location.status === 'NON_RESIDENTIAL') {
-    details.push({ key: { text: 'Non-residential room' }, value: { text: location.convertedCellType } })
+    details.push(nonResCellTypeRow(location))
   } else {
     if (location.locationType === 'Cell') {
-      details.push(cellTypesRow(location.specialistCellTypes, location, req))
+      details.push(cellTypesRow(location, req))
     }
 
     details.push({
