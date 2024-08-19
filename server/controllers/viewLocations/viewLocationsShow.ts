@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 
 export default async (req: Request, res: Response) => {
   const { location } = res.locals.residentialSummary
+  const { isResidential, leafLevel } = location
 
   const banner: {
     success?: {
@@ -16,7 +17,7 @@ export default async (req: Request, res: Response) => {
   }
 
   const actions: { text: string; href: string }[] = []
-  if (req.canAccess('convert_non_residential') && location.isResidential) {
+  if (req.canAccess('convert_non_residential') && isResidential && leafLevel) {
     actions.push({
       text: 'Convert to non-residential room',
       href: `/location/${location.id}/non-residential-conversion`,
