@@ -16,7 +16,7 @@ describe('view locations show', () => {
       // @ts-ignore
       locals: {
         residentialSummary: {
-          location: LocationFactory.build(),
+          location: LocationFactory.build({ isResidential: true, leafLevel: true }),
         },
       },
       render: jest.fn(),
@@ -69,7 +69,18 @@ describe('view locations show', () => {
     })
 
     it('adds no action for non-res cell', () => {
-      res.locals.residentialSummary.location = LocationFactory.build({ isResidential: false })
+      res.locals.residentialSummary.location = LocationFactory.build({ isResidential: false, leafLevel: true })
+
+      controller(req, res)
+
+      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        actions: [],
+        banner: {},
+      })
+    })
+
+    it('adds no action when not leaf level', () => {
+      res.locals.residentialSummary.location = LocationFactory.build({ isResidential: true, leafLevel: false })
 
       controller(req, res)
 
