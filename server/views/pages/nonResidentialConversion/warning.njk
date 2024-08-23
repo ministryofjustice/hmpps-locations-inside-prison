@@ -8,6 +8,9 @@
 {% block heading %}
 {% endblock %}
 
+{% block beforeContent %}
+{% endblock %}
+
 {% block content %}
   {% set formMethod = options.method | default('post') %}
   {% set formAction = options.action | default('') %}
@@ -64,7 +67,7 @@
     {{ govukPanel({
       titleHtml: panelTitle,
       html: panelBody,
-      classes: "govuk-panel--left-align govuk-panel--brand-colour"
+      classes: "govuk-panel--left-align govuk-panel--brand-colour govuk-!-padding-9 govuk-!-margin-top-7"
     }) }}
   </div>
 {% endblock %}
