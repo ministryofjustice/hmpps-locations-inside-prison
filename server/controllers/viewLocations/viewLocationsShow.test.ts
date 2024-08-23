@@ -89,5 +89,20 @@ describe('view locations show', () => {
         banner: {},
       })
     })
+
+    it('adds no action when location is inactive', () => {
+      res.locals.residentialSummary.location = LocationFactory.build({
+        active: false,
+        isResidential: true,
+        leafLevel: true,
+      })
+
+      controller(req, res)
+
+      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        actions: [],
+        banner: {},
+      })
+    })
   })
 })
