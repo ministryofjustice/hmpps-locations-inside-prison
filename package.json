@@ -160,6 +160,11 @@
   "overrides": {
     "@jgoz/esbuild-plugin-typecheck": {
       "esbuild": "$esbuild"
+    },
+    "jest": {
+      "jest-core": {
+        "micromatch": "4.0.8"
+      }
     }
   }
 }
