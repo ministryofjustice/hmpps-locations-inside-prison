@@ -1,4 +1,4 @@
-import { Location } from '../data/locationsApiClient'
+import { Location } from '../data/types/locationsApi'
 import LocationsService from '../services/locationsService'
 import ManageUsersService from '../services/manageUsersService'
 import logger from '../../logger'

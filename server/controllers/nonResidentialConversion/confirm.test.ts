@@ -18,25 +18,21 @@ describe('NonResidentialConversionConfirm', () => {
     req = {
       flash: jest.fn(),
       form: {
-        // @ts-ignore
         options: {},
       },
       journeyModel: {
         reset: jest.fn(),
       },
-      // @ts-ignore
       services: {
         authService,
         locationsService,
       },
-      // @ts-ignore
       session: {
         referrerUrl: '/',
       },
-      // @ts-ignore
       sessionModel: {
         get: jest.fn(
-          fieldName =>
+          (fieldName?: string) =>
             ({
               convertedCellType: { text: 'Treatment room', value: 'TREATMENT_ROOM' },
               otherConvertedCellType: '',
@@ -44,9 +40,8 @@ describe('NonResidentialConversionConfirm', () => {
         ),
         reset: jest.fn(),
       },
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         errorlist: [],
         location: LocationFactory.build({
@@ -67,7 +62,6 @@ describe('NonResidentialConversionConfirm', () => {
         options: {
           fields,
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -80,7 +74,7 @@ describe('NonResidentialConversionConfirm', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
@@ -101,7 +95,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
 
     it('formats the change summary correctly with zero working cap and other type', () => {
       req.sessionModel.get = jest.fn(
-        fieldName =>
+        (fieldName?: string) =>
           ({
             convertedCellType: { text: 'Other', value: 'OTHER' },
             otherConvertedCellType: 'Server room',
@@ -145,7 +139,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
     it('sets the next step to the cell occupied page when cell is occupied error occurs', async () => {
       const error: any = new Error('API error: Cell is occupied')
       error.data = { errorCode: 109 }
-      locationsService.convertCellToNonResCell.mockRejectedValue(error)
+      ;(locationsService.convertCellToNonResCell as jest.Mock).mockRejectedValue(error)
       await controller.saveValues(req, res, next)
 
       expect(req.form.options.next).toEqual('occupied')
@@ -154,7 +148,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
 
     it('calls next with any unexpected errors', async () => {
       const error = new Error('API error')
-      locationsService.convertCellToNonResCell.mockRejectedValue(error)
+      ;(locationsService.convertCellToNonResCell as jest.Mock).mockRejectedValue(error)
       await controller.saveValues(req, res, next)
 
       expect(next).toHaveBeenCalledWith(error)

@@ -1,15 +1,15 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import NonResidentialConversionWarning from './warning'
 import LocationFactory from '../../testutils/factories/location'
+import DeactivateTemporaryOccupied from './occupied'
 
-describe('NonResidentialConversionWarning', () => {
-  const controller = new NonResidentialConversionWarning({ route: '/' })
+describe('DeactivateTemporaryOccupied', () => {
+  const controller = new DeactivateTemporaryOccupied({ route: '/' })
   let req: FormWizard.Request
   let res: Response
 
   beforeEach(() => {
-    req = {} as unknown as typeof req
+    req = { session: {} } as unknown as typeof req
     res = {
       locals: {
         location: LocationFactory.build({

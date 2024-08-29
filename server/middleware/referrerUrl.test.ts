@@ -12,9 +12,8 @@ describe('Referrer URL', () => {
       headers: {},
       originalUrl: '/this/page',
       query: {},
-      // @ts-ignore
       session: {},
-    }
+    } as unknown as typeof req
     next = jest.fn()
 
     controller = referrerUrl()

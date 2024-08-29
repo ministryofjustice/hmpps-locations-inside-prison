@@ -1,4 +1,4 @@
-import { Location } from '../data/locationsApiClient'
+import { Location } from '../data/types/locationsApi'
 
 export interface DecoratedLocation extends Omit<Location, 'locationType'> {
   raw: Location

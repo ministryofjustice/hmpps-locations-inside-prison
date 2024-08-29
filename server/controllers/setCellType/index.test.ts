@@ -1,4 +1,5 @@
 import { NextFunction, Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import SetCellType from '.'
 import fields from '../../routes/setCellType/fields'
 import AuthService from '../../services/authService'
@@ -7,7 +8,6 @@ import LocationFactory from '../../testutils/factories/location'
 
 describe('SetCellType', () => {
   const controller = new SetCellType({ route: '/' })
-  // @ts-ignore
   let req: FormWizard.Request
   let res: Response
   let next: NextFunction
@@ -53,13 +53,11 @@ describe('SetCellType', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        // @ts-ignore
-        get: jest.fn(fieldName => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
         reset: jest.fn(),
       },
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         errorlist: [],
         location: LocationFactory.build({
@@ -77,7 +75,6 @@ describe('SetCellType', () => {
             workingCapacity: 20,
           },
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -86,7 +83,7 @@ describe('SetCellType', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')

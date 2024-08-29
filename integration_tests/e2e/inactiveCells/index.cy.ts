@@ -3,7 +3,7 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import InactiveCellsIndexPage from '../../pages/inactiveCells'
 import LocationFactory from '../../../server/testutils/factories/location'
-import { Location } from '../../../server/data/locationsApiClient'
+import { Location } from '../../../server/data/types/locationsApi'
 import formatDate from '../../../server/formatters/formatDate'
 
 function testInactiveCellsTable(inactiveCellsIndexPage: InactiveCellsIndexPage, locations: Location[]) {

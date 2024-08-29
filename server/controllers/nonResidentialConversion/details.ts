@@ -64,7 +64,7 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     }
   }
 
-  saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { options, values } = req.form
     const { items } = options.fields.convertedCellType
     const convertedCellType = items.find(item => item.value === values.convertedCellType)

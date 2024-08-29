@@ -1,11 +1,11 @@
 import { Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import ReviewCellCapacity from './review'
 import fields from '../../routes/changeCellCapacity/fields'
 import LocationFactory from '../../testutils/factories/location'
 
 describe('ReviewCellCapacity', () => {
   const controller = new ReviewCellCapacity({ route: '/' })
-  // @ts-ignore
   let req: FormWizard.Request
   let res: Response
 
@@ -24,12 +24,10 @@ describe('ReviewCellCapacity', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        // @ts-ignore
-        get: jest.fn(fieldName => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
       },
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         errorlist: [],
         location: LocationFactory.build({
@@ -59,7 +57,7 @@ describe('ReviewCellCapacity', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
   })
 
   describe('validateFields', () => {

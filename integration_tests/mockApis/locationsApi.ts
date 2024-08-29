@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 
-import { Location, PrisonerLocation } from '../../server/data/locationsApiClient'
+import { Location, PrisonerLocation } from '../../server/data/types/locationsApi'
 import LocationFactory from '../../server/testutils/factories/location'
 
 const stubLocationsConstantsAccommodationType = () =>

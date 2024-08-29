@@ -29,30 +29,27 @@ describe('RemoveCellType', () => {
       journeyModel: {
         reset: jest.fn(),
       },
-      // @ts-ignore
       services: {
         authService,
         locationsService,
       },
-      // @ts-ignore
       sessionModel: {
         get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
         reset: jest.fn(),
       },
-    } as unknown as FormWizard.Request
+    } as unknown as typeof req
     res = {
       locals: {
         location: LocationFactory.build({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'MDI',
         }),
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
       },
       redirect: jest.fn(),
-    } as unknown as Response
+    } as unknown as typeof res
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')

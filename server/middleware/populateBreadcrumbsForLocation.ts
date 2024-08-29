@@ -1,5 +1,5 @@
 import asyncMiddleware from './asyncMiddleware'
-import { Location } from '../data/locationsApiClient'
+import { Location } from '../data/types/locationsApi'
 
 const populateBreadcrumbsForLocation = asyncMiddleware((req, res, next) => {
   const { breadcrumbs, topLevelLocationType, locationHierarchy, prisonId } = res.locals

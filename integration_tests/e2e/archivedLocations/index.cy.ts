@@ -2,7 +2,7 @@ import IndexPage from '../../pages/index'
 import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import LocationFactory from '../../../server/testutils/factories/location'
-import { Location } from '../../../server/data/locationsApiClient'
+import { Location } from '../../../server/data/types/locationsApi'
 import formatDate from '../../../server/formatters/formatDate'
 import ArchivedLocationsIndexPage from '../../pages/archivedLocations'
 

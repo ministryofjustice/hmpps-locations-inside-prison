@@ -23,9 +23,7 @@ describe('NonResidentialConversionDetails', () => {
     req = {
       flash: jest.fn(),
       form: {
-        // @ts-ignore
         options: {
-          // @ts-ignore
           fields,
         },
         values: {
@@ -33,25 +31,22 @@ describe('NonResidentialConversionDetails', () => {
           otherConvertedCellType: 'pet therapy room',
         },
       },
-      // @ts-ignore
       services: {
         authService,
         locationsService,
       },
-      // @ts-ignore
       sessionModel: {
         set: jest.fn(),
         get: jest.fn(
-          fieldName =>
+          (fieldName?: string) =>
             ({
               convertedCellType: { text: 'Treatment room', value: 'TREATMENT_ROOM' },
               otherConvertedCellType: 'pet therapy room',
             })[fieldName],
         ),
       },
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         errorlist: [],
         location: LocationFactory.build({
@@ -66,7 +61,6 @@ describe('NonResidentialConversionDetails', () => {
         options: {
           fields,
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -79,7 +73,7 @@ describe('NonResidentialConversionDetails', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')

@@ -9,17 +9,15 @@ describe('NonResidentialConversionOccupied', () => {
   let res: Response
 
   beforeEach(() => {
-    // @ts-ignore
-    req = {}
+    req = {} as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         location: LocationFactory.build({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
         }),
       },
-    }
+    } as unknown as typeof res
   })
 
   describe('locals', () => {

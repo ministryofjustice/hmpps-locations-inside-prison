@@ -3,11 +3,11 @@ import renderConditionalFields, { FieldEntry } from './renderConditionalFields'
 import FeComponentsService from '../../services/feComponentsService'
 
 const feComponentsService = jest.mocked(new FeComponentsService(null))
-const req = {
+const req: FormWizard.Request = {
   services: {
     feComponentsService,
   },
-} as unknown as FormWizard.Request
+} as unknown as typeof req
 
 describe('Field helpers', () => {
   describe('#renderConditionalFields()', () => {

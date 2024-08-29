@@ -22,9 +22,9 @@ const fields = {
     validate: [
       'required',
       'numeric',
-      { fn: greaterThan, arguments: [0] },
-      { fn: lessThanOrEqualTo, arguments: [99] },
-      { fn: lessThanOrEqualTo, arguments: [{ field: 'maxCapacity' }] },
+      greaterThan(0),
+      lessThanOrEqualTo(99),
+      lessThanOrEqualTo({ field: 'maxCapacity' }),
     ],
     errorMessages: { greaterThan: 'Working capacity cannot be 0 for a non-specialist cell' },
   },

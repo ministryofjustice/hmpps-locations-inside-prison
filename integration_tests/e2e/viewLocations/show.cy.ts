@@ -1,7 +1,7 @@
 import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import { Location, LocationSummary } from '../../../server/data/locationsApiClient'
+import { Location, LocationSummary } from '../../../server/data/types/locationsApi'
 import LocationFactory from '../../../server/testutils/factories/location'
 import formatDate from '../../../server/formatters/formatDate'
 

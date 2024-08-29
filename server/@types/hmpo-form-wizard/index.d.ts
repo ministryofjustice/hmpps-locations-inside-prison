@@ -130,7 +130,7 @@ declare module 'hmpo-form-wizard' {
       // eslint-disable-next-line no-underscore-dangle
       _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
-      locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise | object
+      locals(req: Request, res: Express.Response, next: Express.NextFunction): object
 
       getValues(req: Request, res: Express.Response, next: (err: any, values?: any) => void): Promise
 

@@ -17,10 +17,11 @@ const router = express.Router({ mergeParams: true })
 export const addActions = asyncMiddleware(async (req, res, next) => {
   const { location }: { location: DecoratedLocation } = res.locals.residentialSummary
 
-  const { active, isResidential, leafLevel, locationType } = location
+  const { active, isResidential, leafLevel, raw } = location
+  const { locationType } = raw
   if (req.canAccess('convert_non_residential') && active && isResidential && leafLevel) {
     addAction({
-      text: 'Convert to non-residential room',
+      text: `Convert to non-residential room`,
       href: `/location/${location.id}/non-residential-conversion`,
     })(req, res, null)
   }

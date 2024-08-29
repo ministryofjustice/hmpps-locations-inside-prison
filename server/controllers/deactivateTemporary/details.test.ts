@@ -43,7 +43,7 @@ describe('DeactivateTemporaryDetails', () => {
       sessionModel: {
         get: jest.fn((fieldName?: keyof typeof formValues) => formValues[fieldName]),
       },
-    } as unknown as FormWizard.Request
+    } as unknown as typeof req
     res = {
       locals: {
         user: { username: 'username' },
@@ -71,7 +71,7 @@ describe('DeactivateTemporaryDetails', () => {
         values: formValues,
       },
       redirect: jest.fn(),
-    } as unknown as Response
+    } as unknown as typeof res
   })
 
   describe('validateFields', () => {

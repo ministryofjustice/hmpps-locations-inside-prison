@@ -1,7 +1,19 @@
 import { Request, Response } from 'express'
 import controller from './viewLocationsShow'
-import LocationFactory from '../../testutils/factories/location'
 import { addActions } from '../../routes/viewLocationsRouter'
+import { Location } from '../../data/types/locationsApi'
+import LocationFactory from '../../testutils/factories/location'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
+
+const buildDecoratedLocation = (params: Partial<Location>): DecoratedLocation => {
+  const location = LocationFactory.build(params)
+
+  return {
+    ...location,
+    raw: location,
+    locationType: location.locationType.toLowerCase().replace(/^\w/, a => a.toUpperCase()),
+  } as unknown as DecoratedLocation
+}
 
 describe('view locations show', () => {
   let req: Request
@@ -18,19 +30,19 @@ describe('view locations show', () => {
   }
 
   beforeEach(() => {
-    // @ts-ignore
+    const location = buildDecoratedLocation({ isResidential: true, leafLevel: true })
     req = {
       canAccess: jest.fn().mockReturnValue(false),
       flash: jest.fn(),
-    } as unknown as Request
+    } as unknown as typeof req
     res = {
       locals: {
         residentialSummary: {
-          location: LocationFactory.build({ isResidential: true, leafLevel: true }),
+          location: { ...location, raw: location },
         },
       },
       render: jest.fn(),
-    } as unknown as Response
+    } as unknown as typeof res
   })
 
   it('renders the page', () => {
@@ -83,7 +95,7 @@ describe('view locations show', () => {
         })
 
         it('does not add the action for non-res cell', async () => {
-          res.locals.residentialSummary.location = LocationFactory.build({ isResidential: false, leafLevel: true })
+          res.locals.residentialSummary.location = buildDecoratedLocation({ isResidential: false, leafLevel: true })
 
           await addActions(req, res, jest.fn())
 
@@ -91,7 +103,7 @@ describe('view locations show', () => {
         })
 
         it('does not add the action when not leaf level', async () => {
-          res.locals.residentialSummary.location = LocationFactory.build({ isResidential: true, leafLevel: false })
+          res.locals.residentialSummary.location = buildDecoratedLocation({ isResidential: true, leafLevel: false })
 
           await addActions(req, res, jest.fn())
 
@@ -99,7 +111,7 @@ describe('view locations show', () => {
         })
 
         it('does not add the action when location is inactive', async () => {
-          res.locals.residentialSummary.location = LocationFactory.build({
+          res.locals.residentialSummary.location = buildDecoratedLocation({
             active: false,
             isResidential: true,
             leafLevel: true,
@@ -114,7 +126,7 @@ describe('view locations show', () => {
 
     describe('deactivate cell', () => {
       beforeEach(() => {
-        res.locals.residentialSummary.location = LocationFactory.build({
+        res.locals.residentialSummary.location = buildDecoratedLocation({
           active: true,
           locationType: 'CELL',
         })
@@ -152,7 +164,7 @@ describe('view locations show', () => {
         })
 
         it('does not add the action when location is not a CELL', async () => {
-          res.locals.residentialSummary.location.locationType = 'OFFICE'
+          res.locals.residentialSummary.location.raw.locationType = 'OFFICE'
 
           await addActions(req, res, jest.fn())
 
