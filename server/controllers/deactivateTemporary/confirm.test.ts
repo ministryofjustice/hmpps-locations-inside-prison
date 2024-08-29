@@ -1,7 +1,6 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import fields from '../../routes/deactivateTemporary/fields'
-import DeactivateTemporaryDetails from './details'
 import { Services } from '../../services'
 import DeactivateTemporaryConfirm from './confirm'
 
