@@ -13,8 +13,7 @@
 
 {% set locationType = residentialSummary.location.locationType %}
 {% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
-{% set prependedLocationName = residentialSummary.location.localName or locationType + " " + residentialSummary.location.pathHierarchy %}
-{% set title = prependedLocationName + ' - View and update locations' %}
+{% set title = (residentialSummary.location.displayName | capFirst) + ' - View and update locations' %}
 
 {% block head %}
   {{ super() }}

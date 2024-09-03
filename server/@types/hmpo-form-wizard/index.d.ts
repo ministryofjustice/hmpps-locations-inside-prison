@@ -246,6 +246,7 @@ declare module 'hmpo-form-wizard' {
         displayFn?: (value: string) => string
         displayAlways?: boolean
       }
+      errorMessage?: { href: string; text: string }
     }
 
     interface Fields {

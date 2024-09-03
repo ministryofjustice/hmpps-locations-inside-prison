@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
 
 export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   middlewareSetup() {
@@ -26,7 +27,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     return `\
       You are making 1 cell inactive.
       <br/><br/>
-      This will reduce the establishment’s total working capacity from ${overallWorkingCapacity} to ${newOverallVal}.
+      This will reduce the establishment's total working capacity from ${overallWorkingCapacity} to ${newOverallVal}.
     `.replace(/^\s*|\s*$/gm, '')
   }
 
@@ -85,14 +86,14 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.location
+    const { displayName, id: locationId, prisonId } = res.locals.location as DecoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
     req.flash('success', {
-      title: 'Deactivation details updated',
-      content: 'You have updated the deactivation details for this location.',
+      title: 'Cell deactivated',
+      content: `You have deactivated ${displayName}.`,
     })
 
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)

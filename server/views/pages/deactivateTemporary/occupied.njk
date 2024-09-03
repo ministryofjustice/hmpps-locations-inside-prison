@@ -11,14 +11,12 @@
 {% from "../../macros/miniSummary.njk" import miniSummary %}
 
 {% set title = "You can't deactivate this location as it is currently occupied" %}
-{% set locationType = location.locationType %}
-{% set locationName = location.localName or locationType + " " + location.pathHierarchy %}
 
 {% block heading %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-m" data-qa="cell-name">{{ locationName }}</span>
-      <h1 class="govuk-heading-l">You can't deactivate this location as it is currently occupied</h1>
+      <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+      <h1 class="govuk-heading-l">{{ title }}</h1>
     </div>
   </div>
 {% endblock %}

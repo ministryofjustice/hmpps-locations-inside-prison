@@ -21,6 +21,8 @@ export default async function decorateLocation({
 }): Promise<DecoratedLocation> {
   logger.debug(`decorate location: ${JSON.stringify(location)}`)
 
+  const locationType = await locationsService.getLocationType(systemToken, location.locationType)
+
   return {
     ...location,
     raw: location,
@@ -30,6 +32,7 @@ export default async function decorateLocation({
     convertedCellType: location.convertedCellType
       ? await locationsService.getConvertedCellType(systemToken, location.convertedCellType)
       : location.convertedCellType,
+    displayName: location.localName || `${locationType.toLowerCase()} ${location.pathHierarchy}`,
     deactivatedBy:
       location.deactivatedBy && !limited
         ? (await manageUsersService.getUser(userToken, location.deactivatedBy))?.name || location.deactivatedBy
@@ -42,7 +45,7 @@ export default async function decorateLocation({
       location.lastModifiedBy && !limited
         ? (await manageUsersService.getUser(userToken, location.lastModifiedBy))?.name || location.lastModifiedBy
         : location.lastModifiedBy,
-    locationType: await locationsService.getLocationType(systemToken, location.locationType),
+    locationType,
     specialistCellTypes: await Promise.all(
       location.specialistCellTypes.map(a => locationsService.getSpecialistCellType(systemToken, a)),
     ),

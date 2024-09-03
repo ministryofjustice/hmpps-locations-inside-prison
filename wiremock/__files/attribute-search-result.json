@@ -82,7 +82,7 @@
       "releaseOnTemporaryLicenceDate": "2023-05-01",
       "locationDescription": "Outside - released from Leeds",
       "restrictedPatient": true,
-      "supportingPrisonId": "LEI",
+      "supportingPrisonId": "TST",
       "dischargedHospitalId": "HAZLWD",
       "dischargedHospitalDescription": "Hazelwood House",
       "dischargeDate": "2020-05-01",

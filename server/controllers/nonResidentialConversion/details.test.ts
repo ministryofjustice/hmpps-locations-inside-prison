@@ -6,11 +6,6 @@ import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/nonResidentialConversion/fields'
 
-jest.mock('../../presenters/freeTextInput', () => ({
-  __esModule: true,
-  default: () => '<free>text field</free>',
-}))
-
 describe('NonResidentialConversionDetails', () => {
   const controller = new NonResidentialConversionDetails({ route: '/' })
   let req: FormWizard.Request
@@ -105,9 +100,7 @@ describe('NonResidentialConversionDetails', () => {
         {
           text: 'Other',
           value: 'OTHER',
-          conditional: {
-            html: '<free>text field</free>',
-          },
+          conditional: 'otherConvertedCellType',
         },
       ])
     })
@@ -145,9 +138,7 @@ describe('NonResidentialConversionDetails', () => {
                 value: 'OFFICE',
               },
               {
-                conditional: {
-                  html: '<free>text field</free>',
-                },
+                conditional: 'otherConvertedCellType',
                 text: 'Other',
                 value: 'OTHER',
               },
@@ -158,11 +149,7 @@ describe('NonResidentialConversionDetails', () => {
           },
           otherConvertedCellType: {
             autocomplete: 'off',
-            classes: 'govuk-input--width-2',
-            dependent: {
-              field: 'convertedCellType',
-              value: 'OTHER',
-            },
+            component: 'govukInput',
             id: 'otherConvertedCellType',
             label: {
               text: 'Room description',
@@ -183,11 +170,9 @@ describe('NonResidentialConversionDetails', () => {
         { text: 'Kitchen / Servery', value: 'KITCHEN_SERVERY' },
         { text: 'Office', value: 'OFFICE' },
         {
+          conditional: 'otherConvertedCellType',
           text: 'Other',
           value: 'OTHER',
-          conditional: {
-            html: '<free>text field</free>',
-          },
         },
       ]
       controller.saveValues(req, res, next)
@@ -195,7 +180,7 @@ describe('NonResidentialConversionDetails', () => {
 
     it('sets the session model correctly', () => {
       expect(req.sessionModel.set).toHaveBeenCalledWith('convertedCellType', {
-        conditional: { html: '<free>text field</free>' },
+        conditional: 'otherConvertedCellType',
         text: 'Other',
         value: 'OTHER',
       })

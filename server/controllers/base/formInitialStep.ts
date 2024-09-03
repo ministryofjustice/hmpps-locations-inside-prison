@@ -6,8 +6,8 @@ import { FieldEntry } from '../../helpers/field/renderConditionalFields'
 
 export default class FormInitialStep extends FormWizard.Controller {
   middlewareSetup() {
-    this.use(this.setupConditionalFields)
     super.middlewareSetup()
+    this.use(this.setupConditionalFields)
   }
 
   getInitialValues(_req: FormWizard.Request, _res: Response): { [key: string]: any } {
@@ -69,33 +69,40 @@ export default class FormInitialStep extends FormWizard.Controller {
     }
   }
 
-  setupConditionalFields(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { allFields, fields } = req.form.options
-    const stepFieldsArray = Object.entries(fields)
-    const stepFields = stepFieldsArray.map(flattenConditionalFields)
-    const dependentFields = stepFieldsArray.reduce(reduceDependentFields(allFields), {})
+  renderConditionalFields(req: FormWizard.Request, res: Response) {
+    const { options } = req.form
 
-    req.form.options.fields = Object.fromEntries(
-      Object.entries({
-        ...Object.fromEntries(stepFields),
-        ...dependentFields,
-      }).map(([key, field]: FieldEntry, _, obj: FieldEntry[]) => renderConditionalFields(req, [key, field], obj)),
+    options.fields = Object.fromEntries(
+      Object.entries(options.fields).map(([key, field]: FieldEntry, _, obj: FieldEntry[]) =>
+        renderConditionalFields(req, [key, field], obj),
+      ),
     )
+    res.locals.fields = options.fields
+  }
+
+  setupConditionalFields(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { options } = req.form
+
+    const stepFieldsArray = Object.entries(options.fields)
+    const stepFields = stepFieldsArray.map(flattenConditionalFields)
+    const dependentFields = stepFieldsArray.reduce(reduceDependentFields(options.allFields), {})
+
+    options.fields = {
+      ...Object.fromEntries(stepFields),
+      ...dependentFields,
+    }
 
     next()
   }
 
-  locals(_req: FormWizard.Request, res: Response): Record<string, any> {
+  locals(req: FormWizard.Request, res: Response): Record<string, any> {
     const { options, values } = res.locals
     if (!options?.fields) {
       return {}
     }
 
-    const { fields } = options
-    Object.keys(fields).forEach(fieldName => {
-      const value = values[fieldName]
-      fields[fieldName].value = value?.value || value
-    })
+    const { allFields } = options
+    const fields = this.setupFields(req, allFields, options.fields, values, res.locals.errorlist)
 
     const validationErrors: { text: string; href: string }[] = []
 
@@ -118,12 +125,8 @@ export default class FormInitialStep extends FormWizard.Controller {
     return new FormWizard.Controller.Error(fieldName, { args: {}, type, url: '/' })
   }
 
-  setupDateInputFields(req: FormWizard.Request, errorlist: FormWizard.Controller.Error[]) {
-    if (!req.form?.options?.fields) {
-      return
-    }
-
-    Object.values(req.form.options.fields)
+  setupDateInputFields(fields: FormWizard.Fields, errorlist: FormWizard.Controller.Error[]): FormWizard.Fields {
+    Object.values(fields)
       .filter(field => field.component === 'govukDateInput')
       .forEach(field => {
         const { value } = field
@@ -137,27 +140,49 @@ export default class FormInitialStep extends FormWizard.Controller {
           {
             classes: `govuk-input--width-2 ${error && ['*', 'Day'].includes(errorField) ? 'govuk-input--error' : ''}`,
             label: 'Day',
+            id: `${field.id}-day`,
             name: `${field.id}-day`,
             value: day || '',
           },
           {
             classes: `govuk-input--width-2 ${error && ['*', 'Month'].includes(errorField) ? 'govuk-input--error' : ''}`,
             label: 'Month',
+            id: `${field.id}-month`,
             name: `${field.id}-month`,
             value: month || '',
           },
           {
             classes: `govuk-input--width-4 ${error && ['*', 'Year'].includes(errorField) ? 'govuk-input--error' : ''}`,
             label: 'Year',
+            id: `${field.id}-year`,
             name: `${field.id}-year`,
             value: year || '',
           },
         ] as any
       })
+
+    return fields
+  }
+
+  setupFields(
+    req: FormWizard.Request,
+    allFields: { [field: string]: FormWizard.Field },
+    originalFields: FormWizard.Fields,
+    values: { [field: string]: any },
+    errorlist: FormWizard.Controller.Error[],
+  ): FormWizard.Fields {
+    const fields = originalFields
+
+    Object.keys(fields).forEach(fieldName => {
+      const value = values[fieldName]
+      fields[fieldName].value = value?.value || value
+    })
+
+    return this.setupDateInputFields(fields, errorlist)
   }
 
   render(req: FormWizard.Request, res: Response, next: NextFunction) {
-    this.setupDateInputFields(req, res.locals.errorlist)
+    this.renderConditionalFields(req, res)
 
     return super.render(req, res, next)
   }

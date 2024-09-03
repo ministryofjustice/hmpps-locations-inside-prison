@@ -8,6 +8,7 @@ const fields = {
     validate: ['required'],
     id: 'deactivationReason',
     name: 'deactivationReason',
+    errorMessages: { required: 'Select a deactivation reason' },
     label: {
       text: 'Deactivation reason',
     },
@@ -38,6 +39,7 @@ const fields = {
     label: {
       text: 'Description (optional)',
     },
+    nameForErrors: 'Description',
   },
   estimatedReactivationDate: {
     component: 'govukDateInput',

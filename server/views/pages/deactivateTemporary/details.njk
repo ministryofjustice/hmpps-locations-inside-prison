@@ -13,11 +13,9 @@
 {% from "../../macros/miniSummary.njk" import miniSummary %}
 
 {% set title = "Deactivation details" %}
-{% set locationType = location.locationType %}
-{% set locationName = location.localName or locationType + " " + location.pathHierarchy %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ locationName }}</span>
+  <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
   <h1 class="govuk-heading-l">Deactivation details</h1>
 {% endblock %}
 
@@ -74,7 +72,7 @@
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Update deactivation details",
+                  text: "Continue",
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"

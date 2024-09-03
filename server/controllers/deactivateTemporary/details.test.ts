@@ -33,7 +33,12 @@ describe('DeactivateTemporaryDetails', () => {
       },
       form: {
         options: {
-          fields,
+          allFields: Object.fromEntries(Object.entries(fields)),
+          fields: Object.fromEntries(
+            Object.entries(fields).filter(
+              ([n, _]) => !['deactivationReasonDescription', 'deactivationReasonOther'].includes(n),
+            ),
+          ),
         },
         values: formValues,
       },
@@ -130,187 +135,38 @@ describe('DeactivateTemporaryDetails', () => {
 
       expect(req.form.options.fields.deactivationReason.items).toEqual([
         {
+          conditional: 'deactivationReasonDescription-ATEST1',
           text: 'A test 1',
           value: 'ATEST1',
-          conditional: 'deactivationReasonDescription',
         },
         {
+          conditional: 'deactivationReasonDescription-TEST2',
           text: 'Test 2',
           value: 'TEST2',
-          conditional: 'deactivationReasonDescription',
         },
         {
+          conditional: 'deactivationReasonOther',
           text: 'Other',
           value: 'OTHER',
-          conditional: 'deactivationReasonOther',
         },
       ])
-    })
-  })
 
-  describe('differentiateConditionalFields', () => {
-    beforeEach(async () => {
-      req.form.options.fields.deactivationReason.items = [
-        {
-          value: 'ATEST1',
-          conditional: {
-            html: 'name="deactivationReasonDescription" test',
-          },
+      expect(
+        Object.fromEntries(
+          Object.entries(req.form.options.allFields).filter(([n, _]) => n.startsWith('deactivationReasonDescription')),
+        ),
+      ).toEqual({
+        'deactivationReasonDescription-ATEST1': {
+          ...fields.deactivationReasonDescription,
+          id: 'deactivationReasonDescription-ATEST1',
+          name: 'deactivationReasonDescription-ATEST1',
         },
-        {
-          value: 'TEST2',
-          conditional: {
-            html: 'name="deactivationReasonDescription" test',
-          },
+        'deactivationReasonDescription-TEST2': {
+          ...fields.deactivationReasonDescription,
+          id: 'deactivationReasonDescription-TEST2',
+          name: 'deactivationReasonDescription-TEST2',
         },
-        {
-          value: 'OTHER',
-          conditional: {
-            html: 'name="deactivationReasonOther" test',
-          },
-        },
-      ] as FormWizard.Field['items']
-
-      req.form.options.fields.deactivationReasonDescription.dependent = { field: 'testField', value: 'testValue' }
-
-      const callback = jest.fn()
-      controller.differentiateConditionalFields(req, res, callback)
-    })
-
-    it('sets deactivationReasonDescription.dependent.value ', () => {
-      expect(req.form.options.fields.deactivationReasonDescription.dependent.value).toEqual(['ATEST1', 'TEST2'])
-    })
-
-    it('differentiates the names of each conditional', () => {
-      expect(req.form.options.fields.deactivationReason.items).toEqual([
-        {
-          value: 'ATEST1',
-          conditional: {
-            html: 'name="deactivationReasonDescription-ATEST1" test',
-          },
-        },
-        {
-          value: 'TEST2',
-          conditional: {
-            html: 'name="deactivationReasonDescription-TEST2" test',
-          },
-        },
-        {
-          value: 'OTHER',
-          conditional: {
-            html: 'name="deactivationReasonOther" test',
-          },
-        },
-      ])
-    })
-  })
-
-  describe('setDescriptionFields', () => {
-    beforeEach(async () => {
-      req.form.options.fields.deactivationReason.items = [
-        {
-          value: 'ATEST1',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-        {
-          value: 'TEST2',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-        {
-          value: 'OTHER',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-      ] as FormWizard.Field['items']
-    })
-
-    it('sets the correct value for ATEST1', () => {
-      req.form.options.fields.deactivationReason.value = 'ATEST1'
-      req.form.options.fields.deactivationReasonDescription.value = 'a "test" 1'
-
-      controller.setDescriptionFields(req)
-
-      expect(req.form.options.fields.deactivationReason.items).toEqual([
-        {
-          value: 'ATEST1',
-          conditional: {
-            html: 'type="text" value="a &quot;test&quot; 1" test',
-          },
-        },
-        {
-          value: 'TEST2',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-        {
-          value: 'OTHER',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-      ])
-    })
-
-    it('sets the correct value for TEST2', () => {
-      req.form.options.fields.deactivationReason.value = 'TEST2'
-      req.form.options.fields.deactivationReasonDescription.value = '"test" 2'
-
-      controller.setDescriptionFields(req)
-
-      expect(req.form.options.fields.deactivationReason.items).toEqual([
-        {
-          value: 'ATEST1',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-        {
-          value: 'TEST2',
-          conditional: {
-            html: 'type="text" value="&quot;test&quot; 2" test',
-          },
-        },
-        {
-          value: 'OTHER',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-      ])
-    })
-
-    it('sets the correct value for OTHER', () => {
-      req.form.options.fields.deactivationReason.value = 'OTHER'
-      req.form.options.fields.deactivationReasonOther.value = '"other" value'
-
-      controller.setDescriptionFields(req)
-
-      expect(req.form.options.fields.deactivationReason.items).toEqual([
-        {
-          value: 'ATEST1',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-        {
-          value: 'TEST2',
-          conditional: {
-            html: 'type="text" test',
-          },
-        },
-        {
-          value: 'OTHER',
-          conditional: {
-            html: 'type="text" value="&quot;other&quot; value" test',
-          },
-        },
-      ])
+      })
     })
   })
 })

@@ -2,12 +2,14 @@
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
-{% set locationType = residentialSummary.location.locationType %}
-{% set locationName = residentialSummary.location.localName or locationType + " " + residentialSummary.location.pathHierarchy %}
-{% set title = locationName + ' - Inactive cells - View and update locations' if locationHierarchy else 'View all inactive cells' %}
+{% set title = 'View all inactive cells' %}
+{% if residentialSummary.location %}
+  {% set locationName = residentialSummary.location.displayName | capFirst %}
+  {% set title = locationName + ' - Inactive cells - View and update locations' %}
+{% endif %}
 
 {% block heading %}
-  {% if locationHierarchy %}
+  {% if locationName %}
     <span class="govuk-caption-m" data-qa="location-type">{{ locationName }}</span>
   {% endif %}
 

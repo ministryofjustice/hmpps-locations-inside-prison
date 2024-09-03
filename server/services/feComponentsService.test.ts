@@ -17,7 +17,7 @@ describe('Components service', () => {
 
     it('Retrieves and returns requested component', async () => {
       const caseLoad = {
-        caseLoadId: 'LEI',
+        caseLoadId: 'TST',
         description: 'Leeds (HMP)',
         type: 'INST',
         caseloadFunction: 'GENERAL',

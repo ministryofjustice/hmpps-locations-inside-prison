@@ -40,7 +40,7 @@ context('Change cell capacity', () => {
         prisoners: [
           {
             prisonerNumber: 'A1234AA',
-            prisonId: 'LEI',
+            prisonId: 'TST',
             prisonName: 'HMP Leeds',
             cellLocation: '1-1-001',
             firstName: 'Dave',
@@ -59,7 +59,7 @@ context('Change cell capacity', () => {
           },
           {
             prisonerNumber: 'B1234BB',
-            prisonId: 'LEI',
+            prisonId: 'TST',
             prisonName: 'HMP Leeds',
             cellLocation: '1-1-001',
             firstName: 'Horatio',
@@ -93,14 +93,14 @@ context('Change cell capacity', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubGetLocation', location)
-      cy.task('stubGetPrisonersInLocation', prisonerLocations)
+      cy.task('stubLocations', location)
+      cy.task('stubPrisonerLocationsId', prisonerLocations)
       cy.task('stubUpdateCapacity')
       cy.signIn()
     })
 
     it('can be accessed by clicking the change working capacity link on the show location page', () => {
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.summaryCards.workingCapacityChangeLink().click()
 
@@ -108,7 +108,7 @@ context('Change cell capacity', () => {
     })
 
     it('can be accessed by clicking the change maximum capacity link on the show location page', () => {
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.summaryCards.maximumCapacityChangeLink().click()
 
@@ -245,7 +245,7 @@ context('Change cell capacity', () => {
 
       it('shows the correct validation error when max capacity is zero', () => {
         cy.task(
-          'stubGetLocation',
+          'stubLocations',
           LocationFactory.build({
             accommodationTypes: ['NORMAL_ACCOMMODATION'],
             capacity: {
@@ -257,7 +257,7 @@ context('Change cell capacity', () => {
             localName: '1-1-001',
           }),
         )
-        cy.task('stubGetPrisonersInLocation', [])
+        cy.task('stubPrisonerLocationsId', [])
 
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
         const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
@@ -273,7 +273,7 @@ context('Change cell capacity', () => {
 
       it('shows the correct validation error when max capacity is zero and below occupancy', () => {
         cy.task(
-          'stubGetLocation',
+          'stubLocations',
           LocationFactory.build({
             accommodationTypes: ['NORMAL_ACCOMMODATION'],
             capacity: {

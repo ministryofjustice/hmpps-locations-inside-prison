@@ -7,6 +7,7 @@ export interface DecoratedLocation extends Omit<Location, 'locationType'> {
   convertedCellType: string
   deactivatedBy: string
   deactivatedReason: string
+  displayName: string
   lastModifiedBy: string
   locationType: string
   specialistCellTypes: string[]

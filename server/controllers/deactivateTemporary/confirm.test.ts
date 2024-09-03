@@ -92,7 +92,7 @@ describe('DeactivateTemporaryConfirm', () => {
     it('returns the expected string', () => {
       expect(controller.generateChangeSummary(2, 1020)).toEqual(`You are making 1 cell inactive.
 <br/><br/>
-This will reduce the establishment’s total working capacity from 1020 to 1018.`)
+This will reduce the establishment's total working capacity from 1020 to 1018.`)
     })
   })
 
