@@ -121,6 +121,23 @@ describe('locationsApiClient', () => {
   })
 
   describe('locations', () => {
+    describe('deactivate', () => {
+      testCall(
+        'temporary',
+        '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/deactivate/temporary',
+        false,
+        () => apiClient.locations.deactivate.temporary,
+        { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+        'put',
+        {
+          deactivationReason: 'reason',
+          deactivationReasonDescription: 'description',
+          proposedReactivationDate: '2024-01-01',
+          planetFmReference: 'planet',
+        },
+      )
+    })
+
     testCall(
       'convertCellToNonResCell',
       '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/convert-cell-to-non-res-cell',

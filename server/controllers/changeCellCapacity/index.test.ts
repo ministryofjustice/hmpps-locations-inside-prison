@@ -1,10 +1,10 @@
 import { Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import ChangeCellCapacity from './index'
 import fields from '../../routes/changeCellCapacity/fields'
 
 describe('ChangeCellCapacity', () => {
   const controller = new ChangeCellCapacity({ route: '/' })
-  // @ts-ignore
   let req: FormWizard.Request
   let res: Response
 
@@ -23,12 +23,10 @@ describe('ChangeCellCapacity', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        // @ts-ignore
-        get: jest.fn(fieldName => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
       },
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         errorlist: [],
         location: {
@@ -57,7 +55,7 @@ describe('ChangeCellCapacity', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
   })
 
   describe('validateFields', () => {

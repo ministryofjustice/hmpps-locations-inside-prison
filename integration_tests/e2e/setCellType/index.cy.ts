@@ -33,7 +33,7 @@ context('Set cell type', () => {
 
     it('does not show the change/set links on the show location page', () => {
       cy.signIn()
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.setSpecificCellTypeLink().should('not.exist')
       viewLocationsShowPage.changeSpecificCellTypeLink().should('not.exist')
@@ -123,7 +123,7 @@ context('Set cell type', () => {
           localName: '1-1-001',
         })
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubGetLocation', location)
+        cy.task('stubLocations', location)
         cy.signIn()
       })
 
@@ -138,7 +138,7 @@ context('Set cell type', () => {
       })
 
       it('can be accessed by clicking the set cell type link on the show location page', () => {
-        cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000000')
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.setSpecificCellTypeLink().click()
 
@@ -154,8 +154,8 @@ context('Set cell type', () => {
           localName: '1-1-001',
         })
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubGetLocation', location)
-        cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+        cy.task('stubLocations', location)
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.setSpecificCellTypeLink().should('not.exist')
       })
@@ -193,7 +193,7 @@ context('Set cell type', () => {
           localName: '1-1-001',
         })
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubGetLocation', location)
+        cy.task('stubLocations', location)
         cy.signIn()
       })
 
@@ -208,7 +208,7 @@ context('Set cell type', () => {
       })
 
       it('can be accessed by clicking the change link on the show location page', () => {
-        cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000000')
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeSpecificCellTypeLink().click()
 
@@ -224,8 +224,8 @@ context('Set cell type', () => {
           specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
         })
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubGetLocation', location)
-        cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+        cy.task('stubLocations', location)
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeSpecificCellTypeLink().should('not.exist')
       })

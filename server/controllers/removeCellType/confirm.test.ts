@@ -19,23 +19,19 @@ describe('ConfirmRemoveCellType', () => {
       journeyModel: {
         reset: jest.fn(),
       },
-      // @ts-ignore
       services: {
         authService,
         locationsService,
       },
-      // @ts-ignore
       session: {
         referrerUrl: '/',
       },
-      // @ts-ignore
       sessionModel: {
-        get: jest.fn(fieldName => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
         reset: jest.fn(),
       },
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         location: LocationFactory.build({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -51,13 +47,12 @@ describe('ConfirmRemoveCellType', () => {
             workingCapacity: 20,
           },
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
@@ -108,7 +103,7 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
 
     it('calls next with any errors', async () => {
       const error = new Error('API error')
-      locationsService.updateSpecialistCellTypes.mockRejectedValue(error)
+      ;(locationsService.updateSpecialistCellTypes as jest.Mock).mockRejectedValue(error)
       await controller.saveValues(req, res, next)
       expect(next).toHaveBeenCalledWith(error)
     })

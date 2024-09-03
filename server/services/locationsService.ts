@@ -29,6 +29,28 @@ export default class LocationsService {
     return this.locationsApiClient.locations.convertCellToNonResCell(token, { locationId }, params)
   }
 
+  async deactivateTemporary(
+    token: string,
+    locationId: string,
+    deactivationReason: string,
+    deactivationReasonDescription: string,
+    proposedReactivationDate: string,
+    planetFmReference: string,
+  ) {
+    return this.locationsApiClient.locations.deactivate.temporary(
+      token,
+      {
+        locationId,
+      },
+      {
+        deactivationReason,
+        deactivationReasonDescription,
+        proposedReactivationDate,
+        planetFmReference,
+      },
+    )
+  }
+
   async getAccommodationType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getAccommodationTypes'))[key] || 'Unknown'
   }
@@ -47,6 +69,10 @@ export default class LocationsService {
 
   async getDeactivatedReason(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getDeactivatedReasons'))[key] || 'Unknown'
+  }
+
+  async getDeactivatedReasons(token: string) {
+    return this.getConstantDataMap(token, 'getDeactivatedReasons')
   }
 
   async getInactiveCells(token: string, prisonId: string, locationId?: string) {

@@ -1,7 +1,7 @@
-import { RequestHandler } from 'express'
+import asyncMiddleware from './asyncMiddleware'
 
-export default function protectRoute(permission: string): RequestHandler {
-  return async (req, res, next) => {
+export default function protectRoute(permission: string) {
+  return asyncMiddleware((req, res, next) => {
     if (req.canAccess(permission)) {
       return next()
     }
@@ -10,5 +10,5 @@ export default function protectRoute(permission: string): RequestHandler {
     error.status = 403
 
     return next(error)
-  }
+  })
 }

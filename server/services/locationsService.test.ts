@@ -1,67 +1,45 @@
+import { jest } from '@jest/globals'
 import LocationsApiClient from '../data/locationsApiClient'
 import LocationsService from './locationsService'
 
-jest.mock('../data/locationsApiClient')
+function deepMock(object: any, returnValue?: any): object | jest.Mock {
+  if (typeof object === 'object') {
+    return Object.fromEntries(Object.entries(object).map(([k, n]) => [k, deepMock(n, returnValue)]))
+  }
+
+  if (typeof object === 'function') {
+    return jest.fn().mockReturnValue(returnValue)
+  }
+
+  return object
+}
 
 describe('Locations service', () => {
   let locationsApiClient: jest.Mocked<LocationsApiClient>
   let locationsService: LocationsService
 
   beforeEach(() => {
-    locationsApiClient = new LocationsApiClient(null) as jest.Mocked<LocationsApiClient>
-    locationsApiClient.constants = {
-      getAccommodationTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getConvertedCellTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getDeactivatedReasons: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getLocationTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getNonResidentialUsageTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getResidentialAttributeTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getResidentialHousingTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getSpecialistCellTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-      getUsedForTypes: jest
-        .fn()
-        .mockResolvedValue({ accommodationTypes: [{ key: 'KEY', description: 'description' }] }),
-    }
-    locationsApiClient.locations = {
-      convertCellToNonResCell: jest.fn(),
-      getLocation: jest.fn(),
-      getResidentialSummary: jest.fn(),
-      prison: {
-        getArchivedLocations: jest.fn(),
-        getInactiveCells: jest.fn(),
+    locationsApiClient = jest.mocked(new LocationsApiClient(null))
+    locationsApiClient.constants = deepMock(locationsApiClient.constants, {
+      a: [{ key: 'KEY', description: 'description' }],
+    }) as typeof locationsApiClient.constants
+    ;['locations', 'prisonerLocations', 'signedOperationalCapacity'].forEach(
+      (k: 'locations' | 'prisonerLocations' | 'signedOperationalCapacity') => {
+        locationsApiClient[k] = deepMock(locationsApiClient[k]) as any
       },
-      updateCapacity: jest.fn(),
-      updateSpecialistCellTypes: jest.fn(),
-    }
-    locationsApiClient.prisonerLocations = {
-      getPrisonersInLocation: jest.fn(),
-    }
+    )
     locationsService = new LocationsService(locationsApiClient)
   })
 
-  function serviceCall(methodName: keyof LocationsService): (...args: unknown[]) => unknown {
+  function serviceCall(
+    methodName: keyof Omit<LocationsService, 'locationsApiClient'>,
+  ): (...args: unknown[]) => unknown {
     return locationsService[methodName].bind(locationsService)
   }
 
   function testConstantDataGetter(
     apiCallName: keyof LocationsApiClient['constants'],
-    serviceCallName: keyof LocationsService,
+    serviceCallName: keyof Omit<LocationsService, 'locationsApiClient'>,
   ) {
     describe(serviceCallName, () => {
       it('calls the correct client function', async () => {
@@ -98,6 +76,25 @@ describe('Locations service', () => {
   testConstantDataGetter('getResidentialHousingTypes', 'getResidentialHousingType')
   testConstantDataGetter('getSpecialistCellTypes', 'getSpecialistCellType')
   testConstantDataGetter('getUsedForTypes', 'getUsedForType')
+
+  describe('deactivateTemporary', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.deactivateTemporary('token', 'locationId', 'reason', 'description', 'date', 'pfm')
+
+      expect(locationsApiClient.locations.deactivate.temporary).toHaveBeenCalledWith(
+        'token',
+        {
+          locationId: 'locationId',
+        },
+        {
+          deactivationReason: 'reason',
+          deactivationReasonDescription: 'description',
+          proposedReactivationDate: 'date',
+          planetFmReference: 'pfm',
+        },
+      )
+    })
+  })
 
   describe('getArchivedLocations', () => {
     it('calls the correct client function', async () => {

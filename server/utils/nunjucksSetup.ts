@@ -11,6 +11,7 @@ import logger from '../../logger'
 import formatDateWithTime from '../formatters/formatDateWithTime'
 import formatDate from '../formatters/formatDate'
 import formatTime from '../formatters/formatTime'
+import capFirst from '../formatters/capFirst'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -79,6 +80,8 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('formCsrf', formCsrf)
 
   njkEnv.addFilter('initialiseName', initialiseName)
+
+  njkEnv.addFilter('capFirst', capFirst)
   njkEnv.addFilter('formatDate', formatDate)
   njkEnv.addFilter('formatTime', formatTime)
   njkEnv.addFilter('formatDateWithTime', formatDateWithTime)

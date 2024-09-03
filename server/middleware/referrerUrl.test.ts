@@ -12,9 +12,8 @@ describe('Referrer URL', () => {
       headers: {},
       originalUrl: '/this/page',
       query: {},
-      // @ts-ignore
       session: {},
-    }
+    } as unknown as typeof req
     next = jest.fn()
 
     controller = referrerUrl()
@@ -28,7 +27,7 @@ describe('Referrer URL', () => {
     it('should not set a referrerUrl in session by default', async () => {
       await controller(req, res, next)
 
-      expect(req.session.referrerUrl).toEqual(undefined)
+      expect(req.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
   })
@@ -53,7 +52,7 @@ describe('Referrer URL', () => {
 
       await controller(req, res, next)
 
-      expect(req.session.referrerUrl).toEqual(undefined)
+      expect(req.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
 
@@ -64,7 +63,7 @@ describe('Referrer URL', () => {
 
       await controller(req, res, next)
 
-      expect(req.session.referrerUrl).toEqual(undefined)
+      expect(req.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
   })

@@ -3,7 +3,7 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import InactiveCellsIndexPage from '../../pages/inactiveCells'
 import LocationFactory from '../../../server/testutils/factories/location'
-import { Location } from '../../../server/data/locationsApiClient'
+import { Location } from '../../../server/data/types/locationsApi'
 import formatDate from '../../../server/formatters/formatDate'
 
 function testInactiveCellsTable(inactiveCellsIndexPage: InactiveCellsIndexPage, locations: Location[]) {
@@ -15,7 +15,7 @@ function testInactiveCellsTable(inactiveCellsIndexPage: InactiveCellsIndexPage, 
     cy.wrap(cells.location.find('a'))
       .should('have.attr', 'href')
       .and('equal', `/view-and-update-locations/${location.prisonId}/${location.id}`)
-    cy.wrap(cells.reason).contains('Test type')
+    cy.wrap(cells.reason).contains('Test type 1')
     cy.wrap(cells.estimatedReactivationDate).contains(formatDate(location.proposedReactivationDate))
     if (location.planetFmReference) {
       cy.wrap(cells.planetFmReference).contains(location.planetFmReference)
@@ -69,7 +69,7 @@ context('Inactive Cells Index', () => {
             inactiveCells: 1,
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
-            deactivatedReason: 'TEST_TYPE',
+            deactivatedReason: 'TEST1',
             proposedReactivationDate: new Date(2023, 3, 14).toISOString(),
             planetFmReference: 'FM-1234321',
           }),
@@ -81,7 +81,7 @@ context('Inactive Cells Index', () => {
             inactiveCells: 1,
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
-            deactivatedReason: 'TEST_TYPE',
+            deactivatedReason: 'TEST1',
             proposedReactivationDate: new Date(2024, 2, 1).toISOString(),
             planetFmReference: undefined,
           }),
@@ -93,7 +93,7 @@ context('Inactive Cells Index', () => {
             inactiveCells: 1,
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
-            deactivatedReason: 'TEST_TYPE',
+            deactivatedReason: 'TEST1',
             proposedReactivationDate: new Date(2024, 1, 3).toISOString(),
             planetFmReference: 'FM-1133',
           }),
@@ -128,7 +128,7 @@ context('Inactive Cells Index', () => {
             inactiveCells: 1,
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
-            deactivatedReason: 'TEST_TYPE',
+            deactivatedReason: 'TEST1',
             proposedReactivationDate: new Date(2024, 1, 3).toISOString(),
             planetFmReference: 'FM-1133',
           }),

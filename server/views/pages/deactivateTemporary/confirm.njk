@@ -1,0 +1,135 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% from "../../macros/locationsTable.njk" import locationsTable %}
+{% from "../../macros/miniSummary.njk" import miniSummary %}
+
+{% set title = "Check your answers before deactivating this location" %}
+
+{% block heading %}
+  <div class="govuk-grid-row govuk-!-margin-bottom-0">
+    <div class="govuk-grid-column-two-thirds">
+      <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+      <h1 class="govuk-heading-l">Check your answers before deactivating this location</h1>
+    </div>
+  </div>
+{% endblock %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukBackLink({
+          text: "Back",
+          href: backLink
+        }) }}
+
+        {% if errorlist.length %}
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errorlist
+          }) }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block content %}
+
+  {% set formMethod = options.method | default('post') %}
+  {% set formAction = options.action | default('') %}
+  {% set formEnctype = options.enctype | default('') %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ govukSummaryList({
+          card: {
+            title: {
+              text: "Deactivation details"
+            },
+            actions: {
+              items: [
+                {
+                  href: backLink,
+                  text: "Change"
+                }
+              ]
+            }
+          },
+          rows: [
+            {
+              key: {
+              text: "Reason"
+            },
+              value: {
+              html: deactivationReason
+            }
+            },
+            {
+              key: {
+              text: "Estimated reactivation date"
+            },
+              value: {
+              html: (values.estimatedReactivationDate | formatDate) or "Not provided"
+            }
+            },
+            {
+              key: {
+              text: "Planet FM reference number"
+            },
+              value: {
+              html: values.planetFmReference or "Not provided"
+            }
+            }
+          ]
+        }) }}
+
+        <div class="govuk-!-padding-bottom-2 change-summary">
+          <h2 class="govuk-heading-m">Change to establishment capacity</h2>
+
+          <p>{{ changeSummary | safe }}</p>
+        </div>
+
+        <form method="{{ formMethod }}" action="{{ formAction }}"
+            {% if formEnctype %}
+              enctype="{{ formEnctype }}"
+            {% endif %}
+        >
+
+          {% if formMethod == 'post' %}
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          {% endif %}
+
+          <div class="govuk-button-group">
+            {% block formActions %}
+              {% block submitAction %}
+                {{ govukButton({
+                  text: "Confirm deactivation",
+                  classes: options.buttonClasses,
+                  preventDoubleClick: true,
+                  type: "submit"
+                }) }}
+              {% endblock %}
+            {% endblock %}
+          </div>
+        </form>
+
+        <p class="govuk-body">
+          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
+            Cancel and return to location details
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

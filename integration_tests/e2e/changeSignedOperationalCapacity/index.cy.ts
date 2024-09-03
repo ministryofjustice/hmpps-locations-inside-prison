@@ -3,6 +3,7 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
 import ChangeSignedOperationalCapacityPage from '../../pages/changeSignedOperationalCapacity'
+import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
 context('Change signed operational capacity', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -71,7 +72,7 @@ context('Change signed operational capacity', () => {
     })
 
     it('can be accessed by clicking the change signed operational capacity link on the show location index page', () => {
-      cy.visit('/view-and-update-locations/TST')
+      ViewLocationsShowPage.goTo('TST')
       const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsIndexPage)
       viewLocationsIndexPage.capacity.signedOperationalChangeLink().click()
 

@@ -107,6 +107,7 @@
     "superagent": "^10.2.0"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
     "@ministryofjustice/eslint-config-hmpps": "^0.0.1-beta.2",
     "@tsconfig/node22": "^22.0.1",

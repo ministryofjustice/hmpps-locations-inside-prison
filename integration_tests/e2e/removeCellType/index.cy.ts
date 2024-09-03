@@ -36,7 +36,7 @@ context('Remove cell type', () => {
 
     it('does not show the remove link on the show location page', () => {
       cy.signIn()
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.removeSpecificCellTypeLink().should('not.exist')
     })
@@ -55,7 +55,7 @@ context('Remove cell type', () => {
         prisoners: [
           {
             prisonerNumber: 'A1234AA',
-            prisonId: 'LEI',
+            prisonId: 'TST',
             prisonName: 'HMP Leeds',
             cellLocation: '1-1-001',
             firstName: 'Dave',
@@ -74,7 +74,7 @@ context('Remove cell type', () => {
           },
           {
             prisonerNumber: 'B1234BB',
-            prisonId: 'LEI',
+            prisonId: 'TST',
             prisonName: 'HMP Leeds',
             cellLocation: '1-1-001',
             firstName: 'Horatio',
@@ -109,7 +109,7 @@ context('Remove cell type', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubUpdateCapacity')
       cy.task('stubUpdateSpecialistCellTypes')
-      cy.task('stubGetPrisonersInLocation', prisonerLocations)
+      cy.task('stubPrisonerLocationsId', prisonerLocations)
     })
 
     it('does not show the remove cell type link when the cell is inactive', () => {
@@ -125,9 +125,9 @@ context('Remove cell type', () => {
         specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
       })
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubGetLocation', location)
+      cy.task('stubLocations', location)
       cy.signIn()
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
 
       viewLocationsShowPage.removeSpecificCellTypeLink().should('not.exist')
@@ -146,12 +146,12 @@ context('Remove cell type', () => {
           specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
         })
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubGetLocation', location)
+        cy.task('stubLocations', location)
         cy.signIn()
       })
 
       it('can be accessed by clicking the remove link on the show location page', () => {
-        cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.removeSpecificCellTypeLink().click()
 
@@ -194,7 +194,7 @@ context('Remove cell type', () => {
           localName: '1-1-001',
           specialistCellTypes: ['ACCESSIBLE_CELL'],
         })
-        cy.task('stubGetLocation', location)
+        cy.task('stubLocations', location)
 
         RemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         Page.verifyOnPage(RemoveCellTypePage)
@@ -243,13 +243,13 @@ context('Remove cell type', () => {
             maxCapacity: 11,
           },
         })
-        cy.task('stubGetLocation', location)
+        cy.task('stubLocations', location)
         cy.signIn()
       })
 
       describe('are you sure page', () => {
         it('can be accessed by clicking the remove link on the show location page', () => {
-          cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+          ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
           const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
           viewLocationsShowPage.removeSpecificCellTypeLink().click()
 
@@ -292,7 +292,7 @@ context('Remove cell type', () => {
             localName: '1-1-001',
             specialistCellTypes: ['ACCESSIBLE_CELL'],
           })
-          cy.task('stubGetLocation', location)
+          cy.task('stubLocations', location)
 
           CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
           Page.verifyOnPage(CheckRemoveCellTypePage)
@@ -322,7 +322,7 @@ context('Remove cell type', () => {
             localName: '1-1-001',
             specialistCellTypes: ['ACCESSIBLE_CELL'],
           })
-          cy.task('stubGetLocation', location)
+          cy.task('stubLocations', location)
 
           CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
           const checkRemoveCellTypePage = Page.verifyOnPage(CheckRemoveCellTypePage)
@@ -473,8 +473,8 @@ context('Remove cell type', () => {
               specialistCellTypes: ['ACCESSIBLE_CELL'],
               localName: '1-1-001',
             })
-            cy.task('stubGetLocation', location)
-            cy.task('stubGetPrisonersInLocation', [])
+            cy.task('stubLocations', location)
+            cy.task('stubPrisonerLocationsId', [])
 
             const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 
@@ -498,7 +498,7 @@ context('Remove cell type', () => {
               specialistCellTypes: ['ACCESSIBLE_CELL'],
               localName: '1-1-001',
             })
-            cy.task('stubGetLocation', location)
+            cy.task('stubLocations', location)
 
             const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 

@@ -32,11 +32,10 @@ export default class SetCellType extends FormInitialStep {
     const fields = { ...locals.fields }
 
     if (!req.form.values?.specialistCellTypes) {
-      const items = fields.specialistCellTypes.items.map((item: FormWizard.Field) => ({
+      fields.specialistCellTypes.items = fields.specialistCellTypes.items.map((item: FormWizard.Field) => ({
         ...item,
         checked: location.specialistCellTypes.includes(item.value),
       }))
-      fields.specialistCellTypes.items = items
     }
 
     const backLink = backUrl(req, {
@@ -51,7 +50,7 @@ export default class SetCellType extends FormInitialStep {
     }
   }
 
-  validate(req: FormWizard.Request, res: Response, next: NextFunction) {
+  async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 

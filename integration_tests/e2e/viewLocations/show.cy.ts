@@ -1,7 +1,7 @@
 import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import { Location, LocationSummary } from '../../../server/data/locationsApiClient'
+import { Location, LocationSummary } from '../../../server/data/types/locationsApi'
 import LocationFactory from '../../../server/testutils/factories/location'
 import formatDate from '../../../server/formatters/formatDate'
 
@@ -81,7 +81,7 @@ context('View Locations Show', () => {
     }) {
       cy.signIn()
 
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       cy.get('h1').contains(location.localName || location.pathHierarchy)
       viewLocationsShowPage
@@ -103,7 +103,7 @@ context('View Locations Show', () => {
         viewLocationsShowPage.inactiveBanner().should('exist')
         viewLocationsShowPage.inactiveBannerRows().should('have.length', 3)
         viewLocationsShowPage.inactiveBannerRows().eq(0).find('.govuk-summary-list__key').contains('Reason')
-        viewLocationsShowPage.inactiveBannerRows().eq(0).find('.govuk-summary-list__value').contains('Test type')
+        viewLocationsShowPage.inactiveBannerRows().eq(0).find('.govuk-summary-list__value').contains('Test type 1')
         viewLocationsShowPage
           .inactiveBannerRows()
           .eq(1)
@@ -263,7 +263,7 @@ context('View Locations Show', () => {
     let location: Location
 
     context('When the location is a Wing', () => {
-      const locationDetails = {
+      const locationDetails: Partial<Location> = {
         localName: null,
         id: 'b8813f47-4497-4c88-9dee-a8d7ae54ba60',
         prisonId: 'TST',
@@ -278,7 +278,7 @@ context('View Locations Show', () => {
         convertedCellType: 'OFFICE',
         active: true,
         deactivatedByParent: false,
-        deactivatedReason: 'TEST_TYPE',
+        deactivatedReason: 'TEST1',
         proposedReactivationDate: '2024-04-28',
         planetFmReference: 'PFM/1234',
         topLevelId: '7995694d-d12b-4571-a9bb-4de01e1fe910',
@@ -288,7 +288,7 @@ context('View Locations Show', () => {
         inactiveCells: 0,
         lastModifiedBy: 'LOCATION_RO',
         lastModifiedDate: new Date().toISOString(),
-        key: 'LEI-A',
+        key: 'TST-A',
         sortName: 'A',
         isResidential: true,
         capacity: { maxCapacity: 100, workingCapacity: 94 },
@@ -342,7 +342,7 @@ context('View Locations Show', () => {
     })
 
     context('When the location is a Landing', () => {
-      const locationDetails = {
+      const locationDetails: Partial<Location> = {
         id: 'b8813f47-4497-4c88-9dee-a8d7ae54ba60',
         prisonId: 'TST',
         code: '1',
@@ -357,7 +357,7 @@ context('View Locations Show', () => {
         convertedCellType: 'OFFICE',
         active: true,
         deactivatedByParent: false,
-        deactivatedReason: 'TEST_TYPE',
+        deactivatedReason: 'TEST1',
         proposedReactivationDate: '2024-04-28',
         planetFmReference: 'PFM/1234',
         topLevelId: '7995694d-d12b-4571-a9bb-4de01e1fe910',
@@ -367,7 +367,7 @@ context('View Locations Show', () => {
         inactiveCells: 4,
         lastModifiedBy: 'LOCATION_RO',
         lastModifiedDate: new Date().toISOString(),
-        key: 'LEI-A-1',
+        key: 'TST-A-1',
         sortName: 'A-1',
         isResidential: true,
         capacity: { maxCapacity: 20, workingCapacity: 14 },
@@ -430,10 +430,10 @@ context('View Locations Show', () => {
     })
 
     context('When the location is a Cell', () => {
-      const locationDetails = {
+      const locationDetails: Partial<Location> = {
         localName: null,
         id: 'b8813f47-4497-4c88-9dee-a8d7ae54ba60',
-        prisonId: 'LEI',
+        prisonId: 'TST',
         code: '001',
         pathHierarchy: 'A-1-001',
         locationType: 'CELL',
@@ -445,7 +445,7 @@ context('View Locations Show', () => {
         convertedCellType: 'OFFICE',
         active: true,
         deactivatedByParent: false,
-        deactivatedReason: 'TEST_TYPE',
+        deactivatedReason: 'TEST1',
         proposedReactivationDate: '2024-04-28',
         planetFmReference: 'PFM/1234',
         topLevelId: '7995694d-d12b-4571-a9bb-4de01e1fe910',
@@ -455,7 +455,7 @@ context('View Locations Show', () => {
         inactiveCells: 0,
         lastModifiedBy: 'LOCATION_RO',
         lastModifiedDate: new Date().toISOString(),
-        key: 'LEI-A-1-001',
+        key: 'TST-A-1-001',
         sortName: 'A-1-001',
         isResidential: true,
         capacity: { maxCapacity: 2, workingCapacity: 1 },

@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 
-import { Location, PrisonerLocation } from '../../server/data/locationsApiClient'
+import { Location, PrisonerLocation } from '../../server/data/types/locationsApi'
 import LocationFactory from '../../server/testutils/factories/location'
 
 const stubLocationsConstantsAccommodationType = () =>
@@ -62,7 +62,11 @@ const stubLocationsConstantsDeactivatedReason = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {
-        deactivatedReasons: [{ key: 'TEST_TYPE', description: 'Test type' }],
+        deactivatedReasons: [
+          { key: 'TEST1', description: 'Test type 1' },
+          { key: 'OTHER', description: 'Other' },
+          { key: 'TEST2', description: 'Test type 2' },
+        ],
       },
     },
   })
@@ -377,7 +381,7 @@ const stubLocationsPrisonInactiveCellsForLocation = (locations: Location[]) =>
     },
   })
 
-const stubGetLocation = (location: Location) =>
+const stubLocations = (location: Location) =>
   stubFor({
     request: {
       method: 'GET',
@@ -392,7 +396,7 @@ const stubGetLocation = (location: Location) =>
     },
   })
 
-const stubGetPrisonersInLocation = (prisonerLocations: PrisonerLocation[]) =>
+const stubPrisonerLocationsId = (prisonerLocations: PrisonerLocation[]) =>
   stubFor({
     request: {
       method: 'GET',
@@ -437,7 +441,7 @@ const stubUpdateSpecialistCellTypes = () =>
     },
   })
 
-const stubConvertCellToNonResCell = () =>
+const stubLocationsConvertCellToNonResCell = () =>
   stubFor({
     request: {
       method: 'PUT',
@@ -452,10 +456,23 @@ const stubConvertCellToNonResCell = () =>
     },
   })
 
+const stubLocationsDeactivateTemporary = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/deactivate/temporary',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
-  stubConvertCellToNonResCell,
-  stubGetLocation,
-  stubGetPrisonersInLocation,
+  stubLocations,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -465,11 +482,14 @@ export default {
   stubLocationsConstantsResidentialHousingType,
   stubLocationsConstantsSpecialistCellType,
   stubLocationsConstantsUsedForType,
+  stubLocationsConvertCellToNonResCell,
+  stubLocationsDeactivateTemporary,
   stubLocationsLocationsResidentialSummary,
   stubLocationsLocationsResidentialSummaryForLocation,
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
+  stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,
   stubSignedOperationalCapacityGetNotFound,
   stubSignedOperationalCapacityUpdate,
