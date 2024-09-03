@@ -1,116 +1,6 @@
 import config from '../config'
 import BaseApiClient from './baseApiClient'
-
-export interface Location {
-  id: string
-  prisonId: string
-  code: string
-  pathHierarchy: string
-  locationType: string
-  residentialHousingType: string
-  localName: string
-  comments: string
-  permanentlyInactive: boolean
-  permanentlyInactiveReason: string
-  capacity: {
-    maxCapacity: number
-    workingCapacity: number
-  }
-  certification: {
-    certified: boolean
-    capacityOfCertifiedCell: number
-  }
-  attributes: string[]
-  usage: {
-    usageType: string
-    capacity: number
-    sequence: number
-  }[]
-  accommodationTypes: string[]
-  specialistCellTypes: string[]
-  usedFor: string[]
-  orderWithinParentLocation: number
-  status: string
-  convertedCellType: string
-  otherConvertedCellType: string
-  active: boolean
-  deactivatedByParent: boolean
-  deactivatedDate: string
-  deactivatedReason: string
-  deactivatedBy: string
-  proposedReactivationDate?: string
-  topLevelId: string
-  parentId: string
-  parentLocation: string
-  inactiveCells: number
-  childLocations: string[]
-  changeHistory: {
-    attribute: string
-    oldValue: string
-    newValue: string
-    amendedBy: string
-    amendedDate: string
-  }[]
-  lastModifiedBy: string
-  lastModifiedDate: string
-  key: string
-  isResidential: boolean
-  leafLevel: boolean
-  level: number
-  sortName: string
-  planetFmReference: string
-}
-
-export interface LocationSummary {
-  id: string
-  prisonId: string
-  code: string
-  type: string
-  localName?: string
-  pathHierarchy: string
-  level: number
-}
-
-export interface ResidentialSummary {
-  prisonSummary?: {
-    workingCapacity: number
-    signedOperationalCapacity: number
-    maxCapacity: number
-  }
-  parentLocation?: Location
-  topLevelLocationType: string
-  subLocationName: string
-  subLocations: Location[]
-  locationHierarchy: LocationSummary[]
-}
-
-export interface PrisonerLocation {
-  cellLocation: string
-  prisoners: {
-    prisonerNumber: string
-    prisonId: string
-    prisonName: string
-    cellLocation: string
-    firstName: string
-    lastName: string
-    gender: string
-    csra: string
-    category: string
-    alerts: {
-      alertType: string
-      alertCode: string
-      active: boolean
-      expired: boolean
-    }[]
-  }[]
-}
-
-export interface SignedOperationalCapacity {
-  signedOperationCapacity: number
-  prisonId: string
-  whenUpdated: string
-  updatedBy: string
-}
+import { Location, PrisonerLocation, ResidentialSummary, SignedOperationalCapacity } from './types/locationsApi'
 
 export default class LocationsApiClient extends BaseApiClient {
   protected static config() {
@@ -185,6 +75,21 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/convert-cell-to-non-res-cell',
       requestType: 'put',
     }),
+    deactivate: {
+      temporary: this.apiCall<
+        Location,
+        { locationId: string },
+        {
+          deactivationReason: string
+          deactivationReasonDescription: string
+          proposedReactivationDate: string
+          planetFmReference: string
+        }
+      >({
+        path: '/locations/:locationId/deactivate/temporary',
+        requestType: 'put',
+      }),
+    },
     getLocation: this.apiCall<Location, { locationId: string }>({
       path: '/locations/:locationId',
       requestType: 'get',

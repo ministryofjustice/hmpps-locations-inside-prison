@@ -4,6 +4,11 @@
 {% macro inactiveLocationBanner(location) %}
   {% set locationName = location.localName or location.pathHierarchy %}
   {% set locationType = location.locationType %}
+  {% set deactivatedReason = location.deactivatedReason %}
+  {% if location.deactivationReasonDescription %}
+    {% set deactivatedReason = deactivatedReason + " - " + location.deactivationReasonDescription %}
+  {% endif %}
+
   {% set inactiveHtml %}
     <p class="govuk-notification-banner__heading">
       {{ locationType }} {{ locationName }} is temporarily inactive
@@ -15,7 +20,7 @@
         text: 'Reason'
       },
         value: {
-        text: location.deactivatedReason
+        text: deactivatedReason
       }
       },
       {

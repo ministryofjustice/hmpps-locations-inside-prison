@@ -14,18 +14,14 @@ const fields = {
     items: [{ text: 'set at runtime', value: '' }],
   },
   otherConvertedCellType: {
+    component: 'govukInput',
     validate: ['required'],
     id: 'otherConvertedCellType',
     name: 'otherConvertedCellType',
-    classes: 'govuk-input--width-2',
     label: {
       text: 'Room description',
     },
     autocomplete: 'off',
-    dependent: {
-      field: 'convertedCellType',
-      value: 'OTHER',
-    },
   },
 }
 

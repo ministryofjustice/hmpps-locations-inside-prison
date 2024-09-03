@@ -2,7 +2,7 @@ import IndexPage from '../../pages/index'
 import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import LocationFactory from '../../../server/testutils/factories/location'
-import { Location } from '../../../server/data/locationsApiClient'
+import { Location } from '../../../server/data/types/locationsApi'
 import formatDate from '../../../server/formatters/formatDate'
 import ArchivedLocationsIndexPage from '../../pages/archivedLocations'
 
@@ -51,7 +51,7 @@ context('Archived Locations Index', () => {
             inactiveCells: 1,
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
-            deactivatedReason: 'TEST_TYPE',
+            deactivatedReason: 'TEST1',
             proposedReactivationDate: new Date(2023, 3, 14).toISOString(),
             planetFmReference: 'FM-1234321',
           }),
@@ -63,7 +63,7 @@ context('Archived Locations Index', () => {
             inactiveCells: 1,
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
-            deactivatedReason: 'TEST_TYPE',
+            deactivatedReason: 'TEST1',
             proposedReactivationDate: new Date(2024, 2, 1).toISOString(),
             planetFmReference: undefined,
           }),
@@ -75,7 +75,7 @@ context('Archived Locations Index', () => {
             inactiveCells: 1,
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
-            deactivatedReason: 'TEST_TYPE',
+            deactivatedReason: 'TEST1',
             proposedReactivationDate: new Date(2024, 1, 3).toISOString(),
             planetFmReference: 'FM-1133',
           }),

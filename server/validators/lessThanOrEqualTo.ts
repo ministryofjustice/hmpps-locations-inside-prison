@@ -3,4 +3,6 @@ function lessThanOrEqualTo(value: any, arg: number | { field: string }) {
   return Number(value) <= limit
 }
 
-export default lessThanOrEqualTo
+export default function f(arg: number | { field: string }) {
+  return { fn: lessThanOrEqualTo, arguments: [arg] }
+}

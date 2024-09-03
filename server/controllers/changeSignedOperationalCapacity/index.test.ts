@@ -1,10 +1,10 @@
 import { Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import ChangeSignedOperationalCapacity from './index'
 import fields from '../../routes/changeSignedOperationalCapacity/fields'
 
 describe('ChangeSignedOperationalCapacity', () => {
   const controller = new ChangeSignedOperationalCapacity({ route: '/' })
-  // @ts-ignore
   let req: FormWizard.Request
   let res: Response
 
@@ -23,12 +23,10 @@ describe('ChangeSignedOperationalCapacity', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        // @ts-ignore
-        get: jest.fn(fieldName => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
       },
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         errorlist: [],
         prisonId: 'TST',
@@ -39,7 +37,7 @@ describe('ChangeSignedOperationalCapacity', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
   })
 
   describe('validateFields', () => {

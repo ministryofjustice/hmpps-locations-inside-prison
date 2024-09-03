@@ -6,6 +6,9 @@ export default class ViewLocationsShowPage extends Page {
     this.checkOnPage()
   }
 
+  static goTo = (prisonId?: string, locationId?: string) =>
+    cy.visit(`/view-and-update-locations/${[prisonId, locationId].join('/')}`)
+
   checkOnPage() {
     cy.location('pathname').should('contain', '/view-and-update-locations/')
   }
@@ -26,6 +29,8 @@ export default class ViewLocationsShowPage extends Page {
 
   convertToNonResAction = (): PageElement =>
     cy.get('.moj-button-menu__wrapper a:contains("Convert to non-residential room")')
+
+  deactivateAction = (): PageElement => cy.get('.moj-button-menu__wrapper a:contains("Deactivate cell")')
 
   summaryCards = {
     all: (): PageElement => cy.get('.hmpps-summary-card'),

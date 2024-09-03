@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
-import { Location } from '../../data/locationsApiClient'
+import { Location } from '../../data/types/locationsApi'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 
 export default class ChangeCellCapacity extends FormInitialStep {

@@ -11,13 +11,13 @@ describe('Components service', () => {
 
   describe('getComponent', () => {
     beforeEach(() => {
-      componentsClient = new FeComponentsClient() as jest.Mocked<FeComponentsClient>
+      componentsClient = jest.mocked(new FeComponentsClient())
       componentsService = new FeComponentsService(componentsClient)
     })
 
     it('Retrieves and returns requested component', async () => {
       const caseLoad = {
-        caseLoadId: 'LEI',
+        caseLoadId: 'TST',
         description: 'Leeds (HMP)',
         type: 'INST',
         caseloadFunction: 'GENERAL',

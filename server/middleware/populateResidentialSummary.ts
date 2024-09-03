@@ -1,21 +1,21 @@
 import { Request, RequestHandler } from 'express'
 import logger from '../../logger'
 import { Services } from '../services'
-import { Location } from '../data/locationsApiClient'
 import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
+import { DecoratedLocation } from '../decorators/decoratedLocation'
 
-function showChangeCapacityLink(location: Location, req: Request) {
+function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   const { active, capacity, leafLevel } = location
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
-function showEditCellTypeLinks(location: Location, req: Request) {
+function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
   return location.active && req.canAccess('set_cell_type')
 }
 
-function cellTypesRow(location: Location, req: Request): SummaryListRow {
+function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { specialistCellTypes } = location
   const setCellTypeUrl = `/location/${location.id}/set-cell-type`
   const removeCellTypeUrl = `/location/${location.id}/remove-cell-type`
@@ -47,14 +47,14 @@ function cellTypesRow(location: Location, req: Request): SummaryListRow {
   return row
 }
 
-function nonResCellTypeRow(location: Location) {
+function nonResCellTypeRow(location: DecoratedLocation) {
   const { convertedCellType, otherConvertedCellType } = location
   const text = otherConvertedCellType?.length ? `${convertedCellType} - ${otherConvertedCellType}` : convertedCellType
 
   return { key: { text: 'Non-residential room' }, value: { text } }
 }
 
-function getLocationDetails(location: Location, req: Request) {
+function getLocationDetails(location: DecoratedLocation, req: Request) {
   const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
 
   if (!location.leafLevel) {
@@ -103,11 +103,11 @@ export default function populateResidentialSummary({
 
       const apiData = await locationsService.getResidentialSummary(token, prisonId, req.params.locationId)
       const residentialSummary: {
-        location?: Location
+        location?: DecoratedLocation
         locationDetails?: SummaryListRow[]
         locationHistory?: boolean // TODO: change this type when location history tab is implemented
         subLocationName: string
-        subLocations: Location[]
+        subLocations: DecoratedLocation[]
         summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string; linkAriaLabel?: string }[]
       } = {
         subLocationName: apiData.subLocationName,

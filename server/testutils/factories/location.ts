@@ -1,6 +1,6 @@
 import { Factory } from 'fishery'
 
-import { Location } from '../../data/locationsApiClient'
+import { Location } from '../../data/types/locationsApi'
 
 const LocationFactory = Factory.define<Location>(() => {
   return {

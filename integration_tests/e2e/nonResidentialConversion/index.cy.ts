@@ -7,7 +7,7 @@ import NonResidentialConversionWarningPage from '../../pages/nonResidentialConve
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
-context('Change signed operational capacity', () => {
+context('Non-residential conversion', () => {
   const location = LocationFactory.build({
     accommodationTypes: ['NORMAL_ACCOMMODATION'],
     capacity: {
@@ -33,7 +33,7 @@ context('Change signed operational capacity', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubGetLocation', location)
+      cy.task('stubLocations', location)
       cy.signIn()
     })
 
@@ -43,7 +43,7 @@ context('Change signed operational capacity', () => {
     })
 
     it('does not show the action in the menu on the show location page', () => {
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.convertToNonResAction().should('not.exist')
     })
@@ -63,9 +63,9 @@ context('Change signed operational capacity', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubGetLocation', location)
-      cy.task('stubGetPrisonersInLocation', [])
-      cy.task('stubConvertCellToNonResCell')
+      cy.task('stubLocations', location)
+      cy.task('stubPrisonerLocationsId', [])
+      cy.task('stubLocationsConvertCellToNonResCell')
       cy.signIn()
     })
 
@@ -98,7 +98,7 @@ context('Change signed operational capacity', () => {
             prisoners: [
               {
                 prisonerNumber: 'A1234AA',
-                prisonId: 'LEI',
+                prisonId: 'TST',
                 prisonName: 'HMP Leeds',
                 cellLocation: '1-1-001',
                 firstName: 'Dave',
@@ -118,7 +118,7 @@ context('Change signed operational capacity', () => {
             ],
           },
         ]
-        cy.task('stubGetPrisonersInLocation', prisonerLocations)
+        cy.task('stubPrisonerLocationsId', prisonerLocations)
         NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000000')
       })
 
@@ -126,7 +126,7 @@ context('Change signed operational capacity', () => {
     })
 
     it('can be accessed via the actions dropdown on the show location page', () => {
-      cy.visit('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000000')
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.actionsMenu().click()
       viewLocationsShowPage.convertToNonResAction().click()

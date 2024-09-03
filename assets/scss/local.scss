@@ -73,6 +73,10 @@ h1 .govuk-caption-l {
   }
 }
 
+.govuk-\!-float-right {
+  float: right;
+}
+
 .govuk-panel {
   p.govuk-body-l {
     @include govuk-font($size: 24);
@@ -89,8 +93,4 @@ h1 .govuk-caption-l {
   p {
     color: govuk-colour("white");
   }
-}
-
-.govuk-\!-float-right {
-  float: right;
 }

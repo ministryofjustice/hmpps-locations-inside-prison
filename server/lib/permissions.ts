@@ -12,6 +12,7 @@ const manageResLocationsOpCapPermissions: string[] = [
   'change_cell_capacity',
   'change_signed_operational_capacity',
   'convert_non_residential',
+  'deactivate_temporary',
   'set_cell_type',
 ]
 

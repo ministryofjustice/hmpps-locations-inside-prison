@@ -19,7 +19,6 @@ describe('RemoveCellType', () => {
       flash: jest.fn(),
       form: {
         options: {
-          // @ts-ignore
           fields,
         },
         values: {
@@ -30,30 +29,27 @@ describe('RemoveCellType', () => {
       journeyModel: {
         reset: jest.fn(),
       },
-      // @ts-ignore
       services: {
         authService,
         locationsService,
       },
-      // @ts-ignore
       sessionModel: {
-        get: jest.fn(fieldName => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
         reset: jest.fn(),
       },
-    }
+    } as unknown as typeof req
     res = {
       locals: {
         location: LocationFactory.build({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'MDI',
         }),
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
@@ -105,7 +101,7 @@ describe('RemoveCellType', () => {
 
     it('calls next with any errors', async () => {
       const error = new Error('API error')
-      locationsService.updateSpecialistCellTypes.mockRejectedValue(error)
+      ;(locationsService.updateSpecialistCellTypes as jest.Mock).mockRejectedValue(error)
       await controller.saveValues(req, res, next)
       expect(next).toHaveBeenCalledWith(error)
     })

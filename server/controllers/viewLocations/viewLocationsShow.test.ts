@@ -1,33 +1,54 @@
 import { Request, Response } from 'express'
 import controller from './viewLocationsShow'
+import { addActions } from '../../routes/viewLocationsRouter'
+import { Location } from '../../data/types/locationsApi'
 import LocationFactory from '../../testutils/factories/location'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
+
+const buildDecoratedLocation = (params: Partial<Location>): DecoratedLocation => {
+  const location = LocationFactory.build(params)
+
+  return {
+    ...location,
+    raw: location,
+    locationType: location.locationType.toLowerCase().replace(/^\w/, a => a.toUpperCase()),
+  } as unknown as DecoratedLocation
+}
 
 describe('view locations show', () => {
   let req: Request
   let res: Response
 
+  const convertToNonResAction = {
+    text: 'Convert to non-residential room',
+    href: '/location/7e570000-0000-0000-0000-000000000001/non-residential-conversion',
+  }
+
+  const deactivateCellAction = {
+    text: 'Deactivate cell',
+    href: '/location/7e570000-0000-0000-0000-000000000001/deactivate/temporary',
+  }
+
   beforeEach(() => {
-    // @ts-ignore
+    const location = buildDecoratedLocation({ isResidential: true, leafLevel: true })
     req = {
       canAccess: jest.fn().mockReturnValue(false),
       flash: jest.fn(),
-    }
+    } as unknown as typeof req
     res = {
-      // @ts-ignore
       locals: {
         residentialSummary: {
-          location: LocationFactory.build({ isResidential: true, leafLevel: true }),
+          location: { ...location, raw: location },
         },
       },
       render: jest.fn(),
-    }
+    } as unknown as typeof res
   })
 
   it('renders the page', () => {
     controller(req, res)
 
     expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-      actions: [],
       banner: {},
     })
   })
@@ -42,66 +63,113 @@ describe('view locations show', () => {
     controller(req, res)
 
     expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-      actions: [],
       banner: {
         success,
       },
     })
   })
 
-  describe('with the correct permissions', () => {
-    beforeEach(() => {
-      req.canAccess = jest.fn().mockReturnValue(true)
-    })
+  describe('addActions', () => {
+    describe('convert to non-res', () => {
+      describe('without the correct permissions', () => {
+        beforeEach(() => {
+          req.canAccess = jest.fn().mockReturnValue(false)
+        })
 
-    it('adds the convert to non-res action', () => {
-      controller(req, res)
+        it('does not add the action', async () => {
+          await addActions(req, res, jest.fn())
 
-      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-        actions: [
-          {
-            text: 'Convert to non-residential room',
-            href: '/location/7e570000-0000-0000-0000-000000000001/non-residential-conversion',
-          },
-        ],
-        banner: {},
+          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+        })
+      })
+
+      describe('with the correct permissions', () => {
+        beforeEach(() => {
+          req.canAccess = jest.fn().mockReturnValue(true)
+        })
+
+        it('adds the action', async () => {
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions).toContainEqual(convertToNonResAction)
+        })
+
+        it('does not add the action for non-res cell', async () => {
+          res.locals.residentialSummary.location = buildDecoratedLocation({ isResidential: false, leafLevel: true })
+
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+        })
+
+        it('does not add the action when not leaf level', async () => {
+          res.locals.residentialSummary.location = buildDecoratedLocation({ isResidential: true, leafLevel: false })
+
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+        })
+
+        it('does not add the action when location is inactive', async () => {
+          res.locals.residentialSummary.location = buildDecoratedLocation({
+            active: false,
+            isResidential: true,
+            leafLevel: true,
+          })
+
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+        })
       })
     })
 
-    it('adds no action for non-res cell', () => {
-      res.locals.residentialSummary.location = LocationFactory.build({ isResidential: false, leafLevel: true })
-
-      controller(req, res)
-
-      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-        actions: [],
-        banner: {},
-      })
-    })
-
-    it('adds no action when not leaf level', () => {
-      res.locals.residentialSummary.location = LocationFactory.build({ isResidential: true, leafLevel: false })
-
-      controller(req, res)
-
-      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-        actions: [],
-        banner: {},
-      })
-    })
-
-    it('adds no action when location is inactive', () => {
-      res.locals.residentialSummary.location = LocationFactory.build({
-        active: false,
-        isResidential: true,
-        leafLevel: true,
+    describe('deactivate cell', () => {
+      beforeEach(() => {
+        res.locals.residentialSummary.location = buildDecoratedLocation({
+          active: true,
+          locationType: 'CELL',
+        })
       })
 
-      controller(req, res)
+      describe('without the correct permissions', () => {
+        beforeEach(() => {
+          req.canAccess = jest.fn().mockReturnValue(false)
+        })
 
-      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-        actions: [],
-        banner: {},
+        it('does not add the action', async () => {
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions || []).not.toContainEqual(deactivateCellAction)
+        })
+      })
+
+      describe('with the correct permissions', () => {
+        beforeEach(() => {
+          req.canAccess = jest.fn().mockReturnValue(true)
+        })
+
+        it('adds the action', async () => {
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions).toContainEqual(deactivateCellAction)
+        })
+
+        it('does not add the action when location is inactive', async () => {
+          res.locals.residentialSummary.location.active = false
+
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions || []).not.toContainEqual(deactivateCellAction)
+        })
+
+        it('does not add the action when location is not a CELL', async () => {
+          res.locals.residentialSummary.location.raw.locationType = 'OFFICE'
+
+          await addActions(req, res, jest.fn())
+
+          expect(res.locals.actions || []).not.toContainEqual(deactivateCellAction)
+        })
       })
     })
   })

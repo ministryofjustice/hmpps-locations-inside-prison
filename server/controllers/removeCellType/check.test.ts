@@ -13,17 +13,15 @@ describe('CheckRemoveCellType', () => {
   beforeEach(() => {
     req = {
       flash: jest.fn(),
-      // @ts-ignore
       form: {
         options: {
-          // @ts-ignore
           fields,
         },
         values: {
           areYouSure: 'yes',
         },
       },
-    }
+    } as unknown as typeof req
     res = {
       locals: {
         errorlist: [],
@@ -32,10 +30,8 @@ describe('CheckRemoveCellType', () => {
           prisonId: 'MDI',
         }),
         options: {
-          // @ts-ignore
           fields,
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -44,7 +40,7 @@ describe('CheckRemoveCellType', () => {
         },
       },
       redirect: jest.fn(),
-    }
+    } as unknown as typeof res
     next = jest.fn()
   })
 
