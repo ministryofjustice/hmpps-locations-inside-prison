@@ -224,8 +224,8 @@ context('Non-residential conversion', () => {
         detailsPage.continueButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
-        cy.get('.govuk-error-summary__list').contains('Description must be 30 characters or less')
-        cy.get('#otherConvertedCellType-error').contains('Description must be 30 characters or less')
+        cy.get('.govuk-error-summary__list').contains('Room description must be 30 characters or less')
+        cy.get('#otherConvertedCellType-error').contains('Room description must be 30 characters or less')
       })
     })
 
