@@ -60,7 +60,6 @@ export default class FormInitialStep extends FormWizard.Controller {
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName?.toLowerCase()}`,
-      maxlength: 'Description must be 30 characters or less',
     }
 
     const errorMessage = errorMessageOverrides[error.type] || errorMessages[error.type] || `${fieldName} is invalid`
