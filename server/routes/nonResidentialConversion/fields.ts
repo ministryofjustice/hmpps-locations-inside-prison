@@ -1,3 +1,5 @@
+import maxLength from '../../validators/maxLength'
+
 const fields = {
   convertedCellType: {
     component: 'govukRadios',
@@ -15,7 +17,7 @@ const fields = {
   },
   otherConvertedCellType: {
     component: 'govukInput',
-    validate: ['required'],
+    validate: ['required', maxLength(30)],
     id: 'otherConvertedCellType',
     name: 'otherConvertedCellType',
     label: {
