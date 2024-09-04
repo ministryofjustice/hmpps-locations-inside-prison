@@ -215,6 +215,18 @@ context('Non-residential conversion', () => {
         cy.get('.govuk-error-summary__list').contains('Enter a room description')
         cy.get('#otherConvertedCellType-error').contains('Enter a room description')
       })
+
+      it('shows the correct validation error when other is selected with description over 30 characters', () => {
+        const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
+
+        detailsPage.cellTypeRadioItem('OTHER').click()
+        detailsPage.otherFreeText().clear().type('This description is over 30 characters')
+        detailsPage.continueButton().click()
+
+        cy.get('.govuk-error-summary__title').contains('There is a problem')
+        cy.get('.govuk-error-summary__list').contains('Description must be 30 characters or less')
+        cy.get('#otherConvertedCellType-error').contains('Description must be 30 characters or less')
+      })
     })
 
     describe('confirmation page', () => {
