@@ -88,11 +88,76 @@ describe('DeactivateTemporaryConfirm', () => {
     })
   })
 
+  describe('getCellCount', () => {
+    beforeEach(() => {
+      req.services = {
+        authService: {
+          getSystemClientToken: jest.fn().mockResolvedValue('token'),
+        },
+        locationsService: {
+          getResidentialSummary: jest
+            .fn()
+            .mockResolvedValue({ parentLocation: { numberOfCellLocations: 10, inactiveCells: 2 } }),
+        },
+      } as unknown as Services
+    })
+
+    describe('when location is a CELL', () => {
+      beforeEach(() => {
+        res.locals.location.raw = { ...res.locals.location, locationType: 'CELL' }
+      })
+
+      it('sets cellCount to 1 without calling the API', async () => {
+        const callback = jest.fn()
+        await controller.getCellCount(req, res, callback)
+
+        expect(res.locals.cellCount).toBe(1)
+        expect(req.services.authService.getSystemClientToken).not.toHaveBeenCalled()
+        expect(req.services.locationsService.getResidentialSummary).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when location is not a CELL', () => {
+      beforeEach(() => {
+        res.locals.location.raw = { ...res.locals.location, locationType: 'LANDING' }
+      })
+
+      it('calls the API to get cell count', async () => {
+        const callback = jest.fn()
+        await controller.getCellCount(req, res, callback)
+
+        expect(res.locals.cellCount).toBe(8)
+      })
+    })
+
+    it('calls the correct locations service call', async () => {
+      req.services = {
+        authService: {
+          getSystemClientToken: () => 'token',
+        },
+        locationsService: {
+          getResidentialSummary: jest.fn(),
+        },
+      } as unknown as Services
+      const callback = jest.fn()
+      await controller.getResidentialSummary(req, res, callback)
+
+      expect(req.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
+        'token',
+        res.locals.location.prisonId,
+      )
+    })
+  })
+
   describe('generateChangeSummary', () => {
     it('returns the expected string', () => {
-      expect(controller.generateChangeSummary(2, 1020)).toEqual(`You are making 1 cell inactive.
+      expect(controller.generateChangeSummary(1, 2, 1020)).toEqual(`You are making 1 cell inactive.
 <br/><br/>
 This will reduce the establishment's total working capacity from 1020 to 1018.`)
+
+      expect(controller.generateChangeSummary(42, 40, 1020)).toEqual(`You are making 42 cells inactive.
+<br/><br/>
+This will reduce the establishment's total working capacity from 1020 to 980.`)
     })
   })
 
