@@ -5,6 +5,7 @@ import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/nonResidentialConversion/fields'
+import maxLength from '../../validators/maxLength'
 
 describe('NonResidentialConversionDetails', () => {
   const controller = new NonResidentialConversionDetails({ route: '/' })
@@ -155,7 +156,7 @@ describe('NonResidentialConversionDetails', () => {
               text: 'Room description',
             },
             name: 'otherConvertedCellType',
-            validate: ['required'],
+            validate: ['required', maxLength(30)],
             value: 'pet therapy room',
           },
         },
