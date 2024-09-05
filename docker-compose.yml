@@ -70,6 +70,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://locations-inside-prison-db:5432/locations_inside_prison?sslmode=prefer
       - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
       - API_BASE_URL_PRISONER_SEARCH=http://prisoner-search:8080
+      - API_BASE_URL_PRISON_REGISTER=http://prison-register:8080
       - LOCATIONS_INSIDE_PRISON_API_CLIENT_ID=hmpps-locations-inside-prison-system
       - LOCATIONS_INSIDE_PRISON_API_CLIENT_SECRET=clientsecret
 
@@ -121,6 +122,37 @@ services:
     ports:
       - '6379:6379'
 
+  prison-register:
+    image: quay.io/hmpps/prison-register:latest
+    container_name: prison-register
+    depends_on:
+      - hmpps-auth
+      - prison-register-db
+      - localstack
+    networks:
+      - hmpps
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://prison-register-db:5432/prison-register?sslmode=prefer
+      - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
+
+  prison-register-db:
+    image: postgres:16
+    networks:
+      - hmpps
+    container_name: prison-register-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=prison-register
+      - POSTGRES_USER=prison-register
+      - POSTGRES_DB=prison-register
+
   app:
     build:
       context: .
@@ -128,8 +160,7 @@ services:
         BUILD_NUMBER: "1.0.0"
         GIT_REF: "a1b2c3"
         GIT_BRANCH: main
-    networks:
-      - hmpps
+    network_mode: "host"
     depends_on:
       - manage-users-api
       - hmpps-auth
@@ -140,11 +171,11 @@ services:
       - "3000:3000"
     environment:
       - PRODUCT_ID=UNASSIGNED
-      - REDIS_HOST=redis
+      - REDIS_HOST=localhost
       - REDIS_ENABLED=true
       - HMPPS_AUTH_EXTERNAL_URL=http://localhost:8080/auth
-      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
-      - MANAGE_USERS_API_URL=http://manage-users-api:8080
+      - HMPPS_AUTH_URL=http://localhost:8080/auth
+      - MANAGE_USERS_API_URL=http://localhost:8082
       - API_CLIENT_ID=hmpps-locations-inside-prison
       - API_CLIENT_SECRET=clientsecret
       - SYSTEM_CLIENT_ID=hmpps-locations-inside-prison-system
@@ -156,7 +187,7 @@ services:
       - COMPONENT_API_URL=http://not-used-in-local-dev
       - COMMON_COMPONENTS_ENABLED=false
       - DPS_URL=http://localhost:3000
-      - LOCATIONS_API_URL=http://locations-inside-prison-api:8080
+      - LOCATIONS_API_URL=http://localhost:8090
 
 networks:
   hmpps:

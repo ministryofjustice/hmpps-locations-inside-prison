@@ -43,7 +43,7 @@ npm run start:dev
 * all in one, for preview:
 
 ```shell
-docker compose -f docker-compose.yml --profile include-frontend up
+docker compose -f docker-compose.yml --profile include-frontend up --build
 ```
 
 #### Dev logins
