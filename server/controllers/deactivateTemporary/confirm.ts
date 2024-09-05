@@ -7,6 +7,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(this.getResidentialSummary)
+    this.use(this.getCellCount)
   }
 
   async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -19,13 +20,31 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     next()
   }
 
-  generateChangeSummary(cellWorkingCapacity: number, overallWorkingCapacity: number): string | null {
+  async getCellCount(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { user, location } = res.locals
+    const { authService, locationsService } = req.services
+
+    let cellCount = 1
+
+    if (location.raw.locationType !== 'CELL') {
+      const token = await authService.getSystemClientToken(user.username)
+      const residentialSummary = await locationsService.getResidentialSummary(token, location.prisonId, location.id)
+
+      cellCount =
+        residentialSummary.parentLocation.numberOfCellLocations - residentialSummary.parentLocation.inactiveCells
+    }
+    res.locals.cellCount = cellCount
+
+    next()
+  }
+
+  generateChangeSummary(cellCount: number, cellWorkingCapacity: number, overallWorkingCapacity: number): string | null {
     if (cellWorkingCapacity === 0) return null
 
     const newOverallVal = overallWorkingCapacity - cellWorkingCapacity
 
     return `\
-      You are making 1 cell inactive.
+      You are making ${cellCount} cell${cellCount > 1 ? 's' : ''} inactive.
       <br/><br/>
       This will reduce the establishment's total working capacity from ${overallWorkingCapacity} to ${newOverallVal}.
     `.replace(/^\s*|\s*$/gm, '')
@@ -51,10 +70,14 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { location, residentialSummary } = res.locals
+    const { cellCount, location, residentialSummary } = res.locals
     const { workingCapacity } = location.capacity
     const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/deactivate/temporary/details` })
-    const changeSummary = this.generateChangeSummary(workingCapacity, residentialSummary.prisonSummary.workingCapacity)
+    const changeSummary = this.generateChangeSummary(
+      cellCount,
+      workingCapacity,
+      residentialSummary.prisonSummary.workingCapacity,
+    )
 
     return {
       backLink,
@@ -86,13 +109,14 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { displayName, id: locationId, prisonId } = res.locals.location as DecoratedLocation
+    const { location } = res.locals
+    const { displayName, id: locationId, locationType, prisonId } = location as DecoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
     req.flash('success', {
-      title: 'Cell deactivated',
+      title: `${locationType} deactivated`,
       content: `You have deactivated ${displayName}.`,
     })
 
