@@ -9,6 +9,7 @@ describe('rolesToPermissions', () => {
     expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS'])).toEqual([
       'change_cell_capacity',
       'convert_non_residential',
+      'reactivate',
       'set_cell_type',
     ])
   })
@@ -19,6 +20,7 @@ describe('rolesToPermissions', () => {
       'change_signed_operational_capacity',
       'convert_non_residential',
       'deactivate_temporary',
+      'reactivate',
       'set_cell_type',
     ])
   })
@@ -35,6 +37,7 @@ describe('rolesToPermissions', () => {
       'change_signed_operational_capacity',
       'convert_non_residential',
       'deactivate_temporary',
+      'reactivate',
       'set_cell_type',
     ])
   })

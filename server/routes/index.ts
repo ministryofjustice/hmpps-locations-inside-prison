@@ -4,19 +4,21 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import { Page } from '../services/auditService'
 import populateCards from '../middleware/populateCards'
-import viewLocationsRouter from './viewLocationsRouter'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import logPageView from '../middleware/logPageView'
-import inactiveCellsRouter from './inactiveCellsRouter'
-import archivedLocationsRouter from './archivedLocationsRouter'
-import changeCellCapacityRouter from './changeCellCapacity'
 import changeSignedOperationalCapacityRouter from './changeSignedOperationalCapacity'
-import setCellTypeRouter from './setCellType'
-import removeCellTypeRouter from './removeCellType'
-import nonResidentialConversionRouter from './nonResidentialConversion'
-import cellConversionRouter from './cellConversion'
 import addServicesToRequest from '../middleware/addServicesToRequest'
+
+import archivedLocationsRouter from './archivedLocationsRouter'
+import cellConversionRouter from './cellConversion'
+import changeCellCapacityRouter from './changeCellCapacity'
 import deactivateTemporaryRouter from './deactivateTemporary'
+import inactiveCellsRouter from './inactiveCellsRouter'
+import nonResidentialConversionRouter from './nonResidentialConversion'
+import reactivateRouter from './reactivate/cell'
+import removeCellTypeRouter from './removeCellType'
+import setCellTypeRouter from './setCellType'
+import viewLocationsRouter from './viewLocationsRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -42,6 +44,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/change-cell-capacity', changeCellCapacityRouter)
   router.use('/location/:locationId/deactivate/temporary', deactivateTemporaryRouter)
   router.use('/location/:locationId/non-residential-conversion', nonResidentialConversionRouter)
+  router.use('/location/:locationId/reactivate/cell', reactivateRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
 

@@ -5,6 +5,7 @@ const viewInternalLocationPermissions: string[] = []
 const manageResidentialLocationsPermissions: string[] = [
   'change_cell_capacity',
   'convert_non_residential',
+  'reactivate',
   'set_cell_type',
 ]
 
@@ -13,6 +14,7 @@ const manageResLocationsOpCapPermissions: string[] = [
   'change_signed_operational_capacity',
   'convert_non_residential',
   'deactivate_temporary',
+  'reactivate',
   'set_cell_type',
 ]
 
