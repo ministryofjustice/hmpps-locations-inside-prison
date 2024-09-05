@@ -65,6 +65,7 @@ const LocationFactory = Factory.define<Location>(() => {
     leafLevel: false,
     level: 1,
     sortName: 'A-1-001',
+    numberOfCellLocations: 0,
   }
 })
 
