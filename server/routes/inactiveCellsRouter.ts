@@ -20,7 +20,9 @@ const controller = (services: Services) => {
   router.get(
     '/:locationId?',
     asyncMiddleware(async (req, res, next) => {
+      res.locals.options = { action: '/reactivate/cells', method: 'get' }
       if (req.params.locationId) {
+        res.locals.locationId = req.params.locationId
         await populateResidentialSummary(services)(req, res, next)
         return
       }

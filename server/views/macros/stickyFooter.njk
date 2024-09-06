@@ -1,0 +1,39 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% macro stickyFooter(params) %}
+  <div class="sticky-footer">
+    {% if params.stickySelect %}
+      <div class='sticky-select-action-bar {{ "sticky-select-action-bar--fixed" if params.stickySelect.fixed }}' role='toolbar' aria-live='polite'
+           aria-label='actions' aria-disabled='false'
+          {% if params.stickySelect.itemsDescription %}
+            data-description-singular='{{ params.stickySelect.itemsDescription }}'
+          {% endif %}
+          {% if params.stickySelect.itemsDescriptionPlural %}
+            data-description-plural='{{ params.stickySelect.itemsDescriptionPlural }}'
+          {% endif %}
+      >
+        <div class='govuk-width-container'>
+          <div class='sticky-select-action-bar__selected-summary'>
+            <span class='sticky-select-action-bar__count'>x cells selected</span>
+            <a class='sticky-select-action-bar__clear-link'>Clear</a>
+          </div>
+          <div class='govuk-button-group'>
+            {% for action in params.stickySelect.actions %}
+              {{ govukButton({
+                href: action.href if action.href,
+                text: action.text,
+                classes: 'govuk-button--inverse',
+                preventDoubleClick: true,
+                attributes: {
+                  id: params.stickySelect.idPrefix + '-action-' + loop.index0,
+                  formaction: action.formAction,
+                  'data-max-items': action.maxItems if action.maxItems
+                }
+              }) if action }}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}

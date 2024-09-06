@@ -1,0 +1,126 @@
+import { NextFunction, Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
+import { compact } from 'lodash'
+import backUrl from '../../../utils/backUrl'
+import { Location, ResidentialSummary } from '../../../data/types/locationsApi'
+import populateCells from './populateCells'
+import LocationsService from '../../../services/locationsService'
+import populateInactiveParentLocations from '../populateInactiveParentLocations'
+
+export default class ReactivateCellsConfirm extends FormWizard.Controller {
+  middlewareSetup() {
+    super.middlewareSetup()
+    this.use(this.getResidentialSummary)
+    this.use(populateCells)
+    this.use(populateInactiveParentLocations)
+  }
+
+  async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { user } = res.locals
+    const { authService, locationsService } = req.services
+
+    const token = await authService.getSystemClientToken(user.username)
+    res.locals.residentialSummary = await locationsService.getResidentialSummary(
+      token,
+      req.sessionModel.get('referrerPrisonId') as string,
+    )
+
+    next()
+  }
+
+  generateChangeSummary(valName: string, oldVal: number, newVal: number): string | null {
+    if (newVal === oldVal) return null
+
+    const verb = newVal > oldVal ? 'increase' : 'decrease'
+
+    return `\
+      The establishment’s total ${valName} capacity will ${verb} from ${oldVal} to ${newVal}.
+    `.replace(/^\s*|\s*$/gm, '')
+  }
+
+  locals(req: FormWizard.Request, res: Response) {
+    const { cells, residentialSummary }: { cells: Location[]; residentialSummary: ResidentialSummary } =
+      res.locals as unknown as {
+        cells: Location[]
+        residentialSummary: ResidentialSummary
+      }
+    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
+    const referrerLocationId = req.sessionModel.get('referrerLocationId')
+    const backLink = backUrl(req, { fallbackUrl: '/reactivate/cells/check-capacity' })
+    const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
+    const { maxCapacity, workingCapacity } = residentialSummary.prisonSummary
+    let newMaxCapacity = maxCapacity
+    let newWorkingCapacity = workingCapacity
+
+    const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
+      {}) as typeof capacityChanges
+    cells.forEach((cell: Location) => {
+      const changes = capacityChanges[cell.id] || {}
+      const originalCellMaxCapacity = cell.capacity.maxCapacity
+      const originalCellWorkingCapacity = cell.oldWorkingCapacity
+      const newCellMaxCapacity = 'maxCapacity' in changes ? changes.maxCapacity : originalCellMaxCapacity
+      const newCellWorkingCapacity =
+        'workingCapacity' in changes ? changes.workingCapacity : originalCellWorkingCapacity
+      newMaxCapacity += newCellMaxCapacity - originalCellMaxCapacity
+      newWorkingCapacity += newCellWorkingCapacity
+    })
+
+    const changeSummaries = compact([
+      this.generateChangeSummary('working', workingCapacity, newWorkingCapacity),
+      this.generateChangeSummary('maximum', maxCapacity, newMaxCapacity),
+    ])
+
+    const changeSummary = changeSummaries.join('\n<br/><br/>\n')
+
+    return {
+      backLink,
+      cancelLink,
+      changeSummary,
+    }
+  }
+
+  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { cells, user }: { cells?: Location[]; user: Express.User } = res.locals
+    const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
+      {}) as typeof capacityChanges
+    const selectedLocations: string[] = req.sessionModel.get('selectedLocations') as string[]
+    const allCellChanges = Object.fromEntries(
+      selectedLocations.map((id: string) => {
+        const location = cells.find(l => l.id === id)
+
+        return [
+          id,
+          {
+            capacity: {
+              workingCapacity: location?.oldWorkingCapacity,
+              maxCapacity: location?.capacity?.maxCapacity,
+              ...capacityChanges[id],
+            },
+          } || {},
+        ]
+      }),
+    ) as Parameters<LocationsService['reactivateBulk']>[1]
+
+    const { authService, locationsService } = req.services
+    const token = await authService.getSystemClientToken(user.username)
+    await locationsService.reactivateBulk(token, allCellChanges)
+
+    next()
+  }
+
+  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
+    const referrerLocationId = req.sessionModel.get('referrerLocationId')
+    const redirectUrl = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
+
+    req.journeyModel.reset()
+    req.sessionModel.reset()
+
+    req.flash('success', {
+      title: `Cells activated`,
+      content: `You have activated ${res.locals.cells.length} cells.`,
+    })
+
+    res.redirect(redirectUrl)
+  }
+}
