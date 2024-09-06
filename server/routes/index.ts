@@ -15,7 +15,7 @@ import changeCellCapacityRouter from './changeCellCapacity'
 import deactivateTemporaryRouter from './deactivateTemporary'
 import inactiveCellsRouter from './inactiveCellsRouter'
 import nonResidentialConversionRouter from './nonResidentialConversion'
-import reactivateRouter from './reactivate/cell'
+import reactivateRouter from './reactivate'
 import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
 import viewLocationsRouter from './viewLocationsRouter'
@@ -40,11 +40,12 @@ export default function routes(services: Services): Router {
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
 
+  router.use('/reactivate', reactivateRouter)
+
   router.use('/location/:locationId/cell-conversion', cellConversionRouter)
   router.use('/location/:locationId/change-cell-capacity', changeCellCapacityRouter)
   router.use('/location/:locationId/deactivate/temporary', deactivateTemporaryRouter)
   router.use('/location/:locationId/non-residential-conversion', nonResidentialConversionRouter)
-  router.use('/location/:locationId/reactivate/cell', reactivateRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
 
