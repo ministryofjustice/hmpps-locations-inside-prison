@@ -11,6 +11,7 @@ import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsFor
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import addAction from '../middleware/addAction'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
+import addBreadcrumb from '../middleware/addBreadcrumb'
 
 const router = express.Router({ mergeParams: true })
 
@@ -44,6 +45,7 @@ const controller = (services: Services) => {
     '/',
     populateResidentialSummary(services),
     populateBreadcrumbsForLocation,
+    addBreadcrumb({ title: '', href: '/' }),
     logPageView(services.auditService, Page.LOCATIONS_INDEX),
     viewLocationsIndex,
   )
