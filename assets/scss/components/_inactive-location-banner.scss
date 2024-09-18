@@ -1,0 +1,12 @@
+.hmpps-inactive-location-banner {
+  .govuk-notifications-banner__content > * {
+    max-width: 100%
+  }
+  
+  .hmpps-inactive-location-banner-summary-list {
+    .govuk-summary-list__key {
+      width: auto
+    }
+  }
+}
+
