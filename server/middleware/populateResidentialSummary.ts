@@ -59,7 +59,6 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
     row.value = {
       html: location.usedFor.join('<br>'),
     }
-
     if (showChangeUsedForLink(location, req)) {
       row.actions = {
         items: [
@@ -70,12 +69,9 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
         ],
       }
     }
-  } else {
-    row.value = {
-      html: location.usedFor.join('<br>'),
-    }
+    return row
   }
-  return row
+  return null
 }
 
 function nonResCellTypeRow(location: DecoratedLocation) {
