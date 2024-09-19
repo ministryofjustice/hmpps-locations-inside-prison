@@ -123,6 +123,10 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getUsedForTypes'))[key] || 'Unknown'
   }
 
+  async getUsedForTypes(token: string) {
+    return this.getConstantDataMap(token, 'getUsedForTypes')
+  }
+
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
   }
@@ -142,5 +146,9 @@ export default class LocationsService {
 
   async updateSpecialistCellTypes(token: string, locationId: string, cellTypes?: string[]) {
     return this.locationsApiClient.locations.updateSpecialistCellTypes(token, { locationId }, cellTypes)
+  }
+
+  async updateUsedForTypes(token: string, locationId: string, usedForType?: string[]) {
+    return this.locationsApiClient.locations.updateUsedForTypes(token, { locationId }, usedForType)
   }
 }

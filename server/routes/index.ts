@@ -16,6 +16,7 @@ import removeCellTypeRouter from './removeCellType'
 import nonResidentialConversionRouter from './nonResidentialConversion'
 import addServicesToRequest from '../middleware/addServicesToRequest'
 import deactivateTemporaryRouter from './deactivateTemporary'
+import changeUsedForRouter from './changeUsedFor'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -40,6 +41,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/change-cell-capacity', changeCellCapacityRouter)
   router.use('/location/:locationId/deactivate/temporary', deactivateTemporaryRouter)
   router.use('/location/:locationId/non-residential-conversion', nonResidentialConversionRouter)
+  router.use('/location/:locationId/change-used-for', changeUsedForRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
 

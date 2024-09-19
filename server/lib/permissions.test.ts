@@ -10,6 +10,7 @@ describe('rolesToPermissions', () => {
       'change_cell_capacity',
       'convert_non_residential',
       'set_cell_type',
+      'change_used_for',
     ])
   })
 
@@ -20,6 +21,7 @@ describe('rolesToPermissions', () => {
       'convert_non_residential',
       'deactivate_temporary',
       'set_cell_type',
+      'change_used_for',
     ])
   })
 
@@ -33,6 +35,7 @@ describe('rolesToPermissions', () => {
     ).toEqual([
       'change_cell_capacity',
       'change_signed_operational_capacity',
+      'change_used_for',
       'convert_non_residential',
       'deactivate_temporary',
       'set_cell_type',
