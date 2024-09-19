@@ -64,6 +64,14 @@ export default class LocationsApiClient extends BaseApiClient {
       requestType: 'get',
       options: { cacheDuration: 86_400 },
     }),
+    getUsedForTypesForPrison: this.apiCall<
+      { usedForTypes: { key: string; description: string }[] },
+      { prisonId: string }
+    >({
+      path: '/constants/used-for-type/:prisonId',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
   }
 
   locations = {
@@ -73,6 +81,20 @@ export default class LocationsApiClient extends BaseApiClient {
       { convertedCellType: string; otherConvertedCellType?: string }
     >({
       path: '/locations/:locationId/convert-cell-to-non-res-cell',
+      requestType: 'put',
+    }),
+    convertToCell: this.apiCall<
+      Location,
+      { locationId: string },
+      {
+        accommodationType: string
+        specialistCellTypes: string[]
+        maxCapacity: number
+        workingCapacity: number
+        usedForTypes: string[]
+      }
+    >({
+      path: '/locations/:locationId/convert-to-cell',
       requestType: 'put',
     }),
     deactivate: {

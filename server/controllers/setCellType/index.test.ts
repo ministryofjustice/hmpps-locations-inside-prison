@@ -134,6 +134,7 @@ describe('SetCellType', () => {
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         fields,
         pageTitleText: 'Change specific cell type',
         validationErrors: [

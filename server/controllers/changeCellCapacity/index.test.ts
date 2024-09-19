@@ -129,6 +129,7 @@ describe('ChangeCellCapacity', () => {
 
       expect(result).toEqual({
         backLink: '/referrer-url',
+        cancelLink: '/referrer-url',
         fields,
         validationErrors: [
           {

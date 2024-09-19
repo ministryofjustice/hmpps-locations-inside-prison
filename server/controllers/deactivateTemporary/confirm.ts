@@ -2,22 +2,13 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
+import getResidentialSummary from '../../middleware/getResidentialSummary'
 
 export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(this.getResidentialSummary)
+    this.use(getResidentialSummary)
     this.use(this.getCellCount)
-  }
-
-  async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user, location } = res.locals
-    const { authService, locationsService } = req.services
-
-    const token = await authService.getSystemClientToken(user.username)
-    res.locals.residentialSummary = await locationsService.getResidentialSummary(token, location.prisonId)
-
-    next()
   }
 
   async getCellCount(req: FormWizard.Request, res: Response, next: NextFunction) {

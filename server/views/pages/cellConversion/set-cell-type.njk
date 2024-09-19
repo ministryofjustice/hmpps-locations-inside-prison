@@ -1,0 +1,9 @@
+{% extends "pages/setCellType/change.njk" %}
+
+{% set title = 'Convert to cell' %}
+{% set locationName = location.localName or location.pathHierarchy %}
+
+{% block heading %}
+  <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+  <h1 class="govuk-heading-l">Convert to cell</h1>
+{% endblock %}

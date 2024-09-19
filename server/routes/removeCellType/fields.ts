@@ -9,9 +9,6 @@ const fields = {
     errorMessages: { required: 'Select yes if you want to remove the specific cell type' },
     id: 'areYouSure',
     name: 'areYouSure',
-    label: {
-      text: 'Label',
-    },
     items: [
       { text: 'Yes, I want to remove the cell type', value: 'yes' },
       { text: 'No, keep the cell type', value: 'no' },

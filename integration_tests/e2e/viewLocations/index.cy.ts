@@ -69,10 +69,10 @@ context('View Locations Index', () => {
             text: '0',
           },
           accommodationType: {
-            text: 'Test type',
+            text: 'Normal accommodation',
           },
           usedFor: {
-            text: 'Test type',
+            text: 'Close Supervision Centre (CSC)',
           },
         },
         {
@@ -94,10 +94,10 @@ context('View Locations Index', () => {
             href: '/inactive-cells/TST/7e570000-0000-0000-0000-000000000002',
           },
           accommodationType: {
-            text: 'Test type',
+            text: 'Normal accommodation',
           },
           usedFor: {
-            text: 'Test type',
+            text: 'Close Supervision Centre (CSC)',
           },
         },
       ]

@@ -2,7 +2,6 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { isEqual, sortBy } from 'lodash'
 import FormInitialStep from '../base/formInitialStep'
-import backUrl from '../../utils/backUrl'
 
 export default class SetCellType extends FormInitialStep {
   async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -38,13 +37,12 @@ export default class SetCellType extends FormInitialStep {
       }))
     }
 
-    const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-    })
+    const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
     return {
       ...locals,
-      backLink,
+      backLink: cancelLink,
+      cancelLink,
       fields,
       pageTitleText,
     }
