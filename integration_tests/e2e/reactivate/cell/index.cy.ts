@@ -5,22 +5,23 @@ import ReactivateCellDetailsPage from '../../../pages/reactivate/cell/details'
 import ReactivateCellConfirmPage from '../../../pages/reactivate/cell/confirm'
 
 context('Reactivate cell', () => {
-  const location = LocationFactory.build({
-    accommodationTypes: ['NORMAL_ACCOMMODATION'],
-    capacity: {
-      maxCapacity: 3,
-      workingCapacity: 0,
-    },
-    oldWorkingCapacity: 2,
-    leafLevel: true,
-    specialistCellTypes: [],
-    localName: undefined,
-    status: 'INACTIVE',
-    active: false,
-  })
+  let location: ReturnType<typeof LocationFactory.build>
 
   context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
+      location = LocationFactory.build({
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
+        capacity: {
+          maxCapacity: 3,
+          workingCapacity: 0,
+        },
+        oldWorkingCapacity: 2,
+        leafLevel: true,
+        specialistCellTypes: [],
+        localName: undefined,
+        status: 'INACTIVE',
+        active: false,
+      })
       cy.task('reset')
       cy.task('stubSignIn')
       cy.task('stubManageUsers')
@@ -242,6 +243,23 @@ context('Reactivate cell', () => {
         reactivateCellConfirmPage.backLink().click()
 
         Page.verifyOnPage(ReactivateCellDetailsPage)
+      })
+
+      it('shows the correct change summary when changing no values', () => {
+        location.specialistCellTypes = ['TEST']
+        cy.task('stubLocations', location)
+
+        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
+        reactivateCellDetailsPage.workingCapacityInput().clear().type('0')
+        reactivateCellDetailsPage.continueButton().click()
+
+        Page.verifyOnPage(ReactivateCellConfirmPage)
+
+        cy.get('.change-summary h2').contains('Change to establishment capacity')
+        cy.get('.change-summary p').contains(
+          /There will be no change to the establishment's total working or maximum capacity.\s+$/,
+        )
       })
 
       it('shows the correct change summary when changing one value', () => {

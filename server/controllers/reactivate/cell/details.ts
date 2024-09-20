@@ -17,7 +17,6 @@ export default class ReactivateCellDetails extends FormInitialStep {
       const { values } = req.form
       const { location } = res.locals
       const { accommodationTypes, specialistCellTypes }: Location = location.raw
-      const occupants = res.locals.prisonerLocation?.prisoners || []
 
       const validationErrors: any = {}
 
@@ -28,14 +27,6 @@ export default class ReactivateCellDetails extends FormInitialStep {
           !specialistCellTypes.length
         ) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
-        } else if (Number(values?.workingCapacity) < occupants.length) {
-          validationErrors.workingCapacity = this.formError('workingCapacity', 'isNoLessThanOccupancy')
-        }
-      }
-
-      if (!errors.maxCapacity) {
-        if (Number(values?.maxCapacity) < occupants.length) {
-          validationErrors.maxCapacity = this.formError('maxCapacity', 'isNoLessThanOccupancy')
         }
       }
 
