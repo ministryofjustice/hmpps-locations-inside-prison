@@ -3,6 +3,7 @@ import { uniq } from 'lodash'
 const viewInternalLocationPermissions: string[] = []
 
 const manageResidentialLocationsPermissions: string[] = [
+  ...viewInternalLocationPermissions,
   'change_cell_capacity',
   'convert_non_residential',
   'reactivate',
@@ -10,12 +11,9 @@ const manageResidentialLocationsPermissions: string[] = [
 ]
 
 const manageResLocationsOpCapPermissions: string[] = [
-  'change_cell_capacity',
+  ...manageResidentialLocationsPermissions,
   'change_signed_operational_capacity',
-  'convert_non_residential',
   'deactivate_temporary',
-  'reactivate',
-  'set_cell_type',
 ]
 
 const permissionsByRole: { [key: string]: string[] } = {

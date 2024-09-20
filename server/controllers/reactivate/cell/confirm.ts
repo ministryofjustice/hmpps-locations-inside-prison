@@ -27,7 +27,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     const newOverallVal = overallVal + diff
 
     return `\
-      The establishment’s total ${valName} will ${verb} from ${overallVal} to ${newOverallVal}.
+      The establishment's total ${valName} will ${verb} from ${overallVal} to ${newOverallVal}.
     `.replace(/^\s*|\s*$/gm, '')
   }
 
@@ -57,7 +57,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/reactivate/cell/details` })
+    const backLink = backUrl(req, { fallbackUrl: `/reactivate/cell/${location.id}/details` })
 
     return {
       backLink,
@@ -70,16 +70,11 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     try {
       const { user } = res.locals
       const { locationsService } = req.services
+      const workingCapacity = Number(req.sessionModel.get('workingCapacity'))
+      const maxCapacity = Number(req.sessionModel.get('maxCapacity'))
 
-      // TODO: Add API call to reactivate cell when it's available
-      //
-      // const token = await req.services.authService.getSystemClientToken(user.username)
-      // await locationsService.reactivateCell(
-      //   token,
-      //   res.locals.location.id,
-      //   Number(req.sessionModel.get('maxCapacity')),
-      //   Number(req.sessionModel.get('workingCapacity')),
-      // )
+      const token = await req.services.authService.getSystemClientToken(user.username)
+      await locationsService.reactivateCell(token, res.locals.location.id, { maxCapacity, workingCapacity })
 
       next()
     } catch (error) {
@@ -95,7 +90,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
 
     req.flash('success', {
       title: `${locationType} activated`,
-      content: `You activated ${displayName}.`,
+      content: `You have activated ${displayName}.`,
     })
 
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)

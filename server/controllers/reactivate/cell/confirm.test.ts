@@ -85,10 +85,10 @@ describe('ReactivateCellConfirm', () => {
   describe('generateChangeSummary', () => {
     it('returns the expected string', () => {
       expect(controller.generateChangeSummary('TEST_NAME', 0, 2, 40)).toEqual(
-        `The establishment’s total TEST_NAME will increase from 40 to 42.`,
+        `The establishment's total TEST_NAME will increase from 40 to 42.`,
       )
       expect(controller.generateChangeSummary('TEST_NAME', 2, 0, 42)).toEqual(
-        `The establishment’s total TEST_NAME will decrease from 42 to 40.`,
+        `The establishment's total TEST_NAME will decrease from 42 to 40.`,
       )
     })
   })
@@ -113,9 +113,9 @@ describe('ReactivateCellConfirm', () => {
       ;(req.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
 
       expect(controller.locals(req, res)).toEqual({
-        backLink: `/location/${res.locals.location.id}/reactivate/cell/details`,
+        backLink: `/reactivate/cell/${res.locals.location.id}/details`,
         cancelLink: `/view-and-update-locations/${res.locals.location.prisonId}/${res.locals.location.id}`,
-        changeSummary: `The establishment’s total working capacity will increase from 20 to 21.\n<br/><br/>\nThe establishment’s total maximum capacity will increase from 30 to 31.`,
+        changeSummary: `The establishment's total working capacity will increase from 20 to 21.\n<br/><br/>\nThe establishment's total maximum capacity will increase from 30 to 31.`,
       })
     })
   })

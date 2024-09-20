@@ -66,6 +66,7 @@ const LocationFactory = Factory.define<Location>(() => {
     level: 1,
     sortName: 'A-1-001',
     numberOfCellLocations: 0,
+    oldWorkingCapacity: 0,
   }
 })
 

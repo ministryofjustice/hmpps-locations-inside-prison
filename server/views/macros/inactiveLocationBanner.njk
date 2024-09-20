@@ -2,7 +2,7 @@
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% macro inactiveLocationBanner(location) %}
+{% macro inactiveLocationBanner(location, canAccess) %}
   {% set locationName = location.localName or location.pathHierarchy %}
   {% set locationType = location.locationType %}
   {% set deactivatedReason = location.deactivatedReason %}
@@ -51,7 +51,7 @@
           class="govuk-caption-s">Last updated by {{ location.lastModifiedBy }} on {{ location.lastModifiedDate | formatDateWithTime }}.</span>
     {% endif %}
 
-    {% if location.raw.locationType == 'CELL' %}
+    {% if location.raw.locationType == 'CELL' and canAccess('reactivate') %}
       <br>
 
       {{ govukButton({

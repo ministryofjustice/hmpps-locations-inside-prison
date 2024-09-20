@@ -25,6 +25,8 @@ export default class ViewLocationsShowPage extends Page {
 
   inactiveBannerRows = (): PageElement => this.inactiveBanner().find('.govuk-summary-list__row')
 
+  inactiveBannerActivateCellButton = (): PageElement => this.inactiveBanner().get(`a:contains("Activate cell")`)
+
   actionsMenu = (): PageElement => cy.get('button.moj-button-menu__toggle-button')
 
   convertToNonResAction = (): PageElement =>

@@ -7,6 +7,7 @@ export default function setCanAccess(): RequestHandler {
     const permissions = rolesToPermissions(userRoles)
 
     req.canAccess = permission => permissions.includes(permission)
+    res.locals.canAccess = req.canAccess
 
     next()
   }

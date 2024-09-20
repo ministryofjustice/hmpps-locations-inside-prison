@@ -6,15 +6,17 @@ import { Location } from '../../../data/types/locationsApi'
 
 export default class ReactivateCellDetails extends FormInitialStep {
   getInitialValues(req: FormWizard.Request, res: Response) {
-    // TODO: Update this so that max capacity returns the old (prior to deactivation) max capacity when we can get it from API
-    return res.locals.location.capacity
+    return {
+      maxCapacity: res.locals.location.capacity.maxCapacity,
+      workingCapacity: res.locals.location.oldWorkingCapacity,
+    }
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const { location } = res.locals
-      const { accommodationTypes, specialistCellTypes }: Location = location
+      const { accommodationTypes, specialistCellTypes }: Location = location.raw
       const occupants = res.locals.prisonerLocation?.prisoners || []
 
       const validationErrors: any = {}
@@ -47,7 +49,7 @@ export default class ReactivateCellDetails extends FormInitialStep {
 
     const backLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-      nextStepUrl: `/location/${locationId}/reactivate/cell/confirm`,
+      nextStepUrl: `/reactivate/cell/${locationId}/confirm`,
     })
 
     return {

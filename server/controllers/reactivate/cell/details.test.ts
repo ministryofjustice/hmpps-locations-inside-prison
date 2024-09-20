@@ -32,10 +32,20 @@ describe('ReactivateCellDetails', () => {
         location: {
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           capacity: {
-            maxCapacity: 2,
+            maxCapacity: 4,
             workingCapacity: 2,
           },
+          oldWorkingCapacity: 3,
           prisonId: 'TST',
+          raw: {
+            id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+            capacity: {
+              maxCapacity: 4,
+              workingCapacity: 2,
+            },
+            oldWorkingCapacity: 3,
+            prisonId: 'TST',
+          },
         },
         options: {
           fields,
@@ -55,11 +65,20 @@ describe('ReactivateCellDetails', () => {
     } as unknown as typeof res
   })
 
+  describe('getInitialValues', () => {
+    it('contains the old working capacity', () => {
+      expect(controller.getInitialValues(req, res)).toEqual({
+        maxCapacity: 4,
+        workingCapacity: 3,
+      })
+    })
+  })
+
   describe('validateFields', () => {
     it('does not allow zero working capacity for non-specialist cells', () => {
       req.form.values = { maxCapacity: '2', workingCapacity: '0' }
-      res.locals.location.accommodationTypes = ['NORMAL_ACCOMMODATION']
-      res.locals.location.specialistCellTypes = []
+      res.locals.location.raw.accommodationTypes = ['NORMAL_ACCOMMODATION']
+      res.locals.location.raw.specialistCellTypes = []
       const callback = jest.fn()
       controller.validateFields(req, res, callback)
 

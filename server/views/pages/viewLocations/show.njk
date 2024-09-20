@@ -89,7 +89,7 @@
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-three-quarters">
         {% if residentialSummary.location.status == 'INACTIVE' %}
-          {{ inactiveLocationBanner(residentialSummary.location) }}
+          {{ inactiveLocationBanner(residentialSummary.location, canAccess) }}
         {% endif %}
 
         {% if residentialSummary.summaryCards | length %}
