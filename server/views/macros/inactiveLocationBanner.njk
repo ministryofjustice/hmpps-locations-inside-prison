@@ -1,7 +1,8 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% macro inactiveLocationBanner(location) %}
+{% macro inactiveLocationBanner(location, canAccess) %}
   {% set locationName = location.localName or location.pathHierarchy %}
   {% set locationType = location.locationType %}
   {% set deactivatedReason = location.deactivatedReason %}
@@ -42,11 +43,24 @@
     ]}) }}
 
     {% if location.deactivatedDate %}
-      <span class="govuk-caption-s">Deactivated by {{ location.deactivatedBy }} on {{ location.deactivatedDate | formatDateWithTime }}.</span>
-    {% endif  %}
+      <span
+          class="govuk-caption-s">Deactivated by {{ location.deactivatedBy }} on {{ location.deactivatedDate | formatDateWithTime }}.</span>
+    {% endif %}
     {% if location.lastModifiedDate and (location.deactivatedBy != location.lastModifiedBy or location.deactivatedDate != location.lastModifiedDate) %}
-      <span class="govuk-caption-s">Last updated by {{ location.lastModifiedBy }} on {{ location.lastModifiedDate | formatDateWithTime }}.</span>
-    {% endif  %}
+      <span
+          class="govuk-caption-s">Last updated by {{ location.lastModifiedBy }} on {{ location.lastModifiedDate | formatDateWithTime }}.</span>
+    {% endif %}
+
+    {% if location.raw.locationType == 'CELL' and canAccess('reactivate') %}
+      <br>
+
+      {{ govukButton({
+        text: "Activate " + (location.locationType | lower),
+        classes: options.buttonClasses,
+        preventDoubleClick: true,
+        href: "/reactivate/cell/" + location.id
+      }) }}
+    {% endif %}
   {% endset %}
 
   {{ govukNotificationBanner({

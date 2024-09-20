@@ -493,6 +493,21 @@ const stubUpdateCapacity = () =>
     },
   })
 
+const stubLocationsBulkReactivate = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/bulk/reactivate',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubUpdateSpecialistCellTypes = () =>
   stubFor({
     request: {
@@ -555,6 +570,7 @@ const stubLocationsDeactivateTemporary = () =>
 
 export default {
   stubLocations,
+  stubLocationsBulkReactivate,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,

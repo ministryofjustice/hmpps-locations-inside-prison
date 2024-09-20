@@ -75,6 +75,23 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   locations = {
+    bulk: {
+      reactivate: this.apiCall<
+        Location[],
+        null,
+        {
+          locations: {
+            [id: string]: {
+              cascadeReactivation?: boolean
+              capacity?: { maxCapacity?: number; workingCapacity?: number }
+            }
+          }
+        }
+      >({
+        path: '/locations/bulk/reactivate',
+        requestType: 'put',
+      }),
+    },
     convertCellToNonResCell: this.apiCall<
       Location,
       { locationId: string },
