@@ -3,7 +3,26 @@ import { stubFor } from './wiremock'
 import { Location, PrisonerLocation } from '../../server/data/types/locationsApi'
 import LocationFactory from '../../server/testutils/factories/location'
 
-const stubLocationsConstantsAccommodationType = () =>
+const stubLocationsConstantsAccommodationType = (
+  accommodationTypes = [
+    {
+      key: 'CARE_AND_SEPARATION',
+      description: 'Care and separation',
+    },
+    {
+      key: 'HEALTHCARE_INPATIENTS',
+      description: 'Healthcare inpatients',
+    },
+    {
+      key: 'NORMAL_ACCOMMODATION',
+      description: 'Normal accommodation',
+    },
+    {
+      key: 'OTHER_NON_RESIDENTIAL',
+      description: 'Other',
+    },
+  ],
+) =>
   stubFor({
     request: {
       method: 'GET',
@@ -15,7 +34,7 @@ const stubLocationsConstantsAccommodationType = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {
-        accommodationTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+        accommodationTypes,
       },
     },
   })
@@ -179,7 +198,22 @@ const stubLocationsConstantsSpecialistCellType = (
     },
   })
 
-const stubLocationsConstantsUsedForType = () =>
+const stubLocationsConstantsUsedForType = (
+  usedForTypes = [
+    {
+      key: 'CLOSE_SUPERVISION_CENTRE',
+      description: 'Close Supervision Centre (CSC)',
+    },
+    {
+      key: 'SUB_MISUSE_DRUG_RECOVERY',
+      description: 'Drug recovery / Incentivised substance free living (ISFL)',
+    },
+    {
+      key: 'FIRST_NIGHT_CENTRE',
+      description: 'First night centre / Induction',
+    },
+  ],
+) =>
   stubFor({
     request: {
       method: 'GET',
@@ -191,7 +225,40 @@ const stubLocationsConstantsUsedForType = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {
-        usedForTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+        usedForTypes,
+      },
+    },
+  })
+
+const stubLocationsConstantsUsedForTypeForPrison = (
+  prisonId = 'TST',
+  usedForTypes = [
+    {
+      key: 'CLOSE_SUPERVISION_CENTRE',
+      description: 'Close Supervision Centre (CSC)',
+    },
+    {
+      key: 'SUB_MISUSE_DRUG_RECOVERY',
+      description: 'Drug recovery / Incentivised substance free living (ISFL)',
+    },
+    {
+      key: 'FIRST_NIGHT_CENTRE',
+      description: 'First night centre / Induction',
+    },
+  ],
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/constants/used-for-type/${prisonId}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        usedForTypes,
       },
     },
   })
@@ -456,6 +523,21 @@ const stubLocationsConvertCellToNonResCell = () =>
     },
   })
 
+const stubLocationsConvertToCell = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/convert-to-cell',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubLocationsDeactivateTemporary = () =>
   stubFor({
     request: {
@@ -482,7 +564,9 @@ export default {
   stubLocationsConstantsResidentialHousingType,
   stubLocationsConstantsSpecialistCellType,
   stubLocationsConstantsUsedForType,
+  stubLocationsConstantsUsedForTypeForPrison,
   stubLocationsConvertCellToNonResCell,
+  stubLocationsConvertToCell,
   stubLocationsDeactivateTemporary,
   stubLocationsLocationsResidentialSummary,
   stubLocationsLocationsResidentialSummaryForLocation,

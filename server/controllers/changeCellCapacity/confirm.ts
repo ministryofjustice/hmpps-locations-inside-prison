@@ -2,21 +2,12 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../utils/backUrl'
+import getResidentialSummary from '../../middleware/getResidentialSummary'
 
 export default class ConfirmCellCapacity extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(this.getResidentialSummary)
-  }
-
-  async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
-    const { locationsService } = req.services
-
-    const token = await req.services.authService.getSystemClientToken(user.username)
-    res.locals.residentialSummary = await locationsService.getResidentialSummary(token, res.locals.location.prisonId)
-
-    next()
+    this.use(getResidentialSummary)
   }
 
   generateChangeSummary(valName: string, oldVal: number, newVal: number, overallVal: number): string | null {

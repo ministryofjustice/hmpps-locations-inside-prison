@@ -95,16 +95,23 @@ declare module 'hmpo-form-wizard' {
           steps: Steps
           locals: Record<string, boolean | string>
           next?: string
+          fullPath?: string
         }
         persistedAnswers: Record<string, string | string[]>
       }
+      isEditing: boolean
       journeyModel: {
+        set(key: string, value: any): void
+        get: (key: string) => unknown
         reset: () => unknown
       }
       sessionModel: {
-        set: (key: string, value: unknown) => void
-        get: (key: string) => unknown
+        updateSessionData(changes: object): unknown
+        save(): void
+        set: (key: string, value: unknown, options?: { silent?: boolean }) => void
+        get: <T>(key: string) => T
         reset: () => unknown
+        unset: (key: string | string[]) => void
       }
     }
 
@@ -145,6 +152,8 @@ declare module 'hmpo-form-wizard' {
       getErrors(req: Request, res: Express.Response)
 
       render(req: FormWizard.Request, res: Express.Response, next: NextFunction)
+
+      setStepComplete(req: FormWizard.Request, res: Express.Response, path?: string)
     }
 
     namespace Controller {
@@ -212,6 +221,15 @@ declare module 'hmpo-form-wizard' {
 
     type Hint = { kind?: 'html'; html: string } | { kind?: 'text'; text: string }
 
+    interface Item {
+      text?: string
+      value: string
+      label?: string
+      conditional?: Conditional
+      id?: string
+      hint?: Hint
+    }
+
     interface Field {
       attributes?: { [attribute: string]: string | number }
       default?: string | number | []
@@ -234,14 +252,7 @@ declare module 'hmpo-form-wizard' {
       formGroupClasses?: string
       characterCountMax?: number
       classes?: string
-      items?: {
-        text?: string
-        value: string
-        label?: string
-        conditional?: Conditional
-        id?: string
-        hint?: Hint
-      }[]
+      items?: Item[]
       summary?: {
         displayFn?: (value: string) => string
         displayAlways?: boolean
@@ -276,6 +287,7 @@ declare module 'hmpo-form-wizard' {
       sectionProgressRules?: Array<SectionProgressRule>
       noPost?: boolean
       locals?: Record<string, boolean | string>
+      invalid?: boolean
     }
 
     interface RenderedStep {

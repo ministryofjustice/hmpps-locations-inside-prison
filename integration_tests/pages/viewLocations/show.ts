@@ -30,6 +30,8 @@ export default class ViewLocationsShowPage extends Page {
   convertToNonResAction = (): PageElement =>
     cy.get('.moj-button-menu__wrapper a:contains("Convert to non-residential room")')
 
+  convertToCellButton = (): PageElement => cy.get('.govuk-button:contains("Convert to cell")')
+
   deactivateAction = (): PageElement => cy.get('.moj-button-menu__wrapper a:contains("Deactivate cell")')
 
   summaryCards = {
