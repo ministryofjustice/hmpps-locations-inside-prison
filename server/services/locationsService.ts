@@ -151,6 +151,10 @@ export default class LocationsService {
     return (await this.locationsApiClient.constants.getUsedForTypesForPrison(token, { prisonId })).usedForTypes
   }
 
+  async reactivateCell(token: string, locationId: string, capacity: { maxCapacity: number; workingCapacity: number }) {
+    return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations: { [locationId]: { capacity } } })
+  }
+
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
   }
