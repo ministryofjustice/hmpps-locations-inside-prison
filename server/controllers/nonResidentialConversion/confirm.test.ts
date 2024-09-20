@@ -95,7 +95,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
 
     it('formats the change summary correctly with zero working cap and other type', () => {
       req.sessionModel.get = jest.fn(
-        (fieldName?: string) =>
+        (fieldName?: string): any =>
           ({
             convertedCellType: { text: 'Other', value: 'OTHER' },
             otherConvertedCellType: 'Server room',

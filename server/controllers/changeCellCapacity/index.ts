@@ -63,14 +63,15 @@ export default class ChangeCellCapacity extends FormInitialStep {
     const locals = super.locals(req, res)
     const { id: locationId, prisonId } = res.locals.location
 
-    const backLink = backUrl(req, {
+    const cancelLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
       nextStepUrl: `/location/${locationId}/change-cell-capacity/confirm`,
     })
 
     return {
       ...locals,
-      backLink,
+      backLink: cancelLink,
+      cancelLink,
     }
   }
 }

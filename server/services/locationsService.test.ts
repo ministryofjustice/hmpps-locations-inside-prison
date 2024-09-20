@@ -189,4 +189,54 @@ describe('Locations service', () => {
       )
     })
   })
+
+  describe('convertToCell', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.convertToCell(
+        'token',
+        '481fc587-60f8-402b-804d-64462babddcc',
+        'NORMAL_ACCOMMODATION',
+        ['ACCESSIBLE_CELL'],
+        2,
+        1,
+        ['CLOSE_SUPERVISION_CENTRE'],
+      )
+
+      expect(locationsApiClient.locations.convertToCell).toHaveBeenCalledWith(
+        'token',
+        { locationId: '481fc587-60f8-402b-804d-64462babddcc' },
+        {
+          accommodationType: 'NORMAL_ACCOMMODATION',
+          specialistCellTypes: ['ACCESSIBLE_CELL'],
+          maxCapacity: 2,
+          workingCapacity: 1,
+          usedForTypes: ['CLOSE_SUPERVISION_CENTRE'],
+        },
+      )
+    })
+  })
+
+  describe('getAccommodationTypes', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getAccommodationTypes('token')
+
+      expect(locationsApiClient.constants.getAccommodationTypes).toHaveBeenCalledWith('token')
+    })
+  })
+
+  describe('getUsedForTypes', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getUsedForTypes('token')
+
+      expect(locationsApiClient.constants.getUsedForTypes).toHaveBeenCalledWith('token')
+    })
+  })
+
+  describe('getUsedForTypesForPrison', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getUsedForTypesForPrison('token', 'TST')
+
+      expect(locationsApiClient.constants.getUsedForTypesForPrison).toHaveBeenCalledWith('token', { prisonId: 'TST' })
+    })
+  })
 })

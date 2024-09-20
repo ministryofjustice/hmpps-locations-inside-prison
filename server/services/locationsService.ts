@@ -29,6 +29,22 @@ export default class LocationsService {
     return this.locationsApiClient.locations.convertCellToNonResCell(token, { locationId }, params)
   }
 
+  async convertToCell(
+    token: string,
+    locationId: string,
+    accommodationType: string,
+    specialistCellTypes: string[],
+    maxCapacity: number,
+    workingCapacity: number,
+    usedForTypes: string[],
+  ) {
+    return this.locationsApiClient.locations.convertToCell(
+      token,
+      { locationId },
+      { accommodationType, specialistCellTypes, maxCapacity, workingCapacity, usedForTypes },
+    )
+  }
+
   async deactivateTemporary(
     token: string,
     locationId: string,
@@ -53,6 +69,10 @@ export default class LocationsService {
 
   async getAccommodationType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getAccommodationTypes'))[key] || 'Unknown'
+  }
+
+  async getAccommodationTypes(token: string) {
+    return (await this.locationsApiClient.constants.getAccommodationTypes(token)).accommodationTypes
   }
 
   async getArchivedLocations(token: string, prisonId: string) {
@@ -121,6 +141,14 @@ export default class LocationsService {
 
   async getUsedForType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getUsedForTypes'))[key] || 'Unknown'
+  }
+
+  async getUsedForTypes(token: string) {
+    return (await this.locationsApiClient.constants.getUsedForTypes(token)).usedForTypes
+  }
+
+  async getUsedForTypesForPrison(token: string, prisonId: string) {
+    return (await this.locationsApiClient.constants.getUsedForTypesForPrison(token, { prisonId })).usedForTypes
   }
 
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {

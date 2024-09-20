@@ -85,7 +85,7 @@
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Save cell type",
+                  text: buttonText | default("Save cell type"),
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"
@@ -98,7 +98,7 @@
     </div>
 
     <p class="govuk-body">
-      <a href="{{ backLink }}" class="govuk-link govuk-link--no-visited-state">
+      <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
         Cancel and return to location details
       </a>
     </p>

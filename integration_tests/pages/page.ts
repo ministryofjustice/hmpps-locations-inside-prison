@@ -9,8 +9,8 @@ export default abstract class Page {
   }
 
   protected constructor(
-    private readonly title: string | RegExp,
-    private readonly skipA11y = false,
+    protected readonly title: string | RegExp,
+    protected readonly skipA11y = false,
   ) {
     if (title) {
       this.checkOnPage()

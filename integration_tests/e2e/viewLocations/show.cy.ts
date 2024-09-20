@@ -207,7 +207,7 @@ context('View Locations Show', () => {
           .locationDetailsRows()
           .eq(detailsRows)
           .find('.govuk-summary-list__value')
-          .contains('Test type')
+          .contains('Normal accommodation')
         detailsRows += 1
       } else {
         viewLocationsShowPage
@@ -233,7 +233,7 @@ context('View Locations Show', () => {
           .locationDetailsRows()
           .eq(detailsRows)
           .find('.govuk-summary-list__value')
-          .contains('Test type')
+          .contains('Close Supervision Centre (CSC)')
         detailsRows += 1
       }
 
@@ -271,7 +271,7 @@ context('View Locations Show', () => {
         pathHierarchy: 'A',
         locationType: 'WING',
         permanentlyInactive: false,
-        accommodationTypes: ['TEST_TYPE'],
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
         specialistCellTypes: [],
         usedFor: [],
         status: 'ACTIVE',
@@ -350,7 +350,7 @@ context('View Locations Show', () => {
         pathHierarchy: 'A-1',
         locationType: 'LANDING',
         permanentlyInactive: false,
-        accommodationTypes: ['TEST_TYPE'],
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
         specialistCellTypes: [],
         usedFor: [],
         status: 'ACTIVE',
@@ -438,7 +438,7 @@ context('View Locations Show', () => {
         pathHierarchy: 'A-1-001',
         locationType: 'CELL',
         permanentlyInactive: false,
-        accommodationTypes: ['TEST_TYPE'],
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
         specialistCellTypes: ['ACCESSIBLE_CELL'],
         usedFor: [],
         status: 'ACTIVE',

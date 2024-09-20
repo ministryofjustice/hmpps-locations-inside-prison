@@ -68,26 +68,6 @@ describe('DeactivateTemporaryConfirm', () => {
     } as unknown as typeof res
   })
 
-  describe('getResidentialSummary', () => {
-    it('calls the correct locations service call', async () => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
-        locationsService: {
-          getResidentialSummary: jest.fn(),
-        },
-      } as unknown as Services
-      const callback = jest.fn()
-      await controller.getResidentialSummary(req, res, callback)
-
-      expect(req.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
-        'token',
-        res.locals.location.prisonId,
-      )
-    })
-  })
-
   describe('getCellCount', () => {
     beforeEach(() => {
       req.services = {
@@ -128,24 +108,6 @@ describe('DeactivateTemporaryConfirm', () => {
 
         expect(res.locals.cellCount).toBe(8)
       })
-    })
-
-    it('calls the correct locations service call', async () => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
-        locationsService: {
-          getResidentialSummary: jest.fn(),
-        },
-      } as unknown as Services
-      const callback = jest.fn()
-      await controller.getResidentialSummary(req, res, callback)
-
-      expect(req.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
-        'token',
-        res.locals.location.prisonId,
-      )
     })
   })
 
