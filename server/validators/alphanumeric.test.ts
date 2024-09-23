@@ -1,6 +1,10 @@
 import alphanumeric from './alphanumeric'
 
 describe('alphanumeric', () => {
+  it('allows blank', () => {
+    expect(alphanumeric('')).toEqual(true)
+  })
+
   it('allows letters', () => {
     expect(alphanumeric('adg')).toEqual(true)
     expect(alphanumeric('abcdefg')).toEqual(true)

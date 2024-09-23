@@ -1,3 +1,3 @@
 export default function alphanumeric(value: string) {
-  return /^\w+$/.test(value)
+  return /^\w*$/.test(value)
 }

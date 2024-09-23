@@ -1,7 +1,6 @@
 import minLength from '../../validators/minLength'
 import dateTodayOrInFuture from '../../validators/dateTodayOrInFuture'
 import maxLength from '../../validators/maxLength'
-import alphanumeric from '../../validators/alphanumeric'
 
 const fields = {
   deactivationReason: {
@@ -60,7 +59,7 @@ const fields = {
   },
   planetFmReference: {
     component: 'govukInput',
-    validate: [minLength(6), maxLength(18), alphanumeric],
+    validate: [minLength(6), maxLength(18), 'numeric'],
     id: 'planetFmReference',
     name: 'planetFmReference',
     classes: 'govuk-input--width-10',
