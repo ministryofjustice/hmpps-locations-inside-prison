@@ -3,9 +3,11 @@ import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import getResidentialSummary from '../../middleware/getResidentialSummary'
+import checkForPrisoners from './checkForPrisoners'
 
 export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   middlewareSetup() {
+    this.use(checkForPrisoners)
     super.middlewareSetup()
     this.use(getResidentialSummary)
     this.use(this.getCellCount)
