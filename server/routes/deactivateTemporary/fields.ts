@@ -1,6 +1,7 @@
 import minLength from '../../validators/minLength'
-import dateInFuture from '../../validators/dateInFuture'
+import dateTodayOrInFuture from '../../validators/dateTodayOrInFuture'
 import maxLength from '../../validators/maxLength'
+import alphanumeric from '../../validators/alphanumeric'
 
 const fields = {
   deactivationReason: {
@@ -43,7 +44,7 @@ const fields = {
   },
   estimatedReactivationDate: {
     component: 'govukDateInput',
-    validate: [dateInFuture],
+    validate: [dateTodayOrInFuture],
     id: 'estimatedReactivationDate',
     name: 'estimatedReactivationDate',
     label: {
@@ -59,7 +60,7 @@ const fields = {
   },
   planetFmReference: {
     component: 'govukInput',
-    validate: [minLength(6)],
+    validate: [minLength(6), maxLength(18), alphanumeric],
     id: 'planetFmReference',
     name: 'planetFmReference',
     classes: 'govuk-input--width-10',
