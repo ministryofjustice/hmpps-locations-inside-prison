@@ -226,8 +226,10 @@ context('Deactivate temporary', () => {
         detailsPage.continueButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
-        cy.get('.govuk-error-summary__list').contains('Estimated reactivation date must be in the future')
-        cy.get('#estimatedReactivationDate-error').contains('Estimated reactivation date must be in the future')
+        cy.get('.govuk-error-summary__list').contains('Estimated reactivation date must be today or in the future')
+        cy.get('#estimatedReactivationDate-error').contains(
+          'Estimated reactivation date must be today or in the future',
+        )
       })
 
       it('shows the correct validation error when planetFmReference is less than 6 characters', () => {
@@ -266,7 +268,7 @@ context('Deactivate temporary', () => {
         detailsPage.estimatedReactivationDateDayText().clear().type('13')
         detailsPage.estimatedReactivationDateMonthText().clear().type('1')
         detailsPage.estimatedReactivationDateYearText().clear().type('3024')
-        detailsPage.planetFmReferenceText().clear().type('PFMRN123')
+        detailsPage.planetFmReferenceText().clear().type('123456')
         detailsPage.continueButton().click()
       })
 
@@ -296,7 +298,7 @@ context('Deactivate temporary', () => {
         detailsPage.estimatedReactivationDateDayText().clear().type('4')
         detailsPage.estimatedReactivationDateMonthText().clear().type('10')
         detailsPage.estimatedReactivationDateYearText().clear().type('3000')
-        detailsPage.planetFmReferenceText().clear().type('Planet123')
+        detailsPage.planetFmReferenceText().clear().type('654321')
         detailsPage.continueButton().click()
 
         confirmationPage = Page.verifyOnPage(DeactivateTemporaryConfirmPage)
@@ -308,7 +310,7 @@ context('Deactivate temporary', () => {
         detailsPage.estimatedReactivationDateDayText().should('have.value', '04')
         detailsPage.estimatedReactivationDateMonthText().should('have.value', '10')
         detailsPage.estimatedReactivationDateYearText().should('have.value', '3000')
-        detailsPage.planetFmReferenceText().should('have.value', 'Planet123')
+        detailsPage.planetFmReferenceText().should('have.value', '654321')
       })
 
       it('shows the correct summary list', () => {
@@ -319,7 +321,7 @@ context('Deactivate temporary', () => {
         cy.get('.govuk-summary-list__key').eq(1).contains('Estimated reactivation date')
         cy.get('.govuk-summary-list__value').eq(1).contains('13 January 3024')
         cy.get('.govuk-summary-list__key').eq(2).contains('Planet FM reference number')
-        cy.get('.govuk-summary-list__value').eq(2).contains('PFMRN123')
+        cy.get('.govuk-summary-list__value').eq(2).contains('123456')
       })
 
       it('has a change link and shows the correct summary list after change', () => {
@@ -332,7 +334,7 @@ context('Deactivate temporary', () => {
         detailsPage.estimatedReactivationDateDayText().clear().type('4')
         detailsPage.estimatedReactivationDateMonthText().clear().type('10')
         detailsPage.estimatedReactivationDateYearText().clear().type('3000')
-        detailsPage.planetFmReferenceText().clear().type('Planet123')
+        detailsPage.planetFmReferenceText().clear().type('654321')
         detailsPage.continueButton().click()
 
         Page.verifyOnPage(DeactivateTemporaryConfirmPage)
@@ -341,7 +343,7 @@ context('Deactivate temporary', () => {
         cy.get('.govuk-summary-list__key').eq(1).contains('Estimated reactivation date')
         cy.get('.govuk-summary-list__value').eq(1).contains('4 October 3000')
         cy.get('.govuk-summary-list__key').eq(2).contains('Planet FM reference number')
-        cy.get('.govuk-summary-list__value').eq(2).contains('Planet123')
+        cy.get('.govuk-summary-list__value').eq(2).contains('654321')
       })
 
       it('shows the correct change summary', () => {
