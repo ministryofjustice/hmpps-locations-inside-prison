@@ -100,7 +100,7 @@
 
           {% if location.raw.locationType != 'CELL' %}
             {{ govukWarningText({
-              text: "Every cell in " + location.displayName + " will be deactivated",
+              text: "Every cell in " + location.displayName + " will be deactivated.",
               iconFallbackText: "Warning"
             }) }}
           {% endif %}
