@@ -59,7 +59,7 @@ const fields = {
   },
   planetFmReference: {
     component: 'govukInput',
-    validate: [minLength(6)],
+    validate: [minLength(6), 'numeric'],
     id: 'planetFmReference',
     name: 'planetFmReference',
     classes: 'govuk-input--width-10',

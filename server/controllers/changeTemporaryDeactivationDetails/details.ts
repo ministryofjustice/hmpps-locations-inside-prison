@@ -95,7 +95,7 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
 
       const token = await req.services.authService.getSystemClientToken(user.username)
 
-      const t = await locationsService.updateTemporaryDeactivation(
+      await locationsService.updateTemporaryDeactivation(
         token,
         location.id,
         deactivationReason as string,
@@ -112,7 +112,7 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
-    const { displayName, id: locationId, locationType, prisonId } = location as DecoratedLocation
+    const { id: locationId, prisonId } = location as DecoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()
