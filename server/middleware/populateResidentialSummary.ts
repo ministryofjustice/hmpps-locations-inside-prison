@@ -16,7 +16,7 @@ function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
 }
 
 function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
-  return location.active && req.canAccess('change_used_for')
+  return !location.leafLevel && location.active && req.canAccess('change_used_for')
 }
 
 function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow {
