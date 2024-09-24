@@ -6,6 +6,8 @@ import config from '../config'
 export default function setUpWebSecurity(): Router {
   const router = express.Router()
 
+  const gaHosts = ['*.googletagmanager.com', '*.google-analytics.com', '*.analytics.google.com']
+
   // Secure code best practice - see:
   // 1. https://expressjs.com/en/advanced/best-practice-security.html,
   // 2. https://www.npmjs.com/package/helmet
@@ -24,10 +26,12 @@ export default function setUpWebSecurity(): Router {
           // <link href="http://example.com/" rel="stylesheet" nonce="{{ cspNonce }}">
           // This ensures only scripts we trust are loaded, and not anything injected into the
           // page by an attacker.
-          scriptSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
+          scriptSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`, ...gaHosts],
           styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
           fontSrc: ["'self'"],
           formAction: [`'self' ${config.apis.hmppsAuth.externalUrl}`],
+          connectSrc: ["'self'", ...gaHosts],
+          imgSrc: ["'self'", ...gaHosts],
         },
       },
       crossOriginEmbedderPolicy: true,

@@ -4,6 +4,7 @@ import FeComponentsService from './feComponentsService'
 import LocationsService from './locationsService'
 import AuthService from './authService'
 import ManageUsersService from './manageUsersService'
+import AnalyticsService from './analyticsService'
 
 export const services = () => {
   const {
@@ -11,10 +12,12 @@ export const services = () => {
     hmppsAuditClient,
     hmppsAuthClient,
     feComponentsClient,
+    googleAnalyticsClient,
     locationsApiClient,
     manageUsersApiClient,
   } = dataAccess()
 
+  const analyticsService = new AnalyticsService(googleAnalyticsClient)
   const auditService = new AuditService(hmppsAuditClient)
   const authService = new AuthService(hmppsAuthClient)
   const feComponentsService = new FeComponentsService(feComponentsClient)
@@ -22,6 +25,7 @@ export const services = () => {
   const manageUsersService = new ManageUsersService(manageUsersApiClient)
 
   return {
+    analyticsService,
     applicationInfo,
     auditService,
     authService,
