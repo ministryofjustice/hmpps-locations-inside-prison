@@ -61,6 +61,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo, fields)}`,
       maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
       minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
+      numericString: `${fieldName} must only include numbers`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName?.toLowerCase()}`,
