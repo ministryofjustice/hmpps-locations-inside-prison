@@ -35,6 +35,7 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     const { deactivationReason } = req.form.options.fields
     const token = await authService.getSystemClientToken(user.username)
     const deactivationReasons = await locationsService.getDeactivatedReasons(token)
+
     deactivationReason.items = Object.entries(deactivationReasons)
       .sort(([a, _], [b, __]) => {
         if ([a, b].includes('OTHER')) {
@@ -86,6 +87,10 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     }
   }
 
+  compareInitialAndSubmittedValues(values: { initialValues: any; submittedValues: any }) {
+    return JSON.stringify(values.initialValues) !== JSON.stringify(values.submittedValues)
+  }
+
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { user, location } = res.locals
@@ -95,14 +100,31 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
 
       const token = await req.services.authService.getSystemClientToken(user.username)
 
-      await locationsService.updateTemporaryDeactivation(
-        token,
-        location.id,
-        deactivationReason as string,
-        req.form.values[`deactivationReason${deactivationReason === 'OTHER' ? 'Other' : 'Description'}`] as string,
-        estimatedReactivationDate as string,
-        planetFmReference as string,
-      )
+      const submittedValues = {
+        deactivationReason: deactivationReason as string,
+        [`deactivationReasonDescription-${deactivationReason}`]: req.form.values[
+          `deactivationReason${deactivationReason === 'OTHER' ? 'Other' : 'Description'}`
+        ] as string,
+        estimatedReactivationDate: estimatedReactivationDate as string,
+        planetFmReference: planetFmReference as string,
+      }
+
+      // TO DO, Fix: edge case, when an input validation error occurs (e.g. incorrect date format) this returns false
+      res.locals.valuesHaveChanged = this.compareInitialAndSubmittedValues({
+        initialValues: this.getInitialValues(req, res),
+        submittedValues,
+      })
+
+      if (res.locals.valuesHaveChanged) {
+        await locationsService.updateTemporaryDeactivation(
+          token,
+          location.id,
+          submittedValues.deactivationReason,
+          submittedValues[`deactivationReasonDescription-${deactivationReason}`],
+          submittedValues.estimatedReactivationDate,
+          submittedValues.planetFmReference,
+        )
+      }
 
       next()
     } catch (error) {
@@ -117,10 +139,12 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     req.journeyModel.reset()
     req.sessionModel.reset()
 
-    req.flash('success', {
-      title: 'Deactivation details updated',
-      content: `You have updated the deactivation details for this location.`,
-    })
+    if (res.locals.valuesHaveChanged) {
+      req.flash('success', {
+        title: 'Deactivation details updated',
+        content: `You have updated the deactivation details for this location.`,
+      })
+    }
 
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
   }
