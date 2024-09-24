@@ -10,28 +10,22 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     super.middlewareSetup()
   }
 
-  // getInitialValues(req: FormWizard.Request, res: Response) {
-  //   return {
-  //     deactivationReason: res.locals.location.deactivatedReason,
-  //     deactivationReasonDescription: res.locals.location.deactivationReasonDescription,
-  //     deactivationReasonOther: res.locals.location.deactivationReasonDescription,
-  //     estimatedReactivationDate: res.locals.location.proposedReactivationDate,
-  //     planetFmReference: res.locals.location.planetFmReference
-  //    }
-  // }
-
   getInitialValues(_req: FormWizard.Request, res: Response) {
     const { location } = res.locals
-    const { deactivationReason } = location
+    const { deactivatedReason } = location.raw
 
-    if (deactivationReason === 'OTHER') {
-      return {
-        deactivationReasonOther: location.deactivationReasonDescription,
-      }
+    let descriptionFieldKey: string
+    if (deactivatedReason === 'OTHER') {
+      descriptionFieldKey = 'Other'
+    } else {
+      descriptionFieldKey = `Description-${deactivatedReason}`
     }
 
     return {
-      [`deactivationReasonDescription-${deactivationReason}`]: location.deactivationReasonDescription,
+      deactivationReason: deactivatedReason,
+      [`deactivationReason${descriptionFieldKey}`]: location.deactivationReasonDescription,
+      estimatedReactivationDate: location.proposedReactivationDate,
+      planetFmReference: location.planetFmReference,
     }
   }
 
@@ -39,7 +33,6 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     const { user } = res.locals
     const { authService, locationsService } = req.services
     const { deactivationReason } = req.form.options.fields
-
     const token = await authService.getSystemClientToken(user.username)
     const deactivationReasons = await locationsService.getDeactivatedReasons(token)
     deactivationReason.items = Object.entries(deactivationReasons)
@@ -56,24 +49,13 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
         conditional: `deactivationReason${key === 'OTHER' ? 'Other' : `Description-${key}`}`,
       }))
 
-    /*
-    - Description always displays in 'OTHER' section 
-    - Should display in section matching deactivationReasonDescription-${key}
-  */
     Object.keys(deactivationReasons)
       .filter(n => n !== 'OTHER')
       .forEach(key => {
-        if (key === res.locals.location.deactivatedReason) {
-          console.log('Deactivation reason field being updated:', key)
-
-          req.form.options.allFields[`deactivationReasonDescription-${key}`] = {
-            ...req.form.options.allFields.deactivationReasonDescription,
-            id: `deactivationReasonDescription-${key}`,
-            name: `deactivationReasonDescription-${key}`,
-            value: res.locals.location.deactivationReasonDescription,
-          }
-          console.log(req.form.options.allFields[`deactivationReasonDescription-${key}`])
-          console.log(req.form.options.allFields)
+        req.form.options.allFields[`deactivationReasonDescription-${key}`] = {
+          ...req.form.options.allFields.deactivationReasonDescription,
+          id: `deactivationReasonDescription-${key}`,
+          name: `deactivationReasonDescription-${key}`,
         }
       })
 
@@ -109,13 +91,7 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
       const { user, location } = res.locals
       const { locationsService } = req.services
 
-      const {
-        deactivationReason,
-        deactivationReasonDescription,
-        deactivationReasonOther,
-        estimatedReactivationDate,
-        planetFmReference,
-      } = req.form.values
+      const { deactivationReason, estimatedReactivationDate, planetFmReference } = req.form.values
 
       const token = await req.services.authService.getSystemClientToken(user.username)
 
@@ -123,7 +99,7 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
         token,
         location.id,
         deactivationReason as string,
-        deactivationReasonDescription as string,
+        req.form.values[`deactivationReason${deactivationReason === 'OTHER' ? 'Other' : 'Description'}`] as string,
         estimatedReactivationDate as string,
         planetFmReference as string,
       )

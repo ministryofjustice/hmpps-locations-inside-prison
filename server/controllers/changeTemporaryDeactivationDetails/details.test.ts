@@ -160,13 +160,12 @@ describe('DeactivateTemporaryDetails', () => {
           ...fields.deactivationReasonDescription,
           id: 'deactivationReasonDescription-ATEST1',
           name: 'deactivationReasonDescription-ATEST1',
-          value: 'deactivationReasonDescription-ATEST1',
+          value: 'Description',
         },
         'deactivationReasonDescription-TEST2': {
           ...fields.deactivationReasonDescription,
           id: 'deactivationReasonDescription-TEST2',
           name: 'deactivationReasonDescription-TEST2',
-          value: 'deactivationReasonDescription-ATEST2',
         },
       })
     })
