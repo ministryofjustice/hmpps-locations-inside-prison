@@ -74,10 +74,10 @@ describe('ChangeUsedForDetails', () => {
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
-    locationsService.getUsedForTypes = jest.fn().mockResolvedValue({
-      REMAND: 'Remand',
-      THERAPEUTIC_COMMUNITY: 'Therapeutic community',
-    })
+    locationsService.getUsedForTypes = jest.fn().mockResolvedValue([
+      { key: 'REMAND', description: 'Remand' },
+      { key: 'THERAPEUTIC_COMMUNITY', description: 'Therapeutic community' },
+    ])
     locationsService.updateUsedForTypes = jest.fn().mockResolvedValue(true)
   })
 

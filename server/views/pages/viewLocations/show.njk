@@ -10,6 +10,7 @@
 {% from "../../macros/locationsTable.njk" import locationsTable %}
 {% from "../../macros/locationStatusTag.njk" import locationStatusTag %}
 {% from "../../macros/miniSummary.njk" import miniSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set locationType = residentialSummary.location.locationType %}
 {% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
@@ -38,7 +39,7 @@
 
     <div class="govuk-width-container">
       <div class="govuk-grid-row govuk-!-margin-bottom-0">
-        <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-column-three-quarters">
           {{ govukNotificationBanner({
             html: html,
             type: "success",
@@ -68,6 +69,10 @@
           {% endif %}
           {{ locationStatusTag(residentialSummary.location) }}
 
+          {% if actionButton %}
+            {{ govukButton(actionButton) }}
+          {% endif %}
+
           {% if actions | length %}
             <div class="govuk-!-float-right">
               {{ mojButtonMenu({ items: actions }) }}
@@ -84,7 +89,7 @@
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-three-quarters">
         {% if residentialSummary.location.status == 'INACTIVE' %}
-          {{ inactiveLocationBanner(residentialSummary.location) }}
+          {{ inactiveLocationBanner(residentialSummary.location, canAccess) }}
         {% endif %}
 
         {% if residentialSummary.summaryCards | length %}

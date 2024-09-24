@@ -6,6 +6,7 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% from "../../macros/locationsTable.njk" import locationsTable %}
 {% from "../../macros/miniSummary.njk" import miniSummary %}
@@ -96,6 +97,13 @@
 
         <div class="govuk-!-padding-bottom-2 change-summary">
           <h2 class="govuk-heading-m">Change to establishment capacity</h2>
+
+          {% if location.raw.locationType != 'CELL' %}
+            {{ govukWarningText({
+              text: "Every cell in " + location.displayName + " will be deactivated.",
+              iconFallbackText: "Warning"
+            }) }}
+          {% endif %}
 
           <p>{{ changeSummary | safe }}</p>
         </div>

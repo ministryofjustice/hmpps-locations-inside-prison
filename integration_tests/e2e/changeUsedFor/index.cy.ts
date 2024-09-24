@@ -82,7 +82,13 @@ context('Set cell type', () => {
         ChangeUsedForPage.goTo(location.id)
         const changeUsedForPage = Page.verifyOnPage(ChangeUsedForPage)
 
-        const expectedLabels = ['Test type', 'Standard accommodation', 'Changed type']
+        const expectedLabels = [
+          'Close Supervision Centre (CSC)',
+          'Drug recovery / Incentivised substance free living (ISFL)',
+          'First night centre / Induction',
+          'Test type',
+          'Standard accommodation',
+        ]
         expectedLabels.forEach((label, index) => {
           changeUsedForPage.cellTypeCheckboxLabels().eq(index).contains(label)
           changeUsedForPage.cellTypeCheckboxLabels().eq(index).prev('input[type="checkbox"]').should('not.be.checked')
@@ -100,8 +106,8 @@ context('Set cell type', () => {
         ChangeUsedForPage.goTo(location.id)
         const changeUsedForPage = Page.verifyOnPage(ChangeUsedForPage)
 
-        changeUsedForPage.cellTypeCheckboxLabels().eq(0).contains('Test type')
-        changeUsedForPage.cellTypeCheckboxLabels().eq(0).prev('input[type="checkbox"]').should('be.checked')
+        changeUsedForPage.cellTypeCheckboxLabels().eq(3).contains('Test type')
+        changeUsedForPage.cellTypeCheckboxLabels().eq(3).prev('input[type="checkbox"]').should('be.checked')
       })
 
       it('shows success banner when the change is complete', () => {

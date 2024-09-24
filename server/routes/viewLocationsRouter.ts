@@ -11,6 +11,7 @@ import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsFor
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import addAction from '../middleware/addAction'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
+import addBreadcrumb from '../middleware/addBreadcrumb'
 
 const router = express.Router({ mergeParams: true })
 
@@ -26,9 +27,9 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     })(req, res, null)
   }
 
-  if (active && locationType === 'CELL' && req.canAccess('deactivate_temporary')) {
+  if (active && ['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType) && req.canAccess('deactivate_temporary')) {
     addAction({
-      text: 'Deactivate cell',
+      text: `Deactivate ${location.locationType.toLowerCase()}`,
       href: `/location/${location.id}/deactivate/temporary`,
     })(req, res, null)
   }
@@ -44,6 +45,7 @@ const controller = (services: Services) => {
     '/',
     populateResidentialSummary(services),
     populateBreadcrumbsForLocation,
+    addBreadcrumb({ title: '', href: '/' }),
     logPageView(services.auditService, Page.LOCATIONS_INDEX),
     viewLocationsIndex,
   )

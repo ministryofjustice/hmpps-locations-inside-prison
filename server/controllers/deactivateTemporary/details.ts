@@ -2,10 +2,12 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
+import checkForPrisoners from './checkForPrisoners'
 
 export default class DeactivateTemporaryDetails extends FormInitialStep {
   middlewareSetup() {
     this.use(this.populateItems)
+    this.use(checkForPrisoners)
     super.middlewareSetup()
   }
 

@@ -118,6 +118,13 @@ describe('locationsApiClient', () => {
       () => apiClient.constants.getSpecialistCellTypes,
     )
     testCall('getUsedForType', '/constants/used-for-type', true, () => apiClient.constants.getUsedForTypes)
+    testCall(
+      'getUsedForTypesForPrison',
+      '/constants/used-for-type/TST',
+      true,
+      () => apiClient.constants.getUsedForTypesForPrison,
+      { prisonId: 'TST' },
+    )
   })
 
   describe('locations', () => {
@@ -146,6 +153,21 @@ describe('locationsApiClient', () => {
       { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
       'put',
       { convertedCellType: 'OTHER', otherConvertedCellType: 'some type' },
+    )
+    testCall(
+      'convertToCell',
+      '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/convert-to-cell',
+      false,
+      () => apiClient.locations.convertToCell,
+      { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+      'put',
+      {
+        accommodationType: 'NORMAL_ACCOMMODATION',
+        specialistCellTypes: ['ACCESSIBLE_CELL'],
+        maxCapacity: 2,
+        workingCapacity: 1,
+        usedForTypes: ['CLOSE_SUPERVISION_CENTRE'],
+      },
     )
     testCall(
       'getLocation',

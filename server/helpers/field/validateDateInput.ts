@@ -4,16 +4,18 @@ export default function validateDateInput(
   yearInputValue: string,
   isoDate: string,
 ) {
+  const missingFields = []
   if (dayInputValue === '') {
-    return 'dateMissingDay'
+    missingFields.push('Day')
   }
-
   if (monthInputValue === '') {
-    return 'dateMissingMonth'
+    missingFields.push('Month')
   }
-
   if (yearInputValue === '') {
-    return 'dateMissingYear'
+    missingFields.push('Year')
+  }
+  if (missingFields.length) {
+    return `dateMissing${missingFields.join('And')}`
   }
 
   const day = Number(dayInputValue)

@@ -59,4 +59,6 @@ export declare interface Location {
   level: number
   sortName: string
   planetFmReference: string
+  numberOfCellLocations: number
+  oldWorkingCapacity: number
 }

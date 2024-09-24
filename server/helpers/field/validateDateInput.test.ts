@@ -20,7 +20,10 @@ describe('Field helpers', () => {
     describe('when any part of the date is blank', () => {
       it('returns the correct error', () => {
         test('', 1, 2024, 'dateMissingDay')
+        test('', '', 2024, 'dateMissingDayAndMonth')
+        test('', 1, '', 'dateMissingDayAndYear')
         test(1, '', 2024, 'dateMissingMonth')
+        test(1, '', '', 'dateMissingMonthAndYear')
         test(1, 1, '', 'dateMissingYear')
       })
     })

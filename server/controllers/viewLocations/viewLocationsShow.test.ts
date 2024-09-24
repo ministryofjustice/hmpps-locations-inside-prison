@@ -173,4 +173,96 @@ describe('view locations show', () => {
       })
     })
   })
+
+  describe('actionButton', () => {
+    beforeEach(() => {
+      req.canAccess = jest.fn().mockImplementation(permission => permission === 'convert_non_residential')
+      res.locals.residentialSummary.location = LocationFactory.build({
+        active: true,
+        isResidential: false,
+        leafLevel: true,
+      })
+    })
+
+    it('renders the page with the action button', () => {
+      controller(req, res)
+
+      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        actionButton: {
+          text: 'Convert to cell',
+          href: `/location/7e570000-0000-0000-0000-000000000001/cell-conversion`,
+          classes: 'govuk-!-float-right',
+        },
+        banner: {},
+      })
+    })
+
+    describe('without the correct permissions', () => {
+      beforeEach(() => {
+        req.canAccess = jest.fn().mockReturnValue(false)
+      })
+
+      it('renders the page without the action button', () => {
+        controller(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+          banner: {},
+        })
+      })
+    })
+
+    describe('when inactive', () => {
+      beforeEach(() => {
+        res.locals.residentialSummary.location = LocationFactory.build({
+          active: false,
+          isResidential: false,
+          leafLevel: true,
+        })
+      })
+
+      it('renders the page without the action button', () => {
+        controller(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+          banner: {},
+        })
+      })
+    })
+
+    describe('when already residential', () => {
+      beforeEach(() => {
+        res.locals.residentialSummary.location = LocationFactory.build({
+          active: true,
+          isResidential: true,
+          leafLevel: true,
+        })
+      })
+
+      it('renders the page without the action button', () => {
+        controller(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+          banner: {},
+        })
+      })
+    })
+
+    describe('when not leaf level', () => {
+      beforeEach(() => {
+        res.locals.residentialSummary.location = LocationFactory.build({
+          active: true,
+          isResidential: false,
+          leafLevel: false,
+        })
+      })
+
+      it('renders the page without the action button', () => {
+        controller(req, res)
+
+        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+          banner: {},
+        })
+      })
+    })
+  })
 })

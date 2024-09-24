@@ -13,10 +13,11 @@ export default class ChangeUsedForDetails extends FormInitialStep {
   async setOptions(req: FormWizard.Request, res: Response, next: NextFunction) {
     const token = await req.services.authService.getSystemClientToken(res.locals.user.username)
     const usedForTypes = await req.services.locationsService.getUsedForTypes(token)
-    req.form.options.fields.usedFor.items = Object.entries(usedForTypes).map(([key, description]) => ({
-      value: key,
+    req.form.options.fields.usedFor.items = Object.values(usedForTypes).map(({ key, description }) => ({
       text: description,
+      value: key,
     }))
+
     next()
   }
 
