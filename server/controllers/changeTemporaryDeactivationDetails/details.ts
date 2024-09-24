@@ -110,12 +110,15 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
       }
 
       // TO DO, Fix: edge case, when an input validation error occurs (e.g. incorrect date format) this returns false
-      res.locals.valuesHaveChanged = this.compareInitialAndSubmittedValues({
+      // res.locals.valuesHaveChanged = this.compareInitialAndSubmittedValues({
+      const valuesHaveChanged = this.compareInitialAndSubmittedValues({
         initialValues: this.getInitialValues(req, res),
         submittedValues,
       })
 
-      if (res.locals.valuesHaveChanged) {
+      // if (res.locals.valuesHaveChanged) {
+      if (valuesHaveChanged) {
+        res.locals.valuesHaveChanged = valuesHaveChanged
         await locationsService.updateTemporaryDeactivation(
           token,
           location.id,
