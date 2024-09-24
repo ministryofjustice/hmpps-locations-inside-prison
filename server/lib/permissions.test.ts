@@ -23,6 +23,7 @@ describe('rolesToPermissions', () => {
       'convert_non_residential',
       'deactivate_temporary',
       'reactivate',
+      'change_temporary_deactivation_details',
       'set_cell_type',
     ])
   })
@@ -38,6 +39,7 @@ describe('rolesToPermissions', () => {
       'change_cell_capacity',
       'change_signed_operational_capacity',
       'change_used_for',
+      'change_temporary_deactivation_details',
       'convert_non_residential',
       'deactivate_temporary',
       'reactivate',
