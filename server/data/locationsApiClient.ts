@@ -157,6 +157,10 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/specialist-cell-types',
       requestType: 'put',
     }),
+    updateUsedForTypes: this.apiCall<Location, { locationId: string }, string[]>({
+      path: '/locations/:locationId/used-for-type',
+      requestType: 'put',
+    }),
   }
 
   prisonerLocations = {

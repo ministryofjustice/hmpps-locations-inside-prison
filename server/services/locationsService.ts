@@ -175,4 +175,8 @@ export default class LocationsService {
   async updateSpecialistCellTypes(token: string, locationId: string, cellTypes?: string[]) {
     return this.locationsApiClient.locations.updateSpecialistCellTypes(token, { locationId }, cellTypes)
   }
+
+  async updateUsedForTypes(token: string, locationId: string, usedForType?: string[]) {
+    return this.locationsApiClient.locations.updateUsedForTypes(token, { locationId }, usedForType)
+  }
 }

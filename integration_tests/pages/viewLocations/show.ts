@@ -61,6 +61,11 @@ export default class ViewLocationsShowPage extends Page {
 
   removeSpecificCellTypeLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Remove")')
 
+  cellUsedForDetails = (): PageElement =>
+    this.locationDetailsRows().eq(3).find('.govuk-summary-list__value').contains('Test type')
+
+  changeCellUsedForLink = (): PageElement => this.locationDetailsRows().eq(3).find('a:contains("Change")')
+
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 
   locationsHeader = (): PageElement => this.locationsTable().find('caption')
