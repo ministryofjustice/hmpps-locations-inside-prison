@@ -10,6 +10,19 @@
 {% block head %}
   <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet"/>
 
+  {% if googleAnalyticsMeasurementId %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ googleAnalyticsMeasurementId }}"></script>
+    <script nonce="{{ cspNonce }}">
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ googleAnalyticsMeasurementId }}', {
+        active_case_load: '{{ user.activeCaseload.id | default('') }}',
+      });
+    </script>
+  {% endif %}
+
   <script src="/assets/js/jquery.min.js"></script>
 
   {% if feComponents.jsIncludes %}

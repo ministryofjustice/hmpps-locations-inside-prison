@@ -17,6 +17,7 @@ import config from '../config'
 import FeComponentsClient from './feComponentsClient'
 import HmppsAuditClient from './hmppsAuditClient'
 import LocationsApiClient from './locationsApiClient'
+import GoogleAnalyticsClient from './googleAnalyticsClient'
 import RedisTokenStore from './tokenStore/redisTokenStore'
 import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
 
@@ -25,6 +26,7 @@ type RestClientBuilder<T> = (token: string) => T
 export const dataAccess = () => ({
   applicationInfo,
   feComponentsClient: new FeComponentsClient(),
+  googleAnalyticsClient: new GoogleAnalyticsClient(),
   hmppsAuthClient: new HmppsAuthClient(
     config.redis.enabled ? new RedisTokenStore(redisClient) : new InMemoryTokenStore(),
   ),
