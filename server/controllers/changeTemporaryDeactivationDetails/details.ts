@@ -4,7 +4,7 @@ import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
 
-export default class DeactivateTemporaryDetails extends FormInitialStep {
+export default class ChangeTemporaryDeactivationDetails extends FormInitialStep {
   middlewareSetup() {
     this.use(this.populateItems)
     super.middlewareSetup()
