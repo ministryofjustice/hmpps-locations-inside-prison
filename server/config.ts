@@ -104,4 +104,11 @@ export default {
   dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
   ingressUrl: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
+  googleAnalytics: {
+    measurementId: get('GOOGLE_ANALYTICS_MEASUREMENT_ID', ''),
+    measurementApi: {
+      secret: get('GOOGLE_ANALYTICS_MEASUREMENT_API_SECRET', ''),
+      url: 'https://www.google-analytics.com',
+    },
+  },
 }

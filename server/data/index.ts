@@ -17,6 +17,7 @@ import config from '../config'
 import FeComponentsClient from './feComponentsClient'
 import HmppsAuditClient from './hmppsAuditClient'
 import LocationsApiClient from './locationsApiClient'
+import GoogleAnalyticsClient from './googleAnalyticsClient'
 import logger from '../../logger'
 
 export const dataAccess = () => {
@@ -28,12 +29,15 @@ export const dataAccess = () => {
 
   return {
     applicationInfo,
+    feComponentsClient: new FeComponentsClient(),
+    googleAnalyticsClient: new GoogleAnalyticsClient(),
     hmppsAuthClient,
-  hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
-  locationsApiClient: new LocationsApiClient(redisClient),
-  manageUsersApiClient: new ManageUsersApiClient(redisClient),
-  redisClient,
-}}
+    hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
+    locationsApiClient: new LocationsApiClient(redisClient),
+    manageUsersApiClient: new ManageUsersApiClient(redisClient),
+    redisClient,
+  }
+}
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
