@@ -212,6 +212,14 @@ const stubLocationsConstantsUsedForType = (
       key: 'FIRST_NIGHT_CENTRE',
       description: 'First night centre / Induction',
     },
+    {
+      key: 'TEST_TYPE',
+      description: 'Test type',
+    },
+    {
+      key: 'STANDARD_ACCOMMODATION',
+      description: 'Standard accommodation',
+    },
   ],
 ) =>
   stubFor({
@@ -523,6 +531,21 @@ const stubUpdateSpecialistCellTypes = () =>
     },
   })
 
+const stubUpdateLocationsConstantsUsedForType = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/used-for-type',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubLocationsConvertCellToNonResCell = () =>
   stubFor({
     request: {
@@ -595,4 +618,5 @@ export default {
   stubSignedOperationalCapacityUpdate,
   stubUpdateCapacity,
   stubUpdateSpecialistCellTypes,
+  stubUpdateLocationsConstantsUsedForType,
 }

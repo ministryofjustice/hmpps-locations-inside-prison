@@ -8,12 +8,14 @@ const manageResidentialLocationsPermissions: string[] = [
   'convert_non_residential',
   'reactivate',
   'set_cell_type',
+  'change_used_for',
 ]
 
 const manageResLocationsOpCapPermissions: string[] = [
   ...manageResidentialLocationsPermissions,
   'change_signed_operational_capacity',
   'deactivate_temporary',
+  'change_used_for',
 ]
 
 const permissionsByRole: { [key: string]: string[] } = {

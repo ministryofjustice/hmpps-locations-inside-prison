@@ -8,6 +8,7 @@ describe('rolesToPermissions', () => {
   it('returns the correct permissions for MANAGE_RESIDENTIAL_LOCATIONS', () => {
     expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS']).sort()).toEqual([
       'change_cell_capacity',
+      'change_used_for',
       'convert_non_residential',
       'reactivate',
       'set_cell_type',
@@ -18,6 +19,7 @@ describe('rolesToPermissions', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP']).sort()).toEqual([
       'change_cell_capacity',
       'change_signed_operational_capacity',
+      'change_used_for',
       'convert_non_residential',
       'deactivate_temporary',
       'reactivate',
@@ -35,6 +37,7 @@ describe('rolesToPermissions', () => {
     ).toEqual([
       'change_cell_capacity',
       'change_signed_operational_capacity',
+      'change_used_for',
       'convert_non_residential',
       'deactivate_temporary',
       'reactivate',

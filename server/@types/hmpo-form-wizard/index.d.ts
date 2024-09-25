@@ -252,7 +252,14 @@ declare module 'hmpo-form-wizard' {
       formGroupClasses?: string
       characterCountMax?: number
       classes?: string
-      items?: Item[]
+      items?: {
+        text?: string
+        value: string
+        label?: string
+        conditional?: Conditional
+        id?: string
+        hint?: Hint
+      }[]
       summary?: {
         displayFn?: (value: string) => string
         displayAlways?: boolean

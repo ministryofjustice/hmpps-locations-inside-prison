@@ -190,6 +190,20 @@ describe('Locations service', () => {
     })
   })
 
+  describe('updateCellUsedFor', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.updateUsedForTypes('token', '481fc587-60f8-402b-804d-64462babddcc', ['REMAND'])
+
+      expect(locationsApiClient.locations.updateUsedForTypes).toHaveBeenCalledWith(
+        'token',
+        {
+          locationId: '481fc587-60f8-402b-804d-64462babddcc',
+        },
+        ['REMAND'],
+      )
+    })
+  })
+
   describe('convertToCell', () => {
     it('calls the correct client function', async () => {
       await locationsService.convertToCell(
