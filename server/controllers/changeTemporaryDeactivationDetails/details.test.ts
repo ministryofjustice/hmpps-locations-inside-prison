@@ -1,11 +1,11 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import fields from '../../routes/deactivateTemporary/fields'
-import DeactivateTemporaryDetails from './details'
+import ChangeTemporaryDeactivationDetails from './details'
 import { Services } from '../../services'
 
-describe('DeactivateTemporaryDetails', () => {
-  const controller = new DeactivateTemporaryDetails({ route: '/' })
+describe('ChangeTemporaryDeactivationDetails', () => {
+  const controller = new ChangeTemporaryDeactivationDetails({ route: '/' })
   let req: FormWizard.Request
   let res: Response
   let formValues: {
@@ -24,6 +24,7 @@ describe('DeactivateTemporaryDetails', () => {
       estimatedReactivationDate: '2030-04-20',
       planetFmReference: 'PFMRN123',
     }
+
     req = {
       body: {
         'deactivationReasonDescription-DAMAGE': 'Damage',
@@ -116,6 +117,35 @@ describe('DeactivateTemporaryDetails', () => {
           },
         ],
       })
+    })
+  })
+
+  describe('compareInitialAndSubmittedValues', () => {
+    it('returns a boolean true value if the objects do not match', () => {
+      const submittedValues = {
+        ...req.form.values,
+      }
+      submittedValues.estimatedReactivationDate = ''
+
+      expect(
+        controller.compareInitialAndSubmittedValues({
+          initialValues: req.form.values,
+          submittedValues,
+        }),
+      ).toBe(true)
+    })
+
+    it('returns a boolean false value if the objects match', () => {
+      const submittedValues = {
+        ...req.form.values,
+      }
+
+      expect(
+        controller.compareInitialAndSubmittedValues({
+          initialValues: req.form.values,
+          submittedValues,
+        }),
+      ).toBe(false)
     })
   })
 
