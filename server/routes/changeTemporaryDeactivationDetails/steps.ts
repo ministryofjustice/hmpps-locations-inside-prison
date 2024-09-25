@@ -1,5 +1,4 @@
 import ChangeTemporaryDeactivationDetails from '../../controllers/changeTemporaryDeactivationDetails/details'
-import DeactivateTemporaryOccupied from '../../controllers/deactivateTemporary/occupied'
 
 const steps = {
   '/': {

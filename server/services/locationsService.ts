@@ -188,7 +188,6 @@ export default class LocationsService {
     proposedReactivationDate?: string,
     planetFmReference?: string,
   ) {
-    console.log({ deactivationReason, deactivationReasonDescription, proposedReactivationDate, planetFmReference })
     return this.locationsApiClient.locations.updateTemporaryDeactivation(
       token,
       { locationId },
