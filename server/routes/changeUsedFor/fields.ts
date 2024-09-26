@@ -6,7 +6,7 @@ const fields = {
     errorMessages: { required: 'Select what the location is used for' },
     id: 'usedFor',
     name: 'usedFor',
-    hint: { text: 'Select all that apply' },
+    hint: { text: 'Select all that apply.' },
     items: [{ text: 'set at runtime', value: '' }],
   },
 }

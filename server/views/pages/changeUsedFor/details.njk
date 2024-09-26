@@ -8,6 +8,7 @@
 
 {% set title = "Change what the location is used for" %}
 {% set locationName = location.localName or location.pathHierarchy %}
+{% set locationType = location.locationType | title %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
@@ -34,10 +35,10 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-2">
       <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name"> {{ locationName }}</span>
+        <span class="govuk-caption-m" data-qa="cell-name">{{ locationType }} {{ locationName }}</span>
         <h1 class="govuk-heading-l">Change what the location is used for</h1>
         {{ govukWarningText({
-          text: 'This change will apply to all normal accommodation locations in ' + locationName + '.',
+          text: 'This change will apply to all normal accommodation locations in ' + locationType + ' ' + locationName + '.',
           iconFallbackText: "Warning"
         }) }}
       </div>

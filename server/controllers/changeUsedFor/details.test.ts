@@ -118,7 +118,7 @@ describe('ChangeUsedForDetails', () => {
             errorMessages: {
               required: 'Select what the location is used for',
             },
-            hint: { text: 'Select all that apply' },
+            hint: { text: 'Select all that apply.' },
             id: 'usedFor',
             items: [
               {

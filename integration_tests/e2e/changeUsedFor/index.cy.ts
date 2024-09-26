@@ -89,7 +89,7 @@ context('Set cell type', () => {
           .usedForWarningText()
           .should(
             'contain.text',
-            `This change will apply to all normal accommodation locations in ${locationAsWing.localName}.`,
+            `This change will apply to all normal accommodation locations in Wing ${locationAsWing.localName}.`,
           )
       })
 
