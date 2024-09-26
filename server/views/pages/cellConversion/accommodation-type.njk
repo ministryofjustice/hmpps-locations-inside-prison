@@ -8,6 +8,8 @@
 {% set title = 'Convert to cell' %}
 {% set locationName = location.localName or location.pathHierarchy %}
 
+{% block pageTitle %}{{ 'What type of accommodation is it? - Convert to cell - ' + applicationName }}{% endblock %}
+
 {% block heading %}
   <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
   <h1 class="govuk-heading-l">{{ title }}</h1>
