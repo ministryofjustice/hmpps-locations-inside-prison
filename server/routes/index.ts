@@ -19,6 +19,7 @@ import reactivateRouter from './reactivate'
 import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
 import viewLocationsRouter from './viewLocationsRouter'
+import changeNonResidentialTypeRouter from './changeNonResidentialType'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -50,6 +51,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
+  router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
 
   return router
 }

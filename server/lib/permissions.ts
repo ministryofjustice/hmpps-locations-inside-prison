@@ -8,6 +8,7 @@ const manageResidentialLocationsPermissions: string[] = [
   'convert_non_residential',
   'reactivate',
   'set_cell_type',
+  'change_non_residential_type',
 ]
 
 const manageResLocationsOpCapPermissions: string[] = [
