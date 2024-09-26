@@ -13,6 +13,7 @@ describe('CellConversionConfirm', () => {
   let next: NextFunction
   let sessionModelGet: jest.Mock
   let sessionModelSet: jest.Mock
+  let sessionModelUnset: jest.Mock
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const formValues: any = {
@@ -26,6 +27,7 @@ describe('CellConversionConfirm', () => {
   beforeEach(() => {
     sessionModelSet = jest.fn()
     sessionModelGet = jest.fn().mockImplementation(key => formValues[key])
+    sessionModelUnset = jest.fn()
     req = {
       flash: jest.fn(),
       form: {
@@ -47,6 +49,7 @@ describe('CellConversionConfirm', () => {
         get: sessionModelGet,
         set: sessionModelSet,
         reset: jest.fn(),
+        unset: sessionModelUnset,
       },
     } as unknown as FormWizard.Request
     res = {
@@ -199,6 +202,13 @@ describe('CellConversionConfirm', () => {
       const result: any = controller.locals(req, res)
 
       expect(result.changeSummary).toEqual('This will increase the establishment’s maximum capacity from 30 to 32.')
+    })
+
+    it('clears any saved values from the edit journeys', () => {
+      controller.locals(req, res)
+
+      expect(sessionModelUnset).toHaveBeenCalledWith('previousCellTypes')
+      expect(sessionModelUnset).toHaveBeenCalledWith('previousAccommodationType')
     })
   })
 

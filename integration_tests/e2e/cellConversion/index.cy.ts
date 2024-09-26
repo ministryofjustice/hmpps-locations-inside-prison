@@ -613,7 +613,7 @@ context('Cell conversion', () => {
         })
 
         it('has the correct warning text', () => {
-          cy.get('.govuk-warning-text__text').contains('This cell will be certified and active')
+          cy.get('.govuk-warning-text__text').contains('This cell will be certified and active.')
         })
 
         it('shows the success banner on completion', () => {
