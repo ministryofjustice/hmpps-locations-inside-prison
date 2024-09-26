@@ -47,11 +47,32 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
   return row
 }
 
+function showChangeNonResLink(location: DecoratedLocation) {
+  return !location.leafLevel && location.active
+}
+
 function nonResCellTypeRow(location: DecoratedLocation) {
+  const changeNonResTypeUrl = `/location/${location.id}/update-non-res-cell`
+
   const { convertedCellType, otherConvertedCellType } = location
   const text = otherConvertedCellType?.length ? `${convertedCellType} - ${otherConvertedCellType}` : convertedCellType
 
-  return { key: { text: 'Non-residential room' }, value: { text } }
+  const row: any = { key: { text: 'Used for' } }
+
+  if (showChangeNonResLink(location)) {
+    row.actions = {
+      items: [
+        {
+          href: changeNonResTypeUrl,
+          text: 'Change',
+        },
+      ],
+    }
+  }
+  return {
+    key: { text: 'Non-residential room' },
+    value: { text },
+  }
 }
 
 function getLocationDetails(location: DecoratedLocation, req: Request) {
