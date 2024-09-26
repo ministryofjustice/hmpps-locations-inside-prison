@@ -175,4 +175,17 @@ export default class LocationsService {
   async updateSpecialistCellTypes(token: string, locationId: string, cellTypes?: string[]) {
     return this.locationsApiClient.locations.updateSpecialistCellTypes(token, { locationId }, cellTypes)
   }
+
+  async changeNonResType(
+    token: string,
+    locationId: string,
+    convertedCellType: string,
+    otherConvertedCellType?: string,
+  ) {
+    const params = pickBy({ convertedCellType, otherConvertedCellType }) as {
+      convertedCellType: string
+      otherConvertedCellType?: string
+    }
+    return this.locationsApiClient.locations.updateNonResCell(token, { locationId }, params)
+  }
 }

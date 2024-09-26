@@ -216,6 +216,18 @@ describe('Locations service', () => {
     })
   })
 
+  describe('updateNonResCell', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.changeNonResType('token', '481fc587-60f8-402b-804d-64462babddcc', 'OFFICE')
+
+      expect(locationsApiClient.locations.updateNonResCell).toHaveBeenCalledWith(
+        'token',
+        { locationId: '481fc587-60f8-402b-804d-64462babddcc' },
+        { convertedCellType: 'OFFICE' },
+      )
+    })
+  })
+
   describe('getAccommodationTypes', () => {
     it('calls the correct client function', async () => {
       await locationsService.getAccommodationTypes('token')

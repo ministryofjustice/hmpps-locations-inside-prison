@@ -157,6 +157,14 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/specialist-cell-types',
       requestType: 'put',
     }),
+    updateNonResCell: this.apiCall<
+      Location,
+      { locationId: string },
+      { convertedCellType: string; otherConvertedCellType?: string }
+    >({
+      path: '/locations/:locationId/update-non-res-cell',
+      requestType: 'put',
+    }),
   }
 
   prisonerLocations = {
