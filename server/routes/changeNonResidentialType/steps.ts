@@ -11,7 +11,6 @@ const steps = {
   '/details': {
     fields: ['convertedCellType', 'otherConvertedCellType'],
     controller: ChangeNonResidentialTypeDetails,
-    next: 'confirm',
   },
 }
 
