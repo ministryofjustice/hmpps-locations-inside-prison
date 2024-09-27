@@ -141,7 +141,7 @@ services:
       - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
 
   prison-register-db:
-    image: postgres:16
+    image: postgres:17
     networks:
       - hmpps
     container_name: prison-register-db
