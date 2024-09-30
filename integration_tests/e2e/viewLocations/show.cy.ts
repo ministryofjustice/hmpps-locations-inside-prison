@@ -237,19 +237,17 @@ context('View Locations Show', () => {
         detailsRows += 1
       }
 
-      if (!location.leafLevel) {
-        viewLocationsShowPage
-          .locationDetailsRows()
-          .eq(detailsRows)
-          .find('.govuk-summary-list__key')
-          .contains('Last updated')
-        viewLocationsShowPage
-          .locationDetailsRows()
-          .eq(detailsRows)
-          .find('.govuk-summary-list__value')
-          .contains('Today by john smith')
-        detailsRows += 1
-      }
+      viewLocationsShowPage
+        .locationDetailsRows()
+        .eq(detailsRows)
+        .find('.govuk-summary-list__key')
+        .contains('Last updated')
+      viewLocationsShowPage
+        .locationDetailsRows()
+        .eq(detailsRows)
+        .find('.govuk-summary-list__value')
+        .contains('Today by john smith')
+      detailsRows += 1
 
       viewLocationsShowPage.locationDetailsRows().should('have.length', detailsRows)
 

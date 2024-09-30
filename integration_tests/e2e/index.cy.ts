@@ -35,7 +35,6 @@ context('Index', () => {
       indexPage.cards.viewLocations().contains('View and update locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
-      indexPage.cards.locationHistory().contains('Residential location history')
     })
   })
 })
