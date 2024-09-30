@@ -1,7 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
-import fields from '../../routes/changeNonResidentialType/fields'
 
 export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
   middlewareSetup() {
@@ -34,12 +33,39 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { options, values } = req.form
-    const { items } = options.fields.convertedCellType
-    const convertedCellType = items.find(item => item.value === values.convertedCellType)
-    req.sessionModel.set('convertedCellType', convertedCellType)
-    req.sessionModel.set('otherConvertedCellType', values.otherConvertedCellType)
+    try {
+      const { user } = res.locals
+      const { locationsService } = req.services
+      const token = await req.services.authService.getSystemClientToken(user.username)
 
-    next()
+      const { options, values } = req.form
+
+      const { items } = options.fields.convertedCellType
+      const found = items.find(item => item.value === values.convertedCellType)
+      const convertedCellType: string = found ? String(found.value) : ''
+      await locationsService.changeNonResType(token, res.locals.location.id, convertedCellType)
+
+      req.sessionModel.set('convertedCellType', convertedCellType)
+      req.sessionModel.set('otherConvertedCellType', values.otherConvertedCellType)
+
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { id: locationId, prisonId, localName, pathHierarchy } = res.locals.location
+    const locationName = localName || pathHierarchy
+
+    req.journeyModel.reset()
+    req.sessionModel.reset()
+
+    req.flash('success', {
+      title: 'changed non residential type',
+      content: `You have changed non residential type for ${locationName}.`,
+    })
+
+    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
   }
 }

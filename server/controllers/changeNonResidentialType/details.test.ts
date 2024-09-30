@@ -166,30 +166,13 @@ describe('ChangeNonResidentialTypeDetails', () => {
   })
 
   describe('saveValues', () => {
-    beforeEach(() => {
-      req.form.options.fields.convertedCellType.items = [
-        { text: 'Kitchen / Servery', value: 'KITCHEN_SERVERY' },
-        { text: 'Office', value: 'OFFICE' },
-        {
-          conditional: 'otherConvertedCellType',
-          text: 'Other',
-          value: 'OTHER',
-        },
-      ]
-      controller.saveValues(req, res, next)
-    })
-
-    it('sets the session model correctly', () => {
-      expect(req.sessionModel.set).toHaveBeenCalledWith('convertedCellType', {
-        conditional: 'otherConvertedCellType',
-        text: 'Other',
-        value: 'OTHER',
-      })
-      expect(req.sessionModel.set).toHaveBeenCalledWith('otherConvertedCellType', 'pet therapy room')
-    })
-
-    it('calls next', () => {
-      expect(next).toHaveBeenCalled()
+    it('saves the values via the locations API', async () => {
+      await controller.saveValues(req, res, next)
+      expect(locationsService.changeNonResType).toHaveBeenCalledWith(
+        'token',
+        '7e570000-0000-0000-0000-000000000001',
+        'OFFICE',
+      )
     })
   })
 })

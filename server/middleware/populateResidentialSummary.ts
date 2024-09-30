@@ -48,7 +48,7 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
 }
 
 function showChangeNonResLink(location: DecoratedLocation) {
-  return !location.leafLevel && location.active
+  return !location.isResidential
 }
 
 function nonResCellTypeRow(location: DecoratedLocation) {
