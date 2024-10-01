@@ -10,7 +10,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('convert_non_residential'),
-  populateLocation(),
+  populateLocation(true),
   populatePrisonersInLocation(),
   wizard(steps, fields, {
     name: 'non-residential-conversion',

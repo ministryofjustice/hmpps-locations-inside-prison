@@ -5,7 +5,6 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% set title = "Confirm conversion to non-residential room" %}
-{% set locationName = location.localName or location.pathHierarchy %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
@@ -20,7 +19,7 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
         <h1 class="govuk-heading-l">Confirm conversion to non-residential room</h1>
       </div>
     </div>

@@ -19,7 +19,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const { location } = res.locals
-      const { accommodationTypes, specialistCellTypes }: Location = location
+      const { accommodationTypes, specialistCellTypes }: Location = location.raw
       const occupants = res.locals.prisonerLocation?.prisoners || []
 
       const validationErrors: any = {}

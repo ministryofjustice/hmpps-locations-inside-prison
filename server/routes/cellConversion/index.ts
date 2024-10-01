@@ -9,7 +9,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('convert_non_residential'),
-  populateLocation(),
+  populateLocation(true),
   wizard(steps, fields, {
     name: 'cell-conversion',
     templatePath: 'pages/cellConversion',

@@ -9,7 +9,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('change_used_for'),
-  populateLocation(),
+  populateLocation(true),
   wizard(steps, fields, {
     name: 'change-used-for',
     templatePath: 'pages/changeUsedFor',
