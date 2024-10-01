@@ -8,7 +8,7 @@ export default class ReviewCellCapacity extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
-    this.use(populateLocation(true))
+    this.use(populateLocation({ decorate: true }))
   }
 
   getInitialValues(req: FormWizard.Request, res: Response) {

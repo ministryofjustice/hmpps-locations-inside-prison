@@ -9,7 +9,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('change_cell_capacity'),
-  populateLocation(true),
+  populateLocation({ decorate: true }),
   wizard(steps, fields, {
     name: 'change-cell-capacity',
     templatePath: 'pages/changeCellCapacity',

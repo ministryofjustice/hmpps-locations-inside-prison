@@ -10,7 +10,7 @@ export default class ConfirmRemoveCellType extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(getResidentialSummary)
-    this.use(populateLocation(true))
+    this.use(populateLocation({ decorate: true }))
   }
 
   locals(req: FormWizard.Request, res: Response): object {
