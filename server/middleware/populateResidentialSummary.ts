@@ -103,14 +103,20 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
     details.push(usedForRow(location, req))
   }
 
-  if (!location.leafLevel) {
-    details.push({
-      key: { text: 'Last updated' },
-      value: {
-        text: `${formatDaysAgo(location.lastModifiedDate)} by ${location.lastModifiedBy}`,
-      },
-    })
-  }
+  details.push({
+    key: { text: 'Last updated' },
+    value: {
+      text: `${formatDaysAgo(location.lastModifiedDate)} by ${location.lastModifiedBy}`,
+    },
+    actions: {
+      items: [
+        {
+          text: 'View history',
+          href: `/location-history/${location.id}`,
+        },
+      ],
+    },
+  })
 
   return details
 }

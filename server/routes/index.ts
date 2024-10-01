@@ -20,6 +20,7 @@ import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
 import viewLocationsRouter from './viewLocationsRouter'
 import changeUsedForRouter from './changeUsedFor'
+import locationHistoryRouter from './locationHistoryRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -40,6 +41,8 @@ export default function routes(services: Services): Router {
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
+
+  router.use('/location-history', locationHistoryRouter(services))
 
   router.use('/reactivate', reactivateRouter)
 
