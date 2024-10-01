@@ -19,7 +19,7 @@ const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
 
 router.use(
   protectRoute('deactivate_temporary'),
-  populateLocation(true),
+  populateLocation({ decorate: true }),
   checkSupportedLocationType,
   wizard(steps, fields, {
     name: 'deactivate-temporary',

@@ -99,8 +99,12 @@ export default class LocationsService {
     return this.locationsApiClient.locations.prison.getInactiveCells(token, { prisonId, parentLocationId: locationId })
   }
 
-  async getLocation(token: string, locationId: string) {
-    return this.locationsApiClient.locations.getLocation(token, { locationId })
+  async getLocation(token: string, locationId: string, includeHistory: boolean = false) {
+    const params = {
+      locationId,
+      includeHistory: includeHistory ? 'true' : 'false',
+    }
+    return this.locationsApiClient.locations.getLocation(token, params)
   }
 
   async getLocationType(token: string, key: string) {

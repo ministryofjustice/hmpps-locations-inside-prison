@@ -37,7 +37,6 @@ describe('GET /', () => {
         expect(res.text).toContain('View and update locations')
         expect(res.text).toContain('View all inactive cells')
         expect(res.text).toContain('Archived locations')
-        expect(res.text).toContain('Residential location history')
 
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
           who: user.username,

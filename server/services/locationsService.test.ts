@@ -123,10 +123,20 @@ describe('Locations service', () => {
   })
 
   describe('getLocation', () => {
-    it('calls the correct client function', async () => {
+    it('calls the correct client function when not including history', async () => {
       await locationsService.getLocation('token', '481fc587-60f8-402b-804d-64462babddcc')
 
       expect(locationsApiClient.locations.getLocation).toHaveBeenCalledWith('token', {
+        includeHistory: 'false',
+        locationId: '481fc587-60f8-402b-804d-64462babddcc',
+      })
+    })
+
+    it('calls the correct client function when including history', async () => {
+      await locationsService.getLocation('token', '481fc587-60f8-402b-804d-64462babddcc', true)
+
+      expect(locationsApiClient.locations.getLocation).toHaveBeenCalledWith('token', {
+        includeHistory: 'true',
         locationId: '481fc587-60f8-402b-804d-64462babddcc',
       })
     })

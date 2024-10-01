@@ -19,7 +19,7 @@ const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
 
 router.use(
   protectRoute('reactivate'),
-  populateLocation(true),
+  populateLocation({ decorate: true }),
   checkSupportedLocationType,
   wizard(steps, fields, {
     name: 'reactivate',

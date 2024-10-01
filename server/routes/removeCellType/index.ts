@@ -9,7 +9,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('set_cell_type'),
-  populateLocation(false),
+  populateLocation(),
   wizard(steps, fields, {
     name: 'remove-cell-type',
     templatePath: 'pages/removeCellType',

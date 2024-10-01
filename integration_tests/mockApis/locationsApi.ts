@@ -460,7 +460,7 @@ const stubLocations = (location: Location) =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/locations-api/locations/[\\w-]+',
+      urlPattern: '/locations-api/locations/[\\w-]+\\?includeHistory=(false|true)',
     },
     response: {
       status: 200,
