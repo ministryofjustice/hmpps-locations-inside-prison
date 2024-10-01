@@ -7,7 +7,7 @@ export default class CheckRemoveCellType extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
     // decorate the location now that the steps config has been processed
-    this.use(populateLocation(true))
+    this.use(populateLocation({ decorate: true }))
   }
 
   locals(req: FormWizard.Request, res: Response) {

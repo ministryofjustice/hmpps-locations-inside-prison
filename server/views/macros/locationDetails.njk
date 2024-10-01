@@ -2,46 +2,13 @@
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
 
 {% macro locationDetails(location, details, history) %}
-  {% set detailsHtml %}
-    <h3 class="govuk-heading-m">{{ location.locationType }} details</h3>
+  <h3 class="govuk-heading-m">{{ location.locationType }} details</h3>
 
-    {{ govukSummaryList({
-      rows: details,
-      attributes: {
-        "data-qa": "location-details"
-      }
-    }) }}
-  {% endset -%}
-
-  {% set historyHtml %}
-    <h3 class="govuk-heading-m">Recent history</h3>
-
-    <p>
-      There is no recent history for this location.
-    </p>
-  {% endset -%}
-
-  {% if not location.leafLevel %}
-    {{ govukTabs({
-      items: [
-        {
-          label: location.locationType + " details",
-          id: 'location-details',
-          panel: {
-          html: detailsHtml
-        }
-        },
-        {
-          label: "Recent history",
-          id: 'recent-history',
-          panel: {
-          html: historyHtml
-        }
-        }
-      ]
-    }) }}
-  {% else %}
-    {{ detailsHtml | safe }}
-    {{ historyHtml | safe }}
-  {% endif %}
+  {{ govukSummaryList({
+    rows: details,
+    attributes: {
+      "data-qa": "location-details"
+    },
+    classes: "govuk-!-margin-bottom-8"
+  }) }}
 {% endmacro %}
