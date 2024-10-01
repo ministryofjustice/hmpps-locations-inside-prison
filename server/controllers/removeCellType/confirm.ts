@@ -4,11 +4,13 @@ import { compact } from 'lodash'
 import backUrl from '../../utils/backUrl'
 import generateChangeSummary from '../../lib/generateChangeSummary'
 import getResidentialSummary from '../../middleware/getResidentialSummary'
+import populateLocation from '../../middleware/populateLocation'
 
 export default class ConfirmRemoveCellType extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(getResidentialSummary)
+    this.use(populateLocation({ decorate: true }))
   }
 
   locals(req: FormWizard.Request, res: Response): object {

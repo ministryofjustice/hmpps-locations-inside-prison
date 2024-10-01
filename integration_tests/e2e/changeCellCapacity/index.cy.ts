@@ -127,7 +127,7 @@ context('Change cell capacity', () => {
       ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
 
       cy.get('h1').contains('Change cell capacity')
-      cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+      cy.get('.govuk-caption-m').contains('1-1-001')
     })
 
     it('has a cancel link', () => {

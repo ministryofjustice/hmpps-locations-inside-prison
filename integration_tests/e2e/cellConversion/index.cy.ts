@@ -83,7 +83,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionAccommodationTypePage)
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('has a back link', () => {
@@ -145,7 +145,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionUsedForPage)
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('has a back link', () => {
@@ -226,7 +226,7 @@ context('Cell conversion', () => {
 
         it('has a caption showing the cell description', () => {
           Page.verifyOnPage(CellConversionSpecificCellTypePage)
-          cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+          cy.get('.govuk-caption-m').contains('1-1-001')
         })
 
         it('has a back link to the accommodation type page', () => {
@@ -284,7 +284,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionSetCellTypePage)
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('has a back link', () => {
@@ -402,7 +402,7 @@ context('Cell conversion', () => {
         it('has a caption showing the cell description', () => {
           Page.verifyOnPage(CellConversionSetCellCapacityPage)
 
-          cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+          cy.get('.govuk-caption-m').contains('1-1-001')
         })
 
         describe('validations', () => {

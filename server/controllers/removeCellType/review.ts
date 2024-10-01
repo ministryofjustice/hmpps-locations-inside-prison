@@ -2,11 +2,13 @@ import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
+import populateLocation from '../../middleware/populateLocation'
 
 export default class ReviewCellCapacity extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
+    this.use(populateLocation({ decorate: true }))
   }
 
   getInitialValues(req: FormWizard.Request, res: Response) {

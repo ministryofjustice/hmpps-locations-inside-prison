@@ -6,8 +6,6 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
 {% set title = 'Convert to cell' %}
-{% set locationName = location.localName or location.pathHierarchy %}
-
 {% block pageTitle %}{{ 'Is it a specific type of cell? - Convert to cell - ' + applicationName }}{% endblock %}
 
 {% block beforeContent %}
@@ -35,7 +33,7 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
         <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ title }}</h1>
       </div>
     </div>
