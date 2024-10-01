@@ -6,12 +6,11 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% set title = 'Convert to cell' %}
-{% set locationName = location.localName or location.pathHierarchy %}
 
 {% block pageTitle %}{{ 'What is the location used for? - Convert to cell - ' + applicationName }}{% endblock %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+  <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
   <h1 class="govuk-heading-l">{{ title }}</h1>
 {% endblock %}
 

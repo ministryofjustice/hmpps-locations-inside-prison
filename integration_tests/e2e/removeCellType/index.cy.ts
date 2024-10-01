@@ -180,7 +180,7 @@ context('Remove cell type', () => {
         Page.verifyOnPage(RemoveCellTypePage)
 
         cy.get('h1').contains('Are you sure you want to remove all of the specific cell types?')
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('has the correct main heading when only one cell type', () => {
@@ -278,7 +278,7 @@ context('Remove cell type', () => {
           Page.verifyOnPage(CheckRemoveCellTypePage)
 
           cy.get('h1').contains('Are you sure you want to remove all of the specific cell types?')
-          cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+          cy.get('.govuk-caption-m').contains('1-1-001')
         })
 
         it('has the correct main heading when only one cell type', () => {

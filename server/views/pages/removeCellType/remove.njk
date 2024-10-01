@@ -3,13 +3,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set title = pageTitleText %}
-{% set locationName = location.localName or location.pathHierarchy %}
 
 {% block heading %}
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
         <h1 class="govuk-heading-l">{{ pageTitleText }}</h1>
       </div>
     </div>

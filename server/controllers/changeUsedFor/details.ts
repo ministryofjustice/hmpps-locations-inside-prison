@@ -32,7 +32,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
       if (location.usedFor.length === 1) {
         fields.usedFor.items = fields.usedFor.items.map((item: FormWizard.Field) => ({
           ...item,
-          checked: location.usedFor.includes(item.value),
+          checked: location.raw.usedFor.includes(item.value),
         }))
       }
     }

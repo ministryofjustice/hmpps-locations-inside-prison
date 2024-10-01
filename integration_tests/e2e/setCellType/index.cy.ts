@@ -134,7 +134,7 @@ context('Set cell type', () => {
         Page.verifyOnPage(SetCellTypePage)
 
         cy.get('h1').contains('Set specific cell type')
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('can be accessed by clicking the set cell type link on the show location page', () => {
@@ -204,7 +204,7 @@ context('Set cell type', () => {
         Page.verifyOnPage(SetCellTypePage)
 
         cy.get('h1').contains('Change specific cell type')
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('can be accessed by clicking the change link on the show location page', () => {
@@ -233,8 +233,6 @@ context('Set cell type', () => {
       it('shows the correct validation error when nothing is selected', () => {
         SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
-
-        setCellTypePage.cellTypeCheckbox('BIOHAZARD_DIRTY_PROTEST').click()
         setCellTypePage.saveCellTypeButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')

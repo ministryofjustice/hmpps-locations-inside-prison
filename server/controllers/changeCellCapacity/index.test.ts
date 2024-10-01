@@ -36,6 +36,10 @@ describe('ChangeCellCapacity', () => {
             workingCapacity: 2,
           },
           prisonId: 'MDI',
+          raw: {
+            accommodationTypes: ['NORMAL_ACCOMMODATION'],
+            specialistCellTypes: [],
+          },
         },
         options: {
           fields,
@@ -61,8 +65,6 @@ describe('ChangeCellCapacity', () => {
   describe('validateFields', () => {
     it('does not allow zero working capacity for non-specialist cells', () => {
       req.form.values = { maxCapacity: '2', workingCapacity: '0' }
-      res.locals.location.accommodationTypes = ['NORMAL_ACCOMMODATION']
-      res.locals.location.specialistCellTypes = []
       const callback = jest.fn()
       controller.validateFields(req, res, callback)
 
