@@ -13,7 +13,23 @@ describe('ChangeNonResidentialTypeDetails', () => {
   let res: Response
   let next: NextFunction
   const authService = new AuthService(null) as jest.Mocked<AuthService>
-  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const locationsService = new LocationsService(undefined) as jest.Mocked<LocationsService>
+
+  const locationId = '7e570000-0000-0000-0000-000000000001'
+  const nonResTypes = [
+    {
+      key: 'KITCHEN_SERVERY',
+      description: 'Kitchen / Servery',
+    },
+    {
+      key: 'OFFICE',
+      description: 'Office',
+    },
+    {
+      key: 'OTHER',
+      description: 'Other',
+    },
+  ]
 
   beforeEach(() => {
     req = {
@@ -23,30 +39,59 @@ describe('ChangeNonResidentialTypeDetails', () => {
           fields,
         },
         values: {
-          convertedCellType: 'OTHER',
+          convertedCellType: 'OFFICE',
           otherConvertedCellType: 'pet therapy room',
         },
+      },
+      journeyModel: {
+        reset: jest.fn(),
       },
       services: {
         authService,
         locationsService,
       },
       sessionModel: {
+        reset: jest.fn(),
         set: jest.fn(),
         get: jest.fn(
           (fieldName?: string) =>
             ({
-              convertedCellType: { text: 'Treatment room', value: 'TREATMENT_ROOM' },
+              convertedCellType: { text: 'office', value: 'OFFICE' },
               otherConvertedCellType: 'pet therapy room',
             })[fieldName],
         ),
       },
     } as unknown as typeof req
     res = {
+      services: {
+        authService: {
+          getSystemClientToken: jest.fn().mockResolvedValue('token'),
+        },
+        locationsService: {
+          changeNonResType: jest.fn().mockResolvedValue(undefined), // Mocked locations service
+        },
+      },
+      form: {
+        options: {
+          fields: {
+            convertedCellType: {
+              items: [
+                { text: 'office', value: 'OFFICE' }, // Matching value to be found
+                { text: 'pet therapy room', value: 'PET_THERAPY' },
+              ],
+            },
+          },
+        },
+        values: {
+          convertedCellType: 'OFFICE', // Mock the form value correctly
+          otherConvertedCellType: 'pet therapy room',
+        },
+      },
+
       locals: {
         errorlist: [],
         location: LocationFactory.build({
-          id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+          id: locationId,
           localName: 'A-1-001',
           capacity: {
             maxCapacity: 2,
@@ -62,8 +107,8 @@ describe('ChangeNonResidentialTypeDetails', () => {
         },
         values: {
           convertedCellType: {
-            text: 'Treatment room',
-            value: 'TREATMENT_ROOM',
+            text: 'office',
+            value: 'OFFICE',
           },
           otherConvertedCellType: 'pet therapy room',
         },
@@ -73,20 +118,8 @@ describe('ChangeNonResidentialTypeDetails', () => {
     next = jest.fn()
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
-    locationsService.getConvertedCellTypes = jest.fn().mockResolvedValue([
-      {
-        key: 'KITCHEN_SERVERY',
-        description: 'Kitchen / Servery',
-      },
-      {
-        key: 'OFFICE',
-        description: 'Office',
-      },
-      {
-        key: 'OTHER',
-        description: 'Other',
-      },
-    ])
+    locationsService.getConvertedCellTypes = jest.fn().mockResolvedValue(nonResTypes)
+    locationsService.changeNonResType = jest.fn()
   })
 
   describe('setOptions', () => {
@@ -96,8 +129,8 @@ describe('ChangeNonResidentialTypeDetails', () => {
 
     it('sets the correct radio items', () => {
       expect(req.form.options.fields.convertedCellType.items).toEqual([
-        { text: 'Kitchen / Servery', value: 'KITCHEN_SERVERY' },
-        { text: 'Office', value: 'OFFICE' },
+        { text: 'Kitchen / Servery', value: 'KITCHEN_SERVERY', conditional: undefined },
+        { text: 'Office', value: 'OFFICE', conditional: undefined },
         {
           text: 'Other',
           value: 'OTHER',
@@ -115,7 +148,8 @@ describe('ChangeNonResidentialTypeDetails', () => {
   describe('locals', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(req, res)).toEqual({
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        backLink: `/view-and-update-locations/TST/${locationId}`,
+        cancelLink: `/view-and-update-locations/TST/${locationId}`,
         fields: {
           convertedCellType: {
             component: 'govukRadios',
@@ -131,10 +165,12 @@ describe('ChangeNonResidentialTypeDetails', () => {
             id: 'convertedCellType',
             items: [
               {
+                conditional: undefined,
                 text: 'Kitchen / Servery',
                 value: 'KITCHEN_SERVERY',
               },
               {
+                conditional: undefined,
                 text: 'Office',
                 value: 'OFFICE',
               },
@@ -146,7 +182,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
             ],
             name: 'convertedCellType',
             validate: ['required'],
-            value: 'TREATMENT_ROOM',
+            value: 'OFFICE',
           },
           otherConvertedCellType: {
             autocomplete: 'off',
@@ -168,11 +204,32 @@ describe('ChangeNonResidentialTypeDetails', () => {
   describe('saveValues', () => {
     it('saves the values via the locations API', async () => {
       await controller.saveValues(req, res, next)
-      expect(locationsService.changeNonResType).toHaveBeenCalledWith(
-        'token',
-        '7e570000-0000-0000-0000-000000000001',
-        'OFFICE',
-      )
+      expect(locationsService.changeNonResType).toHaveBeenCalledWith('token', locationId, 'OFFICE')
+    })
+  })
+
+  describe('successHandler', () => {
+    beforeEach(() => {
+      controller.successHandler(req, res, next)
+    })
+
+    it('resets the journey model', () => {
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+    })
+
+    it('resets the session model', () => {
+      expect(req.sessionModel.reset).toHaveBeenCalled()
+    })
+
+    it('sets the flash correctly', () => {
+      expect(req.flash).toHaveBeenCalledWith('success', {
+        content: `You have changed non residential type for A-1-001.`,
+        title: 'changed non residential type',
+      })
+    })
+
+    it('redirects to the view location page', () => {
+      expect(res.redirect).toHaveBeenCalledWith(`/view-and-update-locations/TST/${locationId}`)
     })
   })
 })

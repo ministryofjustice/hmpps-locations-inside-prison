@@ -25,10 +25,12 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId } = location
+    const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
     return {
       ...locals,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      backLink: cancelLink,
+      cancelLink,
     }
   }
 

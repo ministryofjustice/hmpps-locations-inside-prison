@@ -52,12 +52,10 @@ function showChangeNonResLink(location: DecoratedLocation) {
 }
 
 function nonResCellTypeRow(location: DecoratedLocation) {
-  const changeNonResTypeUrl = `/location/${location.id}/update-non-res-cell`
-
+  const changeNonResTypeUrl = `/location/${location.id}/change-non-residential-type`
   const { convertedCellType, otherConvertedCellType } = location
   const text = otherConvertedCellType?.length ? `${convertedCellType} - ${otherConvertedCellType}` : convertedCellType
-
-  const row: any = { key: { text: 'Used for' } }
+  const row: any = { key: { text: 'Non-residential room' }, value: { text } }
 
   if (showChangeNonResLink(location)) {
     row.actions = {
@@ -69,10 +67,8 @@ function nonResCellTypeRow(location: DecoratedLocation) {
       ],
     }
   }
-  return {
-    key: { text: 'Non-residential room' },
-    value: { text },
-  }
+
+  return row
 }
 
 function getLocationDetails(location: DecoratedLocation, req: Request) {
