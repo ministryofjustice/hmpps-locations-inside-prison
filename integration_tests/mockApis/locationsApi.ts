@@ -591,6 +591,21 @@ const stubLocationsDeactivateTemporary = () =>
     },
   })
 
+const stubLocationsChangeTemporaryDeactivationDetails = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/update/temporary-deactivation',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -619,4 +634,5 @@ export default {
   stubUpdateCapacity,
   stubUpdateSpecialistCellTypes,
   stubUpdateLocationsConstantsUsedForType,
+  stubLocationsChangeTemporaryDeactivationDetails,
 }

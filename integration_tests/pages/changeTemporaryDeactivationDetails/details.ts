@@ -1,6 +1,6 @@
 import Page, { PageElement } from '../page'
 
-export default class ChangeTemporaryDeactivationDetails extends Page {
+export default class ChangeTemporaryDeactivationsDetailsPage extends Page {
   constructor() {
     super('Deactivation details')
   }
