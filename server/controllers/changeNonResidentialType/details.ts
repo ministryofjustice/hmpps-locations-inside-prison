@@ -62,7 +62,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     req.sessionModel.reset()
 
     req.flash('success', {
-      title: 'changed non residential type',
+      title: 'Non-residential type Changed',
       content: `You have changed non residential type for ${locationName}.`,
     })
 
