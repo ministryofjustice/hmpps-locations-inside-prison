@@ -18,10 +18,5 @@ generic-service:
     ENVIRONMENT_NAME: DEV
     AUDIT_ENABLED: "false"
 
-  allowlist:
-    groups:
-      - digital_staff_and_mojo
-      - prisons
-
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
