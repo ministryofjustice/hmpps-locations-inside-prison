@@ -40,10 +40,14 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
       const { locationsService } = req.services
       const token = await req.services.authService.getSystemClientToken(user.username)
       const { options, values } = req.form
-      const { items } = options.fields.convertedCellType
-      const found = items.find(item => item.value === values.convertedCellType)
-      const convertedCellType: string = found ? String(found.value) : ''
-      await locationsService.changeNonResType(token, res.locals.location.id, convertedCellType)
+
+      await locationsService.changeNonResType(
+        token,
+        res.locals.location.id,
+        String(values.convertedCellType),
+        values.convertedCellType === 'OTHER' ? String(values.otherConvertedCellType) : undefined,
+      )
+
       next()
     } catch (error) {
       next(error)

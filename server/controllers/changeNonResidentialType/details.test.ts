@@ -204,7 +204,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
   describe('saveValues', () => {
     it('saves the values via the locations API', async () => {
       await controller.saveValues(req, res, next)
-      expect(locationsService.changeNonResType).toHaveBeenCalledWith('token', locationId, 'OFFICE')
+      expect(locationsService.changeNonResType).toHaveBeenCalledWith('token', locationId, 'OFFICE', undefined)
     })
   })
 
