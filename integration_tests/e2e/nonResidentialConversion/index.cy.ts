@@ -72,7 +72,7 @@ context('Non-residential conversion', () => {
     function itDisplaysTheCellOccupiedPage() {
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(NonResidentialConversionOccupiedPage)
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('shows the correct error message', () => {
@@ -177,7 +177,7 @@ context('Non-residential conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(NonResidentialConversionDetailsPage)
-        cy.get('.govuk-caption-m').contains('Cell 1-1-001')
+        cy.get('.govuk-caption-m').contains('1-1-001')
       })
 
       it('shows the correct radio buttons', () => {

@@ -12,10 +12,9 @@
 {% from "../../macros/miniSummary.njk" import miniSummary %}
 
 {% set title = pageTitleText %}
-{% set locationName = location.localName or location.pathHierarchy %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+  <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
   <h1 class="govuk-heading-l">{{ pageTitleText }}</h1>
 {% endblock %}
 

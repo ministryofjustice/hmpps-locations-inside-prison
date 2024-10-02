@@ -68,9 +68,13 @@ export default class CellConversionConfirm extends FormInitialStep {
   }
 
   locals(req: FormWizard.Request, res: Response): object {
+    const { sessionModel } = req
     const { location, maxCapacity, workingCapacity } = res.locals
     const { id: locationId, prisonId } = location
     const { accommodationType, residentialSummary, specialistCellTypes, usedForTypes } = res.locals
+
+    sessionModel.unset('previousCellTypes')
+    sessionModel.unset('previousAccommodationType')
 
     const editLink = (step: string) => `/location/${locationId}/cell-conversion/${step}/edit`
 

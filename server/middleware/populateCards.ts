@@ -25,13 +25,6 @@ export default function populateCards(): RequestHandler {
         description: 'View locations that have been permanently deactivated as residential locations.',
         'data-qa': 'archived-locations-card',
       },
-      {
-        clickable: true,
-        heading: 'Residential location history',
-        href: '/residential-location-history',
-        description: 'View the history of residential locations.',
-        'data-qa': 'location-history-card',
-      },
     ]
 
     next()

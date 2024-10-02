@@ -43,20 +43,25 @@ export default class FormInitialStep extends FormWizard.Controller {
     const errorMessageOverrides = field?.errorMessages || {}
 
     const errorMessages: Record<string, string> = {
-      dateInFuture: `${fieldName} must be in the future`,
-      dateInvalid: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
-      dateInvalidDay: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
-      dateInvalidMonth: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
-      dateInvalidYear: `${fieldName} must be a real date (TEMP COPY, from govuk)`,
-      dateMissingDay: `${fieldName} must include a day (TEMP COPY, from govuk)`,
-      dateMissingMonth: `${fieldName} must include a month (TEMP COPY, from govuk)`,
-      dateMissingYear: `${fieldName} must include a year (TEMP COPY, from govuk)`,
+      alphanumeric: `${fieldName} must not contain special characters`,
+      dateTodayOrInFuture: `${fieldName} must be today or in the future`,
+      dateInvalid: `${fieldName} must be a real date`,
+      dateInvalidDay: `${fieldName} must be a real date`,
+      dateInvalidMonth: `${fieldName} must be a real date`,
+      dateInvalidYear: `${fieldName} must be a real date`,
+      dateMissingDay: `${fieldName} must include a day`,
+      dateMissingDayAndMonth: `${fieldName} must include a day and month`,
+      dateMissingDayAndYear: `${fieldName} must include a day and year`,
+      dateMissingMonth: `${fieldName} must include a month`,
+      dateMissingMonthAndYear: `${fieldName} must include a month and year`,
+      dateMissingYear: `${fieldName} must include a year`,
       doesNotExceedEstMaxCap: `${fieldName} cannot be more than the establishment's maximum capacity`,
       doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
       lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo, fields)}`,
       maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
       minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
+      numericString: `${fieldName} must only include numbers`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName?.toLowerCase()}`,
@@ -131,28 +136,30 @@ export default class FormInitialStep extends FormWizard.Controller {
       .forEach(field => {
         const { value } = field
         const error = errorlist.find(e => e.key === field.id)
-        const errorFieldMatches = error?.type?.match(/Day|Month|Year$/)
-        const errorField = errorFieldMatches ? errorFieldMatches[0] : '*'
+        let errorFields = error?.type?.match(/(Day|Month|Year)/g)?.slice()
+        if (!errorFields) {
+          errorFields = ['*']
+        }
         const [year, month, day] = value ? (value as string).split('-') : []
 
         // eslint-disable-next-line no-param-reassign
         field.items = [
           {
-            classes: `govuk-input--width-2 ${error && ['*', 'Day'].includes(errorField) ? 'govuk-input--error' : ''}`,
+            classes: `govuk-input--width-2 ${error && ['*', 'Day'].filter(s => errorFields.includes(s)).length ? 'govuk-input--error' : ''}`,
             label: 'Day',
             id: `${field.id}-day`,
             name: `${field.id}-day`,
             value: day || '',
           },
           {
-            classes: `govuk-input--width-2 ${error && ['*', 'Month'].includes(errorField) ? 'govuk-input--error' : ''}`,
+            classes: `govuk-input--width-2 ${error && ['*', 'Month'].filter(s => errorFields.includes(s)).length ? 'govuk-input--error' : ''}`,
             label: 'Month',
             id: `${field.id}-month`,
             name: `${field.id}-month`,
             value: month || '',
           },
           {
-            classes: `govuk-input--width-4 ${error && ['*', 'Year'].includes(errorField) ? 'govuk-input--error' : ''}`,
+            classes: `govuk-input--width-4 ${error && ['*', 'Year'].filter(s => errorFields.includes(s)).length ? 'govuk-input--error' : ''}`,
             label: 'Year',
             id: `${field.id}-year`,
             name: `${field.id}-year`,

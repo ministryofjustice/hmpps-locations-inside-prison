@@ -15,6 +15,10 @@ function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
   return location.active && req.canAccess('set_cell_type')
 }
 
+function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
+  return !location.leafLevel && location.active && req.canAccess('change_used_for')
+}
+
 function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { specialistCellTypes } = location
   const setCellTypeUrl = `/location/${location.id}/set-cell-type`
@@ -45,6 +49,29 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
     }
   }
   return row
+}
+
+function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
+  const { usedFor } = location
+  const changeUsedForUrl = `/location/${location.id}/change-used-for`
+  const row: any = { key: { text: 'Used for' } }
+  if (usedFor.length) {
+    row.value = {
+      html: location.usedFor.join('<br>'),
+    }
+    if (showChangeUsedForLink(location, req)) {
+      row.actions = {
+        items: [
+          {
+            href: changeUsedForUrl,
+            text: 'Change',
+          },
+        ],
+      }
+    }
+    return row
+  }
+  return null
 }
 
 function showChangeNonResLink(location: DecoratedLocation) {
@@ -90,19 +117,23 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
       value: { html: location.accommodationTypes.join('<br>') },
     })
 
-    if (location.usedFor.length) {
-      details.push({ key: { text: 'Used for' }, value: { html: location.usedFor.join('<br>') } })
-    }
+    details.push(usedForRow(location, req))
   }
 
-  if (!location.leafLevel) {
-    details.push({
-      key: { text: 'Last updated' },
-      value: {
-        text: `${formatDaysAgo(location.lastModifiedDate)} by ${location.lastModifiedBy}`,
-      },
-    })
-  }
+  details.push({
+    key: { text: 'Last updated' },
+    value: {
+      text: `${formatDaysAgo(location.lastModifiedDate)} by ${location.lastModifiedBy}`,
+    },
+    actions: {
+      items: [
+        {
+          text: 'View history',
+          href: `/location-history/${location.id}`,
+        },
+      ],
+    },
+  })
 
   return details
 }

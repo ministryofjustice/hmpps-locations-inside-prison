@@ -9,7 +9,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('set_cell_type'),
-  populateLocation(),
+  populateLocation({ decorate: true }),
   wizard(steps, fields, {
     name: 'set-cell-type',
     templatePath: 'pages/setCellType',

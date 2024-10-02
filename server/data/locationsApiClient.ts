@@ -129,8 +129,9 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
-    getLocation: this.apiCall<Location, { locationId: string }>({
+    getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
+      queryParams: ['includeHistory'],
       requestType: 'get',
     }),
     getResidentialSummary: this.apiCall<ResidentialSummary, { prisonId: string; parentLocationId?: string }>({
@@ -155,6 +156,10 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     updateSpecialistCellTypes: this.apiCall<Location, { locationId: string }, string[]>({
       path: '/locations/:locationId/specialist-cell-types',
+      requestType: 'put',
+    }),
+    updateUsedForTypes: this.apiCall<Location, { locationId: string }, string[]>({
+      path: '/locations/:locationId/used-for-type',
       requestType: 'put',
     }),
     updateNonResCell: this.apiCall<

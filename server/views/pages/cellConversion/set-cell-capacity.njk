@@ -1,9 +1,10 @@
 {% extends "pages/changeCellCapacity/change.njk" %}
 
 {% set title = 'Set cell capacity' %}
-{% set locationName = location.localName or location.pathHierarchy %}
+
+{% block pageTitle %}{{ 'Set cell capacity - Convert to cell - ' + applicationName }}{% endblock %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ location.locationType | title }} {{ locationName }}</span>
+  <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
   <h1 class="govuk-heading-l">Set cell capacity</h1>
 {% endblock %}

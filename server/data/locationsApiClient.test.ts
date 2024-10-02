@@ -179,10 +179,10 @@ describe('locationsApiClient', () => {
     )
     testCall(
       'getLocation',
-      '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6',
+      '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6?includeHistory=false',
       false,
       () => apiClient.locations.getLocation,
-      { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+      { includeHistory: 'false', locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
     )
     testCall(
       'getResidentialSummary',
