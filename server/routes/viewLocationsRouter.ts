@@ -34,7 +34,7 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     })(req, res, null)
   }
 
-  if (req.canAccess('change_non_residential_type') && !isResidential && leafLevel) {
+  if (req.canAccess('change_non_residential_type') && !isResidential && locationType === 'ROOM') {
     addAction({
       text: `Change non-residential room type`,
       href: `/location/${location.id}/change-non-residential-type`,
