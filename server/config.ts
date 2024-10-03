@@ -48,6 +48,8 @@ const auditConfig = () => {
   }
 }
 
+const environmentName = get('ENVIRONMENT_NAME', '')
+
 export default {
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
@@ -121,7 +123,7 @@ export default {
   },
   dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
-  environmentName: get('ENVIRONMENT_NAME', ''),
+  environmentName,
   googleAnalytics: {
     measurementId: get('GOOGLE_ANALYTICS_MEASUREMENT_ID', ''),
     measurementApi: {
@@ -129,4 +131,6 @@ export default {
       url: 'https://www.google-analytics.com',
     },
   },
+  productionUrl: get('PRODUCTION_URL', '#'),
+  sandbox: environmentName === 'Training',
 }
