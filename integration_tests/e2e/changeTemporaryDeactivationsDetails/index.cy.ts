@@ -45,17 +45,41 @@ context('Change temporary deactivations details', () => {
       beforeEach(() => {
         locations = [
           LocationFactory.build({
-            id: '7e570000-0000-000b-0001-000000000001',
-            pathHierarchy: 'B-1-001',
-            localName: null,
-            code: '001',
-            inactiveCells: 1,
-            capacity: { maxCapacity: 3, workingCapacity: 1 },
+            id: '74a5ea0a-5457-4028-b5eb-0a32daf25546',
+            prisonId: 'TST',
+            code: '005',
+            pathHierarchy: 'A-1-001',
+            locationType: 'CELL',
+            permanentlyInactive: false,
+            capacity: {
+              maxCapacity: 2,
+              workingCapacity: 0,
+            },
+            oldWorkingCapacity: 0,
+            certification: {
+              certified: true,
+              capacityOfCertifiedCell: 2,
+            },
+            accommodationTypes: ['NORMAL_ACCOMMODATION'],
+            specialistCellTypes: [],
+            usedFor: ['STANDARD_ACCOMMODATION'],
             status: 'INACTIVE',
-            deactivatedReason: 'TEST1',
-            deactivationReasonDescription: 'TEST2',
-            proposedReactivationDate: new Date(2024, 1, 3).toISOString(),
-            planetFmReference: 'FM-1133',
+            active: false,
+            deactivatedByParent: false,
+            deactivatedDate: '2024-10-03T09:18:58',
+            deactivatedReason: 'OTHER',
+            deactivationReasonDescription: 'Broken door lock',
+            deactivatedBy: 'ITAG_USER',
+            proposedReactivationDate: '2024-11-22',
+            planetFmReference: '123005',
+            topLevelId: '5d597e0b-e350-40bc-bc05-2af159ffa15b',
+            level: 3,
+            leafLevel: true,
+            parentId: 'e53902e1-eab8-4eae-b30f-f6f835f06956',
+            lastModifiedBy: 'ITAG_USER',
+            lastModifiedDate: '2024-10-03T09:18:58',
+            key: 'LEI-A-1-005',
+            isResidential: true,
           }),
         ]
         cy.task('stubLocationsPrisonInactiveCells', locations)
@@ -67,7 +91,7 @@ context('Change temporary deactivations details', () => {
         indexPage.cards.inactiveCells().click()
         const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
-        const singleLocation = {
+        const wingLocation = {
           topLevelLocationType: 'Wings',
           locationHierarchy: [],
           parentLocation: {
@@ -106,56 +130,17 @@ context('Change temporary deactivations details', () => {
           },
           subLocations: [],
         }
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', singleLocation)
+        cy.task('stubLocationsLocationsResidentialSummaryForLocation', wingLocation)
         inactiveCellsIndexPage.getFirstRow().click()
 
         const residentialSummaryPage = Page.verifyOnPage(ResidentialSummaryPage)
-        cy.task('stubLocationsChangeTemporaryDeactivationDetails', singleLocation)
 
+        cy.task('stubLocationsChangeTemporaryDeactivationDetails')
         cy.task('stubPrisonerLocationsId', [])
-
-        const locationObj = {
-          id: '74a5ea0a-5457-4028-b5eb-0a32daf25546',
-          prisonId: 'TST',
-          code: '005',
-          pathHierarchy: 'A-1-001',
-          locationType: 'CELL',
-          permanentlyInactive: false,
-          capacity: {
-            maxCapacity: 2,
-            workingCapacity: 0,
-          },
-          oldWorkingCapacity: 0,
-          certification: {
-            certified: true,
-            capacityOfCertifiedCell: 2,
-          },
-          accommodationTypes: ['NORMAL_ACCOMMODATION'],
-          specialistCellTypes: [],
-          usedFor: ['STANDARD_ACCOMMODATION'],
-          status: 'INACTIVE',
-          active: false,
-          deactivatedByParent: false,
-          deactivatedDate: '2024-10-03T09:18:58',
-          deactivatedReason: 'TEST1',
-          deactivationReasonDescription: 'Bed bugs',
-          deactivatedBy: 'ITAG_USER',
-          proposedReactivationDate: '2024-11-22',
-          planetFmReference: '123005',
-          topLevelId: '5d597e0b-e350-40bc-bc05-2af159ffa15b',
-          level: 3,
-          leafLevel: true,
-          parentId: 'e53902e1-eab8-4eae-b30f-f6f835f06956',
-          lastModifiedBy: 'ITAG_USER',
-          lastModifiedDate: '2024-10-03T09:18:58',
-          key: 'LEI-A-1-005',
-          isResidential: true,
-        }
-
-        cy.task('stubLocations', locationObj)
+        cy.task('stubLocations', locations[0])
 
         residentialSummaryPage.inactiveBannerChangeLink().click()
-        // const changeTemporaryDeactivationDetailsPage = Page.verifyOnPage(ChangeTemporaryDeactivationDetailsPage)
+        const changeTemporaryDeactivationDetailsPage = Page.verifyOnPage(ChangeTemporaryDeactivationDetailsPage)
       })
     })
   })
