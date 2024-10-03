@@ -224,7 +224,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
     it('sets the flash correctly', () => {
       expect(req.flash).toHaveBeenCalledWith('success', {
         content: `You have changed non residential type for A-1-001.`,
-        title: 'Non-residential type Changed',
+        title: 'Non-residential room type changed',
       })
     })
 
