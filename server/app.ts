@@ -23,6 +23,7 @@ import setUpWebSession from './middleware/setUpWebSession'
 import routes from './routes'
 import type { Services } from './services'
 import setCanAccess from './middleware/setCanAccess'
+import config from './config'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -47,7 +48,10 @@ export default function createApp(services: Services): express.Application {
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
   app.use(setCanAccess())
-  app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
+
+  if (config.environmentName !== 'Training') {
+    app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
+  }
 
   app.use(routes(services))
 

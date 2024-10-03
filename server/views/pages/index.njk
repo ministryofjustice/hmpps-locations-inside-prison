@@ -10,6 +10,32 @@
   <script src="/assets/js/card.js"></script>
 {% endblock %}
 
+{% block topBannerContent %}
+  <div id="top-banner">
+    <div class="govuk-width-container">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+          <h1 class="govuk-heading-xl govuk-!-margin-top-5 govuk-!-margin-bottom-5">
+            Practice using Residential locations
+          </h1>
+          <p class="govuk-body govuk-!-margin-bottom-6">
+            Use this practice version of the service to explore and learn how to use it
+            <br>
+            without making real changes.
+          </p>
+          <a role="button" class="govuk-button govuk-button--inverse" href="{{ productionUrl }}">
+            Switch to the live service
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block heading %}
+  <h1 class="govuk-heading-l">{{ title }}{{ " (practice version)" if sandbox }}</h1>
+{% endblock %}
+
 {% block content %}
   <div class="body-tiles">
     <div class="govuk-width-container">
