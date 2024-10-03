@@ -59,8 +59,28 @@
 {% block bodyStart %}
 {% endblock %}
 
-
 {% block main %}
+  {% block topBanner %}
+    {% if sandbox %}
+      {% block topBannerContent %}
+        <div id="top-banner">
+          <div class="govuk-width-container">
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-three-quarters">
+                <h1 class="govuk-heading-l govuk-!-margin-top-5 govuk-!-margin-bottom-5">
+                  Residential locations (practice version)
+                </h1>
+                <a role="button" class="govuk-button govuk-button--inverse" href="{{ productionUrl }}">
+                  Switch to the live service
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endblock %}
+    {% endif %}
+  {% endblock %}
+
   {% block beforeContent %}
     <div class="govuk-width-container">
       {{ breadcrumb('', breadcrumbs, false) }}
@@ -79,6 +99,20 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  {% if sandbox %}
+    <div class="sticky-footer">
+      <h2 class="sticky-footer__heading">
+        Practice version
+      </h2>
+
+      <ul class="sticky-footer__items">
+        <li class="sticky-footer__item">
+          <a href="{{ productionUrl }}">Switch to live service</a>
+        </li>
+      </ul>
+    </div>
+  {% endif %}
+
   <script type="module" src="/assets/govukFrontendInit.js"></script>
   <script src="/assets/moj/all.js"></script>
   <script src="/assets/mojFrontendInit.js"></script>

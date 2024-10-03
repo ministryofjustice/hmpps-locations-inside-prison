@@ -16,13 +16,9 @@ generic-service:
     COMPONENT_API_URL: "http://not-used"
     DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-train.hmpps.service.justice.gov.uk"
-    ENVIRONMENT_NAME: TRAINING
+    ENVIRONMENT_NAME: Training
     AUDIT_ENABLED: "false"
-
-  allowlist:
-    groups:
-      - digital_staff_and_mojo
-      - prisons
+    PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
       
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev

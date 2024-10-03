@@ -94,3 +94,74 @@ h1 .govuk-caption-l {
     color: govuk-colour("white");
   }
 }
+
+#top-banner {
+  background-color: govuk-colour("purple");
+
+  h1, p {
+    color: govuk-colour("white");
+  }
+
+  .govuk-button--inverse {
+    box-shadow: 0 2px 0 #002c18;
+    color: govuk-colour("purple");
+  }
+}
+
+$sticky-footer-border-colour: govuk-colour("purple");
+$sticky-footer-background-colour: govuk-tint($sticky-footer-border-colour, 90);
+$sticky-footer-horizontal-spacing: govuk-spacing(3);
+$sticky-footer-vertical-spacing: govuk-spacing(2);
+
+.sticky-footer {
+  @include govuk-font($size: 16);
+  border-top: 2px solid $sticky-footer-border-colour;
+  background: $sticky-footer-background-colour;
+  bottom: 0;
+  left: 0;
+  padding: $sticky-footer-vertical-spacing $sticky-footer-horizontal-spacing;
+  position: fixed;
+  right: 0;
+
+  &__heading {
+    @include govuk-font($size: 16, $weight: bold);
+    background: $sticky-footer-background-colour;
+    border-right: 2px solid $sticky-footer-border-colour;
+    border-top: 2px solid $sticky-footer-border-colour;
+    left: 0;
+    margin: 0;
+    padding: govuk-spacing(2) $sticky-footer-horizontal-spacing govuk-spacing(1);
+    position: absolute;
+    top: -37px;
+  }
+
+  &__items {
+    @include govuk-clearfix;
+    @include govuk-font($size: 16);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__item {
+    display: block;
+    float: left;
+    font-weight: bold;
+
+    & + & {
+      margin-left: govuk-spacing(4);
+    }
+
+    a {
+      font-weight: normal;
+    }
+
+    a:link,
+    a:hover,
+    a:active,
+    a:visited,
+    a:focus {
+      color: $govuk-text-colour;
+    }
+  }
+}

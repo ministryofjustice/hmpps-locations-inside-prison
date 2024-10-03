@@ -13,15 +13,22 @@ import capFirst from '../formatters/capFirst'
 
 const production = process.env.NODE_ENV === 'production'
 
+const ENV_TAG_COLOURS: Record<string, string> = {
+  'PRE-PRODUCTION': 'govuk-tag--green',
+  Training: 'govuk-tag--purple',
+}
+
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
   app.locals.applicationName = 'Residential locations'
   app.locals.environmentName = config.environmentName
-  app.locals.environmentNameColour = config.environmentName === 'PRE-PRODUCTION' ? 'govuk-tag--green' : ''
+  app.locals.environmentNameColour = ENV_TAG_COLOURS[config.environmentName] || ''
+  app.locals.sandbox = config.sandbox
 
   app.locals.dpsUrl = config.dpsUrl
+  app.locals.productionUrl = config.productionUrl
 
   // Cachebusting version string
   if (production) {
