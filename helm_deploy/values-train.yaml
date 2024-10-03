@@ -18,6 +18,7 @@ generic-service:
     LOCATIONS_API_URL: "https://locations-inside-prison-api-train.hmpps.service.justice.gov.uk"
     ENVIRONMENT_NAME: Training
     AUDIT_ENABLED: "false"
+    PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
       
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
