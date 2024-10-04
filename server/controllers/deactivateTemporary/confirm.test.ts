@@ -1,13 +1,21 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import fields from '../../routes/deactivateTemporary/fields'
 import { Services } from '../../services'
 import DeactivateTemporaryConfirm from './confirm'
+import LocationsService from '../../services/locationsService'
+import AuthService from '../../services/authService'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('DeactivateTemporaryConfirm', () => {
   const controller = new DeactivateTemporaryConfirm({ route: '/' })
   let req: FormWizard.Request
   let res: Response
+  let next: NextFunction
+  const authService = new AuthService(null) as jest.Mocked<AuthService>
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
+
   let formValues: {
     deactivationReason: string
     estimatedReactivationDate: string
@@ -31,6 +39,11 @@ describe('DeactivateTemporaryConfirm', () => {
         },
         values: formValues,
       },
+      services: {
+        analyticsService,
+        authService,
+        locationsService,
+      },
       session: {
         referrerUrl: '/referrer-url',
       },
@@ -49,6 +62,7 @@ describe('DeactivateTemporaryConfirm', () => {
             maxCapacity: 2,
             workingCapacity: 2,
           },
+          locationType: 'CELL',
         },
         options: {
           fields,
@@ -66,6 +80,11 @@ describe('DeactivateTemporaryConfirm', () => {
       },
       redirect: jest.fn(),
     } as unknown as typeof res
+    next = jest.fn()
+
+    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
+    locationsService.deactivateTemporary = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('getCellCount', () => {
@@ -175,6 +194,37 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
       await controller._locals(req, res, callback)
 
       expect(res.locals.deactivationReason).toEqual('Translated reason')
+    })
+  })
+
+  describe('saveValues', () => {
+    it('calls locationsService', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
+        'token',
+        'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        'OTHER',
+        'Other',
+        '2030-04-20',
+        'PFMRN123',
+      )
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'deactivate_temp', {
+        prison_id: 'TST',
+        location_type: 'CELL',
+        deactivation_reason: 'OTHER',
+      })
+    })
+
+    it('calls next', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(next).toHaveBeenCalled()
     })
   })
 })

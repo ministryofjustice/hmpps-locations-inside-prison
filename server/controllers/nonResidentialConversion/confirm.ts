@@ -39,7 +39,7 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { location, user } = res.locals
       const { locationsService } = req.services
       const convertedCellType = req.sessionModel.get('convertedCellType') as { text: string; value: string }
       let otherConvertedCellType = req.sessionModel.get('otherConvertedCellType') as string
@@ -50,10 +50,15 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
       const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.convertCellToNonResCell(
         token,
-        res.locals.location.id,
+        location.id,
         convertedCellType?.value,
         otherConvertedCellType,
       )
+
+      req.services.analyticsService.sendEvent(req, 'convert_to_non_res', {
+        prison_id: location.prisonId,
+        converted_cell_type: convertedCellType.value,
+      })
 
       return next()
     } catch (error) {

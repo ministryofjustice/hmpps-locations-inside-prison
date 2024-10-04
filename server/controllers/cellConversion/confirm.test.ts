@@ -5,6 +5,7 @@ import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
 import CellConversionConfirm from './confirm'
 import fields from '../../routes/cellConversion/fields'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('CellConversionConfirm', () => {
   const controller = new CellConversionConfirm({ route: '/' })
@@ -16,6 +17,8 @@ describe('CellConversionConfirm', () => {
   let sessionModelUnset: jest.Mock
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
+
   const formValues: any = {
     accommodationType: 'NORMAL_ACCOMMODATION',
     maxCapacity: 2,
@@ -39,6 +42,7 @@ describe('CellConversionConfirm', () => {
         reset: jest.fn(),
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -97,6 +101,7 @@ describe('CellConversionConfirm', () => {
     locationsService.getSpecialistCellType = jest.fn().mockImplementation((_, key) => allSpecialistCellTypes[key])
     locationsService.getUsedForType = jest.fn().mockImplementation((_, key) => allUsedForTypes[key])
     locationsService.convertToCell = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('get', () => {
@@ -230,6 +235,15 @@ describe('CellConversionConfirm', () => {
     it('calls next when successful', async () => {
       await controller.saveValues(req, res, next)
       expect(next).toHaveBeenCalled()
+    })
+
+    it('sends an analytics event when successful', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'convert_to_cell', {
+        prison_id: 'TST',
+        accommodation_type: 'NORMAL_ACCOMMODATION',
+      })
     })
 
     it('calls next with any unexpected errors', async () => {
