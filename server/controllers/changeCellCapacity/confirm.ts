@@ -61,16 +61,18 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { location, user } = res.locals
       const { locationsService } = req.services
 
       const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.updateCapacity(
         token,
-        res.locals.location.id,
+        location.id,
         Number(req.sessionModel.get('maxCapacity')),
         Number(req.sessionModel.get('workingCapacity')),
       )
+
+      req.services.analyticsService.sendEvent(req, 'change_cell_capacity', { prison_id: location.prisonId })
 
       next()
     } catch (error) {

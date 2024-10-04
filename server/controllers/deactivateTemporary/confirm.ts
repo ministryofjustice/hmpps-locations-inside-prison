@@ -95,6 +95,12 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
         req.sessionModel.get('planetFmReference') as string,
       )
 
+      req.services.analyticsService.sendEvent(req, 'deactivate_temp', {
+        prison_id: location.prisonId,
+        location_type: location.locationType,
+        deactivation_reason: reason,
+      })
+
       next()
     } catch (error) {
       next(error)

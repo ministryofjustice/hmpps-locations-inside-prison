@@ -101,16 +101,18 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { prisonId, user } = res.locals
       const { locationsService } = req.services
       const { newSignedOperationalCapacity } = req.form.values
       const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.updateSignedOperationalCapacity(
         token,
-        res.locals.prisonId,
+        prisonId,
         Number(newSignedOperationalCapacity),
         user.username,
       )
+
+      req.services.analyticsService.sendEvent(req, 'change_signed_op_cap', { prison_id: prisonId })
 
       next()
     } catch (error) {

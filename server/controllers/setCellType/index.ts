@@ -61,13 +61,16 @@ export default class SetCellType extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { location, user } = res.locals
       const { locationsService } = req.services
 
       const token = await req.services.authService.getSystemClientToken(user.username)
 
       const cellTypes = req.form.values.specialistCellTypes as string[]
       await locationsService.updateSpecialistCellTypes(token, res.locals.location.id, cellTypes)
+
+      const eventName = location.specialistCellTypes?.length ? 'change_cell_type' : 'set_cell_type'
+      req.services.analyticsService.sendEvent(req, eventName, { prison_id: location.prisonId })
 
       next()
     } catch (error) {

@@ -50,11 +50,14 @@ export default class ChangeUsedForDetails extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { location, user } = res.locals
       const { locationsService } = req.services
       const token = await req.services.authService.getSystemClientToken(user.username)
       const usedFor = req.form.values.usedFor as string[]
-      await locationsService.updateUsedForTypes(token, res.locals.location.id, usedFor)
+      await locationsService.updateUsedForTypes(token, location.id, usedFor)
+
+      req.services.analyticsService.sendEvent(req, 'change_used_for', { prison_id: location.prisonId })
+
       next()
     } catch (error) {
       next(error)

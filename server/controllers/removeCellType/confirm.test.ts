@@ -4,6 +4,7 @@ import ConfirmRemoveCellType from './confirm'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('ConfirmRemoveCellType', () => {
   const controller = new ConfirmRemoveCellType({ route: '/' })
@@ -12,6 +13,7 @@ describe('ConfirmRemoveCellType', () => {
   let next: NextFunction
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
     req = {
@@ -20,6 +22,7 @@ describe('ConfirmRemoveCellType', () => {
         reset: jest.fn(),
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -57,6 +60,7 @@ describe('ConfirmRemoveCellType', () => {
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.updateSpecialistCellTypes = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('locals', () => {
@@ -94,6 +98,12 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
           args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', []],
         },
       ])
+    })
+
+    it('sends an analytics event when successful', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'remove_cell_type', { prison_id: 'TST' })
     })
 
     it('calls next when successful', async () => {
