@@ -1,12 +1,19 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import ChangeSignedOperationalCapacity from './index'
 import fields from '../../routes/changeSignedOperationalCapacity/fields'
+import LocationsService from '../../services/locationsService'
+import AuthService from '../../services/authService'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('ChangeSignedOperationalCapacity', () => {
   const controller = new ChangeSignedOperationalCapacity({ route: '/' })
   let req: FormWizard.Request
   let res: Response
+  let next: NextFunction
+  const authService = new AuthService(null) as jest.Mocked<AuthService>
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
     req = {
@@ -18,6 +25,11 @@ describe('ChangeSignedOperationalCapacity', () => {
           newSignedOperationalCapacity: 14,
           prisonGovernorApproval: true,
         },
+      },
+      services: {
+        analyticsService,
+        authService,
+        locationsService,
       },
       session: {
         referrerUrl: '/referrer-url',
@@ -35,9 +47,17 @@ describe('ChangeSignedOperationalCapacity', () => {
         options: {
           fields,
         },
+        user: {
+          username: 'HSLUGHORN',
+        },
       },
       redirect: jest.fn(),
     } as unknown as typeof res
+    next = jest.fn()
+
+    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
+    locationsService.updateSignedOperationalCapacity = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('validateFields', () => {
@@ -64,6 +84,31 @@ describe('ChangeSignedOperationalCapacity', () => {
       controller.validate(req, res, jest.fn())
 
       expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST')
+    })
+  })
+
+  describe('saveValues', () => {
+    it('calls locationsService', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(locationsService.updateSignedOperationalCapacity).toHaveBeenCalledWith(
+        'token',
+        res.locals.prisonId,
+        req.form.values.newSignedOperationalCapacity,
+        res.locals.user.username,
+      )
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_signed_op_cap', { prison_id: 'TST' })
+    })
+
+    it('calls next', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(next).toHaveBeenCalled()
     })
   })
 })

@@ -5,6 +5,7 @@ import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/nonResidentialConversion/fields'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('NonResidentialConversionConfirm', () => {
   const controller = new NonResidentialConversionConfirm({ route: '/' })
@@ -13,6 +14,7 @@ describe('NonResidentialConversionConfirm', () => {
   let next: NextFunction
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
     req = {
@@ -24,6 +26,7 @@ describe('NonResidentialConversionConfirm', () => {
         reset: jest.fn(),
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -79,6 +82,7 @@ describe('NonResidentialConversionConfirm', () => {
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.convertCellToNonResCell = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('locals', () => {
@@ -134,6 +138,15 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
     it('calls next when successful', async () => {
       await controller.saveValues(req, res, next)
       expect(next).toHaveBeenCalled()
+    })
+
+    it('sends an analytics event when successful', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'convert_to_non_res', {
+        prison_id: 'TST',
+        converted_cell_type: 'TREATMENT_ROOM',
+      })
     })
 
     it('sets the next step to the cell occupied page when cell is occupied error occurs', async () => {
