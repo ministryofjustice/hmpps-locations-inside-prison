@@ -36,11 +36,13 @@ export default class RemoveCellType extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { location, user } = res.locals
       const { locationsService } = req.services
 
       const token = await req.services.authService.getSystemClientToken(user.username)
-      await locationsService.updateSpecialistCellTypes(token, res.locals.location.id, [])
+      await locationsService.updateSpecialistCellTypes(token, location.id, [])
+
+      req.services.analyticsService.sendEvent(req, 'remove_cell_type', { prison_id: location.prisonId })
 
       next()
     } catch (error) {

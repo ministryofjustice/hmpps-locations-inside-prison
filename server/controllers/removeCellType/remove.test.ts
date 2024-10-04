@@ -5,6 +5,7 @@ import RemoveCellType from './remove'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('RemoveCellType', () => {
   const controller = new RemoveCellType({ route: '/' })
@@ -13,6 +14,7 @@ describe('RemoveCellType', () => {
   let next: NextFunction
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
     req = {
@@ -30,6 +32,7 @@ describe('RemoveCellType', () => {
         reset: jest.fn(),
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -54,6 +57,7 @@ describe('RemoveCellType', () => {
 
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.updateSpecialistCellTypes = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('locals', () => {
@@ -97,6 +101,12 @@ describe('RemoveCellType', () => {
     it('calls next when successful', async () => {
       await controller.saveValues(req, res, next)
       expect(next).toHaveBeenCalled()
+    })
+
+    it('sends an analytics event when successful', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'remove_cell_type', { prison_id: 'MDI' })
     })
 
     it('calls next with any errors', async () => {
