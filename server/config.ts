@@ -125,6 +125,7 @@ export default {
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName,
   googleAnalytics: {
+    containerId: get('GOOGLE_TAG_MANAGER_CONTAINER_ID', ''),
     measurementId: get('GOOGLE_ANALYTICS_MEASUREMENT_ID', ''),
     measurementApi: {
       secret: get('GOOGLE_ANALYTICS_MEASUREMENT_API_SECRET', ''),
