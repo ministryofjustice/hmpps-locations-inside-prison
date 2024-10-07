@@ -36,5 +36,14 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
     })
+
+    it('has a feedback banner', () => {
+      cy.signIn()
+      cy.get('.feedback-banner a:contains("Suggest an improvement or report a problem with this service")').should(
+        'have.attr',
+        'href',
+        'http://feedback-form',
+      )
+    })
   })
 })

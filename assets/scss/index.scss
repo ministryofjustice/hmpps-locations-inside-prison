@@ -11,5 +11,6 @@ $govuk-page-width: $moj-page-width;
 @import './components/header-bar';
 @import './components/mini-summary';
 @import './components/summary-card';
+@import './components/feedback-banner';
 @import './overrides/local';
 @import 'assets/scss/local';
