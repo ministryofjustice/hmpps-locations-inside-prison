@@ -32,8 +32,13 @@ context('View non-residential rooms', () => {
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubLocationsConstantsAccommodationType')
       cy.task('stubLocationsConstantsConvertedCellType')
+      cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsSpecialistCellType')
+      cy.task('stubLocationsConstantsUsedForType')
+
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
