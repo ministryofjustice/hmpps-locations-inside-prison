@@ -1,6 +1,6 @@
 import Page, { PageElement } from '../page'
 
-export default class NonResidentialConversionDetailsPage extends Page {
+export default class NonResidentialResidentialTypeChangePage extends Page {
   constructor() {
     super('Change non-residential room type')
   }

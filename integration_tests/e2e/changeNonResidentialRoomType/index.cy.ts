@@ -78,5 +78,24 @@ context('View non-residential rooms', () => {
       cy.get('.govuk-notification-banner__content h3').contains('Non-residential room type changed')
       cy.get('.govuk-notification-banner__content p').contains('You have changed non residential type for A-1-001')
     })
+
+    it('User can select other reason type', () => {
+      NonResidentialRoomPage.goTo(location.prisonId, location.id)
+      const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
+      nonResidentialRoomPage.changeLink().click()
+
+      const nonResidentialRoomTypeChangePage = Page.verifyOnPage(NonResidentialRoomTypeChangePage)
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('OTHER').click()
+      nonResidentialRoomTypeChangePage.otherFreeText().should('exist')
+      nonResidentialRoomTypeChangePage.otherFreeText().type('Some other type')
+
+      cy.task('stubLocationsLocationsNonResidentialSummaryForLocation')
+
+      nonResidentialRoomTypeChangePage.continueButton().click()
+      Page.verifyOnPage(NonResidentialRoomPageSuccess)
+      cy.get('#govuk-notification-banner-title').contains('Success')
+
+      cy.get(':nth-child(2) > .govuk-summary-list__value').contains('Some other type')
+    })
   })
 })
