@@ -2,6 +2,7 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import LocationFactory from '../../../server/testutils/factories/location'
 import NonResidentialRoomPage from '../../pages/nonResidentialRoom'
+import NonResidentialRoomPageSuccess from '../../pages/nonResidentialRoomSuccess'
 import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoomTypeChange'
 
 context('View non-residential rooms', () => {
@@ -31,16 +32,12 @@ context('View non-residential rooms', () => {
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
       cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
+      cy.task('stubLocationsUpdateNonResCell')
       cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
       cy.signIn()
     })
@@ -70,8 +67,11 @@ context('View non-residential rooms', () => {
       Page.verifyOnPage(NonResidentialRoomPage)
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').click()
 
-      // nonResidentialRoomTypeChangePage.continueButton().click()
-      // need to verify we are on next success page for 'non-residential room type changed'
+      nonResidentialRoomTypeChangePage.continueButton().click()
+      Page.verifyOnPage(NonResidentialRoomPageSuccess)
+      cy.get('#govuk-notification-banner-title').contains('Success')
+      cy.get('.govuk-notification-banner__content h3').contains('Non-residential room type changed')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed non residential type for A-1-001')
     })
   })
 })
