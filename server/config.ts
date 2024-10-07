@@ -134,4 +134,5 @@ export default {
   },
   productionUrl: get('PRODUCTION_URL', '#'),
   sandbox: environmentName === 'Training',
+  feedbackFormUrl: get('FEEDBACK_FORM_URL', ''),
 }

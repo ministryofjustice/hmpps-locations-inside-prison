@@ -3,6 +3,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% from "../macros/breadcrumb.njk" import breadcrumb %}
+{% from "../macros/feedbackBanner.njk" import feedbackBanner %}
 
 {% set pageTitle = title if title === applicationName else title + ' - ' + applicationName %}
 {% set mainClasses = "app-container govuk-body" %}
@@ -59,6 +60,14 @@
 {% endblock %}
 
 {% block footer %}
+  {% if feedbackFormUrl %}
+    {{
+      feedbackBanner({
+        feedbackBannerAdditionalClasses: feedbackBannerBackground,
+        feedbackFormUrl: feedbackFormUrl
+      })
+    }}
+  {% endif %}
   {% if feComponents.footer %}
     {{ feComponents.footer | safe }}
   {% else %}
