@@ -351,96 +351,6 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
     },
   })
 
-const stubLocationsLocationsNonResidentialSummaryForLocation = ({
-  parentLocation = {
-    id: '7e570000-0000-0000-0000-000000000001',
-    prisonId: 'TST',
-    code: '007',
-    pathHierarchy: 'A-1-007',
-    locationType: 'ROOM',
-    permanentlyInactive: false,
-    capacity: {
-      maxCapacity: 0,
-      workingCapacity: 0,
-    },
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
-    accommodationTypes: ['NORMAL_ACCOMMODATION'],
-    specialistCellTypes: [],
-    usedFor: [],
-    status: 'NON_RESIDENTIAL',
-    convertedCellType: 'OTHER',
-    otherConvertedCellType: 'Some other type',
-    active: true,
-    deactivatedByParent: false,
-    topLevelId: 'de1ec665-29ad-4154-a0ae-b47fa8e9e553',
-    level: 3,
-    leafLevel: true,
-    parentId: '026d204d-c249-41f2-b081-139ad884fbe8',
-    inactiveCells: 0,
-    numberOfCellLocations: 1,
-    lastModifiedBy: 'LOCATION_MAINTAIN',
-    lastModifiedDate: '2024-10-07T11:36:06',
-    key: 'TST-A-1-007',
-    isResidential: false,
-  },
-  subLocationName = 'Landings',
-  subLocations = [],
-  topLevelLocationType = 'Wings',
-  locationHierarchy = [
-    {
-      id: 'de1ec665-29ad-4154-a0ae-b47fa8e9e553',
-      prisonId: 'TST',
-      code: 'A',
-      type: 'WING',
-      pathHierarchy: 'A',
-      level: 1,
-    },
-    {
-      id: '026d204d-c249-41f2-b081-139ad884fbe8',
-      prisonId: 'TST',
-      code: '1',
-      type: 'LANDING',
-      pathHierarchy: 'A-1',
-      level: 2,
-    },
-    {
-      id: '7e570000-0000-0000-0000-000000000001',
-      prisonId: 'TST',
-      code: '007',
-      type: 'ROOM',
-      pathHierarchy: 'A-1-007',
-      level: 3,
-    },
-  ],
-  prisonSummary = {
-    workingCapacity: 8,
-    signedOperationalCapacity: 10,
-    maxCapacity: 9,
-  },
-} = {}) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/locations-api/locations/residential-summary/\\w+(\\?parentLocationId=[\\w-]+)?',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: {
-        parentLocation,
-        subLocationName,
-        subLocations,
-        topLevelLocationType,
-        locationHierarchy,
-        prisonSummary,
-      },
-    },
-  })
 const stubSignedOperationalCapacityGet = (
   returnData = {
     signedOperationCapacity: 200,
@@ -725,5 +635,4 @@ export default {
   stubUpdateSpecialistCellTypes,
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsUpdateNonResCell,
-  stubLocationsLocationsNonResidentialSummaryForLocation,
 }

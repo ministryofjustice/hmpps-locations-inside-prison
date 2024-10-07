@@ -25,6 +25,14 @@ context('View non-residential rooms', () => {
       localName: 'A-1-001',
       status: 'NON_RESIDENTIAL',
     })
+    const locationOther = LocationFactory.build({
+      isResidential: false,
+      leafLevel: true,
+      localName: 'A-1-001',
+      status: 'NON_RESIDENTIAL',
+      convertedCellType: 'OTHER',
+      otherConvertedCellType: 'Some other type',
+    })
 
     beforeEach(() => {
       cy.task('reset')
@@ -38,7 +46,6 @@ context('View non-residential rooms', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
-
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
@@ -52,9 +59,7 @@ context('View non-residential rooms', () => {
       const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
 
       cy.get('.govuk-heading-l').contains('A-1-001')
-
       nonResidentialRoomPage.changeLink().should('exist')
-
       nonResidentialRoomPage.changeLink().click()
 
       // check cancel link
@@ -89,13 +94,11 @@ context('View non-residential rooms', () => {
       nonResidentialRoomTypeChangePage.otherFreeText().should('exist')
       nonResidentialRoomTypeChangePage.otherFreeText().type('Some other type')
 
-      cy.task('stubLocationsLocationsNonResidentialSummaryForLocation')
-
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationOther })
       nonResidentialRoomTypeChangePage.continueButton().click()
       Page.verifyOnPage(NonResidentialRoomPageSuccess)
       cy.get('#govuk-notification-banner-title').contains('Success')
-
-      cy.get(':nth-child(2) > .govuk-summary-list__value').contains('Some other type')
+      cy.get('.govuk-summary-list__row').contains('Other - Some other type ')
     })
   })
 })
