@@ -5,6 +5,7 @@ import fields from '../../routes/setCellType/fields'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('SetCellType', () => {
   const controller = new SetCellType({ route: '/' })
@@ -13,6 +14,7 @@ describe('SetCellType', () => {
   let next: NextFunction
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   const allCellTypes = [
     {
@@ -46,6 +48,7 @@ describe('SetCellType', () => {
         reset: jest.fn(),
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -89,6 +92,7 @@ describe('SetCellType', () => {
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getSpecialistCellTypes = jest.fn().mockResolvedValue(allCellTypes)
     locationsService.updateSpecialistCellTypes = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('configure', () => {
@@ -165,6 +169,22 @@ describe('SetCellType', () => {
         '7e570000-0000-0000-0000-000000000001',
         ['CAT_A'],
       )
+    })
+
+    it('sends an analytics event when setting cell type', async () => {
+      res.locals.location.specialistCellTypes = []
+
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'set_cell_type', { prison_id: 'TST' })
+    })
+
+    it('sends an analytics event when changing cell type', async () => {
+      res.locals.location.specialistCellTypes = ['EXISTING_TYPE']
+
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_cell_type', { prison_id: 'TST' })
     })
   })
 

@@ -107,19 +107,30 @@ export default class CellConversionConfirm extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
-      const { locationsService } = req.services
+      const { location, user } = res.locals
+      const { services, sessionModel } = req
+      const { locationsService } = services
+      const accommodationType = sessionModel.get<string>('accommodationType')
+      const specialistCellTypes = sessionModel.get<string[]>('specialistCellTypes')
+      const maxCapacity = sessionModel.get<number>('maxCapacity')
+      const workingCapacity = sessionModel.get<number>('workingCapacity')
+      const usedForTypes = sessionModel.get<string[]>('usedForTypes')
 
       const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.convertToCell(
         token,
         res.locals.location.id,
-        req.sessionModel.get('accommodationType'),
-        req.sessionModel.get('specialistCellTypes'),
-        req.sessionModel.get('maxCapacity'),
-        req.sessionModel.get('workingCapacity'),
-        req.sessionModel.get('usedForTypes'),
+        accommodationType,
+        specialistCellTypes,
+        maxCapacity,
+        workingCapacity,
+        usedForTypes,
       )
+
+      req.services.analyticsService.sendEvent(req, 'convert_to_cell', {
+        prison_id: location.prisonId,
+        accommodation_type: accommodationType,
+      })
 
       return next()
     } catch (error) {

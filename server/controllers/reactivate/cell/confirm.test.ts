@@ -1,13 +1,21 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import fields from '../../../routes/deactivateTemporary/fields'
 import { Services } from '../../../services'
 import ReactivateCellConfirm from './confirm'
+import LocationsService from '../../../services/locationsService'
+import AuthService from '../../../services/authService'
+import AnalyticsService from '../../../services/analyticsService'
 
 describe('ReactivateCellConfirm', () => {
   const controller = new ReactivateCellConfirm({ route: '/' })
   let req: FormWizard.Request
   let res: Response
+  let next: NextFunction
+  const authService = new AuthService(null) as jest.Mocked<AuthService>
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
+
   let formValues: {
     maxCapacity: number
     workingCapacity: number
@@ -24,6 +32,11 @@ describe('ReactivateCellConfirm', () => {
           fields,
         },
         values: formValues,
+      },
+      services: {
+        analyticsService,
+        authService,
+        locationsService,
       },
       session: {
         referrerUrl: '/referrer-url',
@@ -60,6 +73,11 @@ describe('ReactivateCellConfirm', () => {
       },
       redirect: jest.fn(),
     } as unknown as typeof res
+    next = jest.fn()
+
+    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
+    locationsService.reactivateCell = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('getResidentialSummary', () => {
@@ -117,6 +135,26 @@ describe('ReactivateCellConfirm', () => {
         cancelLink: `/view-and-update-locations/${res.locals.location.prisonId}/${res.locals.location.id}`,
         changeSummary: `The establishment's total working capacity will increase from 20 to 21.\n<br/><br/>\nThe establishment's total maximum capacity will increase from 30 to 31.`,
       })
+    })
+  })
+
+  describe('saveValues', () => {
+    it('calls locationsService', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(locationsService.reactivateCell).toHaveBeenCalledWith('token', res.locals.location.id, formValues)
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'reactivate_cell', { prison_id: 'TST' })
+    })
+
+    it('calls next', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(next).toHaveBeenCalled()
     })
   })
 })

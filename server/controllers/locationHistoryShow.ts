@@ -11,7 +11,8 @@ export default ({ authService, manageUsersService }: Services) =>
 
     const tableRows = await Promise.all(
       changeHistory.map(async ({ amendedBy, amendedDate, attribute, newValue, oldValue }) => {
-        const { name } = await manageUsersService.getUser(token, amendedBy)
+        const user = await manageUsersService.getUser(token, amendedBy)
+        const name = user?.name || 'Unknown'
 
         return [
           { text: attribute },

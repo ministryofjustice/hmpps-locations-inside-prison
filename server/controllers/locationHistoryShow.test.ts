@@ -55,4 +55,21 @@ describe('view locations show', () => {
       ],
     })
   })
+
+  describe('when the user is not found', () => {
+    beforeEach(() => {
+      manageUsersService.getUser = jest.fn().mockResolvedValue(null)
+    })
+
+    it('renders the page', async () => {
+      await controller(req, res)
+
+      expect(res.render).toHaveBeenCalledWith('pages/locationHistory/show', {
+        backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        tableRows: [
+          [{ text: 'Location Type' }, { text: 'CELL' }, { text: 'WING' }, { text: 'Unknown' }, { text: '05/07/2021' }],
+        ],
+      })
+    })
+  })
 })
