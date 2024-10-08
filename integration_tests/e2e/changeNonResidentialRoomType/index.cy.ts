@@ -2,8 +2,8 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import LocationFactory from '../../../server/testutils/factories/location'
 import NonResidentialRoomPage from '../../pages/nonResidentialRoom'
-import NonResidentialRoomPageSuccess from '../../pages/nonResidentialRoomSuccess'
-import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoomTypeChange'
+import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoom/setNonResidentialChangeType'
+import NonResidentialRoomPageSuccess from '../../pages/nonResidentialRoom/indexSuccess'
 
 context('View non-residential rooms', () => {
   context('When user does not have the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
