@@ -25,7 +25,7 @@ export default class ChangeTemporaryDeactivationsDetailsPage extends Page {
 
   planetFmReferenceText = (): PageElement => cy.get('#planetFmReference')
 
-  continueButton = (): PageElement => cy.get('button:contains("Update deactivation details")')
+  updateButton = (): PageElement => cy.get('button:contains("Update deactivation details")')
 
   backLink = (): PageElement => cy.get('.govuk-back-link')
 
