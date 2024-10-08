@@ -99,12 +99,13 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
       const { deactivationReason, estimatedReactivationDate, planetFmReference } = req.form.values
 
       const token = await req.services.authService.getSystemClientToken(user.username)
-
+      const deactivationReasonDesc = `deactivationReason${deactivationReason === 'OTHER' ? 'Other' : `Description-${deactivationReason}`}`
       const submittedValues = {
         deactivationReason: deactivationReason as string,
-        [`deactivationReasonDescription-${deactivationReason}`]: req.form.values[
+        [deactivationReasonDesc]: req.form.values[
           `deactivationReason${deactivationReason === 'OTHER' ? 'Other' : 'Description'}`
         ] as string,
+
         estimatedReactivationDate: estimatedReactivationDate as string,
         planetFmReference: planetFmReference as string,
       }
@@ -120,7 +121,7 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
           token,
           location.id,
           submittedValues.deactivationReason,
-          submittedValues[`deactivationReasonDescription-${deactivationReason}`],
+          submittedValues[deactivationReasonDesc],
           submittedValues.estimatedReactivationDate,
           submittedValues.planetFmReference,
         )

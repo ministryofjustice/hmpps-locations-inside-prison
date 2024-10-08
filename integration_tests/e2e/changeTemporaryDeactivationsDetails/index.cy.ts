@@ -166,6 +166,16 @@ context('Change temporary deactivations details', () => {
           ).contains('You have updated the deactivation details for this location.')
           cy.get('.govuk-button').contains('Activate cell')
         })
+
+        it('does not display the sucess notification banner with the expected elements when a change is made in the details page', () => {
+          Page.verifyOnPage(ChangeTemporaryDeactivationDetailsPage)
+          cy.get('button:contains("Update deactivation details")').click()
+          Page.verifyOnPage(ViewLocationsShowPage)
+
+          cy.get(':nth-child(5) > .govuk-grid-row > .govuk-grid-column-three-quarters > .govuk-notification-banner')
+            .contains('Success')
+            .should('not.exist')
+        })
       })
     })
   })
