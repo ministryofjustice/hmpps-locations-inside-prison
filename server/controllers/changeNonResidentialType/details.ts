@@ -63,7 +63,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
 
     req.flash('success', {
       title: 'Non-residential room type changed',
-      content: `You have changed non residential type for ${locationName}.`,
+      content: `You have changed the room type for ${locationName}.`,
     })
 
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
