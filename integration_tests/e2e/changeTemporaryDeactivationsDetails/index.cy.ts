@@ -145,12 +145,22 @@ context('Change temporary deactivations details', () => {
       })
 
       describe('view location page', () => {
+        it('does not display the sucess notification banner with the expected elements when a change is made in the details page', () => {
+          Page.verifyOnPage(ChangeTemporaryDeactivationDetailsPage)
+          cy.get('button:contains("Update deactivation details")').click()
+          Page.verifyOnPage(ViewLocationsShowPage)
+
+          cy.get(
+            ':nth-child(5) > .govuk-grid-row > .govuk-grid-column-three-quarters > .govuk-notification-banner',
+          ).should('not.exist')
+        })
+
         it('displays the sucess notification banner with the expected elements when a change is made in the details page', () => {
           const detailsPage = Page.verifyOnPage(ChangeTemporaryDeactivationDetailsPage)
           detailsPage.reasonRadioItem('OTHER').click()
 
           cy.get('#deactivationReasonOther').clear()
-          cy.get('#deactivationReasonOther').type('a')
+          cy.get('#deactivationReasonOther').type('A reason')
           cy.get('button:contains("Update deactivation details")').click()
 
           Page.verifyOnPage(ViewLocationsShowPage)
@@ -165,16 +175,6 @@ context('Change temporary deactivations details', () => {
             ':nth-child(5) > .govuk-grid-row > .govuk-grid-column-three-quarters > .govuk-notification-banner',
           ).contains('You have updated the deactivation details for this location.')
           cy.get('.govuk-button').contains('Activate cell')
-        })
-
-        it('does not display the sucess notification banner with the expected elements when a change is made in the details page', () => {
-          Page.verifyOnPage(ChangeTemporaryDeactivationDetailsPage)
-          cy.get('button:contains("Update deactivation details")').click()
-          Page.verifyOnPage(ViewLocationsShowPage)
-
-          cy.get(':nth-child(5) > .govuk-grid-row > .govuk-grid-column-three-quarters > .govuk-notification-banner')
-            .contains('Success')
-            .should('not.exist')
         })
       })
     })
