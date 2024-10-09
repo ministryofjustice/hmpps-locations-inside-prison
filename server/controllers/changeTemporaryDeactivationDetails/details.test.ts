@@ -4,7 +4,6 @@ import fields from '../../routes/deactivateTemporary/fields'
 import ChangeTemporaryDeactivationDetails from './details'
 import { Services } from '../../services'
 import LocationsService from '../../services/locationsService'
-import AuthService from '../../services/authService'
 
 describe('ChangeTemporaryDeactivationDetails', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
