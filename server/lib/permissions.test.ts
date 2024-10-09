@@ -19,8 +19,8 @@ describe('rolesToPermissions', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP']).sort()).toEqual([
       'change_cell_capacity',
       'change_signed_operational_capacity',
-      'change_used_for',
       'change_temporary_deactivation_details',
+      'change_used_for',
       'convert_non_residential',
       'deactivate_temporary',
       'reactivate',
