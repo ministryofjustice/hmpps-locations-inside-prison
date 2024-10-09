@@ -70,7 +70,7 @@
     }), row) %}
   {% endif %}
   {% set row = (row.push(
-    { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>" },
+    { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>", classes: 'govuk-table__header' },
     { text: cell.deactivatedReason },
     { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
     { text: cell.planetFmReference or 'Not provided' },
@@ -119,7 +119,6 @@
         attributes: {
           "data-qa": "inactive-cells-table"
         },
-        firstCellIsHeader: true,
         head: tableHead,
         rows: rows
       }) }}
