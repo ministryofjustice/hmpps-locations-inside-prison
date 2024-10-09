@@ -165,16 +165,19 @@ describe('ChangeNonResidentialTypeDetails', () => {
             id: 'convertedCellType',
             items: [
               {
+                checked: false,
                 conditional: undefined,
                 text: 'Kitchen / Servery',
                 value: 'KITCHEN_SERVERY',
               },
               {
+                checked: false,
                 conditional: undefined,
                 text: 'Office',
                 value: 'OFFICE',
               },
               {
+                checked: false,
                 conditional: 'otherConvertedCellType',
                 text: 'Other',
                 value: 'OTHER',

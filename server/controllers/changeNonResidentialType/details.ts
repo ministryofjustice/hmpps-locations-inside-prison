@@ -27,6 +27,15 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     const { id: locationId, prisonId } = location
     const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
+    const fields = { ...locals.fields }
+
+    const convertedCellTypes = location.raw?.convertedCellType || []
+
+    fields.convertedCellType.items = fields.convertedCellType.items.map((item: FormWizard.Field) => ({
+      ...item,
+      checked: convertedCellTypes.includes(item.value), // Use the new variable
+    }))
+
     return {
       ...locals,
       backLink: cancelLink,
