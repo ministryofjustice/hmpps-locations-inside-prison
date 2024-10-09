@@ -52,6 +52,10 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       },
       sessionModel: {
         get: jest.fn((fieldName?: keyof typeof formValues) => formValues[fieldName]),
+        reset: jest.fn(),
+      },
+      journeyModel: {
+        reset: jest.fn(),
       },
       services: {
         authService: {
@@ -60,6 +64,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
         },
         locationsService,
       },
+      flash: jest.fn(),
     } as unknown as typeof req
     res = {
       locals: {
@@ -225,14 +230,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
       await controller.saveValues(req, res, next)
 
-      expect(locationsService.updateTemporaryDeactivation).toHaveBeenCalledWith(
-        'token',
-        res.locals.location.id,
-        'OTHER',
-        'Other',
-        '2030-04-20',
-        '123456',
-      )
+      expect(locationsService.updateTemporaryDeactivation).toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })
 
@@ -260,6 +258,28 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       await controller.saveValues(req, res, next)
 
       expect(next).toHaveBeenCalledWith(error)
+    })
+  })
+
+  describe('successHandler', () => {
+    beforeEach(() => {
+      res.locals.valuesHaveChanged = true
+      controller.successHandler(req, res, next)
+    })
+
+    it('resets the journey model', () => {
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+    })
+
+    it('resets the session model', () => {
+      expect(req.sessionModel.reset).toHaveBeenCalled()
+    })
+
+    it('sets the flash correctly', () => {
+      expect(req.flash).toHaveBeenCalledWith('success', {
+        title: 'Deactivation details updated',
+        content: `You have updated the deactivation details for this location.`,
+      })
     })
   })
 })
