@@ -112,7 +112,7 @@
     "express-prom-bundle": "^7.0.0",
     "express-session": "^1.18.0",
     "govuk-frontend": "^5.6.0",
-    "helmet": "^7.2.0",
+    "helmet": "^8.0.0",
     "hmpo-form-wizard": "^13.0.2",
     "http-errors": "^2.0.0",
     "jquery": "^3.7.1",
