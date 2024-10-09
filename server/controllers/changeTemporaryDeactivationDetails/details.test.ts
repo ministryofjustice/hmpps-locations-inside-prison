@@ -1,13 +1,17 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import fields from '../../routes/deactivateTemporary/fields'
 import ChangeTemporaryDeactivationDetails from './details'
 import { Services } from '../../services'
+import LocationsService from '../../services/locationsService'
+import AuthService from '../../services/authService'
 
 describe('ChangeTemporaryDeactivationDetails', () => {
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const controller = new ChangeTemporaryDeactivationDetails({ route: '/' })
   let req: FormWizard.Request
   let res: Response
+  let next: NextFunction
   let formValues: {
     deactivationReason: string
     estimatedReactivationDate: string
@@ -22,7 +26,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       deactivationReasonDescription: 'Description',
       deactivationReasonOther: 'Other',
       estimatedReactivationDate: '2030-04-20',
-      planetFmReference: 'PFMRN123',
+      planetFmReference: '123456',
     }
 
     req = {
@@ -48,6 +52,13 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       },
       sessionModel: {
         get: jest.fn((fieldName?: keyof typeof formValues) => formValues[fieldName]),
+      },
+      services: {
+        authService: {
+          hmppsAuthClient: {},
+          getSystemClientToken: jest.fn().mockResolvedValue('token'),
+        },
+        locationsService,
       },
     } as unknown as typeof req
     res = {
@@ -78,6 +89,9 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       },
       redirect: jest.fn(),
     } as unknown as typeof res
+    next = jest.fn()
+
+    locationsService.updateTemporaryDeactivation = jest.fn()
   })
 
   describe('validateFields', () => {
@@ -198,6 +212,54 @@ describe('ChangeTemporaryDeactivationDetails', () => {
           name: 'deactivationReasonDescription-TEST2',
         },
       })
+    })
+  })
+
+  describe('saveValues', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('calls locationsService.updateTemporaryDeactivation with correct values if values have changed', async () => {
+      jest.spyOn(controller, 'getInitialValues').mockReturnValue(formValues)
+
+      await controller.saveValues(req, res, next)
+
+      expect(locationsService.updateTemporaryDeactivation).toHaveBeenCalledWith(
+        'token',
+        res.locals.location.id,
+        'OTHER',
+        'Other',
+        '2030-04-20',
+        '123456',
+      )
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('does not call locationsService.updateTemporaryDeactivation if values have not changed', async () => {
+      jest.spyOn(controller, 'getInitialValues').mockReturnValue({
+        deactivationReason: 'OTHER',
+        deactivationReasonOther: 'Other',
+        estimatedReactivationDate: '2030-04-20',
+        planetFmReference: '123456',
+      })
+
+      await controller.saveValues(req, res, next)
+
+      expect(locationsService.updateTemporaryDeactivation).not.toHaveBeenCalled()
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('calls next with an error if an error is thrown', async () => {
+      const error = new Error('Some error')
+
+      req.services.authService.getSystemClientToken = jest.fn().mockImplementation(() => {
+        throw error
+      })
+
+      await controller.saveValues(req, res, next)
+
+      expect(next).toHaveBeenCalledWith(error)
     })
   })
 })
