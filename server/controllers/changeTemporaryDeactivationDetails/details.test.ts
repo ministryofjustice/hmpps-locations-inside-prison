@@ -4,6 +4,7 @@ import fields from '../../routes/deactivateTemporary/fields'
 import ChangeTemporaryDeactivationDetails from './details'
 import { Services } from '../../services'
 import LocationsService from '../../services/locationsService'
+import AuthService from '../../services/authService'
 
 describe('ChangeTemporaryDeactivationDetails', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
@@ -229,7 +230,14 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
       await controller.saveValues(req, res, next)
 
-      expect(locationsService.updateTemporaryDeactivation).toHaveBeenCalled()
+      expect(locationsService.updateTemporaryDeactivation).toHaveBeenCalledWith(
+        'token',
+        res.locals.location.id,
+        'OTHER',
+        'Other',
+        '2030-04-20',
+        '123456',
+      )
       expect(next).toHaveBeenCalled()
     })
 
