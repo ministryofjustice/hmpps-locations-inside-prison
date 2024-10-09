@@ -180,6 +180,21 @@ export default class LocationsService {
     return this.locationsApiClient.locations.updateSpecialistCellTypes(token, { locationId }, cellTypes)
   }
 
+  async updateTemporaryDeactivation(
+    token: string,
+    locationId: string,
+    deactivationReason: string,
+    deactivationReasonDescription?: string,
+    proposedReactivationDate?: string,
+    planetFmReference?: string,
+  ) {
+    return this.locationsApiClient.locations.updateTemporaryDeactivation(
+      token,
+      { locationId },
+      { deactivationReason, deactivationReasonDescription, proposedReactivationDate, planetFmReference },
+    )
+  }
+
   async updateUsedForTypes(token: string, locationId: string, usedForType?: string[]) {
     return this.locationsApiClient.locations.updateUsedForTypes(token, { locationId }, usedForType)
   }

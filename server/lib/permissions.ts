@@ -16,6 +16,8 @@ const manageResLocationsOpCapPermissions: string[] = [
   'change_signed_operational_capacity',
   'deactivate_temporary',
   'change_used_for',
+  'change_temporary_deactivation_details',
+  'set_cell_type',
 ]
 
 const permissionsByRole: { [key: string]: string[] } = {
