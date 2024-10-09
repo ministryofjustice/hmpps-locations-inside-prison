@@ -74,17 +74,17 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
   return null
 }
 
-function showChangeNonResLink(location: DecoratedLocation) {
-  return !location.isResidential
+function showChangeNonResLink(location: DecoratedLocation, req: Request) {
+  return !location.isResidential && req.canAccess('change_non_residential_type')
 }
 
-function nonResCellTypeRow(location: DecoratedLocation) {
+function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
   const changeNonResTypeUrl = `/location/${location.id}/change-non-residential-type`
   const { convertedCellType, otherConvertedCellType } = location
   const text = otherConvertedCellType?.length ? `${convertedCellType} - ${otherConvertedCellType}` : convertedCellType
   const row: any = { key: { text: 'Non-residential room' }, value: { text } }
 
-  if (showChangeNonResLink(location)) {
+  if (showChangeNonResLink(location, req)) {
     row.actions = {
       items: [
         {
@@ -106,7 +106,7 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
   }
 
   if (location.status === 'NON_RESIDENTIAL') {
-    details.push(nonResCellTypeRow(location))
+    details.push(nonResCellTypeRow(location, req))
   } else {
     if (location.locationType === 'Cell') {
       details.push(cellTypesRow(location, req))
