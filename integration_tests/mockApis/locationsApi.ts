@@ -279,6 +279,7 @@ const stubLocationsLocationsResidentialSummary = (
       maxCapacity: 9,
     },
     subLocationName: 'TestWings',
+    active: true,
     subLocations: [
       LocationFactory.build(),
       LocationFactory.build({
@@ -486,6 +487,21 @@ const stubPrisonerLocationsId = (prisonerLocations: PrisonerLocation[]) =>
     },
   })
 
+const stubPrisonerLocations = (prisonerLocations: PrisonerLocation[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: prisonerLocations,
+    },
+  })
+
 const stubUpdateCapacity = () =>
   stubFor({
     request: {
@@ -591,6 +607,21 @@ const stubLocationsDeactivateTemporary = () =>
     },
   })
 
+const stubLocationsChangeTemporaryDeactivationDetails = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/update/temporary-deactivation',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -612,6 +643,7 @@ export default {
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
+  stubPrisonerLocations,
   stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,
   stubSignedOperationalCapacityGetNotFound,
@@ -619,4 +651,5 @@ export default {
   stubUpdateCapacity,
   stubUpdateSpecialistCellTypes,
   stubUpdateLocationsConstantsUsedForType,
+  stubLocationsChangeTemporaryDeactivationDetails,
 }

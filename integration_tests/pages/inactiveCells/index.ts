@@ -9,6 +9,8 @@ export default class InactiveCellsIndexPage extends Page {
 
   locationsTableRows = (): PageElement => this.locationsTable().find('tbody tr')
 
+  getFirstRow = (): PageElement => cy.get('[data-qa=inactive-cells-table] .govuk-table__header > a')
+
   locationsTableCells = (row: PageElement) => {
     const children = row.children()
 
