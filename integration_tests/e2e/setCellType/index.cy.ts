@@ -64,7 +64,7 @@ context('Set cell type', () => {
 
     function itBehavesLikeSetCellTypePage() {
       it('has a back link to the show location page', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
         setCellTypePage.backLink().click()
 
@@ -72,14 +72,14 @@ context('Set cell type', () => {
       })
 
       it('has the expected hint text', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         Page.verifyOnPage(SetCellTypePage)
 
         cy.get('#specialistCellTypes-hint').contains('Select all that apply.')
       })
 
       it('shows the correct checkbox list', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
 
         setCellTypePage.cellTypeCheckboxLabels().eq(0).contains('Accessible cell')
@@ -93,7 +93,7 @@ context('Set cell type', () => {
       })
 
       it('has an inset text warning about working capacity', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
 
         cy.get('.govuk-inset-text p').contains(
           'Set the working capacity to 0 for special accommodation cells as they should only be used for temporary housing:',
@@ -105,7 +105,7 @@ context('Set cell type', () => {
       })
 
       it('has a cancel link', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
 
         setCellTypePage.cancelLink().click()
@@ -130,7 +130,7 @@ context('Set cell type', () => {
       itBehavesLikeSetCellTypePage()
 
       it('has the correct main heading and a caption showing the cell description', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         Page.verifyOnPage(SetCellTypePage)
 
         cy.get('h1').contains('Set specific cell type')
@@ -138,7 +138,7 @@ context('Set cell type', () => {
       })
 
       it('can be accessed by clicking the set cell type link on the show location page', () => {
-        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000000')
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.setSpecificCellTypeLink().click()
 
@@ -161,7 +161,7 @@ context('Set cell type', () => {
       })
 
       it('shows the correct validation error when nothing is selected', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
 
         setCellTypePage.saveCellTypeButton().click()
@@ -172,7 +172,7 @@ context('Set cell type', () => {
       })
 
       it('shows the success banner when the change is complete', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
         setCellTypePage.cellTypeCheckbox('ACCESSIBLE_CELL').click()
         setCellTypePage.saveCellTypeButton().click()
@@ -200,7 +200,7 @@ context('Set cell type', () => {
       itBehavesLikeSetCellTypePage()
 
       it('has the correct main heading and a caption showing the cell description', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         Page.verifyOnPage(SetCellTypePage)
 
         cy.get('h1').contains('Change specific cell type')
@@ -208,7 +208,7 @@ context('Set cell type', () => {
       })
 
       it('can be accessed by clicking the change link on the show location page', () => {
-        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000000')
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeSpecificCellTypeLink().click()
 
@@ -231,7 +231,7 @@ context('Set cell type', () => {
       })
 
       it('shows the correct validation error when nothing is selected', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
         setCellTypePage.saveCellTypeButton().click()
 
@@ -241,7 +241,7 @@ context('Set cell type', () => {
       })
 
       it('shows the success banner when the change is complete', () => {
-        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000000')
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
         setCellTypePage.cellTypeCheckbox('ACCESSIBLE_CELL').click()
         setCellTypePage.cellTypeCheckbox('BIOHAZARD_DIRTY_PROTEST').click()
