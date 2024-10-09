@@ -288,4 +288,21 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       })
     })
   })
+
+  describe('compareInitialAndSubmittedValues', () => {
+    it('should convert undefined date values into empty strings', () => {
+      const initialValues = req.form.values
+      initialValues.estimatedReactivationDate = undefined
+
+      const submittedValues = initialValues
+      submittedValues.estimatedReactivationDate = ''
+
+      expect(
+        controller.compareInitialAndSubmittedValues({
+          initialValues,
+          submittedValues,
+        }),
+      ).toBe(false)
+    })
+  })
 })

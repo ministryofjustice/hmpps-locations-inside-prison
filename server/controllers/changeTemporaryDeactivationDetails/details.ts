@@ -88,7 +88,13 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
   }
 
   compareInitialAndSubmittedValues(values: { initialValues: any; submittedValues: any }) {
-    return JSON.stringify(values.initialValues) !== JSON.stringify(values.submittedValues)
+    const initialValues = { ...values.initialValues }
+    Object.keys(initialValues).forEach(key => {
+      if (initialValues[key] === undefined) {
+        initialValues[key] = ''
+      }
+    })
+    return JSON.stringify(initialValues) !== JSON.stringify(values.submittedValues)
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
