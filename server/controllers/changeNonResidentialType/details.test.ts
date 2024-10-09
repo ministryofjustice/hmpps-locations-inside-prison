@@ -212,27 +212,59 @@ describe('ChangeNonResidentialTypeDetails', () => {
   })
 
   describe('successHandler', () => {
+    let reqSuccessHandler: any
+    let resSuccessHandler: any
+    let nextSuccessHandler: any
+    let locationIdSuccesHandler: string
     beforeEach(() => {
-      controller.successHandler(req, res, next)
+      reqSuccessHandler = {
+        sessionModel: {
+          get: jest.fn(),
+          reset: jest.fn(),
+        },
+        journeyModel: {
+          reset: jest.fn(),
+        },
+        flash: jest.fn(),
+      }
+      resSuccessHandler = {
+        redirect: jest.fn(),
+        locals: {
+          location: {
+            id: locationIdSuccesHandler,
+            prisonId: 'TST',
+            localName: 'A-1-001',
+            pathHierarchy: null,
+          },
+        },
+      }
+      nextSuccessHandler = jest.fn()
     })
 
-    it('resets the journey model', () => {
-      expect(req.journeyModel.reset).toHaveBeenCalled()
-    })
-
-    it('resets the session model', () => {
-      expect(req.sessionModel.reset).toHaveBeenCalled()
-    })
-
-    it('sets the flash correctly', () => {
-      expect(req.flash).toHaveBeenCalledWith('success', {
+    it('sets the flash correctly when change is Successful', () => {
+      reqSuccessHandler.sessionModel.get.mockReturnValue(true)
+      controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
+      expect(reqSuccessHandler.flash).toHaveBeenCalledWith('success', {
         content: `You have changed the room type for A-1-001.`,
         title: 'Non-residential room type changed',
       })
     })
 
+    it('resets the journey model', () => {
+      controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
+      expect(reqSuccessHandler.journeyModel.reset).toHaveBeenCalled()
+    })
+
+    it('resets the session model', () => {
+      controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
+      expect(reqSuccessHandler.sessionModel.reset).toHaveBeenCalled()
+    })
+
     it('redirects to the view location page', () => {
-      expect(res.redirect).toHaveBeenCalledWith(`/view-and-update-locations/TST/${locationId}`)
+      controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
+      expect(resSuccessHandler.redirect).toHaveBeenCalledWith(
+        `/view-and-update-locations/TST/${locationIdSuccesHandler}`,
+      )
     })
   })
 })
