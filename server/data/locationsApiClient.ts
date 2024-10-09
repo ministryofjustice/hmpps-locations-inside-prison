@@ -162,6 +162,19 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/used-for-type',
       requestType: 'put',
     }),
+    updateTemporaryDeactivation: this.apiCall<
+      Location,
+      { locationId: string },
+      {
+        deactivationReason: string
+        deactivationReasonDescription?: string
+        proposedReactivationDate?: string
+        planetFmReference?: string
+      }
+    >({
+      path: '/locations/:locationId/update/temporary-deactivation',
+      requestType: 'put',
+    }),
     updateNonResCell: this.apiCall<
       Location,
       { locationId: string },
