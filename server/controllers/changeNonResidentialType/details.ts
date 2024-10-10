@@ -48,8 +48,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
       const { user } = res.locals
       const { locationsService } = req.services
       const token = await req.services.authService.getSystemClientToken(user.username)
-      const { options, values } = req.form
-
+      const { values } = req.form
       const preSelectedConvertedCellType = res.locals.location.raw?.convertedCellType || []
       const selectedConvertedCellType = values.convertedCellType
       const isSameAsPreSelected = preSelectedConvertedCellType.includes(selectedConvertedCellType)
