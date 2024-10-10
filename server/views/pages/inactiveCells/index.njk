@@ -13,16 +13,16 @@
   {% set title = locationName + ' - Inactive cells - View and update locations' %}
 {% endif %}
 
-{% if canAccess('reactivate') %}
-  {% block stickyFooterContent %}
+{% block stickyFooterContent %}
+  {% if canAccess('reactivate') %}
     {{ multiSelectFooter({
       actions: [{
         text: 'Activate selected cells',
         formAction: 'submit'
       }]
     }) }}
-  {% endblock %}
-{% endif %}
+  {% endif %}
+{% endblock %}
 
 {% block beforeContent %}
   {{ super() }}
