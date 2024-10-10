@@ -3,7 +3,6 @@ import Page from '../../pages/page'
 import LocationFactory from '../../../server/testutils/factories/location'
 import NonResidentialRoomPage from '../../pages/nonResidentialRoom'
 import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoom/setNonResidentialChangeType'
-import NonResidentialRoomPageSuccess from '../../pages/nonResidentialRoom/indexSuccess'
 
 context('View non-residential rooms', () => {
   context('When user does not have the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -81,7 +80,7 @@ context('View non-residential rooms', () => {
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').click()
 
       nonResidentialRoomTypeChangePage.continueButton().click()
-      Page.verifyOnPage(NonResidentialRoomPageSuccess)
+      Page.verifyOnPage(NonResidentialRoomPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Non-residential room type changed')
       cy.get('.govuk-notification-banner__content p').contains('You have changed the room type for A-1-001.')
@@ -99,7 +98,7 @@ context('View non-residential rooms', () => {
 
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationOther })
       nonResidentialRoomTypeChangePage.continueButton().click()
-      Page.verifyOnPage(NonResidentialRoomPageSuccess)
+      Page.verifyOnPage(NonResidentialRoomPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-summary-list__row').contains('Other - Some other type ')
     })
@@ -129,7 +128,7 @@ context('View non-residential rooms', () => {
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').click()
 
       nonResidentialRoomTypeChangePage.continueButton().click()
-      Page.verifyOnPage(NonResidentialRoomPageSuccess)
+      Page.verifyOnPage(NonResidentialRoomPage)
     })
   })
 })
