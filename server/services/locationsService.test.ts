@@ -263,4 +263,30 @@ describe('Locations service', () => {
       expect(locationsApiClient.constants.getUsedForTypesForPrison).toHaveBeenCalledWith('token', { prisonId: 'TST' })
     })
   })
+
+  describe('reactivateCell', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.reactivateCell('token', 'location-id', { maxCapacity: 1, workingCapacity: 2 })
+
+      expect(locationsApiClient.locations.bulk.reactivate).toHaveBeenCalledWith('token', null, {
+        locations: {
+          'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
+        },
+      })
+    })
+  })
+
+  describe('reactivateBulk', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.reactivateBulk('token', {
+        'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
+      })
+
+      expect(locationsApiClient.locations.bulk.reactivate).toHaveBeenCalledWith('token', null, {
+        locations: {
+          'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
+        },
+      })
+    })
+  })
 })

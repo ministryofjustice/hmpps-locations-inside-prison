@@ -38,7 +38,7 @@ context('Non-residential conversion', () => {
     })
 
     it('redirects user to sign in page when accessed directly', () => {
-      NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000000')
+      NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
       Page.verifyOnPage(AuthSignInPage)
     })
 
@@ -119,7 +119,7 @@ context('Non-residential conversion', () => {
           },
         ]
         cy.task('stubPrisonerLocationsId', prisonerLocations)
-        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000000')
+        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
       })
 
       itDisplaysTheCellOccupiedPage()
@@ -136,7 +136,7 @@ context('Non-residential conversion', () => {
 
     describe('warning page', () => {
       beforeEach(() => {
-        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000000')
+        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
       })
 
       it('has the correct panel text', () => {
@@ -163,7 +163,7 @@ context('Non-residential conversion', () => {
 
     describe('details page', () => {
       beforeEach(() => {
-        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000000')
+        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
         const cellOccupiedPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
         cellOccupiedPage.continueButton().click()
       })
@@ -231,7 +231,7 @@ context('Non-residential conversion', () => {
 
     describe('confirmation page', () => {
       beforeEach(() => {
-        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000000')
+        NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
         const cellOccupiedPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
         cellOccupiedPage.continueButton().click()
         const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)

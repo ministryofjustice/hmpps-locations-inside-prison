@@ -5,6 +5,12 @@ import ReactivateCellDetailsPage from '../../../pages/reactivate/cell/details'
 import ReactivateCellConfirmPage from '../../../pages/reactivate/cell/confirm'
 
 context('Reactivate cell', () => {
+  const genericLocation = LocationFactory.build({
+    id: '57718979-573c-433a-9e51-2d83f887c11c',
+    parentId: undefined,
+    topLevelId: undefined,
+  })
+
   let location: ReturnType<typeof LocationFactory.build>
 
   context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -67,6 +73,7 @@ context('Reactivate cell', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
+      cy.task('stubLocations', genericLocation)
       cy.task('stubLocationsBulkReactivate')
       cy.signIn()
     })
