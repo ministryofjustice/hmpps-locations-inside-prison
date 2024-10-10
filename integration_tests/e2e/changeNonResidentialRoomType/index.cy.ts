@@ -51,10 +51,10 @@ context('View non-residential rooms', () => {
       cy.task('stubLocationsUpdateNonResCell')
       cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
       cy.signIn()
+      NonResidentialRoomPage.goTo(location.prisonId, location.id)
     })
 
     it('Enables navigation to the Change non-residential room type, page', () => {
-      NonResidentialRoomPage.goTo(location.prisonId, location.id)
       const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
 
       cy.get('.govuk-heading-l').contains('A-1-001')
@@ -87,7 +87,6 @@ context('View non-residential rooms', () => {
     })
 
     it('User can select other reason type', () => {
-      NonResidentialRoomPage.goTo(location.prisonId, location.id)
       const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
       nonResidentialRoomPage.changeLink().click()
 
@@ -104,7 +103,6 @@ context('View non-residential rooms', () => {
     })
 
     it('User selects same change type then Success Banner is not displayed', () => {
-      NonResidentialRoomPage.goTo(location.prisonId, location.id)
       const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
 
       cy.get('.govuk-heading-l').contains('A-1-001')
