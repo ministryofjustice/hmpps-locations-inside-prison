@@ -1,0 +1,84 @@
+.sticky-footer {
+  position: sticky;
+  z-index: 1000;
+  bottom: -1px;
+
+  .sticky-select-action-bar {
+    display: none;
+    background-color: $govuk-brand-colour;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 20px 20px;
+
+    &--active {
+      display: block !important;
+    }
+
+    &--fixed {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    &__selected-summary {
+      display: none;
+    }
+
+    &__count {
+      @include govuk-font($size: 19, $weight: bold);
+      color: white;
+    }
+
+    &__clear-link {
+      @extend %govuk-link;
+      @include govuk-font($size: 19);
+      color: white;
+      margin-left: 10px;
+
+      &:visited, &:hover {
+        color: white;
+      }
+
+      &:hover {
+        @include govuk-font($size: 19, $weight: bold);
+        cursor: pointer;
+      }
+    }
+
+    .govuk-width-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .govuk-button-group {
+      gap: 10px;
+    }
+
+    .govuk-button-group, .govuk-button {
+      margin: 0;
+    }
+  }
+}
+
+.js-enabled .sticky-select-action-bar {
+  &__selected-summary {
+    display: revert;
+  }
+
+  .govuk-width-container {
+    justify-content: space-between;
+  }
+}
+
+// This is required to override a style added by govuk-frontend
+// which sets the S-P-T to 0 when sticky is used
+@supports (position: sticky) {
+  .govuk-template {
+    scroll-padding-top: 80px !important;
+  }
+}
+
+.moj-filter__content {
+  margin-bottom: 30px;
+}

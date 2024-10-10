@@ -5,7 +5,6 @@ import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeTemporaryDeactivationDetailsPage from '../../pages/changeTemporaryDeactivationDetails/details'
 import AuthSignInPage from '../../pages/authSignIn'
 import IndexPage from '../../pages/index'
-import { Location } from '../../../server/data/types/locationsApi'
 
 context('Change temporary deactivations details', () => {
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -39,50 +38,49 @@ context('Change temporary deactivations details', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
     })
-    let locations: Location[]
+    let location: ReturnType<typeof LocationFactory.build>
 
     context('When location id is provided', () => {
       beforeEach(() => {
-        locations = [
-          LocationFactory.build({
-            id: '74a5ea0a-5457-4028-b5eb-0a32daf25546',
-            prisonId: 'TST',
-            code: '005',
-            pathHierarchy: 'A-1-001',
-            locationType: 'CELL',
-            permanentlyInactive: false,
-            capacity: {
-              maxCapacity: 2,
-              workingCapacity: 0,
-            },
-            oldWorkingCapacity: 0,
-            certification: {
-              certified: true,
-              capacityOfCertifiedCell: 2,
-            },
-            accommodationTypes: ['NORMAL_ACCOMMODATION'],
-            specialistCellTypes: [],
-            usedFor: ['STANDARD_ACCOMMODATION'],
-            status: 'INACTIVE',
-            active: false,
-            deactivatedByParent: false,
-            deactivatedDate: '2024-10-03T09:18:58',
-            deactivatedReason: 'OTHER',
-            deactivationReasonDescription: 'Broken door lock',
-            deactivatedBy: 'ITAG_USER',
-            proposedReactivationDate: '2024-11-22',
-            planetFmReference: '123005',
-            topLevelId: '5d597e0b-e350-40bc-bc05-2af159ffa15b',
-            level: 3,
-            leafLevel: true,
-            parentId: 'e53902e1-eab8-4eae-b30f-f6f835f06956',
-            lastModifiedBy: 'ITAG_USER',
-            lastModifiedDate: '2024-10-03T09:18:58',
-            key: 'LEI-A-1-005',
-            isResidential: true,
-          }),
-        ]
-        cy.task('stubLocationsPrisonInactiveCells', locations)
+        location = LocationFactory.build({
+          id: '74a5ea0a-5457-4028-b5eb-0a32daf25546',
+          prisonId: 'TST',
+          code: '005',
+          pathHierarchy: 'A-1-001',
+          locationType: 'CELL',
+          permanentlyInactive: false,
+          capacity: {
+            maxCapacity: 2,
+            workingCapacity: 0,
+          },
+          oldWorkingCapacity: 0,
+          certification: {
+            certified: true,
+            capacityOfCertifiedCell: 2,
+          },
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
+          specialistCellTypes: [],
+          usedFor: ['STANDARD_ACCOMMODATION'],
+          status: 'INACTIVE',
+          active: false,
+          deactivatedByParent: false,
+          deactivatedDate: '2024-10-03T09:18:58',
+          deactivatedReason: 'OTHER',
+          deactivationReasonDescription: 'Broken door lock',
+          deactivatedBy: 'ITAG_USER',
+          proposedReactivationDate: '2024-11-22',
+          planetFmReference: '123005',
+          topLevelId: '5d597e0b-e350-40bc-bc05-2af159ffa15b',
+          level: 3,
+          leafLevel: true,
+          parentId: 'e53902e1-eab8-4eae-b30f-f6f835f06956',
+          lastModifiedBy: 'ITAG_USER',
+          lastModifiedDate: '2024-10-03T09:18:58',
+          key: 'LEI-A-1-005',
+          isResidential: true,
+        })
+
+        cy.task('stubLocationsPrisonInactiveCells', [location])
 
         cy.signIn()
         const indexPage = Page.verifyOnPage(IndexPage)
@@ -90,7 +88,7 @@ context('Change temporary deactivations details', () => {
         const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-          parentLocation: locations[0],
+          parentLocation: location,
           prisonSummary: {
             workingCapacity: 9,
             signedOperationalCapacity: 11,
@@ -104,7 +102,7 @@ context('Change temporary deactivations details', () => {
 
         cy.task('stubLocationsChangeTemporaryDeactivationDetails')
         cy.task('stubPrisonerLocationsId', [])
-        cy.task('stubLocations', locations[0])
+        cy.task('stubLocations', location)
 
         viewLocationsShowPage.inactiveBannerChangeLink().click()
       })

@@ -159,6 +159,13 @@ export default class LocationsService {
     return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations: { [locationId]: { capacity } } })
   }
 
+  async reactivateBulk(
+    token: string,
+    locations: Parameters<LocationsApiClient['locations']['bulk']['reactivate']>[2]['locations'],
+  ) {
+    return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations })
+  }
+
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
   }
