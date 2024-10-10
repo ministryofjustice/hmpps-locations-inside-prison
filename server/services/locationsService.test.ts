@@ -56,13 +56,13 @@ describe('Locations service', () => {
         expect(await serviceCall(serviceCallName)('token', 'KEY')).toEqual('description')
       })
 
-      it('only calls the api once per request', async () => {
+      it('calls the api every time (caching is handled by redis)', async () => {
         await serviceCall(serviceCallName)('token', 'TYPE')
         await serviceCall(serviceCallName)('token', 'TYPE')
         await serviceCall(serviceCallName)('token', 'TYPE')
 
         expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledWith('token')
-        expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledTimes(1)
+        expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledTimes(3)
       })
     })
   }
