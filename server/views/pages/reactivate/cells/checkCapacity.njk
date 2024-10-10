@@ -2,11 +2,9 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
 
-{% from "../../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../../macros/miniSummary.njk" import miniSummary %}
-
-{% set title = "You are about to reactivate " + location.displayName %}
+{% set title = "Check capacity of cells" %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
@@ -20,7 +18,7 @@
         {% if errorlist.length %}
           {{ govukErrorSummary({
             titleText: "There is a problem",
-            errorList: errorlist
+            errorList: validationErrors
           }) }}
         {% endif %}
       </div>
@@ -37,24 +35,43 @@
 
   <div class="govuk-width-container">
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-!-padding-bottom-2 change-summary">
-          <h2 class="govuk-heading-m">Change to establishment capacity</h2>
-          <p>
-            {% if changeSummary %}
-              {{ (changeSummary | safe) }}
-            {% else %}
-              There will be no change to the establishment's total working or maximum capacity.
+      <div class="govuk-grid-column-one-half">
+        {% set rows = [] %}
+        {% for cell in cells %}
+          {% set workingCapacity = (cell.oldWorkingCapacity or 0) | string %}
+          {% set maxCapacity = (cell.capacity.maxCapacity or 0) | string %}
+          {% if values.capacityChanges and values.capacityChanges[cell.id] %}
+            {% if values.capacityChanges[cell.id].workingCapacity %}
+              {% set workingCapacity = values.capacityChanges[cell.id].workingCapacity %}
             {% endif %}
-          </p>
+            {% if values.capacityChanges[cell.id].maxCapacity %}
+              {% set maxCapacity = values.capacityChanges[cell.id].maxCapacity %}
+            {% endif %}
+          {% endif %}
 
-          {% for parentLocation in inactiveParentLocations | sort(attribute='pathHierarchy') %}
-            <p>
-              The status of {{ parentLocation.displayName }} will change to active because it will contain active
-              locations.
-            </p>
-          {% endfor %}
-        </div>
+          {% set rows = (rows.push(
+            [
+              { text: cell.pathHierarchy },
+              { html: workingCapacity },
+              { html: maxCapacity },
+              { html: '<a href="/reactivate/cells/change-capacity/' + cell.id  + '" id="' + cell.id + '">Change</a>' }
+            ]
+          ), rows) %}
+        {% endfor %}
+
+        {{ govukTable({
+          attributes: {
+            "data-qa": "locations-table"
+          },
+          head: [
+            { text: "Location" },
+            { text: "Working capacity" },
+            { text: "Maximum capacity" },
+            { text: "Action" }
+          ],
+          rows: rows
+        }) }}
+
 
         <form method="{{ formMethod }}" action="{{ formAction }}"
             {% if formEnctype %}
@@ -65,12 +82,11 @@
           {% if formMethod == 'post' %}
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
           {% endif %}
-
           <div class="govuk-button-group">
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Confirm activation",
+                  text: "Continue",
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"
@@ -82,7 +98,7 @@
 
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel and return to location details
+            Cancel
           </a>
         </p>
       </div>
