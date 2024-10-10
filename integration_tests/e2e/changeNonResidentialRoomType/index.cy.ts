@@ -107,6 +107,7 @@ context('View non-residential rooms', () => {
 
       cy.get('.govuk-heading-l').contains('A-1-001')
       nonResidentialRoomPage.changeLink().should('exist')
+      cy.get('.govuk-summary-list__value').contains('Office')
       nonResidentialRoomPage.changeLink().click()
 
       // check cancel link
@@ -125,8 +126,12 @@ context('View non-residential rooms', () => {
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').should('be.checked')
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').click()
 
+      // return to the Room view without Success banner
       nonResidentialRoomTypeChangePage.continueButton().click()
       Page.verifyOnPage(NonResidentialRoomPage)
+      cy.get('.govuk-heading-l').contains('A-1-001')
+      nonResidentialRoomPage.changeLink().should('exist')
+      cy.get('.govuk-summary-list__value').contains('Office')
     })
   })
 })
