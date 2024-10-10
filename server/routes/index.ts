@@ -20,6 +20,7 @@ import nonResidentialConversionRouter from './nonResidentialConversion'
 import reactivateRouter from './reactivate'
 import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
+import changeNonResidentialTypeRouter from './changeNonResidentialType'
 import changeUsedForRouter from './changeUsedFor'
 import locationHistoryRouter from './locationHistoryRouter'
 
@@ -57,6 +58,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/change-temporary-deactivation-details', changeTemporaryDeactivationDetailsRouter)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
+  router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
 
   return router
 }

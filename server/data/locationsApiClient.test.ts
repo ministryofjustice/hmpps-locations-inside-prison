@@ -144,7 +144,15 @@ describe('locationsApiClient', () => {
         },
       )
     })
-
+    testCall(
+      'updateNonResCell',
+      '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/update-non-res-cell',
+      false,
+      () => apiClient.locations.updateNonResCell,
+      { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+      'put',
+      { convertedCellType: 'OTHER', otherConvertedCellType: 'some type' },
+    )
     testCall(
       'convertCellToNonResCell',
       '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/convert-cell-to-non-res-cell',
