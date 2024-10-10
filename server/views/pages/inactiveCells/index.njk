@@ -5,12 +5,23 @@
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
-{% from "../../macros/stickyFooter.njk" import stickyFooter %}
+{% from "../../macros/multiSelectFooter.njk" import multiSelectFooter %}
 
 {% set title = 'View all inactive cells' %}
 {% if residentialSummary.location %}
   {% set locationName = residentialSummary.location.displayName | capFirst %}
   {% set title = locationName + ' - Inactive cells - View and update locations' %}
+{% endif %}
+
+{% if canAccess('reactivate') %}
+  {% block stickyFooterContent %}
+    {{ multiSelectFooter({
+      actions: [{
+        text: 'Activate selected cells',
+        formAction: 'submit'
+      }]
+    }) }}
+  {% endblock %}
 {% endif %}
 
 {% block beforeContent %}
@@ -133,15 +144,4 @@
       {% endif %}
     </form>
   </div>
-
-  {% if canAccess('reactivate') %}
-    {{ stickyFooter({
-      stickySelect: {
-        actions: [{
-          text: 'Activate selected cells',
-          formAction: 'submit'
-        }]
-      }
-    }) }}
-  {% endif %}
 {% endblock %}
