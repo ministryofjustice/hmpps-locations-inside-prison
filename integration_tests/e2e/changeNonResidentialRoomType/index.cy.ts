@@ -32,6 +32,14 @@ context('View non-residential rooms', () => {
       convertedCellType: 'OTHER',
       otherConvertedCellType: 'Some other type',
     })
+    const locationChanged = LocationFactory.build({
+      isResidential: false,
+      leafLevel: true,
+      localName: 'A-1-001',
+      status: 'NON_RESIDENTIAL',
+      convertedCellType: 'KITCHEN_SERVERY',
+      otherConvertedCellType: '',
+    })
 
     beforeEach(() => {
       cy.task('reset')
@@ -78,12 +86,16 @@ context('View non-residential rooms', () => {
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').should('be.checked')
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').should('not.be.checked')
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').click()
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationChanged })
 
       nonResidentialRoomTypeChangePage.continueButton().click()
       Page.verifyOnPage(NonResidentialRoomPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Non-residential room type changed')
       cy.get('.govuk-notification-banner__content p').contains('You have changed the room type for A-1-001.')
+      cy.get('.govuk-heading-l').contains('A-1-001')
+      nonResidentialRoomPage.changeLink().should('exist')
+      cy.get('.govuk-summary-list__value').contains('Kitchen / Servery')
     })
 
     it('User can select other reason type', () => {
