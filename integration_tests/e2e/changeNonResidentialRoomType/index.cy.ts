@@ -75,13 +75,16 @@ context('View non-residential rooms', () => {
       // go forward
       nonResidentialRoomPage.changeLink().click()
       Page.verifyOnPage(NonResidentialRoomPage)
-      nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').click()
+
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').should('be.checked')
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').should('not.be.checked')
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').click()
 
       nonResidentialRoomTypeChangePage.continueButton().click()
       Page.verifyOnPage(NonResidentialRoomPageSuccess)
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Non-residential room type changed')
-      cy.get('.govuk-notification-banner__content p').contains('You have changed non residential type for A-1-001')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed the room type for A-1-001.')
     })
 
     it('User can select other reason type', () => {
@@ -99,6 +102,34 @@ context('View non-residential rooms', () => {
       Page.verifyOnPage(NonResidentialRoomPageSuccess)
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-summary-list__row').contains('Other - Some other type ')
+    })
+
+    it('User selects same change type then Success Banner is not displayed', () => {
+      NonResidentialRoomPage.goTo(location.prisonId, location.id)
+      const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
+
+      cy.get('.govuk-heading-l').contains('A-1-001')
+      nonResidentialRoomPage.changeLink().should('exist')
+      nonResidentialRoomPage.changeLink().click()
+
+      // check cancel link
+      const nonResidentialRoomTypeChangePage = Page.verifyOnPage(NonResidentialRoomTypeChangePage)
+      nonResidentialRoomTypeChangePage.cancelLink().click()
+      Page.verifyOnPage(NonResidentialRoomPage)
+
+      // check back link
+      nonResidentialRoomPage.changeLink().click()
+      nonResidentialRoomTypeChangePage.backLink().click()
+      Page.verifyOnPage(NonResidentialRoomPage)
+
+      // go forward
+      nonResidentialRoomPage.changeLink().click()
+      Page.verifyOnPage(NonResidentialRoomPage)
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').should('be.checked')
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').click()
+
+      nonResidentialRoomTypeChangePage.continueButton().click()
+      Page.verifyOnPage(NonResidentialRoomPageSuccess)
     })
   })
 })
