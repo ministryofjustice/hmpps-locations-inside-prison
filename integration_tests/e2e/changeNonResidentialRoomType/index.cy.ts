@@ -4,7 +4,7 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import NonResidentialRoomPage from '../../pages/nonResidentialRoom'
 import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoom/setNonResidentialChangeType'
 
-context('View non-residential rooms', () => {
+context('Change non-residential rooms', () => {
   context('When user does not have the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
       cy.task('reset')
