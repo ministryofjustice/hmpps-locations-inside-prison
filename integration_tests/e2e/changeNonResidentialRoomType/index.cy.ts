@@ -23,6 +23,8 @@ context('View non-residential rooms', () => {
       leafLevel: true,
       localName: 'A-1-001',
       status: 'NON_RESIDENTIAL',
+      convertedCellType: 'OFFICE',
+      otherConvertedCellType: '',
     })
     const locationOther = LocationFactory.build({
       isResidential: false,
