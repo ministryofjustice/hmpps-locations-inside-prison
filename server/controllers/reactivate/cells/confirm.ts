@@ -96,7 +96,7 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
               maxCapacity: location?.capacity?.maxCapacity,
               ...capacityChanges[id],
             },
-          } || {},
+          },
         ]
       }),
     ) as Parameters<LocationsService['reactivateBulk']>[1]
