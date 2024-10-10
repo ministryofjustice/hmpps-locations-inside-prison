@@ -18,7 +18,8 @@
     {{ multiSelectFooter({
       actions: [{
         text: 'Activate selected cells',
-        formAction: 'submit'
+        formAction: 'submit',
+        form: 'reactivate-cells'
       }]
     }) }}
   {% endif %}
@@ -97,7 +98,7 @@
     {% set formAction = options.action | default('') %}
     {% set formEnctype = options.enctype | default('') %}
 
-    <form method="{{ formMethod }}" action="{{ formAction }}"
+    <form id="reactivate-cells" method="{{ formMethod }}" action="{{ formAction }}"
         {% if formEnctype %}
           enctype="{{ formEnctype }}"
         {% endif %}
