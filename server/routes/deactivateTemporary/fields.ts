@@ -20,6 +20,7 @@ const fields = {
       },
     },
     items: [{ text: 'set at runtime', value: '' }],
+    autocomplete: 'off',
   },
   deactivationReasonOther: {
     component: 'govukInput',
@@ -30,6 +31,7 @@ const fields = {
       text: 'Describe deactivation reason',
     },
     nameForErrors: 'Deactivation reason',
+    autocomplete: 'off',
   },
   deactivationReasonDescription: {
     component: 'govukInput',
@@ -41,6 +43,7 @@ const fields = {
       text: 'Description (optional)',
     },
     nameForErrors: 'Description',
+    autocomplete: 'off',
   },
   estimatedReactivationDate: {
     component: 'govukDateInput',
@@ -69,6 +72,7 @@ const fields = {
       classes: 'govuk-label--m',
     },
     nameForErrors: 'Planet FM reference number',
+    autocomplete: 'off',
   },
 }
 
