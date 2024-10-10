@@ -4,16 +4,10 @@ import LocationsApiClient from '../data/locationsApiClient'
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
 
-  private constantDataMaps: { [key: string]: { [key: string]: string } } = {}
-
   private async getConstantDataMap(token: string, apiCallName: keyof LocationsApiClient['constants']) {
-    if (!this.constantDataMaps[apiCallName]) {
-      this.constantDataMaps[apiCallName] = Object.fromEntries(
-        Object.values(await this.locationsApiClient.constants[apiCallName](token))[0].map(i => [i.key, i.description]),
-      )
-    }
-
-    return this.constantDataMaps[apiCallName]
+    return Object.fromEntries(
+      Object.values(await this.locationsApiClient.constants[apiCallName](token))[0].map(i => [i.key, i.description]),
+    )
   }
 
   async convertCellToNonResCell(
