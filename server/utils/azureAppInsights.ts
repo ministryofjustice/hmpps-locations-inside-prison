@@ -31,6 +31,8 @@ export function buildAppInsightsClient(
   if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
     defaultClient.context.tags['ai.cloud.role'] = overrideName || applicationName
     defaultClient.context.tags['ai.application.ver'] = buildNumber
+    defaultClient.addTelemetryProcessor(addUserDataToRequests)
+    defaultClient.addTelemetryProcessor(ignorePathsProcessor)
 
     defaultClient.addTelemetryProcessor(({ tags, data }, contextObjects) => {
       const operationNameOverride = contextObjects.correlationContext?.customProperties?.getProperty('operationName')
@@ -50,13 +52,13 @@ export function buildAppInsightsClient(
 export function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObjects: ContextObject) {
   const isRequest = envelope.data.baseType === Contracts.TelemetryTypeString.Request
   if (isRequest) {
-    const { username, activeCaseLoad } = contextObjects?.['http.ServerRequest']?.res?.locals?.user || {}
+    const { username, activeCaseload } = contextObjects?.['http.ServerRequest']?.res?.locals?.user || {}
     if (username) {
       const { properties } = envelope.data.baseData
       // eslint-disable-next-line no-param-reassign
       envelope.data.baseData.properties = {
         username,
-        activeCaseLoadId: activeCaseLoad?.id,
+        activeCaseLoadId: activeCaseload?.id,
         ...properties,
       }
     }
@@ -65,7 +67,7 @@ export function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObject
 }
 
 export const ignorePathsProcessor = (envelope: EnvelopeTelemetry) => {
-  const prefixesToIgnore = ['GET /health', 'GET /info']
+  const prefixesToIgnore = ['GET /health', 'GET /info', 'GET /metrics', 'GET /ping']
 
   const isRequest = envelope.data.baseType === Contracts.TelemetryTypeString.Request
   if (isRequest) {
