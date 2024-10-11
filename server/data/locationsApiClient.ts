@@ -175,6 +175,14 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/update/temporary-deactivation',
       requestType: 'put',
     }),
+    updateNonResCell: this.apiCall<
+      Location,
+      { locationId: string },
+      { convertedCellType: string; otherConvertedCellType?: string }
+    >({
+      path: '/locations/:locationId/update-non-res-cell',
+      requestType: 'put',
+    }),
   }
 
   prisonerLocations = {

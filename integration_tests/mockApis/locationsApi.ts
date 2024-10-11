@@ -622,6 +622,21 @@ const stubLocationsChangeTemporaryDeactivationDetails = () =>
     },
   })
 
+const stubLocationsUpdateNonResCell = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/update-non-res-cell', // path: '/locations/:locationId/update-non-res-cell',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -652,4 +667,5 @@ export default {
   stubUpdateSpecialistCellTypes,
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsChangeTemporaryDeactivationDetails,
+  stubLocationsUpdateNonResCell,
 }
