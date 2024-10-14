@@ -1,6 +1,7 @@
 import config from '../config'
 import BaseApiClient from './baseApiClient'
 import { Location, PrisonerLocation, ResidentialSummary, SignedOperationalCapacity } from './types/locationsApi'
+import { LocationForLocalName } from './types/locationsApi/locationForLocalName'
 
 export default class LocationsApiClient extends BaseApiClient {
   protected static config() {
@@ -92,6 +93,10 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
+    getLocationByLocalName: this.apiCall<LocationForLocalName, { prisonId: string; localName?: string }>({
+      path: '/locations/:prisonId/local-name/:localName',
+      requestType: 'get',
+    }),
     convertCellToNonResCell: this.apiCall<
       Location,
       { locationId: string },
@@ -160,6 +165,10 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     updateUsedForTypes: this.apiCall<Location, { locationId: string }, string[]>({
       path: '/locations/:locationId/used-for-type',
+      requestType: 'put',
+    }),
+    updateLocalName: this.apiCall<Location, { locationId: string }, { localName?: string; updatedBy?: string }>({
+      path: '/locations/:locationId/change-local-name',
       requestType: 'put',
     }),
   }

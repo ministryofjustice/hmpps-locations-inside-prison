@@ -214,6 +214,22 @@ describe('Locations service', () => {
     })
   })
 
+  describe('changeLocalName', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.updateLocalName('token', '481fc587-60f8-402b-804d-64462babddcc', 'New local name', 'user1')
+      expect(locationsApiClient.locations.updateLocalName).toHaveBeenCalledWith(
+        'token',
+        {
+          locationId: '481fc587-60f8-402b-804d-64462babddcc',
+        },
+        {
+          localName: 'New local name',
+          updatedBy: 'user1',
+        },
+      )
+    })
+  })
+
   describe('convertToCell', () => {
     it('calls the correct client function', async () => {
       await locationsService.convertToCell(
