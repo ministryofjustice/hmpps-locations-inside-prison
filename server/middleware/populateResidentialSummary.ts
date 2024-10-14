@@ -11,6 +11,10 @@ function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
+function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
+  return location.active && req.canAccess('change_local_name')
+}
+
 function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
   return location.active && req.canAccess('set_cell_type')
 }
@@ -19,6 +23,31 @@ function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
   return !location.leafLevel && location.active && req.canAccess('change_used_for')
 }
 
+function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow {
+  const { id, localName } = location
+  const baseUrl = `/location/${id}/`
+
+  const row: any = { key: { text: 'Local Name' } }
+
+  if (localName) {
+    row.value = { html: localName }
+
+    if (showEditLocalNameLink(location, req)) {
+      row.actions = {
+        items: [
+          { href: `${baseUrl}remove-local-name`, text: 'Remove' },
+          { href: `${baseUrl}change-local-name`, text: 'Change' },
+        ],
+      }
+    }
+  } else if (showEditLocalNameLink(location, req)) {
+    row.value = {
+      html: `<a href="${baseUrl}add-local-name" class="govuk-link">Add local name</a>`,
+    }
+  }
+
+  return row
+}
 function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { specialistCellTypes } = location
   const setCellTypeUrl = `/location/${location.id}/set-cell-type`
@@ -85,7 +114,7 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
   const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
 
   if (!location.leafLevel) {
-    details.push({ key: { text: 'Local name' }, value: { text: location.localName } })
+    details.push(localNameRow(location, req))
   }
 
   if (location.status === 'NON_RESIDENTIAL') {

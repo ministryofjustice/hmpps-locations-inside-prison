@@ -21,6 +21,9 @@ import setCellTypeRouter from './setCellType'
 import viewLocationsRouter from './viewLocationsRouter'
 import changeUsedForRouter from './changeUsedFor'
 import locationHistoryRouter from './locationHistoryRouter'
+import setLocalNameRouter from './setLocalName'
+import changeLocalNameRouter from './changeLocalName'
+import removeLocalNameRouter from './removeLocalName'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -53,6 +56,9 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/change-used-for', changeUsedForRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
+  router.use('/location/:locationId/add-local-name', setLocalNameRouter)
+  router.use('/location/:locationId/change-local-name', changeLocalNameRouter)
+  router.use('/location/:locationId/remove-local-name', removeLocalNameRouter)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
 
