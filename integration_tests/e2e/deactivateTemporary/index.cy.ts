@@ -257,6 +257,26 @@ context('Deactivate temporary', () => {
 
         Page.verifyOnPage(DeactivateTemporaryConfirmPage)
       })
+
+      it('deactivation reason description input contains an autocomplete off attribute', () => {
+        cy.get('#deactivationReasonDescription-TEST2').should('have.attr', 'autocomplete', 'off')
+      })
+
+      it('estimated reactivation date - day input field contains an autocomplete off attribute', () => {
+        cy.get('#estimatedReactivationDate-day').should('have.attr', 'autocomplete', 'off')
+      })
+
+      it('estimated reactivation date - month input field contains an autocomplete off attribute', () => {
+        cy.get('#estimatedReactivationDate-month').should('have.attr', 'autocomplete', 'off')
+      })
+
+      it('estimated reactivation date - year input fieldcontains an autocomplete off attribute', () => {
+        cy.get('#estimatedReactivationDate-year').should('have.attr', 'autocomplete', 'off')
+      })
+
+      it('planet FM reference number input field contains an autocomplete off attribute', () => {
+        cy.get('#planetFmReference').should('have.attr', 'autocomplete', 'off')
+      })
     })
 
     describe('confirmation page', () => {
