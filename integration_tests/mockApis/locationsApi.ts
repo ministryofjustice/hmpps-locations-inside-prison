@@ -501,6 +501,52 @@ const stubUpdateCapacity = () =>
     },
   })
 
+const stubLocationsCheckLocalNameDoesntExist = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/[\\w-%]+/local-name/[\\w-%]+',
+    },
+    response: {
+      status: 404,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+    },
+  })
+
+const stubLocationsCheckLocalNameExists = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/[\\w-%]+/local-name/[\\w-%]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      body: JSON.stringify({
+        exists: true,
+      }),
+    },
+  })
+
+const stubUpdateLocalName = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-%]+/change-local-name',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubLocationsBulkReactivate = () =>
   stubFor({
     request: {
@@ -594,6 +640,8 @@ const stubLocationsDeactivateTemporary = () =>
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
+  stubLocationsCheckLocalNameDoesntExist,
+  stubLocationsCheckLocalNameExists,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -617,6 +665,7 @@ export default {
   stubSignedOperationalCapacityGetNotFound,
   stubSignedOperationalCapacityUpdate,
   stubUpdateCapacity,
+  stubUpdateLocalName,
   stubUpdateSpecialistCellTypes,
   stubUpdateLocationsConstantsUsedForType,
 }
