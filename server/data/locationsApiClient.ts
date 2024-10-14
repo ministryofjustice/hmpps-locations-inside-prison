@@ -1,7 +1,12 @@
 import config from '../config'
 import BaseApiClient from './baseApiClient'
-import { Location, PrisonerLocation, ResidentialSummary, SignedOperationalCapacity } from './types/locationsApi'
-import { LocationForLocalName } from './types/locationsApi/locationForLocalName'
+import {
+  Location,
+  PrisonerLocation,
+  LocationForLocalName,
+  ResidentialSummary,
+  SignedOperationalCapacity,
+} from './types/locationsApi'
 
 export default class LocationsApiClient extends BaseApiClient {
   protected static config() {
@@ -169,6 +174,27 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     updateLocalName: this.apiCall<Location, { locationId: string }, { localName?: string; updatedBy?: string }>({
       path: '/locations/:locationId/change-local-name',
+      requestType: 'put',
+    }),
+    updateTemporaryDeactivation: this.apiCall<
+      Location,
+      { locationId: string },
+      {
+        deactivationReason: string
+        deactivationReasonDescription?: string
+        proposedReactivationDate?: string
+        planetFmReference?: string
+      }
+    >({
+      path: '/locations/:locationId/update/temporary-deactivation',
+      requestType: 'put',
+    }),
+    updateNonResCell: this.apiCall<
+      Location,
+      { locationId: string },
+      { convertedCellType: string; otherConvertedCellType?: string }
+    >({
+      path: '/locations/:locationId/update-non-res-cell',
       requestType: 'put',
     }),
   }

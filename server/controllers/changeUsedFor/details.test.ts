@@ -5,6 +5,7 @@ import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/changeUsedFor/fields'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('ChangeUsedForDetails', () => {
   const controller = new ChangeUsedForDetails({ route: '/' })
@@ -13,6 +14,7 @@ describe('ChangeUsedForDetails', () => {
   let next: NextFunction
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
     req = {
@@ -29,6 +31,7 @@ describe('ChangeUsedForDetails', () => {
         },
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -79,6 +82,7 @@ describe('ChangeUsedForDetails', () => {
       { key: 'THERAPEUTIC_COMMUNITY', description: 'Therapeutic community' },
     ])
     locationsService.updateUsedForTypes = jest.fn().mockResolvedValue(true)
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('setOptions', () => {
@@ -163,6 +167,12 @@ describe('ChangeUsedForDetails', () => {
         res.locals.location.id,
         req.form.values.usedFor,
       )
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_used_for', { prison_id: 'TST' })
     })
 
     it('calls next', () => {

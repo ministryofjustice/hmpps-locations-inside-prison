@@ -2,11 +2,13 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../../utils/backUrl'
+import populateInactiveParentLocations from '../populateInactiveParentLocations'
 
 export default class ReactivateCellConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(this.getResidentialSummary)
+    this.use(populateInactiveParentLocations)
   }
 
   async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -68,13 +70,15 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { location, user } = res.locals
       const { locationsService } = req.services
       const workingCapacity = Number(req.sessionModel.get('workingCapacity'))
       const maxCapacity = Number(req.sessionModel.get('maxCapacity'))
 
       const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.reactivateCell(token, res.locals.location.id, { maxCapacity, workingCapacity })
+
+      req.services.analyticsService.sendEvent(req, 'reactivate_cell', { prison_id: location.prisonId })
 
       next()
     } catch (error) {

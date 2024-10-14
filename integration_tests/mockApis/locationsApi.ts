@@ -279,6 +279,7 @@ const stubLocationsLocationsResidentialSummary = (
       maxCapacity: 9,
     },
     subLocationName: 'TestWings',
+    active: true,
     subLocations: [
       LocationFactory.build(),
       LocationFactory.build({
@@ -460,7 +461,7 @@ const stubLocations = (location: Location) =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/locations-api/locations/[\\w-]+\\?includeHistory=(false|true)',
+      urlPattern: `/locations-api/locations/${location.id}\\?includeHistory=(false|true)`,
     },
     response: {
       status: 200,
@@ -476,6 +477,21 @@ const stubPrisonerLocationsId = (prisonerLocations: PrisonerLocation[]) =>
     request: {
       method: 'GET',
       urlPattern: '/locations-api/prisoner-locations/id/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: prisonerLocations,
+    },
+  })
+
+const stubPrisonerLocations = (prisonerLocations: PrisonerLocation[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/[\\w-]+',
     },
     response: {
       status: 200,
@@ -637,6 +653,36 @@ const stubLocationsDeactivateTemporary = () =>
     },
   })
 
+const stubLocationsChangeTemporaryDeactivationDetails = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/update/temporary-deactivation',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+const stubLocationsUpdateNonResCell = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/update-non-res-cell', // path: '/locations/:locationId/update-non-res-cell',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -660,6 +706,7 @@ export default {
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
+  stubPrisonerLocations,
   stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,
   stubSignedOperationalCapacityGetNotFound,
@@ -668,4 +715,6 @@ export default {
   stubUpdateLocalName,
   stubUpdateSpecialistCellTypes,
   stubUpdateLocationsConstantsUsedForType,
+  stubLocationsChangeTemporaryDeactivationDetails,
+  stubLocationsUpdateNonResCell,
 }

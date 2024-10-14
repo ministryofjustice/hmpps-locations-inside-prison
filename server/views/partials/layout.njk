@@ -3,24 +3,47 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% from "../macros/breadcrumb.njk" import breadcrumb %}
+{% from "../macros/feedbackBanner.njk" import feedbackBanner %}
 
 {% set pageTitle = title if title === applicationName else title + ' - ' + applicationName %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block head %}
-  <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet"/>
+  <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet" />
 
   {% if googleAnalyticsMeasurementId %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ googleAnalyticsMeasurementId }}"></script>
     <script nonce="{{ cspNonce }}">
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      window.dataLayer = window.dataLayer || []
+
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+
+      gtag('js', new Date())
       gtag('config', '{{ googleAnalyticsMeasurementId }}', {
         active_case_load: '{{ user.activeCaseload.id | default('') }}',
-      });
+      })
     </script>
+  {% endif %}
+
+  {% if googleTagManagerContainerId %}
+    <!-- Google Tag Manager -->
+    <script nonce="{{ cspNonce }}">(function(w, d, s, l, i) {
+        w[l] = w[l] || []
+        w[l].push({
+          'gtm.start':
+            new Date().getTime(), event: 'gtm.js',
+        })
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''
+        j.async = true
+        j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+        f.parentNode.insertBefore(j, f)
+      })(window, document, 'script', 'dataLayer', '{{ googleTagManagerContainerId }}')</script>
+    <!-- End Google Tag Manager -->
   {% endif %}
 
   <script src="/assets/js/jquery.min.js"></script>
@@ -38,7 +61,7 @@
   {% endif %}
 {% endblock %}
 
-{% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
+{% block pageTitle %}{{ pageTitle | default(applicationName) }}{% endblock %}
 
 {% block header %}
   {% if feComponents.header %}
@@ -49,6 +72,12 @@
 {% endblock %}
 
 {% block footer %}
+  {% if feedbackFormUrl %}
+    {{ feedbackBanner({
+      feedbackBannerAdditionalClasses: feedbackBannerBackground,
+      feedbackFormUrl: feedbackFormUrl
+    }) }}
+  {% endif %}
   {% if feComponents.footer %}
     {{ feComponents.footer | safe }}
   {% else %}
@@ -57,6 +86,14 @@
 {% endblock %}
 
 {% block bodyStart %}
+  {% if googleTagManagerContainerId %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id={{ googleTagManagerContainerId }}"
+              height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  {% endif %}
 {% endblock %}
 
 {% block main %}
@@ -67,7 +104,7 @@
           <div class="govuk-width-container">
             <div class="govuk-grid-row">
               <div class="govuk-grid-column-three-quarters">
-                <h1 class="govuk-heading-l govuk-!-margin-top-5 govuk-!-margin-bottom-5">
+                <h1 class="govuk-heading-l govuk-!-padding-top-5 govuk-!-margin-bottom-5">
                   Residential locations (practice version)
                 </h1>
                 <a role="button" class="govuk-button govuk-button--inverse" href="{{ productionUrl }}">
@@ -99,19 +136,24 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  {% if sandbox %}
-    <div class="sticky-footer">
-      <h2 class="sticky-footer__heading">
-        Practice version
-      </h2>
+  <div class="sticky-footer">
+    {% block stickyFooterContent %}
+    {% endblock %}
 
-      <ul class="sticky-footer__items">
-        <li class="sticky-footer__item">
-          <a href="{{ productionUrl }}">Switch to live service</a>
-        </li>
-      </ul>
-    </div>
-  {% endif %}
+    {% if sandbox %}
+      <div class="sticky-footer__testing-banner">
+        <h2 class="sticky-footer__testing-banner__heading">
+          Practice version
+        </h2>
+
+        <ul class="sticky-footer__testing-banner__items">
+          <li class="sticky-footer__testing-banner__item">
+            <a href="{{ productionUrl }}">Switch to live service</a>
+          </li>
+        </ul>
+      </div>
+    {% endif %}
+  </div>
 
   <script type="module" src="/assets/govukFrontendInit.js"></script>
   <script src="/assets/moj/all.js"></script>

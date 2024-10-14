@@ -1,6 +1,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% macro inactiveLocationBanner(location, canAccess) %}
   {% set locationName = location.localName or location.pathHierarchy %}
@@ -11,36 +12,66 @@
   {% endif %}
 
   {% set inactiveHtml %}
-    <p class="govuk-notification-banner__heading">
-      {{ locationType }} {{ locationName }} is temporarily inactive
-    </p>
+    <span class="hmpps-inactive-location-banner">
+      <p class="govuk-notification-banner__heading">
+        {{ locationType }} {{ locationName }} is temporarily inactive
+      </p>
 
-    {{ govukSummaryList({rows:[
-      {
-        key: {
-        text: 'Reason'
-      },
-        value: {
-        text: deactivatedReason
-      }
-      },
-      {
-        key: {
-        text: 'Estimated reactivation date'
-      },
-        value: {
-        text: location.proposedReactivationDate | formatDate
-      }
-      },
-      {
-        key: {
-        text: 'Planet FM reference number'
-      },
-        value: {
-        text: location.planetFmReference
-      }
-      }
-    ]}) }}
+      {{ govukSummaryList({rows:[
+        {
+          key: {
+          text: 'Reason'
+          },
+            value: {
+            text: deactivatedReason
+          },
+          actions: {
+            items: [
+              {
+                href: '/location/' + location.id + '/change-temporary-deactivation-details',
+                text: "Change",
+                visuallyHiddenText: "reason"
+              }
+            ]
+          }
+          },
+          {
+            key: {
+            text: 'Estimated reactivation date'
+          },
+            value: {
+            text: location.proposedReactivationDate | formatDate
+          },
+          actions: {
+            items: [
+              {
+                href: '/location/' + location.id + '/change-temporary-deactivation-details',
+                text: "Change",
+                visuallyHiddenText: "estimatedReactivationDate"
+              }
+            ]
+          }
+          },
+          {
+            key: {
+            text: 'Planet FM reference number'
+          },
+            value: {
+            text: location.planetFmReference
+          },
+          actions: {
+            items: [
+              {
+                href: '/location/' + location.id + '/change-temporary-deactivation-details',
+                text: "Change",
+                visuallyHiddenText: "planetFMReferenceNumber"
+              }
+            ]
+          }
+        }
+      ],
+      classes: 'hmpps-inactive-location-banner-summary-list' }) }}
+    </span>
 
     {% if location.deactivatedDate %}
       <span
@@ -62,6 +93,7 @@
       }) }}
     {% endif %}
   {% endset %}
+
 
   {{ govukNotificationBanner({
     html: inactiveHtml,

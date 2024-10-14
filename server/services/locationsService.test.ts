@@ -56,13 +56,13 @@ describe('Locations service', () => {
         expect(await serviceCall(serviceCallName)('token', 'KEY')).toEqual('description')
       })
 
-      it('only calls the api once per request', async () => {
+      it('calls the api every time (caching is handled by redis)', async () => {
         await serviceCall(serviceCallName)('token', 'TYPE')
         await serviceCall(serviceCallName)('token', 'TYPE')
         await serviceCall(serviceCallName)('token', 'TYPE')
 
         expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledWith('token')
-        expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledTimes(1)
+        expect(locationsApiClient.constants[apiCallName]).toHaveBeenCalledTimes(3)
       })
     })
   }
@@ -256,6 +256,18 @@ describe('Locations service', () => {
     })
   })
 
+  describe('updateNonResCell', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.changeNonResType('token', '481fc587-60f8-402b-804d-64462babddcc', 'OFFICE')
+
+      expect(locationsApiClient.locations.updateNonResCell).toHaveBeenCalledWith(
+        'token',
+        { locationId: '481fc587-60f8-402b-804d-64462babddcc' },
+        { convertedCellType: 'OFFICE' },
+      )
+    })
+  })
+
   describe('getAccommodationTypes', () => {
     it('calls the correct client function', async () => {
       await locationsService.getAccommodationTypes('token')
@@ -277,6 +289,32 @@ describe('Locations service', () => {
       await locationsService.getUsedForTypesForPrison('token', 'TST')
 
       expect(locationsApiClient.constants.getUsedForTypesForPrison).toHaveBeenCalledWith('token', { prisonId: 'TST' })
+    })
+  })
+
+  describe('reactivateCell', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.reactivateCell('token', 'location-id', { maxCapacity: 1, workingCapacity: 2 })
+
+      expect(locationsApiClient.locations.bulk.reactivate).toHaveBeenCalledWith('token', null, {
+        locations: {
+          'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
+        },
+      })
+    })
+  })
+
+  describe('reactivateBulk', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.reactivateBulk('token', {
+        'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
+      })
+
+      expect(locationsApiClient.locations.bulk.reactivate).toHaveBeenCalledWith('token', null, {
+        locations: {
+          'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
+        },
+      })
     })
   })
 })

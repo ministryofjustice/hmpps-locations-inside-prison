@@ -4,16 +4,10 @@ import LocationsApiClient from '../data/locationsApiClient'
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
 
-  private constantDataMaps: { [key: string]: { [key: string]: string } } = {}
-
   private async getConstantDataMap(token: string, apiCallName: keyof LocationsApiClient['constants']) {
-    if (!this.constantDataMaps[apiCallName]) {
-      this.constantDataMaps[apiCallName] = Object.fromEntries(
-        Object.values(await this.locationsApiClient.constants[apiCallName](token))[0].map(i => [i.key, i.description]),
-      )
-    }
-
-    return this.constantDataMaps[apiCallName]
+    return Object.fromEntries(
+      Object.values(await this.locationsApiClient.constants[apiCallName](token))[0].map(i => [i.key, i.description]),
+    )
   }
 
   async convertCellToNonResCell(
@@ -163,6 +157,13 @@ export default class LocationsService {
     return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations: { [locationId]: { capacity } } })
   }
 
+  async reactivateBulk(
+    token: string,
+    locations: Parameters<LocationsApiClient['locations']['bulk']['reactivate']>[2]['locations'],
+  ) {
+    return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations })
+  }
+
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
   }
@@ -184,11 +185,39 @@ export default class LocationsService {
     return this.locationsApiClient.locations.updateSpecialistCellTypes(token, { locationId }, cellTypes)
   }
 
+  async updateTemporaryDeactivation(
+    token: string,
+    locationId: string,
+    deactivationReason: string,
+    deactivationReasonDescription?: string,
+    proposedReactivationDate?: string,
+    planetFmReference?: string,
+  ) {
+    return this.locationsApiClient.locations.updateTemporaryDeactivation(
+      token,
+      { locationId },
+      { deactivationReason, deactivationReasonDescription, proposedReactivationDate, planetFmReference },
+    )
+  }
+
   async updateUsedForTypes(token: string, locationId: string, usedForType?: string[]) {
     return this.locationsApiClient.locations.updateUsedForTypes(token, { locationId }, usedForType)
   }
 
   async updateLocalName(token: string, locationId: string, localName?: string, updatedBy?: string) {
     return this.locationsApiClient.locations.updateLocalName(token, { locationId }, { localName, updatedBy })
+  }
+
+  async changeNonResType(
+    token: string,
+    locationId: string,
+    convertedCellType: string,
+    otherConvertedCellType?: string,
+  ) {
+    const params = pickBy({ convertedCellType, otherConvertedCellType }) as {
+      convertedCellType: string
+      otherConvertedCellType?: string
+    }
+    return this.locationsApiClient.locations.updateNonResCell(token, { locationId }, params)
   }
 }

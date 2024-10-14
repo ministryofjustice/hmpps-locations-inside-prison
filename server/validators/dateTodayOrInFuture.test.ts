@@ -14,6 +14,7 @@ describe('dateTodayOrInFuture', () => {
     const date = new Date()
     date.setHours(0)
     date.setMinutes(0)
+    date.setDate(date.getDate())
     expect(dateTodayOrInFuture(formatISO(date))).toEqual(true)
   })
 

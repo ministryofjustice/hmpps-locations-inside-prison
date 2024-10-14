@@ -10,5 +10,8 @@ $govuk-page-width: $moj-page-width;
 @import './components/card';
 @import './components/header-bar';
 @import './components/mini-summary';
+@import './components/sticky-footer';
 @import './components/summary-card';
+@import './components/feedback-banner';
+@import './components/inactive-location-banner';
 @import 'assets/scss/local';

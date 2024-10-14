@@ -1,0 +1,11 @@
+{% macro feedbackBanner(params) %}
+<div class="govuk-!-display-none-print {{ params.feedbackBannerAdditionalClasses }}">
+  <div class="govuk-width-container">
+    <div class="feedback-banner" data-test="feedback-banner" data-qa="feedback-link">
+      <a href="{{ params.feedbackFormUrl }}" class="govuk-body govuk-link govuk-link--inverse" rel="noopener noreferrer" target="_blank">
+        Suggest an improvement or report a problem with this service
+      </a>
+    </div>
+  </div>
+</div>
+{% endmacro %}

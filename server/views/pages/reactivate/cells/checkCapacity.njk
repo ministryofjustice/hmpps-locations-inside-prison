@@ -1,0 +1,107 @@
+{% extends "../../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set title = "Check capacity of cells" %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukBackLink({
+          text: "Back",
+          href: backLink
+        }) }}
+
+        {% if errorlist.length %}
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: validationErrors
+          }) }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block content %}
+
+  {% set formMethod = options.method | default('post') %}
+  {% set formAction = options.action | default('') %}
+  {% set formEnctype = options.enctype | default('') %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-half">
+        {% set rows = [] %}
+        {% for cell in cells %}
+          {% set workingCapacity = (cell.oldWorkingCapacity or 0) | string %}
+          {% set maxCapacity = (cell.capacity.maxCapacity or 0) | string %}
+          {% if values.capacityChanges and values.capacityChanges[cell.id] %}
+            {% if values.capacityChanges[cell.id].workingCapacity %}
+              {% set workingCapacity = values.capacityChanges[cell.id].workingCapacity %}
+            {% endif %}
+            {% if values.capacityChanges[cell.id].maxCapacity %}
+              {% set maxCapacity = values.capacityChanges[cell.id].maxCapacity %}
+            {% endif %}
+          {% endif %}
+
+          {% set rows = (rows.push(
+            [
+              { text: cell.pathHierarchy },
+              { html: workingCapacity },
+              { html: maxCapacity },
+              { html: '<a href="/reactivate/cells/change-capacity/' + cell.id  + '" id="' + cell.id + '">Change</a>' }
+            ]
+          ), rows) %}
+        {% endfor %}
+
+        {{ govukTable({
+          attributes: {
+            "data-qa": "locations-table"
+          },
+          head: [
+            { text: "Location" },
+            { text: "Working capacity" },
+            { text: "Maximum capacity" },
+            { text: "Action" }
+          ],
+          rows: rows
+        }) }}
+
+
+        <form method="{{ formMethod }}" action="{{ formAction }}"
+            {% if formEnctype %}
+              enctype="{{ formEnctype }}"
+            {% endif %}
+        >
+
+          {% if formMethod == 'post' %}
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          {% endif %}
+          <div class="govuk-button-group">
+            {% block formActions %}
+              {% block submitAction %}
+                {{ govukButton({
+                  text: "Continue",
+                  classes: options.buttonClasses,
+                  preventDoubleClick: true,
+                  type: "submit"
+                }) }}
+              {% endblock %}
+            {% endblock %}
+          </div>
+        </form>
+
+        <p class="govuk-body">
+          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
+            Cancel
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

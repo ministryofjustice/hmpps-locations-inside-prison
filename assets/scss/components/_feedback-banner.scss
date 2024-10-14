@@ -1,0 +1,13 @@
+.feedback-banner {
+  background: $govuk-brand-colour;
+  padding: govuk-spacing(4);
+
+  a {
+    color: govuk-colour("white");
+    font-weight: bold;
+  }
+}
+
+.feedbackBannerBackground {
+  background: #f0f4f5;
+}

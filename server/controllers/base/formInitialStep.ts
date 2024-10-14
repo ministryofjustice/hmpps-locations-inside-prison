@@ -39,7 +39,7 @@ export default class FormInitialStep extends FormWizard.Controller {
   getErrorDetail(error: { args: any; key: string; type: string }, res: Response): { text: string; href: string } {
     const { fields } = res.locals.options
     const field = fields[error.key]
-    const fieldName: string = field.nameForErrors || field?.label?.text
+    const fieldName: string = field?.nameForErrors || field?.label?.text
     const errorMessageOverrides = field?.errorMessages || {}
 
     const errorMessages: Record<string, string> = {

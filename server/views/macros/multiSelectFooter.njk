@@ -1,0 +1,36 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% macro multiSelectFooter(params) %}
+  <div class='sticky-select-action-bar' role='toolbar' aria-live='polite'
+       aria-label='actions' aria-disabled='false'
+      {% if params.itemsDescription %}
+        data-description-singular='{{ params.itemsDescription }}'
+      {% endif %}
+      {% if params.itemsDescriptionPlural %}
+        data-description-plural='{{ params.itemsDescriptionPlural }}'
+      {% endif %}
+  >
+    <div class='govuk-width-container'>
+      <div class='sticky-select-action-bar__selected-summary'>
+        <span class='sticky-select-action-bar__count'>x cells selected</span>
+        <a class='sticky-select-action-bar__clear-link'>Clear</a>
+      </div>
+      <div class='govuk-button-group'>
+        {% for action in params.actions %}
+          {{ govukButton({
+            href: action.href if action.href,
+            text: action.text,
+            classes: 'govuk-button--inverse',
+            preventDoubleClick: true,
+            attributes: {
+              id: params.idPrefix + '-action-' + loop.index0,
+              formaction: action.formAction,
+              'data-max-items': action.maxItems if action.maxItems,
+              form: action.form if action.form
+            }
+          }) if action }}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}

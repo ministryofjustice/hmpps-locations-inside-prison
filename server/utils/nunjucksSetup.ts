@@ -74,6 +74,8 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('callAsMacro', callAsMacro)
   njkEnv.addGlobal('formCsrf', formCsrf)
   njkEnv.addGlobal('googleAnalyticsMeasurementId', config.googleAnalytics.measurementId)
+  njkEnv.addGlobal('googleTagManagerContainerId', config.googleAnalytics.containerId)
+  njkEnv.addGlobal('feedbackFormUrl', config.feedbackFormUrl)
 
   njkEnv.addFilter('initialiseName', initialiseName)
 

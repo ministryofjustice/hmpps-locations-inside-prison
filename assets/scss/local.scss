@@ -100,6 +100,10 @@ h1 .govuk-caption-l {
   resize: none
 }
 
+.govuk-table__cell {
+  vertical-align: middle;
+}
+
 #top-banner {
   background-color: govuk-colour("purple");
 
@@ -118,15 +122,12 @@ $sticky-footer-background-colour: govuk-tint($sticky-footer-border-colour, 90);
 $sticky-footer-horizontal-spacing: govuk-spacing(3);
 $sticky-footer-vertical-spacing: govuk-spacing(2);
 
-.sticky-footer {
+.sticky-footer__testing-banner {
   @include govuk-font($size: 16);
   border-top: 2px solid $sticky-footer-border-colour;
   background: $sticky-footer-background-colour;
-  bottom: 0;
-  left: 0;
   padding: $sticky-footer-vertical-spacing $sticky-footer-horizontal-spacing;
-  position: fixed;
-  right: 0;
+  position: relative;
 
   &__heading {
     @include govuk-font($size: 16, $weight: bold);

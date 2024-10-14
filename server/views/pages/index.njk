@@ -3,6 +3,7 @@
 {% from "../macros/card.njk" import card %}
 
 {% set title = applicationName %}
+{% set feedbackBannerBackground = 'feedbackBannerBackground'%}
 
 {% block head %}
   {{ super() }}
@@ -15,7 +16,7 @@
     <div class="govuk-width-container">
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
-          <h1 class="govuk-heading-xl govuk-!-margin-top-5 govuk-!-margin-bottom-5">
+          <h1 class="govuk-heading-xl govuk-!-padding-top-5 govuk-!-margin-bottom-5">
             Practice using Residential locations
           </h1>
           <p class="govuk-body govuk-!-margin-bottom-6">

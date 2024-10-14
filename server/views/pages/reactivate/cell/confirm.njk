@@ -47,6 +47,13 @@
               There will be no change to the establishment's total working or maximum capacity.
             {% endif %}
           </p>
+
+          {% for parentLocation in inactiveParentLocations | sort(attribute='pathHierarchy') %}
+            <p>
+              The status of {{ parentLocation.displayName }} will change to active because it will contain active
+              locations.
+            </p>
+          {% endfor %}
         </div>
 
         <form method="{{ formMethod }}" action="{{ formAction }}"
