@@ -27,7 +27,7 @@ const checkForPrisoners = asyncMiddleware(async (req, res, next) => {
 
 const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
   const { locationType } = res.locals.location.raw
-  if (!['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType)) {
+  if (!['CELL', 'ROOM', 'LANDING', 'WING', 'SPUR'].includes(locationType)) {
     throw new Error(`UNSUPPORTED LOCATION TYPE: ${locationType}`)
   }
 
