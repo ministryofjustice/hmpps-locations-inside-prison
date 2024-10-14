@@ -26,10 +26,4 @@ $(() => {
   })
 
   $('.govuk-checkboxes__input').on('click', updateCheckedCount)
-
-  $('.sticky-select-action-bar button[type=submit]').on('click', () => {
-    $('form button[type=submit]:first').trigger('click')
-
-    return false
-  })
 })
