@@ -7,12 +7,14 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 
-<script src="/assets/js/textInputWithCharacterCount.js"></script>
-
 {% set title = "Add local name" %}
 {% set locationName = location.displayName | capFirst %}
 {% set errors = validationErrors[0].text %}
 
+{% block head %}
+  {{ super() }}
+  <script src="/assets/js/textInputWithCharacterCount.js"></script>
+{% endblock %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
