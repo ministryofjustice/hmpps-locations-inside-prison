@@ -61,9 +61,54 @@
           {% endif %}
 
           {% block fields %}
+          
             {% for key, fieldsOptions in fields %}
               {% if fieldsOptions.component and not fieldsOptions.skip %}
-                {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+                {% if fieldsOptions.component == "govukDateInput" %}
+                  {% set fieldsOptions = { 
+                    "component":"govukDateInput",
+                    "id": fieldsOptions.id,
+                    "name": fieldsOptions.name,
+                    "label": fieldsOptions.label,
+                    "fieldset": fieldsOptions.fieldset,
+                    "nameForErrors": fieldsOptions.nameForErrors,
+                    "items": [
+                      {
+                        "label": fieldsOptions.items[0].label,
+                        "id": fieldsOptions.items[0].id,
+                        "name": fieldsOptions.items[0].name,
+                        "classes": fieldsOptions.items[0].classes,
+                        "value": fieldsOptions.items[0].value,
+                        "attributes": {
+                          "autocomplete": "off"
+                        }
+                      },
+                      {
+                        "label": fieldsOptions.items[1].label,
+                        "id": fieldsOptions.items[1].id,
+                        "name": fieldsOptions.items[1].name,
+                        "classes": fieldsOptions.items[1].classes,
+                        "value": fieldsOptions.items[1].value,
+                        "attributes": {
+                          "autocomplete": "off"
+                        }
+                      },
+                      {
+                        "label": fieldsOptions.items[2].label,
+                        "id": fieldsOptions.items[2].id,
+                        "name": fieldsOptions.items[2].name,
+                        "classes": fieldsOptions.items[2].classes,
+                        "value": fieldsOptions.items[2].value,
+                        "attributes": {
+                          "autocomplete": "off"
+                        }
+                      }
+                    ],
+                    "errorMessage": fieldsOptions.errorMessage
+                    } 
+                    %}
+                {% endif %}
+                  {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
               {% endif %}
             {% endfor %}
           {% endblock %}
