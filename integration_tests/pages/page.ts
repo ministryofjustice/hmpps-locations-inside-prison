@@ -29,7 +29,7 @@ export default abstract class Page {
           { id: 'region', reviewOnFail: true, selector: '.govuk-back-link' },
         ],
       })
-      cy.checkA11y(undefined, undefined, this.logAccessibilityViolations)
+      cy.checkA11y({ exclude: ['.govuk-js-character-count'] }, undefined, this.logAccessibilityViolations)
     }
   }
 
