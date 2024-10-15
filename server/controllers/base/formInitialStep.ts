@@ -59,6 +59,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
       lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo, fields)}`,
+      localNameExists: 'A location with this name already exists',
       maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
       minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
       numericString: `${fieldName} must only include numbers`,

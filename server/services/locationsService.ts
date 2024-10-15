@@ -105,6 +105,10 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getLocationTypes'))[key] || 'Unknown'
   }
 
+  async getLocationByLocalName(token: string, prisonId: string, localName: string) {
+    return this.locationsApiClient.locations.getLocationByLocalName(token, { prisonId, localName })
+  }
+
   async getNonResidentialUsageType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getNonResidentialUsageTypes'))[key] || 'Unknown'
   }
@@ -198,6 +202,10 @@ export default class LocationsService {
 
   async updateUsedForTypes(token: string, locationId: string, usedForType?: string[]) {
     return this.locationsApiClient.locations.updateUsedForTypes(token, { locationId }, usedForType)
+  }
+
+  async updateLocalName(token: string, locationId: string, localName?: string, updatedBy?: string) {
+    return this.locationsApiClient.locations.updateLocalName(token, { locationId }, { localName, updatedBy })
   }
 
   async changeNonResType(

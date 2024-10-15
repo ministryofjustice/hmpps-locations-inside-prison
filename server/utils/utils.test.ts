@@ -1,4 +1,4 @@
-import { convertToTitleCase, initialiseName } from './utils'
+import { convertToTitleCase, initialiseName, sanitizeString } from './utils'
 
 describe('convert to title case', () => {
   it.each([
@@ -26,5 +26,18 @@ describe('initialise name', () => {
     ['Double barrelled', 'Robert-John Smith-Jones-Wilson', 'R. Smith-Jones-Wilson'],
   ])('%s initialiseName(%s, %s)', (_: string, a: string, expected: string) => {
     expect(initialiseName(a)).toEqual(expected)
+  })
+})
+
+describe('sanitizeString', () => {
+  it.each([
+    [null, null, null],
+    ['Empty string', '', null],
+    ['One word', ' wing ', 'wing'],
+    ['Two words', ' dinner hall ', 'dinner hall'],
+    ['Decorated', ' wing Red/White ', 'wing red/white'],
+    ['Extra spaces', '   quiet space    ', 'quiet space'],
+  ])('%s -> sanitizeString(%s)', (_, input, expected) => {
+    expect(sanitizeString(input)).toEqual(expected)
   })
 })
