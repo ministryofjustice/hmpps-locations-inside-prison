@@ -63,6 +63,14 @@ export default class ViewLocationsShowPage extends Page {
 
   removeSpecificCellTypeLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Remove")')
 
+  localNameRow = (): PageElement => cy.get('dt.govuk-summary-list__key').contains('Local Name')
+
+  setLocalNameLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Add local name")')
+
+  changeLocalNameLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Change")')
+
+  removeLocalNameLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Remove")')
+
   cellUsedForDetails = (): PageElement =>
     this.locationDetailsRows().eq(3).find('.govuk-summary-list__value').contains('Test type')
 

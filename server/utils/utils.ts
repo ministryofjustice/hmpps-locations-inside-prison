@@ -21,3 +21,7 @@ export const initialiseName = (fullName?: string): string | null => {
   const array = fullName.split(' ')
   return `${array[0][0]}. ${array[array.length - 1]}`
 }
+
+export const sanitizeString = (string: string | null): string | null => {
+  return string ? string.trim().toLowerCase() : null
+}
