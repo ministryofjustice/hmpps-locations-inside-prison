@@ -70,6 +70,7 @@ context('Inactive Cells Index', () => {
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
             deactivatedReason: 'TEST1',
+            deactivationReasonDescription: 'TEST1 REASON DESCRIPTION',
             proposedReactivationDate: new Date(2023, 3, 14).toISOString(),
             planetFmReference: 'FM-1234321',
           }),
@@ -82,6 +83,7 @@ context('Inactive Cells Index', () => {
             capacity: { maxCapacity: 3, workingCapacity: 1 },
             status: 'INACTIVE',
             deactivatedReason: 'TEST1',
+            deactivationReasonDescription: '',
             proposedReactivationDate: new Date(2024, 2, 1).toISOString(),
             planetFmReference: undefined,
           }),
@@ -114,6 +116,45 @@ context('Inactive Cells Index', () => {
         cy.get('h1').contains('Inactive cells (3)')
 
         testInactiveCellsTable(inactiveCellsIndexPage, locations)
+      })
+
+      it('Displays both the reason and reason description values when it is present in the data', () => {
+        cy.signIn()
+        const indexPage = Page.verifyOnPage(IndexPage)
+
+        indexPage.cards.inactiveCells().find('a').click()
+        Page.verifyOnPage(InactiveCellsIndexPage)
+
+        cy.title().should('eq', 'View all inactive cells - Residential locations')
+        cy.get('h1').contains('Inactive cells (3)')
+
+        cy.get('.govuk-table__body > :nth-child(1) > :nth-child(2)').contains('Test type 1 - TEST1 REASON DESCRIPTION')
+      })
+
+      it('Displays only the reason when a reason description is an empty string value', () => {
+        cy.signIn()
+        const indexPage = Page.verifyOnPage(IndexPage)
+
+        indexPage.cards.inactiveCells().find('a').click()
+        Page.verifyOnPage(InactiveCellsIndexPage)
+
+        cy.title().should('eq', 'View all inactive cells - Residential locations')
+        cy.get('h1').contains('Inactive cells (3)')
+
+        cy.get('.govuk-table__body > :nth-child(2) > :nth-child(2)').contains('Test type 1')
+      })
+
+      it('Displays only the reason when a reason description value is not present in the data', () => {
+        cy.signIn()
+        const indexPage = Page.verifyOnPage(IndexPage)
+
+        indexPage.cards.inactiveCells().find('a').click()
+        Page.verifyOnPage(InactiveCellsIndexPage)
+
+        cy.title().should('eq', 'View all inactive cells - Residential locations')
+        cy.get('h1').contains('Inactive cells (3)')
+
+        cy.get('.govuk-table__body > :nth-child(3) > :nth-child(2)').contains('Test type 1')
       })
     })
 

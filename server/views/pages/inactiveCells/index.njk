@@ -81,9 +81,15 @@
                </div>'
     }), row) %}
   {% endif %}
+  {% if cell.deactivationReasonDescription %}
+    {% set deactivationDescription = ' - ' + cell.deactivationReasonDescription %}
+  {% else %}
+    {% set deactivationDescription = '' %}
+  {% endif %}
+
   {% set row = (row.push(
     { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>", classes: 'govuk-table__header' },
-    { text: cell.deactivatedReason },
+    { text: cell.deactivatedReason + deactivationDescription },
     { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
     { text: cell.planetFmReference or 'Not provided' },
     { text: cell.deactivatedBy }
