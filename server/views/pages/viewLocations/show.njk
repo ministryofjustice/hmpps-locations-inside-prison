@@ -52,34 +52,32 @@
 {% endblock %}
 
 {% block heading %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-three-quarters">
-        <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
-        <h1 class="govuk-heading-l">
-          {{ locationName }}
-          {% if residentialSummary.location.leafLevel and residentialSummary.location.certification and residentialSummary.location.certification.certified %}
-            {{ govukTag({
-              text: 'Certified',
-              classes: "govuk-tag--hollow",
-              attributes: {
-                "data-qa": "certified-tag"
-              }
-            }) }}
-          {% endif %}
-          {{ locationStatusTag(residentialSummary.location) }}
+  <div class="govuk-grid-row govuk-!-margin-bottom-0">
+    <div class="govuk-grid-column-three-quarters">
+      <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
+      <h1 class="govuk-heading-l">
+        {{ locationName }}
+        {% if residentialSummary.location.leafLevel and residentialSummary.location.certification and residentialSummary.location.certification.certified %}
+          {{ govukTag({
+            text: 'Certified',
+            classes: "govuk-tag--hollow",
+            attributes: {
+              "data-qa": "certified-tag"
+            }
+          }) }}
+        {% endif %}
+        {{ locationStatusTag(residentialSummary.location) }}
 
-          {% if actionButton %}
-            {{ govukButton(actionButton) }}
-          {% endif %}
+        {% if actionButton %}
+          {{ govukButton(actionButton) }}
+        {% endif %}
 
-          {% if actions | length %}
-            <div class="govuk-!-float-right">
-              {{ mojButtonMenu({ items: actions }) }}
-            </div>
-          {% endif %}
-        </h1>
-      </div>
+        {% if actions | length %}
+          <div class="govuk-!-float-right">
+            {{ mojButtonMenu({ items: actions }) }}
+          </div>
+        {% endif %}
+      </h1>
     </div>
   </div>
 {% endblock %}
