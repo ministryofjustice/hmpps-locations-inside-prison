@@ -6,12 +6,10 @@
 {% set title = "You are about to convert this cell to a non-residential room" %}
 
 {% block heading %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
-        <h1 class="govuk-heading-l">You can’t convert this location as it is currently occupied</h1>
-      </div>
+  <div class="govuk-grid-row govuk-!-margin-bottom-0">
+    <div class="govuk-grid-column-two-thirds">
+      <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+      <h1 class="govuk-heading-l">You can’t convert this location as it is currently occupied</h1>
     </div>
   </div>
 {% endblock %}
