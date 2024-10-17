@@ -109,7 +109,7 @@
     "date-fns": "^4.1.0",
     "express": "^4.21.1",
     "express-async-errors": "^3.1.1",
-    "express-prom-bundle": "^7.0.0",
+    "express-prom-bundle": "^7.0.2",
     "express-session": "^1.18.1",
     "govuk-frontend": "^5.7.1",
     "helmet": "^8.0.0",
