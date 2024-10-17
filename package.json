@@ -96,7 +96,7 @@
     "@aws-sdk/client-sqs": "^3.670.0",
     "@ministryofjustice/frontend": "^2.2.4",
     "agentkeepalive": "^4.5.0",
-    "applicationinsights": "^3.2.2",
+    "applicationinsights": "^2.9.6",
     "axe-core": "^4.10.0",
     "body-parser": "^1.20.3",
     "bunyan": "^1.8.15",
