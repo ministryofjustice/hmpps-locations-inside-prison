@@ -191,6 +191,12 @@
       "jest-core": {
         "micromatch": "4.0.8"
       }
+    },
+    "csurf": {
+      "cookie": "0.7.2"
+    },
+    "applicationinsights": {
+      "cookie": "0.7.2"
     }
   }
 }
