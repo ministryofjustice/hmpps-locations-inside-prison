@@ -196,7 +196,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
             },
             name: 'otherConvertedCellType',
             validate: ['required', maxLength(30)],
-            value: 'pet therapy room',
+            value: '',
           },
         },
         validationErrors: [],
