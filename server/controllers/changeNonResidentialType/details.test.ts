@@ -40,7 +40,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
         },
         values: {
           convertedCellType: 'OFFICE',
-          otherConvertedCellType: 'pet therapy room',
+          otherConvertedCellType: '',
         },
       },
       journeyModel: {
@@ -57,7 +57,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
           (fieldName?: string) =>
             ({
               convertedCellType: { text: 'office', value: 'OFFICE' },
-              otherConvertedCellType: 'pet therapy room',
+              otherConvertedCellType: '',
             })[fieldName],
         ),
       },
@@ -84,7 +84,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
         },
         values: {
           convertedCellType: 'OFFICE', // Mock the form value correctly
-          otherConvertedCellType: 'pet therapy room',
+          otherConvertedCellType: '',
         },
       },
 
@@ -110,7 +110,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
             text: 'office',
             value: 'OFFICE',
           },
-          otherConvertedCellType: 'pet therapy room',
+          otherConvertedCellType: '',
         },
       },
       redirect: jest.fn(),
