@@ -268,3 +268,72 @@ describe('ChangeNonResidentialTypeDetails', () => {
     })
   })
 })
+
+describe('ConvertedCellType Tests', () => {
+  let req: any
+  let res: any
+  let next: any
+
+  const fieldsItems = {
+    convertedCellType: {
+      items: [
+        { value: 'OFFICE', text: 'Office' },
+        { value: 'OTHER', text: 'Other' },
+      ],
+    },
+  }
+
+  // Test cases with different sets of values for two scenarios
+  const testCases = [
+    {
+      description: 'OFFICE type selected, no other room description',
+      values: {
+        convertedCellType: 'OFFICE',
+        otherConvertedCellType: '',
+      },
+    },
+    {
+      description: 'OTHER type selected with other room description',
+      values: {
+        convertedCellType: 'OTHER',
+        otherConvertedCellType: 'pet therapy room',
+      },
+    },
+  ]
+
+  // Parameterized test
+  testCases.forEach(({ description, values }) => {
+    describe(description, () => {
+      beforeEach(() => {
+        req = {
+          flash: jest.fn(),
+          form: {
+            options: {
+              fieldsItems,
+            },
+            values,
+          },
+        }
+
+        res = {
+          locals: {
+            user: { username: 'testUser' },
+            location: {
+              raw: {
+                convertedCellType: values.convertedCellType,
+                otherConvertedCellType: values.otherConvertedCellType,
+              },
+            },
+          },
+        }
+
+        next = jest.fn()
+      })
+
+      it('should correctly handle the converted cell type', () => {
+        expect(req.form.values.convertedCellType).toBe(values.convertedCellType)
+        expect(req.form.values.otherConvertedCellType).toBe(values.otherConvertedCellType)
+      })
+    })
+  })
+})
