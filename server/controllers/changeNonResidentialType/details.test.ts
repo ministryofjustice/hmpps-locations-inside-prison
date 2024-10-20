@@ -271,8 +271,6 @@ describe('ChangeNonResidentialTypeDetails', () => {
 
 describe('OtherConvertedCellType Tests', () => {
   let req: any
-  let resOtherConvertedCellType: any
-  let nextOtherConvertedCellType: any
 
   const fieldsItems = {
     convertedCellType: {
@@ -314,20 +312,6 @@ describe('OtherConvertedCellType Tests', () => {
             values,
           },
         }
-
-        resOtherConvertedCellType = {
-          locals: {
-            user: { username: 'testUser' },
-            location: {
-              raw: {
-                convertedCellType: values.convertedCellType,
-                otherConvertedCellType: values.otherConvertedCellType,
-              },
-            },
-          },
-        }
-
-        nextOtherConvertedCellType = jest.fn()
       })
 
       it('should correctly handle the converted cell type', () => {
