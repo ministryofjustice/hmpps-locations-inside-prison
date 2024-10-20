@@ -26,7 +26,7 @@ describe('view locations show', () => {
 
   const deactivateCellAction = {
     text: 'Deactivate cell',
-    href: '/location/7e570000-0000-0000-0000-000000000001/deactivate/temporary',
+    href: '/location/7e570000-0000-0000-0000-000000000001/deactivate',
   }
 
   beforeEach(() => {

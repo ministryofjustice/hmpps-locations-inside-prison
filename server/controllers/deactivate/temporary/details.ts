@@ -1,13 +1,10 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../utils/backUrl'
-import FormInitialStep from '../base/formInitialStep'
-import checkForPrisoners from './checkForPrisoners'
+import FormInitialStep from '../../base/formInitialStep'
 
 export default class DeactivateTemporaryDetails extends FormInitialStep {
   middlewareSetup() {
     this.use(this.populateItems)
-    this.use(checkForPrisoners)
     super.middlewareSetup()
   }
 
@@ -57,13 +54,11 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
 
     const { id: locationId, prisonId } = res.locals.location
 
-    const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-      nextStepUrl: `/location/${locationId}/deactivate/temporary/confirm`,
-    })
+    const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
+
     return {
       ...locals,
-      backLink,
+      backLink: res.locals.backLink || cancelLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
     }
   }

@@ -25,6 +25,7 @@ const steps = {
   },
   '/occupied': {
     controller: NonResidentialConversionOccupied,
+    checkJourney: false,
   },
   '/warning': {
     controller: NonResidentialConversionWarning,

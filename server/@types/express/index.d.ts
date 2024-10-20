@@ -28,6 +28,7 @@ export declare global {
       flash(type: string, message: any[] | any): number
       flash(type: string, format: string, ...args: any[]): number
       canAccess: (permission: string) => boolean
+      featureFlags?: Record<string, boolean>
     }
 
     interface Locals {

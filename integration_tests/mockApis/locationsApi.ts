@@ -623,6 +623,26 @@ const stubLocationsConvertCellToNonResCell = () =>
     },
   })
 
+const stubLocationsConvertCellToNonResCellOccupied = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/convert-cell-to-non-res-cell',
+    },
+    response: {
+      status: 409,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        status: 409,
+        userMessage: 'Deactivation Exception: 1 locations contain 1 prisoners',
+        developerMessage: '1 locations contain 1 prisoners',
+        errorCode: 109,
+      },
+    },
+  })
+
 const stubLocationsConvertToCell = () =>
   stubFor({
     request: {
@@ -638,6 +658,41 @@ const stubLocationsConvertToCell = () =>
     },
   })
 
+const stubLocationsDeactivatePermanent = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/deactivate/permanent',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+const stubLocationsDeactivatePermanentOccupied = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/deactivate/permanent',
+    },
+    response: {
+      status: 409,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        status: 409,
+        userMessage: 'Deactivation Exception: 1 locations contain 1 prisoners',
+        developerMessage: '1 locations contain 1 prisoners',
+        errorCode: 109,
+      },
+    },
+  })
+
 const stubLocationsDeactivateTemporary = () =>
   stubFor({
     request: {
@@ -650,6 +705,26 @@ const stubLocationsDeactivateTemporary = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {},
+    },
+  })
+
+const stubLocationsDeactivateTemporaryOccupied = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/[\\w-]+/deactivate/temporary',
+    },
+    response: {
+      status: 409,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        status: 409,
+        userMessage: 'Deactivation Exception: 1 locations contain 1 prisoners',
+        developerMessage: '1 locations contain 1 prisoners',
+        errorCode: 109,
+      },
     },
   })
 
@@ -699,8 +774,12 @@ export default {
   stubLocationsConstantsUsedForType,
   stubLocationsConstantsUsedForTypeForPrison,
   stubLocationsConvertCellToNonResCell,
+  stubLocationsConvertCellToNonResCellOccupied,
   stubLocationsConvertToCell,
+  stubLocationsDeactivatePermanent,
+  stubLocationsDeactivatePermanentOccupied,
   stubLocationsDeactivateTemporary,
+  stubLocationsDeactivateTemporaryOccupied,
   stubLocationsLocationsResidentialSummary,
   stubLocationsLocationsResidentialSummaryForLocation,
   stubLocationsPrisonArchivedLocations,

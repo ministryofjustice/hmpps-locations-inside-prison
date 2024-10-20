@@ -26,7 +26,8 @@ describe('rolesToPermissions', () => {
       'change_temporary_deactivation_details',
       'change_used_for',
       'convert_non_residential',
-      'deactivate_temporary',
+      'deactivate',
+      'deactivate:permanent',
       'reactivate',
       'set_cell_type',
     ])
@@ -47,7 +48,8 @@ describe('rolesToPermissions', () => {
       'change_temporary_deactivation_details',
       'change_used_for',
       'convert_non_residential',
-      'deactivate_temporary',
+      'deactivate',
+      'deactivate:permanent',
       'reactivate',
       'set_cell_type',
     ])

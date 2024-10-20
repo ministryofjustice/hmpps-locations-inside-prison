@@ -1,9 +1,10 @@
 import LocationFactory from '../../../server/testutils/factories/location'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import DeactivateTemporaryOccupiedPage from '../../pages/deactivateTemporary/occupied'
-import DeactivateTemporaryDetailsPage from '../../pages/deactivateTemporary/details'
-import DeactivateTemporaryConfirmPage from '../../pages/deactivateTemporary/confirm'
+import DeactivateOccupiedPage from '../../pages/deactivate/occupied'
+import DeactivateTemporaryDetailsPage from '../../pages/deactivate/temporary/details'
+import DeactivateTemporaryConfirmPage from '../../pages/deactivate/temporary/confirm'
+import DeactivateTypePage from '../../pages/deactivate/type'
 
 context('Deactivate temporary', () => {
   const location = LocationFactory.build({
@@ -15,6 +16,10 @@ context('Deactivate temporary', () => {
     leafLevel: true,
     localName: null,
     specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
+  })
+
+  beforeEach(() => {
+    cy.task('setFeatureFlag', { permanentDeactivation: true })
   })
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -78,17 +83,17 @@ context('Deactivate temporary', () => {
 
     function itDisplaysTheCellOccupiedPage() {
       it('has a caption showing the cell description', () => {
-        Page.verifyOnPage(DeactivateTemporaryOccupiedPage)
+        Page.verifyOnPage(DeactivateOccupiedPage)
         cy.get('.govuk-caption-m').contains('Cell A-1-001')
       })
 
       it('shows the correct error message', () => {
-        Page.verifyOnPage(DeactivateTemporaryOccupiedPage)
+        Page.verifyOnPage(DeactivateOccupiedPage)
         cy.contains('You need to move everyone out of this location before you can deactivate it.')
       })
 
       it('has a cancel link', () => {
-        const cellOccupiedPage = Page.verifyOnPage(DeactivateTemporaryOccupiedPage)
+        const cellOccupiedPage = Page.verifyOnPage(DeactivateOccupiedPage)
         cellOccupiedPage.cancelLink().click()
 
         Page.verifyOnPage(ViewLocationsShowPage)
@@ -130,13 +135,56 @@ context('Deactivate temporary', () => {
       itDisplaysTheCellOccupiedPage()
     })
 
-    it('can be accessed via the actions dropdown on the show location page', () => {
+    it('can be accessed by selecting temporary when prompted after clicking the actions dropdown', () => {
       ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.actionsMenu().click()
       viewLocationsShowPage.deactivateAction().click()
-
+      const deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
+      deactivateTypePage.tempRadioButton().click()
+      deactivateTypePage.continueButton().click()
       Page.verifyOnPage(DeactivateTemporaryDetailsPage)
+    })
+
+    it('has back links via the deactivation type page from the details page', () => {
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      viewLocationsShowPage.actionsMenu().click()
+      viewLocationsShowPage.deactivateAction().click()
+      let deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
+      deactivateTypePage.tempRadioButton().click()
+      deactivateTypePage.continueButton().click()
+      const detailsPage = Page.verifyOnPage(DeactivateTemporaryDetailsPage)
+      detailsPage.backLink().click()
+      Page.verifyOnPage(DeactivateTypePage)
+      deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
+      deactivateTypePage.backLink().click()
+      Page.verifyOnPage(ViewLocationsShowPage)
+    })
+
+    context('when the permanentDeactivation feature flag is disabled', () => {
+      beforeEach(() => {
+        cy.task('setFeatureFlag', { permanentDeactivation: false })
+      })
+
+      it('goes straight to temp deactivation when clicking the actions dropdown', () => {
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.actionsMenu().click()
+        viewLocationsShowPage.deactivateAction().click()
+
+        Page.verifyOnPage(DeactivateTemporaryDetailsPage)
+      })
+
+      it('goes straight back to the view location page when clicking back', () => {
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.actionsMenu().click()
+        viewLocationsShowPage.deactivateAction().click()
+        const deactivateTemporaryPage = Page.verifyOnPage(DeactivateTemporaryDetailsPage)
+        deactivateTemporaryPage.backLink().click()
+        Page.verifyOnPage(ViewLocationsShowPage)
+      })
     })
 
     describe('details page', () => {
@@ -384,6 +432,17 @@ context('Deactivate temporary', () => {
         cy.get('#govuk-notification-banner-title').contains('Success')
         cy.get('.govuk-notification-banner__content h3').contains('Cell deactivated')
         cy.get('.govuk-notification-banner__content p').contains('You have deactivated cell A-1-001.')
+      })
+
+      context('when the cell becomes occupied during the process', () => {
+        beforeEach(() => {
+          cy.task('stubLocationsDeactivateTemporaryOccupied')
+
+          const confirmationPage = Page.verifyOnPage(DeactivateTemporaryConfirmPage)
+          confirmationPage.confirmButton().click()
+        })
+
+        itDisplaysTheCellOccupiedPage()
       })
     })
   })

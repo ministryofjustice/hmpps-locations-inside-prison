@@ -1,8 +1,8 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import fields from '../../routes/deactivateTemporary/fields'
+import fields from '../../../routes/deactivate/fields'
 import DeactivateTemporaryDetails from './details'
-import { Services } from '../../services'
+import { Services } from '../../../services'
 
 describe('DeactivateTemporaryDetails', () => {
   const controller = new DeactivateTemporaryDetails({ route: '/' })
@@ -106,7 +106,7 @@ describe('DeactivateTemporaryDetails', () => {
       const result = controller.locals(req, res)
 
       expect(result).toEqual({
-        backLink: '/referrer-url',
+        backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields,
         validationErrors: [
@@ -115,6 +115,18 @@ describe('DeactivateTemporaryDetails', () => {
             text: 'Enter a deactivation reason',
           },
         ],
+      })
+    })
+
+    it('returns the expected locals when the back link is already set', () => {
+      res.locals.backLink = '/last/step'
+      const result = controller.locals(req, res)
+
+      expect(result).toEqual({
+        backLink: '/last/step',
+        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        fields,
+        validationErrors: [],
       })
     })
   })

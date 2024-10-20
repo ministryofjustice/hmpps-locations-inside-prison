@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import fields from '../../routes/deactivateTemporary/fields'
-import { Services } from '../../services'
+import fields from '../../../routes/deactivate/fields'
+import { Services } from '../../../services'
 import DeactivateTemporaryConfirm from './confirm'
-import LocationsService from '../../services/locationsService'
-import AuthService from '../../services/authService'
-import AnalyticsService from '../../services/analyticsService'
+import LocationsService from '../../../services/locationsService'
+import AuthService from '../../../services/authService'
+import AnalyticsService from '../../../services/analyticsService'
 
 describe('DeactivateTemporaryConfirm', () => {
   const controller = new DeactivateTemporaryConfirm({ route: '/' })
@@ -87,49 +87,6 @@ describe('DeactivateTemporaryConfirm', () => {
     analyticsService.sendEvent = jest.fn()
   })
 
-  describe('getCellCount', () => {
-    beforeEach(() => {
-      req.services = {
-        authService: {
-          getSystemClientToken: jest.fn().mockResolvedValue('token'),
-        },
-        locationsService: {
-          getResidentialSummary: jest
-            .fn()
-            .mockResolvedValue({ parentLocation: { numberOfCellLocations: 10, inactiveCells: 2 } }),
-        },
-      } as unknown as Services
-    })
-
-    describe('when location is a CELL', () => {
-      beforeEach(() => {
-        res.locals.location.raw = { ...res.locals.location, locationType: 'CELL' }
-      })
-
-      it('sets cellCount to 1 without calling the API', async () => {
-        const callback = jest.fn()
-        await controller.getCellCount(req, res, callback)
-
-        expect(res.locals.cellCount).toBe(1)
-        expect(req.services.authService.getSystemClientToken).not.toHaveBeenCalled()
-        expect(req.services.locationsService.getResidentialSummary).not.toHaveBeenCalled()
-      })
-    })
-
-    describe('when location is not a CELL', () => {
-      beforeEach(() => {
-        res.locals.location.raw = { ...res.locals.location, locationType: 'LANDING' }
-      })
-
-      it('calls the API to get cell count', async () => {
-        const callback = jest.fn()
-        await controller.getCellCount(req, res, callback)
-
-        expect(res.locals.cellCount).toBe(8)
-      })
-    })
-  })
-
   describe('generateChangeSummary', () => {
     it('returns the expected string', () => {
       expect(controller.generateChangeSummary(1, 2, 1020)).toEqual(`You are making 1 cell inactive.
@@ -209,6 +166,23 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
         '2030-04-20',
         'PFMRN123',
       )
+    })
+
+    it('redirects to the cell occupied page when cell is occupied error occurs', async () => {
+      const error: any = new Error('API error: Cell is occupied')
+      error.data = { errorCode: 109 }
+      locationsService.deactivateTemporary.mockRejectedValue(error)
+      await controller.saveValues(req, res, next)
+
+      expect(res.redirect).toHaveBeenCalledWith('/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/deactivate/occupied')
+    })
+
+    it('calls next with any unexpected errors', async () => {
+      const error = new Error('API error')
+      locationsService.deactivateTemporary.mockRejectedValue(error)
+      await controller.saveValues(req, res, next)
+
+      expect(next).toHaveBeenCalledWith(error)
     })
 
     it('sends an analytics event', async () => {

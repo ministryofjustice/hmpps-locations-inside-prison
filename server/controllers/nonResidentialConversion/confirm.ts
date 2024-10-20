@@ -38,8 +38,9 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { location, user } = res.locals
+
     try {
-      const { location, user } = res.locals
       const { locationsService } = req.services
       const convertedCellType = req.sessionModel.get('convertedCellType') as { text: string; value: string }
       let otherConvertedCellType = req.sessionModel.get('otherConvertedCellType') as string
@@ -63,8 +64,7 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
       return next()
     } catch (error) {
       if (error.data?.errorCode === 109) {
-        req.form.options.next = 'occupied'
-        return next()
+        return res.redirect(`/location/${location.id}/non-residential-conversion/occupied`)
       }
       return next(error)
     }
