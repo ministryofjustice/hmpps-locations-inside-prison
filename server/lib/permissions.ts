@@ -16,7 +16,8 @@ const manageResidentialLocationsPermissions: string[] = [
 const manageResLocationsOpCapPermissions: string[] = [
   ...manageResidentialLocationsPermissions,
   'change_signed_operational_capacity',
-  'deactivate_temporary',
+  'deactivate',
+  'deactivate:permanent',
   'change_temporary_deactivation_details',
 ]
 

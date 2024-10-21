@@ -12,11 +12,11 @@
 {% from "../../macros/locationsTable.njk" import locationsTable %}
 {% from "../../macros/miniSummary.njk" import miniSummary %}
 
-{% set title = "Deactivation details" %}
+{% set title = "Do you want to deactivate this location temporarily or permanently?" %}
 
 {% block heading %}
   <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
-  <h1 class="govuk-heading-l">Deactivation details</h1>
+  <h1 class="govuk-heading-l">{{ title }}</h1>
 {% endblock %}
 
 {% block beforeContent %}

@@ -1,8 +1,8 @@
-import Page, { PageElement } from '../page'
+import Page, { PageElement } from '../../page'
 
-export default class DeactivateTemporaryConfirmPage extends Page {
+export default class DeactivatePermanentConfirmPage extends Page {
   constructor() {
-    super('Check your answers before deactivating this location')
+    super('You are permanently deactivating this location')
   }
 
   confirmButton = (): PageElement => cy.get('button:contains("Confirm deactivation")')

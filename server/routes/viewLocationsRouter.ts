@@ -27,10 +27,10 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     })(req, res, null)
   }
 
-  if (active && ['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType) && req.canAccess('deactivate_temporary')) {
+  if (active && ['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType) && req.canAccess('deactivate')) {
     addAction({
       text: `Deactivate ${location.locationType.toLowerCase()}`,
-      href: `/location/${location.id}/deactivate/temporary`,
+      href: `/location/${location.id}/deactivate`,
     })(req, res, null)
   }
 

@@ -83,13 +83,20 @@
     {% endif %}
 
     {% if location.raw.locationType == 'CELL' and canAccess('reactivate') %}
-      <br>
-
       {{ govukButton({
         text: "Activate " + (location.locationType | lower),
-        classes: options.buttonClasses,
+        classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
         preventDoubleClick: true,
         href: "/reactivate/cell/" + location.id
+      }) }}
+    {% endif %}
+
+    {% if canAccess('deactivate:permanent') %}
+      {{ govukButton({
+        text: "Deactivate permanently",
+        classes: "govuk-button--secondary govuk-!-margin-top-5 govuk-!-margin-bottom-0",
+        preventDoubleClick: true,
+        href: "/location/" + location.id + "/deactivate/permanent"
       }) }}
     {% endif %}
   {% endset %}

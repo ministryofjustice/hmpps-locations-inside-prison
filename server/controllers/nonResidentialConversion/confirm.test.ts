@@ -149,19 +149,20 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
       })
     })
 
-    it('sets the next step to the cell occupied page when cell is occupied error occurs', async () => {
+    it('redirects to the cell occupied page when cell is occupied error occurs', async () => {
       const error: any = new Error('API error: Cell is occupied')
       error.data = { errorCode: 109 }
-      ;(locationsService.convertCellToNonResCell as jest.Mock).mockRejectedValue(error)
+      locationsService.convertCellToNonResCell.mockRejectedValue(error)
       await controller.saveValues(req, res, next)
 
-      expect(req.form.options.next).toEqual('occupied')
-      expect(next).toHaveBeenCalledWith()
+      expect(res.redirect).toHaveBeenCalledWith(
+        '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/non-residential-conversion/occupied',
+      )
     })
 
     it('calls next with any unexpected errors', async () => {
       const error = new Error('API error')
-      ;(locationsService.convertCellToNonResCell as jest.Mock).mockRejectedValue(error)
+      locationsService.convertCellToNonResCell.mockRejectedValue(error)
       await controller.saveValues(req, res, next)
 
       expect(next).toHaveBeenCalledWith(error)

@@ -130,6 +130,15 @@ describe('locationsApiClient', () => {
   describe('locations', () => {
     describe('deactivate', () => {
       testCall(
+        'permanent',
+        '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/deactivate/permanent',
+        false,
+        () => apiClient.locations.deactivate.permanent,
+        { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+        'put',
+        { reason: 'because it is a very naughty wing' },
+      )
+      testCall(
         'temporary',
         '/locations/cc639c0e-02c4-4d34-a134-a15a40ae17b6/deactivate/temporary',
         false,
