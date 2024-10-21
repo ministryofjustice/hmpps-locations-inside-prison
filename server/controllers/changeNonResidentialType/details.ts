@@ -35,6 +35,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
       ...item,
       checked: convertedCellTypes.includes(item.value), // Use the new variable
     }))
+    fields.otherConvertedCellType.value = res.locals.location.raw?.otherConvertedCellType || ''
 
     return {
       ...locals,

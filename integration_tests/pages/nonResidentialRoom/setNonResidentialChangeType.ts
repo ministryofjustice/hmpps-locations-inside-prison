@@ -12,7 +12,7 @@ export default class NonResidentialRoomTypeChangePage extends Page {
 
   otherFreeText = (): PageElement => cy.get('#otherConvertedCellType')
 
-  continueButton = (): PageElement => cy.get('button:contains("Continue")')
+  continueButton = (): PageElement => cy.get('button:contains("Save")')
 
   backLink = (): PageElement => cy.get('.govuk-back-link')
 

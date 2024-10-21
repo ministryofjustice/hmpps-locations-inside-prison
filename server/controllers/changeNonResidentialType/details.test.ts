@@ -40,7 +40,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
         },
         values: {
           convertedCellType: 'OFFICE',
-          otherConvertedCellType: 'pet therapy room',
+          otherConvertedCellType: '',
         },
       },
       journeyModel: {
@@ -57,7 +57,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
           (fieldName?: string) =>
             ({
               convertedCellType: { text: 'office', value: 'OFFICE' },
-              otherConvertedCellType: 'pet therapy room',
+              otherConvertedCellType: '',
             })[fieldName],
         ),
       },
@@ -84,7 +84,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
         },
         values: {
           convertedCellType: 'OFFICE', // Mock the form value correctly
-          otherConvertedCellType: 'pet therapy room',
+          otherConvertedCellType: '',
         },
       },
 
@@ -110,7 +110,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
             text: 'office',
             value: 'OFFICE',
           },
-          otherConvertedCellType: 'pet therapy room',
+          otherConvertedCellType: '',
         },
       },
       redirect: jest.fn(),
@@ -196,7 +196,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
             },
             name: 'otherConvertedCellType',
             validate: ['required', maxLength(30)],
-            value: 'pet therapy room',
+            value: '',
           },
         },
         validationErrors: [],
@@ -265,6 +265,59 @@ describe('ChangeNonResidentialTypeDetails', () => {
       expect(resSuccessHandler.redirect).toHaveBeenCalledWith(
         `/view-and-update-locations/TST/${locationIdSuccesHandler}`,
       )
+    })
+  })
+})
+
+describe('OtherConvertedCellType Tests', () => {
+  let req: any
+
+  const fieldsItems = {
+    convertedCellType: {
+      items: [
+        { value: 'OFFICE', text: 'Office' },
+        { value: 'OTHER', text: 'Other' },
+      ],
+    },
+  }
+
+  // Test cases with different sets of values for two scenarios
+  const testCases = [
+    {
+      description: 'OFFICE type selected, no other room description',
+      values: {
+        convertedCellType: 'OFFICE',
+        otherConvertedCellType: '',
+      },
+    },
+    {
+      description: 'OTHER type selected with other room description',
+      values: {
+        convertedCellType: 'OTHER',
+        otherConvertedCellType: 'pet therapy room',
+      },
+    },
+  ]
+
+  // Parameterized test
+  testCases.forEach(({ description, values }) => {
+    describe(description, () => {
+      beforeEach(() => {
+        req = {
+          flash: jest.fn(),
+          form: {
+            options: {
+              fieldsItems,
+            },
+            values,
+          },
+        }
+      })
+
+      it('should correctly handle the converted cell type', () => {
+        expect(req.form.values.convertedCellType).toBe(values.convertedCellType)
+        expect(req.form.values.otherConvertedCellType).toBe(values.otherConvertedCellType)
+      })
     })
   })
 })
