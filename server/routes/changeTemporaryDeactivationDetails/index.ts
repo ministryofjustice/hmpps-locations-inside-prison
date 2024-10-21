@@ -8,23 +8,6 @@ import asyncMiddleware from '../../middleware/asyncMiddleware'
 
 const router = express.Router({ mergeParams: true })
 
-const checkForPrisoners = asyncMiddleware(async (req, res, next) => {
-  const { locationId } = req.params
-  const redirectUrl = `/location/${locationId}/deactivate/temporary/occupied`
-  if (req.originalUrl === redirectUrl) {
-    return next()
-  }
-
-  const { user } = res.locals
-  const token = await req.services.authService.getSystemClientToken(user.username)
-  const locations = await req.services.locationsService.getPrisonersInLocation(token, locationId)
-  if (locations.find(({ prisoners }) => prisoners?.length)) {
-    return res.redirect(redirectUrl)
-  }
-
-  return next()
-})
-
 const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
   const { locationType } = res.locals.location.raw
   if (!['CELL', 'ROOM', 'LANDING', 'WING', 'SPUR'].includes(locationType)) {
@@ -36,7 +19,6 @@ const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
 
 router.use(
   protectRoute('change_temporary_deactivation_details'),
-  checkForPrisoners,
   populateLocation({ decorate: true }),
   checkSupportedLocationType,
   wizard(steps, fields, {

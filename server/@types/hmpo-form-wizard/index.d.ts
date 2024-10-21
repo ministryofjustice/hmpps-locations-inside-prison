@@ -121,7 +121,7 @@ declare module 'hmpo-form-wizard' {
 
       middlewareSetup(): void
 
-      use(...args: ((req: Request, res: Express.Response, next: Express.NextFunction) => any)[]): any
+      use(...args: ((req: Request | Express.Request, res: Express.Response, next: Express.NextFunction) => any)[]): any
 
       get(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 

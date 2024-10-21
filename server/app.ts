@@ -24,6 +24,7 @@ import routes from './routes'
 import type { Services } from './services'
 import setCanAccess from './middleware/setCanAccess'
 import config from './config'
+import setUpFeatureFlags from './middleware/setUpFeatureFlags'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -40,6 +41,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
   nunjucksSetup(app)
+  app.use(setUpFeatureFlags())
   app.use(setUpAuthentication())
   app.use(
     authorisationMiddleware(['MANAGE_RES_LOCATIONS_OP_CAP', 'MANAGE_RESIDENTIAL_LOCATIONS', 'VIEW_INTERNAL_LOCATION']),

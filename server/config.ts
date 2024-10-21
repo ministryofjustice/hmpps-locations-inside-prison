@@ -117,4 +117,7 @@ export default {
   productionUrl: get('PRODUCTION_URL', '#'),
   sandbox: environmentName === 'Training',
   feedbackFormUrl: get('FEEDBACK_FORM_URL', ''),
+  featureFlags: {
+    permanentDeactivation: get('FLAG_MVP2_PERMANENT_DEACTIVATION', 'disabled') === 'enabled',
+  },
 }

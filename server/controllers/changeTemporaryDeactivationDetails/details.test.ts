@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import fields from '../../routes/deactivateTemporary/fields'
+import fields from '../../routes/deactivate/fields'
 import ChangeTemporaryDeactivationDetails from './details'
 import { Services } from '../../services'
 import LocationsService from '../../services/locationsService'

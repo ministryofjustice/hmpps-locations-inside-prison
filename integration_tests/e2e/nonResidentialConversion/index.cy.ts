@@ -147,15 +147,15 @@ context('Non-residential conversion', () => {
       })
 
       it('has a cancel link', () => {
-        const cellOccupiedPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
-        cellOccupiedPage.cancelLink().click()
+        const warningPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
+        warningPage.cancelLink().click()
 
         Page.verifyOnPage(ViewLocationsShowPage)
       })
 
       it('continues to the details page when the button is clicked', () => {
-        const cellOccupiedPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
-        cellOccupiedPage.continueButton().click()
+        const warningPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
+        warningPage.continueButton().click()
 
         Page.verifyOnPage(NonResidentialConversionDetailsPage)
       })
@@ -164,8 +164,8 @@ context('Non-residential conversion', () => {
     describe('details page', () => {
       beforeEach(() => {
         NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
-        const cellOccupiedPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
-        cellOccupiedPage.continueButton().click()
+        const warningPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
+        warningPage.continueButton().click()
       })
 
       it('has a back link to the warning page', () => {
@@ -232,8 +232,8 @@ context('Non-residential conversion', () => {
     describe('confirmation page', () => {
       beforeEach(() => {
         NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
-        const cellOccupiedPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
-        cellOccupiedPage.continueButton().click()
+        const warningPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
+        warningPage.continueButton().click()
         const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
         detailsPage.cellTypeRadioItem('OFFICE').click()
         detailsPage.continueButton().click()
@@ -315,6 +315,17 @@ context('Non-residential conversion', () => {
         cy.get('.govuk-notification-banner__content p').contains(
           'You have converted 1-1-001 into a non-residential room.',
         )
+      })
+
+      context('when the cell becomes occupied during the process', () => {
+        beforeEach(() => {
+          cy.task('stubLocationsConvertCellToNonResCellOccupied')
+
+          const confirmationPage = Page.verifyOnPage(NonResidentialConversionConfirmPage)
+          confirmationPage.confirmButton().click()
+        })
+
+        itDisplaysTheCellOccupiedPage()
       })
     })
   })

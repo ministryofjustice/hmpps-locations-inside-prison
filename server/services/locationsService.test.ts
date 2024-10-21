@@ -77,6 +77,18 @@ describe('Locations service', () => {
   testConstantDataGetter('getSpecialistCellTypes', 'getSpecialistCellType')
   testConstantDataGetter('getUsedForTypes', 'getUsedForType')
 
+  describe('deactivatePermanent', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.deactivatePermanent('token', 'locationId', 'reason')
+
+      expect(locationsApiClient.locations.deactivate.permanent).toHaveBeenCalledWith(
+        'token',
+        { locationId: 'locationId' },
+        { reason: 'reason' },
+      )
+    })
+  })
+
   describe('deactivateTemporary', () => {
     it('calls the correct client function', async () => {
       await locationsService.deactivateTemporary('token', 'locationId', 'reason', 'description', 'date', 'pfm')
@@ -197,6 +209,15 @@ describe('Locations service', () => {
         { locationId: '481fc587-60f8-402b-804d-64462babddcc' },
         { convertedCellType: 'OTHER', otherConvertedCellType: 'tuck shop' },
       )
+    })
+
+    it('bubbles up any errors', async () => {
+      const error: any = new Error('API error: Location is occupied')
+      locationsApiClient.locations.convertCellToNonResCell.mockRejectedValue(error)
+
+      await expect(
+        locationsService.convertCellToNonResCell('token', '481fc587-60f8-402b-804d-64462babddcc', 'OTHER', 'tuck shop'),
+      ).rejects.toThrow('API error: Location is occupied')
     })
   })
 

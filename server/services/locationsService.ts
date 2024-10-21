@@ -39,6 +39,10 @@ export default class LocationsService {
     )
   }
 
+  async deactivatePermanent(token: string, locationId: string, reason: string) {
+    return this.locationsApiClient.locations.deactivate.permanent(token, { locationId }, { reason })
+  }
+
   async deactivateTemporary(
     token: string,
     locationId: string,

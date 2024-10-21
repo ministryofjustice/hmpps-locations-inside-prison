@@ -125,6 +125,10 @@ export default class LocationsApiClient extends BaseApiClient {
       requestType: 'put',
     }),
     deactivate: {
+      permanent: this.apiCall<Location, { locationId: string }, { reason: string }>({
+        path: '/locations/:locationId/deactivate/permanent',
+        requestType: 'put',
+      }),
       temporary: this.apiCall<
         Location,
         { locationId: string },

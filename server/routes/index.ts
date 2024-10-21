@@ -14,7 +14,7 @@ import archivedLocationsRouter from './archivedLocationsRouter'
 import cellConversionRouter from './cellConversion'
 import changeCellCapacityRouter from './changeCellCapacity'
 import changeSignedOperationalCapacityRouter from './changeSignedOperationalCapacity'
-import deactivateTemporaryRouter from './deactivateTemporary'
+import deactivateRouter from './deactivate'
 import inactiveCellsRouter from './inactiveCellsRouter'
 import nonResidentialConversionRouter from './nonResidentialConversion'
 import reactivateRouter from './reactivate'
@@ -53,7 +53,7 @@ export default function routes(services: Services): Router {
 
   router.use('/location/:locationId/cell-conversion', cellConversionRouter)
   router.use('/location/:locationId/change-cell-capacity', changeCellCapacityRouter)
-  router.use('/location/:locationId/deactivate/temporary', deactivateTemporaryRouter)
+  router.use('/location/:locationId/deactivate', deactivateRouter)
   router.use('/location/:locationId/non-residential-conversion', nonResidentialConversionRouter)
   router.use('/location/:locationId/change-used-for', changeUsedForRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)

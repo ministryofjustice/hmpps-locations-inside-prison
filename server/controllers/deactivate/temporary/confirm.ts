@@ -1,34 +1,15 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../utils/backUrl'
-import { DecoratedLocation } from '../../decorators/decoratedLocation'
-import getResidentialSummary from '../../middleware/getResidentialSummary'
-import checkForPrisoners from './checkForPrisoners'
+import backUrl from '../../../utils/backUrl'
+import { DecoratedLocation } from '../../../decorators/decoratedLocation'
+import getCellCount from '../../../middleware/getCellCount'
+import getResidentialSummary from '../../../middleware/getResidentialSummary'
 
 export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   middlewareSetup() {
-    this.use(checkForPrisoners)
     super.middlewareSetup()
     this.use(getResidentialSummary)
-    this.use(this.getCellCount)
-  }
-
-  async getCellCount(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user, location } = res.locals
-    const { authService, locationsService } = req.services
-
-    let cellCount = 1
-
-    if (location.raw.locationType !== 'CELL') {
-      const token = await authService.getSystemClientToken(user.username)
-      const residentialSummary = await locationsService.getResidentialSummary(token, location.prisonId, location.id)
-
-      cellCount =
-        residentialSummary.parentLocation.numberOfCellLocations - residentialSummary.parentLocation.inactiveCells
-    }
-    res.locals.cellCount = cellCount
-
-    next()
+    this.use(getCellCount)
   }
 
   generateChangeSummary(cellCount: number, cellWorkingCapacity: number, overallWorkingCapacity: number): string | null {
@@ -80,8 +61,9 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { user, location } = res.locals
+
     try {
-      const { user, location } = res.locals
       const { locationsService } = req.services
 
       const token = await req.services.authService.getSystemClientToken(user.username)
@@ -101,9 +83,12 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
         deactivation_reason: reason,
       })
 
-      next()
+      return next()
     } catch (error) {
-      next(error)
+      if (error.data?.errorCode === 109) {
+        return res.redirect(`/location/${location.id}/deactivate/occupied`)
+      }
+      return next(error)
     }
   }
 
