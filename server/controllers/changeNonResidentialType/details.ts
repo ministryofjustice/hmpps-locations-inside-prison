@@ -92,7 +92,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     if (otherTypeChanged) {
       req.flash('success', {
         title: 'Non-residential room details updated',
-        content: `You have updated the non-residential room details for this location.`,
+        content: `You have changed the room description for ${locationName}.`,
       })
     }
 
