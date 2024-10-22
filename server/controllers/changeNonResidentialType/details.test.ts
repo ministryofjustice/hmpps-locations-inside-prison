@@ -250,6 +250,19 @@ describe('ChangeNonResidentialTypeDetails', () => {
       })
     })
 
+    it('sets the flash correctly when other description update is Successful', () => {
+      reqSuccessHandler.sessionModel.get.mockImplementation((key: string) => {
+        if (key === 'otherTypeChanged') return true
+        return false
+      })
+
+      controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
+      expect(reqSuccessHandler.flash).toHaveBeenCalledWith('success', {
+        content: `You have updated the non-residential room details for this location.`,
+        title: 'Non-residential room details updated',
+      })
+    })
+
     it('resets the journey model', () => {
       controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
       expect(reqSuccessHandler.journeyModel.reset).toHaveBeenCalled()
