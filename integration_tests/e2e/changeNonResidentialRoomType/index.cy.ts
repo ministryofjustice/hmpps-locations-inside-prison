@@ -42,7 +42,6 @@ context('Change non-residential rooms', () => {
       convertedCellType: 'KITCHEN_SERVERY',
       otherConvertedCellType: '',
     })
-
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
@@ -146,6 +145,31 @@ context('Change non-residential rooms', () => {
       cy.get('.govuk-heading-l').contains('A-1-001')
       nonResidentialRoomPage.changeLink().should('exist')
       cy.get('.govuk-summary-list__value').contains('Office')
+    })
+
+    it('Enables navigation to update other description then Success details updated Banner for non-residential room type', () => {
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationOther })
+      cy.task('stubLocations', locationOther)
+      NonResidentialRoomPage.goTo(location.prisonId, location.id)
+      const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
+
+      cy.get('.govuk-heading-l').contains('A-1-001')
+      nonResidentialRoomPage.changeLink().should('exist').click()
+
+      const nonResidentialRoomTypeChangePage = Page.verifyOnPage(NonResidentialRoomTypeChangePage)
+      Page.verifyOnPage(NonResidentialRoomPage)
+
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('OTHER').should('be.checked')
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').should('not.be.checked')
+      nonResidentialRoomTypeChangePage.cellTypeRadioItem('OTHER').click()
+      nonResidentialRoomTypeChangePage.otherFreeText().should('exist').clear().type('Some other updated')
+      nonResidentialRoomTypeChangePage.continueButton().click()
+
+      cy.get('#govuk-notification-banner-title').contains('Success')
+      cy.get('.govuk-notification-banner__content h3').contains('Non-residential room details updated')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed the room description for A-1-001.')
+      cy.get('.govuk-heading-l').contains('A-1-001')
+      cy.get('.govuk-summary-list__value').contains('Other')
     })
   })
 })

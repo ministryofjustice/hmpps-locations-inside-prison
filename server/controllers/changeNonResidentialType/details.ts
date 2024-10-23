@@ -51,9 +51,16 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
       const token = await req.services.authService.getSystemClientToken(user.username)
       const { values } = req.form
       const preSelectedConvertedCellType = res.locals.location.raw?.convertedCellType || []
+      const preOtherTypeChanged = res.locals.location.raw?.otherConvertedCellType || []
+
       const selectedConvertedCellType = values.convertedCellType
+      const selectedOtherConvertedCellType = values.otherConvertedCellType
+
       const isSameAsPreSelected = preSelectedConvertedCellType.includes(selectedConvertedCellType)
+      const isOtherTypeChanged = preOtherTypeChanged.includes(selectedOtherConvertedCellType)
+
       req.sessionModel.set('convertedCellTypeChanged', !isSameAsPreSelected)
+      req.sessionModel.set('otherTypeChanged', !isOtherTypeChanged)
 
       await locationsService.changeNonResType(
         token,
@@ -73,11 +80,19 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     const locationName = localName || pathHierarchy
 
     const roomTypeChanged = req.sessionModel.get('convertedCellTypeChanged')
+    const otherTypeChanged = req.sessionModel.get('otherTypeChanged')
 
     if (roomTypeChanged) {
       req.flash('success', {
         title: 'Non-residential room type changed',
         content: `You have changed the room type for ${locationName}.`,
+      })
+    }
+
+    if (otherTypeChanged) {
+      req.flash('success', {
+        title: 'Non-residential room details updated',
+        content: `You have changed the room description for ${locationName}.`,
       })
     }
 
