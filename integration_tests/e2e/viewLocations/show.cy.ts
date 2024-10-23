@@ -322,7 +322,7 @@ context('View Locations Show', () => {
         describe('Deactivate button', () => {
           before(() => {
             cy.task('stubSignIn', {
-              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP', 'VIEW_INTERNAL_LOCATION'],
+              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
             })
             cy.signIn()
           })
@@ -425,7 +425,7 @@ context('View Locations Show', () => {
         describe('Deactivate button', () => {
           before(() => {
             cy.task('stubSignIn', {
-              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP', 'VIEW_INTERNAL_LOCATION'],
+              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
             })
             cy.signIn()
           })
