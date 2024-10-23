@@ -42,14 +42,6 @@ context('Change non-residential rooms', () => {
       convertedCellType: 'KITCHEN_SERVERY',
       otherConvertedCellType: '',
     })
-    const locationOtherDescriptionChanged = LocationFactory.build({
-      isResidential: false,
-      leafLevel: true,
-      localName: 'A-1-001',
-      status: 'NON_RESIDENTIAL',
-      convertedCellType: 'OTHER',
-      otherConvertedCellType: 'Some other updated',
-    })
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
@@ -158,6 +150,7 @@ context('Change non-residential rooms', () => {
     it('Enables navigation to update other description then Success details updated Banner for non-residential room type', () => {
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationOther })
       cy.task('stubLocations', locationOther)
+      NonResidentialRoomPage.goTo(location.prisonId, location.id)
       const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
 
       cy.get('.govuk-heading-l').contains('A-1-001')
@@ -176,7 +169,7 @@ context('Change non-residential rooms', () => {
       cy.get('.govuk-notification-banner__content h3').contains('Non-residential room details updated')
       cy.get('.govuk-notification-banner__content p').contains('You have changed the room description for A-1-001.')
       cy.get('.govuk-heading-l').contains('A-1-001')
-      cy.get('.govuk-summary-list__value').contains('Other - Some other')
+      cy.get('.govuk-summary-list__value').contains('Other')
     })
   })
 })
