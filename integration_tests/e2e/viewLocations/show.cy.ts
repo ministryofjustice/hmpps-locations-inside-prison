@@ -318,6 +318,21 @@ context('View Locations Show', () => {
         it('Correctly presents the API data', () => {
           testShow({ location, locationHierarchy })
         })
+
+        describe('Deactivate button', () => {
+          before(() => {
+            cy.task('stubSignIn', {
+              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
+            })
+            cy.signIn()
+          })
+
+          it('Shows the Deactivate landing button if actions are provided', () => {
+            ViewLocationsShowPage.goTo(location.prisonId, location.id)
+            Page.verifyOnPage(ViewLocationsShowPage)
+            cy.get('.govuk-button').contains('Deactivate wing')
+          })
+        })
       })
 
       context('When the location is Inactive', () => {
@@ -405,6 +420,21 @@ context('View Locations Show', () => {
 
         it('Correctly presents the API data', () => {
           testShow({ location, locationHierarchy })
+        })
+
+        describe('Deactivate button', () => {
+          before(() => {
+            cy.task('stubSignIn', {
+              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
+            })
+            cy.signIn()
+          })
+
+          it('Shows the Deactivate landing button if actions are provided', () => {
+            ViewLocationsShowPage.goTo(location.prisonId, location.id)
+            Page.verifyOnPage(ViewLocationsShowPage)
+            cy.get('.govuk-button').contains('Deactivate landing')
+          })
         })
       })
 
@@ -501,6 +531,21 @@ context('View Locations Show', () => {
 
         it('Correctly presents the API data', () => {
           testShow({ location, locationHierarchy })
+        })
+
+        describe('Actions button', () => {
+          before(() => {
+            cy.task('stubSignIn', {
+              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
+            })
+            cy.signIn()
+          })
+
+          it('Shows the Action button if actions are provided', () => {
+            ViewLocationsShowPage.goTo(location.prisonId, location.id)
+            Page.verifyOnPage(ViewLocationsShowPage)
+            cy.get('.govuk-button').contains('Actions')
+          })
         })
       })
 

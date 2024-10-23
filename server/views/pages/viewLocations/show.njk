@@ -74,7 +74,13 @@
 
         {% if actions | length %}
           <div class="govuk-!-float-right">
-            {{ mojButtonMenu({ items: actions }) }}
+            {% if actions | length > 1 %}
+              {{ mojButtonMenu({ items: actions }) }}
+            {% else %}
+              <a href={{actions[0].href}} 
+                role="button" 
+                class="govuk-button govuk-button--secondary">{{ actions[0].text }}</a>
+            {% endif %}
           </div>
         {% endif %}
       </h1>
