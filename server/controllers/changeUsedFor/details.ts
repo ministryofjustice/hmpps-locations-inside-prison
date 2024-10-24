@@ -67,7 +67,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
   async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
-    if (isEqual(sortBy(req.form.values.usedFor), sortBy(location.usedFor))) {
+    if (isEqual(sortBy(req.form.values.usedFor), sortBy(res.locals.location.raw.usedFor))) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
     return next()
