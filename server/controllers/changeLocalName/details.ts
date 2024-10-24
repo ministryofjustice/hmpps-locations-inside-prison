@@ -14,6 +14,9 @@ export default class Details extends FormInitialStep {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 
+    const fields = { ...locals.fields }
+    fields.localName.value = req.form.values.localName || res.locals.location.localName
+
     const backLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
     })
