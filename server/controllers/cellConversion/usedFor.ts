@@ -30,6 +30,9 @@ export default class CellConversionUsedFor extends FormInitialStep {
       }))
     }
 
+    if (usedForTypes !== undefined && usedForTypes !== (req.body.usedForTypes || []))
+      req.sessionModel.unset('usedForTypes')
+
     return {
       ...locals,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
