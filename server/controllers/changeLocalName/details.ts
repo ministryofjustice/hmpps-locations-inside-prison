@@ -32,10 +32,10 @@ export default class Details extends FormInitialStep {
       const sanitizedLocalName = sanitizeString(String(values.localName))
       const { user, location } = res.locals
       const token = await authService.getSystemClientToken(user.username)
-      const { prisonId } = location
+      const { prisonId, id: locationId } = location
       const validationErrors: any = {}
       if (sanitizeString(String(values.localName)) === sanitizeString(res.locals.location.localName)) {
-        return callback({ ...errors, ...validationErrors })
+        return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
       }
       try {
         const localNameExists = await locationsService.getLocationByLocalName(
