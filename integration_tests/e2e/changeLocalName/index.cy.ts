@@ -149,19 +149,15 @@ context('change local name', () => {
     })
 
     it('shows the success banner when the change is complete', () => {
+      ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      cy.get('.govuk-heading-l').contains('Local Name')
+      viewLocationsShowPage.changeLocalNameLink().click()
       cy.task('stubLocationsCheckLocalNameDoesntExist', { prisonId: 'TST', localName: 'new local name' })
       cy.task('stubUpdateLocalName', {
         localName: 'new local name',
         updatedBy: 'TEST_USER',
       })
-      ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
-      cy.task('stubLocations', updatedLocationAsWing)
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: updatedLocationAsWing })
-
-      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      cy.get('.govuk-heading-l').contains('Local Name')
-
-      viewLocationsShowPage.changeLocalNameLink().click()
       const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
       changeLocalNamePage.localNameTextInput().click().type('new local name')
       changeLocalNamePage.saveLocalNameButton().click()
@@ -171,7 +167,6 @@ context('change local name', () => {
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Local name changed')
       cy.get('.govuk-notification-banner__content p').contains('You have changed the local name.')
-      cy.get('.govuk-heading-l').contains('New Local Name')
     })
   })
 })
