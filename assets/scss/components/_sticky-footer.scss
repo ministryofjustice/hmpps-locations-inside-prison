@@ -1,7 +1,8 @@
 .sticky-footer {
-  position: sticky;
+  position: fixed;
   z-index: 1000;
-  bottom: -1px;
+  bottom: 40px;
+  width: 100%;
 
   .sticky-select-action-bar {
     display: none;
