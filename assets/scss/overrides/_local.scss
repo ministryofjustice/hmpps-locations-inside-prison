@@ -127,7 +127,9 @@ $sticky-footer-vertical-spacing: govuk-spacing(2);
   border-top: 2px solid $sticky-footer-border-colour;
   background: $sticky-footer-background-colour;
   padding: $sticky-footer-vertical-spacing $sticky-footer-horizontal-spacing;
-  position: relative;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
 
   &__heading {
     @include govuk-font($size: 16, $weight: bold);
