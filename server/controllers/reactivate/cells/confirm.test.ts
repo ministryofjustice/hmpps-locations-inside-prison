@@ -1,13 +1,20 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import fields from '../../../routes/deactivate/fields'
 import { Services } from '../../../services'
 import ReactivateCellsConfirm from './confirm'
+import AuthService from '../../../services/authService'
+import LocationsService from '../../../services/locationsService'
+import AnalyticsService from '../../../services/analyticsService'
 
 describe('ReactivateCellsConfirm', () => {
   const controller = new ReactivateCellsConfirm({ route: '/' })
   let req: FormWizard.Request
   let res: Response
+  let next: NextFunction
+  const authService = new AuthService(null) as jest.Mocked<AuthService>
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
   let sessionModelValues: {
     referrerPrisonId: string
     referrerLocationId: string
@@ -27,6 +34,11 @@ describe('ReactivateCellsConfirm', () => {
         },
         values: sessionModelValues,
       },
+      services: {
+        analyticsService,
+        authService,
+        locationsService,
+      },
       session: {
         referrerUrl: '/referrer-url',
       },
@@ -36,7 +48,13 @@ describe('ReactivateCellsConfirm', () => {
     } as unknown as typeof req
     res = {
       locals: {
-        user: { username: 'username' },
+        user: {
+          activeCaseload: {
+            id: 'TST',
+            name: 'Test Prison',
+          },
+          username: 'username',
+        },
         errorlist: [],
         location: {
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -52,6 +70,13 @@ describe('ReactivateCellsConfirm', () => {
             oldWorkingCapacity: 2,
             capacity: {
               maxCapacity: 3,
+            },
+          },
+          {
+            id: 'l2',
+            oldWorkingCapacity: 1,
+            capacity: {
+              maxCapacity: 2,
             },
           },
         ],
@@ -71,6 +96,11 @@ describe('ReactivateCellsConfirm', () => {
       },
       redirect: jest.fn(),
     } as unknown as typeof res
+    next = jest.fn()
+
+    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
+    locationsService.reactivateBulk = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('getResidentialSummary', () => {
@@ -120,8 +150,31 @@ describe('ReactivateCellsConfirm', () => {
       expect(controller.locals(req, res)).toEqual({
         backLink: `/reactivate/cells/check-capacity`,
         cancelLink: `/inactive-cells/${sessionModelValues.referrerPrisonId}/${sessionModelValues.referrerLocationId}`,
-        changeSummary: `The establishment’s total working capacity will increase from 20 to 22.`,
+        changeSummary: `The establishment’s total working capacity will increase from 20 to 23.`,
       })
+    })
+  })
+
+  describe('saveValues', () => {
+    it('calls locationsService', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(locationsService.reactivateBulk).toHaveBeenCalledWith('token', {
+        l1: { capacity: { maxCapacity: 3, workingCapacity: 2 } },
+        l2: { capacity: { maxCapacity: 2, workingCapacity: 1 } },
+      })
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'reactivate_cells', { prison_id: 'TST' })
+    })
+
+    it('calls next', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(next).toHaveBeenCalled()
     })
   })
 })

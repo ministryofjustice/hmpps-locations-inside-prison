@@ -61,6 +61,9 @@ export default class Details extends FormInitialStep {
       const token = await req.services.authService.getSystemClientToken(user.username)
       const { localName } = req.form.values
       await locationsService.updateLocalName(token, location.id, String(localName), user.username)
+
+      req.services.analyticsService.sendEvent(req, 'change_local_name', { prison_id: location.prisonId })
+
       next()
     } catch (error) {
       next(error)
