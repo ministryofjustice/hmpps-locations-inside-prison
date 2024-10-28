@@ -17,6 +17,7 @@ generic-service:
     LOCATIONS_API_URL: "https://locations-inside-prison-api-preprod.hmpps.service.justice.gov.uk"
     ENVIRONMENT_NAME: PRE-PRODUCTION
     AUDIT_ENABLED: "false"
+    FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
