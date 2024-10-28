@@ -147,6 +147,37 @@ context('Deactivate permanent', () => {
       Page.verifyOnPage(DeactivatePermanentWarningPage)
     })
 
+    it('shows the correct validation error when no deactivation type is selected', () => {
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      viewLocationsShowPage.actionsMenu().click()
+      viewLocationsShowPage.deactivateAction().click()
+      const deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
+      deactivateTypePage.continueButton().click()
+
+      cy.get('.govuk-error-summary__title').contains('There is a problem')
+      cy.get('.govuk-error-summary__list').contains(
+        'Select if you want to deactivate the location temporarily or permanently',
+      )
+      cy.get('#deactivationType-error').contains(
+        'Select if you want to deactivate the location temporarily or permanently',
+      )
+    })
+
+    it('remembers the deactivation type when clicking back', () => {
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      viewLocationsShowPage.actionsMenu().click()
+      viewLocationsShowPage.deactivateAction().click()
+      let deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
+      deactivateTypePage.permRadioButton().click()
+      deactivateTypePage.continueButton().click()
+      const warningPage = Page.verifyOnPage(DeactivatePermanentWarningPage)
+      warningPage.backLink().click()
+      deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
+      deactivateTypePage.permRadioButton().should('be.checked')
+    })
+
     it('has back links via the deactivation type page from the details page', () => {
       ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
