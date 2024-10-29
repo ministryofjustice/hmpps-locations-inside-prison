@@ -46,7 +46,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user } = res.locals
+      const { location, user } = res.locals
       const { locationsService } = req.services
       const token = await req.services.authService.getSystemClientToken(user.username)
       const { values } = req.form
@@ -64,10 +64,15 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
 
       await locationsService.changeNonResType(
         token,
-        res.locals.location.id,
+        location.id,
         String(values.convertedCellType),
         values.convertedCellType === 'OTHER' ? String(values.otherConvertedCellType) : undefined,
       )
+
+      req.services.analyticsService.sendEvent(req, 'change_non_res_type', {
+        prison_id: location.prisonId,
+        converted_cell_type: values.convertedCellType,
+      })
 
       next()
     } catch (error) {
