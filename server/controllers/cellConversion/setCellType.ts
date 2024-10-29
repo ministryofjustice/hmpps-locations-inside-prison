@@ -36,6 +36,9 @@ export default class CellConversionSetCellType extends FormInitialStep {
       }))
     }
 
+    if (specialistCellTypes !== undefined && specialistCellTypes !== (req.body.specialistCellTypes || []))
+      req.sessionModel.unset('specialistCellTypes')
+
     return {
       ...locals,
       buttonText: 'Continue',
