@@ -144,3 +144,9 @@
   border: none;
   margin-left: 12px;
 }
+
+.hmpps-header__link_training {
+  pointer-events: none;
+  color: govuk-colour('white')!important;
+  text-decoration: none;
+}
