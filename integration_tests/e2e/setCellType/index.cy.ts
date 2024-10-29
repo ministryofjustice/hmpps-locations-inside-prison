@@ -230,14 +230,32 @@ context('Set cell type', () => {
         viewLocationsShowPage.changeSpecificCellTypeLink().should('not.exist')
       })
 
+      it('starts with the existing types checked', () => {
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
+        const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
+        setCellTypePage.cellTypeCheckbox('BIOHAZARD_DIRTY_PROTEST').should('be.checked')
+      })
+
       it('shows the correct validation error when nothing is selected', () => {
         SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
+        setCellTypePage.cellTypeCheckbox('BIOHAZARD_DIRTY_PROTEST').click()
+        setCellTypePage.cellTypeCheckbox('BIOHAZARD_DIRTY_PROTEST').should('not.be.checked')
         setCellTypePage.saveCellTypeButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
         cy.get('.govuk-error-summary__list').contains('Select a cell type')
         cy.get('#specialistCellTypes-error').contains('Select a cell type')
+      })
+
+      it('does not show the success banner when no change is made', () => {
+        SetCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
+        const setCellTypePage = Page.verifyOnPage(SetCellTypePage)
+        setCellTypePage.cellTypeCheckbox('BIOHAZARD_DIRTY_PROTEST').should('be.checked')
+        setCellTypePage.saveCellTypeButton().click()
+
+        Page.verifyOnPage(ViewLocationsShowPage)
+        cy.get('#govuk-notification-banner-title').should('not.exist')
       })
 
       it('shows the success banner when the change is complete', () => {
