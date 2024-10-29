@@ -97,41 +97,64 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     return JSON.stringify(initialValues) !== JSON.stringify(values.submittedValues)
   }
 
+  validate(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { location } = res.locals
+    const { id: locationId, prisonId } = location
+
+    const valuesHaveChanged = this.compareInitialAndSubmittedValues({
+      initialValues: this.getInitialValues(req, res),
+      submittedValues: this.getSubmittedValues(req),
+    })
+
+    if (!valuesHaveChanged) {
+      return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    }
+
+    return next()
+  }
+
+  getDeactivationReasonDesc(deactivationReason: string) {
+    return `deactivationReason${deactivationReason === 'OTHER' ? 'Other' : `Description-${deactivationReason}`}`
+  }
+
+  getSubmittedValues(req: FormWizard.Request) {
+    const { deactivationReason, estimatedReactivationDate, planetFmReference } = req.form.values
+    const deactivationReasonDesc = this.getDeactivationReasonDesc(deactivationReason as string)
+
+    return {
+      deactivationReason: deactivationReason as string,
+      [deactivationReasonDesc]: req.form.values[
+        `deactivationReason${deactivationReason === 'OTHER' ? 'Other' : 'Description'}`
+      ] as string,
+
+      estimatedReactivationDate: estimatedReactivationDate as string,
+      planetFmReference: planetFmReference as string,
+    }
+  }
+
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { user, location } = res.locals
       const { locationsService } = req.services
 
-      const { deactivationReason, estimatedReactivationDate, planetFmReference } = req.form.values
+      const submittedValues = this.getSubmittedValues(req)
 
       const token = await req.services.authService.getSystemClientToken(user.username)
-      const deactivationReasonDesc = `deactivationReason${deactivationReason === 'OTHER' ? 'Other' : `Description-${deactivationReason}`}`
-      const submittedValues = {
-        deactivationReason: deactivationReason as string,
-        [deactivationReasonDesc]: req.form.values[
-          `deactivationReason${deactivationReason === 'OTHER' ? 'Other' : 'Description'}`
-        ] as string,
 
-        estimatedReactivationDate: estimatedReactivationDate as string,
-        planetFmReference: planetFmReference as string,
-      }
+      await locationsService.updateTemporaryDeactivation(
+        token,
+        location.id,
+        submittedValues.deactivationReason,
+        submittedValues[this.getDeactivationReasonDesc(submittedValues.deactivationReason as string)],
+        submittedValues.estimatedReactivationDate,
+        submittedValues.planetFmReference,
+      )
 
-      const valuesHaveChanged = this.compareInitialAndSubmittedValues({
-        initialValues: this.getInitialValues(req, res),
-        submittedValues,
+      req.services.analyticsService.sendEvent(req, 'change_temp_deactivation', {
+        prison_id: location.prisonId,
+        location_type: location.locationType,
+        deactivation_reason: submittedValues.deactivationReason,
       })
-
-      if (valuesHaveChanged) {
-        res.locals.valuesHaveChanged = valuesHaveChanged
-        await locationsService.updateTemporaryDeactivation(
-          token,
-          location.id,
-          submittedValues.deactivationReason,
-          submittedValues[deactivationReasonDesc],
-          submittedValues.estimatedReactivationDate,
-          submittedValues.planetFmReference,
-        )
-      }
 
       next()
     } catch (error) {
@@ -146,12 +169,10 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
-    if (res.locals.valuesHaveChanged) {
-      req.flash('success', {
-        title: 'Deactivation details updated',
-        content: `You have updated the deactivation details for this location.`,
-      })
-    }
+    req.flash('success', {
+      title: 'Deactivation details updated',
+      content: `You have updated the deactivation details for this location.`,
+    })
 
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
   }

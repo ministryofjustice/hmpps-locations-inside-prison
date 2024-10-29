@@ -62,6 +62,9 @@ export default class Details extends FormInitialStep {
       await locationsService.updateLocalName(token, location.id, sanitizedLocalName, user.username)
 
       res.locals.location.localName = localName
+
+      req.services.analyticsService.sendEvent(req, 'set_local_name', { prison_id: location.prisonId })
+
       next()
     } catch (error) {
       next(error)

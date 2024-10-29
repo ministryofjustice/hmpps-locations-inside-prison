@@ -4,9 +4,11 @@ import fields from '../../routes/deactivate/fields'
 import ChangeTemporaryDeactivationDetails from './details'
 import { Services } from '../../services'
 import LocationsService from '../../services/locationsService'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('ChangeTemporaryDeactivationDetails', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
   const controller = new ChangeTemporaryDeactivationDetails({ route: '/' })
   let req: FormWizard.Request
   let res: Response
@@ -57,6 +59,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
         reset: jest.fn(),
       },
       services: {
+        analyticsService,
         authService: {
           hmppsAuthClient: {},
           getSystemClientToken: jest.fn().mockResolvedValue('token'),
@@ -76,6 +79,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
             maxCapacity: 2,
             workingCapacity: 2,
           },
+          locationType: 'CELL',
         },
         options: {
           fields,
@@ -96,6 +100,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
     next = jest.fn()
 
     locationsService.updateTemporaryDeactivation = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('validateFields', () => {
@@ -219,6 +224,21 @@ describe('ChangeTemporaryDeactivationDetails', () => {
     })
   })
 
+  describe('validate', () => {
+    it('cancels and redirects to the show location page when there are no changes', () => {
+      jest.spyOn(controller, 'getInitialValues').mockReturnValue({
+        deactivationReason: 'OTHER',
+        deactivationReasonOther: 'Other',
+        estimatedReactivationDate: '2030-04-20',
+        planetFmReference: '123456',
+      })
+
+      controller.validate(req, res, jest.fn())
+
+      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+    })
+  })
+
   describe('saveValues', () => {
     beforeEach(() => {
       jest.clearAllMocks()
@@ -240,18 +260,16 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       expect(next).toHaveBeenCalled()
     })
 
-    it('does not call locationsService.updateTemporaryDeactivation if values have not changed', async () => {
-      jest.spyOn(controller, 'getInitialValues').mockReturnValue({
-        deactivationReason: 'OTHER',
-        deactivationReasonOther: 'Other',
-        estimatedReactivationDate: '2030-04-20',
-        planetFmReference: '123456',
-      })
+    it('sends an analytics event', async () => {
+      jest.spyOn(controller, 'getInitialValues').mockReturnValue(formValues)
 
       await controller.saveValues(req, res, next)
 
-      expect(locationsService.updateTemporaryDeactivation).not.toHaveBeenCalled()
-      expect(next).toHaveBeenCalled()
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_temp_deactivation', {
+        prison_id: 'TST',
+        deactivation_reason: 'OTHER',
+        location_type: 'CELL',
+      })
     })
 
     it('calls next with an error if an error is thrown', async () => {

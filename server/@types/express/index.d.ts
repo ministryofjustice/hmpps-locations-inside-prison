@@ -13,9 +13,22 @@ export declare module 'express-session' {
 export declare global {
   namespace Express {
     interface User {
-      username: string
-      token: string
+      activeCaseload?: {
+        id: string
+        name: string
+      }
       authSource: string
+      caseloads?: {
+        id: string
+        name: string
+      }[]
+      displayName?: string
+      name?: string
+      staffId?: number
+      token: string
+      userId?: string
+      username: string
+      userRoles?: string[]
     }
 
     interface Request {

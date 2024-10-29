@@ -15,8 +15,12 @@
 {% set title = "Do you want to deactivate this location temporarily or permanently?" %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
-  <h1 class="govuk-heading-l">{{ title }}</h1>
+  <div class="govuk-grid-row govuk-!-margin-bottom-0">
+    <div class="govuk-grid-column-two-thirds">
+      <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+    </div>
+  </div>
 {% endblock %}
 
 {% block beforeContent %}

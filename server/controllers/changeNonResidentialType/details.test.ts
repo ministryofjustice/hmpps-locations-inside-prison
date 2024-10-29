@@ -6,12 +6,14 @@ import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/nonResidentialConversion/fields'
 import maxLength from '../../validators/maxLength'
 import ChangeNonResidentialTypeDetails from './details'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('ChangeNonResidentialTypeDetails', () => {
   const controller = new ChangeNonResidentialTypeDetails({ route: '/' })
   let req: FormWizard.Request
   let res: Response
   let next: NextFunction
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(undefined) as jest.Mocked<LocationsService>
 
@@ -47,6 +49,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
         reset: jest.fn(),
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -120,6 +123,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getConvertedCellTypes = jest.fn().mockResolvedValue(nonResTypes)
     locationsService.changeNonResType = jest.fn()
+    analyticsService.sendEvent = jest.fn()
   })
 
   describe('setOptions', () => {
@@ -208,6 +212,21 @@ describe('ChangeNonResidentialTypeDetails', () => {
     it('saves the values via the locations API', async () => {
       await controller.saveValues(req, res, next)
       expect(locationsService.changeNonResType).toHaveBeenCalledWith('token', locationId, 'OFFICE', undefined)
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_non_res_type', {
+        converted_cell_type: 'OFFICE',
+        prison_id: 'TST',
+      })
+    })
+
+    it('calls next', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(next).toHaveBeenCalled()
     })
   })
 

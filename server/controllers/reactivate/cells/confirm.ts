@@ -105,6 +105,8 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     const token = await authService.getSystemClientToken(user.username)
     await locationsService.reactivateBulk(token, allCellChanges)
 
+    req.services.analyticsService.sendEvent(req, 'reactivate_cells', { prison_id: user.activeCaseload?.id })
+
     next()
   }
 
