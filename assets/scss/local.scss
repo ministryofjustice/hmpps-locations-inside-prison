@@ -4,15 +4,13 @@ body {
 
 .govuk-main-wrapper {
   min-height: 600px;
+  margin-bottom: -40px;
 }
 
 .body-tiles {
-  margin-left: -51.8vw;
-  margin-right: -51.8vw;
-  margin-bottom: -40px;
   background: #f0f4f5;
   min-height: 500px;
-  padding: 30px 51.8vw 40px;
+  padding: 30px 40px;
 }
 
 h1.govuk-heading-l .govuk-tag {
