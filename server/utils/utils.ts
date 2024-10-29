@@ -23,5 +23,5 @@ export const initialiseName = (fullName?: string): string | null => {
 }
 
 export const sanitizeString = (string: string | null): string | null => {
-  return string ? string.trim().toLowerCase() : null
+  return string ? string.replace(/<\/?[^>]+(>|$)/g, '').trim() : null
 }

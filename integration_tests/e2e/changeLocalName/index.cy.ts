@@ -97,6 +97,14 @@ context('change local name', () => {
       Page.verifyOnPage(ViewLocationsShowPage)
     })
 
+    it('shows the local name prepopulated in the text area', () => {
+      ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      viewLocationsShowPage.changeLocalNameLink().click()
+      const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
+      changeLocalNamePage.localNameTextInput().contains('Local Name')
+    })
+
     it('shows the correct validation error when no local name is set', () => {
       cy.task('stubLocationsCheckLocalNameDoesntExist', {
         localName: null,
@@ -106,8 +114,8 @@ context('change local name', () => {
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.changeLocalNameLink().click()
       const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
+      changeLocalNamePage.localNameTextInput().clear()
       changeLocalNamePage.saveLocalNameButton().click()
-
       cy.get('.govuk-error-summary__title').contains('There is a problem')
       cy.get('.govuk-error-summary__list').contains('Enter a local name')
     })
@@ -121,6 +129,7 @@ context('change local name', () => {
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.changeLocalNameLink().click()
       const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
+      changeLocalNamePage.localNameTextInput().clear()
       changeLocalNamePage.localNameTextInput().click().type('1234567890123456789012345678901')
       changeLocalNamePage.saveLocalNameButton().click()
 
@@ -141,6 +150,7 @@ context('change local name', () => {
       const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: updatedLocationAsWing })
       cy.task('stubLocations', updatedLocationAsWing)
+      changeLocalNamePage.localNameTextInput().clear()
       changeLocalNamePage.localNameTextInput().click().type('changed local name')
       changeLocalNamePage.saveLocalNameButton().click()
 
@@ -159,6 +169,7 @@ context('change local name', () => {
         updatedBy: 'TEST_USER',
       })
       const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
+      changeLocalNamePage.localNameTextInput().clear()
       changeLocalNamePage.localNameTextInput().click().type('new local name')
       changeLocalNamePage.saveLocalNameButton().click()
 
