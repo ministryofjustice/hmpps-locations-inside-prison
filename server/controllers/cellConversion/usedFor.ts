@@ -20,7 +20,7 @@ export default class CellConversionUsedFor extends FormInitialStep {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId } = location
-    const usedForTypes = req.sessionModel.get<string[]>('usedForTypes')
+    const usedForTypes = req.form.values.usedForTypes || req.sessionModel.get<string[]>('usedForTypes')
     const fields = { ...locals.fields }
 
     if (usedForTypes) {
@@ -29,9 +29,6 @@ export default class CellConversionUsedFor extends FormInitialStep {
         checked: usedForTypes.includes(item.value as string),
       }))
     }
-
-    if (usedForTypes !== undefined && usedForTypes !== (req.body.usedForTypes || []))
-      req.sessionModel.unset('usedForTypes')
 
     return {
       ...locals,

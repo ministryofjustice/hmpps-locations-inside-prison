@@ -27,7 +27,7 @@ export default class CellConversionSetCellType extends FormInitialStep {
     const { id: locationId, prisonId } = location
     const fields = { ...locals.fields }
 
-    const specialistCellTypes = sessionModel.get<string[]>('specialistCellTypes')
+    const specialistCellTypes = req.form.values.specialistCellTypes || sessionModel.get<string[]>('specialistCellTypes')
 
     if (specialistCellTypes) {
       fields.specialistCellTypes.items = fields.specialistCellTypes.items.map((item: FormWizard.Field) => ({
@@ -35,9 +35,6 @@ export default class CellConversionSetCellType extends FormInitialStep {
         checked: specialistCellTypes.includes(item.value as string),
       }))
     }
-
-    if (specialistCellTypes !== undefined && specialistCellTypes !== (req.body.specialistCellTypes || []))
-      req.sessionModel.unset('specialistCellTypes')
 
     return {
       ...locals,
