@@ -136,7 +136,11 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  <div class="sticky-footer">
+   {% if sandbox %}
+     <div class="sticky-footer sticky-footer-sandbox">
+   {% else %}
+     <div class="sticky-footer">
+    {% endif %}
     {% block stickyFooterContent %}
     {% endblock %}
 

@@ -1,7 +1,7 @@
 .sticky-footer {
   position: fixed;
   z-index: 1000;
-  bottom: 40px;
+  bottom: 0px;
   width: 100%;
 
   .sticky-select-action-bar {
@@ -60,6 +60,10 @@
       margin: 0;
     }
   }
+}
+
+.sticky-footer-sandbox {
+  bottom: 40px !important
 }
 
 .js-enabled .sticky-select-action-bar {
