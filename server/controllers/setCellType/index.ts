@@ -33,7 +33,7 @@ export default class SetCellType extends FormInitialStep {
     if (!req.form.values?.specialistCellTypes) {
       fields.specialistCellTypes.items = fields.specialistCellTypes.items.map((item: FormWizard.Field) => ({
         ...item,
-        checked: location.specialistCellTypes.includes(item.value),
+        checked: location.raw.specialistCellTypes.includes(item.value),
       }))
     }
 
@@ -52,7 +52,7 @@ export default class SetCellType extends FormInitialStep {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 
-    if (isEqual(sortBy(req.form.values.specialistCellTypes), sortBy(location.specialistCellTypes))) {
+    if (isEqual(sortBy(req.form.values.specialistCellTypes), sortBy(location.raw.specialistCellTypes))) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
 
