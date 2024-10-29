@@ -33,6 +33,14 @@ describe('SetCellType', () => {
     },
   ]
 
+  const location = LocationFactory.build({
+    specialistCellTypes: ['Biohazard / dirty protest cell'],
+  })
+  location.raw = {
+    ...location,
+    specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+  }
+
   beforeEach(() => {
     req = {
       flash: jest.fn(),
@@ -63,9 +71,7 @@ describe('SetCellType', () => {
     res = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({
-          specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
-        }),
+        location,
         options: {
           fields,
         },
@@ -125,7 +131,7 @@ describe('SetCellType', () => {
   })
 
   describe('locals', () => {
-    it('returns the expected locals', () => {
+    it('returns the expected locals when there are errors', () => {
       res.locals.errorlist = [
         {
           key: 'specialistCellTypes',
@@ -147,6 +153,80 @@ describe('SetCellType', () => {
             text: 'Select a cell type',
           },
         ],
+      })
+    })
+
+    it('returns the expected locals when there are existing cell types', () => {
+      const checkboxFields = {
+        specialistCellTypes: {
+          items: [
+            {
+              hint: {
+                text: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
+              },
+              text: 'Accessible cell',
+              value: 'ACCESSIBLE_CELL',
+            },
+            {
+              hint: {
+                text: 'Previously known as a dirty protest cell',
+              },
+              text: 'Biohazard / dirty protest cell',
+              value: 'BIOHAZARD_DIRTY_PROTEST',
+            },
+            {
+              text: 'Constant Supervision Cell',
+              value: 'CONSTANT_SUPERVISION',
+            },
+          ],
+        },
+      }
+      req.form.values = {}
+      res.locals.fields = checkboxFields
+
+      const result = controller.locals(req, res)
+
+      expect(result).toEqual({
+        backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        fields: {
+          specialistCellTypes: {
+            component: 'govukCheckboxes',
+            multiple: true,
+            validate: ['required'],
+            errorMessages: { required: 'Select a cell type' },
+            id: 'specialistCellTypes',
+            name: 'specialistCellTypes',
+            label: { text: 'Set specific cell type' },
+            hint: { text: 'Select all that apply.' },
+            items: [
+              {
+                text: 'Accessible cell',
+                value: 'ACCESSIBLE_CELL',
+                hint: {
+                  text: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
+                },
+                checked: false,
+              },
+              {
+                text: 'Biohazard / dirty protest cell',
+                value: 'BIOHAZARD_DIRTY_PROTEST',
+                hint: { text: 'Previously known as a dirty protest cell' },
+                checked: true,
+              },
+              {
+                text: 'Constant Supervision Cell',
+                value: 'CONSTANT_SUPERVISION',
+                hint: { text: undefined },
+                checked: false,
+              },
+            ],
+            value: ['CAT_A'],
+            errorMessage: { text: 'Select a cell type', href: '#specialistCellTypes' },
+          },
+        },
+        pageTitleText: 'Change specific cell type',
+        validationErrors: [],
       })
     })
   })
