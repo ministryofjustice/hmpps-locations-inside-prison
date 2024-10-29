@@ -5,12 +5,14 @@ import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/changeLocalName/fields'
+import AnalyticsService from '../../services/analyticsService'
 
 describe('RemoveLocalName', () => {
   const controller = new Check({ route: '/' })
   let req: FormWizard.Request
   let res: Response
   let next: NextFunction
+  const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
@@ -29,6 +31,7 @@ describe('RemoveLocalName', () => {
         },
       },
       services: {
+        analyticsService,
         authService,
         locationsService,
       },
@@ -71,6 +74,7 @@ describe('RemoveLocalName', () => {
     authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getLocation = jest.fn().mockResolvedValue(true)
     locationsService.updateLocalName = jest.fn().mockResolvedValue(true)
+    analyticsService.sendEvent = jest.fn()
   })
 
   afterEach(() => {
@@ -127,6 +131,12 @@ describe('RemoveLocalName', () => {
         null,
         'JTIMPSON',
       )
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(req, res, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'remove_local_name', { prison_id: 'TST' })
     })
 
     it('calls next when successful', async () => {

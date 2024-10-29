@@ -36,6 +36,9 @@ export default class RemoveLocalName extends FormInitialStep {
       const token = await req.services.authService.getSystemClientToken(user.username)
       const localName: any = null
       await locationsService.updateLocalName(token, location.id, localName, user.username)
+
+      req.services.analyticsService.sendEvent(req, 'remove_local_name', { prison_id: location.prisonId })
+
       next()
     } catch (error) {
       next(error)
