@@ -14,6 +14,9 @@ export default class Details extends FormInitialStep {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 
+    const fields = { ...locals.fields }
+    fields.localName.value = req.form.values.localName || res.locals.location.localName
+
     const backLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
     })
@@ -58,9 +61,11 @@ export default class Details extends FormInitialStep {
     try {
       const { user, location } = res.locals
       const { locationsService } = req.services
-      const token = await req.services.authService.getSystemClientToken(user.username)
       const { localName } = req.form.values
-      await locationsService.updateLocalName(token, location.id, String(localName), user.username)
+      const token = await req.services.authService.getSystemClientToken(user.username)
+
+      const sanitizedLocalName = sanitizeString(String(localName))
+      await locationsService.updateLocalName(token, location.id, sanitizedLocalName, user.username)
 
       req.services.analyticsService.sendEvent(req, 'change_local_name', { prison_id: location.prisonId })
 

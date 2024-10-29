@@ -35,7 +35,8 @@ describe('sanitizeString', () => {
     ['Empty string', '', null],
     ['One word', ' wing ', 'wing'],
     ['Two words', ' dinner hall ', 'dinner hall'],
-    ['Decorated', ' wing Red/White ', 'wing red/white'],
+    ['HTML characters', 'study <br>room<em></em> ', 'study room'],
+    ['Decorated', ' wing Red/White ', 'wing Red/White'],
     ['Extra spaces', '   quiet space    ', 'quiet space'],
   ])('%s -> sanitizeString(%s)', (_, input, expected) => {
     expect(sanitizeString(input)).toEqual(expected)
