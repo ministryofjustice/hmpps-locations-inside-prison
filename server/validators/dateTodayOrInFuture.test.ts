@@ -1,28 +1,27 @@
-import { formatISO } from 'date-fns'
+import { startOfTomorrow, startOfToday, startOfYesterday } from 'date-fns'
 import dateTodayOrInFuture from './dateTodayOrInFuture'
 
 describe('dateTodayOrInFuture', () => {
   it('allows dates in the future', () => {
-    const date = new Date()
-    date.setHours(0)
-    date.setMinutes(0)
-    date.setDate(date.getDate() + 1)
-    expect(dateTodayOrInFuture(formatISO(date))).toEqual(true)
+    const tomorrow = startOfTomorrow()
+    const tomorrowAsString = `${tomorrow.getFullYear()}-${tomorrow.getMonth() + 1}-${tomorrow.getDate()}`
+    expect(dateTodayOrInFuture(tomorrowAsString)).toEqual(true)
   })
 
   it("allows today's date", () => {
-    const date = new Date()
-    date.setHours(0)
-    date.setMinutes(0)
-    date.setDate(date.getDate())
-    expect(dateTodayOrInFuture(formatISO(date))).toEqual(true)
+    const today = startOfToday()
+    const todayAsString = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
+    expect(dateTodayOrInFuture(todayAsString)).toEqual(true)
   })
 
-  it('forbids past dates', () => {
-    const date = new Date()
-    date.setHours(0)
-    date.setMinutes(0)
-    date.setDate(date.getDate() - 1)
-    expect(dateTodayOrInFuture(formatISO(date))).toEqual(false)
+  it('forbids recent past dates', () => {
+    const yesterday = startOfYesterday()
+    const yesterdayAsString = `${yesterday.getFullYear()}-${yesterday.getMonth() + 1}-${yesterday.getDate()}`
+    expect(dateTodayOrInFuture(yesterdayAsString)).toEqual(false)
+  })
+
+  it('forbids really old past dates', () => {
+    const reallyOldDate = '1066-1-10'
+    expect(dateTodayOrInFuture(reallyOldDate)).toEqual(false)
   })
 })
