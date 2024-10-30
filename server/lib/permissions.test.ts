@@ -10,8 +10,10 @@ describe('rolesToPermissions', () => {
       'change_cell_capacity',
       'change_local_name',
       'change_non_residential_type',
+      'change_temporary_deactivation_details',
       'change_used_for',
       'convert_non_residential',
+      'deactivate',
       'reactivate',
       'set_cell_type',
     ])
