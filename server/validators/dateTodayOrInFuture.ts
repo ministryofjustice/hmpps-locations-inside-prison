@@ -1,7 +1,10 @@
+import { startOfToday } from 'date-fns'
+
 export default function dateTodayOrInFuture(value: string) {
-  const today = new Date()
-  today.setHours(0)
-  today.setMinutes(0)
-  today.setSeconds(0)
-  return value === '' || new Date(value).getTime() >= today.getTime()
+  const parsedDate = value.split('-')
+  const year = parseInt(parsedDate[0], 10)
+  const month = parseInt(parsedDate[1], 10) - 1
+  const date = parseInt(parsedDate[2], 10)
+  const dateInput = new Date(year, month, date)
+  return value === '' || dateInput >= startOfToday()
 }
