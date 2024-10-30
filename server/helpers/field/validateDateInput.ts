@@ -1,9 +1,4 @@
-export default function validateDateInput(
-  dayInputValue: string,
-  monthInputValue: string,
-  yearInputValue: string,
-  isoDate: string,
-) {
+export default function validateDateInput(dayInputValue: string, monthInputValue: string, yearInputValue: string) {
   const missingFields = []
   if (dayInputValue === '') {
     missingFields.push('Day')
@@ -21,7 +16,7 @@ export default function validateDateInput(
   const day = Number(dayInputValue)
   const month = Number(monthInputValue)
   const year = Number(yearInputValue)
-  const estimatedReactivationDate = new Date(isoDate as string)
+  const estimatedReactivationDate = new Date(year, month - 1, day)
   let invalidField: string
   if (
     !Number.isFinite(day) ||

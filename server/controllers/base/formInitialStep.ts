@@ -226,7 +226,7 @@ export default class FormInitialStep extends FormWizard.Controller {
           const day = req.body[`${id}-day`]
           const month = req.body[`${id}-month`]
           const year = req.body[`${id}-year`]
-          const error = validateDateInput(day, month, year, values[id] as string)
+          const error = validateDateInput(day, month, year)
           if (error) {
             // eslint-disable-next-line no-param-reassign
             validationErrors[field.id] = this.formError(field.id, error)

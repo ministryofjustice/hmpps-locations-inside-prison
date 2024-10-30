@@ -1,18 +1,7 @@
 import validateDateInput from './validateDateInput'
 
 function test(day: string | number, month: string | number, year: string | number, error: string) {
-  expect(
-    validateDateInput(
-      day.toString(),
-      month.toString(),
-      year.toString(),
-      [
-        year,
-        month !== '' ? month.toString().padStart(2, '0') : '',
-        day !== '' ? day.toString().padStart(2, '0') : '',
-      ].join('-'),
-    ),
-  ).toBe(error)
+  expect(validateDateInput(day.toString(), month.toString(), year.toString())).toBe(error)
 }
 
 describe('Field helpers', () => {
