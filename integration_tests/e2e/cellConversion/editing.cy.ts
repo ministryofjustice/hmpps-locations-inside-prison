@@ -133,7 +133,7 @@ context('Cell conversion', () => {
         cy.get('.govuk-summary-list__value').eq(1).contains('First night centre / Induction')
       })
 
-      it('can uncheck the used for types and leave XXXXX ', () => {
+      it('can unselect the usedForTypes and cellTypeType when click back and forward not showing', () => {
         const usedForPage = Page.verifyOnPage(CellConversionUsedForPage)
         usedForPage.usedForCheckboxItem('CLOSE_SUPERVISION_CENTRE').click()
         usedForPage.usedForCheckboxItem('SUB_MISUSE_DRUG_RECOVERY').click()
