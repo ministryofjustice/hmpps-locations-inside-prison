@@ -48,7 +48,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       dateInvalid: `${fieldName} must be a real date`,
       dateInvalidDay: `${fieldName} must be a real date`,
       dateInvalidMonth: `${fieldName} must be a real date`,
-      dateInvalidYear: `${fieldName} must be a real date`,
+      dateInvalidYear: `Year must include 4 numbers`,
       dateMissingDay: `${fieldName} must include a day`,
       dateMissingDayAndMonth: `${fieldName} must include a day and month`,
       dateMissingDayAndYear: `${fieldName} must include a day and year`,

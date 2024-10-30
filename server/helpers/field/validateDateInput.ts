@@ -34,7 +34,7 @@ export default function validateDateInput(
   if (!Number.isFinite(month) || month <= 0 || month > 12) {
     invalidField = invalidField ? '*' : 'Month'
   }
-  if (!Number.isFinite(year)) {
+  if (!Number.isFinite(year) || yearInputValue.length < 4) {
     invalidField = invalidField ? '*' : 'Year'
   }
 
