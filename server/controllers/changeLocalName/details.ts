@@ -55,8 +55,8 @@ export default class Details extends FormInitialStep {
           return callback({ ...errors, ...validationErrors })
         }
       } catch (error) {
-        if (error.data.errorCode !== 101) {
-          return callback({ ...errors, ...validationErrors })
+        if (error.data?.errorCode !== 101) {
+          return res.redirect(`/location/${location.id}/deactivate/occupied`)
         }
       }
       return callback({ ...errors, ...validationErrors })
