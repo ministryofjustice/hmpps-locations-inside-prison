@@ -175,7 +175,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
                 value: 'KITCHEN_SERVERY',
               },
               {
-                checked: false,
+                checked: true,
                 conditional: undefined,
                 text: 'Office',
                 value: 'OFFICE',
@@ -234,7 +234,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
     let reqSuccessHandler: any
     let resSuccessHandler: any
     let nextSuccessHandler: any
-    let locationIdSuccesHandler: string
+    let locationIdSuccessHandler: string
     beforeEach(() => {
       reqSuccessHandler = {
         sessionModel: {
@@ -250,7 +250,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
         redirect: jest.fn(),
         locals: {
           location: {
-            id: locationIdSuccesHandler,
+            id: locationIdSuccessHandler,
             prisonId: 'TST',
             localName: 'A-1-001',
             pathHierarchy: null,
@@ -295,7 +295,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
     it('redirects to the view location page', () => {
       controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
       expect(resSuccessHandler.redirect).toHaveBeenCalledWith(
-        `/view-and-update-locations/TST/${locationIdSuccesHandler}`,
+        `/view-and-update-locations/TST/${locationIdSuccessHandler}`,
       )
     })
   })
