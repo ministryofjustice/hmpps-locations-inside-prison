@@ -60,7 +60,6 @@ export default class BaseApiClient {
         query,
         data,
       })
-      logger.debug(`Result: ${JSON.stringify(result)}`)
 
       if (cacheDuration && this.redisClient) {
         logger.debug(`Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)}`)
