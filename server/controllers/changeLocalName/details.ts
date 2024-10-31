@@ -32,11 +32,14 @@ export default class Details extends FormInitialStep {
     super.validateFields(req, res, async errors => {
       const { locationsService, authService } = req.services
       const { values } = req.form
-      const sanitizedLocalName = sanitizeString(String(values.localName))
       const { user, location } = res.locals
-      const token = await authService.getSystemClientToken(user.username)
       const { prisonId, id: locationId, parentId } = location
+
+      const sanitizedLocalName = sanitizeString(String(values.localName))
+      const token = await authService.getSystemClientToken(user.username)
+
       const validationErrors: any = {}
+
       if (sanitizeString(String(values.localName)) === sanitizeString(res.locals.location.localName)) {
         return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
       }
@@ -49,11 +52,13 @@ export default class Details extends FormInitialStep {
         )
         if (localNameExists) {
           validationErrors.localName = this.formError('localName', 'localNameExists')
+          return callback({ ...errors, ...validationErrors })
         }
       } catch (error) {
-        return callback({ ...errors, ...validationErrors })
+        if (error.data.errorCode !== 101) {
+          return callback({ ...errors, ...validationErrors })
+        }
       }
-
       return callback({ ...errors, ...validationErrors })
     })
   }

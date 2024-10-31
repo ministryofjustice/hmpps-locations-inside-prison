@@ -103,6 +103,7 @@ export default class LocationsApiClient extends BaseApiClient {
       { prisonId: string; localName?: string; parentLocationId?: string }
     >({
       path: '/locations/:prisonId/local-name/:localName',
+      queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
     convertCellToNonResCell: this.apiCall<
