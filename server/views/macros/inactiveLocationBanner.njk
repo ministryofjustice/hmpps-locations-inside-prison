@@ -30,7 +30,8 @@
               {
                 href: '/location/' + location.id + '/change-temporary-deactivation-details',
                 text: "Change",
-                visuallyHiddenText: "reason"
+                visuallyHiddenText: "reason",
+                classes: "govuk-link--no-visited-state"
               }
             ]
           }
@@ -40,14 +41,15 @@
             text: 'Estimated reactivation date'
           },
             value: {
-            text: location.proposedReactivationDate | formatDate
+            text: location.proposedReactivationDate | formatDate or "Not provided"
           },
           actions: {
             items: [
               {
                 href: '/location/' + location.id + '/change-temporary-deactivation-details',
                 text: "Change",
-                visuallyHiddenText: "estimatedReactivationDate"
+                visuallyHiddenText: "estimatedReactivationDate",
+                classes: "govuk-link--no-visited-state"
               }
             ]
           }
@@ -57,14 +59,15 @@
             text: 'Planet FM reference number'
           },
             value: {
-            text: location.planetFmReference
+            text: location.planetFmReference or "Not provided"
           },
           actions: {
             items: [
               {
                 href: '/location/' + location.id + '/change-temporary-deactivation-details',
                 text: "Change",
-                visuallyHiddenText: "planetFMReferenceNumber"
+                visuallyHiddenText: "planetFMReferenceNumber",
+                classes: "govuk-link--no-visited-state"
               }
             ]
           }
