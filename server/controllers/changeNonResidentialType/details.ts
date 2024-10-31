@@ -28,20 +28,44 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
     const fields = { ...locals.fields }
-
-    const convertedCellTypes = location.raw?.convertedCellType || []
+    const convertedCellType = req.form.values.convertedCellType || location.raw?.convertedCellType || ''
+    const otherConvertedCellType = req.form.values.otherConvertedCellType || location.raw?.otherConvertedCellType || ''
 
     fields.convertedCellType.items = fields.convertedCellType.items.map((item: FormWizard.Field) => ({
       ...item,
-      checked: convertedCellTypes.includes(item.value), // Use the new variable
+      checked: item.value === convertedCellType,
     }))
-    fields.otherConvertedCellType.value = res.locals.location.raw?.otherConvertedCellType || ''
+
+    fields.otherConvertedCellType.value = convertedCellType === 'OTHER' ? otherConvertedCellType : ''
 
     return {
       ...locals,
       backLink: cancelLink,
       cancelLink,
     }
+  }
+
+  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+    super.validateFields(req, res, async errors => {
+      const { location } = res.locals
+      const { prisonId, id: locationId } = location
+
+      const { convertedCellType } = req.form.values
+      const { otherConvertedCellType } = req.form.values
+      const currentConvertedCellType = res.locals.location.raw.convertedCellType
+      const currentOtherConvertedCellType = res.locals.location.raw.otherConvertedCellType
+
+      const convertedCellTypeUnchanged = convertedCellType === currentConvertedCellType
+      const otherConvertedCellTypeUnchanged = otherConvertedCellType === currentOtherConvertedCellType
+
+      if (
+        (convertedCellTypeUnchanged && convertedCellType !== 'OTHER') ||
+        (convertedCellType === 'OTHER' && convertedCellTypeUnchanged && otherConvertedCellTypeUnchanged)
+      ) {
+        return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+      }
+      return callback({ ...errors })
+    })
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
