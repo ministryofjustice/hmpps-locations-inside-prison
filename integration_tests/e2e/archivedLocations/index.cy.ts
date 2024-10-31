@@ -100,6 +100,7 @@ context('Archived Locations Index', () => {
 
           cy.wrap(cells.location).contains(location.localName || location.pathHierarchy)
           cy.wrap(cells.locationType).contains('Cell')
+          cy.wrap(cells.reason).contains('Demolished')
           cy.wrap(cells.deactivatedBy).contains(`john smith on ${formatDate(location.deactivatedDate)}`)
         })
         archivedLocationsIndexPage.emptyStateMessage().should('not.exist')
