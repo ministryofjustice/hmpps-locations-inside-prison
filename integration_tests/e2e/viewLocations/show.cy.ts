@@ -113,7 +113,7 @@ context('View Locations Show', () => {
           .inactiveBannerRows()
           .eq(1)
           .find('.govuk-summary-list__value')
-          .contains(formatDate(location.proposedReactivationDate))
+          .contains(formatDate(location.proposedReactivationDate || 'Not provided'))
         viewLocationsShowPage
           .inactiveBannerRows()
           .eq(2)
@@ -123,7 +123,7 @@ context('View Locations Show', () => {
           .inactiveBannerRows()
           .eq(2)
           .find('.govuk-summary-list__value')
-          .contains(location.planetFmReference)
+          .contains(location.planetFmReference || 'Not provided')
       } else {
         viewLocationsShowPage.inactiveBanner().should('not.exist')
       }
@@ -554,6 +554,26 @@ context('View Locations Show', () => {
           location = LocationFactory.build({
             ...locationDetails,
             status: 'INACTIVE',
+          })
+
+          cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+            parentLocation: location,
+            locationHierarchy,
+          })
+        })
+
+        it('Correctly presents the API data', () => {
+          testShow({ location, locationHierarchy })
+        })
+      })
+
+      context('When the location is Inactive without deactivation details', () => {
+        beforeEach(() => {
+          location = LocationFactory.build({
+            ...locationDetails,
+            status: 'INACTIVE',
+            proposedReactivationDate: undefined,
+            planetFmReference: '',
           })
 
           cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
