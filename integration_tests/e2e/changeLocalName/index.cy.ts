@@ -141,7 +141,7 @@ context('change local name', () => {
     it('shows the correct validation error when there is a matching local name', () => {
       cy.task('stubLocationsCheckLocalNameExists')
       cy.task('stubUpdateLocalName', {
-        localName: 'new local name',
+        localName: 'changed local name',
         updatedBy: 'TEST_USER',
       })
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)

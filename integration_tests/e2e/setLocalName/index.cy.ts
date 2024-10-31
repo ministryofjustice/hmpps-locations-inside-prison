@@ -126,6 +126,10 @@ context('Set local name', () => {
 
     it('shows validation error when local name already exists', () => {
       cy.task('stubLocationsCheckLocalNameExists')
+      cy.task('stubUpdateLocalName', {
+        localName: 'new local name',
+        updatedBy: 'TEST_USER',
+      })
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.setLocalNameLink().click()
