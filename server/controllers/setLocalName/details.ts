@@ -32,13 +32,14 @@ export default class Details extends FormInitialStep {
       const sanitizedLocalName = sanitizeString(String(values.localName))
       const { user, location } = res.locals
       const token = await req.services.authService.getSystemClientToken(user.username)
-      const { prisonId } = location
+      const { prisonId, parentId } = location
       const validationErrors: any = {}
       try {
         const localNameExists = await locationsService.getLocationByLocalName(
           token,
           String(prisonId),
           sanitizedLocalName,
+          parentId,
         )
         if (localNameExists) {
           validationErrors.localName = this.formError('localName', 'localNameExists')
