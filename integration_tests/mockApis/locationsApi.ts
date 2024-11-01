@@ -535,7 +535,7 @@ const stubLocationsCheckLocalNameExists = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/locations-api/locations/[\\w-%]+/local-name/[\\w-%]+',
+      urlPattern: '/locations-api/locations/[\\w-%]+/local-name/[\\w-%]+(?:\\?parentLocationId=[0-9a-fA-F-]+)?$',
     },
     response: {
       status: 200,
