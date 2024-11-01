@@ -2,11 +2,9 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
-{% from "../../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../../macros/miniSummary.njk" import miniSummary %}
-
-{% set title = "You are about to reactivate " + location.displayName %}
+{% set title = "Activate individual " + (locationResidentialSummary.subLocationName | lower) %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
@@ -16,46 +14,37 @@
           text: "Back",
           href: backLink
         }) }}
-
-        {% if errorlist.length %}
-          {{ govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: errorlist
-          }) }}
-        {% endif %}
       </div>
     </div>
   </div>
+{% endblock %}
 
+{% block heading %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-one-half">
+        {% if errorlist.length %}
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: validationErrors
+          }) }}
+        {% endif %}
+
+        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+        <h1 class="govuk-heading-l">{{ title }}</h1>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block content %}
-
   {% set formMethod = options.method | default('post') %}
   {% set formAction = options.action | default('') %}
   {% set formEnctype = options.enctype | default('') %}
 
   <div class="govuk-width-container">
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-!-padding-bottom-2 change-summary">
-          <h2 class="govuk-heading-m">Change to establishment capacity</h2>
-          <p>
-            {% if changeSummary %}
-              {{ (changeSummary | safe) }}
-            {% else %}
-              There will be no change to the establishment's total working or maximum capacity.
-            {% endif %}
-          </p>
-
-          {% for parentLocation in inactiveParentLocations | sort(attribute='pathHierarchy') %}
-            <p>
-              The status of {{ parentLocation.displayName }} will change to active because it will contain active
-              locations.
-            </p>
-          {% endfor %}
-        </div>
-
+      <div class="govuk-grid-column-one-half">
         <form method="{{ formMethod }}" action="{{ formAction }}"
             {% if formEnctype %}
               enctype="{{ formEnctype }}"
@@ -66,11 +55,19 @@
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
           {% endif %}
 
+          {% block fields %}
+            {% for key, fieldsOptions in fields %}
+              {% if fieldsOptions.component and not fieldsOptions.skip %}
+                {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+              {% endif %}
+            {% endfor %}
+          {% endblock %}
+
           <div class="govuk-button-group">
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Confirm activation",
+                  text: "Continue",
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"
@@ -83,9 +80,6 @@
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
             Cancel
-            {% if '/view-and-update-locations' in cancelLink %}
-              and return to location details
-            {% endif %}
           </a>
         </p>
       </div>

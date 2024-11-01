@@ -3,28 +3,29 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../../utils/backUrl'
 import { Location, ResidentialSummary } from '../../../data/types/locationsApi'
-import populateCells from './populateCells'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
+import { DecoratedLocation } from '../../../decorators/decoratedLocation'
+import getResidentialSummaries from './middleware/getResidentialSummaries'
+import populateLocations from './middleware/populateLocations'
 import { PrisonResidentialSummary } from '../../../data/types/locationsApi/prisonResidentialSummary'
 
-export default class ReactivateCellsConfirm extends FormWizard.Controller {
+export default class ReactivateParentConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(this.getResidentialSummary)
-    this.use(populateCells)
+    this.use(getResidentialSummaries)
+    this.use(populateLocations(false))
     this.use(populateInactiveParentLocations)
+    this.use(this.stripInactiveSelectedLoctaions)
   }
 
-  async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
-    const { authService, locationsService } = req.services
+  stripInactiveSelectedLoctaions(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const selectedLocationIds = req.sessionModel.get<string[]>('selectLocations') || []
+    const { inactiveParentLocations }: { inactiveParentLocations: DecoratedLocation[] } = res.locals as unknown as {
+      inactiveParentLocations: DecoratedLocation[]
+    }
 
-    const token = await authService.getSystemClientToken(user.username)
-    res.locals.residentialSummary = await locationsService.getResidentialSummary(
-      token,
-      req.sessionModel.get('referrerPrisonId') as string,
-    )
+    res.locals.inactiveParentLocations = inactiveParentLocations.filter(l => !selectedLocationIds.includes(l.id))
 
     next()
   }
@@ -40,22 +41,27 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { cells, residentialSummary }: { cells: Location[]; residentialSummary: PrisonResidentialSummary } =
+    const {
+      cells,
+      location,
+      prisonResidentialSummary,
+    }: { cells: DecoratedLocation[]; location: DecoratedLocation; prisonResidentialSummary: PrisonResidentialSummary } =
       res.locals as unknown as {
-        cells: Location[]
-        residentialSummary: ResidentialSummary
+        cells: DecoratedLocation[]
+        location: DecoratedLocation
+        prisonResidentialSummary: PrisonResidentialSummary
       }
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const backLink = backUrl(req, { fallbackUrl: '/reactivate/cells/check-capacity' })
+    const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${location.id}/check-capacity` })
     const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
-    const { maxCapacity, workingCapacity } = residentialSummary.prisonSummary
+    const { maxCapacity, workingCapacity } = prisonResidentialSummary.prisonSummary
     let newMaxCapacity = maxCapacity
     let newWorkingCapacity = workingCapacity
 
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
-    cells.forEach((cell: Location) => {
+    cells.forEach(cell => {
       const changes = capacityChanges[cell.id] || {}
       const originalCellMaxCapacity = cell.capacity.maxCapacity
       const originalCellWorkingCapacity = cell.oldWorkingCapacity
@@ -81,40 +87,57 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { cells, user }: { cells?: Location[]; user: Express.User } = res.locals
+    const {
+      cells,
+      locationResidentialSummary,
+      user,
+    }: { cells?: Location[]; locationResidentialSummary: ResidentialSummary; user: Express.User } =
+      res.locals as unknown as {
+        cells?: Location[]
+        locationResidentialSummary: ResidentialSummary
+        user: Express.User
+      }
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
-    const selectedLocations: string[] = req.sessionModel.get('selectedLocations') as string[]
     const allCellChanges = Object.fromEntries(
-      selectedLocations.map((id: string) => {
-        const location = cells.find(l => l.id === id)
+      cells
+        .map((cell: Location) => {
+          const changes = capacityChanges[cell.id]
+          if (!changes) {
+            return null
+          }
 
-        return [
-          id,
-          {
-            capacity: {
-              workingCapacity: location?.oldWorkingCapacity,
-              maxCapacity: location?.capacity?.maxCapacity,
-              ...capacityChanges[id],
+          return [
+            cell.id,
+            {
+              capacity: {
+                workingCapacity: cell?.oldWorkingCapacity,
+                maxCapacity: cell?.capacity?.maxCapacity,
+                ...capacityChanges[cell.id],
+              },
             },
-          },
-        ]
-      }),
+          ]
+        })
+        .filter(e => e),
     ) as Parameters<LocationsService['reactivateBulk']>[1]
+    let selectedLocationIds = req.sessionModel.get<string[]>('selectLocations')
+    if (!selectedLocationIds?.length) {
+      selectedLocationIds = locationResidentialSummary.subLocations.map(l => l.id)
+    }
 
     const { authService, locationsService } = req.services
     const token = await authService.getSystemClientToken(user.username)
-    await locationsService.reactivateBulk(token, allCellChanges)
-
-    req.services.analyticsService.sendEvent(req, 'reactivate_cells', { prison_id: user.activeCaseload?.id })
+    await locationsService.reactivateBulk(token, {
+      ...Object.fromEntries(selectedLocationIds.map(id => [id, { cascadeReactivation: true }])),
+      ...allCellChanges,
+    })
 
     next()
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
-    const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const redirectUrl = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
+    const { location }: { location: DecoratedLocation } = res.locals as unknown as { location: DecoratedLocation }
+    const redirectUrl = `/view-and-update-locations/${location.prisonId}/${location.id}`
 
     req.journeyModel.reset()
     req.sessionModel.reset()

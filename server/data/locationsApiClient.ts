@@ -7,6 +7,8 @@ import {
   ResidentialSummary,
   SignedOperationalCapacity,
 } from './types/locationsApi'
+import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
+import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
 
 export default class LocationsApiClient extends BaseApiClient {
   protected static config() {
@@ -152,7 +154,10 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['includeHistory'],
       requestType: 'get',
     }),
-    getResidentialSummary: this.apiCall<ResidentialSummary, { prisonId: string; parentLocationId?: string }>({
+    getResidentialSummary: this.apiCall<
+      LocationResidentialSummary | PrisonResidentialSummary,
+      { prisonId: string; parentLocationId?: string }
+    >({
       path: '/locations/residential-summary/:prisonId',
       queryParams: ['parentLocationId'],
       requestType: 'get',

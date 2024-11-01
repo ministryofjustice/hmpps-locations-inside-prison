@@ -3,12 +3,14 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../../utils/backUrl'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
+import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 
 export default class ReactivateCellConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(this.getResidentialSummary)
     this.use(populateInactiveParentLocations)
+    this.use(getReferrerRootUrl)
   }
 
   async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -34,8 +36,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response): object {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { location, referrerRootUrl } = res.locals
     const { maxCapacity, workingCapacity } = location.capacity
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
@@ -63,7 +64,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
 
     return {
       backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      cancelLink: referrerRootUrl,
       changeSummary,
     }
   }

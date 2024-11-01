@@ -6,6 +6,7 @@ import ReactivateCellConfirm from './confirm'
 import LocationsService from '../../../services/locationsService'
 import AuthService from '../../../services/authService'
 import AnalyticsService from '../../../services/analyticsService'
+import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 
 describe('ReactivateCellConfirm', () => {
   const controller = new ReactivateCellConfirm({ route: '/' })
@@ -124,6 +125,8 @@ describe('ReactivateCellConfirm', () => {
     })
 
     it('sets the correct locals', async () => {
+      getReferrerRootUrl(req, res, jest.fn())
+
       req.form.values = {
         deactivationReason: 'REASON',
         deactivationReasonDescription: 'Description text',

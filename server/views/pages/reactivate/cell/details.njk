@@ -88,7 +88,10 @@
 
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel and return to location details
+            Cancel
+            {% if '/view-and-update-locations' in cancelLink %}
+              and return to location details
+            {% endif %}
           </a>
         </p>
       </div>

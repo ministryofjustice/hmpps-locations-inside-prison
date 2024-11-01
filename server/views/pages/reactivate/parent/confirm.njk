@@ -1,30 +1,25 @@
 {% extends "../../../partials/layout.njk" %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% from "../../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../../macros/miniSummary.njk" import miniSummary %}
-
-{% set title = "You are about to reactivate " + location.displayName %}
+{% set title = "You are about to reactivate " + (cells | length) + " cells" %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
-        {{ govukBackLink({
-          text: "Back",
-          href: backLink
-        }) }}
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
 
-        {% if errorlist.length %}
-          {{ govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: errorlist
-          }) }}
-        {% endif %}
-      </div>
-    </div>
+    {% if errorlist.length %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errorlist
+      }) }}
+    {% endif %}
   </div>
 
 {% endblock %}
@@ -40,16 +35,23 @@
       <div class="govuk-grid-column-two-thirds">
         <div class="govuk-!-padding-bottom-2 change-summary">
           <h2 class="govuk-heading-m">Change to establishment capacity</h2>
-          <p>
-            {% if changeSummary %}
-              {{ (changeSummary | safe) }}
-            {% else %}
-              There will be no change to the establishment's total working or maximum capacity.
+          {% set topLevelLocationNames = [] %}
+          {% for topLevelLocationData in locations %}
+            {% if not topLevelLocationData.location.leafLevel %}
+              {% set topLevelLocationNames = (topLevelLocationNames.push(topLevelLocationData.location.localName or topLevelLocationData.location.pathHierarchy), topLevelLocationNames) %}
             {% endif %}
-          </p>
+          {% endfor %}
+          {% if topLevelLocationNames | length %}
+            {{ govukWarningText({
+              text: "Every cell in " + (topLevelLocationNames | nonOxfordJoin) + " will be activated.",
+              iconFallbackText: "Warning"
+            }) }}
+          {% endif %}
+
+          <p data-qa="change-summary">{{ changeSummary | safe }}</p>
 
           {% for parentLocation in inactiveParentLocations | sort(attribute='pathHierarchy') %}
-            <p>
+            <p data-qa="inactive-parent-{{ parentLocation.id }}">
               The status of {{ parentLocation.displayName }} will change to active because it will contain active
               locations.
             </p>
@@ -83,9 +85,6 @@
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
             Cancel
-            {% if '/view-and-update-locations' in cancelLink %}
-              and return to location details
-            {% endif %}
           </a>
         </p>
       </div>

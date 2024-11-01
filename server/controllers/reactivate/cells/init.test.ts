@@ -45,7 +45,9 @@ describe('ReactivateCellsInit', () => {
       it('it redirects to single cell reactivation', async () => {
         await controller.render(req, res, next)
 
-        expect(res.redirect).toHaveBeenCalledWith(`/reactivate/cell/${req.query.selectedLocations}`)
+        expect(res.redirect).toHaveBeenCalledWith(
+          `/reactivate/cell/${req.query.selectedLocations}?ref=inactive-cells&refPrisonId=TST&refLocationId=l0`,
+        )
       })
     })
 
