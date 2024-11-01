@@ -13,6 +13,7 @@
     [
       { text: location.pathHierarchy },
       { text: location.locationType },
+      { text: location.permanentlyInactiveReason  or "Not provided" },
       { text: location.deactivatedBy + ' on ' + (location.deactivatedDate | formatDate) }
     ]
   ), rows) %}
@@ -28,7 +29,8 @@
         head: [
           { text: "Location", classes: "govuk-!-width-one-sixth" },
           { text: "Location type", classes: "govuk-!-width-one-sixth" },
-          { text: "Archived by", classes: "govuk-!-width-four-sixths" }
+          { text: "Reason", classes: "govuk-!-width-two-sixths" },
+          { text: "Deactivated by", classes: "govuk-!-width-two-sixths" }
         ],
         rows: rows
       }) }}

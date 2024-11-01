@@ -15,7 +15,8 @@ export default class ArchivedLocationsIndexPage extends Page {
     return {
       location: children.eq(0),
       locationType: children.eq(1),
-      deactivatedBy: children.eq(2),
+      reason: children.eq(2),
+      deactivatedBy: children.eq(3),
     }
   }
 

@@ -100,6 +100,7 @@ context('Archived Locations Index', () => {
 
           cy.wrap(cells.location).contains(location.localName || location.pathHierarchy)
           cy.wrap(cells.locationType).contains('Cell')
+          cy.wrap(cells.reason).contains('Demolished')
           cy.wrap(cells.deactivatedBy).contains(`john smith on ${formatDate(location.deactivatedDate)}`)
         })
         archivedLocationsIndexPage.emptyStateMessage().should('not.exist')
@@ -122,6 +123,50 @@ context('Archived Locations Index', () => {
 
         archivedLocationsIndexPage.locationsTable().should('not.exist')
         archivedLocationsIndexPage.emptyStateMessage().should('exist')
+      })
+    })
+
+    context('When there are archived locations but permanentlyInactiveReason is not provided ', () => {
+      beforeEach(() => {
+        locations = [
+          LocationFactory.build({
+            id: '7e570000-0000-000a-0001-000000000001',
+            pathHierarchy: 'A-1-001',
+            localName: undefined,
+            code: '001',
+            inactiveCells: 1,
+            capacity: { maxCapacity: 3, workingCapacity: 1 },
+            status: 'INACTIVE',
+            deactivatedReason: 'TEST1',
+            permanentlyInactiveReason: undefined,
+            proposedReactivationDate: new Date(2023, 3, 14).toISOString(),
+            planetFmReference: 'FM-1234321',
+          }),
+        ]
+
+        cy.task('stubLocationsPrisonArchivedLocations', locations)
+      })
+
+      it('Correctly presents the API data', () => {
+        cy.signIn()
+        const indexPage = Page.verifyOnPage(IndexPage)
+
+        indexPage.cards.archivedLocations().find('a').click()
+        const archivedLocationsIndexPage = Page.verifyOnPage(ArchivedLocationsIndexPage)
+
+        cy.title().should('eq', 'Archived locations - Residential locations')
+
+        archivedLocationsIndexPage.locationsTable().should('exist')
+        archivedLocationsIndexPage.locationsTableRows().each((row, i) => {
+          const location = locations[i]
+          const cells = archivedLocationsIndexPage.locationsTableCells(row as unknown as PageElement)
+
+          cy.wrap(cells.location).contains(location.localName || location.pathHierarchy)
+          cy.wrap(cells.locationType).contains('Cell')
+          cy.wrap(cells.reason).contains('Not provided')
+          cy.wrap(cells.deactivatedBy).contains(`john smith on ${formatDate(location.deactivatedDate)}`)
+        })
+        archivedLocationsIndexPage.emptyStateMessage().should('not.exist')
       })
     })
   })
