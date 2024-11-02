@@ -28,8 +28,11 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
     const fields = { ...locals.fields }
-    const convertedCellType = req.form.values.convertedCellType || location.raw?.convertedCellType || ''
-    const otherConvertedCellType = req.form.values.otherConvertedCellType || location.raw?.otherConvertedCellType || ''
+    const convertedCellType = req.form.values.convertedCellType ?? location.raw?.convertedCellType ?? ''
+    const otherConvertedCellType =
+      req.form.values.otherConvertedCellType === ''
+        ? null
+        : req.form.values.otherConvertedCellType || location.raw?.otherConvertedCellType || ''
 
     fields.convertedCellType.items = fields.convertedCellType.items.map((item: FormWizard.Field) => ({
       ...item,
@@ -40,6 +43,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
 
     return {
       ...locals,
+      fields,
       backLink: cancelLink,
       cancelLink,
     }
