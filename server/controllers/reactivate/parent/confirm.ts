@@ -7,8 +7,10 @@ import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import { DecoratedLocation } from '../../../decorators/decoratedLocation'
 import getResidentialSummaries from './middleware/getResidentialSummaries'
-import populateLocations from './middleware/populateLocations'
+import populateLocations, { LocationMap } from './middleware/populateLocations'
 import { PrisonResidentialSummary } from '../../../data/types/locationsApi/prisonResidentialSummary'
+import { LocationResidentialSummary } from '../../../data/types/locationsApi/locationResidentialSummary'
+import nonOxfordJoin from '../../../formatters/nonOxfordJoin'
 
 export default class ReactivateParentConfirm extends FormWizard.Controller {
   middlewareSetup() {
@@ -135,16 +137,47 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
     next()
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location }: { location: DecoratedLocation } = res.locals as unknown as { location: DecoratedLocation }
+  async successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const {
+      location,
+      locationResidentialSummary,
+      locations,
+      user,
+    }: {
+      location: DecoratedLocation
+      locationResidentialSummary: LocationResidentialSummary
+      locations: LocationMap[]
+      user: Express.User
+    } = res.locals as unknown as {
+      location: DecoratedLocation
+      locationResidentialSummary: LocationResidentialSummary
+      locations: LocationMap[]
+      user: Express.User
+    }
     const redirectUrl = `/view-and-update-locations/${location.prisonId}/${location.id}`
+
+    const selectLocations = req.sessionModel.get<string[]>('selectLocations') || []
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
+    let { locationType } = location
+    if (selectLocations.length) {
+      if (selectLocations.length === 1) {
+        const { authService, locationsService } = req.services
+        const systemToken = await authService.getSystemClientToken(user.username)
+        locationType = await locationsService.getLocationType(systemToken, locations[0].location.locationType)
+      } else {
+        locationType = locationResidentialSummary.subLocationName
+      }
+    }
+    const locationNames = nonOxfordJoin(
+      (selectLocations.length ? locations.map(l => l.location) : [location]).map(l => l.localName || l.pathHierarchy),
+    )
+
     req.flash('success', {
-      title: `Cells activated`,
-      content: `You have activated ${res.locals.cells.length} cells.`,
+      title: `${locationType} activated`,
+      content: `You have activated ${locationNames}.`,
     })
 
     res.redirect(redirectUrl)

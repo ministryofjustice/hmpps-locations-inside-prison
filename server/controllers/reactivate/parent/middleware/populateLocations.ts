@@ -6,7 +6,7 @@ import LocationsService from '../../../../services/locationsService'
 import decorateLocation from '../../../../decorators/location'
 import { LocationResidentialSummary } from '../../../../data/types/locationsApi/locationResidentialSummary'
 
-interface LocationMap {
+export interface LocationMap {
   location: DecoratedLocation | Location
   subLocations: LocationMap[]
 }

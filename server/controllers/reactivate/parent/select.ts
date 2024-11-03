@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
-import { Location, ResidentialSummary } from '../../../data/types/locationsApi'
+import { Location } from '../../../data/types/locationsApi'
 import { LocationResidentialSummary } from '../../../data/types/locationsApi/locationResidentialSummary'
 
 export default class ReactivateParentSelect extends FormInitialStep {

@@ -1,12 +1,6 @@
 import config from '../config'
 import BaseApiClient from './baseApiClient'
-import {
-  Location,
-  PrisonerLocation,
-  LocationForLocalName,
-  ResidentialSummary,
-  SignedOperationalCapacity,
-} from './types/locationsApi'
+import { Location, PrisonerLocation, LocationForLocalName, SignedOperationalCapacity } from './types/locationsApi'
 import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
 import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
 

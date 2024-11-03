@@ -3,7 +3,6 @@ import populateLocations from './populateLocations'
 import LocationResidentialSummaryFactory from '../../../../testutils/factories/locationResidentialSummary'
 import { Location } from '../../../../data/types/locationsApi'
 import decorateLocation from '../../../../decorators/location'
-import { LocationResidentialSummary } from '../../../../data/types/locationsApi/locationResidentialSummary'
 
 const populateLocationsFunc = populateLocations(false)
 
