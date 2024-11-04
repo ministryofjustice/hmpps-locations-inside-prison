@@ -62,10 +62,9 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { user, location } = res.locals
+    const { analyticsService, locationsService } = req.services
 
     try {
-      const { locationsService } = req.services
-
       const token = await req.services.authService.getSystemClientToken(user.username)
       const reason = req.sessionModel.get('deactivationReason') as string
       await locationsService.deactivateTemporary(
@@ -77,7 +76,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
         req.sessionModel.get('planetFmReference') as string,
       )
 
-      req.services.analyticsService.sendEvent(req, 'deactivate_temp', {
+      analyticsService.sendEvent(req, 'deactivate_temp', {
         prison_id: location.prisonId,
         location_type: location.locationType,
         deactivation_reason: reason,
@@ -86,6 +85,11 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
       return next()
     } catch (error) {
       if (error.data?.errorCode === 109) {
+        analyticsService.sendEvent(req, 'handled_error', {
+          prison_id: location.prisonId,
+          error_code: 109,
+        })
+
         return res.redirect(`/location/${location.id}/deactivate/occupied`)
       }
       return next(error)
