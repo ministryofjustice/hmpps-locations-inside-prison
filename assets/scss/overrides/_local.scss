@@ -171,3 +171,7 @@ $sticky-footer-vertical-spacing: govuk-spacing(2);
     }
   }
 }
+
+#locations-table tbody tr th {
+  vertical-align: middle
+}
