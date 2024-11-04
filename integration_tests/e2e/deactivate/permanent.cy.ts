@@ -36,13 +36,15 @@ context('Deactivate permanent', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
+      cy.task('stubLocationsLocationsResidentialSummary', {
         prisonSummary: {
           workingCapacity: 9,
           signedOperationalCapacity: 11,
           maxCapacity: 10,
         },
+      })
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        parentLocation: location,
       })
       cy.task('stubLocations', location)
       cy.signIn()
@@ -68,13 +70,15 @@ context('Deactivate permanent', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
+      cy.task('stubLocationsLocationsResidentialSummary', {
         prisonSummary: {
           workingCapacity: 9,
           signedOperationalCapacity: 11,
           maxCapacity: 10,
         },
+      })
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        parentLocation: location,
       })
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])

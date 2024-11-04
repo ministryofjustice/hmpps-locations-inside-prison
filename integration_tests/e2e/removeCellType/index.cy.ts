@@ -235,8 +235,7 @@ context('Remove cell type', () => {
           localName: '1-1-001',
           specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
         })
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-          parentLocation: location,
+        cy.task('stubLocationsLocationsResidentialSummary', {
           prisonSummary: {
             workingCapacity: 8,
             signedOperationalCapacity: 10,
@@ -249,6 +248,17 @@ context('Remove cell type', () => {
 
       describe('are you sure page', () => {
         it('can be accessed by clicking the remove link on the show location page', () => {
+          const location = LocationFactory.build({
+            accommodationTypes: ['NORMAL_ACCOMMODATION'],
+            capacity: {
+              maxCapacity: 3,
+              workingCapacity: 0,
+            },
+            leafLevel: true,
+            localName: '1-1-001',
+            specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
+          })
+          cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
           ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
           const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
           viewLocationsShowPage.removeSpecificCellTypeLink().click()
@@ -606,6 +616,17 @@ context('Remove cell type', () => {
           })
 
           it('shows the success banner on completion', () => {
+            const location = LocationFactory.build({
+              accommodationTypes: ['NORMAL_ACCOMMODATION'],
+              capacity: {
+                maxCapacity: 3,
+                workingCapacity: 0,
+              },
+              leafLevel: true,
+              localName: '1-1-001',
+              specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
+            })
+            cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
             const confirmRemoveCellTypePage = Page.verifyOnPage(ConfirmRemoveCellTypePage)
             confirmRemoveCellTypePage.updateCellButton().click()
 

@@ -3,7 +3,7 @@ import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
 import fs from 'fs'
-import { isFunction } from 'lodash'
+import { get, isFunction } from 'lodash'
 import { initialiseName } from './utils'
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
@@ -12,6 +12,7 @@ import formatDateWithTime from '../formatters/formatDateWithTime'
 import formatDate from '../formatters/formatDate'
 import formatTime from '../formatters/formatTime'
 import capFirst from '../formatters/capFirst'
+import nonOxfordJoin from '../formatters/nonOxfordJoin'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -88,6 +89,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('googleAnalyticsMeasurementId', config.googleAnalytics.measurementId)
   njkEnv.addGlobal('googleTagManagerContainerId', config.googleAnalytics.containerId)
   njkEnv.addGlobal('feedbackFormUrl', config.feedbackFormUrl)
+  njkEnv.addGlobal('propEquals', (k: string, v: any, o: object) => get(o, k) === v)
 
   njkEnv.addFilter('initialiseName', initialiseName)
 
@@ -95,5 +97,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('formatDate', formatDate)
   njkEnv.addFilter('formatTime', formatTime)
   njkEnv.addFilter('formatDateWithTime', formatDateWithTime)
+  njkEnv.addFilter('nonOxfordJoin', nonOxfordJoin)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
 }

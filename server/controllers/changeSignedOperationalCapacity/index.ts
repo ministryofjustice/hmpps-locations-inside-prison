@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
+import { PrisonResidentialSummary } from '../../data/types/locationsApi/prisonResidentialSummary'
 
 export default class ChangeSignedOperationalCapacity extends FormInitialStep {
   middlewareSetup() {
@@ -42,7 +43,10 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
       }
     }
 
-    const residentialSummary = await locationsService.getResidentialSummary(token, res.locals.prisonId)
+    const residentialSummary = (await locationsService.getResidentialSummary(
+      token,
+      res.locals.prisonId,
+    )) as PrisonResidentialSummary
     res.locals.maxCapacity = residentialSummary?.prisonSummary?.maxCapacity
 
     next()

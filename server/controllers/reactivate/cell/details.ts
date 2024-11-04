@@ -3,8 +3,14 @@ import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../../utils/backUrl'
 import FormInitialStep from '../../base/formInitialStep'
 import { Location } from '../../../data/types/locationsApi'
+import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 
 export default class ReactivateCellDetails extends FormInitialStep {
+  middlewareSetup() {
+    super.middlewareSetup()
+    this.use(getReferrerRootUrl)
+  }
+
   getInitialValues(req: FormWizard.Request, res: Response) {
     return {
       maxCapacity: res.locals.location.capacity.maxCapacity,
@@ -36,17 +42,18 @@ export default class ReactivateCellDetails extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response): object {
     const locals = super.locals(req, res)
-    const { id: locationId, prisonId } = res.locals.location
+    const { location, referrerRootUrl } = res.locals
+    const { id: locationId } = location
 
     const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
+      fallbackUrl: referrerRootUrl,
       nextStepUrl: `/reactivate/cell/${locationId}/confirm`,
     })
 
     return {
       ...locals,
       backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      cancelLink: referrerRootUrl,
     }
   }
 }

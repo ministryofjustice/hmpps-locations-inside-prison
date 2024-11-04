@@ -299,7 +299,7 @@ const stubLocationsLocationsResidentialSummary = (
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/locations-api/locations/residential-summary/\\w+(\\?parentLocationId=[\\w-]+)?',
+      urlPattern: '/locations-api/locations/residential-summary/\\w+',
     },
     response: {
       status: 200,
@@ -325,16 +325,11 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
       level: 1,
     },
   ],
-  prisonSummary = {
-    workingCapacity: 8,
-    signedOperationalCapacity: 10,
-    maxCapacity: 9,
-  },
 } = {}) =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/locations-api/locations/residential-summary/\\w+(\\?parentLocationId=[\\w-]+)?',
+      urlPattern: `/locations-api/locations/residential-summary/${parentLocation.prisonId}\\?parentLocationId=${parentLocation.id}`,
     },
     response: {
       status: 200,
@@ -347,7 +342,6 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
         subLocations,
         topLevelLocationType,
         locationHierarchy,
-        prisonSummary,
       },
     },
   })

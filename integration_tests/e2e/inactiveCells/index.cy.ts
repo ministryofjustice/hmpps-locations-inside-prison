@@ -3,10 +3,12 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import InactiveCellsIndexPage from '../../pages/inactiveCells'
 import LocationFactory from '../../../server/testutils/factories/location'
-import { Location } from '../../../server/data/types/locationsApi'
 import formatDate from '../../../server/formatters/formatDate'
 
-function testInactiveCellsTable(inactiveCellsIndexPage: InactiveCellsIndexPage, locations: Location[]) {
+function testInactiveCellsTable(
+  inactiveCellsIndexPage: InactiveCellsIndexPage,
+  locations: ReturnType<typeof LocationFactory.build>[],
+) {
   inactiveCellsIndexPage.locationsTableRows().each((row, i) => {
     const location = locations[i]
     const cells = inactiveCellsIndexPage.locationsTableCells(row as unknown as PageElement)
@@ -56,7 +58,7 @@ context('Inactive Cells Index', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
     })
-    let locations: Location[]
+    let locations: ReturnType<typeof LocationFactory.build>[]
 
     context('When no location id is provided', () => {
       beforeEach(() => {
@@ -102,6 +104,15 @@ context('Inactive Cells Index', () => {
         ]
 
         cy.task('stubLocationsLocationsResidentialSummary')
+        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+          parentLocation: LocationFactory.build({
+            localName: undefined,
+            pathHierarchy: 'B',
+            code: 'B',
+            locationType: 'WING',
+          }),
+          locationHierarchy: [],
+        })
         cy.task('stubLocationsPrisonInactiveCells', locations)
       })
 
@@ -159,6 +170,7 @@ context('Inactive Cells Index', () => {
     })
 
     context('When location id is provided', () => {
+      let parentLocation: ReturnType<typeof LocationFactory.build>
       beforeEach(() => {
         locations = [
           LocationFactory.build({
@@ -174,14 +186,16 @@ context('Inactive Cells Index', () => {
             planetFmReference: 'FM-1133',
           }),
         ]
+        parentLocation = LocationFactory.build({
+          id: 'parentLocation',
+          localName: undefined,
+          pathHierarchy: 'B',
+          code: 'B',
+          locationType: 'WING',
+        })
 
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-          parentLocation: LocationFactory.build({
-            localName: undefined,
-            pathHierarchy: 'B',
-            code: 'B',
-            locationType: 'WING',
-          }),
+          parentLocation,
           locationHierarchy: [],
         })
         cy.task('stubLocationsPrisonInactiveCellsForLocation', locations)
@@ -191,7 +205,7 @@ context('Inactive Cells Index', () => {
         cy.signIn()
         Page.verifyOnPage(IndexPage)
 
-        cy.visit('/inactive-cells/TST/8ba666c5-1425-4509-a777-63343956da9a')
+        cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
         const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
         cy.title().should('eq', 'Wing B - Inactive cells - View and update locations - Residential locations')
