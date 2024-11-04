@@ -49,15 +49,14 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { user, location } = res.locals
+    const { analyticsService, locationsService } = req.services
 
     try {
-      const { locationsService } = req.services
-
       const token = await req.services.authService.getSystemClientToken(user.username)
       const reason = req.sessionModel.get('permanentDeactivationReason') as string
       await locationsService.deactivatePermanent(token, location.id, reason)
 
-      req.services.analyticsService.sendEvent(req, 'deactivate_perm', {
+      analyticsService.sendEvent(req, 'deactivate_perm', {
         prison_id: location.prisonId,
         location_type: location.locationType,
       })
@@ -65,6 +64,11 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
       return next()
     } catch (error) {
       if (error.data?.errorCode === 109) {
+        analyticsService.sendEvent(req, 'handled_error', {
+          prison_id: location.prisonId,
+          error_code: 109,
+        })
+
         return res.redirect(`/location/${location.id}/deactivate/occupied`)
       }
       return next(error)
