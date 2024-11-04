@@ -3,7 +3,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% macro inactiveLocationBanner(location, canAccess) %}
+{% macro inactiveLocationBanner(residentialSummary, canAccess) %}
+  {% set location = residentialSummary.location %}
   {% set locationName = location.localName or location.pathHierarchy %}
   {% set locationType = location.locationType %}
   {% set deactivatedReason = location.deactivatedReason %}
@@ -20,9 +21,9 @@
       {{ govukSummaryList({rows:[
         {
           key: {
-          text: 'Reason'
+            text: 'Reason'
           },
-            value: {
+          value: {
             text: deactivatedReason
           },
           actions: {
@@ -31,16 +32,15 @@
                 href: '/location/' + location.id + '/change-temporary-deactivation-details',
                 text: "Change",
                 visuallyHiddenText: "reason",
-                classes: "govuk-link--no-visited-state"
-              }
+                classes: "govuk-link--no-visited-state"}
             ]
           }
-          },
-          {
-            key: {
+        },
+        {
+          key: {
             text: 'Estimated reactivation date'
           },
-            value: {
+          value: {
             text: location.proposedReactivationDate | formatDate or "Not provided"
           },
           actions: {
@@ -49,16 +49,15 @@
                 href: '/location/' + location.id + '/change-temporary-deactivation-details',
                 text: "Change",
                 visuallyHiddenText: "estimatedReactivationDate",
-                classes: "govuk-link--no-visited-state"
-              }
+                classes: "govuk-link--no-visited-state"}
             ]
           }
-          },
-          {
-            key: {
+        },
+        {
+          key: {
             text: 'Planet FM reference number'
           },
-            value: {
+          value: {
             text: location.planetFmReference or "Not provided"
           },
           actions: {
@@ -85,13 +84,29 @@
           class="govuk-caption-s">Last updated by {{ location.lastModifiedBy }} on {{ location.lastModifiedDate | formatDateWithTime }}.</span>
     {% endif %}
 
-    {% if location.raw.locationType == 'CELL' and canAccess('reactivate') %}
-      {{ govukButton({
-        text: "Activate " + (location.locationType | lower),
-        classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
-        preventDoubleClick: true,
-        href: "/reactivate/cell/" + location.id
-      }) }}
+    {% if canAccess('reactivate') %}
+      {% if location.raw.locationType == 'CELL' %}
+        {{ govukButton({
+          text: "Activate " + (location.locationType | lower),
+          classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
+          preventDoubleClick: true,
+          href: "/reactivate/cell/" + location.id
+        }) }}
+      {% elseif ['WING', 'LANDING', 'SPUR'].includes(location.raw.locationType) %}
+        {{ govukButton({
+          text: "Activate entire " + (location.locationType | lower),
+          classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
+          preventDoubleClick: true,
+          href: "/reactivate/parent/" + location.id
+        }) }}
+
+        {{ govukButton({
+          text: "Activate individual " + (residentialSummary.subLocationName | lower),
+          classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
+          preventDoubleClick: true,
+          href: "/reactivate/parent/" + location.id +"?select=1"
+        }) }}
+      {% endif %}
     {% endif %}
 
     {% if canAccess('deactivate:permanent') %}

@@ -92,6 +92,7 @@ context('Change cell capacity', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubLocationsLocationsResidentialSummary')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', prisonerLocations)

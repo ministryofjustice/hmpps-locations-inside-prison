@@ -6,6 +6,7 @@ import { Location, ResidentialSummary } from '../../../data/types/locationsApi'
 import populateCells from './populateCells'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
+import { PrisonResidentialSummary } from '../../../data/types/locationsApi/prisonResidentialSummary'
 
 export default class ReactivateCellsConfirm extends FormWizard.Controller {
   middlewareSetup() {
@@ -39,7 +40,7 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { cells, residentialSummary }: { cells: Location[]; residentialSummary: ResidentialSummary } =
+    const { cells, residentialSummary }: { cells: Location[]; residentialSummary: PrisonResidentialSummary } =
       res.locals as unknown as {
         cells: Location[]
         residentialSummary: ResidentialSummary

@@ -206,7 +206,7 @@ export default function populateResidentialSummary({
       res.locals.topLevelLocationType = apiData.topLevelLocationType
       res.locals.locationHierarchy = apiData.locationHierarchy
 
-      if (apiData.parentLocation) {
+      if ('parentLocation' in apiData) {
         residentialSummary.location = await decorateLocation({
           location: apiData.parentLocation,
           locationsService,
@@ -258,7 +258,7 @@ export default function populateResidentialSummary({
               : []),
           )
         }
-      } else if (apiData.prisonSummary) {
+      } else if ('prisonSummary' in apiData) {
         const changeLink: { linkHref?: string; linkLabel?: string; linkAriaLabel?: string } = {}
         if (req.canAccess('change_signed_operational_capacity')) {
           changeLink.linkHref = `/change-signed-operational-capacity/${prisonId}`

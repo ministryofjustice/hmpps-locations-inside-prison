@@ -27,6 +27,11 @@ export default class ViewLocationsShowPage extends Page {
 
   inactiveBannerActivateCellButton = (): PageElement => this.inactiveBanner().get(`a:contains("Activate cell")`)
 
+  inactiveBannerActivateEntireButton = (): PageElement => this.inactiveBanner().get(`a:contains("Activate entire")`)
+
+  inactiveBannerActivateIndividualButton = (): PageElement =>
+    this.inactiveBanner().get(`a:contains("Activate individual")`)
+
   inactiveBannerChangeLink = (): PageElement => this.inactiveBanner().get(`a:contains("Change")`).first()
 
   actionsMenu = (): PageElement => cy.get('button.moj-button-menu__toggle-button')

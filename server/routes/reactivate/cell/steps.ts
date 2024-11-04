@@ -1,13 +1,14 @@
 import ReactivateCellConfirm from '../../../controllers/reactivate/cell/confirm'
 import ReactivateCellDetails from '../../../controllers/reactivate/cell/details'
+import ReactivateCellInit from '../../../controllers/reactivate/cell/init'
 
 const steps = {
   '/': {
     entryPoint: true,
     reset: true,
     resetJourney: true,
-    skip: true,
     next: 'details',
+    controller: ReactivateCellInit,
   },
   '/details': {
     fields: ['workingCapacity', 'maxCapacity'],

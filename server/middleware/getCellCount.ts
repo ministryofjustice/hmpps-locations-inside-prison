@@ -1,5 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { LocationResidentialSummary } from '../data/types/locationsApi/locationResidentialSummary'
 
 export default async function getCellCount(req: FormWizard.Request, res: Response, next: NextFunction) {
   const { user, location } = res.locals
@@ -9,7 +10,11 @@ export default async function getCellCount(req: FormWizard.Request, res: Respons
 
   if (location.raw.locationType !== 'CELL') {
     const token = await authService.getSystemClientToken(user.username)
-    const residentialSummary = await locationsService.getResidentialSummary(token, location.prisonId, location.id)
+    const residentialSummary = (await locationsService.getResidentialSummary(
+      token,
+      location.prisonId,
+      location.id,
+    )) as LocationResidentialSummary
 
     cellCount =
       residentialSummary.parentLocation.numberOfCellLocations - residentialSummary.parentLocation.inactiveCells

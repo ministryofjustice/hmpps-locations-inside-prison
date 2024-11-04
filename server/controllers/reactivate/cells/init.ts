@@ -7,7 +7,9 @@ export default class ReactivateCellsInit extends FormInitialStep {
     const { locationId, prisonId, selectedLocations } = req.query
 
     if (typeof selectedLocations === 'string') {
-      res.redirect(`/reactivate/cell/${selectedLocations}`)
+      res.redirect(
+        `/reactivate/cell/${selectedLocations}?ref=inactive-cells&refPrisonId=${prisonId}&refLocationId=${locationId}`,
+      )
 
       return
     }

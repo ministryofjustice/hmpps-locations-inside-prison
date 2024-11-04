@@ -13,41 +13,44 @@ context('Reactivate cell', () => {
 
   let location: ReturnType<typeof LocationFactory.build>
 
+  beforeEach(() => {
+    location = LocationFactory.build({
+      accommodationTypes: ['NORMAL_ACCOMMODATION'],
+      capacity: {
+        maxCapacity: 3,
+        workingCapacity: 0,
+      },
+      oldWorkingCapacity: 2,
+      leafLevel: true,
+      specialistCellTypes: [],
+      localName: undefined,
+      status: 'INACTIVE',
+      active: false,
+    })
+    cy.task('reset')
+    cy.task('stubManageUsers')
+    cy.task('stubManageUsersMe')
+    cy.task('stubManageUsersMeCaseloads')
+    cy.task('stubLocationsConstantsAccommodationType')
+    cy.task('stubLocationsConstantsConvertedCellType')
+    cy.task('stubLocationsConstantsDeactivatedReason')
+    cy.task('stubLocationsConstantsLocationType')
+    cy.task('stubLocationsConstantsSpecialistCellType')
+    cy.task('stubLocationsConstantsUsedForType')
+    cy.task('stubLocationsLocationsResidentialSummary', {
+      prisonSummary: {
+        workingCapacity: 9,
+        signedOperationalCapacity: 11,
+        maxCapacity: 10,
+      },
+    })
+    cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+    cy.task('stubLocations', location)
+  })
+
   context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
-      location = LocationFactory.build({
-        accommodationTypes: ['NORMAL_ACCOMMODATION'],
-        capacity: {
-          maxCapacity: 3,
-          workingCapacity: 0,
-        },
-        oldWorkingCapacity: 2,
-        leafLevel: true,
-        specialistCellTypes: [],
-        localName: undefined,
-        status: 'INACTIVE',
-        active: false,
-      })
-      cy.task('reset')
       cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
-      })
-      cy.task('stubLocations', location)
       cy.signIn()
     })
 
@@ -60,19 +63,7 @@ context('Reactivate cell', () => {
 
   context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
-      cy.task('reset')
       cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubLocations', location)
       cy.task('stubLocations', genericLocation)
       cy.task('stubLocationsBulkReactivate')
       cy.signIn()
@@ -87,7 +78,7 @@ context('Reactivate cell', () => {
     })
 
     it('has a back link to the show location page', () => {
-      ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+      ReactivateCellDetailsPage.goTo(location.id)
       const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
       reactivateCellDetailsPage.backLink().click()
 
@@ -95,14 +86,14 @@ context('Reactivate cell', () => {
     })
 
     it('has the correct main heading and a caption showing the cell description', () => {
-      ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+      ReactivateCellDetailsPage.goTo(location.id)
 
       cy.get('h1').contains('Check cell capacity')
       cy.get('.govuk-caption-m').contains('Cell A-1-001')
     })
 
     it('has a cancel link', () => {
-      ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+      ReactivateCellDetailsPage.goTo(location.id)
       const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
       reactivateCellDetailsPage.cancelLink().click()
 
@@ -111,7 +102,7 @@ context('Reactivate cell', () => {
 
     describe('validations', () => {
       it('shows the correct validation error when missing working capacity', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('4')
@@ -124,7 +115,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when working capacity > 99', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('4')
@@ -137,7 +128,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when working capacity is not a number', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('4')
@@ -150,7 +141,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when working capacity is greater than max capacity', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('3')
@@ -163,7 +154,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('3')
@@ -176,7 +167,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when missing max capacity', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear()
@@ -189,7 +180,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when max capacity > 99', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('100')
@@ -202,7 +193,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when max capacity is not a number', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('hello')
@@ -215,7 +206,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct validation error when max capacity is zero', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
         reactivateCellDetailsPage.maxCapacityInput().clear().type('0')
@@ -230,7 +221,7 @@ context('Reactivate cell', () => {
 
     describe('confirm cell capacity', () => {
       it('has the correct title', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
         reactivateCellDetailsPage.workingCapacityInput().clear().type('2')
         reactivateCellDetailsPage.continueButton().click()
@@ -241,7 +232,7 @@ context('Reactivate cell', () => {
       })
 
       it('has a back link to the details page', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
         reactivateCellDetailsPage.workingCapacityInput().clear().type('2')
         reactivateCellDetailsPage.continueButton().click()
@@ -256,7 +247,7 @@ context('Reactivate cell', () => {
         location.specialistCellTypes = ['TEST']
         cy.task('stubLocations', location)
 
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
         reactivateCellDetailsPage.workingCapacityInput().clear().type('0')
         reactivateCellDetailsPage.continueButton().click()
@@ -270,7 +261,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the correct change summary when changing one value', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
         reactivateCellDetailsPage.workingCapacityInput().clear().type('2')
         reactivateCellDetailsPage.continueButton().click()
@@ -279,12 +270,12 @@ context('Reactivate cell', () => {
 
         cy.get('.change-summary h2').contains('Change to establishment capacity')
         cy.get('.change-summary p').contains(
-          /The establishment's total working capacity will increase from 8 to 10.\s+$/,
+          /The establishment's total working capacity will increase from 9 to 11.\s+$/,
         )
       })
 
       it('shows the correct change summary when changing both values', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
         reactivateCellDetailsPage.workingCapacityInput().clear().type('2')
         reactivateCellDetailsPage.maxCapacityInput().clear().type('4')
@@ -293,14 +284,14 @@ context('Reactivate cell', () => {
         Page.verifyOnPage(ReactivateCellConfirmPage)
 
         cy.get('.change-summary h2').contains('Change to establishment capacity')
-        cy.get('.change-summary p').contains(/The establishment's total working capacity will increase from 8 to 10./)
+        cy.get('.change-summary p').contains(/The establishment's total working capacity will increase from 9 to 11./)
         cy.get('.change-summary p').contains(
-          /The establishment's total maximum capacity will increase from 9 to 10.\s+$/,
+          /The establishment's total maximum capacity will increase from 10 to 11.\s+$/,
         )
       })
 
       it('has a cancel link', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
         reactivateCellDetailsPage.workingCapacityInput().clear().type('2')
         reactivateCellDetailsPage.continueButton().click()
@@ -312,7 +303,7 @@ context('Reactivate cell', () => {
       })
 
       it('shows the success banner when the change is complete', () => {
-        ReactivateCellDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        ReactivateCellDetailsPage.goTo(location.id)
         const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
         reactivateCellDetailsPage.workingCapacityInput().clear().type('2')
         reactivateCellDetailsPage.maxCapacityInput().clear().type('4')

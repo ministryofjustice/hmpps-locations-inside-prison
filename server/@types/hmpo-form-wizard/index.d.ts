@@ -242,6 +242,13 @@ declare module 'hmpo-form-wizard' {
       id?: string
       hint?: Hint
       type?: FieldType
+      fieldset?: {
+        legend: {
+          text: string
+          classes: string
+        }
+      }
+      errorMessages?: { [type: string]: string }
       multiple?: boolean
       options?: FormWizard.Field.Options
       formatter?: Formatter[]

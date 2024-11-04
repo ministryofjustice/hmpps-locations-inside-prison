@@ -2,6 +2,7 @@ import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import fields from '../../../routes/reactivate/cell/fields'
 import ReactivateCellDetails from './details'
+import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 
 describe('ReactivateCellDetails', () => {
   const controller = new ReactivateCellDetails({ route: '/' })
@@ -94,6 +95,8 @@ describe('ReactivateCellDetails', () => {
 
   describe('locals', () => {
     it('returns the expected locals', () => {
+      getReferrerRootUrl(req, res, jest.fn())
+
       res.locals.errorlist = [
         {
           key: 'workingCapacity',

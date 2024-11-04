@@ -53,7 +53,7 @@ export default class BaseApiClient {
       }
 
       logger.debug(
-        `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)}`,
+        `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)} - data ${JSON.stringify(data)}`,
       )
       const result = await (this.constructor as typeof BaseApiClient).restClient(token)[requestType]<ReturnType>({
         path: filledPath,
