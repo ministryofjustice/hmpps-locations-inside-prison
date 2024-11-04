@@ -149,15 +149,27 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
       })
     })
 
-    it('redirects to the cell occupied page when cell is occupied error occurs', async () => {
-      const error: any = new Error('API error: Cell is occupied')
-      error.data = { errorCode: 109 }
-      locationsService.convertCellToNonResCell.mockRejectedValue(error)
-      await controller.saveValues(req, res, next)
+    describe('when cell is occupied error occurs', () => {
+      beforeEach(async () => {
+        const error: any = new Error('API error: Cell is occupied')
+        error.data = { errorCode: 109 }
+        locationsService.convertCellToNonResCell.mockRejectedValue(error)
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/non-residential-conversion/occupied',
-      )
+        await controller.saveValues(req, res, next)
+      })
+
+      it('redirects to the cell occupied page', () => {
+        expect(res.redirect).toHaveBeenCalledWith(
+          '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/non-residential-conversion/occupied',
+        )
+      })
+
+      it('sends a handled_error event to Google Analytics', () => {
+        expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'handled_error', {
+          prison_id: 'TST',
+          error_code: 109,
+        })
+      })
     })
 
     it('calls next with any unexpected errors', async () => {

@@ -39,9 +39,9 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location, user } = res.locals
+    const { analyticsService, locationsService } = req.services
 
     try {
-      const { locationsService } = req.services
       const convertedCellType = req.sessionModel.get('convertedCellType') as { text: string; value: string }
       let otherConvertedCellType = req.sessionModel.get('otherConvertedCellType') as string
       if (!otherConvertedCellType?.length) {
@@ -56,7 +56,7 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
         otherConvertedCellType,
       )
 
-      req.services.analyticsService.sendEvent(req, 'convert_to_non_res', {
+      analyticsService.sendEvent(req, 'convert_to_non_res', {
         prison_id: location.prisonId,
         converted_cell_type: convertedCellType.value,
       })
@@ -64,6 +64,11 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
       return next()
     } catch (error) {
       if (error.data?.errorCode === 109) {
+        analyticsService.sendEvent(req, 'handled_error', {
+          prison_id: location.prisonId,
+          error_code: 109,
+        })
+
         return res.redirect(`/location/${location.id}/non-residential-conversion/occupied`)
       }
       return next(error)

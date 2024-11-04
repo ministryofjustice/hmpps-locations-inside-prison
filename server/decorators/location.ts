@@ -1,7 +1,6 @@
 import { Location } from '../data/types/locationsApi'
 import LocationsService from '../services/locationsService'
 import ManageUsersService from '../services/manageUsersService'
-import logger from '../../logger'
 import { DecoratedLocation } from './decoratedLocation'
 
 export default async function decorateLocation({
@@ -19,8 +18,6 @@ export default async function decorateLocation({
   locationsService: LocationsService
   limited?: boolean
 }): Promise<DecoratedLocation> {
-  logger.debug(`decorate location: ${JSON.stringify(location)}`)
-
   const locationType = await locationsService.getLocationType(systemToken, location.locationType)
 
   return {
