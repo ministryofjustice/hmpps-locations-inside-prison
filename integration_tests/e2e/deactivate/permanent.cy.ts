@@ -1,6 +1,4 @@
 import LocationFactory from '../../../server/testutils/factories/location'
-import { Location } from '../../../server/data/types/locationsApi'
-
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import DeactivateOccupiedPage from '../../pages/deactivate/occupied'
@@ -377,7 +375,6 @@ context('Deactivate permanent', () => {
 
       context('With the VIEW_INTERNAL_LOCATION role', () => {
         let locations: ReturnType<typeof LocationFactory.build>[]
-
         beforeEach(() => {
           locations = [
             LocationFactory.build({
