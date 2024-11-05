@@ -16,14 +16,6 @@
 {% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
 {% set title = (residentialSummary.location.displayName | capFirst) + ' - View and update locations' %}
 
-{% block head %}
-  {{ super() }}
-
-  {% if actions | length %}
-    <script src="/assets/js/buttonMenu.js"></script>
-  {% endif %}
-{% endblock %}
-
 {% block beforeContent %}
   {{ super() }}
 
@@ -75,10 +67,14 @@
         {% if actions | length %}
           <div class="govuk-!-float-right">
             {% if actions | length > 1 %}
-              {{ mojButtonMenu({ items: actions }) }}
+              {{ mojButtonMenu({
+                button: { text: "Actions" },
+                alignMenu: "right",
+                items: actions
+              }) }}
             {% else %}
-              <a href={{actions[0].href}} 
-                role="button" 
+              <a href="{{actions[0].href}}"
+                role="button"
                 class="govuk-button govuk-button--secondary">{{ actions[0].text }}</a>
             {% endif %}
           </div>
