@@ -1,4 +1,6 @@
 import LocationFactory from '../../../server/testutils/factories/location'
+import { Location } from '../../../server/data/types/locationsApi'
+
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import DeactivateOccupiedPage from '../../pages/deactivate/occupied'
@@ -6,6 +8,7 @@ import DeactivatePermanentConfirmPage from '../../pages/deactivate/permanent/con
 import DeactivatePermanentDetailsPage from '../../pages/deactivate/permanent/details'
 import DeactivatePermanentWarningPage from '../../pages/deactivate/permanent/warning'
 import DeactivateTypePage from '../../pages/deactivate/type'
+import ArchivedLocationsIndexPage from '../../pages/archivedLocations'
 
 context('Deactivate permanent', () => {
   const location = LocationFactory.build({
@@ -372,14 +375,59 @@ context('Deactivate permanent', () => {
         cy.get('.change-summary p').contains(/The establishment’s maximum capacity will reduce from 10 to 8.$/)
       })
 
-      it('shows the success banner on completion', () => {
-        const confirmationPage = Page.verifyOnPage(DeactivatePermanentConfirmPage)
-        confirmationPage.confirmButton().click()
+      context('With the VIEW_INTERNAL_LOCATION role', () => {
+        let locations: Location[]
 
-        Page.verifyOnPage(ViewLocationsShowPage)
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Location archived')
-        cy.get('.govuk-notification-banner__content p').contains('You have permanently deactivated cell A-1-001.')
+        beforeEach(() => {
+          locations = [
+            LocationFactory.build({
+              id: '7e570000-0000-000a-0001-000000000001',
+              pathHierarchy: 'A-1-001',
+              localName: undefined,
+              code: '001',
+              inactiveCells: 1,
+              capacity: { maxCapacity: 3, workingCapacity: 1 },
+              status: 'INACTIVE',
+              deactivatedReason: 'TEST1',
+              proposedReactivationDate: new Date(2023, 3, 14).toISOString(),
+              planetFmReference: 'FM-1234321',
+            }),
+            LocationFactory.build({
+              id: '7e570000-0000-000a-0001-000000000002',
+              pathHierarchy: 'A-1-002',
+              localName: undefined,
+              code: '002',
+              inactiveCells: 1,
+              capacity: { maxCapacity: 3, workingCapacity: 1 },
+              status: 'INACTIVE',
+              deactivatedReason: 'TEST1',
+              proposedReactivationDate: new Date(2024, 2, 1).toISOString(),
+              planetFmReference: undefined,
+            }),
+            LocationFactory.build({
+              id: '7e570000-0000-000b-0001-000000000001',
+              pathHierarchy: 'B-1-001',
+              localName: undefined,
+              code: '001',
+              inactiveCells: 1,
+              capacity: { maxCapacity: 3, workingCapacity: 1 },
+              status: 'INACTIVE',
+              deactivatedReason: 'TEST1',
+              proposedReactivationDate: new Date(2024, 1, 3).toISOString(),
+              planetFmReference: 'FM-1133',
+            }),
+          ]
+          cy.task('stubLocationsPrisonArchivedLocations', locations)
+        })
+
+        it('shows the success banner on completion', () => {
+          const confirmationPage = Page.verifyOnPage(DeactivatePermanentConfirmPage)
+          confirmationPage.confirmButton().click()
+          Page.verifyOnPage(ArchivedLocationsIndexPage)
+          cy.get('#govuk-notification-banner-title').contains('Success')
+          cy.get('.govuk-notification-banner__content h3').contains('Location archived')
+          cy.get('.govuk-notification-banner__content p').contains('You have permanently deactivated cell A-1-001.')
+        })
       })
 
       context('when the cell becomes occupied during the process', () => {

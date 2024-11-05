@@ -196,7 +196,7 @@ The establishment’s maximum capacity will reduce from 30 to 15.`,
     })
 
     it('redirects to the view location page', () => {
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+      expect(res.redirect).toHaveBeenCalledWith('/archived-locations/TST')
     })
   })
 })
