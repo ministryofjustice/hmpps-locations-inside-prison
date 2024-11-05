@@ -376,7 +376,7 @@ context('Deactivate permanent', () => {
       })
 
       context('With the VIEW_INTERNAL_LOCATION role', () => {
-        let locations: Location[]
+        let locations: ReturnType<typeof LocationFactory.build>[]
 
         beforeEach(() => {
           locations = [
