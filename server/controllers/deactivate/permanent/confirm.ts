@@ -77,7 +77,7 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
-    const { displayName, id: locationId, prisonId } = location as DecoratedLocation
+    const { displayName, prisonId } = location as DecoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -86,7 +86,6 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
       title: 'Location archived',
       content: `You have permanently deactivated ${displayName}.`,
     })
-
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(`/archived-locations/${prisonId}`)
   }
 }
