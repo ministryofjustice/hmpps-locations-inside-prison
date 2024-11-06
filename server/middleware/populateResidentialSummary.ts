@@ -27,7 +27,7 @@ function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow
   const { id, localName } = location
   const baseUrl = `/location/${id}/`
 
-  const row: any = { key: { text: 'Local Name' } }
+  const row: any = { key: { text: 'Local name' } }
 
   if (localName) {
     row.value = { html: localName }
