@@ -132,7 +132,7 @@
         { text: "Planet FM reference number" },
         { text: "Deactivated by" }
       ), tableHead) %}
-
+      {% if rows | length %}
       {{ govukTable({
         attributes: {
           "data-qa": "inactive-cells-table"
@@ -149,6 +149,9 @@
           classes: "moj-js-hidden"
         }) }}
       {% endif %}
+      {% else %}
+            <p data-qa="empty-state-message">There are no inactive locations.</p>
+    {% endif %}
     </form>
   </div>
 {% endblock %}

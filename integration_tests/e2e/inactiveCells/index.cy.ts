@@ -214,5 +214,35 @@ context('Inactive Cells Index', () => {
         testInactiveCellsTable(inactiveCellsIndexPage, locations)
       })
     })
+
+    context('When location id is provided and there is no any inactive cell', () => {
+      let parentLocation: ReturnType<typeof LocationFactory.build>
+      beforeEach(() => {
+        locations = []
+        parentLocation = LocationFactory.build({
+          id: 'parentLocation',
+          localName: undefined,
+          pathHierarchy: 'B',
+          code: 'B',
+          locationType: 'WING',
+        })
+        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+          parentLocation,
+          locationHierarchy: [],
+        })
+        cy.task('stubLocationsPrisonInactiveCellsForLocation', locations)
+      })
+      it('Correctly presents message there are no inactive locations when there is no any inactive cell', () => {
+        cy.signIn()
+        Page.verifyOnPage(IndexPage)
+        cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
+        const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
+        cy.title().should('eq', 'Wing B - Inactive cells - View and update locations - Residential locations')
+        cy.get('h1').contains('Inactive cells (0)')
+        cy.contains('There are no inactive locations')
+        inactiveCellsIndexPage.locationsTable().should('not.exist')
+        inactiveCellsIndexPage.emptyStateMessage().should('exist')
+      })
+    })
   })
 })
