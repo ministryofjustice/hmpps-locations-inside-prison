@@ -163,7 +163,7 @@ context('View Locations Show', () => {
           .locationDetailsRows()
           .eq(detailsRows)
           .find('.govuk-summary-list__key')
-          .contains('Local Name')
+          .contains('Local name')
 
         if (location.localName) {
           viewLocationsShowPage
