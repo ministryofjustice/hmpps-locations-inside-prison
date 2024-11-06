@@ -1,6 +1,8 @@
 {% extends "../../partials/layout.njk" %}
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
 {% set locationType = residentialSummary.location.locationType %}
@@ -18,6 +20,33 @@
     ]
   ), rows) %}
 {% endfor %}
+
+{% block beforeContent %}
+  {{ super() }}
+
+  {% if banner.success %}
+    {% set html %}
+      <h3 class="govuk-notification-banner__heading">
+        {{ banner.success.title }}
+      </h3>
+      <p class="govuk-body">
+        {{ banner.success.content }}
+      </p>
+    {% endset %}
+
+    <div class="govuk-width-container">
+      <div class="govuk-grid-row govuk-!-margin-bottom-0">
+        <div class="govuk-grid-column-two-thirds">
+          {{ govukNotificationBanner({
+            html: html,
+            type: "success",
+            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+          }) }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
 
 {% block content %}
   <div class="govuk-width-container">
