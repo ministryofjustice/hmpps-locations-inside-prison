@@ -8,6 +8,8 @@ export default class InactiveCellsIndexPage extends Page {
     super('')
   }
 
+  emptyStateMessage = (): PageElement => cy.get('[data-qa=empty-state-message]')
+
   locationsTable = (): PageElement => cy.get('[data-qa=inactive-cells-table]')
 
   locationsTableRows = (): PageElement => this.locationsTable().find('tbody tr')
