@@ -76,7 +76,7 @@
   {% if canAccess('reactivate') %}
     {% set row = (row.push({
       html: '<div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
-                 <input aria-label="' + cell.pathHierarchy + '" type="checkbox" class="govuk-checkboxes__input" name="selectedLocations" id="location-' + cell.id + '" value="' + cell.id + '">
+                 <input aria-label="' + cell.pathHierarchy + '" type="checkbox" class="govuk-checkboxes__input" name="selectedLocations" id="location-' + cell.id + '" value="' + cell.id + '" autocomplete="off">
                  <label class="govuk-label govuk-checkboxes__label moj-multi-select__toggle-label" for="location-' + cell.id + '"></label>
                </div>'
     }), row) %}
