@@ -13,17 +13,19 @@ function updateCheckedCount() {
   }
 }
 
-$(() => {
-  const multiSelect = new MOJFrontend.MultiSelect({
-    container: '.moj-multi-select',
-    checkboxes: '.govuk-checkboxes__input:not(#checkboxes-all)',
-  })
+module.exports = mojFrontend => {
+  $(() => {
+    const multiSelect = new mojFrontend.MultiSelect({
+      container: '.moj-multi-select',
+      checkboxes: '.govuk-checkboxes__input:not(#checkboxes-all)',
+    })
 
-  $('.sticky-select-action-bar__clear-link').on('click', () => {
-    multiSelect.uncheckAll()
-    multiSelect.toggleButton[0].checked = false
-    updateCheckedCount()
-  })
+    $('.sticky-select-action-bar__clear-link').on('click', () => {
+      multiSelect.uncheckAll()
+      multiSelect.toggleButton[0].checked = false
+      updateCheckedCount()
+    })
 
-  $('.govuk-checkboxes__input').on('click', updateCheckedCount)
-})
+    $('.govuk-checkboxes__input').on('click', updateCheckedCount)
+  })
+}

@@ -64,6 +64,12 @@
       "rules": {
         "@typescript-eslint/ban-ts-comment": "off"
       }
+    },
+    {
+      "files": ["esbuild/**/*"],
+      "rules": {
+        "no-console": "off"
+      }
     }
   ],
 
@@ -94,7 +100,7 @@
     "comma-dangle": ["error", "always-multiline"],
     "import/no-extraneous-dependencies": [
       "error",
-      { "devDependencies": ["**/*.test.js", "**/*.test.ts", "**/testutils/**", "cypress.config.ts"] }
+      { "devDependencies": ["**/*.test.js", "**/*.test.ts", "**/testutils/**", "cypress.config.ts", "esbuild/**/*"] }
     ],
     "no-only-tests/no-only-tests": "error",
     "prettier/prettier": [
