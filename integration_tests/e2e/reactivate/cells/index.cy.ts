@@ -5,6 +5,7 @@ import ReactivateCellDetailsPage from '../../../pages/reactivate/cell/details'
 import ReactivateCellsCheckCapacityPage from '../../../pages/reactivate/cells/checkCapacity'
 import ReactivateCellsConfirmPage from '../../../pages/reactivate/cells/confirm'
 import ReactivateCellsChangeCapacityPage from '../../../pages/reactivate/cells/changeCapacity'
+import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 
 context('Reactivate cells', () => {
   let locations: ReturnType<typeof LocationFactory.build>[]
@@ -208,6 +209,21 @@ context('Reactivate cells', () => {
 
         page.footerClearLink().click()
         page.footer().should('exist').should('not.be.visible')
+      })
+
+      it('unchecks the boxes when navigating away and then back using the browser back button', () => {
+        InactiveCellsIndexPage.goTo()
+        const inactiveCellsPage = Page.verifyOnPage(InactiveCellsIndexPage)
+        inactiveCellsPage.selectAllCheckbox().click({ force: true })
+        cy.get('a:contains("A-1-002")').click()
+        Page.verifyOnPage(ViewLocationsShowPage)
+        cy.go('back')
+        // wait for js to load
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(1000)
+        Page.verifyOnPage(InactiveCellsIndexPage)
+        cy.get('input:checked').should('not.exist')
+        cy.get('.sticky-select-action-bar--active').should('not.exist')
       })
     })
 

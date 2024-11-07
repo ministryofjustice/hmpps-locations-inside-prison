@@ -8,6 +8,7 @@ const fields = {
       text: 'local name',
       classes: 'govuk-fieldset__legend--m',
     },
+    autocomplete: 'off',
   },
 }
 
