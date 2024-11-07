@@ -1,12 +1,14 @@
 module.exports = () => {
   $(() => {
     // Loops through dom and finds all elements with card--clickable class
-    document.querySelectorAll('.card--clickable').forEach(card => {
+    $('.card--clickable').each(function () {
+      const link = this.querySelector('a')
       // Check if card has a link within it
-      if (card.querySelector('a') !== null) {
+      if (link !== null) {
         // Clicks the link within the heading to navigate to desired page
-        card.addEventListener('click', () => {
-          card.querySelector('a').click()
+        $(this).on('click', () => {
+          // Use HTMLAnchorElement.click() rather than jQuery's trigger('click') to prevent recursion
+          link.click()
         })
       }
     })
