@@ -40,6 +40,9 @@ export default class Details extends FormInitialStep {
 
       const validationErrors: any = {}
 
+      if (!sanitizedLocalName) {
+        return callback({ ...errors, ...validationErrors })
+      }
       if (sanitizeString(String(values.localName)) === sanitizeString(res.locals.location.localName)) {
         return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
       }
