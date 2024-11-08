@@ -2,7 +2,9 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
+import fs from 'fs'
 import { get, isFunction } from 'lodash'
+
 import { initialiseName } from './utils'
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
@@ -11,6 +13,7 @@ import formatDate from '../formatters/formatDate'
 import formatTime from '../formatters/formatTime'
 import capFirst from '../formatters/capFirst'
 import nonOxfordJoin from '../formatters/nonOxfordJoin'
+import logger from '../../logger'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -41,6 +44,17 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
       res.locals.version = Date.now().toString()
       return next()
     })
+  }
+
+  let assetManifest: Record<string, string> = {}
+
+  try {
+    const assetMetadataPath = path.resolve(__dirname, '../../assets/manifest.json')
+    assetManifest = JSON.parse(fs.readFileSync(assetMetadataPath, 'utf8'))
+  } catch (e) {
+    if (process.env.NODE_ENV !== 'test') {
+      logger.error(e, 'Could not read asset manifest file')
+    }
   }
 
   const njkEnv = nunjucks.configure(
@@ -80,6 +94,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('propEquals', (k: string, v: any, o: object) => get(o, k) === v)
 
   njkEnv.addFilter('initialiseName', initialiseName)
+  njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
 
   njkEnv.addFilter('capFirst', capFirst)
   njkEnv.addFilter('formatDate', formatDate)

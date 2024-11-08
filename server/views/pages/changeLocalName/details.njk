@@ -10,11 +10,6 @@
 {% set title = "Change local name" %}
 {%  set locationName = location.displayName | capFirst %}
 
-{% block head %}
-  {{ super() }}
-  <script src="/assets/js/textInputWithCharacterCount.js"></script>
-{% endblock %}
-
 {% block beforeContent %}
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
