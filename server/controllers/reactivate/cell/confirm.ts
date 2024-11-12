@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
+import { validate as validateUUID } from 'uuid'
 import backUrl from '../../../utils/backUrl'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
@@ -89,6 +90,9 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { displayName, id: locationId, locationType, prisonId } = res.locals.location
+    const referrerFlow = req.sessionModel.get<string>('referrerFlow')
+    const referrerPrisonId = req.sessionModel.get<string>('referrerPrisonId')
+    const referrerLocationId = req.sessionModel.get<string>('referrerLocationId')
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -97,6 +101,21 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
       title: `${locationType} activated`,
       content: `You have activated ${displayName}.`,
     })
+
+    if (referrerFlow === 'parent' && validateUUID(referrerLocationId)) {
+      res.redirect(`/view-and-update-locations/${encodeURIComponent(referrerPrisonId)}/${referrerLocationId}`)
+      return
+    }
+
+    if (referrerFlow === 'inactive-cells') {
+      if (validateUUID(referrerLocationId)) {
+        res.redirect(`/inactive-cells/${encodeURIComponent(referrerPrisonId)}/${referrerLocationId}`)
+        return
+      }
+
+      res.redirect(`/inactive-cells/${encodeURIComponent(referrerPrisonId)}`)
+      return
+    }
 
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
   }

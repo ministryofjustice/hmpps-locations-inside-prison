@@ -123,7 +123,7 @@ describe('ReactivateParentSelect', () => {
         await controller.successHandler(req, res, jest.fn())
 
         expect(res.redirect).toHaveBeenCalledWith(
-          `/reactivate/cell/id1?ref=parent&refLocationId=${res.locals.location.id}`,
+          `/reactivate/cell/id1?ref=parent&refPrisonId=${res.locals.location.prisonId}&refLocationId=${res.locals.location.id}`,
         )
       })
     })
