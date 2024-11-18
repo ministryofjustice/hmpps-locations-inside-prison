@@ -17,22 +17,20 @@ describe('ReactivateCellConfirm', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
-  let formValues: {
-    maxCapacity: number
-    workingCapacity: number
-  }
+  let sessionModel: { [key: string]: any }
 
   beforeEach(() => {
-    formValues = {
+    sessionModel = {
       maxCapacity: 2,
       workingCapacity: 1,
     }
     req = {
+      flash: jest.fn(),
       form: {
         options: {
           fields,
         },
-        values: formValues,
+        values: sessionModel,
       },
       services: {
         analyticsService,
@@ -43,7 +41,12 @@ describe('ReactivateCellConfirm', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: keyof typeof formValues) => formValues[fieldName]),
+        set: jest.fn(),
+        get: jest.fn((fieldName?: string) => sessionModel[fieldName]),
+        reset: jest.fn(),
+      },
+      journeyModel: {
+        reset: jest.fn(),
       },
     } as unknown as typeof req
     res = {
@@ -51,7 +54,9 @@ describe('ReactivateCellConfirm', () => {
         user: { username: 'username' },
         errorlist: [],
         location: {
-          id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+          displayName: 'A-1-001',
+          id: '7e570000-0000-0000-0000-000000000001',
+          locationType: 'Cell',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 1,
@@ -70,7 +75,7 @@ describe('ReactivateCellConfirm', () => {
             workingCapacity: 20,
           },
         },
-        values: formValues,
+        values: sessionModel,
       },
       redirect: jest.fn(),
     } as unknown as typeof res
@@ -145,7 +150,7 @@ describe('ReactivateCellConfirm', () => {
     it('calls locationsService', async () => {
       await controller.saveValues(req, res, next)
 
-      expect(locationsService.reactivateCell).toHaveBeenCalledWith('token', res.locals.location.id, formValues)
+      expect(locationsService.reactivateCell).toHaveBeenCalledWith('token', res.locals.location.id, sessionModel)
     })
 
     it('sends an analytics event', async () => {
@@ -158,6 +163,70 @@ describe('ReactivateCellConfirm', () => {
       await controller.saveValues(req, res, next)
 
       expect(next).toHaveBeenCalled()
+    })
+  })
+
+  describe('successHandler', () => {
+    beforeEach(() => {
+      controller.successHandler(req, res, next)
+    })
+
+    it('resets the journey model', () => {
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+    })
+
+    it('resets the session model', () => {
+      expect(req.sessionModel.reset).toHaveBeenCalled()
+    })
+
+    it('sets the flash correctly', () => {
+      expect(req.flash).toHaveBeenCalledWith('success', {
+        title: 'Cell activated',
+        content: 'You have activated A-1-001.',
+      })
+    })
+
+    it('redirects to the view location page', () => {
+      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+    })
+
+    describe('when the referrer is parent', () => {
+      beforeEach(() => {
+        sessionModel.referrerFlow = 'parent'
+        sessionModel.referrerPrisonId = 'ABC'
+        sessionModel.referrerLocationId = '7e570000-0000-1000-8000-000000000001'
+      })
+
+      it('redirects to the parent view location page', () => {
+        controller.successHandler(req, res, next)
+
+        expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/ABC/7e570000-0000-1000-8000-000000000001')
+      })
+    })
+
+    describe('when the referrer is inactive-cells', () => {
+      beforeEach(() => {
+        sessionModel.referrerFlow = 'inactive-cells'
+        sessionModel.referrerPrisonId = 'ABC'
+      })
+
+      it('redirects to the prison inactive cells page', () => {
+        controller.successHandler(req, res, next)
+
+        expect(res.redirect).toHaveBeenCalledWith('/inactive-cells/ABC')
+      })
+
+      describe('when a referrerLocationId is set', () => {
+        beforeEach(() => {
+          sessionModel.referrerLocationId = '7e570000-0000-1000-8000-000000000001'
+        })
+
+        it('redirects to the locations inactive cells page', () => {
+          controller.successHandler(req, res, next)
+
+          expect(res.redirect).toHaveBeenCalledWith('/inactive-cells/ABC/7e570000-0000-1000-8000-000000000001')
+        })
+      })
     })
   })
 })
