@@ -64,7 +64,9 @@ export default class ReactivateParentSelect extends FormInitialStep {
     }
     const { selectLocations } = req.form.values
     if (locationResidentialSummary.subLocationName === 'Cells' && selectLocations.length === 1) {
-      res.redirect(`/reactivate/cell/${selectLocations[0]}?ref=parent&refLocationId=${location.id}`)
+      res.redirect(
+        `/reactivate/cell/${selectLocations[0]}?ref=parent&refPrisonId=${location.prisonId}&refLocationId=${location.id}`,
+      )
 
       return
     }
