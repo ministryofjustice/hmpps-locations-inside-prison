@@ -5,6 +5,8 @@ export default class ReactivateParentSelectPage extends Page {
     super('')
   }
 
+  locationCheckboxItems = (): PageElement => cy.get(`input[name="selectLocations"][type="checkbox"]`)
+
   locationCheckboxItem = (value: string): PageElement =>
     cy.get(`input[name="selectLocations"][type="checkbox"][value="${value}"]`)
 
