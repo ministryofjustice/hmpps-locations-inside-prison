@@ -66,6 +66,8 @@ describe('ReactivateParentSelect', () => {
             { id: 'id1', localName: 'Name 1' },
             { id: 'id2', pathHierarchy: 'A-2' },
             { id: 'id3', localName: 'Name 3' },
+            { id: 'rr', localName: 'Residential room', isResidential: true, locationType: 'ROOM' },
+            { id: 'nrr', localName: 'Non-residential room', locationType: 'ROOM' },
           ],
         },
         values: sessionModelValues,
@@ -91,6 +93,10 @@ describe('ReactivateParentSelect', () => {
         {
           text: 'Name 3',
           value: 'id3',
+        },
+        {
+          text: 'Residential room',
+          value: 'rr',
         },
       ])
       expect(selectLocations.fieldset.legend.text).toEqual('Select the wing you want to activate')

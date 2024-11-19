@@ -16,10 +16,14 @@ export default class ReactivateParentSelect extends FormInitialStep {
     const { locationResidentialSummary }: { locationResidentialSummary: LocationResidentialSummary } =
       res.locals as unknown as { locationResidentialSummary: LocationResidentialSummary }
     const { selectLocations } = req.form.options.fields
-    selectLocations.items = locationResidentialSummary.subLocations.map(l => ({
-      text: l.localName || l.pathHierarchy,
-      value: l.id,
-    }))
+    selectLocations.items = locationResidentialSummary.subLocations
+      .filter(l => {
+        return l.locationType !== 'ROOM' || l.isResidential
+      })
+      .map(l => ({
+        text: l.localName || l.pathHierarchy,
+        value: l.id,
+      }))
     selectLocations.fieldset.legend.text = selectLocations.fieldset.legend.text.replace(
       'CHILD_TYPE',
       locationResidentialSummary.subLocationName.toLowerCase(),
