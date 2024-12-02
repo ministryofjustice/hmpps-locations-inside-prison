@@ -14,6 +14,7 @@ generic-service:
     DPS_URL: "https://digital.prison.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api.hmpps.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
+    FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
 
 generic-prometheus-alerts:
   alertSeverity: hmpps-prisoner-cell-allocation-prod
