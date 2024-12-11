@@ -145,6 +145,7 @@ describe('ChangeUsedForDetails', () => {
             ],
           },
         },
+        leafLevel: false,
         validationErrors: [],
       })
     })

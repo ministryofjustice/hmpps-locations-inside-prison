@@ -20,7 +20,7 @@ function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
 }
 
 function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
-  return !location.leafLevel && location.active && req.canAccess('change_used_for')
+  return location.active && req.canAccess('change_used_for')
 }
 
 function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow {
