@@ -60,15 +60,7 @@ context('Set cell type', () => {
     })
 
     const itBehavesLikeChangeUsedForPage = () => {
-      it('does not show the change used for link on a cell level', () => {
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsCell })
-        cy.task('stubLocations', locationAsCell)
-        ViewLocationsShowPage.goTo(locationAsCell.prisonId, locationAsCell.id)
-        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-        viewLocationsShowPage.changeCellUsedForLink().should('not.exist')
-      })
-
-      it('does show the change used for link on a parent level and can be accessed', () => {
+      it('shows the change used for link on all levels and can be accessed', () => {
         ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeCellUsedForLink().click()
@@ -82,7 +74,7 @@ context('Set cell type', () => {
         Page.verifyOnPage(ViewLocationsShowPage)
       })
 
-      it('displays a warning about applying change', () => {
+      it('displays a warning on parent levels about applying change', () => {
         ChangeUsedForPage.goTo(locationAsWing.id)
         const changeUsedForPage = Page.verifyOnPage(ChangeUsedForPage)
         changeUsedForPage
@@ -93,7 +85,14 @@ context('Set cell type', () => {
           )
       })
 
-      it('shows the correct unchecked checkbox list', () => {
+      it('does not display a warning on a cell level about applying change', () => {
+        cy.task('stubLocations', locationAsCell)
+        ChangeUsedForPage.goTo(locationAsCell.id)
+        const changeUsedForPage = Page.verifyOnPage(ChangeUsedForPage)
+        changeUsedForPage.usedForWarningText().should('not.exist')
+      })
+
+      it('does show an unchecked checkbox list on a parent level when multiple are checked', () => {
         ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeCellUsedForLink().click()
@@ -113,7 +112,29 @@ context('Set cell type', () => {
         })
       })
 
-      it('shows the correct checked checkbox list', () => {
+      it('does show a checked checkbox list on a cell level when multiple are checked', () => {
+        cy.task('stubLocations', locationAsCell)
+        ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsCell.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.changeCellUsedForLink().click()
+        ChangeUsedForPage.goTo(locationAsWing.id)
+        const changeUsedForPage = Page.verifyOnPage(ChangeUsedForPage)
+
+        const expectedLabels = [
+          'Close Supervision Centre (CSC)',
+          'Drug recovery / Incentivised substance free living (ISFL)',
+          'First night centre / Induction',
+          'Test type',
+          'Standard accommodation',
+        ]
+        expectedLabels.forEach((label, index) => {
+          changeUsedForPage.cellTypeCheckboxLabels().eq(index).contains(label)
+        })
+        changeUsedForPage.cellTypeCheckboxLabels().eq(3).prev('input[type="checkbox"]').should('be.checked')
+        changeUsedForPage.cellTypeCheckboxLabels().eq(4).prev('input[type="checkbox"]').should('be.checked')
+      })
+
+      it('shows the correct checked checkbox list when one option is checked', () => {
         const updatedLocation = LocationFactory.build({ usedFor: ['TEST_TYPE'] })
         cy.task('stubLocations', updatedLocation)
 

@@ -96,7 +96,7 @@ so that assets are rebuilt when modified and tests will re-run:
 
 ```shell
 docker compose -f docker-compose-test.yml up
-npm run start-feature:dev
+npm run start-feature
 npm run int-test-ui
 ```
 

@@ -7,7 +7,8 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% set title = "Change what the location is used for" %}
-{%  set locationName = location.displayName | capFirst %}
+{% set locationName = location.displayName | capFirst %}
+{% set leafLevel = location.leafLevel %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
@@ -38,7 +39,7 @@
       {{ govukWarningText({
         text: 'This change will apply to all normal accommodation locations in ' + locationName + '.',
         iconFallbackText: "Warning"
-      }) }}
+      }) if not leafLevel }}
     </div>
   </div>
 {% endblock %}

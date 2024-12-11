@@ -24,12 +24,11 @@ export default class ChangeUsedForDetails extends FormInitialStep {
   locals(req: FormWizard.Request, res: Response): Record<string, any> {
     const locals = super.locals(req, res)
     const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { id: locationId, prisonId, leafLevel } = location
 
     const fields = { ...locals.fields }
-
     if (!req.form.values?.usedFor) {
-      if (location.usedFor.length === 1) {
+      if (leafLevel || location.usedFor.length === 1) {
         fields.usedFor.items = fields.usedFor.items.map((item: FormWizard.Field) => ({
           ...item,
           checked: location.raw.usedFor.includes(item.value),
@@ -43,6 +42,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
 
     return {
       ...locals,
+      leafLevel,
       backLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
     }
