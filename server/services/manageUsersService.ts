@@ -7,7 +7,7 @@ export default class ManageUsersService {
     if (username) {
       try {
         return await this.manageUsersApiClient.users.get(token, { username })
-      } catch (e) {
+      } catch {
         return null
       }
     }
