@@ -8,6 +8,7 @@ export default class ManageUsersService {
       try {
         return await this.manageUsersApiClient.users.get(token, { username })
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.log(e)
         return null
       }
