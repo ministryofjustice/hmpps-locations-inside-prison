@@ -1,4 +1,5 @@
 import ManageUsersApiClient from '../data/manageUsersApiClient'
+import logger from '../../logger'
 
 export default class ManageUsersService {
   constructor(private readonly manageUsersApiClient: ManageUsersApiClient) {}
@@ -8,8 +9,7 @@ export default class ManageUsersService {
       try {
         return await this.manageUsersApiClient.users.get(token, { username })
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log(e)
+        logger.error(e)
         return null
       }
     }
