@@ -1,5 +1,11 @@
 # Change log
 
+**Dec 17th 2024** –
+
+Node 22 is now LTS. Notes [here](https://nodejs.org/en/blog/announcements/v22-release-announce)
+
+See PR [#474](https://github.com/ministryofjustice/hmpps-template-typescript/pull/474)
+
 **May 22nd 2024** – Remove prometheus metrics middleware and metrics app. We had discussed that very few teams actually go on to set up a dashboard to surface the information and tend to use application insights instead for the information.  In addition it had also caused a memory leak and production issues (manifesting in increased 502 error rates) in at least two applications that had inherited from the template so it seems wise to remove this tooling by default.
 
 PR: [#365](https://github.com/ministryofjustice/hmpps-template-typescript/pull/365)
