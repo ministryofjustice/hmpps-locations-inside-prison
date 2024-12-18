@@ -120,7 +120,7 @@
     "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/lodash": "^4.17.7",
+    "@types/lodash": "^4.17.13",
     "@types/node": "^22.14.0",
     "@types/nunjucks": "^3.2.6",
     "@types/passport": "^1.0.17",
