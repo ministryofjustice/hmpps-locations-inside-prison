@@ -79,7 +79,15 @@ npm test
 ```shell
 npm test -- authorisationMiddleware
 ```
+## Testing coverage report
 
+Run:
+
+```shell
+npm run test-coverage
+```
+
+Then view output file for coverage report.
 ### Integration tests
 
 Run the full set of headless integration tests, in separate shell sessions:
@@ -166,3 +174,4 @@ The code in this repository uses the MIT licence.
 
 * [MoJ security guidance](https://security-guidance.service.justice.gov.uk/)
 * [MoJ technical guidance](https://technical-guidance.service.justice.gov.uk/)
+
