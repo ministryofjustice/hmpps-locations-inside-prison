@@ -42,6 +42,27 @@ const createCell = (landingId: number, id: number) => {
   })
 }
 
+const createRoom = (landingId: number, id: number) => {
+  return LocationFactory.build({
+    locationType: 'ROOM',
+    accommodationTypes: ['NORMAL_ACCOMMODATION'],
+    leafLevel: true,
+    specialistCellTypes: [],
+    localName: undefined,
+    status: 'INACTIVE',
+    active: false,
+    id: `inactiveLanding${landingId}Room${id}`,
+    pathHierarchy: `A-${landingId}-10${id}`,
+    parentId: `inactiveLanding${landingId}`,
+    oldWorkingCapacity: id,
+    capacity: {
+      maxCapacity: id + 2,
+      workingCapacity: 0,
+    },
+    isResidential: false,
+  })
+}
+
 context('Reactivate parent', () => {
   let locations: ReturnType<typeof LocationFactory.build>[]
   let inactiveWing: ReturnType<typeof LocationFactory.build>
@@ -55,6 +76,8 @@ context('Reactivate parent', () => {
   let inactiveLanding1Cell5: ReturnType<typeof LocationFactory.build>
   let inactiveLanding1Cell6: ReturnType<typeof LocationFactory.build>
   let inactiveLanding1Cell7: ReturnType<typeof LocationFactory.build>
+  let inactiveLanding1Room1: ReturnType<typeof LocationFactory.build>
+  let inactiveLanding1Room2: ReturnType<typeof LocationFactory.build>
   let inactiveLanding2Cell1: ReturnType<typeof LocationFactory.build>
   let inactiveLanding2Cell2: ReturnType<typeof LocationFactory.build>
 
@@ -99,6 +122,8 @@ context('Reactivate parent', () => {
     inactiveLanding1Cell5 = createCell(1, 5)
     inactiveLanding1Cell6 = createCell(1, 6)
     inactiveLanding1Cell7 = createCell(1, 7)
+    inactiveLanding1Room1 = createRoom(1, 1)
+    inactiveLanding1Room2 = createRoom(1, 2)
     inactiveLanding2Cell1 = createCell(2, 1)
     inactiveLanding2Cell2 = createCell(2, 2)
     locations = [
@@ -114,6 +139,8 @@ context('Reactivate parent', () => {
       inactiveLanding1Cell5,
       inactiveLanding1Cell6,
       inactiveLanding1Cell7,
+      inactiveLanding1Room1,
+      inactiveLanding1Room2,
       inactiveLanding2Cell1,
       inactiveLanding2Cell2,
     ]
@@ -518,279 +545,117 @@ context('Reactivate parent', () => {
       })
     })
 
-    context('after clicking "Activate individual"', () => {
-      let selectPage: ReactivateParentSelectPage
+    context('when the child locations are cells/rooms', () => {
       beforeEach(() => {
-        viewLocationsShowPage.inactiveBannerActivateIndividualButton().click()
-        selectPage = Page.verifyOnPage(ReactivateParentSelectPage)
-        cy.get('h1').contains('Activate individual landings')
+        ViewLocationsShowPage.goTo(inactiveLanding1.prisonId, inactiveLanding1.id)
+        viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       })
 
-      it('displays an error if no locations are selected', () => {
-        selectPage.continueButton().click()
-
-        cy.get('.govuk-error-summary__title').contains('There is a problem')
-        cy.get('.govuk-error-summary__list').contains('Select which landings you want to activate')
-        cy.get('#selectLocations-error').contains('Select which landings you want to activate')
-      })
-
-      context('after selecting a landing', () => {
-        let checkCapacityPage: ReactivateParentCheckCapacityPage
+      context('after clicking "Activate individual"', () => {
+        let selectPage: ReactivateParentSelectPage
         beforeEach(() => {
-          selectPage.locationCheckboxItem('inactiveLanding1').click()
+          viewLocationsShowPage.inactiveBannerActivateIndividualButton().click()
+          selectPage = Page.verifyOnPage(ReactivateParentSelectPage)
+          cy.get('h1').contains('Activate individual landings')
+        })
+
+        it('displays an error if no locations are selected', () => {
           selectPage.continueButton().click()
-          checkCapacityPage = Page.verifyOnPage(ReactivateParentCheckCapacityPage)
+
+          cy.get('.govuk-error-summary__title').contains('There is a problem')
+          cy.get('.govuk-error-summary__list').contains('Select which landings you want to activate')
+          cy.get('#selectLocations-error').contains('Select which landings you want to activate')
         })
 
-        it('shows a list of locations and capacities', () => {
-          const rows = checkCapacityPage.locationsTableRows()
-          const expectedRows = [
-            {
-              location: 'A-1-001',
-              workingCapacity: inactiveLanding1Cell1.oldWorkingCapacity.toString(),
-              maximumCapacity: inactiveLanding1Cell1.capacity.maxCapacity.toString(),
-              action: 'Change',
-            },
-            {
-              location: 'A-1-002',
-              workingCapacity: inactiveLanding1Cell2.oldWorkingCapacity.toString(),
-              maximumCapacity: inactiveLanding1Cell2.capacity.maxCapacity.toString(),
-              action: 'Change',
-            },
-            {
-              location: 'A-1-003',
-              workingCapacity: inactiveLanding1Cell3.oldWorkingCapacity.toString(),
-              maximumCapacity: inactiveLanding1Cell3.capacity.maxCapacity.toString(),
-              action: 'Change',
-            },
-            {
-              location: 'A-1-004',
-              workingCapacity: inactiveLanding1Cell4.oldWorkingCapacity.toString(),
-              maximumCapacity: inactiveLanding1Cell4.capacity.maxCapacity.toString(),
-              action: 'Change',
-            },
-            {
-              location: 'A-1-005',
-              workingCapacity: inactiveLanding1Cell5.oldWorkingCapacity.toString(),
-              maximumCapacity: inactiveLanding1Cell5.capacity.maxCapacity.toString(),
-              action: 'Change',
-            },
-            {
-              location: 'A-1-006',
-              workingCapacity: inactiveLanding1Cell6.oldWorkingCapacity.toString(),
-              maximumCapacity: inactiveLanding1Cell6.capacity.maxCapacity.toString(),
-              action: 'Change',
-            },
-            {
-              location: 'A-1-007',
-              workingCapacity: inactiveLanding1Cell7.oldWorkingCapacity.toString(),
-              maximumCapacity: inactiveLanding1Cell7.capacity.maxCapacity.toString(),
-              action: 'Change',
-            },
-          ]
+        it('only displays cells', () => {
+          selectPage.locationCheckboxItems().should('have.length', 7)
 
-          rows.should('have.length', expectedRows.length)
-          rows.each((row, i) => {
-            const expected = expectedRows[i]
-            const cells = checkCapacityPage.locationsTableCells(row as unknown as PageElement)
+          selectPage.locationCheckboxItem('inactiveLanding1Cell1').should('exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Cell2').should('exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Cell3').should('exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Cell4').should('exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Cell5').should('exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Cell6').should('exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Cell7').should('exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Room1').should('not.exist')
+          selectPage.locationCheckboxItem('inactiveLanding1Room2').should('not.exist')
+        })
+      })
+    })
 
-            cy.wrap(cells.location).contains(expected.location)
-            cy.wrap(cells.workingCapacity).contains(expected.workingCapacity)
-            cy.wrap(cells.maximumCapacity).contains(expected.maximumCapacity)
-            cy.wrap(cells.action).contains(expected.action)
-          })
+    context('when the child locations are not cells/rooms', () => {
+      context('after clicking "Activate individual"', () => {
+        let selectPage: ReactivateParentSelectPage
+        beforeEach(() => {
+          viewLocationsShowPage.inactiveBannerActivateIndividualButton().click()
+          selectPage = Page.verifyOnPage(ReactivateParentSelectPage)
+          cy.get('h1').contains('Activate individual landings')
         })
 
-        describe('when no capacities are changed', () => {
-          let confirmPage: ReactivateParentConfirmPage
+        it('displays an error if no locations are selected', () => {
+          selectPage.continueButton().click()
+
+          cy.get('.govuk-error-summary__title').contains('There is a problem')
+          cy.get('.govuk-error-summary__list').contains('Select which landings you want to activate')
+          cy.get('#selectLocations-error').contains('Select which landings you want to activate')
+        })
+
+        context('after selecting a landing', () => {
+          let checkCapacityPage: ReactivateParentCheckCapacityPage
           beforeEach(() => {
-            checkCapacityPage.continueButton().click()
-            confirmPage = Page.verifyOnPage(ReactivateParentConfirmPage)
-          })
-
-          it('shows the expected text on the confirm screen', () => {
-            cy.get('.change-summary h2').contains('Change to establishment capacity')
-            confirmPage.warningText().contains('Every cell in A-1 will be activated.')
-            cy.get('.change-summary p[data-qa="change-summary"]').contains(
-              /^The establishment’s total working capacity will increase from 8 to 36.$/,
-            )
-            cy.get('.change-summary p[data-qa="inactive-parent-inactiveWing"]').contains(
-              /The status of wing A will change to active because it will contain active locations./,
-            )
-          })
-
-          it('shows the correct banner text after the transaction is submitted', () => {
-            confirmPage.confirmButton().click()
-
-            Page.verifyOnPage(ViewLocationsShowPage)
-            cy.get('#govuk-notification-banner-title').contains('Success')
-            cy.get('.govuk-notification-banner__content h3').contains('Landing activated')
-            cy.get('.govuk-notification-banner__content p').contains('You have activated A-1.')
-          })
-        })
-
-        describe('when on the changeCapacity page', () => {
-          let changeCapacityPage: ReactivateParentChangeCapacityPage
-          beforeEach(() => {
-            checkCapacityPage.locationsTableRows().eq(0).find('a').click({ force: true })
-            changeCapacityPage = Page.verifyOnPage(ReactivateParentChangeCapacityPage)
-          })
-
-          it('shows the correct validation error when missing working capacity', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('4')
-            changeCapacityPage.workingCapacityInput().clear()
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Enter a working capacity')
-            cy.get('#workingCapacity-error').contains('Enter a working capacity')
-          })
-
-          it('shows the correct validation error when working capacity > 99', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('4')
-            changeCapacityPage.workingCapacityInput().clear().type('100')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Working capacity cannot be more than 99')
-            cy.get('#workingCapacity-error').contains('Working capacity cannot be more than 99')
-          })
-
-          it('shows the correct validation error when working capacity is not a number', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('4')
-            changeCapacityPage.workingCapacityInput().clear().type('hello')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Working capacity must be a number')
-            cy.get('#workingCapacity-error').contains('Working capacity must be a number')
-          })
-
-          it('shows the correct validation error when working capacity is greater than max capacity', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('3')
-            changeCapacityPage.workingCapacityInput().clear().type('4')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Working capacity cannot be more than the maximum capacity')
-            cy.get('#workingCapacity-error').contains('Working capacity cannot be more than the maximum capacity')
-          })
-
-          it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('3')
-            changeCapacityPage.workingCapacityInput().clear().type('0')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
-            cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
-          })
-
-          it('shows the correct validation error when missing max capacity', () => {
-            changeCapacityPage.maxCapacityInput().clear()
-            changeCapacityPage.workingCapacityInput().clear().type('2')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Enter a maximum capacity')
-            cy.get('#maxCapacity-error').contains('Enter a maximum capacity')
-          })
-
-          it('shows the correct validation error when max capacity > 99', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('100')
-            changeCapacityPage.workingCapacityInput().clear().type('2')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Maximum capacity cannot be more than 99')
-            cy.get('#maxCapacity-error').contains('Maximum capacity cannot be more than 99')
-          })
-
-          it('shows the correct validation error when max capacity is not a number', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('hello')
-            changeCapacityPage.workingCapacityInput().clear().type('2')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Maximum capacity must be a number')
-            cy.get('#maxCapacity-error').contains('Maximum capacity must be a number')
-          })
-
-          it('shows the correct validation error when max capacity is zero', () => {
-            changeCapacityPage.maxCapacityInput().clear().type('0')
-            changeCapacityPage.workingCapacityInput().clear().type('0')
-            changeCapacityPage.continueButton().click()
-
-            cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Maximum capacity cannot be 0')
-            cy.get('#maxCapacity-error').contains('Maximum capacity cannot be 0')
-          })
-        })
-
-        describe('when capacities are changed', () => {
-          beforeEach(() => {
-            checkCapacityPage.locationsTableRows().eq(0).find('a').click({ force: true })
-            let changeCapacityPage = Page.verifyOnPage(ReactivateParentChangeCapacityPage)
-            changeCapacityPage.maxCapacityInput().clear().type('9')
-            changeCapacityPage.workingCapacityInput().clear().type('8')
-            changeCapacityPage.continueButton().click()
-
-            checkCapacityPage.locationsTableRows().eq(1).find('a').click({ force: true })
-            changeCapacityPage = Page.verifyOnPage(ReactivateParentChangeCapacityPage)
-            changeCapacityPage.maxCapacityInput().clear().type('7')
-            changeCapacityPage.workingCapacityInput().clear().type('4')
-            changeCapacityPage.continueButton().click()
-
+            selectPage.locationCheckboxItem('inactiveLanding1').click()
+            selectPage.continueButton().click()
             checkCapacityPage = Page.verifyOnPage(ReactivateParentCheckCapacityPage)
           })
 
-          it('displays the new values in the locations list', () => {
+          it('shows a list of locations and capacities', () => {
             const rows = checkCapacityPage.locationsTableRows()
             const expectedRows = [
               {
                 location: 'A-1-001',
-                workingCapacity: '8',
-                maximumCapacity: '9',
+                workingCapacity: inactiveLanding1Cell1.oldWorkingCapacity.toString(),
+                maximumCapacity: inactiveLanding1Cell1.capacity.maxCapacity.toString(),
                 action: 'Change',
               },
               {
                 location: 'A-1-002',
-                workingCapacity: '4',
-                maximumCapacity: '7',
+                workingCapacity: inactiveLanding1Cell2.oldWorkingCapacity.toString(),
+                maximumCapacity: inactiveLanding1Cell2.capacity.maxCapacity.toString(),
                 action: 'Change',
               },
               {
                 location: 'A-1-003',
-                workingCapacity: '3',
-                maximumCapacity: '5',
+                workingCapacity: inactiveLanding1Cell3.oldWorkingCapacity.toString(),
+                maximumCapacity: inactiveLanding1Cell3.capacity.maxCapacity.toString(),
                 action: 'Change',
               },
               {
                 location: 'A-1-004',
-                workingCapacity: '4',
-                maximumCapacity: '6',
+                workingCapacity: inactiveLanding1Cell4.oldWorkingCapacity.toString(),
+                maximumCapacity: inactiveLanding1Cell4.capacity.maxCapacity.toString(),
                 action: 'Change',
               },
               {
                 location: 'A-1-005',
-                workingCapacity: '5',
-                maximumCapacity: '7',
+                workingCapacity: inactiveLanding1Cell5.oldWorkingCapacity.toString(),
+                maximumCapacity: inactiveLanding1Cell5.capacity.maxCapacity.toString(),
                 action: 'Change',
               },
               {
                 location: 'A-1-006',
-                workingCapacity: '6',
-                maximumCapacity: '8',
+                workingCapacity: inactiveLanding1Cell6.oldWorkingCapacity.toString(),
+                maximumCapacity: inactiveLanding1Cell6.capacity.maxCapacity.toString(),
                 action: 'Change',
               },
               {
                 location: 'A-1-007',
-                workingCapacity: '7',
-                maximumCapacity: '9',
+                workingCapacity: inactiveLanding1Cell7.oldWorkingCapacity.toString(),
+                maximumCapacity: inactiveLanding1Cell7.capacity.maxCapacity.toString(),
                 action: 'Change',
               },
             ]
 
+            rows.should('have.length', expectedRows.length)
             rows.each((row, i) => {
               const expected = expectedRows[i]
               const cells = checkCapacityPage.locationsTableCells(row as unknown as PageElement)
@@ -802,33 +667,235 @@ context('Reactivate parent', () => {
             })
           })
 
-          it('shows the expected text on the confirm page', () => {
-            checkCapacityPage.continueButton().click()
-            const confirmPage = Page.verifyOnPage(ReactivateParentConfirmPage)
+          describe('when no capacities are changed', () => {
+            let confirmPage: ReactivateParentConfirmPage
+            beforeEach(() => {
+              checkCapacityPage.continueButton().click()
+              confirmPage = Page.verifyOnPage(ReactivateParentConfirmPage)
+            })
 
-            cy.get('.change-summary h2').contains('Change to establishment capacity')
-            confirmPage.warningText().contains('Every cell in A-1 will be activated.')
-            cy.get('.change-summary p[data-qa="change-summary"]').contains(
-              /^The establishment’s total working capacity will increase from 8 to 45./,
-            )
-            cy.get('.change-summary p[data-qa="change-summary"]').contains(
-              /The establishment’s total maximum capacity will increase from 15 to 24.$/,
-            )
-            cy.get('.change-summary p[data-qa="inactive-parent-inactiveWing"]').contains(
-              /The status of wing A will change to active because it will contain active locations./,
-            )
+            it('shows the expected text on the confirm screen', () => {
+              cy.get('.change-summary h2').contains('Change to establishment capacity')
+              confirmPage.warningText().contains('Every cell in A-1 will be activated.')
+              cy.get('.change-summary p[data-qa="change-summary"]').contains(
+                /^The establishment’s total working capacity will increase from 8 to 36.$/,
+              )
+              cy.get('.change-summary p[data-qa="inactive-parent-inactiveWing"]').contains(
+                /The status of wing A will change to active because it will contain active locations./,
+              )
+            })
+
+            it('shows the correct banner text after the transaction is submitted', () => {
+              confirmPage.confirmButton().click()
+
+              Page.verifyOnPage(ViewLocationsShowPage)
+              cy.get('#govuk-notification-banner-title').contains('Success')
+              cy.get('.govuk-notification-banner__content h3').contains('Landing activated')
+              cy.get('.govuk-notification-banner__content p').contains('You have activated A-1.')
+            })
           })
 
-          it('shows the correct banner text after the transaction is submitted', () => {
-            checkCapacityPage.continueButton().click()
-            const confirmPage = Page.verifyOnPage(ReactivateParentConfirmPage)
+          describe('when on the changeCapacity page', () => {
+            let changeCapacityPage: ReactivateParentChangeCapacityPage
+            beforeEach(() => {
+              checkCapacityPage.locationsTableRows().eq(0).find('a').click({ force: true })
+              changeCapacityPage = Page.verifyOnPage(ReactivateParentChangeCapacityPage)
+            })
 
-            confirmPage.confirmButton().click()
-            Page.verifyOnPage(InactiveCellsIndexPage)
+            it('shows the correct validation error when missing working capacity', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('4')
+              changeCapacityPage.workingCapacityInput().clear()
+              changeCapacityPage.continueButton().click()
 
-            cy.get('#govuk-notification-banner-title').contains('Success')
-            cy.get('.govuk-notification-banner__content h3').contains('Landing activated')
-            cy.get('.govuk-notification-banner__content p').contains('You have activated A-1.')
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Enter a working capacity')
+              cy.get('#workingCapacity-error').contains('Enter a working capacity')
+            })
+
+            it('shows the correct validation error when working capacity > 99', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('4')
+              changeCapacityPage.workingCapacityInput().clear().type('100')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Working capacity cannot be more than 99')
+              cy.get('#workingCapacity-error').contains('Working capacity cannot be more than 99')
+            })
+
+            it('shows the correct validation error when working capacity is not a number', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('4')
+              changeCapacityPage.workingCapacityInput().clear().type('hello')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Working capacity must be a number')
+              cy.get('#workingCapacity-error').contains('Working capacity must be a number')
+            })
+
+            it('shows the correct validation error when working capacity is greater than max capacity', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('3')
+              changeCapacityPage.workingCapacityInput().clear().type('4')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Working capacity cannot be more than the maximum capacity')
+              cy.get('#workingCapacity-error').contains('Working capacity cannot be more than the maximum capacity')
+            })
+
+            it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('3')
+              changeCapacityPage.workingCapacityInput().clear().type('0')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
+              cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
+            })
+
+            it('shows the correct validation error when missing max capacity', () => {
+              changeCapacityPage.maxCapacityInput().clear()
+              changeCapacityPage.workingCapacityInput().clear().type('2')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Enter a maximum capacity')
+              cy.get('#maxCapacity-error').contains('Enter a maximum capacity')
+            })
+
+            it('shows the correct validation error when max capacity > 99', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('100')
+              changeCapacityPage.workingCapacityInput().clear().type('2')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Maximum capacity cannot be more than 99')
+              cy.get('#maxCapacity-error').contains('Maximum capacity cannot be more than 99')
+            })
+
+            it('shows the correct validation error when max capacity is not a number', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('hello')
+              changeCapacityPage.workingCapacityInput().clear().type('2')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Maximum capacity must be a number')
+              cy.get('#maxCapacity-error').contains('Maximum capacity must be a number')
+            })
+
+            it('shows the correct validation error when max capacity is zero', () => {
+              changeCapacityPage.maxCapacityInput().clear().type('0')
+              changeCapacityPage.workingCapacityInput().clear().type('0')
+              changeCapacityPage.continueButton().click()
+
+              cy.get('.govuk-error-summary__title').contains('There is a problem')
+              cy.get('.govuk-error-summary__list').contains('Maximum capacity cannot be 0')
+              cy.get('#maxCapacity-error').contains('Maximum capacity cannot be 0')
+            })
+          })
+
+          describe('when capacities are changed', () => {
+            beforeEach(() => {
+              checkCapacityPage.locationsTableRows().eq(0).find('a').click({ force: true })
+              let changeCapacityPage = Page.verifyOnPage(ReactivateParentChangeCapacityPage)
+              changeCapacityPage.maxCapacityInput().clear().type('9')
+              changeCapacityPage.workingCapacityInput().clear().type('8')
+              changeCapacityPage.continueButton().click()
+
+              checkCapacityPage.locationsTableRows().eq(1).find('a').click({ force: true })
+              changeCapacityPage = Page.verifyOnPage(ReactivateParentChangeCapacityPage)
+              changeCapacityPage.maxCapacityInput().clear().type('7')
+              changeCapacityPage.workingCapacityInput().clear().type('4')
+              changeCapacityPage.continueButton().click()
+
+              checkCapacityPage = Page.verifyOnPage(ReactivateParentCheckCapacityPage)
+            })
+
+            it('displays the new values in the locations list', () => {
+              const rows = checkCapacityPage.locationsTableRows()
+              const expectedRows = [
+                {
+                  location: 'A-1-001',
+                  workingCapacity: '8',
+                  maximumCapacity: '9',
+                  action: 'Change',
+                },
+                {
+                  location: 'A-1-002',
+                  workingCapacity: '4',
+                  maximumCapacity: '7',
+                  action: 'Change',
+                },
+                {
+                  location: 'A-1-003',
+                  workingCapacity: '3',
+                  maximumCapacity: '5',
+                  action: 'Change',
+                },
+                {
+                  location: 'A-1-004',
+                  workingCapacity: '4',
+                  maximumCapacity: '6',
+                  action: 'Change',
+                },
+                {
+                  location: 'A-1-005',
+                  workingCapacity: '5',
+                  maximumCapacity: '7',
+                  action: 'Change',
+                },
+                {
+                  location: 'A-1-006',
+                  workingCapacity: '6',
+                  maximumCapacity: '8',
+                  action: 'Change',
+                },
+                {
+                  location: 'A-1-007',
+                  workingCapacity: '7',
+                  maximumCapacity: '9',
+                  action: 'Change',
+                },
+              ]
+
+              rows.each((row, i) => {
+                const expected = expectedRows[i]
+                const cells = checkCapacityPage.locationsTableCells(row as unknown as PageElement)
+
+                cy.wrap(cells.location).contains(expected.location)
+                cy.wrap(cells.workingCapacity).contains(expected.workingCapacity)
+                cy.wrap(cells.maximumCapacity).contains(expected.maximumCapacity)
+                cy.wrap(cells.action).contains(expected.action)
+              })
+            })
+
+            it('shows the expected text on the confirm page', () => {
+              checkCapacityPage.continueButton().click()
+              const confirmPage = Page.verifyOnPage(ReactivateParentConfirmPage)
+
+              cy.get('.change-summary h2').contains('Change to establishment capacity')
+              confirmPage.warningText().contains('Every cell in A-1 will be activated.')
+              cy.get('.change-summary p[data-qa="change-summary"]').contains(
+                /^The establishment’s total working capacity will increase from 8 to 45./,
+              )
+              cy.get('.change-summary p[data-qa="change-summary"]').contains(
+                /The establishment’s total maximum capacity will increase from 15 to 24.$/,
+              )
+              cy.get('.change-summary p[data-qa="inactive-parent-inactiveWing"]').contains(
+                /The status of wing A will change to active because it will contain active locations./,
+              )
+            })
+
+            it('shows the correct banner text after the transaction is submitted', () => {
+              checkCapacityPage.continueButton().click()
+              const confirmPage = Page.verifyOnPage(ReactivateParentConfirmPage)
+
+              confirmPage.confirmButton().click()
+              Page.verifyOnPage(InactiveCellsIndexPage)
+
+              cy.get('#govuk-notification-banner-title').contains('Success')
+              cy.get('.govuk-notification-banner__content h3').contains('Landing activated')
+              cy.get('.govuk-notification-banner__content p').contains('You have activated A-1.')
+            })
           })
         })
       })

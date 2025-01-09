@@ -68,7 +68,7 @@ context('Change temporary deactivations details', () => {
           deactivatedReason: 'OTHER',
           deactivationReasonDescription: 'Broken door lock',
           deactivatedBy: 'ITAG_USER',
-          proposedReactivationDate: '2024-11-22',
+          proposedReactivationDate: '2084-11-22',
           planetFmReference: '123005',
           topLevelId: '5d597e0b-e350-40bc-bc05-2af159ffa15b',
           level: 3,

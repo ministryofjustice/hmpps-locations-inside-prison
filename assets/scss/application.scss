@@ -4,8 +4,8 @@ $path: "/assets/images/";
 $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
 
-@import 'govuk/all';
-@import 'moj/all';
+@import "govuk-frontend/dist/govuk/all";
+@import "@ministryofjustice/frontend/moj/all";
 
 @import './components/card';
 @import './components/header-bar';
@@ -14,4 +14,4 @@ $govuk-page-width: $moj-page-width;
 @import './components/summary-card';
 @import './components/feedback-banner';
 @import './components/inactive-location-banner';
-@import 'assets/scss/local';
+@import './local';

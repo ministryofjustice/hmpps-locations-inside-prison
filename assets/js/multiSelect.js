@@ -13,17 +13,32 @@ function updateCheckedCount() {
   }
 }
 
-$(() => {
-  const multiSelect = new MOJFrontend.MultiSelect({
-    container: '.moj-multi-select',
-    checkboxes: '.govuk-checkboxes__input:not(#checkboxes-all)',
-  })
+module.exports = mojFrontend => {
+  // Disable autocomplete for the select all checkbox
+  mojFrontend.MultiSelect.prototype.getToggleHtml = function () {
+    return (
+      '' +
+      '<div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">' +
+      '  <input type="checkbox" class="govuk-checkboxes__input" id="checkboxes-all" autocomplete="off">' +
+      '  <label class="govuk-label govuk-checkboxes__label moj-multi-select__toggle-label" for="checkboxes-all">' +
+      '    <span class="govuk-visually-hidden">Select all</span>' +
+      '  </label>' +
+      '</div>'
+    )
+  }
 
-  $('.sticky-select-action-bar__clear-link').on('click', () => {
-    multiSelect.uncheckAll()
-    multiSelect.toggleButton[0].checked = false
-    updateCheckedCount()
-  })
+  $(() => {
+    const multiSelect = new mojFrontend.MultiSelect({
+      container: '.moj-multi-select',
+      checkboxes: '.govuk-checkboxes__input:not(#checkboxes-all)',
+    })
 
-  $('.govuk-checkboxes__input').on('click', updateCheckedCount)
-})
+    $('.sticky-select-action-bar__clear-link').on('click', () => {
+      multiSelect.uncheckAll()
+      multiSelect.toggleButton[0].checked = false
+      updateCheckedCount()
+    })
+
+    $('.govuk-checkboxes__input').on('click', updateCheckedCount)
+  })
+}

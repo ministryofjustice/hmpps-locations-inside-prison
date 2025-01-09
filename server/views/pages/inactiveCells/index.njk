@@ -52,12 +52,6 @@
   {% endif %}
 {% endblock %}
 
-{% block head %}
-  {{ super() }}
-
-  <script src="/assets/js/multiSelect.js"></script>
-{% endblock %}
-
 {% block heading %}
   {% if locationName %}
     <span class="govuk-caption-m" data-qa="location-type">{{ locationName }}</span>

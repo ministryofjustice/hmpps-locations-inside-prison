@@ -79,7 +79,15 @@ npm test
 ```shell
 npm test -- authorisationMiddleware
 ```
+## Testing coverage report
 
+Run:
+
+```shell
+npm run test-coverage
+```
+
+Then view output file for coverage report.
 ### Integration tests
 
 Run the full set of headless integration tests, in separate shell sessions:
@@ -95,7 +103,7 @@ so that assets are rebuilt when modified and tests will re-run:
 
 ```shell
 docker compose -f docker-compose-test.yml up
-npm run start-feature:dev
+npm run start-feature
 npm run int-test-ui
 ```
 
@@ -166,3 +174,4 @@ The code in this repository uses the MIT licence.
 
 * [MoJ security guidance](https://security-guidance.service.justice.gov.uk/)
 * [MoJ technical guidance](https://technical-guidance.service.justice.gov.uk/)
+
