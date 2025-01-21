@@ -1,7 +1,33 @@
 import { Request, Response } from 'express'
 import { format } from 'date-fns'
+
 import { Location } from '../data/types/locationsApi'
 import { Services } from '../services'
+import renderMacro from '../utils/renderMacro'
+
+function formatValue(attribute: string, value: string) {
+  if (attribute === 'Status') {
+    return {
+      html: renderMacro('macros/locationStatusTag.njk', 'locationStatusTag', {
+        status: value.toUpperCase().replace('-', '_'),
+      }),
+    }
+  }
+
+  if (attribute === 'Certification' && value === 'Certified') {
+    return {
+      html: renderMacro('govuk/components/tag/macro.njk', 'govukTag', {
+        text: 'Certified',
+        classes: 'govuk-tag--hollow',
+        attributes: {
+          'data-qa': 'certified-tag',
+        },
+      }),
+    }
+  }
+
+  return { text: value }
+}
 
 export default ({ authService, manageUsersService }: Services) =>
   async (req: Request, res: Response) => {
@@ -16,8 +42,8 @@ export default ({ authService, manageUsersService }: Services) =>
 
         return [
           { text: attribute },
-          { text: oldValue },
-          { text: newValue },
+          formatValue(attribute, oldValue),
+          formatValue(attribute, newValue),
           { text: name },
           { text: format(amendedDate, 'dd/MM/yyyy') },
         ]
