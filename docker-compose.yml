@@ -125,6 +125,8 @@ services:
   prison-register:
     image: quay.io/hmpps/prison-register:latest
     container_name: prison-register
+    ports:
+      - "8084:8080"
     depends_on:
       - hmpps-auth
       - prison-register-db
