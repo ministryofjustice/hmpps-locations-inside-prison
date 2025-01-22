@@ -10,7 +10,7 @@ function formatValue(attribute: string, values: string[]) {
   if (values?.length) {
     if (attribute === 'Status') {
       return {
-        html: renderMacro('macros/locationStatusTag.njk', 'locationStatusTag', {
+        html: renderMacro('macros/locationStatusTag', 'locationStatusTag', {
           status: values[0].toUpperCase().replace('-', '_'),
         }),
       }
@@ -18,7 +18,7 @@ function formatValue(attribute: string, values: string[]) {
 
     if (attribute === 'Certification' && values[0] === 'Certified') {
       return {
-        html: renderMacro('govuk/components/tag/macro.njk', 'govukTag', {
+        html: renderMacro('govuk/components/tag/macro', 'govukTag', {
           text: 'Certified',
           classes: 'govuk-tag--hollow',
           attributes: {
