@@ -52,8 +52,8 @@ const LocationFactory = Factory.define<Location>(() => {
     changeHistory: [
       {
         attribute: 'Location Type',
-        oldValue: 'CELL',
-        newValue: 'WING',
+        oldValues: ['CELL'],
+        newValues: ['WING'],
         amendedBy: 'user',
         amendedDate: '2021-07-05T10:35:17',
       },
