@@ -1,6 +1,6 @@
-import nunjucks from 'nunjucks'
 import FeComponentsClient, { AvailableComponent } from '../data/feComponentsClient'
 import kebabCase from '../formatters/kebabCase'
+import renderMacro from '../utils/renderMacro'
 
 export default class FeComponentsService {
   constructor(private readonly feComponentsClient: FeComponentsClient) {}
@@ -27,13 +27,8 @@ export default class FeComponentsService {
   }
 
   getComponent(macroName: string, params = {}) {
-    const macroParams = JSON.stringify(params, null, 2)
     const filename = this.macroNameToFilepath(macroName)
-    const macroString = `
-      {%- from "${filename}/macro.njk" import ${macroName} -%}
-      {{- ${macroName}(${macroParams}) -}}
-    `
 
-    return nunjucks.renderString(macroString, undefined)
+    return renderMacro(`${filename}/macro`, macroName, params)
   }
 }

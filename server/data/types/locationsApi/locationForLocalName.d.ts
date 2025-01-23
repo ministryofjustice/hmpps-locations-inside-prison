@@ -43,8 +43,8 @@ export declare interface LocationForLocalName {
   childLocations: string[]
   changeHistory: {
     attribute: string
-    oldValue: string
-    newValue: string
+    oldValues: string[]
+    newValues: string[]
     amendedBy: string
     amendedDate: string
   }[]
