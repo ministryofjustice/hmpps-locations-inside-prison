@@ -47,8 +47,8 @@ export declare interface Location {
   childLocations: string[]
   changeHistory: {
     attribute: string
-    oldValue: string
-    newValue: string
+    oldValues: string[]
+    newValues: string[]
     amendedBy: string
     amendedDate: string
   }[]
