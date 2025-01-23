@@ -1,6 +1,6 @@
 {% extends "../partials/layout.njk" %}
 
-{% set title = message if message else applicationName + " - Error" %}
+{% set title = "Sorry, there is a problem with this service" %}
 
 {% block pageTitle %}{{ applicationName }} - Error{% endblock %}
 
@@ -8,8 +8,22 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <h2 class="govuk-heading-m">{{ status }}</h2>
-        <pre>{{ stack }}</pre>
+        <p>
+          Try again later.
+        </p>
+
+        <p>
+          Any information you entered has not been saved. You will need to start again.
+        </p>
+
+        <p>
+          <a href="/">Return to Residential locations</a>
+        </p>
+
+        {% if message or stack %}
+          <h2 class="govuk-heading-m">{{ message }}</h2>
+          <pre>{{ stack }}</pre>
+        {% endif %}
       </div>
     </div>
   </div>
