@@ -3,7 +3,6 @@ import config from '../config'
 import RestClient from './restClient'
 import logger from '../../logger'
 import { RedisClient } from './redisClient'
-import BaseApiError from './baseApiError'
 
 export default class BaseApiClient {
   constructor(private readonly redisClient: RedisClient) {}
@@ -71,7 +70,8 @@ export default class BaseApiClient {
 
         return result
       } catch (error) {
-        throw new BaseApiError(error)
+        error.isApiError = true
+        throw error
       }
     }
   }

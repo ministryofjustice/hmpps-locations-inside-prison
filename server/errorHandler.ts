@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import type { HTTPError } from 'superagent'
 import logger from '../logger'
-import BaseApiError from './data/baseApiError'
 
 type ErrorPatch = {
   code?: string
@@ -22,7 +21,7 @@ export default function createErrorHandler(production: boolean) {
       error_code: error?.data?.errorCode,
     })
 
-    if (!(error instanceof BaseApiError) && (error.status === 401 || error.status === 403)) {
+    if (!(error as any).isApiError && (error.status === 401 || error.status === 403)) {
       logger.info('Logging user out')
       return res.redirect('/sign-out')
     }
