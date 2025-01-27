@@ -33,41 +33,46 @@ export default class BaseApiClient {
     }
   }) {
     return async (token: string, parameters: Parameters = {} as never, data: Data = undefined): Promise<ReturnType> => {
-      const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
-      const query = queryParams?.length ? Object.fromEntries(queryParams.map(p => [p, parameters[p]])) : undefined
+      try {
+        const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
+        const query = queryParams?.length ? Object.fromEntries(queryParams.map(p => [p, parameters[p]])) : undefined
 
-      const cacheDuration = options?.cacheDuration || 0
-      if (cacheDuration && this.redisClient) {
-        logger.debug(`Getting ${filledPath} from redis`)
-        const cachedResult = await this.redisClient.get(filledPath)
+        const cacheDuration = options?.cacheDuration || 0
+        if (cacheDuration && this.redisClient) {
+          logger.debug(`Getting ${filledPath} from redis`)
+          const cachedResult = await this.redisClient.get(filledPath)
 
-        if (cachedResult) {
-          logger.debug(`Found ${filledPath} in redis, value: ${cachedResult}`)
+          if (cachedResult) {
+            logger.debug(`Found ${filledPath} in redis, value: ${cachedResult}`)
 
-          if (typeof cachedResult === 'string') {
-            return JSON.parse(cachedResult)
+            if (typeof cachedResult === 'string') {
+              return JSON.parse(cachedResult)
+            }
+
+            return cachedResult as ReturnType
           }
-
-          return cachedResult as ReturnType
         }
+
+        logger.debug(
+          `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)} - data ${JSON.stringify(data)}`,
+        )
+        const result = await (this.constructor as typeof BaseApiClient).restClient(token)[requestType]<ReturnType>({
+          path: filledPath,
+          query,
+          data,
+        })
+
+        if (cacheDuration && this.redisClient) {
+          logger.debug(`Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)}`)
+
+          await this.redisClient.set(filledPath, JSON.stringify(result), { EX: cacheDuration })
+        }
+
+        return result
+      } catch (error) {
+        error.isApiError = true
+        throw error
       }
-
-      logger.debug(
-        `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)} - data ${JSON.stringify(data)}`,
-      )
-      const result = await (this.constructor as typeof BaseApiClient).restClient(token)[requestType]<ReturnType>({
-        path: filledPath,
-        query,
-        data,
-      })
-
-      if (cacheDuration && this.redisClient) {
-        logger.debug(`Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)}`)
-
-        await this.redisClient.set(filledPath, JSON.stringify(result), { EX: cacheDuration })
-      }
-
-      return result
     }
   }
 }
