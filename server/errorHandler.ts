@@ -37,6 +37,10 @@ export default function createErrorHandler(production: boolean) {
 
     res.status(error.status || 500)
 
-    return res.render('pages/error')
+    if (error.status === 404) {
+      return res.render('pages/errors/404')
+    }
+
+    return res.render('pages/errors/generic')
   }
 }
