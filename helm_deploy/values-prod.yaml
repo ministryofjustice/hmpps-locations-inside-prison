@@ -17,4 +17,4 @@ generic-service:
     FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
 
 generic-prometheus-alerts:
-  alertSeverity: hmpps-prisoner-cell-allocation-prod
+  alertSeverity: move-a-prisoner-alerts-prod

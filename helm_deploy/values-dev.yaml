@@ -18,6 +18,3 @@ generic-service:
     ENVIRONMENT_NAME: DEV
     AUDIT_ENABLED: "false"
     FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
-
-generic-prometheus-alerts:
-  alertSeverity: digital-prison-service-dev
