@@ -165,7 +165,7 @@
     "cypress-axe": "^1.5.0",
     "cypress-multi-reporters": "^1.6.4",
     "dotenv": "^16.4.7",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.25.0",
     "esbuild-plugin-clean": "^1.0.1",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-plugin-manifest": "^1.0.5",
