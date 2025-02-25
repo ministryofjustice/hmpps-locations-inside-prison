@@ -31,7 +31,10 @@ const fields = {
       text: 'Any change to the signed operational capacity must be approved by the prison governor.',
     },
     items: [
-      { text: 'I confirm that the signed operational capacity has been approved by the prison governor.', value: 'yes' },
+      {
+        text: 'I confirm that the signed operational capacity has been approved by the prison governor.',
+        value: 'yes',
+      },
     ],
   },
 }
