@@ -26,6 +26,7 @@ import locationHistoryRouter from './locationHistoryRouter'
 import setLocalNameRouter from './setLocalName'
 import changeLocalNameRouter from './changeLocalName'
 import removeLocalNameRouter from './removeLocalName'
+import { dprRouter } from './dpr'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -65,6 +66,9 @@ export default function routes(services: Services): Router {
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
   router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
+
+  // Digital Prison Reporting
+  dprRouter(router, services)
 
   return router
 }

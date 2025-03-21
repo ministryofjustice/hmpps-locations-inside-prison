@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
 import nunjucks from 'nunjucks'
+import setUpNunjucksFilters from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/setUpNunjucksFilters'
 import express from 'express'
 import fs from 'fs'
 import { get, isFunction } from 'lodash'
@@ -63,6 +64,9 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
       'node_modules/govuk-frontend/dist/',
       'node_modules/@ministryofjustice/frontend/',
       'node_modules/@ministryofjustice/frontend/moj/components/',
+      // Digital Prison Reporting
+      'node_modules/@ministryofjustice/hmpps-digital-prison-reporting-frontend/',
+      'node_modules/@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/components/',
     ],
     {
       autoescape: true,
@@ -101,4 +105,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('formatTime', formatTime)
   njkEnv.addFilter('formatDateWithTime', formatDateWithTime)
   njkEnv.addFilter('nonOxfordJoin', nonOxfordJoin)
+  // Digital Prison Reporting configuration
+  setUpNunjucksFilters(njkEnv)
 }

@@ -4,7 +4,7 @@ import logger from '../../logger'
 import { convertToTitleCase } from '../utils/utils'
 import { Services } from '../services'
 
-export default function populateCurrentUser({ manageUsersService }: Services): RequestHandler {
+export default function populateCurrentUser({ manageUsersService, authService }: Services): RequestHandler {
   return async (req, res, next) => {
     try {
       const {
@@ -27,6 +27,8 @@ export default function populateCurrentUser({ manageUsersService }: Services): R
         activeCaseload: caseloadsData.activeCaseload,
         caseloads: caseloadsData.caseloads,
       }
+
+      res.locals.systemToken = await authService.getSystemClientToken(res.locals.user.username)
 
       if (res.locals.user.authSource === 'nomis') {
         res.locals.user.staffId = parseInt(userId, 10) || undefined

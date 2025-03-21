@@ -11,6 +11,7 @@ export interface BaseUser {
   caseloads: Caseload[]
   username: string
   userId: string
+  uuid?: string
   name: string
   displayName: string
   userRoles: string[]

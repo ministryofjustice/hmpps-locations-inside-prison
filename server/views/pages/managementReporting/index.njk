@@ -1,0 +1,32 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set title = 'Management reports' %}
+
+{% block beforeContent %}
+  {{ super() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+
+    <p>Below is the of available management reports</p>
+
+    {% for definition in definitions %}
+      {% if definition.authorised %}
+        <h2 class="govuk-heading-m">{{ definition.name }}</h2>
+        <p class="govuk-body">{{ definition.description }}</p>
+
+        {% for variant in definition.variants %}
+          <h3 class="govuk-heading-s"><a id="{{ definition.id }}-{{ variant.id }}" href="/management-reporting/{{ definition.id }}-{{ variant.id }}" class="govuk-link"> {{ variant.name }} </a></h3>
+          <p class="govuk-body">{{ variant.description }}</p>
+
+        {% endfor %}
+      {%  endif %}
+    {% endfor %}
+  </div>
+{% endblock %}

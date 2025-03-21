@@ -135,6 +135,7 @@ export default {
   productionUrl: get('PRODUCTION_URL', '#'),
   sandbox: environmentName === 'Training',
   feedbackFormUrl: get('FEEDBACK_FORM_URL', ''),
+  loadReportDefinitionsOnStartup: get('LOAD_DPR_ON_STARTUP', 'false') === 'true',
   featureFlags: {
     permanentDeactivation: get('FLAG_MVP2_PERMANENT_DEACTIVATION', 'disabled') === 'enabled',
   },

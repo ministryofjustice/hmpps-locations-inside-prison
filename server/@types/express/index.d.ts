@@ -46,6 +46,7 @@ export declare global {
 
     interface Locals {
       user: HmppsUser
+      systemToken?: string
     }
   }
 }

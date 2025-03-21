@@ -1,5 +1,6 @@
 import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
+import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -223,5 +224,9 @@ export default class LocationsService {
       otherConvertedCellType?: string
     }
     return this.locationsApiClient.locations.updateNonResCell(token, { locationId }, params)
+  }
+
+  async getManagementReportDefinitions(token: string): Promise<ManagementReportDefinition[]> {
+    return this.locationsApiClient.managementReportDefinitions.get(token)
   }
 }

@@ -9,7 +9,9 @@
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block head %}
-  <link href="{{ '/assets/css/app.css' | assetMap }}" rel="stylesheet"/>
+  {% block pageStylesheets %}
+    <link href="{{ '/assets/css/app.css' | assetMap }}" rel="stylesheet"/>
+  {% endblock %}
 
   {% if googleAnalyticsMeasurementId %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
