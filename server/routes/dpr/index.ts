@@ -4,8 +4,6 @@ import config from '../../config'
 import { Services } from '../../services'
 import LocationsService from '../../services/locationsService'
 import { ManagementReportDefinition } from '../../data/types/locationsApi/managementReportDefinition'
-import populateBreadcrumbsForLocation from '../../middleware/populateBreadcrumbsForLocation'
-import addBreadcrumb from '../../middleware/addBreadcrumb'
 
 let definitionsRoutesInitialised: boolean = false
 
@@ -16,7 +14,9 @@ async function populateRoutes(
 ): Promise<ManagementReportDefinition[]> {
   const allDefinitions = await locationService.getManagementReportDefinitions(token)
   if (definitionsRoutesInitialised === false) {
+    // eslint-disable-next-line no-restricted-syntax
     for (const definition of allDefinitions) {
+      // eslint-disable-next-line no-restricted-syntax
       for (const variant of definition.variants) {
         router.get(
           `/management-reporting/${definition.id}-${variant.id}`,
@@ -41,7 +41,7 @@ async function populateRoutes(
 
 // eslint-disable-next-line import/prefer-default-export
 export function dprRouter(router: Router, services: Services): Router {
-  if ( config.loadReportDefinitionsOnStartup === true && definitionsRoutesInitialised === false) {
+  if (config.loadReportDefinitionsOnStartup === true && definitionsRoutesInitialised === false) {
     services.authService.getSystemClientToken().then(token => populateRoutes(services.locationsService, token, router))
   }
 
