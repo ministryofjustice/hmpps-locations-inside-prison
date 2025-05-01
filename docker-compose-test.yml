@@ -7,7 +7,7 @@ services:
   redis:
     image: redis:7.2
     networks:
-      - hmpps
+      - hmpps_int
     container_name: irs-redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes

@@ -10,12 +10,12 @@ export default class FormInitialStep extends FormWizard.Controller {
     this.use(this.setupConditionalFields)
   }
 
-  getInitialValues(_req: FormWizard.Request, _res: Response): { [key: string]: any } {
+  getInitialValues(_req: FormWizard.Request, _res: Response): FormWizard.Values {
     // Override in subclass to return initial values for form
     return {}
   }
 
-  getValues(req: FormWizard.Request, res: Response, callback: (err: any, values?: any) => void) {
+  getValues(req: FormWizard.Request, res: Response, callback: (err: Error, values?: FormWizard.Values) => void) {
     return super.getValues(req, res, (err, values) => {
       if (err) return callback(err)
 
@@ -36,7 +36,10 @@ export default class FormInitialStep extends FormWizard.Controller {
     return typeof arg === 'number' ? arg : `the ${fields[arg?.field]?.label?.text?.toLowerCase()}`
   }
 
-  getErrorDetail(error: { args: any; key: string; type: string }, res: Response): { text: string; href: string } {
+  getErrorDetail(
+    error: { args: FormWizard.Values; key: string; type: string },
+    res: Response,
+  ): { text: string; href: string } {
     const { fields } = res.locals.options
     const field = fields[error.key]
     const fieldName: string = field?.nameForErrors || field?.label?.text
@@ -58,7 +61,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       doesNotExceedEstMaxCap: `${fieldName} cannot be more than the establishment's maximum capacity`,
       doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
-      lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo, fields)}`,
+      lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo as number, fields)}`,
       localNameExists: 'A location with this name already exists',
       maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
       minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
@@ -101,7 +104,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, any> {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const { options, values } = res.locals
     if (!options?.fields) {
       return {}
@@ -112,7 +115,7 @@ export default class FormInitialStep extends FormWizard.Controller {
 
     const validationErrors: { text: string; href: string }[] = []
 
-    res.locals.errorlist.forEach((error: { args: any; key: string; type: string }) => {
+    res.locals.errorlist.forEach((error: { args: FormWizard.Values; key: string; type: string }) => {
       const errorDetail = this.getErrorDetail(error, res)
       validationErrors.push(errorDetail)
       const field = fields[error.key]
@@ -166,7 +169,7 @@ export default class FormInitialStep extends FormWizard.Controller {
             name: `${field.id}-year`,
             value: year || '',
           },
-        ] as any
+        ]
       })
 
     return fields
@@ -176,14 +179,19 @@ export default class FormInitialStep extends FormWizard.Controller {
     req: FormWizard.Request,
     allFields: { [field: string]: FormWizard.Field },
     originalFields: FormWizard.Fields,
-    values: { [field: string]: any },
+    values: FormWizard.Values | { [field: string]: { value: string } },
     errorlist: FormWizard.Controller.Error[],
   ): FormWizard.Fields {
     const fields = originalFields
 
     Object.keys(fields).forEach(fieldName => {
       const value = values[fieldName]
-      fields[fieldName].value = value?.value || value
+
+      if (typeof value === 'object' && value !== null && 'value' in value) {
+        fields[fieldName].value = value?.value as string
+      } else {
+        fields[fieldName].value = value as string
+      }
     })
 
     return this.setupDateInputFields(fields, errorlist)
@@ -215,7 +223,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       })
   }
 
-  validateDateInputFields(req: FormWizard.Request, validationErrors: any) {
+  validateDateInputFields(req: FormWizard.Request, validationErrors: FormWizard.Errors) {
     const { values } = req.form
 
     Object.values(req.form.options.fields)
@@ -235,11 +243,11 @@ export default class FormInitialStep extends FormWizard.Controller {
       })
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     this.populateDateInputFieldValues(req)
 
     super.validateFields(req, res, errors => {
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       this.validateDateInputFields(req, validationErrors)
 

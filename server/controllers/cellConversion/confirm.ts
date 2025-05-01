@@ -67,7 +67,7 @@ export default class CellConversionConfirm extends FormInitialStep {
     }
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const { sessionModel } = req
     const { location, maxCapacity, workingCapacity } = res.locals
     const { id: locationId, prisonId } = location

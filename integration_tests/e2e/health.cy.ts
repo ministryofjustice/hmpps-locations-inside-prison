@@ -5,7 +5,8 @@ context('Healthcheck', () => {
       cy.task('stubAuthPing')
       cy.task('stubManageHealthPing')
       cy.task('stubTokenVerificationPing')
-      cy.task('stubExamplePing')
+      cy.task('stubLocationsHealthPing')
+      cy.task('stubComponentsHealthPing')
     })
 
     it('Health check page is visible and UP', () => {

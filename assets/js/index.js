@@ -9,5 +9,5 @@ govukFrontend.initAll()
 mojFrontend.initAll()
 
 card()
-multiSelect(mojFrontend)
+multiSelect()
 localNameInputSubmit()

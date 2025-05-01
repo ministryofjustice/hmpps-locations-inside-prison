@@ -29,7 +29,7 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     next()
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response) {
+  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
     const { cell } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
@@ -41,12 +41,12 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     }
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const { cell } = res.locals
       const { accommodationTypes, specialistCellTypes }: Location = cell.raw
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       if (!errors.workingCapacity) {
         if (

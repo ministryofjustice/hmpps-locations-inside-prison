@@ -1,5 +1,7 @@
+import { RestClient } from '@ministryofjustice/hmpps-rest-client'
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
-import RestClient from './restClient'
+import logger from '../../logger'
 
 export interface Component {
   html: string
@@ -36,13 +38,13 @@ export interface FeComponentsResponse {
   meta: FeComponentsMeta
 }
 
-export default class FeComponentsClient {
-  private static restClient(token: string): RestClient {
-    return new RestClient('HMPPS Components Client', config.apis.frontendComponents, token)
+export default class FeComponentsClient extends RestClient {
+  constructor(authenticationClient: AuthenticationClient) {
+    super('FeComponentsClient', config.apis.frontendComponents, logger, authenticationClient)
   }
 
   getComponents<T extends AvailableComponent[]>(components: T, userToken: string): Promise<FeComponentsResponse> {
-    return FeComponentsClient.restClient(userToken).get<FeComponentsResponse>({
+    return this.get<FeComponentsResponse>({
       path: `/components`,
       query: `component=${components.join('&component=')}`,
       headers: { 'x-user-token': userToken },

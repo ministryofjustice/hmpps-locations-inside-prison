@@ -4,7 +4,7 @@ import FormInitialStep from '../base/formInitialStep'
 import setStepValidity from '../../lib/setStepValidity'
 
 export default class CellConversionSpecificCellType extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
     const { sessionModel } = req
@@ -27,9 +27,9 @@ export default class CellConversionSpecificCellType extends FormInitialStep {
         }
         // and set the next step so that it skips the specialist cell types so that the
         // journey is still valid if we click back again
-        const journeyHistory: any = req.journeyModel.get('history')
-        const thisStep = journeyHistory.find((step: any) => step.path.includes('/specific-cell-type'))
-        thisStep.next = journeyHistory.find((step: any) => step.path.includes('/set-cell-capacity'))?.path
+        const journeyHistory = req.journeyModel.get('history') as FormWizard.HistoryStep[]
+        const thisStep = journeyHistory.find(step => step.path.includes('/specific-cell-type'))
+        thisStep.next = journeyHistory.find(step => step.path.includes('/set-cell-capacity'))?.path
         req.journeyModel.set('history', journeyHistory)
       }
 

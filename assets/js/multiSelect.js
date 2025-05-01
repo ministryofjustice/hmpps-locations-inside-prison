@@ -1,5 +1,5 @@
 function updateCheckedCount() {
-  const selected = $('.govuk-checkboxes__input:checked').length - $('#checkboxes-all:checked').length
+  const selected = $('.govuk-checkboxes__input:checked').length - $('#locations-checkboxes-all:checked').length
   const actionBar = $('.sticky-select-action-bar')
   if (!actionBar.length) {
     return
@@ -13,32 +13,18 @@ function updateCheckedCount() {
   }
 }
 
-module.exports = mojFrontend => {
-  // Disable autocomplete for the select all checkbox
-  mojFrontend.MultiSelect.prototype.getToggleHtml = function () {
-    return (
-      '' +
-      '<div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">' +
-      '  <input type="checkbox" class="govuk-checkboxes__input" id="checkboxes-all" autocomplete="off">' +
-      '  <label class="govuk-label govuk-checkboxes__label moj-multi-select__toggle-label" for="checkboxes-all">' +
-      '    <span class="govuk-visually-hidden">Select all</span>' +
-      '  </label>' +
-      '</div>'
-    )
-  }
-
+module.exports = () => {
   $(() => {
-    const multiSelect = new mojFrontend.MultiSelect({
-      container: '.moj-multi-select',
-      checkboxes: '.govuk-checkboxes__input:not(#checkboxes-all)',
-    })
+    // TODO: remove this when https://github.com/ministryofjustice/moj-frontend/pull/1407 is merged and released
+    $('#locations-checkboxes-all').attr('autocomplete', 'off')
+
+    $('.govuk-checkboxes__input').on('change', updateCheckedCount)
 
     $('.sticky-select-action-bar__clear-link').on('click', () => {
-      multiSelect.uncheckAll()
-      multiSelect.toggleButton[0].checked = false
+      $('#locations-checkboxes-all').trigger('click')
+      // click the select-all again if it is checked
+      $('#locations-checkboxes-all:checked').trigger('click')
       updateCheckedCount()
     })
-
-    $('.govuk-checkboxes__input').on('click', updateCheckedCount)
   })
 }

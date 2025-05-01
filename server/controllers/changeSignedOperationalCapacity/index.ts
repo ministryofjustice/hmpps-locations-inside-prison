@@ -36,7 +36,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
       }
       res.locals.currentSignedOperationalCapacity = signedOperationalCapacitySummary.signedOperationCapacity
     } catch (e) {
-      if (e.status === 404) {
+      if (e.responseStatus === 404) {
         res.locals.currentSignedOperationalCapacity = 0
       } else {
         throw e
@@ -52,12 +52,12 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     next()
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
-    super.validateFields(req, res, errors => {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+    super.validateFields(req, res, (errors: FormWizard.Errors) => {
       const { values } = req.form
       const { maxCapacity } = res.locals
 
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       if (!errors.newSignedOperationalCapacity) {
         const { newSignedOperationalCapacity } = values
@@ -88,7 +88,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     return next()
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals
 

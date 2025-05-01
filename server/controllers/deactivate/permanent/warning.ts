@@ -9,7 +9,7 @@ export default class DeactivatePermanentWarning extends FormInitialStep {
     this.use(protectRoute('deactivate:permanent'))
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 

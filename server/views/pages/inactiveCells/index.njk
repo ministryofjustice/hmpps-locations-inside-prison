@@ -70,9 +70,11 @@
   {% if canAccess('reactivate') %}
     {% set row = (row.push({
       html: '<div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
-                 <input aria-label="' + cell.pathHierarchy + '" type="checkbox" class="govuk-checkboxes__input" name="selectedLocations" id="location-' + cell.id + '" value="' + cell.id + '" autocomplete="off">
-                 <label class="govuk-label govuk-checkboxes__label moj-multi-select__toggle-label" for="location-' + cell.id + '"></label>
-               </div>'
+               <input type="checkbox" class="govuk-checkboxes__input" name="selectedLocations" id="location-' + cell.id + '" value="' + cell.id + '" autocomplete="off">
+               <label class="govuk-label govuk-checkboxes__label" for="location-' + cell.id + '">
+                 <span class="govuk-visually-hidden">' + cell.pathHierarchy + '</span>
+               </label>
+             </div>'
     }), row) %}
   {% endif %}
   {% if cell.deactivationReasonDescription %}
@@ -98,13 +100,13 @@
     {% set formAction = options.action | default('') %}
     {% set formEnctype = options.enctype | default('') %}
 
-    <form id="reactivate-cells" method="{{ formMethod }}" action="{{ formAction }}"
-        {% if formEnctype %}
-          enctype="{{ formEnctype }}"
-        {% endif %}
+    <form id="reactivate-cells" method={{ formMethod }} action={{ formAction }}
+      {% if formEnctype %}
+        enctype="{{ formEnctype }}"
+      {% endif %}
     >
-      <input type="hidden" name="prisonId" value="{{ prisonId }}">
-      <input type="hidden" name="locationId" value="{{ locationId }}">
+      <input type="hidden" name="prisonId" value={{ prisonId }}>
+      <input type="hidden" name="locationId" value={{ locationId }}>
 
       {% if canAccess('reactivate') %}
         {{ govukButton({
@@ -117,7 +119,12 @@
 
       {% set tableHead = [] %}
       {% if canAccess('reactivate') %}
-        {% set tableHead = (tableHead.push({ html: '<div class="moj-multi-select"></div>'}), tableHead) %}
+        {% set tableHead = (tableHead.push({
+          text: '',
+          attributes: {
+            id: 'locations-select-all'
+          }
+        }), tableHead) %}
       {% endif %}
       {% set tableHead = (tableHead.push(
         { text: "Location" },
@@ -127,25 +134,27 @@
         { text: "Deactivated by" }
       ), tableHead) %}
       {% if rows | length %}
-      {{ govukTable({
-        attributes: {
-          "data-qa": "inactive-cells-table"
-        },
-        head: tableHead,
-        rows: rows
-      }) }}
-
-      {% if canAccess('reactivate') %}
-        {{ govukButton({
-          text: "Activate selected cells",
-          preventDoubleClick: true,
-          type: "submit",
-          classes: "moj-js-hidden"
+        {{ govukTable({
+          attributes: {
+            "data-qa": "inactive-cells-table",
+            "data-module": "moj-multi-select",
+            "data-id-prefix": "locations-"
+          },
+          head: tableHead,
+          rows: rows
         }) }}
-      {% endif %}
+
+        {% if canAccess('reactivate') %}
+          {{ govukButton({
+            text: "Activate selected cells",
+            preventDoubleClick: true,
+            type: "submit",
+            classes: "moj-js-hidden"
+          }) }}
+        {% endif %}
       {% else %}
-            <p data-qa="empty-state-message">There are no inactive locations.</p>
-    {% endif %}
+        <p data-qa="empty-state-message">There are no inactive locations.</p>
+      {% endif %}
     </form>
   </div>
 {% endblock %}

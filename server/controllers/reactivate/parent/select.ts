@@ -42,7 +42,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
 
     const { form } = req
     const { fields } = form.options
-    const { selectLocations } = form.values
+    const { selectLocations } = form.values as { selectLocations: string[] }
 
     if (selectLocations) {
       fields.selectLocations.items = fields.selectLocations.items.map(item => ({
@@ -66,7 +66,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
       location: Location
       locationResidentialSummary: LocationResidentialSummary
     }
-    const { selectLocations } = req.form.values
+    const { selectLocations } = req.form.values as { selectLocations: string[] }
     if (locationResidentialSummary.subLocationName === 'Cells' && selectLocations.length === 1) {
       res.redirect(
         `/reactivate/cell/${selectLocations[0]}?ref=parent&refPrisonId=${location.prisonId}&refLocationId=${location.id}`,

@@ -28,7 +28,7 @@ export default class InactiveCellsIndexPage extends Page {
     }
   }
 
-  selectAllCheckbox = () => cy.get('#checkboxes-all')
+  selectAllCheckbox = () => cy.get('#locations-checkboxes-all')
 
   selectCheckbox = (locationId: string) => cy.get(`#location-${locationId}`)
 

@@ -1,5 +1,4 @@
 import express, { Express } from 'express'
-import cookieSession from 'cookie-session'
 import { NotFound } from 'http-errors'
 
 import { randomUUID } from 'crypto'
@@ -11,8 +10,18 @@ import AuditService from '../../services/auditService'
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import setUpWebSession from '../../middleware/setUpWebSession'
 import setCanAccess from '../../middleware/setCanAccess'
+import { ApplicationInfo } from '../../applicationInfo'
 
 jest.mock('../../services/auditService')
+
+const testAppInfo: ApplicationInfo = {
+  applicationName: 'test',
+  buildNumber: '1',
+  gitRef: 'long ref',
+  gitShortHash: 'short ref',
+  productId: 'product-id',
+  branchName: 'main',
+}
 
 export const user: HmppsUser = {
   name: 'FIRST LAST',
@@ -42,9 +51,9 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
 
   app.set('view engine', 'njk')
 
-  nunjucksSetup(app)
+  nunjucksSetup(app, testAppInfo)
   app.use(setUpWebSession())
-  app.use(cookieSession({ keys: [''] }))
+  // app.use(cookieSession({ keys: [''] }))
   app.use((req, res, next) => {
     req.user = userSupplier() as Express.User
     req.flash = flashProvider

@@ -1,3 +1,4 @@
+import type { ResponseError } from 'superagent'
 import asyncMiddleware from './asyncMiddleware'
 
 export default function protectRoute(permission: string) {
@@ -6,7 +7,7 @@ export default function protectRoute(permission: string) {
       return next()
     }
 
-    const error: any = new Error(`Forbidden. Missing permission: '${permission}'`)
+    const error: ResponseError = new Error(`Forbidden. Missing permission: '${permission}'`)
     error.status = 403
 
     return next(error)

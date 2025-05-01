@@ -4,11 +4,9 @@
 import { NextFunction, Response } from 'express'
 
 declare module 'hmpo-form-wizard' {
-  import Express from 'express'
-
   // These enums have to live here because of TS/Jest and Enums work..  ¯\_(ツ)_/¯
   // Also this ESLint override because of how TS/Eslint works.
-  // eslint-disable-next-line no-shadow
+
   export const enum FieldType {
     Text = 'TEXT',
     Radio = 'RADIO',
@@ -18,7 +16,6 @@ declare module 'hmpo-form-wizard' {
     Dropdown = 'DROPDOWN',
   }
 
-  // eslint-disable-next-line no-shadow
   export const enum ValidationType {
     String = 'string',
     Regex = 'regex',
@@ -49,7 +46,6 @@ declare module 'hmpo-form-wizard' {
     AfterDateField = 'afterField',
   }
 
-  // eslint-disable-next-line no-shadow
   export const enum FormatterType {
     Trim = 'trim',
     Boolean = 'boolean',
@@ -67,7 +63,6 @@ declare module 'hmpo-form-wizard' {
     Base64Decode = 'base64decode',
   }
 
-  // eslint-disable-next-line no-shadow
   export const enum Gender {
     NotKnown = 0,
     Male = 1,
@@ -82,10 +77,35 @@ declare module 'hmpo-form-wizard' {
     type ConditionFn = (isValidated: boolean, values: Record<string, string | Array<string>>) => boolean
     type SectionProgressRule = { fieldCode: string; conditionFn: ConditionFn }
 
+    export interface Item {
+      classes?: string
+      text?: string
+      value: string
+      label?: string
+      conditional?: Conditional
+      id?: string
+      name?: string
+      hint?: Hint
+      checked?: boolean
+    }
+    export type Errors = Record<string, FormWizard.Controller.Error>
+    export type Values = Record<string, string | string[] | number>
+    export interface HistoryStep {
+      path: string
+      next: string
+      fields?: string[]
+      formFields?: string[]
+      wizard: string
+    }
+
     interface Request extends Omit<Express.Request, 'flash'> {
-      flash: (type: string, data?: any) => void
+      query: Record<string, string | string[]>
+      params: Record<string, string>
+      cookies: Record<string, string>
+      body: Record<string, string>
+      flash: (type: string, data?: { title: string; content: string }) => void
       form: {
-        values: Record<string, string | string[]>
+        values: FormWizard.Values
         options: {
           allFields: { [key: string]: Field }
           journeyName: string
@@ -97,11 +117,11 @@ declare module 'hmpo-form-wizard' {
           next?: string
           fullPath?: string
         }
-        persistedAnswers: Record<string, string | string[]>
+        persistedAnswers: FormWizard.Values
       }
       isEditing: boolean
       journeyModel: {
-        set: (key: string, value: any) => void
+        set: (key: string, value: unknown) => void
         get: (key: string) => unknown
         unset: (key: string) => unknown
         reset: () => unknown
@@ -121,7 +141,9 @@ declare module 'hmpo-form-wizard' {
 
       middlewareSetup(): void
 
-      use(...args: ((req: Request | Express.Request, res: Express.Response, next: Express.NextFunction) => any)[]): any
+      use(
+        ...args: ((req: Request | Express.Request, res: Express.Response, next: Express.NextFunction) => void)[]
+      ): void
 
       get(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
@@ -133,14 +155,14 @@ declare module 'hmpo-form-wizard' {
 
       validate(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
-      validateFields(req: FormWizard.Request, res: Express.Response, callback: (errors: any) => void)
+      validateFields(req: FormWizard.Request, res: Express.Response, callback: (errors: FormWizard.Errors) => void)
 
       // eslint-disable-next-line no-underscore-dangle
       _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
       locals(req: Request, res: Express.Response, next: Express.NextFunction): object
 
-      getValues(req: Request, res: Express.Response, next: (err: any, values?: any) => void): Promise
+      getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 
       saveValues(req: Request, res: Express.Response, next: Express.NextFunction): Promise
 
@@ -174,7 +196,7 @@ declare module 'hmpo-form-wizard' {
 
         type: string
 
-        args: { [key: string]: any }
+        args: { [key: string]: unknown }
 
         constructor(key?: string, options = {}, req?: Request): void
       }
@@ -210,7 +232,7 @@ declare module 'hmpo-form-wizard' {
       | { type: FormatterType; arguments?: (string | number)[] }
       | { fn: FormatterFn; arguments?: (string | number)[] }
 
-    type ValidatorFn = (val: AnswerValue, ...args: any) => boolean
+    type ValidatorFn = (val: AnswerValue, ...args: unknown) => boolean
 
     type Validate =
       | string
@@ -221,15 +243,6 @@ declare module 'hmpo-form-wizard' {
     type Dependent = { field: string; value: string | string[]; displayInline?: boolean }
 
     type Hint = { kind?: 'html'; html: string } | { kind?: 'text'; text: string }
-
-    interface Item {
-      text?: string
-      value: string
-      label?: string
-      conditional?: Conditional
-      id?: string
-      hint?: Hint
-    }
 
     interface Field {
       attributes?: { [attribute: string]: string | number }
@@ -260,14 +273,7 @@ declare module 'hmpo-form-wizard' {
       formGroupClasses?: string
       characterCountMax?: number
       classes?: string
-      items?: {
-        text?: string
-        value: string
-        label?: string
-        conditional?: Conditional
-        id?: string
-        hint?: Hint
-      }[]
+      items?: Item[]
       summary?: {
         displayFn?: (value: string) => string
         displayAlways?: boolean

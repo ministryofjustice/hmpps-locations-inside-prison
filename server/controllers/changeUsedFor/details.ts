@@ -21,15 +21,15 @@ export default class ChangeUsedForDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, any> {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId, leafLevel } = location
 
-    const fields = { ...locals.fields }
+    const fields = { ...(locals.fields as FormWizard.Fields) }
     if (!req.form.values?.usedFor) {
       if (leafLevel || location.usedFor.length === 1) {
-        fields.usedFor.items = fields.usedFor.items.map((item: FormWizard.Field) => ({
+        fields.usedFor.items = fields.usedFor.items.map((item: FormWizard.Item) => ({
           ...item,
           checked: location.raw.usedFor.includes(item.value),
         }))
@@ -67,7 +67,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
   async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
-    if (isEqual(sortBy(req.form.values.usedFor), sortBy(res.locals.location.raw.usedFor))) {
+    if (isEqual(sortBy(req.form.values.usedFor as string[]), sortBy(res.locals.location.raw.usedFor))) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
     return next()

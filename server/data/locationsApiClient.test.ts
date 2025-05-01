@@ -4,8 +4,6 @@ import { createClient } from 'redis'
 import config from '../config'
 import LocationsApiClient from './locationsApiClient'
 
-jest.mock('./tokenStore/redisTokenStore')
-
 const token = { access_token: 'token-1', expires_in: 300 }
 const redisClient = {
   cache: {} as { [key: string]: string },
@@ -24,7 +22,7 @@ describe('locationsApiClient', () => {
 
   beforeEach(() => {
     fakeApiClient = nock(config.apis.locationsApi.url)
-    apiClient = new LocationsApiClient(redisClient as unknown as ReturnType<typeof createClient>)
+    apiClient = new LocationsApiClient(redisClient as unknown as ReturnType<typeof createClient>, null)
 
     redisClient.cache = {}
   })

@@ -10,7 +10,7 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     super.middlewareSetup()
   }
 
-  getInitialValues(_req: FormWizard.Request, res: Response) {
+  getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     const { location } = res.locals
     const { deactivatedReason } = location.raw
 
@@ -65,13 +65,13 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     next()
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     req.form.values.deactivationReasonDescription =
       req.body[`deactivationReasonDescription-${req.form.values.deactivationReason}`]
     super.validateFields(req, res, callback)
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
 
     const { id: locationId, prisonId } = res.locals.location
@@ -87,7 +87,7 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     }
   }
 
-  compareInitialAndSubmittedValues(values: { initialValues: any; submittedValues: any }) {
+  compareInitialAndSubmittedValues(values: { initialValues: FormWizard.Values; submittedValues: FormWizard.Values }) {
     const initialValues = { ...values.initialValues }
     Object.keys(initialValues).forEach(key => {
       if (initialValues[key] === undefined) {

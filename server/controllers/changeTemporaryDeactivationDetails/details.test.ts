@@ -13,13 +13,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
   let req: FormWizard.Request
   let res: Response
   let next: NextFunction
-  let formValues: {
-    deactivationReason: string
-    estimatedReactivationDate: string
-    planetFmReference: string
-    deactivationReasonDescription: string
-    deactivationReasonOther: string
-  }
+  let formValues: FormWizard.Values
 
   beforeEach(() => {
     formValues = {

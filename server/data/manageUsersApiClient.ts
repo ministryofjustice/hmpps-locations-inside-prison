@@ -1,5 +1,7 @@
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import BaseApiClient from './baseApiClient'
+import { RedisClient } from './redisClient'
 
 export interface User {
   username: string
@@ -29,8 +31,11 @@ export interface UserRole {
 }
 
 export default class ManageUsersApiClient extends BaseApiClient {
-  protected static config() {
-    return config.apis.manageUsersApi
+  constructor(
+    protected readonly redisClient: RedisClient,
+    authenticationClient: AuthenticationClient,
+  ) {
+    super('ManageUsersApiClient', redisClient, config.apis.manageUsersApi, authenticationClient)
   }
 
   users = {

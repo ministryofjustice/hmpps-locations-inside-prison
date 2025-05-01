@@ -19,7 +19,7 @@ describe('Locations service', () => {
   let locationsService: LocationsService
 
   beforeEach(() => {
-    locationsApiClient = jest.mocked(new LocationsApiClient(null))
+    locationsApiClient = jest.mocked(new LocationsApiClient(null, null))
     locationsApiClient.constants = deepMock(locationsApiClient.constants, {
       a: [{ key: 'KEY', description: 'description' }],
     }) as typeof locationsApiClient.constants
@@ -212,7 +212,7 @@ describe('Locations service', () => {
     })
 
     it('bubbles up any errors', async () => {
-      const error: any = new Error('API error: Location is occupied')
+      const error = new Error('API error: Location is occupied')
       locationsApiClient.locations.convertCellToNonResCell.mockRejectedValue(error)
 
       await expect(

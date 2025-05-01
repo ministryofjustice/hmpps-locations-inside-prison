@@ -43,13 +43,13 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     next()
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     req.form.values.deactivationReasonDescription =
       req.body[`deactivationReasonDescription-${req.form.values.deactivationReason}`]
     super.validateFields(req, res, callback)
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
 
     const { id: locationId, prisonId } = res.locals.location

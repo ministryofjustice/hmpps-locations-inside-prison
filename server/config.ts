@@ -52,6 +52,7 @@ export default {
   apis: {
     frontendComponents: {
       url: get('COMPONENT_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 10000)),
         deadline: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 10000)),
@@ -75,6 +76,7 @@ export default {
     },
     locationsApi: {
       url: get('LOCATIONS_API_URL', 'http://localhost:9092', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 10000)),
@@ -83,6 +85,7 @@ export default {
     },
     manageUsersApi: {
       url: get('MANAGE_USERS_API_URL', 'http://localhost:9091', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 10000)),

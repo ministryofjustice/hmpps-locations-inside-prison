@@ -20,17 +20,18 @@ export default class CellConversionSetCellType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { sessionModel } = req
     const { location } = res.locals
     const { id: locationId, prisonId } = location
-    const fields = { ...locals.fields }
+    const fields = { ...(locals.fields as FormWizard.Fields) }
 
-    const specialistCellTypes = req.form.values.specialistCellTypes || sessionModel.get<string[]>('specialistCellTypes')
+    const specialistCellTypes = (req.form.values.specialistCellTypes ||
+      sessionModel.get<string[]>('specialistCellTypes')) as string[]
 
     if (specialistCellTypes) {
-      fields.specialistCellTypes.items = fields.specialistCellTypes.items.map((item: FormWizard.Field) => ({
+      fields.specialistCellTypes.items = fields.specialistCellTypes.items.map(item => ({
         ...item,
         checked: specialistCellTypes.includes(item.value as string),
       }))

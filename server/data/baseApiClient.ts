@@ -1,18 +1,17 @@
-import { NotImplemented } from 'http-errors'
+import { asUser, RestClient } from '@ministryofjustice/hmpps-rest-client'
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
-import RestClient from './restClient'
 import logger from '../../logger'
 import { RedisClient } from './redisClient'
 
-export default class BaseApiClient {
-  constructor(private readonly redisClient: RedisClient) {}
-
-  protected static config(): typeof config.apis.locationsApi {
-    throw NotImplemented()
-  }
-
-  protected static restClient(token: string): RestClient {
-    return new RestClient(this.name, this.config(), token)
+export default class BaseApiClient extends RestClient {
+  constructor(
+    name: string,
+    protected readonly redisClient: RedisClient,
+    _config: typeof config.apis.locationsApi,
+    authenticationClient: AuthenticationClient,
+  ) {
+    super(name, _config, logger, authenticationClient)
   }
 
   protected apiCall<
@@ -56,11 +55,14 @@ export default class BaseApiClient {
         logger.debug(
           `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)} - data ${JSON.stringify(data)}`,
         )
-        const result = await (this.constructor as typeof BaseApiClient).restClient(token)[requestType]<ReturnType>({
-          path: filledPath,
-          query,
-          data,
-        })
+        const result = await this[requestType]<ReturnType>(
+          {
+            path: filledPath,
+            query,
+            data,
+          },
+          asUser(token),
+        )
 
         if (cacheDuration && this.redisClient) {
           logger.debug(`Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)}`)

@@ -3,7 +3,7 @@ import { Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 
 export default class CellConversionSetCellCapacity extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId } = location
@@ -14,14 +14,14 @@ export default class CellConversionSetCellCapacity extends FormInitialStep {
     }
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { sessionModel } = req
       const { values } = req.form
       const accommodationType = sessionModel.get<string>('accommodationType')
       const specialistCellTypes = sessionModel.get<string>('specialistCellTypes')
 
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       if (
         !errors.workingCapacity &&

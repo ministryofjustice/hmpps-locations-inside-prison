@@ -8,7 +8,7 @@ describe('Manage users service', () => {
   let service: ManageUsersService
 
   beforeEach(() => {
-    apiClient = new ManageUsersApiClient(null) as jest.Mocked<ManageUsersApiClient>
+    apiClient = new ManageUsersApiClient(null, null) as jest.Mocked<ManageUsersApiClient>
     apiClient.users = {
       me: {
         get: jest.fn(),

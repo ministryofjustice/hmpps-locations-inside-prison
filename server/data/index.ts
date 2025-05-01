@@ -29,22 +29,16 @@ export const dataAccess = () => {
 
   return {
     applicationInfo,
-    feComponentsClient: new FeComponentsClient(),
+    feComponentsClient: new FeComponentsClient(hmppsAuthClient),
     googleAnalyticsClient: new GoogleAnalyticsClient(),
     hmppsAuthClient,
     hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
-    locationsApiClient: new LocationsApiClient(redisClient),
-    manageUsersApiClient: new ManageUsersApiClient(redisClient),
+    locationsApiClient: new LocationsApiClient(redisClient, hmppsAuthClient),
+    manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
     redisClient,
   }
 }
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
-export {
-  AuthenticationClient,
-  FeComponentsClient,
-  HmppsAuditClient,
-  LocationsApiClient,
-  ManageUsersApiClient,
-}
+export { AuthenticationClient, FeComponentsClient, HmppsAuditClient, LocationsApiClient, ManageUsersApiClient }

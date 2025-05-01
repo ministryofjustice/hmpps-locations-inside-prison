@@ -1,12 +1,17 @@
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import BaseApiClient from './baseApiClient'
 import { Location, PrisonerLocation, LocationForLocalName, SignedOperationalCapacity } from './types/locationsApi'
 import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
 import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
+import { RedisClient } from './redisClient'
 
 export default class LocationsApiClient extends BaseApiClient {
-  protected static config() {
-    return config.apis.locationsApi
+  constructor(
+    protected readonly redisClient: RedisClient,
+    authenticationClient: AuthenticationClient,
+  ) {
+    super('LocationsApiClient', redisClient, config.apis.locationsApi, authenticationClient)
   }
 
   constants = {

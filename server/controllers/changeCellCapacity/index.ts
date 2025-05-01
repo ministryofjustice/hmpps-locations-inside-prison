@@ -11,18 +11,18 @@ export default class ChangeCellCapacity extends FormInitialStep {
     this.use(populatePrisonersInLocation())
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response) {
+  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
     return res.locals.location.capacity
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const { location } = res.locals
       const { accommodationTypes, specialistCellTypes }: Location = location.raw
       const occupants = res.locals.prisonerLocation?.prisoners || []
 
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       if (!errors.workingCapacity) {
         if (
@@ -59,7 +59,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     return next()
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { id: locationId, prisonId } = res.locals.location
 

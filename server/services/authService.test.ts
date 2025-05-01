@@ -1,14 +1,14 @@
-import HmppsAuthClient from '../data/hmppsAuthClient'
+import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import AuthService from './authService'
 
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/hmpps-auth-clients')
 
 describe('Auth service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
+  let hmppsAuthClient: jest.Mocked<AuthenticationClient>
   let authService: AuthService
 
   beforeEach(() => {
-    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+    hmppsAuthClient = new AuthenticationClient(null, null) as jest.Mocked<AuthenticationClient>
     authService = new AuthService(hmppsAuthClient)
   })
 
@@ -16,7 +16,7 @@ describe('Auth service', () => {
     it('calls the correct client function', async () => {
       await authService.getSystemClientToken('Testuser')
 
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('Testuser')
+      expect(hmppsAuthClient.getToken).toHaveBeenCalledWith('Testuser')
     })
   })
 })

@@ -130,7 +130,7 @@ describe('Change Local Name', () => {
     delete req.form.values.localName
     res.locals.location.localName = 'Local Name from response'
     const result = controller.locals(req, res)
-    expect(result.fields.localName.value).toBe('Local Name from response')
+    expect((result.fields as FormWizard.Fields).localName.value).toBe('Local Name from response')
   })
 
   describe('validateFields', () => {

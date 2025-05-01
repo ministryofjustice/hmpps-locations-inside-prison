@@ -3,7 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../base/formInitialStep'
 
 export default class DeactivateTemporaryOccupied extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 

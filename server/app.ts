@@ -40,7 +40,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebSession())
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
-  nunjucksSetup(app)
+  nunjucksSetup(app, services.applicationInfo)
   app.use(setUpFeatureFlags())
   app.use(setUpAuthentication())
   app.use(

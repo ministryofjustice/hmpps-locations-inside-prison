@@ -16,17 +16,17 @@ export default class CellConversionUsedFor extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId } = location
     const usedForTypes = req.form.values.usedForTypes || req.sessionModel.get<string[]>('usedForTypes')
-    const fields = { ...locals.fields }
+    const fields = { ...(locals.fields as FormWizard.Fields) }
 
     if (usedForTypes) {
-      fields.usedForTypes.items = fields.usedForTypes.items.map((item: FormWizard.Field) => ({
+      fields.usedForTypes.items = fields.usedForTypes.items.map(item => ({
         ...item,
-        checked: usedForTypes.includes(item.value as string),
+        checked: (usedForTypes as string[]).includes(item.value as string),
       }))
     }
 

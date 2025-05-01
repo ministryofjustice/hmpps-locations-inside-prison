@@ -752,6 +752,17 @@ const stubLocationsUpdateNonResCell = () =>
     },
   })
 
+const stubLocationsHealthPing = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/health/ping',
+    },
+    response: {
+      status: 200,
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -774,6 +785,7 @@ export default {
   stubLocationsDeactivatePermanentOccupied,
   stubLocationsDeactivateTemporary,
   stubLocationsDeactivateTemporaryOccupied,
+  stubLocationsHealthPing,
   stubLocationsLocationsResidentialSummary,
   stubLocationsLocationsResidentialSummaryForLocation,
   stubLocationsPrisonArchivedLocations,

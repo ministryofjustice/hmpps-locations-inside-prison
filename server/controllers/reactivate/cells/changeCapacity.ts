@@ -25,7 +25,7 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
     next()
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response) {
+  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
     const { location } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
@@ -37,12 +37,12 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
     }
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const { location } = res.locals
       const { accommodationTypes, specialistCellTypes }: Location = location
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       if (!errors.workingCapacity) {
         if (

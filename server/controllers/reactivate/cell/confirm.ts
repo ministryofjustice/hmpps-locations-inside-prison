@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import { validate as validateUUID } from 'uuid'
 import backUrl from '../../../utils/backUrl'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
+import { isValidUUID } from '../../../utils/isValidUUID'
 
 export default class ReactivateCellConfirm extends FormWizard.Controller {
   middlewareSetup() {
@@ -102,13 +102,13 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
       content: `You have activated ${displayName}.`,
     })
 
-    if (referrerFlow === 'parent' && validateUUID(referrerLocationId)) {
+    if (referrerFlow === 'parent' && isValidUUID(referrerLocationId)) {
       res.redirect(`/view-and-update-locations/${encodeURIComponent(referrerPrisonId)}/${referrerLocationId}`)
       return
     }
 
     if (referrerFlow === 'inactive-cells') {
-      if (validateUUID(referrerLocationId)) {
+      if (isValidUUID(referrerLocationId)) {
         res.redirect(`/inactive-cells/${encodeURIComponent(referrerPrisonId)}/${referrerLocationId}`)
         return
       }

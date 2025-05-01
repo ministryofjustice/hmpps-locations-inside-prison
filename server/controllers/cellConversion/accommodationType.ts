@@ -18,7 +18,7 @@ export default class CellConversionAccommodationType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
     const { sessionModel } = req
@@ -32,9 +32,9 @@ export default class CellConversionAccommodationType extends FormInitialStep {
       } else {
         // and set the next step so that it skips the used for types so that the
         // journey is still valid if we click back again
-        const journeyHistory: any = req.journeyModel.get('history')
-        const thisStep = journeyHistory.find((step: any) => step.path.includes('/accommodation-type'))
-        thisStep.next = journeyHistory.find((step: any) => step.path.includes('/specific-cell-type'))?.path
+        const journeyHistory = req.journeyModel.get('history') as FormWizard.HistoryStep[]
+        const thisStep = journeyHistory.find(step => step.path.includes('/accommodation-type'))
+        thisStep.next = journeyHistory.find(step => step.path.includes('/specific-cell-type'))?.path
         req.journeyModel.set('history', journeyHistory)
       }
 

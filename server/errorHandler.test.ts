@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from 'express'
 import request from 'supertest'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
 import createErrorHandler from './errorHandler'
 import AnalyticsService from './services/analyticsService'
@@ -56,16 +57,20 @@ describe('error handler', () => {
         username: 'NSCAMANDER',
       },
     },
-  } as Response
+    redirect: jest.fn(),
+    render: jest.fn(),
+  } as unknown as Response
+  let error: SanitisedError<object>
 
   beforeEach(() => {
     analyticsService.sendEvent = jest.fn()
     res.render = jest.fn()
     res.status = jest.fn()
+    error = new Error('API error')
+    error.responseStatus = 500
   })
 
   it('should send an API error event to Google Analytics', () => {
-    const error: any = new Error('API error')
     error.data = { errorCode: 117, status: 400 }
 
     errorHandler(error, req, res, undefined)
@@ -77,13 +82,91 @@ describe('error handler', () => {
   })
 
   it('should send an unknown error event to Google Analytics', () => {
-    const error: any = new Error('API error')
-
     errorHandler(error, req, res, undefined)
 
     expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'unhandled_error', {
       prison_id: 'TST',
       error_code: undefined,
+    })
+  })
+
+  describe('when the error is an api error', () => {
+    beforeEach(() => {
+      ;(error as any).isApiError = true
+    })
+
+    describe('when the error is 401', () => {
+      beforeEach(() => {
+        error.responseStatus = 401
+      })
+
+      it('renders the generic error page', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
+      })
+    })
+
+    describe('when the error is 403', () => {
+      beforeEach(() => {
+        error.responseStatus = 403
+      })
+
+      it('renders the generic error page', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
+      })
+    })
+
+    describe('when the error is 404', () => {
+      beforeEach(() => {
+        error.responseStatus = 404
+      })
+
+      it('renders the 404 page', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.render).toHaveBeenCalledWith('pages/errors/404')
+      })
+    })
+  })
+
+  describe('when the error is not an api error', () => {
+    describe('when the error is 401', () => {
+      beforeEach(() => {
+        error.responseStatus = 401
+      })
+
+      it('logs the user out', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.redirect).toHaveBeenCalledWith('/sign-out')
+      })
+    })
+
+    describe('when the error is 403', () => {
+      beforeEach(() => {
+        error.responseStatus = 403
+      })
+
+      it('logs the user out', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.redirect).toHaveBeenCalledWith('/sign-out')
+      })
+    })
+
+    describe('when the error is 404', () => {
+      beforeEach(() => {
+        error.responseStatus = 404
+      })
+
+      it('renders the 404 page', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.render).toHaveBeenCalledWith('pages/errors/404')
+      })
     })
   })
 })

@@ -21,17 +21,17 @@ export default class SetCellType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 
     const pageTitleText = location.specialistCellTypes.length ? 'Change specific cell type' : 'Set specific cell type'
 
-    const fields = { ...locals.fields }
+    const fields = { ...(locals.fields as FormWizard.Fields) }
 
     if (!req.form.values?.specialistCellTypes) {
-      fields.specialistCellTypes.items = fields.specialistCellTypes.items.map((item: FormWizard.Field) => ({
+      fields.specialistCellTypes.items = fields.specialistCellTypes.items.map((item: FormWizard.Item) => ({
         ...item,
         checked: location.raw.specialistCellTypes.includes(item.value),
       }))
@@ -52,7 +52,7 @@ export default class SetCellType extends FormInitialStep {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 
-    if (isEqual(sortBy(req.form.values.specialistCellTypes), sortBy(location.raw.specialistCellTypes))) {
+    if (isEqual(sortBy(req.form.values.specialistCellTypes as string[]), sortBy(location.raw.specialistCellTypes))) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
 

@@ -11,16 +11,16 @@ export default class ReviewCellCapacity extends FormInitialStep {
     this.use(populateLocation({ decorate: true }))
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response) {
+  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
     return res.locals.location.capacity
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const occupants = res.locals.prisonerLocation?.prisoners || []
 
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       if (!errors.workingCapacity) {
         if (Number(values?.workingCapacity) < occupants.length) {

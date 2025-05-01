@@ -11,7 +11,7 @@ describe('feComponentsClient', () => {
 
   beforeEach(() => {
     fakeComponentsApi = nock(config.apis.frontendComponents.url)
-    componentsClient = new FeComponentsClient()
+    componentsClient = new FeComponentsClient(null)
   })
 
   afterEach(() => {

@@ -9,7 +9,7 @@ export default class DeactivatePermanentDetails extends FormInitialStep {
     this.use(protectRoute('deactivate:permanent'))
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
 
     const { id: locationId, prisonId } = res.locals.location

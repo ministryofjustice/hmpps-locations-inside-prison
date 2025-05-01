@@ -21,20 +21,20 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, any> {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId } = location
     const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
-    const fields = { ...locals.fields }
+    const fields = { ...(locals.fields as FormWizard.Fields) }
     const convertedCellType = req.form.values.convertedCellType ?? location.raw?.convertedCellType ?? ''
     const otherConvertedCellType =
       req.form.values.otherConvertedCellType === ''
         ? null
         : req.form.values.otherConvertedCellType || location.raw?.otherConvertedCellType || ''
 
-    fields.convertedCellType.items = fields.convertedCellType.items.map((item: FormWizard.Field) => ({
+    fields.convertedCellType.items = fields.convertedCellType.items.map(item => ({
       ...item,
       checked: item.value === convertedCellType,
     }))
@@ -49,7 +49,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     }
   }
 
-  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { location } = res.locals
       const { prisonId, id: locationId } = location
