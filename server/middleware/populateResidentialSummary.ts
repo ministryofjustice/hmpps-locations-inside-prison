@@ -27,7 +27,7 @@ function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow
   const { id, localName } = location
   const baseUrl = `/location/${id}/`
 
-  const row: any = { key: { text: 'Local name' } }
+  const row: SummaryListRow = { key: { text: 'Local name' } }
 
   if (localName) {
     row.value = { html: localName }
@@ -52,7 +52,7 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
   const { specialistCellTypes } = location
   const setCellTypeUrl = `/location/${location.id}/set-cell-type`
   const removeCellTypeUrl = `/location/${location.id}/remove-cell-type`
-  const row: any = { key: { text: 'Cell type' } }
+  const row: SummaryListRow = { key: { text: 'Cell type' } }
   if (specialistCellTypes.length) {
     row.value = {
       html: specialistCellTypes.join('<br>'),
@@ -83,7 +83,7 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
 function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { usedFor } = location
   const changeUsedForUrl = `/location/${location.id}/change-used-for`
-  const row: any = { key: { text: 'Used for' } }
+  const row: SummaryListRow = { key: { text: 'Used for' } }
   if (usedFor.length) {
     row.value = {
       html: location.usedFor.join('<br>'),
@@ -111,7 +111,7 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
   const changeNonResTypeUrl = `/location/${location.id}/change-non-residential-type`
   const { convertedCellType, otherConvertedCellType } = location
   const text = otherConvertedCellType?.length ? `${convertedCellType} - ${otherConvertedCellType}` : convertedCellType
-  const row: any = { key: { text: 'Non-residential room' }, value: { text } }
+  const row: SummaryListRow = { key: { text: 'Non-residential room' }, value: { text } }
 
   if (showChangeNonResLink(location, req)) {
     row.actions = {

@@ -11,6 +11,9 @@ config.push({
       module: true,
     },
   },
+  rules: {
+    'func-names': 0,
+  },
 })
 
 config.push({

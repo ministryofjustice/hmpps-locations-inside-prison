@@ -1,5 +1,6 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
@@ -9,7 +10,7 @@ import fields from '../../routes/cellConversion/fields'
 describe('CellConversionSetCellCapacity', () => {
   const controller = new CellConversionSetCellCapacity({ route: '/' })
   let req: FormWizard.Request
-  let res: Response
+  let res: DeepPartial<Response>
   let sessionModelSet: jest.Mock
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
@@ -56,7 +57,6 @@ describe('CellConversionSetCellCapacity', () => {
             workingCapacity: 20,
           },
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -80,7 +80,7 @@ describe('CellConversionSetCellCapacity', () => {
           },
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(req, res as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -108,7 +108,7 @@ describe('CellConversionSetCellCapacity', () => {
 
       it('calls back with the expected error', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res, callback)
+        controller.validateFields(req, res as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({
           workingCapacity: {
@@ -132,7 +132,7 @@ describe('CellConversionSetCellCapacity', () => {
 
       it('calls back with no errors', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res, callback)
+        controller.validateFields(req, res as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({})
       })
@@ -151,7 +151,7 @@ describe('CellConversionSetCellCapacity', () => {
 
       it('calls back with no errors', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res, callback)
+        controller.validateFields(req, res as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({})
       })
@@ -169,7 +169,7 @@ describe('CellConversionSetCellCapacity', () => {
 
       it('calls back with no errors', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res, callback)
+        controller.validateFields(req, res as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({})
       })

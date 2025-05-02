@@ -1,5 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
@@ -9,7 +10,7 @@ import fields from '../../routes/cellConversion/fields'
 describe('CellConversionAccommodationType', () => {
   const controller = new CellConversionAccommodationType({ route: '/' })
   let req: FormWizard.Request
-  let res: Response
+  let res: DeepPartial<Response>
   let next: NextFunction
   let sessionModelSave: jest.Mock
   let sessionModelSet: jest.Mock
@@ -116,7 +117,6 @@ describe('CellConversionAccommodationType', () => {
             workingCapacity: 20,
           },
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -153,7 +153,7 @@ describe('CellConversionAccommodationType', () => {
 
   describe('configure', () => {
     it('adds the options to the field', async () => {
-      await controller.configure(req, res, next)
+      await controller.configure(req, res as Response, next)
       expect(req.form.options.fields.accommodationType.items).toEqual([
         {
           text: 'Care and separation',
@@ -184,7 +184,7 @@ describe('CellConversionAccommodationType', () => {
     })
 
     it('returns the expected locals', () => {
-      const result = controller.locals(req, res)
+      const result = controller.locals(req, res as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -205,7 +205,7 @@ describe('CellConversionAccommodationType', () => {
       })
 
       it('returns the expected locals', () => {
-        const result = controller.locals(req, res)
+        const result = controller.locals(req, res as Response)
 
         expect(result).toEqual({
           backLink: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/confirm',
@@ -230,7 +230,7 @@ describe('CellConversionAccommodationType', () => {
           newHistory[2].invalid = false
           newHistory[2].revalidate = false
 
-          controller.locals(req, res)
+          controller.locals(req, res as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
       })
@@ -244,7 +244,7 @@ describe('CellConversionAccommodationType', () => {
         })
 
         it('sets the next step back to /specific-cell-type so that the journey is valid if we click back', () => {
-          controller.locals(req, res)
+          controller.locals(req, res as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', initialJourneyHistory())
         })
       })
@@ -263,13 +263,13 @@ describe('CellConversionAccommodationType', () => {
           })
 
           it('directly sets this as the accommodation type in the session', () => {
-            controller.locals(req, res)
+            controller.locals(req, res as Response)
             expect(updateSessionData).toHaveBeenCalledWith({ accommodationType: 'CARE_AND_SEPARATION' })
             expect(sessionModelSave).toHaveBeenCalled()
           })
 
           it('updates the locals with the saved accommodation type', () => {
-            controller.locals(req, res)
+            controller.locals(req, res as Response)
             expect(res.locals.values.accommodationType).toEqual('CARE_AND_SEPARATION')
           })
         })
@@ -288,13 +288,13 @@ describe('CellConversionAccommodationType', () => {
           })
 
           it('directly sets this as the accommodation type in the session', () => {
-            controller.locals(req, res)
+            controller.locals(req, res as Response)
             expect(updateSessionData).toHaveBeenCalledWith({ accommodationType: 'CARE_AND_SEPARATION' })
             expect(sessionModelSave).toHaveBeenCalled()
           })
 
           it('updates the locals with the saved accommodation type', () => {
-            controller.locals(req, res)
+            controller.locals(req, res as Response)
             expect(res.locals.values.accommodationType).toEqual('CARE_AND_SEPARATION')
           })
         })
@@ -314,12 +314,12 @@ describe('CellConversionAccommodationType', () => {
           })
 
           it('does not directly set this as the accommodation type in the session', () => {
-            controller.locals(req, res)
+            controller.locals(req, res as Response)
             expect(updateSessionData).not.toHaveBeenCalledWith({ accommodationType: 'CARE_AND_SEPARATION' })
           })
 
           it('does not update the locals with the saved accommodation type', () => {
-            controller.locals(req, res)
+            controller.locals(req, res as Response)
             expect(res.locals.values.accommodationType).not.toEqual('CARE_AND_SEPARATION')
           })
         })
@@ -347,7 +347,7 @@ describe('CellConversionAccommodationType', () => {
         })
 
         it('saves the previous accomodation type', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(sessionModelSet).toHaveBeenCalledWith('previousAccommodationType', 'CARE_AND_SEPARATION')
         })
 
@@ -356,12 +356,12 @@ describe('CellConversionAccommodationType', () => {
           newHistory[2].invalid = true
           newHistory[2].revalidate = true
 
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(next).toHaveBeenCalled()
         })
       })
@@ -372,13 +372,13 @@ describe('CellConversionAccommodationType', () => {
         })
 
         it('unsets the used for types and saved accommodation type in the session', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('usedForTypes')
           expect(sessionModelUnset).toHaveBeenCalledWith('previousAccommodationType')
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(next).toHaveBeenCalled()
         })
       })

@@ -10,7 +10,7 @@ export default async (req: Request, res: Response) => {
 
   const success = req.flash('success')
   if (success?.length) {
-    banner.success = success[0]
+    ;[banner.success] = success
   }
   return res.render('pages/archivedLocations/index', {
     banner,

@@ -58,7 +58,7 @@ describe('view locations show', () => {
       title: 'Your attention please',
       content: 'Dinner is served',
     }
-    // @ts-ignore
+    // @ts-expect-error: lint thinks that the jest.fn has 0 args
     req.flash = jest.fn(_param => [success])
     controller(req, res)
 

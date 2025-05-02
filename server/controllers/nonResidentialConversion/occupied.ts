@@ -2,7 +2,7 @@ import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 
 export default class NonResidentialConversionOccupied extends FormWizard.Controller {
-  locals(_req: FormWizard.Request, res: Response): Record<string, any> {
+  locals(_req: FormWizard.Request, res: Response): Record<string, unknown> {
     const { location } = res.locals
     const { id: locationId, prisonId } = location
 

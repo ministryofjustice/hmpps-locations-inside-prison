@@ -14,7 +14,7 @@ export default async (req: Request, res: Response) => {
 
   const success = req.flash('success')
   if (success?.length) {
-    banner.success = success[0]
+    ;[banner.success] = success
   }
 
   if (req.canAccess('convert_non_residential') && active && !isResidential && leafLevel) {

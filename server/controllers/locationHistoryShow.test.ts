@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { DeepPartial } from 'fishery'
 import locationHistoryShowController from './locationHistoryShow'
 import LocationFactory from '../testutils/factories/location'
 import { Services } from '../services'
@@ -10,9 +11,9 @@ jest.mock('../services/manageUsersService')
 
 describe('view locations show', () => {
   let req: Request
-  let res: Response
+  let res: DeepPartial<Response>
   let controller: (req: Request, res: Response) => Promise<void>
-  let services: Services
+  let services: Partial<Services>
   const authService = jest.mocked(new AuthService(null))
   const manageUsersService = jest.mocked(new ManageUsersService(null))
 
@@ -20,10 +21,8 @@ describe('view locations show', () => {
     const location = LocationFactory.build()
     req = {} as Request
     res = {
-      // @ts-ignore
       locals: {
         location,
-        // @ts-ignore
         user: {
           username: 'LLANLEY',
         },
@@ -31,16 +30,15 @@ describe('view locations show', () => {
       render: jest.fn(),
     }
     manageUsersService.getUser = jest.fn().mockResolvedValue({ name: 'Lyle Lanley' })
-    // @ts-ignore
     services = {
       authService,
       manageUsersService,
     }
-    controller = locationHistoryShowController(services)
+    controller = locationHistoryShowController(services as Services)
   })
 
   it('renders the page', async () => {
-    await controller(req, res)
+    await controller(req, res as Response)
 
     expect(res.render).toHaveBeenCalledWith('pages/locationHistory/show', {
       backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -62,7 +60,7 @@ describe('view locations show', () => {
     })
 
     it('renders the page', async () => {
-      await controller(req, res)
+      await controller(req, res as Response)
 
       expect(res.render).toHaveBeenCalledWith('pages/locationHistory/show', {
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',

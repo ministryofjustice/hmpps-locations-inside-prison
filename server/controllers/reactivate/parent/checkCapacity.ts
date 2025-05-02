@@ -35,7 +35,10 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
     const backLink = isSelect
       ? `/reactivate/parent/${location.id}/select`
       : `/view-and-update-locations/${[location.prisonId, location.id].join('/')}`
-    const { cells, errorlist }: { cells: Location[]; errorlist: FormWizard.Controller.Error[] } = res.locals as any
+    const { cells, errorlist } = res.locals as unknown as {
+      cells: Location[]
+      errorlist: FormWizard.Controller.Error[]
+    }
 
     res.locals.options.fields = Object.fromEntries(
       errorlist.map(error => {
@@ -65,14 +68,14 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
     return req.sessionModel.get('errors')
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
-      const { cells }: { cells: DecoratedLocation[] } = res.locals as any
+      const { cells } = res.locals as unknown as { cells: DecoratedLocation[] }
       const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get(
         'capacityChanges',
       ) || {}) as typeof capacityChanges
 
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       cells.forEach(cell => {
         const { accommodationTypes, specialistCellTypes } = cell.raw

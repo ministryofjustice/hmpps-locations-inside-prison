@@ -1,5 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import LocationFactory from '../../testutils/factories/location'
 import CellConversionSpecificCellType from './specificCellType'
 import fields from '../../routes/cellConversion/fields'
@@ -7,7 +8,7 @@ import fields from '../../routes/cellConversion/fields'
 describe('CellConversionSpecificCellType', () => {
   const controller = new CellConversionSpecificCellType({ route: '/' })
   let req: FormWizard.Request
-  let res: Response
+  let res: DeepPartial<Response>
   let next: NextFunction
   let sessionModelSave: jest.Mock
   let sessionModelSet: jest.Mock
@@ -105,7 +106,6 @@ describe('CellConversionSpecificCellType', () => {
             workingCapacity: 20,
           },
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -131,7 +131,7 @@ describe('CellConversionSpecificCellType', () => {
     })
 
     it('returns the expected locals', () => {
-      const result = controller.locals(req, res)
+      const result = controller.locals(req, res as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -151,7 +151,7 @@ describe('CellConversionSpecificCellType', () => {
       })
 
       it('returns the expected locals', () => {
-        const result = controller.locals(req, res)
+        const result = controller.locals(req, res as Response)
 
         expect(result).toEqual({
           cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -175,7 +175,7 @@ describe('CellConversionSpecificCellType', () => {
           newHistory[4].invalid = false
           newHistory[4].revalidate = false
 
-          controller.locals(req, res)
+          controller.locals(req, res as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
       })
@@ -188,17 +188,17 @@ describe('CellConversionSpecificCellType', () => {
         it('sets the next step back to /set-cell-capacity so that the journey is valid if we click back', () => {
           const newJourneyHistory = initialJourneyHistory()
           newJourneyHistory[3].next = '/location/44711e6c-7b06-451e-95fe-c454e6957744/cell-conversion/set-cell-capacity'
-          controller.locals(req, res)
+          controller.locals(req, res as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newJourneyHistory)
         })
 
         it('sets the answer back to no in the session', () => {
-          controller.locals(req, res)
+          controller.locals(req, res as Response)
           expect(sessionModelSet).toHaveBeenCalledWith('hasSpecificCellType', 'no', { silent: true })
         })
 
         it('sets the answer as no in the locals', () => {
-          controller.locals(req, res)
+          controller.locals(req, res as Response)
           expect(res.locals.values.hasSpecificCellType).toEqual('no')
         })
       })
@@ -216,7 +216,7 @@ describe('CellConversionSpecificCellType', () => {
           newHistory[5].invalid = false
           newHistory[5].revalidate = false
 
-          controller.locals(req, res)
+          controller.locals(req, res as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
       })
@@ -235,7 +235,7 @@ describe('CellConversionSpecificCellType', () => {
         })
 
         it('clears the saved cell types', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('previousCellTypes')
         })
 
@@ -244,12 +244,12 @@ describe('CellConversionSpecificCellType', () => {
           newHistory[4].invalid = true
           newHistory[4].revalidate = true
 
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(next).toHaveBeenCalled()
         })
       })
@@ -260,17 +260,17 @@ describe('CellConversionSpecificCellType', () => {
         })
 
         it('unsets the specialist cell types', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('specialistCellTypes')
         })
 
         it('clears the saved cell types', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('previousCellTypes')
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res, next)
+          controller.saveValues(req, res as Response, next)
           expect(next).toHaveBeenCalled()
         })
 
@@ -292,12 +292,12 @@ describe('CellConversionSpecificCellType', () => {
             newHistory[5].invalid = true
             newHistory[5].revalidate = true
 
-            controller.saveValues(req, res, next)
+            controller.saveValues(req, res as Response, next)
             expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
           })
 
           it('saves the cell types in case we need to restore them', () => {
-            controller.saveValues(req, res, next)
+            controller.saveValues(req, res as Response, next)
             expect(sessionModelSet).toHaveBeenCalledWith('previousCellTypes', ['ACCESSIBLE_CELL'])
           })
         })
@@ -317,7 +317,7 @@ describe('CellConversionSpecificCellType', () => {
             newHistory[5].invalid = true
             newHistory[5].revalidate = true
 
-            controller.saveValues(req, res, next)
+            controller.saveValues(req, res as Response, next)
             expect(journeyModelSet).not.toHaveBeenCalledWith('history', newHistory)
           })
         })

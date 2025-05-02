@@ -21,7 +21,7 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, any> {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
 
     const { location } = res.locals

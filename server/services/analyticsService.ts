@@ -6,7 +6,7 @@ import logger from '../../logger'
 export default class AnalyticsService {
   constructor(private readonly googleAnalyticsClient: GoogleAnalyticsClient) {}
 
-  async sendEvent(req: Request | FormWizard.Request, name: string, params: Record<string, any>) {
+  async sendEvent(req: Request | FormWizard.Request, name: string, params: Record<string, unknown>) {
     const event: GoogleAnalyticsEvent = { name: `res_locations_${name}`, params }
 
     try {

@@ -96,6 +96,8 @@ declare module 'hmpo-form-wizard' {
       fields?: string[]
       formFields?: string[]
       wizard: string
+      invalid?: boolean
+      revalidate?: boolean
     }
 
     interface Request extends Omit<Express.Request, 'flash'> {
@@ -237,8 +239,8 @@ declare module 'hmpo-form-wizard' {
     type Validate =
       | string
       | ValidatorFn
-      | { type: ValidationType; arguments?: (string | number | object)[]; message: string }
-      | { fn: ValidatorFn; arguments?: (string | number | object)[]; message?: string }
+      | { type: ValidationType; arguments?: (string | number | { field: string })[]; message: string }
+      | { fn: ValidatorFn; arguments?: (string | number | { field: string })[]; message?: string }
 
     type Dependent = { field: string; value: string | string[]; displayInline?: boolean }
 

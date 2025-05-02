@@ -18,7 +18,7 @@ type GoogleAnalyticsPayload = {
 export default class GoogleAnalyticsClient {
   constructor() {}
 
-  async post(data: GoogleAnalyticsPayload): Promise<any> {
+  async post(data: GoogleAnalyticsPayload): Promise<unknown> {
     logger.info(`Google Analytics API POST: /mp/collect`)
 
     const { measurementId, measurementApi } = config.googleAnalytics

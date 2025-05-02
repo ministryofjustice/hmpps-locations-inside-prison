@@ -31,15 +31,18 @@ export declare global {
       userRoles?: string[]
     }
 
+    interface Flash {
+      title: string
+      content: string
+    }
+
     interface Request {
       verified?: boolean
       id: string
       logout(done: (err: unknown) => void): void
       services?: Services
-      flash(): { [key: string]: any[] }
-      flash(message: string): any[]
-      flash(type: string, message: any[] | any): number
-      flash(type: string, format: string, ...args: any[]): number
+      flash(message: string): Flash[]
+      flash(type: string, message: Flash): Flash[]
       canAccess: (permission: string) => boolean
       featureFlags?: Record<string, boolean>
     }

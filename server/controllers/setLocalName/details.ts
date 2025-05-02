@@ -9,7 +9,7 @@ export default class Details extends FormInitialStep {
     super.middlewareSetup()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, any> {
+  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { location } = res.locals
     const { id: locationId, prisonId } = location
@@ -25,7 +25,7 @@ export default class Details extends FormInitialStep {
     }
   }
 
-  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: any) => void) {
+  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { locationsService } = req.services
       const { values } = req.form
@@ -35,7 +35,7 @@ export default class Details extends FormInitialStep {
       const sanitizedLocalName = sanitizeString(String(values.localName))
       const token = await req.services.authService.getSystemClientToken(user.username)
 
-      const validationErrors: any = {}
+      const validationErrors: FormWizard.Errors = {}
 
       try {
         const localNameExists = await locationsService.getLocationByLocalName(

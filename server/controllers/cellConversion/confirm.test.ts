@@ -1,5 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
@@ -10,7 +11,7 @@ import AnalyticsService from '../../services/analyticsService'
 describe('CellConversionConfirm', () => {
   const controller = new CellConversionConfirm({ route: '/' })
   let req: FormWizard.Request
-  let res: Response
+  let res: DeepPartial<Response>
   let next: NextFunction
   let sessionModelGet: jest.Mock
   let sessionModelSet: jest.Mock
@@ -69,7 +70,6 @@ describe('CellConversionConfirm', () => {
             workingCapacity: 20,
           },
         },
-        // @ts-ignore
         user: {
           username: 'JTIMPSON',
         },
@@ -106,7 +106,7 @@ describe('CellConversionConfirm', () => {
 
   describe('get', () => {
     it('adds the human-readable type names to the locals', async () => {
-      await controller.get(req, res, next)
+      await controller.get(req, res as Response, next)
       expect(res.locals.accommodationType).toEqual('Normal accommodation')
       expect(res.locals.maxCapacity).toEqual(2)
       expect(res.locals.specialistCellTypes).toEqual(['Accessible cell', 'Care and separation cell'])
@@ -125,7 +125,7 @@ describe('CellConversionConfirm', () => {
     })
 
     it('returns the expected locals', () => {
-      const result = controller.locals(req, res)
+      const result = controller.locals(req, res as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -204,13 +204,13 @@ describe('CellConversionConfirm', () => {
     it('returns the correct summary when working cap is zero', () => {
       res.locals.maxCapacity = '2'
       res.locals.workingCapacity = '0'
-      const result: any = controller.locals(req, res)
+      const result: any = controller.locals(req, res as Response)
 
       expect(result.changeSummary).toEqual('This will increase the establishment’s maximum capacity from 30 to 32.')
     })
 
     it('clears any saved values from the edit journeys', () => {
-      controller.locals(req, res)
+      controller.locals(req, res as Response)
 
       expect(sessionModelUnset).toHaveBeenCalledWith('previousCellTypes')
       expect(sessionModelUnset).toHaveBeenCalledWith('previousAccommodationType')
@@ -219,7 +219,7 @@ describe('CellConversionConfirm', () => {
 
   describe('saveValues', () => {
     it('converts the location to a cell via the locations API', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(req, res as Response, next)
 
       expect(locationsService.convertToCell).toHaveBeenCalledWith(
         'token',
@@ -233,12 +233,12 @@ describe('CellConversionConfirm', () => {
     })
 
     it('calls next when successful', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(req, res as Response, next)
       expect(next).toHaveBeenCalled()
     })
 
     it('sends an analytics event when successful', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(req, res as Response, next)
 
       expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'convert_to_cell', {
         prison_id: 'TST',
@@ -249,7 +249,7 @@ describe('CellConversionConfirm', () => {
     it('calls next with any unexpected errors', async () => {
       const error = new Error('API error')
       ;(locationsService.convertToCell as jest.Mock).mockRejectedValue(error)
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(req, res as Response, next)
 
       expect(next).toHaveBeenCalledWith(error)
     })
@@ -257,7 +257,7 @@ describe('CellConversionConfirm', () => {
 
   describe('successHandler', () => {
     beforeEach(() => {
-      controller.successHandler(req, res, next)
+      controller.successHandler(req, res as Response, next)
     })
 
     it('resets the journey model', () => {

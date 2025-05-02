@@ -1,4 +1,5 @@
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import setStepValidity from './setStepValidity'
 
 describe('setStepValidity', () => {
@@ -19,8 +20,7 @@ describe('setStepValidity', () => {
     },
   ]
 
-  const req: FormWizard.Request = {
-    // @ts-ignore
+  const req: DeepPartial<FormWizard.Request> = {
     journeyModel: {
       get: jest.fn().mockImplementation(key => (key === 'history' ? initialJourneyHistory() : undefined)),
       set: jest.fn(),
@@ -32,7 +32,7 @@ describe('setStepValidity', () => {
     newJourneyHistory[1].invalid = true
     newJourneyHistory[1].revalidate = true
 
-    setStepValidity(req, 'set-cell-capacity', false)
+    setStepValidity(req as FormWizard.Request, 'set-cell-capacity', false)
     expect(req.journeyModel.set).toHaveBeenCalledWith('history', newJourneyHistory)
   })
 })

@@ -5,7 +5,7 @@ type SummaryListRow = {
     html?: string
     classes?: string
   }
-  value: {
+  value?: {
     text?: string
     html?: string
     classes?: string
