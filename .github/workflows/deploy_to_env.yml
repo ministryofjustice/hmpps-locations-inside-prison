@@ -8,10 +8,10 @@ on:
         type: choice
         required: true
         options:
-          - dev
+          - development
           - preprod
           - prod
-        default: 'dev'
+        default: 'development'
       version:
         description: version to be deployed to the environment - must already exist.
         required: true
