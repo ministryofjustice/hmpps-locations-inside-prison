@@ -10,11 +10,11 @@
 {% from "../../macros/locationsTable.njk" import locationsTable %}
 {% from "../../macros/miniSummary.njk" import miniSummary %}
 
-{% set title = "Confirm cell capacity" %}
+{% set title = "Confirm " + ('cell' if canAccess('change_max_capacity') else 'working') + " capacity" %}
 
 {% block heading %}
   <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
-  <h1 class="govuk-heading-l">Confirm cell capacity</h1>
+  <h1 class="govuk-heading-l">Confirm {{ 'cell' if canAccess('change_max_capacity') else 'working' }} capacity</h1>
 {% endblock %}
 
 {% block beforeContent %}
@@ -31,7 +31,7 @@
       }) }}
     {% endif %}
   </div>
-  
+
 {% endblock %}
 
 {% block content %}
@@ -55,7 +55,7 @@
                   href: backLink,
                   text: "Change"
                 }
-              ]
+              ] if canAccess('change_max_capacity')
             }
           },
           rows: [
@@ -65,6 +65,14 @@
               },
               value: {
                 html: values.workingCapacity
+              },
+              actions: {
+                items: [
+                  {
+                    href: backLink,
+                    text: "Change"
+                  }
+                ] if not canAccess('change_max_capacity')
               }
             },
             {
@@ -79,7 +87,7 @@
         }) }}
 
         <div class="govuk-!-padding-bottom-2 change-summary">
-          <h2 class="govuk-heading-m">Change to cell’s capacity</h2>
+          <h2 class="govuk-heading-m">Change to {{ 'cell’s' if canAccess('change_max_capacity') else 'working' }} capacity</h2>
 
           <p>{{ changeSummary | safe }}</p>
         </div>
@@ -98,7 +106,7 @@
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Update cell capacity",
+                  text: "Update " + ('cell' if canAccess('change_max_capacity') else 'working') + " capacity",
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"

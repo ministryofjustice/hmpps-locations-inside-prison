@@ -25,9 +25,14 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response): object {
-    const { location } = res.locals
+    const { location, values } = res.locals
     const { id: locationId, prisonId } = location
     const { maxCapacity, workingCapacity } = location.capacity
+
+    if (!req.canAccess('change_max_capacity')) {
+      req.sessionModel.set('maxCapacity', maxCapacity)
+      values.maxCapacity = maxCapacity
+    }
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
     const newMaxCap = Number(req.sessionModel.get('maxCapacity'))
@@ -63,6 +68,10 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
     try {
       const { location, user } = res.locals
       const { locationsService } = req.services
+
+      if (!req.canAccess('change_max_capacity')) {
+        req.sessionModel.set('maxCapacity', location.capacity.maxCapacity)
+      }
 
       const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.updateCapacity(
