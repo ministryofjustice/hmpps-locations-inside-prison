@@ -25,6 +25,13 @@ export default function populateCards(): RequestHandler {
         description: 'View locations that have been permanently deactivated as residential locations.',
         'data-qa': 'archived-locations-card',
       },
+      {
+        clickable: true,
+        heading: 'Management reporting',
+        href: '/management-reporting',
+        description: 'Run management reports for printing or exporting.',
+        'data-qa': 'management-reporting-card',
+      },
     ]
 
     next()

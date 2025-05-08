@@ -1,0 +1,12 @@
+{% extends "partials/layout.njk" %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
+{% set title = "View management report" %}
+
+{% block pageStylesheets %}
+  <link href="{{ "/assets/css/dpr.css" | assetMap }}" rel="stylesheet" />
+{% endblock %}
+
+{% block pageJavascript %}
+  <script type="module" src="{{ "/assets/js/dpr.js" | assetMap }}"></script>
+{% endblock %}

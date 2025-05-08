@@ -9,7 +9,11 @@
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block head %}
-  <link href="{{ '/assets/css/index.css' | assetMap }}" rel="stylesheet"/>
+
+  {% block pageStylesheets %}
+    <link href="{{ '/assets/css/index.css' | assetMap }}" rel="stylesheet"/>
+  {% endblock %}
+
 
   {% if googleAnalyticsMeasurementId %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -159,5 +163,7 @@
     {% endif %}
   </div>
 
+ {% block pageJavascript %}
   <script type="module" src="{{ '/assets/js/index.js' | assetMap }}"></script>
+ {% endblock %}
 {% endblock %}

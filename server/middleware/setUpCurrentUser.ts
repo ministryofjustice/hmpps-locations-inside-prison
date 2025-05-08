@@ -4,7 +4,7 @@ import { convertToTitleCase } from '../utils/utils'
 import logger from '../../logger'
 import { Services } from '../services'
 
-export default function setUpCurrentUser({ manageUsersService }: Services): Router {
+export default function setUpCurrentUser({ manageUsersService, authService }: Services): Router {
   const router = Router({ mergeParams: true })
 
   router.use(async (req, res, next) => {
@@ -29,6 +29,8 @@ export default function setUpCurrentUser({ manageUsersService }: Services): Rout
         activeCaseload: caseloadsData.activeCaseload,
         caseloads: caseloadsData.caseloads,
       }
+
+      res.locals.systemToken = await authService.getSystemClientToken(res.locals.user.username)
 
       if (res.locals.user.authSource === 'nomis') {
         res.locals.user.staffId = parseInt(userId, 10) || undefined

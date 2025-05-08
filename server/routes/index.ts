@@ -9,6 +9,7 @@ import changeTemporaryDeactivationDetailsRouter from './changeTemporaryDeactivat
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import logPageView from '../middleware/logPageView'
 import addServicesToRequest from '../middleware/addServicesToRequest'
+import { dprRouter } from './dpr'
 
 import archivedLocationsRouter from './archivedLocationsRouter'
 import cellConversionRouter from './cellConversion'
@@ -65,6 +66,9 @@ export default function routes(services: Services): Router {
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
   router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
+
+  // Digital Prison Reporting
+  dprRouter(router, services)
 
   return router
 }

@@ -4,6 +4,8 @@ import BaseApiClient from './baseApiClient'
 import { Location, PrisonerLocation, LocationForLocalName, SignedOperationalCapacity } from './types/locationsApi'
 import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
 import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
+import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
+
 import { RedisClient } from './redisClient'
 
 export default class LocationsApiClient extends BaseApiClient {
@@ -230,6 +232,13 @@ export default class LocationsApiClient extends BaseApiClient {
     >({
       path: '/signed-op-cap/',
       requestType: 'post',
+    }),
+  }
+
+  managementReportDefinitions = {
+    get: this.apiCall<ManagementReportDefinition[], null>({
+      path: '/definitions',
+      requestType: 'get',
     }),
   }
 }
