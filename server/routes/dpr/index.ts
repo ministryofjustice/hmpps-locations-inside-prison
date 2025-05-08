@@ -1,11 +1,9 @@
-import { Request, Response, Router } from 'express'
+import { Response, Router } from 'express'
 import ReportListUtils from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/components/report-list/utils'
 import config from '../../config'
 import { Services } from '../../services'
 import { ManagementReportDefinition } from '../../data/types/locationsApi/managementReportDefinition'
 import LocationsService from '../../services/locationsService'
-import addBreadcrumb from '../../middleware/addBreadcrumb'
-import populateBreadcrumbsForLocation from '../../middleware/populateBreadcrumbsForLocation'
 
 let definitionsRoutesInitialised: boolean = false
 
