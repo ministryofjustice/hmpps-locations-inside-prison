@@ -2,6 +2,8 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
+import setUpNunjucksFilters from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/setUpNunjucksFilters'
+
 import fs from 'fs'
 import { get, isFunction } from 'lodash'
 
@@ -62,6 +64,9 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
       'node_modules/govuk-frontend/dist/',
       'node_modules/@ministryofjustice/frontend/',
       'node_modules/@ministryofjustice/frontend/moj/components/',
+      // Digital Prison Reporting
+      'node_modules/@ministryofjustice/hmpps-digital-prison-reporting-frontend/',
+      'node_modules/@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/components/',
     ],
     {
       autoescape: true,
@@ -84,6 +89,9 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   function formCsrf() {
     return this.ctx['csrf-token']
   }
+
+  // Digital Prison Reporting configuration
+  setUpNunjucksFilters(njkEnv)
 
   njkEnv.addGlobal('callAsMacro', callAsMacro)
   njkEnv.addGlobal('formCsrf', formCsrf)

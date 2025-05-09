@@ -24,6 +24,7 @@ const testAppInfo: ApplicationInfo = {
 }
 
 export const user: HmppsUser = {
+  uuid: 'xxxx-xxxx-xxxx-xxxx',
   name: 'FIRST LAST',
   userId: 'id',
   token: 'token',

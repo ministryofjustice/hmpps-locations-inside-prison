@@ -29,6 +29,7 @@ export default function setUpWebSecurity(): Router {
           scriptSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`, ...gaHosts],
           styleSrc: [
             "'self'",
+            'fonts.googleapis.com',
             (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
             config.apis.frontendComponents.url,
           ],

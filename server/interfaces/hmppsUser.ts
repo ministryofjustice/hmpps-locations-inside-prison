@@ -28,6 +28,7 @@ export interface BaseUser {
 export interface PrisonUser extends BaseUser {
   authSource: 'nomis'
   staffId: number
+  uuid: string
 }
 
 /**
@@ -36,6 +37,7 @@ export interface PrisonUser extends BaseUser {
  */
 export interface ProbationUser extends BaseUser {
   authSource: 'delius'
+  uuid: string
 }
 
 /**
@@ -45,6 +47,7 @@ export interface ProbationUser extends BaseUser {
  */
 export interface ExternalUser extends BaseUser {
   authSource: 'external'
+  uuid: string
 }
 
 /**
@@ -58,6 +61,7 @@ export interface ExternalUser extends BaseUser {
  */
 export interface AzureADUser extends BaseUser {
   authSource: 'azuread'
+  uuid: string
 }
 
 export type HmppsUser = PrisonUser | ProbationUser | ExternalUser | AzureADUser
