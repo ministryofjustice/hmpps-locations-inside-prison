@@ -7,9 +7,12 @@ describe('ChangeCellCapacity', () => {
   const controller = new ChangeCellCapacity({ route: '/' })
   let req: FormWizard.Request
   let res: Response
+  let permissions: { [permission: string]: boolean }
 
   beforeEach(() => {
+    permissions = { change_max_capacity: true }
     req = {
+      canAccess: (permission: string) => permissions[permission],
       form: {
         options: {
           fields,
@@ -112,6 +115,28 @@ describe('ChangeCellCapacity', () => {
       controller.validate(req, res, jest.fn())
 
       expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+    })
+
+    it('does not redirect to the show location page when the only change is max capacity', () => {
+      req.form.values = { maxCapacity: '9', workingCapacity: '2' }
+      res.redirect = jest.fn()
+      controller.validate(req, res, jest.fn())
+
+      expect(res.redirect).not.toHaveBeenCalled()
+    })
+
+    describe('when the user does not have permission to change_max_capacity', () => {
+      beforeEach(() => {
+        permissions.change_max_capacity = false
+      })
+
+      it('redirects to the show location page when the only change is max capacity', () => {
+        req.form.values = { maxCapacity: '9', workingCapacity: '2' }
+        res.redirect = jest.fn()
+        controller.validate(req, res, jest.fn())
+
+        expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+      })
     })
   })
 
