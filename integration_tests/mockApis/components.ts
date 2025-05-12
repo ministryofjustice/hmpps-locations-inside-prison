@@ -4,7 +4,7 @@ const stubComponentsHealthPing = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/components-api/health/ping',
+      urlPattern: '/components-api/health',
     },
     response: {
       status: 200,

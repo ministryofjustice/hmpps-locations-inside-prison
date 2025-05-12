@@ -52,7 +52,7 @@ export default {
   apis: {
     frontendComponents: {
       url: get('COMPONENT_API_URL', 'http://localhost:8082', requiredInProduction),
-      healthPath: '/health/ping',
+      healthPath: '/health',
       timeout: {
         response: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 10000)),
         deadline: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 10000)),
