@@ -4,6 +4,7 @@ import config from '../../config'
 import { Services } from '../../services'
 import { ManagementReportDefinition } from '../../data/types/locationsApi/managementReportDefinition'
 import LocationsService from '../../services/locationsService'
+import protectRoute from '../../middleware/protectRoute'
 
 let definitionsRoutesInitialised: boolean = false
 
@@ -18,6 +19,7 @@ async function populateRoutes(
       for (const variant of definition.variants) {
         router.get(
           `/management-reporting/${definition.id}-${variant.id}`,
+          protectRoute('reporting_location_information'),
           ReportListUtils.createReportListRequestHandler({
             title: variant.name,
             definitionName: definition.id,
@@ -43,7 +45,7 @@ export function dprRouter(router: Router, services: Services): Router {
     services.authService.getSystemClientToken().then(token => populateRoutes(services.locationsService, token, router))
   }
 
-  router.get('/management-reporting', async (req, res) => {
+  router.get('/management-reporting', protectRoute('reporting_location_information'), async (req, res) => {
     const definitions = await populateRoutes(services.locationsService, res.locals.systemToken, router)
     res.render('pages/managementReporting/index.njk', { definitions })
   })

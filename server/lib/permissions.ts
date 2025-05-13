@@ -2,6 +2,11 @@ import { uniq } from 'lodash'
 
 const viewInternalLocationPermissions: string[] = []
 
+const reportingLocationInformationPermissions: string[] = [
+  ...viewInternalLocationPermissions,
+  'reporting_location_information',
+]
+
 const manageResidentialLocationsPermissions: string[] = [
   ...viewInternalLocationPermissions,
   'change_cell_capacity',
@@ -25,6 +30,7 @@ const permissionsByRole: { [key: string]: string[] } = {
   VIEW_INTERNAL_LOCATION: viewInternalLocationPermissions,
   MANAGE_RESIDENTIAL_LOCATIONS: manageResidentialLocationsPermissions,
   MANAGE_RES_LOCATIONS_OP_CAP: manageResLocationsOpCapPermissions,
+  REPORTING_LOCATION_INFORMATION: reportingLocationInformationPermissions,
 }
 
 const rolesToPermissions = (roles: string[], mapping = permissionsByRole) =>

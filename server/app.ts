@@ -44,7 +44,12 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpFeatureFlags())
   app.use(setUpAuthentication())
   app.use(
-    authorisationMiddleware(['MANAGE_RES_LOCATIONS_OP_CAP', 'MANAGE_RESIDENTIAL_LOCATIONS', 'VIEW_INTERNAL_LOCATION']),
+    authorisationMiddleware([
+      'REPORTING_LOCATION_INFORMATION',
+      'MANAGE_RES_LOCATIONS_OP_CAP',
+      'MANAGE_RESIDENTIAL_LOCATIONS',
+      'VIEW_INTERNAL_LOCATION',
+    ]),
   )
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
