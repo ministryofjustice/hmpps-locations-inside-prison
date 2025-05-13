@@ -22,6 +22,7 @@ async function populateRoutes(
           `/management-reporting/${definition.id}-${variant.id}`,
           protectRoute('reporting_location_information'),
           addBreadcrumb({ title: 'Management reporting', href: '/management-reporting' }),
+          addBreadcrumb({ title: variant.name, href: `/management-reporting/${definition.id}-${variant.id}` }),
           ReportListUtils.createReportListRequestHandler({
             title: variant.name,
             definitionName: definition.id,
@@ -50,7 +51,7 @@ export function dprRouter(router: Router, services: Services): Router {
   router.get(
     '/management-reporting',
     protectRoute('reporting_location_information'),
-    addBreadcrumb({ title: '', href: '/' }),
+    addBreadcrumb({ title: 'Management reporting', href: '/management-reporting' }),
     async (req, res) => {
       const definitions = await populateRoutes(services.locationsService, res.locals.systemToken, router)
       res.render('pages/managementReporting/index.njk', { definitions })
