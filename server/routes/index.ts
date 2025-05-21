@@ -5,6 +5,7 @@ import type { Services } from '../services'
 import { Page } from '../services/auditService'
 import populateCards from '../middleware/populateCards'
 import viewLocationsRouter from './viewLocationsRouter'
+import manageLocationsRouter from './manageLocationsRouter'
 import changeTemporaryDeactivationDetailsRouter from './changeTemporaryDeactivationDetails'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import logPageView from '../middleware/logPageView'
@@ -47,6 +48,8 @@ export default function routes(services: Services): Router {
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
+
+  router.use('/manage-locations/:prisonId?', manageLocationsRouter(services))
 
   router.use('/location-history', locationHistoryRouter(services))
 

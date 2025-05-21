@@ -25,3 +25,7 @@ export const initialiseName = (fullName?: string): string | null => {
 export const sanitizeString = (string: string | null): string | null => {
   return string ? string.replace(/<\/?[^>]+(>|$)/g, '').trim() : null
 }
+
+export const singularizeString = (string: string | null): string | null => {
+  return string ? string.replace(/s$/, '') : null
+}
