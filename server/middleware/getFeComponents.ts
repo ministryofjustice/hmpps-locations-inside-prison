@@ -1,4 +1,4 @@
-import { type NextFunction, Request, RequestHandler, type Response } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 
 import logger from '../../logger'
 import { Services } from '../services'

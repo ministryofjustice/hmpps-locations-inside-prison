@@ -4,7 +4,7 @@ import { convertToTitleCase } from '../utils/utils'
 import logger from '../../logger'
 import { Services } from '../services'
 
-export default function setUpCurrentUser({ manageUsersService, authService }: Services): Router {
+export default function setUpCurrentUser({ manageUsersService }: Services): Router {
   const router = Router({ mergeParams: true })
 
   router.use(async (req, res, next) => {

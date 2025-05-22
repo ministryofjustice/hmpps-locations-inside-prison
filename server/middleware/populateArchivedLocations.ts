@@ -1,4 +1,4 @@
-import { type NextFunction, Request, RequestHandler, type Response } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 import { Services } from '../services'
 import decorateLocation from '../decorators/location'
 import logger from '../../logger'

@@ -2,7 +2,6 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
-import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import { TypedLocals } from '../../@types/express'
 
 export default class ChangeTemporaryDeactivationDetails extends FormInitialStep {

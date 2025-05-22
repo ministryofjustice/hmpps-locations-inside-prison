@@ -38,7 +38,7 @@ function formatValue(attribute: string, values: string[]) {
   return { text: '' }
 }
 
-export default ({ authService, manageUsersService }: Services) =>
+export default ({ manageUsersService }: Services) =>
   async (req: Request, res: Response) => {
     const { systemToken } = req.session
     const { location } = res.locals

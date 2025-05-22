@@ -3,7 +3,6 @@ import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import fields from '../../routes/cellConversion/fields'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import CellConversionUsedFor from './usedFor'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 

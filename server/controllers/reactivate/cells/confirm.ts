@@ -2,11 +2,10 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../../utils/backUrl'
-import { Location, ResidentialSummary } from '../../../data/types/locationsApi'
+import { Location } from '../../../data/types/locationsApi'
 import populateCells from './populateCells'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
-import { PrisonResidentialSummary } from '../../../data/types/locationsApi/prisonResidentialSummary'
 
 export default class ReactivateCellsConfirm extends FormWizard.Controller {
   middlewareSetup() {

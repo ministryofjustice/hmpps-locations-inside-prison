@@ -3,7 +3,6 @@ import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import fields from '../../../routes/deactivate/fields'
 import DeactivatePermanentDetails from './details'
-import LocationFactory from '../../../testutils/factories/location'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('DeactivatePermanentDetails', () => {
