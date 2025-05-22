@@ -8,7 +8,7 @@
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 
 {% set title = "Change local name" %}
-{%  set locationName = location.displayName | capFirst %}
+{%  set locationName = decoratedLocation.displayName | capFirst %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">

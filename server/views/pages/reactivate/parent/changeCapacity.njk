@@ -7,7 +7,7 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set title = "Change cell capacity" %}
-{% set locationName = cell.displayName | capFirst %}
+{% set locationName = decoratedCell.displayName | capFirst %}
 
 {% block heading %}
   <span class="govuk-caption-m" data-qa="cell-name">{{ locationName }}</span>

@@ -1,23 +1,31 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import AuthService from '../../services/authService'
+import { DeepPartial } from 'fishery'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/nonResidentialConversion/fields'
 import maxLength from '../../validators/maxLength'
 import ChangeNonResidentialTypeDetails from './details'
 import AnalyticsService from '../../services/analyticsService'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('ChangeNonResidentialTypeDetails', () => {
   const controller = new ChangeNonResidentialTypeDetails({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(undefined) as jest.Mocked<LocationsService>
 
   const locationId = '7e570000-0000-0000-0000-000000000001'
+  const decoratedLocation = buildDecoratedLocation({
+    id: locationId,
+    localName: 'A-1-001',
+    capacity: {
+      maxCapacity: 2,
+      workingCapacity: 1,
+    },
+    prisonId: 'TST',
+  })
   const nonResTypes = [
     {
       key: 'KITCHEN_SERVERY',
@@ -34,7 +42,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
   ]
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -48,9 +56,11 @@ describe('ChangeNonResidentialTypeDetails', () => {
       journeyModel: {
         reset: jest.fn(),
       },
+      session: {
+        systemToken: 'token',
+      },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       sessionModel: {
@@ -62,46 +72,13 @@ describe('ChangeNonResidentialTypeDetails', () => {
               convertedCellType: { text: 'office', value: 'OFFICE' },
               otherConvertedCellType: '',
             })[fieldName],
-        ),
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
-      services: {
-        authService: {
-          getSystemClientToken: jest.fn().mockResolvedValue('token'),
-        },
-        locationsService: {
-          changeNonResType: jest.fn().mockResolvedValue(undefined), // Mocked locations service
-        },
-      },
-      form: {
-        options: {
-          fields: {
-            convertedCellType: {
-              items: [
-                { text: 'office', value: 'OFFICE' }, // Matching value to be found
-                { text: 'pet therapy room', value: 'PET_THERAPY' },
-              ],
-            },
-          },
-        },
-        values: {
-          convertedCellType: 'OFFICE', // Mock the form value correctly
-          otherConvertedCellType: '',
-        },
-      },
-
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({
-          id: locationId,
-          localName: 'A-1-001',
-          capacity: {
-            maxCapacity: 2,
-            workingCapacity: 1,
-          },
-          prisonId: 'TST',
-        }),
+        decoratedLocation,
         options: {
           fields,
         },
@@ -117,10 +94,9 @@ describe('ChangeNonResidentialTypeDetails', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getConvertedCellTypes = jest.fn().mockResolvedValue(nonResTypes)
     locationsService.changeNonResType = jest.fn()
     analyticsService.sendEvent = jest.fn()
@@ -128,11 +104,11 @@ describe('ChangeNonResidentialTypeDetails', () => {
 
   describe('setOptions', () => {
     beforeEach(async () => {
-      await controller.setOptions(req, res, next)
+      await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('sets the correct radio items', () => {
-      expect(req.form.options.fields.convertedCellType.items).toEqual([
+      expect(deepReq.form.options.fields.convertedCellType.items).toEqual([
         { text: 'Kitchen / Servery', value: 'KITCHEN_SERVERY', conditional: undefined },
         { text: 'Office', value: 'OFFICE', conditional: undefined },
         {
@@ -144,14 +120,14 @@ describe('ChangeNonResidentialTypeDetails', () => {
     })
 
     it('calls next', () => {
-      controller.saveValues(req, res, next)
+      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalled()
     })
   })
 
   describe('locals', () => {
     it('returns the correct locals', () => {
-      expect(controller.locals(req, res)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: `/view-and-update-locations/TST/${locationId}`,
         cancelLink: `/view-and-update-locations/TST/${locationId}`,
         fields: {
@@ -210,21 +186,21 @@ describe('ChangeNonResidentialTypeDetails', () => {
 
   describe('saveValues', () => {
     it('saves the values via the locations API', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(locationsService.changeNonResType).toHaveBeenCalledWith('token', locationId, 'OFFICE', undefined)
     })
 
     it('sends an analytics event', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_non_res_type', {
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'change_non_res_type', {
         converted_cell_type: 'OFFICE',
         prison_id: 'TST',
       })
     })
 
     it('calls next', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalled()
     })
@@ -249,12 +225,12 @@ describe('ChangeNonResidentialTypeDetails', () => {
       resSuccessHandler = {
         redirect: jest.fn(),
         locals: {
-          location: {
+          decoratedLocation: buildDecoratedLocation({
             id: locationIdSuccessHandler,
             prisonId: 'TST',
             localName: 'A-1-001',
             pathHierarchy: null,
-          },
+          }),
         },
       }
       nextSuccessHandler = jest.fn()
@@ -271,8 +247,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
 
     it('sets the flash correctly when other description update is Successful', () => {
       reqSuccessHandler.sessionModel.get.mockImplementation((key: string) => {
-        if (key === 'otherTypeChanged') return true
-        return false
+        return key === 'otherTypeChanged'
       })
 
       controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)

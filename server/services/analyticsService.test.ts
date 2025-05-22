@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import { DeepPartial } from 'fishery'
 import GoogleAnalyticsClient from '../data/googleAnalyticsClient'
 import AnalyticsService from './analyticsService'
 import logger from '../../logger'
@@ -13,11 +14,11 @@ describe('User service', () => {
   describe('getUser', () => {
     const clientId = '123456.7654321'
 
-    const req = {
+    const deepReq: DeepPartial<Request> = {
       cookies: {
         _ga: `GA1.1.${clientId}`,
       },
-    } as unknown as Request
+    }
 
     const name = 'test'
     const params = { action: 'test' }
@@ -37,7 +38,7 @@ describe('User service', () => {
 
     it('retrieves and formats user name', async () => {
       googleAnalyticsClient.sendEvents.mockResolvedValue({ data: 'data' })
-      const result = await analyticsService.sendEvent(req, name, params)
+      const result = await analyticsService.sendEvent(deepReq as Request, name, params)
 
       expect(googleAnalyticsClient.sendEvents).toHaveBeenCalledWith(clientId, events)
       expect(result).toEqual({ data: 'data' })
@@ -46,14 +47,14 @@ describe('User service', () => {
     it('does not reject or throw errors', async () => {
       googleAnalyticsClient.sendEvents.mockRejectedValue(new Error('some error'))
 
-      await expect(analyticsService.sendEvent(req, name, params)).resolves.not.toThrow()
+      await expect(analyticsService.sendEvent(deepReq as Request, name, params)).resolves.not.toThrow()
     })
 
     it('logs errors', async () => {
       const error = new Error('some error')
       googleAnalyticsClient.sendEvents.mockRejectedValue(error)
 
-      await analyticsService.sendEvent(req, name, params)
+      await analyticsService.sendEvent(deepReq as Request, name, params)
 
       expect(logger.warn).toHaveBeenCalledWith(error, 'Failed to send Google Analytics event')
     })

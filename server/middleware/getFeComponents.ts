@@ -1,11 +1,11 @@
-import type { RequestHandler } from 'express'
+import { type NextFunction, Request, RequestHandler, type Response } from 'express'
 
 import logger from '../../logger'
 import { Services } from '../services'
 import config from '../config'
 
-export default function getFrontendComponents({ feComponentsService }: Services): RequestHandler {
-  return async (_req, res, next) => {
+export default function getFrontendComponents({ feComponentsService }: Services) {
+  return async (_req: Request, res: Response, next: NextFunction) => {
     if (!config.apis.frontendComponents.enabled) {
       res.locals.feComponents = {}
       return next()

@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
+import { TypedLocals } from '../../../@types/express'
 
 export default class DeactivateTemporaryDetails extends FormInitialStep {
   middlewareSetup() {
@@ -9,11 +10,10 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
   }
 
   async populateItems(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
-    const { authService, locationsService } = req.services
+    const { systemToken } = req.session
+    const { locationsService } = req.services
     const { deactivationReason } = req.form.options.fields
-    const token = await authService.getSystemClientToken(user.username)
-    const deactivationReasons = await locationsService.getDeactivatedReasons(token)
+    const deactivationReasons = await locationsService.getDeactivatedReasons(systemToken)
     deactivationReason.items = Object.entries(deactivationReasons)
       .sort(([a, _], [b, __]) => {
         if ([a, b].includes('OTHER')) {
@@ -49,10 +49,10 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     super.validateFields(req, res, callback)
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
 
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 

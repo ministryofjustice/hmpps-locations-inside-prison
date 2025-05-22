@@ -9,7 +9,7 @@ import asyncMiddleware from '../../middleware/asyncMiddleware'
 const router = express.Router({ mergeParams: true })
 
 const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
-  const { locationType } = res.locals.location.raw
+  const { locationType } = res.locals.decoratedLocation.raw
   if (!['CELL', 'ROOM', 'LANDING', 'WING', 'SPUR'].includes(locationType)) {
     throw new Error(`UNSUPPORTED LOCATION TYPE: ${locationType}`)
   }

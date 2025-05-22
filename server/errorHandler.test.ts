@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from 'express'
 import request from 'supertest'
 import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
+import { DeepPartial } from 'fishery'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
 import createErrorHandler from './errorHandler'
 import AnalyticsService from './services/analyticsService'
@@ -15,40 +16,17 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('GET 404', () => {
-  it('should render content with stack in dev mode', () => {
-    return request(app)
-      .get('/unknown')
-      .expect(404)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Page not found')
-        expect(res.text).toContain('NotFoundError: Not Found')
-      })
-  })
-
-  it('should render content without stack in production mode', () => {
-    return request(appWithAllRoutes({ production: true }))
-      .get('/unknown')
-      .expect(404)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Page not found')
-        expect(res.text).not.toContain('NotFoundError: Not Found')
-      })
-  })
-})
-
 describe('error handler', () => {
   const errorHandler = createErrorHandler(true)
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
-  const req = {
+  const deepReq: DeepPartial<Request> = {
     originalUrl: '/location/7e570000-0000-0000-0000-000000000001/change-cell-capacity/confirm',
     services: {
       analyticsService,
     },
-  } as unknown as Request
-  const res = {
+  }
+  const req = deepReq as Request
+  const deepRes: DeepPartial<Response> = {
     locals: {
       user: {
         activeCaseload: {
@@ -59,7 +37,8 @@ describe('error handler', () => {
     },
     redirect: jest.fn(),
     render: jest.fn(),
-  } as unknown as Response
+  }
+  const res = deepRes as Response
   let error: SanitisedError<object>
 
   beforeEach(() => {
@@ -70,10 +49,34 @@ describe('error handler', () => {
     error.responseStatus = 500
   })
 
+  describe('GET 404', () => {
+    it('should render content with stack in dev mode', () => {
+      return request(app)
+        .get('/unknown')
+        .expect(404)
+        .expect('Content-Type', /html/)
+        .expect(r => {
+          expect(r.text).toContain('Page not found')
+          expect(r.text).toContain('NotFoundError: Not Found')
+        })
+    })
+
+    it('should render content without stack in production mode', () => {
+      return request(appWithAllRoutes({ production: true }))
+        .get('/unknown')
+        .expect(404)
+        .expect('Content-Type', /html/)
+        .expect(r => {
+          expect(r.text).toContain('Page not found')
+          expect(r.text).not.toContain('NotFoundError: Not Found')
+        })
+    })
+  })
+
   it('should send an API error event to Google Analytics', () => {
     error.data = { errorCode: 117, status: 400 }
 
-    errorHandler(error, req, res, undefined)
+    errorHandler(error, req as Request, res, undefined)
 
     expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'unhandled_error', {
       prison_id: 'TST',
@@ -90,52 +93,58 @@ describe('error handler', () => {
     })
   })
 
-  describe('when the error is an api error', () => {
+  describe('GET 401', () => {
     beforeEach(() => {
-      ;(error as any).isApiError = true
+      error.responseStatus = 401
     })
 
-    describe('when the error is 401', () => {
+    describe('when error.headers signifies that the JWT is invalid', () => {
       beforeEach(() => {
-        error.responseStatus = 401
+        ;(error as SanitisedError).headers = {
+          'www-authenticate':
+            'Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Jwt expired at 2025-05-21T13:39:21Z", error_uri="https://tools.ietf.org/html/rfc6750#section-3.1"',
+        }
       })
 
+      it('logs the user out', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.redirect).toHaveBeenCalledWith('/sign-out')
+      })
+    })
+
+    describe('when error.message specifies invalid permissions', () => {
+      beforeEach(() => {
+        error.message = 'Missing permission'
+      })
+
+      it('logs the user out', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.redirect).toHaveBeenCalledWith('/sign-out')
+      })
+    })
+
+    describe('when error.headers does not signify that the JWT is invalid', () => {
       it('renders the generic error page', () => {
         errorHandler(error, req, res, undefined)
 
         expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
-      })
-    })
-
-    describe('when the error is 403', () => {
-      beforeEach(() => {
-        error.responseStatus = 403
-      })
-
-      it('renders the generic error page', () => {
-        errorHandler(error, req, res, undefined)
-
-        expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
-      })
-    })
-
-    describe('when the error is 404', () => {
-      beforeEach(() => {
-        error.responseStatus = 404
-      })
-
-      it('renders the 404 page', () => {
-        errorHandler(error, req, res, undefined)
-
-        expect(res.render).toHaveBeenCalledWith('pages/errors/404')
       })
     })
   })
 
-  describe('when the error is not an api error', () => {
-    describe('when the error is 401', () => {
+  describe('GET 403', () => {
+    beforeEach(() => {
+      error.responseStatus = 403
+    })
+
+    describe('when error.headers signifies that the JWT is invalid', () => {
       beforeEach(() => {
-        error.responseStatus = 401
+        ;(error as SanitisedError).headers = {
+          'www-authenticate':
+            'Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Jwt expired at 2025-05-21T13:39:21Z", error_uri="https://tools.ietf.org/html/rfc6750#section-3.1"',
+        }
       })
 
       it('logs the user out', () => {
@@ -145,9 +154,9 @@ describe('error handler', () => {
       })
     })
 
-    describe('when the error is 403', () => {
+    describe('when error.message specifies invalid permissions', () => {
       beforeEach(() => {
-        error.responseStatus = 403
+        error.message = 'Missing permission'
       })
 
       it('logs the user out', () => {
@@ -157,15 +166,40 @@ describe('error handler', () => {
       })
     })
 
-    describe('when the error is 404', () => {
-      beforeEach(() => {
-        error.responseStatus = 404
-      })
-
-      it('renders the 404 page', () => {
+    describe('when error.headers does not signify that the JWT is invalid', () => {
+      it('renders the generic error page', () => {
         errorHandler(error, req, res, undefined)
 
-        expect(res.render).toHaveBeenCalledWith('pages/errors/404')
+        expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
+      })
+    })
+  })
+
+  describe('GET 456', () => {
+    beforeEach(() => {
+      error.responseStatus = 456
+    })
+
+    describe('when error.headers signifies that the JWT is invalid', () => {
+      beforeEach(() => {
+        ;(error as SanitisedError).headers = {
+          'www-authenticate':
+            'Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Jwt expired at 2025-05-21T13:39:21Z", error_uri="https://tools.ietf.org/html/rfc6750#section-3.1"',
+        }
+      })
+
+      it('renders the generic error page', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
+      })
+    })
+
+    describe('when error.headers does not signify that the JWT is invalid', () => {
+      it('renders the generic error page', () => {
+        errorHandler(error, req, res, undefined)
+
+        expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
       })
     })
   })

@@ -3,24 +3,35 @@ import FormWizard from 'hmpo-form-wizard'
 import logger from '../../logger'
 import decorateLocation from '../decorators/location'
 
+type LocationLocals = 'location' | 'cell'
+const decoratedLocationLocalsMap: {
+  location: 'decoratedLocation'
+  cell: 'decoratedCell'
+} = {
+  location: 'decoratedLocation',
+  cell: 'decoratedCell',
+}
 type PopulateLocationParams = {
   decorate?: boolean
   id?: string
   includeHistory?: boolean
-  localName?: string
+  localName?: LocationLocals
 }
 
 export default function populateLocation({ decorate, id, includeHistory, localName }: PopulateLocationParams = {}) {
   return async (req: Request | FormWizard.Request, res: Response, next: NextFunction): Promise<void> => {
     const { locationsService, manageUsersService } = req.services
-    const { user } = res.locals
     let location = res.locals[localName || 'location']
 
     try {
-      const token = await req.services.authService.getSystemClientToken(user.username)
+      const { systemToken } = req.session
 
       if (!location) {
-        location = await req.services.locationsService.getLocation(token, id || req.params.locationId, includeHistory)
+        location = await req.services.locationsService.getLocation(
+          systemToken,
+          id || req.params.locationId,
+          includeHistory,
+        )
       }
 
       if (!decorate) {
@@ -28,11 +39,11 @@ export default function populateLocation({ decorate, id, includeHistory, localNa
         return next()
       }
 
-      res.locals[localName || 'location'] = await decorateLocation({
+      res.locals[decoratedLocationLocalsMap[localName || 'location']] = await decorateLocation({
         location,
         locationsService,
         manageUsersService,
-        systemToken: token,
+        systemToken,
         userToken: res.locals.user.token,
         limited: true,
       })

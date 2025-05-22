@@ -11,18 +11,17 @@ import { PrisonResidentialSummary } from '../../../data/types/locationsApi/priso
 export default class ReactivateCellsConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(this.getResidentialSummary)
+    this.use(this.getPrisonResidentialSummary)
     this.use(populateCells)
     this.use(populateInactiveParentLocations)
   }
 
-  async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
-    const { authService, locationsService } = req.services
+  async getPrisonResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { systemToken } = req.session
+    const { locationsService } = req.services
 
-    const token = await authService.getSystemClientToken(user.username)
-    res.locals.residentialSummary = await locationsService.getResidentialSummary(
-      token,
+    res.locals.prisonResidentialSummary = await locationsService.getResidentialSummary(
+      systemToken,
       req.sessionModel.get('referrerPrisonId') as string,
     )
 
@@ -40,16 +39,12 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { cells, residentialSummary }: { cells: Location[]; residentialSummary: PrisonResidentialSummary } =
-      res.locals as unknown as {
-        cells: Location[]
-        residentialSummary: ResidentialSummary
-      }
+    const { cells, prisonResidentialSummary } = res.locals
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
     const backLink = backUrl(req, { fallbackUrl: '/reactivate/cells/check-capacity' })
     const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
-    const { maxCapacity, workingCapacity } = residentialSummary.prisonSummary
+    const { maxCapacity, workingCapacity } = prisonResidentialSummary.prisonSummary
     let newMaxCapacity = maxCapacity
     let newWorkingCapacity = workingCapacity
 
@@ -81,7 +76,8 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { cells, user }: { cells?: Location[]; user: Express.User } = res.locals
+    const { systemToken } = req.session
+    const { cells, user } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
     const selectedLocations: string[] = req.sessionModel.get('selectedLocations') as string[]
@@ -102,9 +98,8 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
       }),
     ) as Parameters<LocationsService['reactivateBulk']>[1]
 
-    const { authService, locationsService } = req.services
-    const token = await authService.getSystemClientToken(user.username)
-    await locationsService.reactivateBulk(token, allCellChanges)
+    const { locationsService } = req.services
+    await locationsService.reactivateBulk(systemToken, allCellChanges)
 
     req.services.analyticsService.sendEvent(req, 'reactivate_cells', { prison_id: user.activeCaseload?.id })
 

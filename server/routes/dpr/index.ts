@@ -1,4 +1,4 @@
-import { Response, Router } from 'express'
+import { Request, Router } from 'express'
 import ReportListUtils from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/components/report-list/utils'
 import config from '../../config'
 import { Services } from '../../services'
@@ -30,8 +30,8 @@ async function populateRoutes(
             apiUrl: config.apis.locationsApi.url,
             apiTimeout: config.apis.locationsApi.timeout.deadline,
             layoutTemplate: 'partials/dprLayout.njk',
-            tokenProvider: (_, res: Response) => {
-              return res.locals.systemToken
+            tokenProvider: (req: Request) => {
+              return req.session.systemToken
             },
           }),
         )
@@ -53,7 +53,7 @@ export function dprRouter(router: Router, services: Services): Router {
     protectRoute('reporting_location_information'),
     addBreadcrumb({ title: 'Management reporting', href: '/management-reporting' }),
     async (req, res) => {
-      const definitions = await populateRoutes(services.locationsService, res.locals.systemToken, router)
+      const definitions = await populateRoutes(services.locationsService, req.session.systemToken, router)
       res.render('pages/managementReporting/index.njk', { definitions })
     },
   )

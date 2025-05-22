@@ -2,7 +2,7 @@ import type { ResponseError } from 'superagent'
 import asyncMiddleware from './asyncMiddleware'
 
 export default function protectRoute(permission: string) {
-  return asyncMiddleware((req, res, next) => {
+  return asyncMiddleware((req, _res, next) => {
     if (req.canAccess(permission)) {
       return next()
     }

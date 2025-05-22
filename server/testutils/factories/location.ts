@@ -10,7 +10,7 @@ const LocationFactory = Factory.define<Location>(() => {
     pathHierarchy: 'A-1-001',
     locationType: 'CELL',
     residentialHousingType: 'NORMAL_ACCOMMODATION',
-    localName: 'Wing A',
+    localName: undefined,
     comments: 'Not to be used',
     permanentlyInactive: false,
     permanentlyInactiveReason: 'Demolished',

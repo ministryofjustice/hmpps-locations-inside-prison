@@ -10,8 +10,8 @@ export default class RemoveCellType extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { location } = res.locals
-    const { id: locationId, prisonId, specialistCellTypes } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId, specialistCellTypes } = decoratedLocation
 
     const multipleTypes = specialistCellTypes.length > 1
 
@@ -36,13 +36,12 @@ export default class RemoveCellType extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { location, user } = res.locals
+      const { decoratedLocation } = res.locals
       const { locationsService } = req.services
 
-      const token = await req.services.authService.getSystemClientToken(user.username)
-      await locationsService.updateSpecialistCellTypes(token, location.id, [])
+      await locationsService.updateSpecialistCellTypes(req.session.systemToken, decoratedLocation.id, [])
 
-      req.services.analyticsService.sendEvent(req, 'remove_cell_type', { prison_id: location.prisonId })
+      req.services.analyticsService.sendEvent(req, 'remove_cell_type', { prison_id: decoratedLocation.prisonId })
 
       next()
     } catch (error) {
@@ -51,7 +50,7 @@ export default class RemoveCellType extends FormWizard.Controller {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()

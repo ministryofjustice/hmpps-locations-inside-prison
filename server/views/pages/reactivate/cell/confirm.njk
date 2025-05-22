@@ -3,10 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% from "../../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../../macros/miniSummary.njk" import miniSummary %}
-
-{% set title = "You are about to reactivate " + location.displayName %}
+{% set title = "You are about to reactivate " + decoratedLocation.displayName %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">

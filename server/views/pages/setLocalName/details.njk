@@ -8,7 +8,7 @@
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 
 {% set title = "Add local name" %}
-{% set locationName = location.displayName | capFirst %}
+{% set locationName = decoratedLocation.displayName | capFirst %}
 {% set errors = validationErrors[0].text %}
 
 {% block head %}

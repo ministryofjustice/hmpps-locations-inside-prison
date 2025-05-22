@@ -1,10 +1,13 @@
+import { DeepPartial } from 'fishery'
+import { Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import populateInactiveParentLocations from './populateInactiveParentLocations'
 import LocationFactory from '../../testutils/factories/location'
 import { Location } from '../../data/types/locationsApi'
 
 describe('populateInactiveParentLocations', () => {
-  let req: any
-  let res: any
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: any
 
   const location1 = LocationFactory.build({
@@ -46,23 +49,20 @@ describe('populateInactiveParentLocations', () => {
 
   beforeEach(() => {
     next = jest.fn()
-    req = {
+    deepReq = {
       session: {},
       services: {
-        authService: {
-          getSystemClientToken: jest.fn().mockResolvedValue('token'),
-        },
         locationsService: {
           getAccommodationType: jest.fn().mockResolvedValue('accommodationType'),
           getConvertedCellType: jest.fn().mockResolvedValue('convertedCellType'),
-          getLocation: jest.fn((token: string, id: string) => locations.find(l => l.id === id)),
+          getLocation: jest.fn((token: string, id: string) => Promise.resolve(locations.find(l => l.id === id))),
           getLocationType: jest.fn().mockResolvedValue('locationType'),
           getSpecialistCellType: jest.fn().mockResolvedValue('specialistCellType'),
           getUsedForType: jest.fn().mockResolvedValue('usedForType'),
         },
       },
     }
-    res = {
+    deepRes = {
       locals: {
         user: {
           username: 'username',
@@ -73,40 +73,40 @@ describe('populateInactiveParentLocations', () => {
 
   describe('when res.locals.cells is set', () => {
     beforeEach(() => {
-      res.locals.cells = [location1, location1, location1, location2]
+      deepRes.locals.cells = [location1, location1, location1, location2]
     })
 
     it('sets the inactiveParentLocations local', async () => {
-      await populateInactiveParentLocations(req, res, next)
+      await populateInactiveParentLocations(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect((res.locals.inactiveParentLocations as Location[]).map(l => l.id)).toEqual(
+      expect((deepRes.locals.inactiveParentLocations as Location[]).map(l => l.id)).toEqual(
         [parent1, parent2, parent3].map(l => l.id),
       )
-      expect(req.services.locationsService.getLocation).toHaveBeenCalledTimes(4)
+      expect(deepReq.services.locationsService.getLocation).toHaveBeenCalledTimes(4)
     })
   })
 
   describe('when res.locals.location is set', () => {
     beforeEach(() => {
-      res.locals.location = location1
+      deepRes.locals.location = location1
     })
 
     it('sets the inactiveParentLocations local', async () => {
-      await populateInactiveParentLocations(req, res, next)
+      await populateInactiveParentLocations(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect((res.locals.inactiveParentLocations as Location[]).map(l => l.id)).toEqual(
+      expect((deepRes.locals.inactiveParentLocations as Location[]).map(l => l.id)).toEqual(
         [parent1, parent2, parent3].map(l => l.id),
       )
-      expect(req.services.locationsService.getLocation).toHaveBeenCalledTimes(3)
+      expect(deepReq.services.locationsService.getLocation).toHaveBeenCalledTimes(3)
     })
   })
 
   describe('when neither of the locals are set', () => {
     it('does not set the inactiveParentLocations local', async () => {
-      await populateInactiveParentLocations(req, res, next)
+      await populateInactiveParentLocations(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(res.locals.inactiveParentLocations).toEqual(undefined)
-      expect(req.services.locationsService.getLocation).not.toHaveBeenCalled()
+      expect(deepRes.locals.inactiveParentLocations).toEqual(undefined)
+      expect(deepReq.services.locationsService.getLocation).not.toHaveBeenCalled()
     })
   })
 })

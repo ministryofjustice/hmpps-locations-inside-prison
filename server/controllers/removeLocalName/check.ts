@@ -9,8 +9,8 @@ export default class RemoveLocalName extends FormInitialStep {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { location } = res.locals
-    const { id: locationId, prisonId, localName } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId, localName } = decoratedLocation
 
     const locals = super.locals(req, res)
 
@@ -31,12 +31,11 @@ export default class RemoveLocalName extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user, location } = res.locals
+      const { user, decoratedLocation } = res.locals
       const { locationsService } = req.services
-      const token = await req.services.authService.getSystemClientToken(user.username)
-      await locationsService.updateLocalName(token, location.id, null, user.username)
+      await locationsService.updateLocalName(req.session.systemToken, decoratedLocation.id, null, user.username)
 
-      req.services.analyticsService.sendEvent(req, 'remove_local_name', { prison_id: location.prisonId })
+      req.services.analyticsService.sendEvent(req, 'remove_local_name', { prison_id: decoratedLocation.prisonId })
 
       next()
     } catch (error) {
@@ -45,7 +44,7 @@ export default class RemoveLocalName extends FormInitialStep {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('success', {

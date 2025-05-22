@@ -2,8 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
 import { Location } from '../../../data/types/locationsApi'
-import { DecoratedLocation } from '../../../decorators/decoratedLocation'
-import populateLocations from './middleware/populateLocations'
+import populateLocationTree from './middleware/populateLocationTree'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
 
 export default class ReactivateParentCheckCapacity extends FormInitialStep {
@@ -11,7 +10,7 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
     super.middlewareSetup()
     this.use(this.resetCapacity)
     this.use(getLocationResidentialSummary)
-    this.use(populateLocations(true))
+    this.use(populateLocationTree(true))
   }
 
   resetCapacity(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -30,20 +29,17 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { location } = res.locals
+    const { decoratedLocation } = res.locals
     const isSelect = !!req.sessionModel.get('selectLocations')
     const backLink = isSelect
-      ? `/reactivate/parent/${location.id}/select`
-      : `/view-and-update-locations/${[location.prisonId, location.id].join('/')}`
-    const { cells, errorlist } = res.locals as unknown as {
-      cells: Location[]
-      errorlist: FormWizard.Controller.Error[]
-    }
+      ? `/reactivate/parent/${decoratedLocation.id}/select`
+      : `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
+    const { decoratedCells, errorlist } = res.locals
 
     res.locals.options.fields = Object.fromEntries(
       errorlist.map(error => {
         const [locationId, fieldName] = error.key.split('_')
-        const cell = cells.find(c => c.id === locationId)
+        const cell = decoratedCells.find(c => c.id === locationId)
 
         return [
           error.key,
@@ -70,14 +66,14 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
-      const { cells } = res.locals as unknown as { cells: DecoratedLocation[] }
+      const { decoratedCells } = res.locals
       const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get(
         'capacityChanges',
       ) || {}) as typeof capacityChanges
 
       const validationErrors: FormWizard.Errors = {}
 
-      cells.forEach(cell => {
+      decoratedCells.forEach(cell => {
         const { accommodationTypes, specialistCellTypes } = cell.raw
         const locationCapacityChanges = capacityChanges[cell.id] || {}
         const workingCapacity =

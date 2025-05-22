@@ -1,18 +1,17 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import fields from '../../../routes/deactivate/fields'
-import { Services } from '../../../services'
 import ReactivateCellsConfirm from './confirm'
-import AuthService from '../../../services/authService'
 import LocationsService from '../../../services/locationsService'
 import AnalyticsService from '../../../services/analyticsService'
+import LocationFactory from '../../../testutils/factories/location'
 
 describe('ReactivateCellsConfirm', () => {
   const controller = new ReactivateCellsConfirm({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
   let sessionModelValues: {
@@ -27,7 +26,7 @@ describe('ReactivateCellsConfirm', () => {
       referrerLocationId: 'l0',
       selectedLocations: ['l1', 'l2'],
     }
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -36,17 +35,19 @@ describe('ReactivateCellsConfirm', () => {
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: keyof typeof sessionModelValues) => sessionModelValues[fieldName]),
+        get: jest.fn(
+          (fieldName?: keyof typeof sessionModelValues) => sessionModelValues[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: {
           activeCaseload: {
@@ -56,29 +57,29 @@ describe('ReactivateCellsConfirm', () => {
           username: 'username',
         },
         errorlist: [],
-        location: {
+        location: LocationFactory.build({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 1,
             workingCapacity: 0,
           },
-        },
+        }),
         cells: [
-          {
+          LocationFactory.build({
             id: 'l1',
             oldWorkingCapacity: 2,
             capacity: {
               maxCapacity: 3,
             },
-          },
-          {
+          }),
+          LocationFactory.build({
             id: 'l2',
             oldWorkingCapacity: 1,
             capacity: {
               maxCapacity: 2,
             },
-          },
+          }),
         ],
         options: {
           fields,
@@ -86,7 +87,7 @@ describe('ReactivateCellsConfirm', () => {
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -95,30 +96,26 @@ describe('ReactivateCellsConfirm', () => {
         values: sessionModelValues,
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.reactivateBulk = jest.fn()
     analyticsService.sendEvent = jest.fn()
   })
 
   describe('getResidentialSummary', () => {
     it('calls the correct locations service call', async () => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
+      deepReq.services = {
         locationsService: {
           getResidentialSummary: jest.fn(),
         },
-      } as unknown as Services
+      }
       const callback = jest.fn()
-      await controller.getResidentialSummary(req, res, callback)
+      await controller.getPrisonResidentialSummary(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(req.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
+      expect(deepReq.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
         'token',
-        res.locals.location.prisonId,
+        deepRes.locals.location.prisonId,
       )
     })
   })
@@ -136,18 +133,15 @@ describe('ReactivateCellsConfirm', () => {
 
   describe('locals', () => {
     beforeEach(() => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
+      deepReq.services = {
         locationsService: {
           getDeactivatedReason: jest.fn(),
         },
-      } as unknown as Services
+      }
     })
 
     it('sets the correct locals', async () => {
-      expect(controller.locals(req, res)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: `/reactivate/cells/check-capacity`,
         cancelLink: `/inactive-cells/${sessionModelValues.referrerPrisonId}/${sessionModelValues.referrerLocationId}`,
         changeSummary: `The establishment’s total working capacity will increase from 20 to 23.`,
@@ -157,7 +151,7 @@ describe('ReactivateCellsConfirm', () => {
 
   describe('saveValues', () => {
     it('calls locationsService', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(locationsService.reactivateBulk).toHaveBeenCalledWith('token', {
         l1: { capacity: { maxCapacity: 3, workingCapacity: 2 } },
@@ -166,13 +160,13 @@ describe('ReactivateCellsConfirm', () => {
     })
 
     it('sends an analytics event', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'reactivate_cells', { prison_id: 'TST' })
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'reactivate_cells', { prison_id: 'TST' })
     })
 
     it('calls next', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalled()
     })

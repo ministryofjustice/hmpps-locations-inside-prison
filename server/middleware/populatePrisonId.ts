@@ -1,7 +1,7 @@
-import { RequestHandler } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 
-export default function populatePrisonId(): RequestHandler {
-  return async (req, res, next) => {
+export default function populatePrisonId() {
+  return async (req: Request, res: Response, next: NextFunction) => {
     res.locals.prisonId = req.params.prisonId || res.locals.user.activeCaseload.id
 
     if (!req.params.prisonId) {

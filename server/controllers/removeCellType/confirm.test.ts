@@ -1,42 +1,43 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import ConfirmRemoveCellType from './confirm'
-import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import AnalyticsService from '../../services/analyticsService'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('ConfirmRemoveCellType', () => {
   const controller = new ConfirmRemoveCellType({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       flash: jest.fn(),
       journeyModel: {
         reset: jest.fn(),
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       session: {
         referrerUrl: '/',
+        systemToken: 'token',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn(
+          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
         reset: jest.fn(),
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
-        location: LocationFactory.build({
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           capacity: {
             maxCapacity: 2,
@@ -44,7 +45,7 @@ describe('ConfirmRemoveCellType', () => {
           },
           prisonId: 'TST',
         }),
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -55,17 +56,16 @@ describe('ConfirmRemoveCellType', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.updateSpecialistCellTypes = jest.fn()
     analyticsService.sendEvent = jest.fn()
   })
 
   describe('locals', () => {
     it('formats the change summary correctly', () => {
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual({
         backLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/remove-cell-type/review',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -86,7 +86,7 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
           .mockImplementation((...args): any => locationsApiCalls.push({ methodName, args }))
       })
 
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(locationsApiCalls).toEqual([
         {
@@ -101,46 +101,48 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
     })
 
     it('sends an analytics event when successful', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'remove_cell_type', { prison_id: 'TST' })
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'remove_cell_type', { prison_id: 'TST' })
     })
 
     it('calls next when successful', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalled()
     })
 
     it('calls next with any errors', async () => {
       const error = new Error('API error')
       ;(locationsService.updateSpecialistCellTypes as jest.Mock).mockRejectedValue(error)
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalledWith(error)
     })
   })
 
   describe('successHandler', () => {
     beforeEach(() => {
-      controller.successHandler(req, res, next)
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('resets the journey model', () => {
-      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
     })
 
     it('resets the session model', () => {
-      expect(req.sessionModel.reset).toHaveBeenCalled()
+      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
     })
 
     it('sets the flash correctly', () => {
-      expect(req.flash).toHaveBeenCalledWith('success', {
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
         content: 'You have removed the cell type and updated the capacity for this location.',
         title: 'Cell updated',
       })
     })
 
     it('redirects to the view location page', () => {
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+      )
     })
   })
 })

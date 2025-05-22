@@ -1,19 +1,20 @@
-import { Request, RequestHandler } from 'express'
+import { Request, RequestHandler, Response } from 'express'
+import { DeepPartial } from 'fishery'
 import referrerUrl from './referrerUrl'
 
 describe('Referrer URL', () => {
-  const res: any = {}
-  let req: Request
+  let deepReq: DeepPartial<Request>
+  const deepRes: DeepPartial<Response> = {}
   let next: () => void
   let controller: RequestHandler
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       headers: {},
       originalUrl: '/this/page',
       query: {},
       session: {},
-    } as unknown as typeof req
+    }
     next = jest.fn()
 
     controller = referrerUrl()
@@ -21,49 +22,49 @@ describe('Referrer URL', () => {
 
   describe('POST request', () => {
     beforeEach(() => {
-      req.method = 'POST'
+      deepReq.method = 'POST'
     })
 
     it('should not set a referrerUrl in session by default', async () => {
-      await controller(req, res, next)
+      await controller(deepReq as Request, deepRes as Response, next)
 
-      expect(req.session.referrerUrl).toBeUndefined()
+      expect(deepReq.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
   })
 
   describe('GET request', () => {
     beforeEach(() => {
-      req.method = 'GET'
-      req.headers = {
+      deepReq.method = 'GET'
+      deepReq.headers = {
         referer: 'https://localhost:3000/other/page',
       }
     })
 
     it('should set referrerUrl in session when referer header is set', async () => {
-      await controller(req, res, next)
+      await controller(deepReq as Request, deepRes as Response, next)
 
-      expect(req.session.referrerUrl).toEqual('https://localhost:3000/other/page')
+      expect(deepReq.session.referrerUrl).toEqual('https://localhost:3000/other/page')
       expect(next).toHaveBeenCalled()
     })
 
     it('should clear referrerUrl in session when referer header is undefined', async () => {
-      req.headers = {}
+      deepReq.headers = {}
 
-      await controller(req, res, next)
+      await controller(deepReq as Request, deepRes as Response, next)
 
-      expect(req.session.referrerUrl).toBeUndefined()
+      expect(deepReq.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
 
     it('should clear referrerUrl in session when referer header points to the current page', async () => {
-      req.headers = {
+      deepReq.headers = {
         referer: 'https://localhost:3000/this/page',
       }
 
-      await controller(req, res, next)
+      await controller(deepReq as Request, deepRes as Response, next)
 
-      expect(req.session.referrerUrl).toBeUndefined()
+      expect(deepReq.session.referrerUrl).toBeUndefined()
       expect(next).toHaveBeenCalled()
     })
   })

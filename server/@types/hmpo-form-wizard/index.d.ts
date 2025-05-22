@@ -2,6 +2,7 @@
 
 /* eslint-disable max-classes-per-file */
 import { NextFunction, Response } from 'express'
+import { TypedLocals } from '../express'
 
 declare module 'hmpo-form-wizard' {
   // These enums have to live here because of TS/Jest and Enums work..  ¯\_(ツ)_/¯
@@ -89,7 +90,7 @@ declare module 'hmpo-form-wizard' {
       checked?: boolean
     }
     export type Errors = Record<string, FormWizard.Controller.Error>
-    export type Values = Record<string, string | string[] | number>
+    export type Values = Record<string, string | string[] | number | boolean>
     export interface HistoryStep {
       path: string
       next: string
@@ -160,9 +161,9 @@ declare module 'hmpo-form-wizard' {
       validateFields(req: FormWizard.Request, res: Express.Response, callback: (errors: FormWizard.Errors) => void)
 
       // eslint-disable-next-line no-underscore-dangle
-      _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise
+      _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise<void>
 
-      locals(req: Request, res: Express.Response, next: Express.NextFunction): object
+      locals(req: Request, res: Express.Response, next: Express.NextFunction): Partial<TypedLocals>
 
       getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 

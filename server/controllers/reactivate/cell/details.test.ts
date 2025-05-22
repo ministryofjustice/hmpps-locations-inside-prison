@@ -1,16 +1,18 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import fields from '../../../routes/reactivate/cell/fields'
 import ReactivateCellDetails from './details'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('ReactivateCellDetails', () => {
   const controller = new ReactivateCellDetails({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -22,15 +24,18 @@ describe('ReactivateCellDetails', () => {
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn(
+          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           capacity: {
             maxCapacity: 4,
@@ -38,20 +43,11 @@ describe('ReactivateCellDetails', () => {
           },
           oldWorkingCapacity: 3,
           prisonId: 'TST',
-          raw: {
-            id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-            capacity: {
-              maxCapacity: 4,
-              workingCapacity: 2,
-            },
-            oldWorkingCapacity: 3,
-            prisonId: 'TST',
-          },
-        },
+        }),
         options: {
           fields,
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -63,12 +59,12 @@ describe('ReactivateCellDetails', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   describe('getInitialValues', () => {
     it('contains the old working capacity', () => {
-      expect(controller.getInitialValues(req, res)).toEqual({
+      expect(controller.getInitialValues(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         maxCapacity: 4,
         workingCapacity: 3,
       })
@@ -77,11 +73,11 @@ describe('ReactivateCellDetails', () => {
 
   describe('validateFields', () => {
     it('does not allow zero working capacity for non-specialist cells', () => {
-      req.form.values = { maxCapacity: '2', workingCapacity: '0' }
-      res.locals.location.raw.accommodationTypes = ['NORMAL_ACCOMMODATION']
-      res.locals.location.raw.specialistCellTypes = []
+      deepReq.form.values = { maxCapacity: '2', workingCapacity: '0' }
+      deepRes.locals.decoratedLocation.raw.accommodationTypes = ['NORMAL_ACCOMMODATION']
+      deepRes.locals.decoratedLocation.raw.specialistCellTypes = []
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({
         workingCapacity: {
@@ -95,9 +91,9 @@ describe('ReactivateCellDetails', () => {
 
   describe('locals', () => {
     it('returns the expected locals', () => {
-      getReferrerRootUrl(req, res, jest.fn())
+      getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'workingCapacity',
           type: 'lessThanOrEqualTo',
@@ -107,11 +103,11 @@ describe('ReactivateCellDetails', () => {
           },
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/referrer-url',
-        cancelLink: `/view-and-update-locations/${res.locals.location.prisonId}/${res.locals.location.id}`,
+        cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
         fields,
         validationErrors: [
           {

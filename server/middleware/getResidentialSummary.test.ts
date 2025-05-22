@@ -1,45 +1,45 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import { Services } from '../services'
-import getResidentialSummary from './getResidentialSummary'
+import { DeepPartial } from 'fishery'
+import getPrisonResidentialSummary from './getPrisonResidentialSummary'
+import LocationFactory from '../testutils/factories/location'
 
 describe('getResidentialSummary', () => {
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
 
   beforeEach(() => {
-    req = {} as unknown as FormWizard.Request
-    res = {
+    deepReq = {
+      session: { systemToken: 'token' },
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
-        location: {
+        location: LocationFactory.build({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 2,
             workingCapacity: 2,
           },
-        },
+        }),
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   it('calls the correct locations service call', async () => {
-    req.services = {
-      authService: {
-        getSystemClientToken: () => 'token',
-      },
+    deepReq.services = {
       locationsService: {
         getResidentialSummary: jest.fn(),
       },
-    } as unknown as Services
+    }
     const callback = jest.fn()
-    await getResidentialSummary(req, res, callback)
+    await getPrisonResidentialSummary(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-    expect(req.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
+    expect(deepReq.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
       'token',
-      res.locals.location.prisonId,
+      deepRes.locals.location.prisonId,
     )
   })
 })

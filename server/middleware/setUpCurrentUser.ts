@@ -30,8 +30,6 @@ export default function setUpCurrentUser({ manageUsersService, authService }: Se
         caseloads: caseloadsData.caseloads,
       }
 
-      res.locals.systemToken = await authService.getSystemClientToken(res.locals.user.username)
-
       if (res.locals.user.authSource === 'nomis') {
         res.locals.user.staffId = parseInt(userId, 10) || undefined
       }

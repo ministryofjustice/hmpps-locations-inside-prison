@@ -1,6 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
 
 export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
   middlewareSetup() {
@@ -9,8 +10,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
   }
 
   async setOptions(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const token = await req.services.authService.getSystemClientToken(res.locals.user.username)
-    const convertedCellType = await req.services.locationsService.getConvertedCellTypes(token)
+    const convertedCellType = await req.services.locationsService.getConvertedCellTypes(req.session.systemToken)
 
     req.form.options.fields.convertedCellType.items = Object.values(convertedCellType).map(({ key, description }) => ({
       value: key,
@@ -21,18 +21,19 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
     const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
-    const convertedCellType = req.form.values.convertedCellType ?? location.raw?.convertedCellType ?? ''
+    const convertedCellType =
+      (req.form.values.convertedCellType as string) ?? decoratedLocation.raw.convertedCellType ?? ''
     const otherConvertedCellType =
       req.form.values.otherConvertedCellType === ''
         ? null
-        : req.form.values.otherConvertedCellType || location.raw?.otherConvertedCellType || ''
+        : (req.form.values.otherConvertedCellType as string) || decoratedLocation.raw.otherConvertedCellType || ''
 
     fields.convertedCellType.items = fields.convertedCellType.items.map(item => ({
       ...item,
@@ -51,13 +52,13 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
 
   async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
-      const { location } = res.locals
-      const { prisonId, id: locationId } = location
+      const { decoratedLocation } = res.locals
+      const { prisonId, id: locationId } = decoratedLocation
 
       const { convertedCellType } = req.form.values
       const { otherConvertedCellType } = req.form.values
-      const currentConvertedCellType = res.locals.location.raw.convertedCellType
-      const currentOtherConvertedCellType = res.locals.location.raw.otherConvertedCellType
+      const currentConvertedCellType = decoratedLocation.raw.convertedCellType
+      const currentOtherConvertedCellType = decoratedLocation.raw.otherConvertedCellType
 
       const convertedCellTypeUnchanged = convertedCellType === currentConvertedCellType
       const otherConvertedCellTypeUnchanged = otherConvertedCellType === currentOtherConvertedCellType
@@ -74,31 +75,30 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { location, user } = res.locals
+      const { decoratedLocation } = res.locals
       const { locationsService } = req.services
-      const token = await req.services.authService.getSystemClientToken(user.username)
       const { values } = req.form
-      const preSelectedConvertedCellType = res.locals.location.raw?.convertedCellType || []
-      const preOtherTypeChanged = res.locals.location.raw?.otherConvertedCellType || []
+      const preSelectedConvertedCellType = decoratedLocation.raw.convertedCellType || ''
+      const preOtherTypeChanged = decoratedLocation.raw.otherConvertedCellType || ''
 
       const selectedConvertedCellType = values.convertedCellType
       const selectedOtherConvertedCellType = values.otherConvertedCellType
 
-      const isSameAsPreSelected = preSelectedConvertedCellType.includes(selectedConvertedCellType)
-      const isOtherTypeChanged = preOtherTypeChanged.includes(selectedOtherConvertedCellType)
+      const isSameAsPreSelected = preSelectedConvertedCellType === selectedConvertedCellType
+      const isOtherTypeChanged = preOtherTypeChanged === selectedOtherConvertedCellType
 
       req.sessionModel.set('convertedCellTypeChanged', !isSameAsPreSelected)
       req.sessionModel.set('otherTypeChanged', !isOtherTypeChanged)
 
       await locationsService.changeNonResType(
-        token,
-        location.id,
+        req.session.systemToken,
+        decoratedLocation.id,
         String(values.convertedCellType),
         values.convertedCellType === 'OTHER' ? String(values.otherConvertedCellType) : undefined,
       )
 
       req.services.analyticsService.sendEvent(req, 'change_non_res_type', {
-        prison_id: location.prisonId,
+        prison_id: decoratedLocation.prisonId,
         converted_cell_type: values.convertedCellType,
       })
 
@@ -109,7 +109,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId, localName, pathHierarchy } = res.locals.location
+    const { id: locationId, prisonId, localName, pathHierarchy } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 
     const roomTypeChanged = req.sessionModel.get('convertedCellTypeChanged')

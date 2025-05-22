@@ -1,11 +1,11 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionSetCellType extends FormInitialStep {
   async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const token = await req.services.authService.getSystemClientToken(res.locals.user.username)
-    const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(token)
+    const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
 
     req.form.options.fields.specialistCellTypes.items = Object.values(specialistCellTypes).map(
       ({ key, description, additionalInformation }) => ({
@@ -20,11 +20,11 @@ export default class CellConversionSetCellType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { sessionModel } = req
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
     const fields = { ...(locals.fields as FormWizard.Fields) }
 
     const specialistCellTypes = (req.form.values.specialistCellTypes ||

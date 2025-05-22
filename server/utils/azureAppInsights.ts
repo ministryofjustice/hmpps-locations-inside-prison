@@ -6,7 +6,7 @@ import {
   setup,
   type TelemetryClient,
 } from 'applicationinsights'
-import { RequestHandler } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contracts'
 import type { ApplicationInfo } from '../applicationInfo'
 
@@ -80,8 +80,8 @@ export const ignorePathsProcessor = (envelope: EnvelopeTelemetry) => {
   return true
 }
 
-export function appInsightsMiddleware(): RequestHandler {
-  return (req, res, next) => {
+export function appInsightsMiddleware() {
+  return (req: Request, res: Response, next: NextFunction) => {
     res.prependOnceListener('finish', () => {
       const context = getCorrelationContext()
       if (context && req.route) {

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import type { Request, Response } from 'express'
+import { DeepPartial } from 'fishery'
 
 import authorisationMiddleware from './authorisationMiddleware'
 
@@ -21,14 +22,15 @@ describe('authorisationMiddleware', () => {
   const next = jest.fn()
 
   function createResWithToken({ authorities }: { authorities: string[] }): Response {
-    return {
+    const deepRes: DeepPartial<Response> = {
       locals: {
         user: {
           token: createToken(authorities),
         },
       },
       redirect: jest.fn(),
-    } as unknown as Response
+    }
+    return deepRes as Response
   }
 
   beforeEach(() => {

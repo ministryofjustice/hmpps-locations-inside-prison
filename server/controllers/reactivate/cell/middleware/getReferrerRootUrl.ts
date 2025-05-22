@@ -15,7 +15,7 @@ export default function getReferrerRootUrl(req: FormWizard.Request, res: Respons
       res.locals.referrerRootUrl += `/${referrerLocationId}`
     }
   } else {
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
     res.locals.referrerRootUrl = `/view-and-update-locations/${prisonId}/${locationId}`
   }
 
