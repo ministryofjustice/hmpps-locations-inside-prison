@@ -52,7 +52,10 @@ export default class ChangeCellCapacity extends FormInitialStep {
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap } = req.form.values
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
-    if (Number(newMaxCap) === maxCapacity && Number(newWorkingCap) === workingCapacity) {
+    if (
+      (!req.canAccess('change_max_capacity') || Number(newMaxCap) === maxCapacity) &&
+      Number(newWorkingCap) === workingCapacity
+    ) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
 

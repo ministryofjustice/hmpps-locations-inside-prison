@@ -5,22 +5,17 @@ import config from '../config'
 const router = express.Router()
 
 export default function setUpFeatureFlags(): Router {
-  const flags: Record<string, boolean> = { ...config.featureFlags }
+  const flags = { ...config.featureFlags }
 
-  router.use((req, res, next) => {
+  router.use((req, _res, next) => {
     req.featureFlags = flags
     next()
   })
 
   if (process.env.FEATURE_FLIPPER_ENABLED === 'true') {
     router.get('/set-feature-flag', (req, res) => {
-      const flagsToSet = Object.entries(req.query as Record<string, string>).map(([key, val]): [string, boolean] => [
-        key,
-        val === 'enabled',
-      ])
-
-      flagsToSet.forEach(([key, val]) => {
-        flags[key] = val
+      ;(Object.entries(req.query) as [keyof typeof flags, string][]).forEach(([key, val]) => {
+        flags[key] = val === 'enabled'
       })
       res.sendStatus(200)
     })
