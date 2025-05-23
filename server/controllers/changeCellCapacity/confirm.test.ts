@@ -121,7 +121,7 @@ This will decrease the establishment’s working capacity from 20 to 19.`,
       it('calls locationsService', async () => {
         await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(locationsService.updateCapacity).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, 3, 1)
+        expect(locationsService.updateCapacity).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, 3, 1)
       })
     })
 

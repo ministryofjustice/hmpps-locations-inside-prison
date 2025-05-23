@@ -13,6 +13,7 @@ import { FeComponentsMeta } from '../../data/feComponentsClient'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
+import config from '../../config'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -163,7 +164,7 @@ export declare global {
       flash(message: string): Flash[]
       flash(type: string, message: Flash): Flash[]
       canAccess: (permission: string) => boolean
-      featureFlags?: Record<string, boolean>
+      featureFlags?: (typeof config)['featureFlags']
     }
   }
 }
