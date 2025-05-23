@@ -1,8 +1,8 @@
-import { RequestHandler } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 import { Services } from '../services'
 
-export default function addServicesToRequest(services: Services): RequestHandler {
-  return async (req, _res, next) => {
+export default function addServicesToRequest(services: Services) {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     req.services = services
 
     next()

@@ -8,8 +8,8 @@
 {% from "../../macros/multiSelectFooter.njk" import multiSelectFooter %}
 
 {% set title = 'View all inactive cells' %}
-{% if residentialSummary.location %}
-  {% set locationName = residentialSummary.location.displayName | capFirst %}
+{% if decoratedResidentialSummary.location %}
+  {% set locationName = decoratedResidentialSummary.location.displayName | capFirst %}
   {% set title = locationName + ' - Inactive cells - View and update locations' %}
 {% endif %}
 

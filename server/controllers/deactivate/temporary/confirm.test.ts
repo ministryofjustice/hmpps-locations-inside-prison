@@ -1,18 +1,17 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import fields from '../../../routes/deactivate/fields'
-import { Services } from '../../../services'
 import DeactivateTemporaryConfirm from './confirm'
 import LocationsService from '../../../services/locationsService'
-import AuthService from '../../../services/authService'
 import AnalyticsService from '../../../services/analyticsService'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('DeactivateTemporaryConfirm', () => {
   const controller = new DeactivateTemporaryConfirm({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
@@ -32,7 +31,7 @@ describe('DeactivateTemporaryConfirm', () => {
       estimatedReactivationDate: '2030-04-20',
       planetFmReference: 'PFMRN123',
     }
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -41,21 +40,23 @@ describe('DeactivateTemporaryConfirm', () => {
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: keyof typeof formValues) => formValues[fieldName]),
+        get: jest.fn(
+          (fieldName?: keyof typeof formValues) => formValues[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
@@ -63,14 +64,14 @@ describe('DeactivateTemporaryConfirm', () => {
             workingCapacity: 2,
           },
           locationType: 'CELL',
-        },
+        }),
         options: {
           fields,
         },
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -79,10 +80,9 @@ describe('DeactivateTemporaryConfirm', () => {
         values: formValues,
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.deactivateTemporary = jest.fn()
     analyticsService.sendEvent = jest.fn()
   })
@@ -101,62 +101,61 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
 
   describe('_locals', () => {
     beforeEach(() => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
+      deepReq.services = {
         locationsService: {
           getDeactivatedReason: jest.fn(),
         },
-      } as unknown as Services
+      }
     })
 
     it('sets the correct local for REASON', async () => {
-      req.form.values = {
+      deepReq.form.values = {
         deactivationReason: 'REASON',
         deactivationReasonDescription: 'Description text',
       }
-      ;(req.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
+      ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
 
       const callback = jest.fn()
       // eslint-disable-next-line no-underscore-dangle
-      await controller._locals(req, res, callback)
+      await controller._locals(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(res.locals.deactivationReason).toEqual('Translated reason - Description text')
+      expect(deepRes.locals.deactivationReason).toEqual('Translated reason - Description text')
     })
 
     it('sets the correct local for OTHER', async () => {
-      req.form.values = {
+      deepReq.form.values = {
         deactivationReason: 'OTHER',
         deactivationReasonOther: 'Other description text',
       }
-      ;(req.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Other translated reason')
+      ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue(
+        'Other translated reason',
+      )
 
       const callback = jest.fn()
       // eslint-disable-next-line no-underscore-dangle
-      await controller._locals(req, res, callback)
+      await controller._locals(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(res.locals.deactivationReason).toEqual('Other translated reason - Other description text')
+      expect(deepRes.locals.deactivationReason).toEqual('Other translated reason - Other description text')
     })
 
     it('sets the correct local for REASON without description', async () => {
-      req.form.values = {
+      deepReq.form.values = {
         deactivationReason: 'REASON',
         deactivationReasonDescription: '',
       }
-      ;(req.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
+      ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
 
       const callback = jest.fn()
       // eslint-disable-next-line no-underscore-dangle
-      await controller._locals(req, res, callback)
+      await controller._locals(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(res.locals.deactivationReason).toEqual('Translated reason')
+      expect(deepRes.locals.deactivationReason).toEqual('Translated reason')
     })
   })
 
   describe('saveValues', () => {
     it('calls locationsService', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
         'token',
@@ -174,15 +173,17 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
         error.data = { errorCode: 109 }
         locationsService.deactivateTemporary.mockRejectedValue(error)
 
-        await controller.saveValues(req, res, next)
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       })
 
       it('redirects to the cell occupied page', () => {
-        expect(res.redirect).toHaveBeenCalledWith('/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/deactivate/occupied')
+        expect(deepRes.redirect).toHaveBeenCalledWith(
+          '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/deactivate/occupied',
+        )
       })
 
       it('sends a handled_error event to Google Analytics', () => {
-        expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'handled_error', {
+        expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'handled_error', {
           prison_id: 'TST',
           error_code: 109,
         })
@@ -192,23 +193,23 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
     it('calls next with any unexpected errors', async () => {
       const error = new Error('API error')
       locationsService.deactivateTemporary.mockRejectedValue(error)
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalledWith(error)
     })
 
     it('sends an analytics event', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'deactivate_temp', {
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'deactivate_temp', {
         prison_id: 'TST',
-        location_type: 'CELL',
+        location_type: 'Cell',
         deactivation_reason: 'OTHER',
       })
     })
 
     it('calls next', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalled()
     })

@@ -9,15 +9,12 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
-{% from "../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../macros/miniSummary.njk" import miniSummary %}
-
 {% set title = "Do you want to deactivate this location temporarily or permanently?" %}
 
 {% block heading %}
   <div class="govuk-grid-row govuk-!-margin-bottom-0">
     <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+      <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
       <h1 class="govuk-heading-l">{{ title }}</h1>
     </div>
   </div>
@@ -65,11 +62,11 @@
           {% endif %}
 
           {% block fields %}
-          
+
             {% for key, fieldsOptions in fields %}
               {% if fieldsOptions.component and not fieldsOptions.skip %}
                 {% if fieldsOptions.component == "govukDateInput" %}
-                  {% set fieldsOptions = { 
+                  {% set fieldsOptions = {
                     "component":"govukDateInput",
                     "id": fieldsOptions.id,
                     "name": fieldsOptions.name,
@@ -109,7 +106,7 @@
                       }
                     ],
                     "errorMessage": fieldsOptions.errorMessage
-                    } 
+                    }
                     %}
                 {% endif %}
                   {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}

@@ -1,23 +1,12 @@
 import { Request, Response } from 'express'
+import { DeepPartial } from 'fishery'
 import controller from './viewLocationsShow'
 import { addActions } from '../../routes/viewLocationsRouter'
-import { Location } from '../../data/types/locationsApi'
-import LocationFactory from '../../testutils/factories/location'
-import { DecoratedLocation } from '../../decorators/decoratedLocation'
-
-const buildDecoratedLocation = (params: Partial<Location>): DecoratedLocation => {
-  const location = LocationFactory.build(params)
-
-  return {
-    ...location,
-    raw: location,
-    locationType: location.locationType.toLowerCase().replace(/^\w/, a => a.toUpperCase()),
-  } as unknown as DecoratedLocation
-}
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('view locations show', () => {
-  let req: Request
-  let res: Response
+  let deepReq: DeepPartial<Request>
+  let deepRes: DeepPartial<Response>
 
   const convertToNonResAction = {
     text: 'Convert to non-residential room',
@@ -30,25 +19,24 @@ describe('view locations show', () => {
   }
 
   beforeEach(() => {
-    const location = buildDecoratedLocation({ isResidential: true, leafLevel: true })
-    req = {
+    deepReq = {
       canAccess: jest.fn().mockReturnValue(false),
       flash: jest.fn(),
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
-        residentialSummary: {
-          location: { ...location, raw: location },
+        decoratedResidentialSummary: {
+          location: buildDecoratedLocation({ isResidential: true, leafLevel: true }),
         },
       },
       render: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   it('renders the page', () => {
-    controller(req, res)
+    controller(deepReq as Request, deepRes as Response)
 
-    expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+    expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: {},
     })
   })
@@ -59,10 +47,10 @@ describe('view locations show', () => {
       content: 'Dinner is served',
     }
     // @ts-expect-error: lint thinks that the jest.fn has 0 args
-    req.flash = jest.fn(_param => [success])
-    controller(req, res)
+    deepReq.flash = jest.fn(_param => [success])
+    controller(deepReq as Request, deepRes as Response)
 
-    expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+    expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: {
         success,
       },
@@ -73,60 +61,66 @@ describe('view locations show', () => {
     describe('convert to non-res', () => {
       describe('without the correct permissions', () => {
         beforeEach(() => {
-          req.canAccess = jest.fn().mockReturnValue(false)
+          deepReq.canAccess = jest.fn().mockReturnValue(false)
         })
 
         it('does not add the action', async () => {
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+          expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
         })
       })
 
       describe('with the correct permissions', () => {
         beforeEach(() => {
-          req.canAccess = jest.fn().mockReturnValue(true)
+          deepReq.canAccess = jest.fn().mockReturnValue(true)
         })
 
         it('adds the action', async () => {
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions).toContainEqual(convertToNonResAction)
+          expect(deepRes.locals.actions).toContainEqual(convertToNonResAction)
         })
 
         it('does not add the action for non-res cell', async () => {
-          res.locals.residentialSummary.location = buildDecoratedLocation({ isResidential: false, leafLevel: true })
+          deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            isResidential: false,
+            leafLevel: true,
+          })
 
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+          expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
         })
 
         it('does not add the action when not leaf level', async () => {
-          res.locals.residentialSummary.location = buildDecoratedLocation({ isResidential: true, leafLevel: false })
+          deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            isResidential: true,
+            leafLevel: false,
+          })
 
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+          expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
         })
 
         it('does not add the action when location is inactive', async () => {
-          res.locals.residentialSummary.location = buildDecoratedLocation({
+          deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
             active: false,
             isResidential: true,
             leafLevel: true,
           })
 
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions || []).not.toContainEqual(convertToNonResAction)
+          expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
         })
       })
     })
 
     describe('deactivate cell', () => {
       beforeEach(() => {
-        res.locals.residentialSummary.location = buildDecoratedLocation({
+        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
           active: true,
           locationType: 'CELL',
         })
@@ -134,41 +128,41 @@ describe('view locations show', () => {
 
       describe('without the correct permissions', () => {
         beforeEach(() => {
-          req.canAccess = jest.fn().mockReturnValue(false)
+          deepReq.canAccess = jest.fn().mockReturnValue(false)
         })
 
         it('does not add the action', async () => {
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions || []).not.toContainEqual(deactivateCellAction)
+          expect(deepRes.locals.actions || []).not.toContainEqual(deactivateCellAction)
         })
       })
 
       describe('with the correct permissions', () => {
         beforeEach(() => {
-          req.canAccess = jest.fn().mockReturnValue(true)
+          deepReq.canAccess = jest.fn().mockReturnValue(true)
         })
 
         it('adds the action', async () => {
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions).toContainEqual(deactivateCellAction)
+          expect(deepRes.locals.actions).toContainEqual(deactivateCellAction)
         })
 
         it('does not add the action when location is inactive', async () => {
-          res.locals.residentialSummary.location.active = false
+          deepRes.locals.decoratedResidentialSummary.location.active = false
 
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions || []).not.toContainEqual(deactivateCellAction)
+          expect(deepRes.locals.actions || []).not.toContainEqual(deactivateCellAction)
         })
 
         it('does not add the action when location is not a CELL', async () => {
-          res.locals.residentialSummary.location.raw.locationType = 'OFFICE'
+          deepRes.locals.decoratedResidentialSummary.location.raw.locationType = 'OFFICE'
 
-          await addActions(req, res, jest.fn())
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
-          expect(res.locals.actions || []).not.toContainEqual(deactivateCellAction)
+          expect(deepRes.locals.actions || []).not.toContainEqual(deactivateCellAction)
         })
       })
     })
@@ -176,8 +170,8 @@ describe('view locations show', () => {
 
   describe('actionButton', () => {
     beforeEach(() => {
-      req.canAccess = jest.fn().mockImplementation(permission => permission === 'convert_non_residential')
-      res.locals.residentialSummary.location = LocationFactory.build({
+      deepReq.canAccess = jest.fn().mockImplementation(permission => permission === 'convert_non_residential')
+      deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
         active: true,
         isResidential: false,
         leafLevel: true,
@@ -185,9 +179,9 @@ describe('view locations show', () => {
     })
 
     it('renders the page with the action button', () => {
-      controller(req, res)
+      controller(deepReq as Request, deepRes as Response)
 
-      expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+      expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
         actionButton: {
           text: 'Convert to cell',
           href: `/location/7e570000-0000-0000-0000-000000000001/cell-conversion`,
@@ -199,13 +193,13 @@ describe('view locations show', () => {
 
     describe('without the correct permissions', () => {
       beforeEach(() => {
-        req.canAccess = jest.fn().mockReturnValue(false)
+        deepReq.canAccess = jest.fn().mockReturnValue(false)
       })
 
       it('renders the page without the action button', () => {
-        controller(req, res)
+        controller(deepReq as Request, deepRes as Response)
 
-        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: {},
         })
       })
@@ -213,7 +207,7 @@ describe('view locations show', () => {
 
     describe('when inactive', () => {
       beforeEach(() => {
-        res.locals.residentialSummary.location = LocationFactory.build({
+        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
           active: false,
           isResidential: false,
           leafLevel: true,
@@ -221,9 +215,9 @@ describe('view locations show', () => {
       })
 
       it('renders the page without the action button', () => {
-        controller(req, res)
+        controller(deepReq as Request, deepRes as Response)
 
-        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: {},
         })
       })
@@ -231,7 +225,7 @@ describe('view locations show', () => {
 
     describe('when already residential', () => {
       beforeEach(() => {
-        res.locals.residentialSummary.location = LocationFactory.build({
+        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
           active: true,
           isResidential: true,
           leafLevel: true,
@@ -239,9 +233,9 @@ describe('view locations show', () => {
       })
 
       it('renders the page without the action button', () => {
-        controller(req, res)
+        controller(deepReq as Request, deepRes as Response)
 
-        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: {},
         })
       })
@@ -249,7 +243,7 @@ describe('view locations show', () => {
 
     describe('when not leaf level', () => {
       beforeEach(() => {
-        res.locals.residentialSummary.location = LocationFactory.build({
+        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
           active: true,
           isResidential: false,
           leafLevel: false,
@@ -257,9 +251,9 @@ describe('view locations show', () => {
       })
 
       it('renders the page without the action button', () => {
-        controller(req, res)
+        controller(deepReq as Request, deepRes as Response)
 
-        expect(res.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: {},
         })
       })

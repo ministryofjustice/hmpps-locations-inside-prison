@@ -2,8 +2,6 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
-import { Location } from '../../../data/types/locationsApi'
-import { LocationResidentialSummary } from '../../../data/types/locationsApi/locationResidentialSummary'
 
 export default class ReactivateParentSelect extends FormInitialStep {
   middlewareSetup() {
@@ -13,8 +11,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
   }
 
   async populateItems(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { locationResidentialSummary }: { locationResidentialSummary: LocationResidentialSummary } =
-      res.locals as unknown as { locationResidentialSummary: LocationResidentialSummary }
+    const { locationResidentialSummary } = res.locals
     const { selectLocations } = req.form.options.fields
     selectLocations.items = locationResidentialSummary.subLocations
       .filter(l => {
@@ -37,8 +34,8 @@ export default class ReactivateParentSelect extends FormInitialStep {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { location } = res.locals
-    const backLink = `/view-and-update-locations/${[location.prisonId, location.id].join('/')}`
+    const { decoratedLocation } = res.locals
+    const backLink = `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
 
     const { form } = req
     const { fields } = form.options
@@ -59,17 +56,11 @@ export default class ReactivateParentSelect extends FormInitialStep {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const {
-      location,
-      locationResidentialSummary,
-    }: { location: Location; locationResidentialSummary: LocationResidentialSummary } = res.locals as unknown as {
-      location: Location
-      locationResidentialSummary: LocationResidentialSummary
-    }
+    const { decoratedLocation, locationResidentialSummary } = res.locals
     const { selectLocations } = req.form.values as { selectLocations: string[] }
     if (locationResidentialSummary.subLocationName === 'Cells' && selectLocations.length === 1) {
       res.redirect(
-        `/reactivate/cell/${selectLocations[0]}?ref=parent&refPrisonId=${location.prisonId}&refLocationId=${location.id}`,
+        `/reactivate/cell/${selectLocations[0]}?ref=parent&refPrisonId=${decoratedLocation.prisonId}&refLocationId=${decoratedLocation.id}`,
       )
 
       return

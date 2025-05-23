@@ -4,8 +4,6 @@
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
-{% set locationType = residentialSummary.location.locationType %}
 {% set title = 'Archived locations' %}
 
 {% set rows = [] %}

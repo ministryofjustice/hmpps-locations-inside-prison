@@ -3,6 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { flattenConditionalFields, reduceDependentFields, renderConditionalFields } from '../../helpers/field'
 import validateDateInput from '../../helpers/field/validateDateInput'
 import { FieldEntry } from '../../helpers/field/renderConditionalFields'
+import { TypedLocals } from '../../@types/express'
 
 export default class FormInitialStep extends FormWizard.Controller {
   middlewareSetup() {
@@ -104,7 +105,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { options, values } = res.locals
     if (!options?.fields) {
       return {}

@@ -3,6 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
 import { PrisonResidentialSummary } from '../../data/types/locationsApi/prisonResidentialSummary'
+import { TypedLocals } from '../../@types/express'
 
 export default class ChangeSignedOperationalCapacity extends FormInitialStep {
   middlewareSetup() {
@@ -11,13 +12,12 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
   }
 
   async getSignedOperationalCapacity(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
     const { locationsService, manageUsersService } = req.services
 
-    const token = await req.services.authService.getSystemClientToken(user.username)
+    const { systemToken } = req.session
     try {
       const signedOperationalCapacitySummary = await locationsService.getSignedOperationalCapacity(
-        token,
+        systemToken,
         res.locals.prisonId,
       )
       const whenUpdated = new Date(signedOperationalCapacitySummary.whenUpdated)
@@ -44,10 +44,10 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     }
 
     const residentialSummary = (await locationsService.getResidentialSummary(
-      token,
+      systemToken,
       res.locals.prisonId,
     )) as PrisonResidentialSummary
-    res.locals.maxCapacity = residentialSummary?.prisonSummary?.maxCapacity
+    res.locals.maxCapacity = residentialSummary?.prisonSummary?.maxCapacity?.toString()
 
     next()
   }
@@ -88,7 +88,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     return next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals
 
@@ -108,9 +108,8 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
       const { prisonId, user } = res.locals
       const { locationsService } = req.services
       const { newSignedOperationalCapacity } = req.form.values
-      const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.updateSignedOperationalCapacity(
-        token,
+        req.session.systemToken,
         prisonId,
         Number(newSignedOperationalCapacity),
         user.username,

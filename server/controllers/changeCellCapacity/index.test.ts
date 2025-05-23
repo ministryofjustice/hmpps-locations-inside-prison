@@ -1,15 +1,18 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import ChangeCellCapacity from './index'
 import fields from '../../routes/changeCellCapacity/fields'
+import PrisonerFactory from '../../testutils/factories/prisoner'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('ChangeCellCapacity', () => {
   const controller = new ChangeCellCapacity({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -21,33 +24,34 @@ describe('ChangeCellCapacity', () => {
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn(
+          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           capacity: {
             maxCapacity: 2,
             workingCapacity: 2,
           },
           prisonId: 'MDI',
-          raw: {
-            accommodationTypes: ['NORMAL_ACCOMMODATION'],
-            specialistCellTypes: [],
-          },
-        },
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
+          specialistCellTypes: [],
+        }),
         options: {
           fields,
         },
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -59,14 +63,14 @@ describe('ChangeCellCapacity', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   describe('validateFields', () => {
     it('does not allow zero working capacity for non-specialist cells', () => {
-      req.form.values = { maxCapacity: '2', workingCapacity: '0' }
+      deepReq.form.values = { maxCapacity: '2', workingCapacity: '0' }
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({
         workingCapacity: {
@@ -78,9 +82,13 @@ describe('ChangeCellCapacity', () => {
     })
 
     it('does not allow max or working capacity lower than current occupancy', () => {
-      res.locals.prisonerLocation.prisoners = [{}, {}, {}]
+      deepRes.locals.prisonerLocation.prisoners = [
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+      ]
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({
         workingCapacity: {
@@ -97,9 +105,9 @@ describe('ChangeCellCapacity', () => {
     })
 
     it('does not break when current occupancy is undefined', () => {
-      res.locals.prisonerLocation = undefined
+      deepRes.locals.prisonerLocation = undefined
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({})
     })
@@ -107,17 +115,19 @@ describe('ChangeCellCapacity', () => {
 
   describe('validate', () => {
     it('redirects to the show location page when there are no changes', () => {
-      req.form.values = { maxCapacity: '2', workingCapacity: '2' }
-      res.redirect = jest.fn()
-      controller.validate(req, res, jest.fn())
+      deepReq.form.values = { maxCapacity: '2', workingCapacity: '2' }
+      deepRes.redirect = jest.fn()
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+      )
     })
   })
 
   describe('locals', () => {
     it('returns the expected locals', () => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'workingCapacity',
           type: 'lessThanOrEqualTo',
@@ -127,7 +137,7 @@ describe('ChangeCellCapacity', () => {
           },
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/referrer-url',

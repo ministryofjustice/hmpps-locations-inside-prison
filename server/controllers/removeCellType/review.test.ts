@@ -1,16 +1,18 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import ReviewCellCapacity from './review'
 import fields from '../../routes/changeCellCapacity/fields'
-import LocationFactory from '../../testutils/factories/location'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import PrisonerFactory from '../../testutils/factories/prisoner'
 
 describe('ReviewCellCapacity', () => {
   const controller = new ReviewCellCapacity({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -24,13 +26,15 @@ describe('ReviewCellCapacity', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn(
+          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({
+        decoratedLocation: buildDecoratedLocation({
           accommodationTypes: ['NORMAL_ACCOMMODATION'],
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           capacity: {
@@ -45,7 +49,7 @@ describe('ReviewCellCapacity', () => {
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -57,14 +61,18 @@ describe('ReviewCellCapacity', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   describe('validateFields', () => {
     it('does not allow max or working capacity lower than current occupancy', () => {
-      res.locals.prisonerLocation.prisoners = [{}, {}, {}]
+      deepRes.locals.prisonerLocation.prisoners = [
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+      ]
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({
         workingCapacity: {
@@ -81,9 +89,9 @@ describe('ReviewCellCapacity', () => {
     })
 
     it('does not break when current occupancy is undefined', () => {
-      res.locals.prisonerLocation = undefined
+      deepRes.locals.prisonerLocation = undefined
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({})
     })
@@ -91,7 +99,7 @@ describe('ReviewCellCapacity', () => {
 
   describe('locals', () => {
     it('returns the expected locals', () => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'workingCapacity',
           type: 'lessThanOrEqualTo',
@@ -101,7 +109,7 @@ describe('ReviewCellCapacity', () => {
           },
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',

@@ -4,6 +4,7 @@ import backUrl from '../../../utils/backUrl'
 import FormInitialStep from '../../base/formInitialStep'
 import { Location } from '../../../data/types/locationsApi'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
+import { TypedLocals } from '../../../@types/express'
 
 export default class ReactivateCellDetails extends FormInitialStep {
   middlewareSetup() {
@@ -11,18 +12,19 @@ export default class ReactivateCellDetails extends FormInitialStep {
     this.use(getReferrerRootUrl)
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
+  getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
+    const { decoratedLocation } = res.locals
     return {
-      maxCapacity: res.locals.location.capacity.maxCapacity,
-      workingCapacity: res.locals.location.oldWorkingCapacity,
+      maxCapacity: decoratedLocation.capacity.maxCapacity,
+      workingCapacity: decoratedLocation.oldWorkingCapacity,
     }
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
-      const { location } = res.locals
-      const { accommodationTypes, specialistCellTypes }: Location = location.raw
+      const { decoratedLocation } = res.locals
+      const { accommodationTypes, specialistCellTypes }: Location = decoratedLocation.raw
 
       const validationErrors: FormWizard.Errors = {}
 
@@ -40,10 +42,10 @@ export default class ReactivateCellDetails extends FormInitialStep {
     })
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { location, referrerRootUrl } = res.locals
-    const { id: locationId } = location
+    const { decoratedLocation, referrerRootUrl } = res.locals
+    const { id: locationId } = decoratedLocation
 
     const backLink = backUrl(req, {
       fallbackUrl: referrerRootUrl,

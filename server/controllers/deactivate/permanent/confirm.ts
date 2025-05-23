@@ -1,16 +1,15 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import { DecoratedLocation } from '../../../decorators/decoratedLocation'
 import getCellCount from '../../../middleware/getCellCount'
-import getResidentialSummary from '../../../middleware/getResidentialSummary'
+import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 import protectRoute from '../../../middleware/protectRoute'
 
 export default class DeactivatePermanentConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(protectRoute('deactivate:permanent'))
-    this.use(getResidentialSummary)
+    this.use(getPrisonResidentialSummary)
     this.use(getCellCount)
   }
 
@@ -23,9 +22,9 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { cellCount, location, residentialSummary } = res.locals
-    const { maxCapacity, workingCapacity } = location.capacity
-    const { maxCapacity: totalMaxCap, workingCapacity: totalWorkingCap } = residentialSummary.prisonSummary
+    const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
+    const { maxCapacity, workingCapacity } = decoratedLocation.capacity
+    const { maxCapacity: totalMaxCap, workingCapacity: totalWorkingCap } = prisonResidentialSummary.prisonSummary
 
     const changeSummaries = compact([
       this.generateChangeSummary('working capacity', workingCapacity, totalWorkingCap),
@@ -41,43 +40,42 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
     const permanentDeactivationReason = req.sessionModel.get<string>('permanentDeactivationReason')
 
     return {
-      cancelLink: `/view-and-update-locations/${location.prisonId}/${location.id}`,
+      cancelLink: `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`,
       changeSummary,
       permanentDeactivationReason,
     }
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user, location } = res.locals
+    const { decoratedLocation } = res.locals
     const { analyticsService, locationsService } = req.services
 
     try {
-      const token = await req.services.authService.getSystemClientToken(user.username)
       const reason = req.sessionModel.get('permanentDeactivationReason') as string
-      await locationsService.deactivatePermanent(token, location.id, reason)
+      await locationsService.deactivatePermanent(req.session.systemToken, decoratedLocation.id, reason)
 
       analyticsService.sendEvent(req, 'deactivate_perm', {
-        prison_id: location.prisonId,
-        location_type: location.locationType,
+        prison_id: decoratedLocation.prisonId,
+        location_type: decoratedLocation.locationType,
       })
 
       return next()
     } catch (error) {
       if (error.data?.errorCode === 109) {
         analyticsService.sendEvent(req, 'handled_error', {
-          prison_id: location.prisonId,
+          prison_id: decoratedLocation.prisonId,
           error_code: 109,
         })
 
-        return res.redirect(`/location/${location.id}/deactivate/occupied`)
+        return res.redirect(`/location/${decoratedLocation.id}/deactivate/occupied`)
       }
       return next(error)
     }
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location } = res.locals
-    const { displayName, prisonId } = location as DecoratedLocation
+    const { decoratedLocation } = res.locals
+    const { displayName, prisonId } = decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()

@@ -1,13 +1,14 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import fields from '../../../routes/deactivate/fields'
 import DeactivateTemporaryDetails from './details'
-import { Services } from '../../../services'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('DeactivateTemporaryDetails', () => {
   const controller = new DeactivateTemporaryDetails({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let formValues: {
     deactivationReason: string
     estimatedReactivationDate: string
@@ -24,7 +25,7 @@ describe('DeactivateTemporaryDetails', () => {
       estimatedReactivationDate: '2030-04-20',
       planetFmReference: 'PFMRN123',
     }
-    req = {
+    deepReq = {
       body: {
         'deactivationReasonDescription-DAMAGE': 'Damage',
         'estimatedReactivationDate-day': '20',
@@ -46,28 +47,30 @@ describe('DeactivateTemporaryDetails', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: keyof typeof formValues) => formValues[fieldName]),
+        get: jest.fn(
+          (fieldName?: keyof typeof formValues) => formValues[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 2,
             workingCapacity: 2,
           },
-        },
+        }),
         options: {
           fields,
         },
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -76,34 +79,34 @@ describe('DeactivateTemporaryDetails', () => {
         values: formValues,
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   describe('validateFields', () => {
     it('sets deactivationReasonDescription to the correct value', () => {
-      req.body = {
+      deepReq.body = {
         'deactivationReasonDescription-TEST1': 'test1',
         'deactivationReasonDescription-TEST2': 'test2',
         'deactivationReasonDescription-TEST3': 'test3',
       }
-      req.form.values.deactivationReason = 'TEST2'
+      deepReq.form.values.deactivationReason = 'TEST2'
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(req.form.values.deactivationReasonDescription).toEqual('test2')
+      expect(deepReq.form.values.deactivationReasonDescription).toEqual('test2')
     })
   })
 
   describe('locals', () => {
     it('returns the expected locals', () => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'deactivationReasonOther',
           type: 'required',
           url: '/',
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -119,8 +122,8 @@ describe('DeactivateTemporaryDetails', () => {
     })
 
     it('returns the expected locals when the back link is already set', () => {
-      res.locals.backLink = '/last/step'
-      const result = controller.locals(req, res)
+      deepRes.locals.backLink = '/last/step'
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/last/step',
@@ -133,19 +136,16 @@ describe('DeactivateTemporaryDetails', () => {
 
   describe('populateItems', () => {
     it('populates the items ', async () => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
+      deepReq.services = {
         locationsService: {
-          getDeactivatedReasons: () => ({ ATEST1: 'A test 1', OTHER: 'Other', TEST2: 'Test 2' }),
+          getDeactivatedReasons: () => Promise.resolve({ ATEST1: 'A test 1', OTHER: 'Other', TEST2: 'Test 2' }),
         },
-      } as unknown as Services
+      }
 
       const callback = jest.fn()
-      await controller.populateItems(req, res, callback)
+      await controller.populateItems(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(req.form.options.fields.deactivationReason.items).toEqual([
+      expect(deepReq.form.options.fields.deactivationReason.items).toEqual([
         {
           conditional: 'deactivationReasonDescription-ATEST1',
           text: 'A test 1',
@@ -165,7 +165,9 @@ describe('DeactivateTemporaryDetails', () => {
 
       expect(
         Object.fromEntries(
-          Object.entries(req.form.options.allFields).filter(([n, _]) => n.startsWith('deactivationReasonDescription')),
+          Object.entries(deepReq.form.options.allFields).filter(([n, _]) =>
+            n.startsWith('deactivationReasonDescription'),
+          ),
         ),
       ).toEqual({
         'deactivationReasonDescription-ATEST1': {

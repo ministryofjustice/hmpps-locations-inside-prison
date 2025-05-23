@@ -1,16 +1,15 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
-import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import CellConversionAccommodationType from './accommodationType'
 import fields from '../../routes/cellConversion/fields'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('CellConversionAccommodationType', () => {
   const controller = new CellConversionAccommodationType({ route: '/' })
-  let req: FormWizard.Request
-  let res: DeepPartial<Response>
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
   let sessionModelSave: jest.Mock
   let sessionModelSet: jest.Mock
@@ -18,7 +17,6 @@ describe('CellConversionAccommodationType', () => {
   let updateSessionData: jest.Mock
   let journeyModelSet: jest.Mock
   let journeyModelGet: jest.Mock
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   const initialJourneyHistory = () => [
@@ -74,7 +72,7 @@ describe('CellConversionAccommodationType', () => {
     updateSessionData = jest.fn()
     journeyModelSet = jest.fn()
     journeyModelGet = jest.fn().mockReturnValue(initialJourneyHistory())
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -90,7 +88,6 @@ describe('CellConversionAccommodationType', () => {
         reset: jest.fn(),
       },
       services: {
-        authService,
         locationsService,
       },
       session: {
@@ -103,15 +100,15 @@ describe('CellConversionAccommodationType', () => {
         unset: sessionModelUnset,
         updateSessionData,
       },
-    } as unknown as FormWizard.Request
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build(),
+        decoratedLocation: buildDecoratedLocation(),
         options: {
           fields,
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -147,14 +144,13 @@ describe('CellConversionAccommodationType', () => {
       },
     ]
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getAccommodationTypes = jest.fn().mockResolvedValue(allAccommodationTypes)
   })
 
   describe('configure', () => {
     it('adds the options to the field', async () => {
-      await controller.configure(req, res as Response, next)
-      expect(req.form.options.fields.accommodationType.items).toEqual([
+      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(deepReq.form.options.fields.accommodationType.items).toEqual([
         {
           text: 'Care and separation',
           value: 'CARE_AND_SEPARATION',
@@ -173,7 +169,7 @@ describe('CellConversionAccommodationType', () => {
 
   describe('locals', () => {
     beforeEach(() => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'accommodationType',
           type: 'required',
@@ -184,7 +180,7 @@ describe('CellConversionAccommodationType', () => {
     })
 
     it('returns the expected locals', () => {
-      const result = controller.locals(req, res as Response)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -201,11 +197,11 @@ describe('CellConversionAccommodationType', () => {
 
     describe('when edititng', () => {
       beforeEach(() => {
-        req.isEditing = true
+        deepReq.isEditing = true
       })
 
       it('returns the expected locals', () => {
-        const result = controller.locals(req, res as Response)
+        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
         expect(result).toEqual({
           backLink: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/confirm',
@@ -222,7 +218,7 @@ describe('CellConversionAccommodationType', () => {
 
       describe('when the used for types have been set already', () => {
         beforeEach(() => {
-          req.sessionModel.get = jest.fn().mockImplementation(key => (key === 'usedForTypes' ? ['HELIPAD'] : null))
+          deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'usedForTypes' ? ['HELIPAD'] : null))
         })
 
         it('makes the next step valid in so that the journey is valid if we click back', () => {
@@ -230,21 +226,21 @@ describe('CellConversionAccommodationType', () => {
           newHistory[2].invalid = false
           newHistory[2].revalidate = false
 
-          controller.locals(req, res as Response)
+          controller.locals(deepReq as FormWizard.Request, deepRes as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
       })
 
       describe('when the used for types have not yet been set', () => {
         beforeEach(() => {
-          req.sessionModel.get = jest.fn().mockReturnValue(undefined)
+          deepReq.sessionModel.get = jest.fn().mockReturnValue(undefined)
           const history = initialJourneyHistory()
           history[1].next = '/location/44711e6c-7b06-451e-95fe-c454e6957744/cell-conversion/used-for'
           journeyModelGet.mockReturnValue(history)
         })
 
         it('sets the next step back to /specific-cell-type so that the journey is valid if we click back', () => {
-          controller.locals(req, res as Response)
+          controller.locals(deepReq as FormWizard.Request, deepRes as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', initialJourneyHistory())
         })
       })
@@ -252,7 +248,7 @@ describe('CellConversionAccommodationType', () => {
       describe('when it is NORMAL_ACCOMMODATION and there is a saved accommodation type', () => {
         describe('when no used for types have been set', () => {
           beforeEach(() => {
-            req.sessionModel.get = jest
+            deepReq.sessionModel.get = jest
               .fn()
               .mockImplementation(
                 (key: string) =>
@@ -263,20 +259,20 @@ describe('CellConversionAccommodationType', () => {
           })
 
           it('directly sets this as the accommodation type in the session', () => {
-            controller.locals(req, res as Response)
+            controller.locals(deepReq as FormWizard.Request, deepRes as Response)
             expect(updateSessionData).toHaveBeenCalledWith({ accommodationType: 'CARE_AND_SEPARATION' })
             expect(sessionModelSave).toHaveBeenCalled()
           })
 
           it('updates the locals with the saved accommodation type', () => {
-            controller.locals(req, res as Response)
-            expect(res.locals.values.accommodationType).toEqual('CARE_AND_SEPARATION')
+            controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+            expect(deepRes.locals.values.accommodationType).toEqual('CARE_AND_SEPARATION')
           })
         })
 
         describe('when there are used for types but no specialist cell types and working cap is zero', () => {
           beforeEach(() => {
-            req.sessionModel.get = jest.fn().mockImplementation(
+            deepReq.sessionModel.get = jest.fn().mockImplementation(
               (key: string) =>
                 ({
                   accommodationType: 'NORMAL_ACCOMMODATION',
@@ -288,20 +284,20 @@ describe('CellConversionAccommodationType', () => {
           })
 
           it('directly sets this as the accommodation type in the session', () => {
-            controller.locals(req, res as Response)
+            controller.locals(deepReq as FormWizard.Request, deepRes as Response)
             expect(updateSessionData).toHaveBeenCalledWith({ accommodationType: 'CARE_AND_SEPARATION' })
             expect(sessionModelSave).toHaveBeenCalled()
           })
 
           it('updates the locals with the saved accommodation type', () => {
-            controller.locals(req, res as Response)
-            expect(res.locals.values.accommodationType).toEqual('CARE_AND_SEPARATION')
+            controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+            expect(deepRes.locals.values.accommodationType).toEqual('CARE_AND_SEPARATION')
           })
         })
 
         describe('when there are used for types and specialist cell types and working cap is zero', () => {
           beforeEach(() => {
-            req.sessionModel.get = jest.fn().mockImplementation(
+            deepReq.sessionModel.get = jest.fn().mockImplementation(
               (key: string) =>
                 ({
                   accommodationType: 'NORMAL_ACCOMMODATION',
@@ -314,13 +310,13 @@ describe('CellConversionAccommodationType', () => {
           })
 
           it('does not directly set this as the accommodation type in the session', () => {
-            controller.locals(req, res as Response)
+            controller.locals(deepReq as FormWizard.Request, deepRes as Response)
             expect(updateSessionData).not.toHaveBeenCalledWith({ accommodationType: 'CARE_AND_SEPARATION' })
           })
 
           it('does not update the locals with the saved accommodation type', () => {
-            controller.locals(req, res as Response)
-            expect(res.locals.values.accommodationType).not.toEqual('CARE_AND_SEPARATION')
+            controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+            expect(deepRes.locals.values.accommodationType).not.toEqual('CARE_AND_SEPARATION')
           })
         })
       })
@@ -330,13 +326,13 @@ describe('CellConversionAccommodationType', () => {
   describe('saveValues', () => {
     describe('when edititng', () => {
       beforeEach(() => {
-        req.isEditing = true
+        deepReq.isEditing = true
       })
 
       describe('when accommodation type is NORMAL_ACCOMMODATION', () => {
         beforeEach(() => {
-          req.form.values.accommodationType = 'NORMAL_ACCOMMODATION'
-          req.sessionModel.get = jest
+          deepReq.form.values.accommodationType = 'NORMAL_ACCOMMODATION'
+          deepReq.sessionModel.get = jest
             .fn()
             .mockImplementation(key => (key === 'accommodationType' ? 'CARE_AND_SEPARATION' : undefined))
 
@@ -347,7 +343,7 @@ describe('CellConversionAccommodationType', () => {
         })
 
         it('saves the previous accomodation type', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(sessionModelSet).toHaveBeenCalledWith('previousAccommodationType', 'CARE_AND_SEPARATION')
         })
 
@@ -356,29 +352,29 @@ describe('CellConversionAccommodationType', () => {
           newHistory[2].invalid = true
           newHistory[2].revalidate = true
 
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(next).toHaveBeenCalled()
         })
       })
 
       describe('when accommodation type is not NORMAL_ACCOMMODATION', () => {
         beforeEach(() => {
-          req.form.values.accommodationType = 'CARE_AND_SEPARATION'
+          deepReq.form.values.accommodationType = 'CARE_AND_SEPARATION'
         })
 
         it('unsets the used for types and saved accommodation type in the session', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('usedForTypes')
           expect(sessionModelUnset).toHaveBeenCalledWith('previousAccommodationType')
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(next).toHaveBeenCalled()
         })
       })

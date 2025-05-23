@@ -1,6 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
 
 export default class NonResidentialConversionDetails extends FormInitialStep {
   middlewareSetup() {
@@ -9,8 +10,7 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
   }
 
   async setOptions(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const token = await req.services.authService.getSystemClientToken(res.locals.user.username)
-    const convertedCellTypes = await req.services.locationsService.getConvertedCellTypes(token)
+    const convertedCellTypes = await req.services.locationsService.getConvertedCellTypes(req.session.systemToken)
 
     req.form.options.fields.convertedCellType.items = Object.values(convertedCellTypes).map(({ key, description }) => ({
       value: key,
@@ -21,11 +21,11 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
 
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     return {
       ...locals,

@@ -1,9 +1,12 @@
-import LocationFactory from '../../../../testutils/factories/location'
+import { DeepPartial } from 'fishery'
+import { Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import getResidentialSummaries from './getResidentialSummaries'
+import LocationFactory from '../../../../testutils/factories/location'
 
 describe('getResidentialSummaries', () => {
-  let req: any
-  let res: any
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: any
 
   const location = LocationFactory.build({
@@ -13,18 +16,15 @@ describe('getResidentialSummaries', () => {
 
   beforeEach(() => {
     next = jest.fn()
-    req = {
+    deepReq = {
       session: {},
       services: {
-        authService: {
-          getSystemClientToken: jest.fn().mockResolvedValue('token'),
-        },
         locationsService: {
           getResidentialSummary: jest.fn().mockResolvedValue('residentialSummary'),
         },
       },
     }
-    res = {
+    deepRes = {
       locals: {
         location,
         user: {
@@ -35,9 +35,9 @@ describe('getResidentialSummaries', () => {
   })
 
   it('sets the summary locals', async () => {
-    await getResidentialSummaries(req, res, next)
+    await getResidentialSummaries(deepReq as FormWizard.Request, deepRes as Response, next)
 
-    expect(res.locals.locationResidentialSummary).toEqual('residentialSummary')
-    expect(res.locals.prisonResidentialSummary).toEqual('residentialSummary')
+    expect(deepRes.locals.locationResidentialSummary).toEqual('residentialSummary')
+    expect(deepRes.locals.prisonResidentialSummary).toEqual('residentialSummary')
   })
 })

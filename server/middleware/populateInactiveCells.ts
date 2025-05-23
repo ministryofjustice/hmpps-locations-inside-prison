@@ -1,24 +1,20 @@
-import { RequestHandler } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 import { Services } from '../services'
 import decorateLocation from '../decorators/location'
 import logger from '../../logger'
 
-export default function populateInactiveCells({
-  authService,
-  locationsService,
-  manageUsersService,
-}: Services): RequestHandler {
-  return async (req, res, next) => {
+export default function populateInactiveCells({ locationsService, manageUsersService }: Services) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { systemToken } = req.session
     const { user, prisonId } = res.locals
 
     try {
-      const token = await authService.getSystemClientToken(user.username)
       res.locals.inactiveCells = await Promise.all(
-        ((await locationsService.getInactiveCells(token, prisonId, req.params.locationId)) || []).map(location =>
+        ((await locationsService.getInactiveCells(systemToken, prisonId, req.params.locationId)) || []).map(location =>
           decorateLocation({
             location,
-            systemToken: token,
-            userToken: res.locals.user.token,
+            systemToken,
+            userToken: user.token,
             manageUsersService,
             locationsService,
           }),

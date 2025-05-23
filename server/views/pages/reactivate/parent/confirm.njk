@@ -36,7 +36,7 @@
         <div class="govuk-!-padding-bottom-2 change-summary">
           <h2 class="govuk-heading-m">Change to establishment capacity</h2>
           {% set topLevelLocationNames = [] %}
-          {% for topLevelLocationData in locations %}
+          {% for topLevelLocationData in locationTree %}
             {% if not topLevelLocationData.location.leafLevel %}
               {% set topLevelLocationNames = (topLevelLocationNames.push(topLevelLocationData.location.localName or topLevelLocationData.location.pathHierarchy), topLevelLocationNames) %}
             {% endif %}

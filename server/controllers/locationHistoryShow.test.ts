@@ -10,8 +10,8 @@ jest.mock('../services/authService')
 jest.mock('../services/manageUsersService')
 
 describe('view locations show', () => {
-  let req: Request
-  let res: DeepPartial<Response>
+  let deepReq: DeepPartial<Request>
+  let deepRes: DeepPartial<Response>
   let controller: (req: Request, res: Response) => Promise<void>
   let services: Partial<Services>
   const authService = jest.mocked(new AuthService(null))
@@ -19,8 +19,12 @@ describe('view locations show', () => {
 
   beforeEach(() => {
     const location = LocationFactory.build()
-    req = {} as Request
-    res = {
+    deepReq = {
+      session: {
+        systemToken: 'token',
+      },
+    }
+    deepRes = {
       locals: {
         location,
         user: {
@@ -38,9 +42,9 @@ describe('view locations show', () => {
   })
 
   it('renders the page', async () => {
-    await controller(req, res as Response)
+    await controller(deepReq as Request, deepRes as Response)
 
-    expect(res.render).toHaveBeenCalledWith('pages/locationHistory/show', {
+    expect(deepRes.render).toHaveBeenCalledWith('pages/locationHistory/show', {
       backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
       tableRows: [
         [
@@ -60,9 +64,9 @@ describe('view locations show', () => {
     })
 
     it('renders the page', async () => {
-      await controller(req, res as Response)
+      await controller(deepReq as Request, deepRes as Response)
 
-      expect(res.render).toHaveBeenCalledWith('pages/locationHistory/show', {
+      expect(deepRes.render).toHaveBeenCalledWith('pages/locationHistory/show', {
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         tableRows: [
           [{ text: 'Location Type' }, { text: 'CELL' }, { text: 'WING' }, { text: 'Unknown' }, { text: '05/07/2021' }],

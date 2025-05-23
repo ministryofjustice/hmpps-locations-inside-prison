@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import NonResidentialConversionDetails from './details'
-import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/nonResidentialConversion/fields'
@@ -9,14 +9,13 @@ import maxLength from '../../validators/maxLength'
 
 describe('NonResidentialConversionDetails', () => {
   const controller = new NonResidentialConversionDetails({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -28,9 +27,9 @@ describe('NonResidentialConversionDetails', () => {
         },
       },
       services: {
-        authService,
         locationsService,
       },
+      session: { systemToken: 'token' },
       sessionModel: {
         set: jest.fn(),
         get: jest.fn(
@@ -39,13 +38,13 @@ describe('NonResidentialConversionDetails', () => {
               convertedCellType: { text: 'Treatment room', value: 'TREATMENT_ROOM' },
               otherConvertedCellType: 'pet therapy room',
             })[fieldName],
-        ),
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({
+        decoratedLocation: LocationFactory.build({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           localName: 'A-1-001',
           capacity: {
@@ -69,10 +68,9 @@ describe('NonResidentialConversionDetails', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getConvertedCellTypes = jest.fn().mockResolvedValue([
       {
         key: 'KITCHEN_SERVERY',
@@ -91,11 +89,11 @@ describe('NonResidentialConversionDetails', () => {
 
   describe('setOptions', () => {
     beforeEach(async () => {
-      await controller.setOptions(req, res, next)
+      await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('sets the correct radio items', () => {
-      expect(req.form.options.fields.convertedCellType.items).toEqual([
+      expect(deepReq.form.options.fields.convertedCellType.items).toEqual([
         { text: 'Kitchen / Servery', value: 'KITCHEN_SERVERY' },
         { text: 'Office', value: 'OFFICE' },
         {
@@ -107,14 +105,14 @@ describe('NonResidentialConversionDetails', () => {
     })
 
     it('calls next', () => {
-      controller.saveValues(req, res, next)
+      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalled()
     })
   })
 
   describe('locals', () => {
     it('returns the correct locals', () => {
-      expect(controller.locals(req, res)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           convertedCellType: {
@@ -167,7 +165,7 @@ describe('NonResidentialConversionDetails', () => {
 
   describe('saveValues', () => {
     beforeEach(() => {
-      req.form.options.fields.convertedCellType.items = [
+      deepReq.form.options.fields.convertedCellType.items = [
         { text: 'Kitchen / Servery', value: 'KITCHEN_SERVERY' },
         { text: 'Office', value: 'OFFICE' },
         {
@@ -176,16 +174,16 @@ describe('NonResidentialConversionDetails', () => {
           value: 'OTHER',
         },
       ]
-      controller.saveValues(req, res, next)
+      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('sets the session model correctly', () => {
-      expect(req.sessionModel.set).toHaveBeenCalledWith('convertedCellType', {
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('convertedCellType', {
         conditional: 'otherConvertedCellType',
         text: 'Other',
         value: 'OTHER',
       })
-      expect(req.sessionModel.set).toHaveBeenCalledWith('otherConvertedCellType', 'pet therapy room')
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('otherConvertedCellType', 'pet therapy room')
     })
 
     it('calls next', () => {

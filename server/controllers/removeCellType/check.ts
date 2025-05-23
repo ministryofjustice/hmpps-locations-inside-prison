@@ -11,8 +11,8 @@ export default class CheckRemoveCellType extends FormInitialStep {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { location } = res.locals
-    const { id: locationId, prisonId, specialistCellTypes } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId, specialistCellTypes } = decoratedLocation
 
     const multipleTypes = specialistCellTypes.length > 1
 
@@ -41,8 +41,8 @@ export default class CheckRemoveCellType extends FormInitialStep {
   }
 
   validate(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
     const { areYouSure } = req.form.values
 
     if (areYouSure !== 'yes') {

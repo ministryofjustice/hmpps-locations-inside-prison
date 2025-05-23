@@ -1,7 +1,6 @@
-import { RequestHandler } from 'express'
 import asyncMiddleware from './asyncMiddleware'
 
-export default function populateCards(): RequestHandler {
+export default function populateCards() {
   return asyncMiddleware((_req, res, next) => {
     res.locals.cards = [
       {

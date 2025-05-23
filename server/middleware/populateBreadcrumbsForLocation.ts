@@ -1,5 +1,4 @@
 import asyncMiddleware from './asyncMiddleware'
-import { Location } from '../data/types/locationsApi'
 
 const populateBreadcrumbsForLocation = asyncMiddleware((req, res, next) => {
   const { breadcrumbs, topLevelLocationType, locationHierarchy, prisonId } = res.locals
@@ -11,7 +10,7 @@ const populateBreadcrumbsForLocation = asyncMiddleware((req, res, next) => {
     })
 
     breadcrumbs.push(
-      ...locationHierarchy.map((l: Location) => {
+      ...locationHierarchy.map(l => {
         return { title: l.localName || l.code, href: `/view-and-update-locations/${l.prisonId}/${l.id}` }
       }),
     )

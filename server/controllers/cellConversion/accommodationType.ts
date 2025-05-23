@@ -2,13 +2,13 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import setStepValidity from '../../lib/setStepValidity'
+import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionAccommodationType extends FormInitialStep {
   async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const token = await req.services.authService.getSystemClientToken(res.locals.user.username)
-    const accommodationTypes = (await req.services.locationsService.getAccommodationTypes(token)).filter(
-      type => type.key !== 'OTHER_NON_RESIDENTIAL',
-    )
+    const accommodationTypes = (
+      await req.services.locationsService.getAccommodationTypes(req.session.systemToken)
+    ).filter(type => type.key !== 'OTHER_NON_RESIDENTIAL')
 
     req.form.options.fields.accommodationType.items = Object.values(accommodationTypes).map(({ key, description }) => ({
       text: description,
@@ -18,9 +18,9 @@ export default class CellConversionAccommodationType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
     const { sessionModel } = req
 
     if (req.isEditing) {

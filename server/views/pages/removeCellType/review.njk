@@ -7,16 +7,13 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% from "../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../macros/miniSummary.njk" import miniSummary %}
-
 {% set title = "Review cell capacity" %}
 
 {% block heading %}
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+        <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
         <h1 class="govuk-heading-l">Review cell capacity</h1>
       </div>
     </div>

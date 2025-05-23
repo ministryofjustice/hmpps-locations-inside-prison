@@ -1,11 +1,12 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
 
 export default class DeactivateTemporaryOccupied extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     return {
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,

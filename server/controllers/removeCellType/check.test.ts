@@ -1,17 +1,18 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import CheckRemoveCellType from './check'
-import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/removeCellType/fields'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('CheckRemoveCellType', () => {
   const controller = new CheckRemoveCellType({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -21,11 +22,11 @@ describe('CheckRemoveCellType', () => {
           areYouSure: 'yes',
         },
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'MDI',
         }),
@@ -40,13 +41,13 @@ describe('CheckRemoveCellType', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
   })
 
   describe('locals', () => {
     beforeEach(() => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'areYouSure',
           type: 'required',
@@ -57,8 +58,8 @@ describe('CheckRemoveCellType', () => {
     })
 
     it('returns the expected locals for a single cell type', () => {
-      res.locals.location.specialistCellTypes = ['Accessible cell']
-      const result = controller.locals(req, res)
+      deepRes.locals.decoratedLocation.specialistCellTypes = ['Accessible cell']
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -76,8 +77,8 @@ describe('CheckRemoveCellType', () => {
     })
 
     it('returns the expected locals for multiple cell types', () => {
-      res.locals.location.specialistCellTypes = ['Dry cell', 'Escape list cell']
-      const result = controller.locals(req, res)
+      deepRes.locals.decoratedLocation.specialistCellTypes = ['Dry cell', 'Escape list cell']
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -97,16 +98,18 @@ describe('CheckRemoveCellType', () => {
 
   describe('validate', () => {
     it('redirects to the show location page when no is selected', () => {
-      req.form.values = { areYouSure: 'no' }
-      res.redirect = jest.fn()
-      controller.validate(req, res, next)
+      deepReq.form.values = { areYouSure: 'no' }
+      deepRes.redirect = jest.fn()
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+      )
     })
 
     it('calls next when yes is selected', () => {
-      req.form.values = { areYouSure: 'yes' }
-      controller.validate(req, res, next)
+      deepReq.form.values = { areYouSure: 'yes' }
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalled()
     })
   })

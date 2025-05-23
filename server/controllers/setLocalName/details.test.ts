@@ -1,26 +1,26 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import Details from './details'
-import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/setLocalName/fields'
 import AnalyticsService from '../../services/analyticsService'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('SetLocalName', () => {
   const controller = new Details({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       flash: jest.fn(),
       session: {
         referrerUrl: '',
+        systemToken: 'token',
       },
       form: {
         options: {
@@ -32,7 +32,6 @@ describe('SetLocalName', () => {
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       sessionModel: {
@@ -43,12 +42,12 @@ describe('SetLocalName', () => {
       journeyModel: {
         reset: jest.fn(),
       },
-    } as unknown as typeof req
+    }
 
-    res = {
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           capacity: {
             maxCapacity: 2,
@@ -67,11 +66,10 @@ describe('SetLocalName', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
 
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getLocation = jest.fn().mockResolvedValue(true)
     locationsService.updateLocalName = jest.fn().mockResolvedValue(true)
     analyticsService.sendEvent = jest.fn()
@@ -83,9 +81,9 @@ describe('SetLocalName', () => {
 
   describe('locals', () => {
     it('returns the correct locals', () => {
-      res.locals.location.localName = 'Wing A'
+      deepRes.locals.decoratedLocation.localName = 'Wing A'
 
-      expect(controller.locals(req, res)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
@@ -122,15 +120,15 @@ describe('SetLocalName', () => {
 
   describe('validateFields', () => {
     it('if local name already exists, callback with error', async () => {
-      req.form.values.localName = 'existing local name'
+      deepReq.form.values.localName = 'existing local name'
       locationsService.getLocationByLocalName = jest.fn().mockResolvedValue(true)
 
       const expectedError = controller.formError('localName', 'localNameExists')
 
       const callback = jest.fn()
-      await controller.validateFields(req, res, callback)
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(callback).toHaveBeenCalledWith(expect.objectContaining({ localName: expectedError }))
     })
@@ -138,9 +136,9 @@ describe('SetLocalName', () => {
 
   describe('saveValues', () => {
     it('sets a local name via the locations API', async () => {
-      req.form.values.localName = 'new local name'
+      deepReq.form.values.localName = 'new local name'
       locationsService.getLocationByLocalName = jest.fn().mockResolvedValue(false)
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(locationsService.updateLocalName).toHaveBeenCalledWith(
         'token',
         'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -150,46 +148,48 @@ describe('SetLocalName', () => {
     })
 
     it('sends an analytics event', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'set_local_name', { prison_id: 'TST' })
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'set_local_name', { prison_id: 'TST' })
     })
 
     it('calls next when successful', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalled()
     })
 
     it('calls next with any errors', async () => {
       const error = new Error('API error')
       ;(locationsService.updateLocalName as jest.Mock).mockRejectedValue(error)
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalledWith(error)
     })
   })
 
   describe('successHandler', () => {
     beforeEach(() => {
-      controller.successHandler(req, res, next)
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('resets the journey model', () => {
-      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
     })
 
     it('resets the session model', () => {
-      expect(req.sessionModel.reset).toHaveBeenCalled()
+      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
     })
 
     it('sets the flash correctly', () => {
-      expect(req.flash).toHaveBeenCalledWith('success', {
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
         content: 'You have added a local name.',
         title: 'Local name added',
       })
     })
 
     it('redirects to the view location page', () => {
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+      )
     })
   })
 })

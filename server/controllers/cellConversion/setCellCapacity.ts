@@ -1,12 +1,13 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionSetCellCapacity extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     return {
       ...locals,

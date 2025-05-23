@@ -1,25 +1,26 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import DeactivatePermanentWarning from './warning'
-import LocationFactory from '../../../testutils/factories/location'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('DeactivatePermanentWarning', () => {
   const controller = new DeactivatePermanentWarning({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
 
   beforeEach(() => {
-    req = {} as unknown as FormWizard.Request
-    res = {
+    deepReq = {}
+    deepRes = {
       locals: {
-        location: LocationFactory.build(),
+        decoratedLocation: buildDecoratedLocation(),
       },
-    } as unknown as Response
+    }
   })
 
   describe('locals', () => {
     it('returns the expected locals when back link not yet set', () => {
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -29,8 +30,8 @@ describe('DeactivatePermanentWarning', () => {
   })
 
   it('returns the expected locals when back link already set', () => {
-    res.locals.backLink = '/last/step'
-    const result = controller.locals(req, res)
+    deepRes.locals.backLink = '/last/step'
+    const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
     expect(result).toEqual({
       backLink: '/last/step',

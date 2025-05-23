@@ -1,17 +1,18 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import fields from '../../routes/deactivate/fields'
 import ChangeTemporaryDeactivationDetails from './details'
-import { Services } from '../../services'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('ChangeTemporaryDeactivationDetails', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
   const controller = new ChangeTemporaryDeactivationDetails({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
   let formValues: FormWizard.Values
 
@@ -24,7 +25,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       planetFmReference: '123456',
     }
 
-    req = {
+    deepReq = {
       body: {
         'deactivationReasonDescription-DAMAGE': 'Damage',
         'estimatedReactivationDate-day': '20',
@@ -44,9 +45,12 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: keyof typeof formValues) => formValues[fieldName]),
+        get: jest.fn(
+          (fieldName?: keyof typeof formValues) => formValues[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
         reset: jest.fn(),
       },
       journeyModel: {
@@ -54,19 +58,15 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       },
       services: {
         analyticsService,
-        authService: {
-          hmppsAuthClient: {},
-          getSystemClientToken: jest.fn().mockResolvedValue('token'),
-        },
         locationsService,
       },
       flash: jest.fn(),
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
@@ -74,14 +74,14 @@ describe('ChangeTemporaryDeactivationDetails', () => {
             workingCapacity: 2,
           },
           locationType: 'CELL',
-        },
+        }),
         options: {
           fields,
         },
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -90,7 +90,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
         values: formValues,
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
     locationsService.updateTemporaryDeactivation = jest.fn()
@@ -99,29 +99,29 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
   describe('validateFields', () => {
     it('sets deactivationReasonDescription to the correct value', () => {
-      req.body = {
+      deepReq.body = {
         'deactivationReasonDescription-TEST1': 'test1',
         'deactivationReasonDescription-TEST2': 'test2',
         'deactivationReasonDescription-TEST3': 'test3',
       }
-      req.form.values.deactivationReason = 'TEST2'
+      deepReq.form.values.deactivationReason = 'TEST2'
       const callback = jest.fn()
-      controller.validateFields(req, res, callback)
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(req.form.values.deactivationReasonDescription).toEqual('test2')
+      expect(deepReq.form.values.deactivationReasonDescription).toEqual('test2')
     })
   })
 
   describe('locals', () => {
     it('returns the expected locals', () => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'deactivationReasonOther',
           type: 'required',
           url: '/',
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/referrer-url',
@@ -140,13 +140,13 @@ describe('ChangeTemporaryDeactivationDetails', () => {
   describe('compareInitialAndSubmittedValues', () => {
     it('returns a boolean true value if the objects do not match', () => {
       const submittedValues = {
-        ...req.form.values,
+        ...deepReq.form.values,
       }
       submittedValues.estimatedReactivationDate = ''
 
       expect(
         controller.compareInitialAndSubmittedValues({
-          initialValues: req.form.values,
+          initialValues: deepReq.form.values,
           submittedValues,
         }),
       ).toBe(true)
@@ -154,12 +154,12 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
     it('returns a boolean false value if the objects match', () => {
       const submittedValues = {
-        ...req.form.values,
+        ...deepReq.form.values,
       }
 
       expect(
         controller.compareInitialAndSubmittedValues({
-          initialValues: req.form.values,
+          initialValues: deepReq.form.values,
           submittedValues,
         }),
       ).toBe(false)
@@ -168,19 +168,16 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
   describe('populateItems', () => {
     it('populates the items ', async () => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
+      deepReq.services = {
         locationsService: {
-          getDeactivatedReasons: () => ({ ATEST1: 'A test 1', OTHER: 'Other', TEST2: 'Test 2' }),
+          getDeactivatedReasons: () => Promise.resolve({ ATEST1: 'A test 1', OTHER: 'Other', TEST2: 'Test 2' }),
         },
-      } as unknown as Services
+      }
 
       const callback = jest.fn()
-      await controller.populateItems(req, res, callback)
+      await controller.populateItems(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(req.form.options.fields.deactivationReason.items).toEqual([
+      expect(deepReq.form.options.fields.deactivationReason.items).toEqual([
         {
           conditional: 'deactivationReasonDescription-ATEST1',
           text: 'A test 1',
@@ -200,7 +197,9 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
       expect(
         Object.fromEntries(
-          Object.entries(req.form.options.allFields).filter(([n, _]) => n.startsWith('deactivationReasonDescription')),
+          Object.entries(deepReq.form.options.allFields).filter(([n, _]) =>
+            n.startsWith('deactivationReasonDescription'),
+          ),
         ),
       ).toEqual({
         'deactivationReasonDescription-ATEST1': {
@@ -227,9 +226,11 @@ describe('ChangeTemporaryDeactivationDetails', () => {
         planetFmReference: '123456',
       })
 
-      controller.validate(req, res, jest.fn())
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+      )
     })
   })
 
@@ -241,11 +242,11 @@ describe('ChangeTemporaryDeactivationDetails', () => {
     it('calls locationsService.updateTemporaryDeactivation with correct values if values have changed', async () => {
       jest.spyOn(controller, 'getInitialValues').mockReturnValue(formValues)
 
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(locationsService.updateTemporaryDeactivation).toHaveBeenCalledWith(
         'token',
-        res.locals.location.id,
+        deepRes.locals.decoratedLocation.id,
         'OTHER',
         'Other',
         '2030-04-20',
@@ -257,23 +258,23 @@ describe('ChangeTemporaryDeactivationDetails', () => {
     it('sends an analytics event', async () => {
       jest.spyOn(controller, 'getInitialValues').mockReturnValue(formValues)
 
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_temp_deactivation', {
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'change_temp_deactivation', {
         prison_id: 'TST',
         deactivation_reason: 'OTHER',
-        location_type: 'CELL',
+        location_type: 'Cell',
       })
     })
 
     it('calls next with an error if an error is thrown', async () => {
       const error = new Error('Some error')
 
-      req.services.authService.getSystemClientToken = jest.fn().mockImplementation(() => {
+      deepReq.services.locationsService.updateTemporaryDeactivation = jest.fn().mockImplementation(() => {
         throw error
       })
 
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalledWith(error)
     })
@@ -281,20 +282,20 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
   describe('successHandler', () => {
     beforeEach(() => {
-      res.locals.valuesHaveChanged = true
-      controller.successHandler(req, res, next)
+      deepRes.locals.valuesHaveChanged = true
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('resets the journey model', () => {
-      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
     })
 
     it('resets the session model', () => {
-      expect(req.sessionModel.reset).toHaveBeenCalled()
+      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
     })
 
     it('sets the flash correctly', () => {
-      expect(req.flash).toHaveBeenCalledWith('success', {
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
         title: 'Deactivation details updated',
         content: `You have updated the deactivation details for this location.`,
       })
@@ -303,7 +304,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
   describe('compareInitialAndSubmittedValues', () => {
     it('should convert undefined date values into empty strings', () => {
-      const initialValues = req.form.values
+      const initialValues = deepReq.form.values
       initialValues.estimatedReactivationDate = undefined
 
       const submittedValues = initialValues

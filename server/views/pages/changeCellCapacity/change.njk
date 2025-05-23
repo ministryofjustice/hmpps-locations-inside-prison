@@ -7,13 +7,10 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
-{% from "../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../macros/miniSummary.njk" import miniSummary %}
-
 {% set title = "Change cell capacity" %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+  <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
   <h1 class="govuk-heading-l">Change cell capacity</h1>
 {% endblock %}
 
@@ -27,6 +24,8 @@
         }) }}
 
         {% if errorlist.length %}
+          {{ errorlist | dump }}
+          {{ validationErrors | dump }}
           {{ govukErrorSummary({
             titleText: "There is a problem",
             errorList: validationErrors,

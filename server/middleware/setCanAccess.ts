@@ -1,8 +1,8 @@
-import { RequestHandler } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 import { rolesToPermissions } from '../lib/permissions'
 
-export default function setCanAccess(): RequestHandler {
-  return async (req, res, next) => {
+export default function setCanAccess() {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const { userRoles } = res.locals.user
     const permissions = rolesToPermissions(userRoles)
 

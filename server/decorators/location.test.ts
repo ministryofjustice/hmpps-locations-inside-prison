@@ -1,22 +1,25 @@
+import { DeepPartial } from 'fishery'
 import LocationFactory from '../testutils/factories/location'
 import decorateLocation from './location'
 import ManageUsersService from '../services/manageUsersService'
 import LocationsService from '../services/locationsService'
 
-const manageUsersService = {
+const deepManageUsersService: DeepPartial<ManageUsersService> = {
   getUser: (_token: string, username: string) => {
-    return { name: `Resolved ${username}` }
+    return Promise.resolve({ name: `Resolved ${username}`, username })
   },
-} as unknown as ManageUsersService
+}
+const manageUsersService = deepManageUsersService as ManageUsersService
 
-const locationsService = {
-  getAccommodationType: (_token: string, type: string) => `Resolved ${type}`,
-  getConvertedCellType: (_token: string, type: string) => `Resolved ${type}`,
-  getDeactivatedReason: (_token: string, type: string) => `Resolved ${type}`,
-  getLocationType: (_token: string, type: string) => `Resolved ${type}`,
-  getSpecialistCellType: (_token: string, type: string) => `Resolved ${type}`,
-  getUsedForType: (_token: string, type: string) => `Resolved ${type}`,
-} as unknown as LocationsService
+const deepLocationsService: DeepPartial<LocationsService> = {
+  getAccommodationType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+  getConvertedCellType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+  getDeactivatedReason: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+  getLocationType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+  getSpecialistCellType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+  getUsedForType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+}
+const locationsService = deepLocationsService as LocationsService
 
 describe('decorateLocation', () => {
   describe('when limited = false', () => {

@@ -8,13 +8,10 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
-{% from "../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../macros/miniSummary.njk" import miniSummary %}
-
 {% set title = pageTitleText %}
 
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+  <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
   <h1 class="govuk-heading-l">{{ pageTitleText }}</h1>
 {% endblock %}
 
@@ -75,7 +72,7 @@
               <li>Unfurnished cells</li>
             </ul>
           {% endset %}
-      
+
           {{ govukInsetText({
             html: workingCapHint
           }) }}

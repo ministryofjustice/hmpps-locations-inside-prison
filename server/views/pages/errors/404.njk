@@ -20,9 +20,9 @@
           <a href="/">Return to Residential locations</a>
         </p>
 
-        {% if message or stack %}
-          <h2 class="govuk-heading-m">{{ message }}</h2>
-          <pre>{{ stack }}</pre>
+        {% if errorMessage or errorStack %}
+          <h2 class="govuk-heading-m">{{ errorMessage }}</h2>
+          <pre>{{ errorStack }}</pre>
         {% endif %}
       </div>
     </div>

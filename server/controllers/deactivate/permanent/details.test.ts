@@ -1,15 +1,17 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import fields from '../../../routes/deactivate/fields'
 import DeactivatePermanentDetails from './details'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('DeactivatePermanentDetails', () => {
   const controller = new DeactivatePermanentDetails({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -22,28 +24,28 @@ describe('DeactivatePermanentDetails', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        get: jest.fn(_ => 'wing disintegrated'),
+        get: jest.fn(_ => 'wing disintegrated') as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 2,
             workingCapacity: 2,
           },
-        },
+        }),
         options: {
           fields,
         },
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -54,19 +56,19 @@ describe('DeactivatePermanentDetails', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   describe('locals', () => {
     it('returns the expected locals', () => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'permanentDeactivationReason',
           type: 'required',
           url: '/',
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',

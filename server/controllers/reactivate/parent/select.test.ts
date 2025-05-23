@@ -1,12 +1,15 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import ReactivateParentSelect from './select'
 import fields from '../../../routes/reactivate/parent/fields'
+import LocationFactory from '../../../testutils/factories/location'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('ReactivateParentSelect', () => {
   const controller = new ReactivateParentSelect({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let sessionModelValues: {
     referrerPrisonId: string
     referrerLocationId: string
@@ -19,7 +22,7 @@ describe('ReactivateParentSelect', () => {
       referrerLocationId: 'l0',
       selectedLocations: ['l1', 'l2'],
     }
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -30,29 +33,31 @@ describe('ReactivateParentSelect', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: keyof typeof sessionModelValues) => sessionModelValues[fieldName]),
+        get: jest.fn(
+          (fieldName?: keyof typeof sessionModelValues) => sessionModelValues[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 1,
             workingCapacity: 0,
           },
-        },
+        }),
         cells: [
-          {
+          LocationFactory.build({
             id: 'l1',
             oldWorkingCapacity: 2,
             capacity: {
               maxCapacity: 3,
             },
-          },
+          }),
         ],
         options: {
           fields,
@@ -63,24 +68,34 @@ describe('ReactivateParentSelect', () => {
         locationResidentialSummary: {
           subLocationName: 'Wing',
           subLocations: [
-            { id: 'id1', localName: 'Name 1' },
-            { id: 'id2', pathHierarchy: 'A-2' },
-            { id: 'id3', localName: 'Name 3' },
-            { id: 'rr', localName: 'Residential room', isResidential: true, locationType: 'ROOM' },
-            { id: 'nrr', localName: 'Non-residential room', locationType: 'ROOM' },
+            LocationFactory.build({ id: 'id1', localName: 'Name 1' }),
+            LocationFactory.build({ id: 'id2', pathHierarchy: 'A-2' }),
+            LocationFactory.build({ id: 'id3', localName: 'Name 3' }),
+            LocationFactory.build({
+              id: 'rr',
+              localName: 'Residential room',
+              isResidential: true,
+              locationType: 'ROOM',
+            }),
+            LocationFactory.build({
+              id: 'nrr',
+              localName: 'Non-residential room',
+              locationType: 'ROOM',
+              isResidential: false,
+            }),
           ],
         },
         values: sessionModelValues,
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   describe('populateItems', () => {
     it('populates the items and error messages', async () => {
-      await controller.populateItems(req, res, jest.fn())
+      await controller.populateItems(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      const { selectLocations } = req.form.options.fields
+      const { selectLocations } = deepReq.form.options.fields
       expect(selectLocations.items).toEqual([
         {
           text: 'Name 1',
@@ -106,12 +121,12 @@ describe('ReactivateParentSelect', () => {
 
   describe('locals', () => {
     it('sets the correct locals', async () => {
-      const locals: { [key: string]: any } = controller.locals(req, res)
+      const locals: { [key: string]: any } = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(locals.backLink).toEqual(
-        `/view-and-update-locations/${res.locals.location.prisonId}/${res.locals.location.id}`,
+        `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
       )
       expect(locals.cancelLink).toEqual(
-        `/view-and-update-locations/${res.locals.location.prisonId}/${res.locals.location.id}`,
+        `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
       )
       expect(locals.fields).not.toEqual(undefined)
       expect(locals.validationErrors).toEqual([])
@@ -121,15 +136,15 @@ describe('ReactivateParentSelect', () => {
   describe('successHandler', () => {
     describe('when only 1 cell is selected', () => {
       beforeEach(() => {
-        res.locals.locationResidentialSummary.subLocationName = 'Cells'
-        req.form.values.selectLocations = ['id1']
+        deepRes.locals.locationResidentialSummary.subLocationName = 'Cells'
+        deepReq.form.values.selectLocations = ['id1']
       })
 
       it('redirects to the single cell reactivation flow', async () => {
-        await controller.successHandler(req, res, jest.fn())
+        await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-        expect(res.redirect).toHaveBeenCalledWith(
-          `/reactivate/cell/id1?ref=parent&refPrisonId=${res.locals.location.prisonId}&refLocationId=${res.locals.location.id}`,
+        expect(deepRes.redirect).toHaveBeenCalledWith(
+          `/reactivate/cell/id1?ref=parent&refPrisonId=${deepRes.locals.decoratedLocation.prisonId}&refLocationId=${deepRes.locals.decoratedLocation.id}`,
         )
       })
     })
