@@ -102,6 +102,7 @@ interface TypedLocals {
   }
   pageTitleText?: string
   pathSuffix?: string
+  routePrefix?: string
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary
