@@ -2,10 +2,12 @@ import Page, { PageElement } from '../page'
 
 export default class ConfirmCellCapacityPage extends Page {
   constructor() {
-    super('Confirm cell capacity')
+    super('')
   }
 
   updateCellCapacityButton = (): PageElement => cy.get('button:contains("Update cell capacity")')
+
+  updateWorkingCapacityButton = (): PageElement => cy.get('button:contains("Update working capacity")')
 
   changeLink = (): PageElement => cy.get('a:contains("Change")')
 
