@@ -11,7 +11,7 @@
 
 {% block heading %}
   <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
-  <h1 class="govuk-heading-l">Confirm {{ 'cell' if canAccess('change_max_capacity') else 'working' }} capacity</h1>
+  <h1 class="govuk-heading-l">{{ title }}</h1>
 {% endblock %}
 
 {% block beforeContent %}

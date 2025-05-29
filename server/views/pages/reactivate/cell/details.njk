@@ -9,7 +9,7 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
-{% set title = "Check cell capacity" %}
+{% set title = "Check " + ('cell' if canAccess('change_max_capacity') else 'working') + " capacity" %}
 
 {% block heading %}
   <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
@@ -52,9 +52,9 @@
         }) }}
 
         <form method="{{ formMethod }}" action="{{ formAction }}"
-            {% if formEnctype %}
-              enctype="{{ formEnctype }}"
-            {% endif %}
+          {% if formEnctype %}
+            enctype="{{ formEnctype }}"
+          {% endif %}
         >
 
           {% if formMethod == 'post' %}
@@ -64,7 +64,19 @@
           {% block fields %}
             {% for key, fieldsOptions in fields %}
               {% if fieldsOptions.component and not fieldsOptions.skip %}
-                {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+                {% if not canAccess('change_max_capacity') and fieldsOptions.id == 'maxCapacity' %}
+                  <div class="govuk-form-group">
+                    <span class="govuk-label {{ fieldsOptions.label.classes }}">{{ fieldsOptions.label.text }}</span>
+
+                    <div class="govuk-hint">
+                      {{ fieldsOptions.hint.text }}
+                    </div>
+
+                    <span class="govuk-label">{{ fieldsOptions.value }}</span>
+                  </div>
+                {% else %}
+                  {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+                {% endif %}
               {% endif %}
             {% endfor %}
           {% endblock %}

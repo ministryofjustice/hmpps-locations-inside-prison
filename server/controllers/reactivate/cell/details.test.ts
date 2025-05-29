@@ -11,8 +11,14 @@ describe('ReactivateCellDetails', () => {
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
 
+  let permissions: { [permission: string]: boolean }
+
   beforeEach(() => {
+    permissions = {
+      change_max_capacity: true,
+    }
     deepReq = {
+      canAccess: (permission: string) => permissions[permission],
       form: {
         options: {
           fields,
@@ -85,6 +91,85 @@ describe('ReactivateCellDetails', () => {
           key: 'workingCapacity',
           type: 'nonZeroForNormalCell',
         },
+      })
+    })
+
+    describe('when the user has permission to change_max_capacity', () => {
+      beforeEach(() => {
+        permissions.change_max_capacity = true
+      })
+
+      it('does not modify the maxCapacity field', () => {
+        deepReq.form.values = { maxCapacity: '0', workingCapacity: '5' }
+        deepRes.locals.decoratedLocation.raw.accommodationTypes = ['NORMAL_ACCOMMODATION']
+        deepRes.locals.decoratedLocation.raw.specialistCellTypes = []
+        const callback = jest.fn()
+        controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+        expect(callback).toHaveBeenCalledWith({
+          maxCapacity: {
+            args: {
+              greaterThan: 0,
+            },
+            errorGroup: undefined,
+            field: undefined,
+            headerMessage: undefined,
+            key: 'maxCapacity',
+            message: undefined,
+            redirect: undefined,
+            type: 'greaterThan',
+            url: undefined,
+          },
+          workingCapacity: {
+            args: {
+              lessThanOrEqualTo: {
+                field: 'maxCapacity',
+              },
+            },
+            errorGroup: undefined,
+            field: undefined,
+            headerMessage: undefined,
+            key: 'workingCapacity',
+            message: undefined,
+            redirect: undefined,
+            type: 'lessThanOrEqualTo',
+            url: undefined,
+          },
+        })
+        expect(deepReq.form.values.maxCapacity).toEqual('0')
+      })
+    })
+
+    describe('when the user does not have permission to change_max_capacity', () => {
+      beforeEach(() => {
+        permissions.change_max_capacity = false
+      })
+
+      it('correctly modifies the maxCapacity field', () => {
+        deepReq.form.values = { maxCapacity: '0', workingCapacity: '5' }
+        deepRes.locals.decoratedLocation.raw.accommodationTypes = ['NORMAL_ACCOMMODATION']
+        deepRes.locals.decoratedLocation.raw.specialistCellTypes = []
+        const callback = jest.fn()
+        controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+        expect(callback).toHaveBeenCalledWith({
+          workingCapacity: {
+            args: {
+              lessThanOrEqualTo: {
+                field: 'maxCapacity',
+              },
+            },
+            errorGroup: undefined,
+            field: undefined,
+            headerMessage: undefined,
+            key: 'workingCapacity',
+            message: undefined,
+            redirect: undefined,
+            type: 'lessThanOrEqualTo',
+            url: undefined,
+          },
+        })
+        expect(deepReq.form.values.maxCapacity).toEqual('4')
       })
     })
   })

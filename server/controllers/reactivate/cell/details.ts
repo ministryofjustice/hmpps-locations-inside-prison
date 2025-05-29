@@ -21,13 +21,17 @@ export default class ReactivateCellDetails extends FormInitialStep {
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+    const { values } = req.form
+    const { decoratedLocation } = res.locals
+    const { accommodationTypes, specialistCellTypes }: Location = decoratedLocation.raw
+
+    const validationErrors: FormWizard.Errors = {}
+
+    if (!req.canAccess('change_max_capacity')) {
+      values.maxCapacity = decoratedLocation.capacity.maxCapacity.toString()
+    }
+
     super.validateFields(req, res, errors => {
-      const { values } = req.form
-      const { decoratedLocation } = res.locals
-      const { accommodationTypes, specialistCellTypes }: Location = decoratedLocation.raw
-
-      const validationErrors: FormWizard.Errors = {}
-
       if (!errors.workingCapacity) {
         if (
           values?.workingCapacity === '0' &&
@@ -36,6 +40,12 @@ export default class ReactivateCellDetails extends FormInitialStep {
         ) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
         }
+      }
+
+      if (!req.canAccess('change_max_capacity')) {
+        // eslint-disable-next-line no-param-reassign
+        delete errors.maxCapacity
+        delete validationErrors.maxCapacity
       }
 
       callback({ ...errors, ...validationErrors })
