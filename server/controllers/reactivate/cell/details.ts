@@ -21,13 +21,17 @@ export default class ReactivateCellDetails extends FormInitialStep {
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+    const { values } = req.form
+    const { decoratedLocation } = res.locals
+    const { accommodationTypes, specialistCellTypes }: Location = decoratedLocation.raw
+
+    const validationErrors: FormWizard.Errors = {}
+
+    if (!req.canAccess('change_max_capacity')) {
+      values.maxCapacity = decoratedLocation.capacity.maxCapacity.toString()
+    }
+
     super.validateFields(req, res, errors => {
-      const { values } = req.form
-      const { decoratedLocation } = res.locals
-      const { accommodationTypes, specialistCellTypes }: Location = decoratedLocation.raw
-
-      const validationErrors: FormWizard.Errors = {}
-
       if (!errors.workingCapacity) {
         if (
           values?.workingCapacity === '0' &&

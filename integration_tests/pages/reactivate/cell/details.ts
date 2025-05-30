@@ -2,7 +2,7 @@ import Page, { PageElement } from '../../page'
 
 export default class ReactivateCellDetailsPage extends Page {
   constructor() {
-    super('Check cell capacity')
+    super('')
   }
 
   static goTo = (locationId: string) => cy.visit(`/reactivate/cell/${locationId}`)

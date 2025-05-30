@@ -161,7 +161,7 @@ context('Reactivate cell (from reactivate parent)', () => {
         })
 
         it('has the correct main heading and a caption showing the cell description', () => {
-          cy.get('h1').contains('Check cell capacity')
+          cy.get('h1').contains('Check working capacity')
           cy.get('.govuk-caption-m').contains('Cell A-1-001')
         })
 

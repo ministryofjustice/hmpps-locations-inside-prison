@@ -110,7 +110,7 @@ declare module 'hmpo-form-wizard' {
       form: {
         values: FormWizard.Values
         options: {
-          allFields: { [key: string]: Field }
+          allFields: Fields
           journeyName: string
           section: string
           sectionProgressRules: Array<SectionProgressRule>
@@ -253,6 +253,8 @@ declare module 'hmpo-form-wizard' {
       name?: string
       text?: string
       component?: string
+      remove?: (req: FormWizard.Request) => boolean
+      removed?: boolean
       prefix?: string
       code?: string
       id?: string
@@ -272,6 +274,11 @@ declare module 'hmpo-form-wizard' {
       dependent?: Dependent
       invalidates?: string[]
       value?: string | string[]
+      label?: {
+        text: string
+        classes?: string
+      }
+      autocomplete?: string
       labelClasses?: string
       formGroupClasses?: string
       characterCountMax?: number

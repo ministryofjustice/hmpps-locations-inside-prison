@@ -9,6 +9,7 @@ export default class FormInitialStep extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(this.setupConditionalFields)
+    this.use(this.setupRemovedFields)
   }
 
   getInitialValues(_req: FormWizard.Request, _res: Response): FormWizard.Values {
@@ -101,6 +102,19 @@ export default class FormInitialStep extends FormWizard.Controller {
       ...Object.fromEntries(stepFields),
       ...dependentFields,
     }
+
+    next()
+  }
+
+  setupRemovedFields(req: FormWizard.Request, _res: Response, next: NextFunction) {
+    const { options } = req.form
+
+    Object.values(options.fields)
+      .filter(f => 'remove' in f && f.remove(req))
+      .forEach(field => {
+        // eslint-disable-next-line no-param-reassign
+        field.removed = true
+      })
 
     next()
   }
@@ -246,6 +260,12 @@ export default class FormInitialStep extends FormWizard.Controller {
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     this.populateDateInputFieldValues(req)
+
+    Object.entries(req.form.options.fields).forEach(([key, field]) => {
+      if (field.removed) {
+        delete req.form.options.fields[key]
+      }
+    })
 
     super.validateFields(req, res, errors => {
       const validationErrors: FormWizard.Errors = {}
