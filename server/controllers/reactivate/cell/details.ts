@@ -42,12 +42,6 @@ export default class ReactivateCellDetails extends FormInitialStep {
         }
       }
 
-      if (!req.canAccess('change_max_capacity')) {
-        // eslint-disable-next-line no-param-reassign
-        delete errors.maxCapacity
-        delete validationErrors.maxCapacity
-      }
-
       callback({ ...errors, ...validationErrors })
     })
   }
