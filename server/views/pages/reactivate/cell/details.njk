@@ -64,7 +64,7 @@
           {% block fields %}
             {% for key, fieldsOptions in fields %}
               {% if fieldsOptions.component and not fieldsOptions.skip %}
-                {% if not canAccess('change_max_capacity') and fieldsOptions.id == 'maxCapacity' %}
+                {% if fieldsOptions.removed %}
                   <div class="govuk-form-group">
                     <span class="govuk-label {{ fieldsOptions.label.classes }}">{{ fieldsOptions.label.text }}</span>
 
