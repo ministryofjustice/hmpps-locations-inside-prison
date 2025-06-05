@@ -6,7 +6,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% set title = "Change cell capacity" %}
+{% set title = "Change " + ('cell' if canAccess('change_max_capacity') else 'working') + " capacity" %}
 {% set locationName = decoratedCell.displayName | capFirst %}
 
 {% block heading %}
@@ -63,7 +63,19 @@
           {% block fields %}
             {% for key, fieldsOptions in fields %}
               {% if fieldsOptions.component and not fieldsOptions.skip %}
-                {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+                {% if fieldsOptions.removed %}
+                  <div class="govuk-form-group">
+                    <span class="govuk-label {{ fieldsOptions.label.classes }}">{{ fieldsOptions.label.text }}</span>
+
+                    <div class="govuk-hint">
+                      {{ fieldsOptions.hint.text }}
+                    </div>
+
+                    <span class="govuk-label">{{ fieldsOptions.value }}</span>
+                  </div>
+                {% else %}
+                  {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+                {% endif %}
               {% endif %}
             {% endfor %}
           {% endblock %}

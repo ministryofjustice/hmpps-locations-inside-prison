@@ -1,3 +1,4 @@
+import FormWizard from 'hmpo-form-wizard'
 import greaterThan from '../../../validators/greaterThan'
 import lessThanOrEqualTo from '../../../validators/lessThanOrEqualTo'
 
@@ -33,6 +34,7 @@ const fields = {
     autocomplete: 'off',
   },
   maxCapacity: {
+    remove: (req: FormWizard.Request) => !req.canAccess('change_max_capacity'),
     component: 'govukInput',
     validate: ['required', 'numeric', greaterThan(0), lessThanOrEqualTo(99)],
     errorMessages: { greaterThan: 'Maximum capacity cannot be 0' },
