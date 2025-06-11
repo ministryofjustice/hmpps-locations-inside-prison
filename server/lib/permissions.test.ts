@@ -12,7 +12,6 @@ describe('rolesToPermissions', () => {
       'change_non_residential_type',
       'change_temporary_deactivation_details',
       'change_used_for',
-      'convert_non_residential',
       'deactivate',
       'reactivate',
       'set_cell_type',
