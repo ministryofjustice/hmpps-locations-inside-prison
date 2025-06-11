@@ -1,4 +1,4 @@
-import { convertToTitleCase, initialiseName, sanitizeString } from './utils'
+import { convertToTitleCase, initialiseName, sanitizeString, singularizeString } from './utils'
 
 describe('convert to title case', () => {
   it.each([
@@ -40,5 +40,16 @@ describe('sanitizeString', () => {
     ['Extra spaces', '   quiet space    ', 'quiet space'],
   ])('%s -> sanitizeString(%s)', (_, input, expected) => {
     expect(sanitizeString(input)).toEqual(expected)
+  })
+})
+
+describe('singularizeString', () => {
+  it.each([
+    [null, null, null],
+    ['Empty string', '', null],
+    ['Word with s', 'Wings', 'Wing'],
+    ['Word without s', 'Landing', 'Landing'],
+  ])('%s -> singularizeString(%s)', (_, input, expected) => {
+    expect(singularizeString(input)).toEqual(expected)
   })
 })
