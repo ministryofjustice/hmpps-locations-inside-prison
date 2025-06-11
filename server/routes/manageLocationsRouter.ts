@@ -3,7 +3,9 @@ import manageLocationsIndex from '../controllers/manageLocations/manageLocations
 import populatePrisonId from '../middleware/populatePrisonId'
 import populateResidentialSummary from '../middleware/populateResidentialSummary'
 import type { Services } from '../services'
+import { Page } from '../services/auditService'
 import validateCaseload from '../middleware/validateCaseload'
+import logPageView from '../middleware/logPageView'
 import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsForLocation'
 
 import addBreadcrumb from '../middleware/addBreadcrumb'
@@ -19,8 +21,7 @@ const controller = (services: Services) => {
     populateResidentialSummary(services),
     populateBreadcrumbsForLocation,
     addBreadcrumb({ title: '', href: '/' }),
-    // TODO: log page view middleware
-    // logPageView(services.auditService, Page.MANAGE_INDEX),
+    logPageView(services.auditService, Page.LOCATION_CREATE),
     manageLocationsIndex,
   )
   return router

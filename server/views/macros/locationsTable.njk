@@ -5,7 +5,7 @@
 
 {% macro locationsTable (actionButton, locationType, locations) %}
 
-<h2 class="govuk-heading-m govuk-!-margin-bottom-3">{{ locationType }}</h2>
+<h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
     {% if actionButton %}
       {{ govukButton(actionButton) }}
 {% endif %}
