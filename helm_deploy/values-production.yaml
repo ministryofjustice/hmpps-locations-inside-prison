@@ -15,6 +15,7 @@ generic-service:
     LOCATIONS_API_URL: "https://locations-inside-prison-api.hmpps.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
     FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
+    FLAG_MANAGE_LOCATIONS_ENABLED: "false"
 
 generic-prometheus-alerts:
   alertSeverity: move-a-prisoner-alerts-prod
