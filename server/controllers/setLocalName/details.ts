@@ -3,16 +3,17 @@ import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
+import { TypedLocals } from '../../@types/express'
 
 export default class Details extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     const backLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
@@ -29,17 +30,16 @@ export default class Details extends FormInitialStep {
     super.validateFields(req, res, async errors => {
       const { locationsService } = req.services
       const { values } = req.form
-      const { user, location } = res.locals
-      const { prisonId, parentId } = location
+      const { decoratedLocation } = res.locals
+      const { prisonId, parentId } = decoratedLocation
 
       const sanitizedLocalName = sanitizeString(String(values.localName))
-      const token = await req.services.authService.getSystemClientToken(user.username)
 
       const validationErrors: FormWizard.Errors = {}
 
       try {
         const localNameExists = await locationsService.getLocationByLocalName(
-          token,
+          req.session.systemToken,
           String(prisonId),
           sanitizedLocalName,
           parentId,
@@ -59,17 +59,21 @@ export default class Details extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user, location } = res.locals
+      const { user, decoratedLocation } = res.locals
       const { locationsService } = req.services
       const { localName } = req.form.values
-      const token = await req.services.authService.getSystemClientToken(user.username)
 
       const sanitizedLocalName = sanitizeString(String(localName))
-      await locationsService.updateLocalName(token, location.id, sanitizedLocalName, user.username)
+      await locationsService.updateLocalName(
+        req.session.systemToken,
+        decoratedLocation.id,
+        sanitizedLocalName,
+        user.username,
+      )
 
-      res.locals.location.localName = localName
+      decoratedLocation.localName = localName as string
 
-      req.services.analyticsService.sendEvent(req, 'set_local_name', { prison_id: location.prisonId })
+      req.services.analyticsService.sendEvent(req, 'set_local_name', { prison_id: decoratedLocation.prisonId })
 
       next()
     } catch (error) {
@@ -78,7 +82,7 @@ export default class Details extends FormInitialStep {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()

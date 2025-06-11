@@ -1,14 +1,13 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../../utils/backUrl'
-import { DecoratedLocation } from '../../../decorators/decoratedLocation'
 import getCellCount from '../../../middleware/getCellCount'
-import getResidentialSummary from '../../../middleware/getResidentialSummary'
+import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 
 export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(getResidentialSummary)
+    this.use(getPrisonResidentialSummary)
     this.use(getCellCount)
   }
 
@@ -26,12 +25,14 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
 
   // eslint-disable-next-line no-underscore-dangle
   async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
-    const { authService, locationsService } = req.services
-    const token = await authService.getSystemClientToken(user.username)
+    const { systemToken } = req.session
+    const { locationsService } = req.services
     const { deactivationReason, deactivationReasonOther, deactivationReasonDescription } = req.form.values
 
-    res.locals.deactivationReason = await locationsService.getDeactivatedReason(token, deactivationReason as string)
+    res.locals.deactivationReason = await locationsService.getDeactivatedReason(
+      systemToken,
+      deactivationReason as string,
+    )
 
     if (deactivationReason === 'OTHER') {
       res.locals.deactivationReason += ` - ${deactivationReasonOther}`
@@ -44,32 +45,31 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { cellCount, location, residentialSummary } = res.locals
-    const { workingCapacity } = location.capacity
-    const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/deactivate/temporary/details` })
+    const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
+    const { workingCapacity } = decoratedLocation.capacity
+    const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/deactivate/temporary/details` })
     const changeSummary = this.generateChangeSummary(
       cellCount,
       workingCapacity,
-      residentialSummary.prisonSummary.workingCapacity,
+      prisonResidentialSummary.prisonSummary.workingCapacity,
     )
 
     return {
       backLink,
-      cancelLink: `/view-and-update-locations/${location.prisonId}/${location.id}`,
+      cancelLink: `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`,
       changeSummary,
     }
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user, location } = res.locals
+    const { decoratedLocation } = res.locals
     const { analyticsService, locationsService } = req.services
 
     try {
-      const token = await req.services.authService.getSystemClientToken(user.username)
       const reason = req.sessionModel.get('deactivationReason') as string
       await locationsService.deactivateTemporary(
-        token,
-        location.id,
+        req.session.systemToken,
+        decoratedLocation.id,
         reason,
         req.sessionModel.get(`deactivationReason${reason === 'OTHER' ? 'Other' : 'Description'}`) as string,
         req.sessionModel.get('estimatedReactivationDate') as string,
@@ -77,8 +77,8 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
       )
 
       analyticsService.sendEvent(req, 'deactivate_temp', {
-        prison_id: location.prisonId,
-        location_type: location.locationType,
+        prison_id: decoratedLocation.prisonId,
+        location_type: decoratedLocation.locationType,
         deactivation_reason: reason,
       })
 
@@ -86,19 +86,19 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     } catch (error) {
       if (error.data?.errorCode === 109) {
         analyticsService.sendEvent(req, 'handled_error', {
-          prison_id: location.prisonId,
+          prison_id: decoratedLocation.prisonId,
           error_code: 109,
         })
 
-        return res.redirect(`/location/${location.id}/deactivate/occupied`)
+        return res.redirect(`/location/${decoratedLocation.id}/deactivate/occupied`)
       }
       return next(error)
     }
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location } = res.locals
-    const { displayName, id: locationId, locationType, prisonId } = location as DecoratedLocation
+    const { decoratedLocation } = res.locals
+    const { displayName, id: locationId, locationType, prisonId } = decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()

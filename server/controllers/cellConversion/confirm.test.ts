@@ -1,22 +1,20 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
-import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import CellConversionConfirm from './confirm'
 import fields from '../../routes/cellConversion/fields'
 import AnalyticsService from '../../services/analyticsService'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('CellConversionConfirm', () => {
   const controller = new CellConversionConfirm({ route: '/' })
-  let req: FormWizard.Request
-  let res: DeepPartial<Response>
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
   let sessionModelGet: jest.Mock
   let sessionModelSet: jest.Mock
   let sessionModelUnset: jest.Mock
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
@@ -32,7 +30,7 @@ describe('CellConversionConfirm', () => {
     sessionModelSet = jest.fn()
     sessionModelGet = jest.fn().mockImplementation(key => formValues[key])
     sessionModelUnset = jest.fn()
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -44,11 +42,11 @@ describe('CellConversionConfirm', () => {
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
         get: sessionModelGet,
@@ -56,15 +54,15 @@ describe('CellConversionConfirm', () => {
         reset: jest.fn(),
         unset: sessionModelUnset,
       },
-    } as unknown as FormWizard.Request
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({ localName: 'Executive washroom' }),
+        decoratedLocation: buildDecoratedLocation({ localName: 'Executive washroom' }),
         options: {
           fields,
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -96,7 +94,6 @@ describe('CellConversionConfirm', () => {
       FIRST_NIGHT_CENTRE: 'First night centre / Induction',
     }
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getAccommodationType = jest.fn().mockImplementation((_, key) => allAccommodationTypes[key])
     locationsService.getSpecialistCellType = jest.fn().mockImplementation((_, key) => allSpecialistCellTypes[key])
     locationsService.getUsedForType = jest.fn().mockImplementation((_, key) => allUsedForTypes[key])
@@ -106,26 +103,26 @@ describe('CellConversionConfirm', () => {
 
   describe('get', () => {
     it('adds the human-readable type names to the locals', async () => {
-      await controller.get(req, res as Response, next)
-      expect(res.locals.accommodationType).toEqual('Normal accommodation')
-      expect(res.locals.maxCapacity).toEqual(2)
-      expect(res.locals.specialistCellTypes).toEqual(['Accessible cell', 'Care and separation cell'])
-      expect(res.locals.usedForTypes).toEqual(['Close Supervision Centre (CSC)', 'First night centre / Induction'])
-      expect(res.locals.workingCapacity).toEqual(1)
+      await controller.get(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(deepRes.locals.accommodationType).toEqual('Normal accommodation')
+      expect(deepRes.locals.maxCapacity).toEqual(2)
+      expect(deepRes.locals.specialistCellTypes).toEqual(['Accessible cell', 'Care and separation cell'])
+      expect(deepRes.locals.usedForTypes).toEqual(['Close Supervision Centre (CSC)', 'First night centre / Induction'])
+      expect(deepRes.locals.workingCapacity).toEqual(1)
     })
   })
 
   describe('locals', () => {
     beforeEach(() => {
-      res.locals.accommodationType = 'Normal accommodation'
-      res.locals.maxCapacity = '2'
-      res.locals.specialistCellTypes = ['Accessible cell', 'Care and separation cell']
-      res.locals.usedForTypes = ['Close Supervision Centre (CSC)', 'First night centre / Induction']
-      res.locals.workingCapacity = '1'
+      deepRes.locals.accommodationType = 'Normal accommodation'
+      deepRes.locals.maxCapacity = '2'
+      deepRes.locals.specialistCellTypes = ['Accessible cell', 'Care and separation cell']
+      deepRes.locals.usedForTypes = ['Close Supervision Centre (CSC)', 'First night centre / Induction']
+      deepRes.locals.workingCapacity = '1'
     })
 
     it('returns the expected locals', () => {
-      const result = controller.locals(req, res as Response)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -202,15 +199,15 @@ describe('CellConversionConfirm', () => {
     })
 
     it('returns the correct summary when working cap is zero', () => {
-      res.locals.maxCapacity = '2'
-      res.locals.workingCapacity = '0'
-      const result: any = controller.locals(req, res as Response)
+      deepRes.locals.maxCapacity = '2'
+      deepRes.locals.workingCapacity = '0'
+      const result: any = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result.changeSummary).toEqual('This will increase the establishment’s maximum capacity from 30 to 32.')
     })
 
     it('clears any saved values from the edit journeys', () => {
-      controller.locals(req, res as Response)
+      controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(sessionModelUnset).toHaveBeenCalledWith('previousCellTypes')
       expect(sessionModelUnset).toHaveBeenCalledWith('previousAccommodationType')
@@ -219,7 +216,7 @@ describe('CellConversionConfirm', () => {
 
   describe('saveValues', () => {
     it('converts the location to a cell via the locations API', async () => {
-      await controller.saveValues(req, res as Response, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(locationsService.convertToCell).toHaveBeenCalledWith(
         'token',
@@ -233,14 +230,14 @@ describe('CellConversionConfirm', () => {
     })
 
     it('calls next when successful', async () => {
-      await controller.saveValues(req, res as Response, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalled()
     })
 
     it('sends an analytics event when successful', async () => {
-      await controller.saveValues(req, res as Response, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'convert_to_cell', {
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'convert_to_cell', {
         prison_id: 'TST',
         accommodation_type: 'NORMAL_ACCOMMODATION',
       })
@@ -249,7 +246,7 @@ describe('CellConversionConfirm', () => {
     it('calls next with any unexpected errors', async () => {
       const error = new Error('API error')
       ;(locationsService.convertToCell as jest.Mock).mockRejectedValue(error)
-      await controller.saveValues(req, res as Response, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalledWith(error)
     })
@@ -257,26 +254,28 @@ describe('CellConversionConfirm', () => {
 
   describe('successHandler', () => {
     beforeEach(() => {
-      controller.successHandler(req, res as Response, next)
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('resets the journey model', () => {
-      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
     })
 
     it('resets the session model', () => {
-      expect(req.sessionModel.reset).toHaveBeenCalled()
+      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
     })
 
     it('sets the flash correctly', () => {
-      expect(req.flash).toHaveBeenCalledWith('success', {
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
         title: 'Non-residential room converted to a cell',
         content: 'You have converted Executive washroom into a cell.',
       })
     })
 
     it('redirects to the view location page', () => {
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+      )
     })
   })
 })

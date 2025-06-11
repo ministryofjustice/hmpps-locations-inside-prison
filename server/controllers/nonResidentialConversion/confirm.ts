@@ -2,12 +2,12 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import generateChangeSummary from '../../lib/generateChangeSummary'
-import getResidentialSummary from '../../middleware/getResidentialSummary'
+import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 
 export default class NonResidentialConversionConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(getResidentialSummary)
+    this.use(getPrisonResidentialSummary)
   }
 
   locals(req: FormWizard.Request, res: Response): object {
@@ -18,14 +18,19 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
       convertedCellTypeDetails += ` - ${otherConvertedCellType}`
     }
 
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
-    const { maxCapacity, workingCapacity } = location.capacity
-    const { residentialSummary } = res.locals
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
+    const { maxCapacity, workingCapacity } = decoratedLocation.capacity
+    const { prisonResidentialSummary } = res.locals
 
     const changeSummaries = compact([
-      generateChangeSummary('working capacity', workingCapacity, 0, residentialSummary.prisonSummary.workingCapacity),
-      generateChangeSummary('maximum capacity', maxCapacity, 0, residentialSummary.prisonSummary.maxCapacity),
+      generateChangeSummary(
+        'working capacity',
+        workingCapacity,
+        0,
+        prisonResidentialSummary.prisonSummary.workingCapacity,
+      ),
+      generateChangeSummary('maximum capacity', maxCapacity, 0, prisonResidentialSummary.prisonSummary.maxCapacity),
     ])
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
@@ -38,7 +43,7 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location, user } = res.locals
+    const { decoratedLocation } = res.locals
     const { analyticsService, locationsService } = req.services
 
     try {
@@ -48,16 +53,15 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
         otherConvertedCellType = undefined
       }
 
-      const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.convertCellToNonResCell(
-        token,
-        location.id,
+        req.session.systemToken,
+        decoratedLocation.id,
         convertedCellType?.value,
         otherConvertedCellType,
       )
 
       analyticsService.sendEvent(req, 'convert_to_non_res', {
-        prison_id: location.prisonId,
+        prison_id: decoratedLocation.prisonId,
         converted_cell_type: convertedCellType.value,
       })
 
@@ -65,18 +69,18 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
     } catch (error) {
       if (error.data?.errorCode === 109) {
         analyticsService.sendEvent(req, 'handled_error', {
-          prison_id: location.prisonId,
+          prison_id: decoratedLocation.prisonId,
           error_code: 109,
         })
 
-        return res.redirect(`/location/${location.id}/non-residential-conversion/occupied`)
+        return res.redirect(`/location/${decoratedLocation.id}/non-residential-conversion/occupied`)
       }
       return next(error)
     }
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.location
+    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 
     req.journeyModel.reset()

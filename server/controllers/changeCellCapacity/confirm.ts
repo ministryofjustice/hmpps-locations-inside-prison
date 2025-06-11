@@ -2,12 +2,12 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../utils/backUrl'
-import getResidentialSummary from '../../middleware/getResidentialSummary'
+import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 
 export default class ConfirmCellCapacity extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(getResidentialSummary)
+    this.use(getPrisonResidentialSummary)
   }
 
   generateChangeSummary(valName: string, oldVal: number, newVal: number, overallVal: number): string | null {
@@ -25,32 +25,37 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response): object {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
-    const { maxCapacity, workingCapacity } = location.capacity
+    const { decoratedLocation, values } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
+    const { maxCapacity, workingCapacity } = decoratedLocation.capacity
+
+    if (!req.canAccess('change_max_capacity')) {
+      req.sessionModel.set('maxCapacity', maxCapacity)
+      values.maxCapacity = maxCapacity
+    }
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
     const newMaxCap = Number(req.sessionModel.get('maxCapacity'))
-    const { residentialSummary } = res.locals
+    const { prisonResidentialSummary } = res.locals
 
     const changeSummaries = compact([
       this.generateChangeSummary(
         'working capacity',
         workingCapacity,
         newWorkingCap,
-        residentialSummary.prisonSummary.workingCapacity,
+        prisonResidentialSummary.prisonSummary.workingCapacity,
       ),
       this.generateChangeSummary(
         'maximum capacity',
         maxCapacity,
         newMaxCap,
-        residentialSummary.prisonSummary.maxCapacity,
+        prisonResidentialSummary.prisonSummary.maxCapacity,
       ),
     ])
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/change-cell-capacity/change` })
+    const backLink = backUrl(req, { fallbackUrl: `/location/${locationId}/change-cell-capacity/change` })
 
     return {
       backLink,
@@ -61,18 +66,21 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { location, user } = res.locals
+      const { decoratedLocation } = res.locals
       const { locationsService } = req.services
 
-      const token = await req.services.authService.getSystemClientToken(user.username)
+      if (!req.canAccess('change_max_capacity')) {
+        req.sessionModel.set('maxCapacity', decoratedLocation.capacity.maxCapacity)
+      }
+
       await locationsService.updateCapacity(
-        token,
-        location.id,
+        req.session.systemToken,
+        decoratedLocation.id,
         Number(req.sessionModel.get('maxCapacity')),
         Number(req.sessionModel.get('workingCapacity')),
       )
 
-      req.services.analyticsService.sendEvent(req, 'change_cell_capacity', { prison_id: location.prisonId })
+      req.services.analyticsService.sendEvent(req, 'change_cell_capacity', { prison_id: decoratedLocation.prisonId })
 
       next()
     } catch (error) {
@@ -80,8 +88,8 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.location
+  successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
+    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 
     req.journeyModel.reset()

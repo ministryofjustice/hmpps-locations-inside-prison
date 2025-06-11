@@ -7,9 +7,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% from "../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../macros/miniSummary.njk" import miniSummary %}
-
 {% set title = "Confirm cell capacity" %}
 
 {% block beforeContent %}
@@ -26,14 +23,14 @@
       }) }}
     {% endif %}
   </div>
-  
+
 {% endblock %}
 
 {% block heading %}
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+        <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
         <h1 class="govuk-heading-l">Confirm cell type removal and capacity changes</h1>
       </div>
     </div>

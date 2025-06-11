@@ -2,11 +2,12 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../base/formInitialStep'
 import setStepValidity from '../../lib/setStepValidity'
+import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionSpecificCellType extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
     const { sessionModel } = req
 
     if (req.isEditing) {

@@ -4,14 +4,15 @@ import FormWizard from 'hmpo-form-wizard'
 export default async function getLocationResidentialSummary(
   req: FormWizard.Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction | null,
 ) {
-  const { location, user } = res.locals
-  const { id, prisonId } = location
-  const { authService, locationsService } = req.services
+  res.locals.locationResidentialSummary = await req.services.locationsService.getResidentialSummary(
+    req.session.systemToken,
+    (res.locals.location || res.locals.decoratedLocation).prisonId,
+    (res.locals.location || res.locals.decoratedLocation).id,
+  )
 
-  const token = await authService.getSystemClientToken(user.username)
-  res.locals.locationResidentialSummary = await locationsService.getResidentialSummary(token, prisonId, id)
-
-  next()
+  if (next) {
+    next()
+  }
 }

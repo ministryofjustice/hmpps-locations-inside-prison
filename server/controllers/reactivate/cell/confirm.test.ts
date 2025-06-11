@@ -1,30 +1,34 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import fields from '../../../routes/deactivate/fields'
-import { Services } from '../../../services'
 import ReactivateCellConfirm from './confirm'
 import LocationsService from '../../../services/locationsService'
-import AuthService from '../../../services/authService'
 import AnalyticsService from '../../../services/analyticsService'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('ReactivateCellConfirm', () => {
   const controller = new ReactivateCellConfirm({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
+  let permissions: { [permission: string]: boolean }
   let sessionModel: { [key: string]: any }
 
   beforeEach(() => {
-    sessionModel = {
-      maxCapacity: 2,
-      workingCapacity: 1,
+    permissions = {
+      change_max_capacity: true,
     }
-    req = {
+    sessionModel = {
+      maxCapacity: 3,
+      workingCapacity: 3,
+    }
+    deepReq = {
+      canAccess: (permission: string) => permissions[permission],
       flash: jest.fn(),
       form: {
         options: {
@@ -34,42 +38,43 @@ describe('ReactivateCellConfirm', () => {
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
-        set: jest.fn(),
-        get: jest.fn((fieldName?: string) => sessionModel[fieldName]),
+        get: jest.fn((fieldName?: string) => sessionModel[fieldName]) as FormWizard.Request['sessionModel']['get'],
+        set: jest.fn((fieldName?: string, value?: unknown) => {
+          sessionModel[fieldName] = value
+        }),
         reset: jest.fn(),
       },
       journeyModel: {
         reset: jest.fn(),
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
         errorlist: [],
-        location: {
-          displayName: 'A-1-001',
+        decoratedLocation: buildDecoratedLocation({
           id: '7e570000-0000-0000-0000-000000000001',
-          locationType: 'Cell',
+          locationType: 'CELL',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 1,
             workingCapacity: 0,
           },
-        },
+        }),
         options: {
           fields,
         },
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -78,32 +83,11 @@ describe('ReactivateCellConfirm', () => {
         values: sessionModel,
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.reactivateCell = jest.fn()
     analyticsService.sendEvent = jest.fn()
-  })
-
-  describe('getResidentialSummary', () => {
-    it('calls the correct locations service call', async () => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
-        locationsService: {
-          getResidentialSummary: jest.fn(),
-        },
-      } as unknown as Services
-      const callback = jest.fn()
-      await controller.getResidentialSummary(req, res, callback)
-
-      expect(req.services.locationsService.getResidentialSummary).toHaveBeenCalledWith(
-        'token',
-        res.locals.location.prisonId,
-      )
-    })
   })
 
   describe('generateChangeSummary', () => {
@@ -119,75 +103,121 @@ describe('ReactivateCellConfirm', () => {
 
   describe('locals', () => {
     beforeEach(() => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
+      deepReq.services = {
         locationsService: {
           getDeactivatedReason: jest.fn(),
         },
-      } as unknown as Services
+      }
     })
 
-    it('sets the correct locals', async () => {
-      getReferrerRootUrl(req, res, jest.fn())
+    describe('when the user has permission to change_max_capacity', () => {
+      beforeEach(() => {
+        permissions.change_max_capacity = true
+      })
 
-      req.form.values = {
-        deactivationReason: 'REASON',
-        deactivationReasonDescription: 'Description text',
-      }
-      ;(req.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
+      it('sets the correct locals', async () => {
+        getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(controller.locals(req, res)).toEqual({
-        backLink: `/reactivate/cell/${res.locals.location.id}/details`,
-        cancelLink: `/view-and-update-locations/${res.locals.location.prisonId}/${res.locals.location.id}`,
-        changeSummary: `The establishment's total working capacity will increase from 20 to 21.\n<br/><br/>\nThe establishment's total maximum capacity will increase from 30 to 31.`,
+        deepReq.form.values = {
+          deactivationReason: 'REASON',
+          deactivationReasonDescription: 'Description text',
+        }
+        ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
+
+        expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
+          backLink: `/reactivate/cell/${deepRes.locals.decoratedLocation.id}/details`,
+          cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
+          changeSummary: `The establishment's total working capacity will increase from 20 to 23.\n<br/><br/>\nThe establishment's total maximum capacity will increase from 30 to 32.`,
+        })
+      })
+    })
+
+    describe('when the user does not have permission to change_max_capacity', () => {
+      beforeEach(() => {
+        permissions.change_max_capacity = false
+      })
+
+      it('sets the correct locals by stripping max capacity changes', async () => {
+        getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
+
+        deepReq.form.values = {
+          deactivationReason: 'REASON',
+          deactivationReasonDescription: 'Description text',
+        }
+        ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
+
+        expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
+          backLink: `/reactivate/cell/${deepRes.locals.decoratedLocation.id}/details`,
+          cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
+          changeSummary: `The establishment's total working capacity will increase from 20 to 23.`,
+        })
       })
     })
   })
 
   describe('saveValues', () => {
     it('calls locationsService', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(locationsService.reactivateCell).toHaveBeenCalledWith('token', res.locals.location.id, sessionModel)
+      expect(locationsService.reactivateCell).toHaveBeenCalledWith(
+        'token',
+        deepRes.locals.decoratedLocation.id,
+        sessionModel,
+      )
     })
 
     it('sends an analytics event', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'reactivate_cell', { prison_id: 'TST' })
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'reactivate_cell', { prison_id: 'TST' })
     })
 
     it('calls next', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalled()
+    })
+
+    describe('when the user does not have permission to change_max_capacity', () => {
+      beforeEach(() => {
+        permissions.change_max_capacity = false
+      })
+
+      it('strips out any change to max capacity', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(locationsService.reactivateCell).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, {
+          maxCapacity: deepRes.locals.decoratedLocation.capacity.maxCapacity,
+          workingCapacity: 3,
+        })
+      })
     })
   })
 
   describe('successHandler', () => {
     beforeEach(() => {
-      controller.successHandler(req, res, next)
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('resets the journey model', () => {
-      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
     })
 
     it('resets the session model', () => {
-      expect(req.sessionModel.reset).toHaveBeenCalled()
+      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
     })
 
     it('sets the flash correctly', () => {
-      expect(req.flash).toHaveBeenCalledWith('success', {
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
         title: 'Cell activated',
-        content: 'You have activated A-1-001.',
+        content: 'You have activated cell A-1-001.',
       })
     })
 
     it('redirects to the view location page', () => {
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+      )
     })
 
     describe('when the referrer is parent', () => {
@@ -198,9 +228,11 @@ describe('ReactivateCellConfirm', () => {
       })
 
       it('redirects to the parent view location page', () => {
-        controller.successHandler(req, res, next)
+        controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/ABC/7e570000-0000-1000-8000-000000000001')
+        expect(deepRes.redirect).toHaveBeenCalledWith(
+          '/view-and-update-locations/ABC/7e570000-0000-1000-8000-000000000001',
+        )
       })
     })
 
@@ -211,9 +243,9 @@ describe('ReactivateCellConfirm', () => {
       })
 
       it('redirects to the prison inactive cells page', () => {
-        controller.successHandler(req, res, next)
+        controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(res.redirect).toHaveBeenCalledWith('/inactive-cells/ABC')
+        expect(deepRes.redirect).toHaveBeenCalledWith('/inactive-cells/ABC')
       })
 
       describe('when a referrerLocationId is set', () => {
@@ -222,9 +254,9 @@ describe('ReactivateCellConfirm', () => {
         })
 
         it('redirects to the locations inactive cells page', () => {
-          controller.successHandler(req, res, next)
+          controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-          expect(res.redirect).toHaveBeenCalledWith('/inactive-cells/ABC/7e570000-0000-1000-8000-000000000001')
+          expect(deepRes.redirect).toHaveBeenCalledWith('/inactive-cells/ABC/7e570000-0000-1000-8000-000000000001')
         })
       })
     })

@@ -1,28 +1,29 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import NonResidentialConversionOccupied from './occupied'
-import LocationFactory from '../../testutils/factories/location'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('NonResidentialConversionOccupied', () => {
   const controller = new NonResidentialConversionOccupied({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
 
   beforeEach(() => {
-    req = {} as unknown as typeof req
-    res = {
+    deepReq = {}
+    deepRes = {
       locals: {
-        location: LocationFactory.build({
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
         }),
       },
-    } as unknown as typeof res
+    }
   })
 
   describe('locals', () => {
     it('returns the correct locals', () => {
-      expect(controller.locals(req, res)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
       })
     })

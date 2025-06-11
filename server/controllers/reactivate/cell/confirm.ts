@@ -5,23 +5,14 @@ import backUrl from '../../../utils/backUrl'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 import { isValidUUID } from '../../../utils/isValidUUID'
+import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 
 export default class ReactivateCellConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(this.getResidentialSummary)
+    this.use(getPrisonResidentialSummary)
     this.use(populateInactiveParentLocations)
     this.use(getReferrerRootUrl)
-  }
-
-  async getResidentialSummary(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
-    const { locationsService } = req.services
-
-    const token = await req.services.authService.getSystemClientToken(user.username)
-    res.locals.residentialSummary = await locationsService.getResidentialSummary(token, res.locals.location.prisonId)
-
-    next()
   }
 
   generateChangeSummary(valName: string, oldVal: number, newVal: number, overallVal: number): string | null {
@@ -37,31 +28,35 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response): object {
-    const { location, referrerRootUrl } = res.locals
-    const { maxCapacity, workingCapacity } = location.capacity
+    const { decoratedLocation, prisonResidentialSummary, referrerRootUrl, values } = res.locals
+    const { maxCapacity, workingCapacity } = decoratedLocation.capacity
+
+    if (!req.canAccess('change_max_capacity')) {
+      req.sessionModel.set('maxCapacity', maxCapacity)
+      values.maxCapacity = maxCapacity
+    }
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
     const newMaxCap = Number(req.sessionModel.get('maxCapacity'))
-    const { residentialSummary } = res.locals
 
     const changeSummaries = compact([
       this.generateChangeSummary(
         'working capacity',
         workingCapacity,
         newWorkingCap,
-        residentialSummary.prisonSummary.workingCapacity,
+        prisonResidentialSummary.prisonSummary.workingCapacity,
       ),
       this.generateChangeSummary(
         'maximum capacity',
         maxCapacity,
         newMaxCap,
-        residentialSummary.prisonSummary.maxCapacity,
+        prisonResidentialSummary.prisonSummary.maxCapacity,
       ),
     ])
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/reactivate/cell/${location.id}/details` })
+    const backLink = backUrl(req, { fallbackUrl: `/reactivate/cell/${decoratedLocation.id}/details` })
 
     return {
       backLink,
@@ -72,15 +67,22 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { location, user } = res.locals
+      const { decoratedLocation } = res.locals
       const { locationsService } = req.services
+
+      if (!req.canAccess('change_max_capacity')) {
+        req.sessionModel.set('maxCapacity', decoratedLocation.capacity.maxCapacity)
+      }
+
       const workingCapacity = Number(req.sessionModel.get('workingCapacity'))
       const maxCapacity = Number(req.sessionModel.get('maxCapacity'))
 
-      const token = await req.services.authService.getSystemClientToken(user.username)
-      await locationsService.reactivateCell(token, res.locals.location.id, { maxCapacity, workingCapacity })
+      await locationsService.reactivateCell(req.session.systemToken, decoratedLocation.id, {
+        maxCapacity,
+        workingCapacity,
+      })
 
-      req.services.analyticsService.sendEvent(req, 'reactivate_cell', { prison_id: location.prisonId })
+      req.services.analyticsService.sendEvent(req, 'reactivate_cell', { prison_id: decoratedLocation.prisonId })
 
       next()
     } catch (error) {
@@ -89,7 +91,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { displayName, id: locationId, locationType, prisonId } = res.locals.location
+    const { displayName, id: locationId, locationType, prisonId } = res.locals.decoratedLocation
     const referrerFlow = req.sessionModel.get<string>('referrerFlow')
     const referrerPrisonId = req.sessionModel.get<string>('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get<string>('referrerLocationId')

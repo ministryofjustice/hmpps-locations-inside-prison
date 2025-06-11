@@ -1,17 +1,28 @@
-import { RequestHandler } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 import { rolesToPermissions } from '../lib/permissions'
 
-export default function setCanAccess(): RequestHandler {
-  return async (req, res, next) => {
+export default function setCanAccess() {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const { userRoles } = res.locals.user
     const permissions = rolesToPermissions(userRoles)
 
-    const disabledPermissions: string[] = []
+    // A map of permission overrides, false = always disabled, true = always enabled
+    const permissionOverrides: { [permission: string]: boolean } = {}
     if (!req.featureFlags?.permanentDeactivation) {
-      disabledPermissions.push('deactivate:permanent')
+      permissionOverrides['deactivate:permanent'] = false
     }
 
-    req.canAccess = permission => !disabledPermissions.includes(permission) && permissions.includes(permission)
+    if (!req.featureFlags?.createAndCertify) {
+      permissionOverrides.change_max_capacity = true
+    }
+
+    req.canAccess = permission => {
+      if (permission in permissionOverrides) {
+        return permissionOverrides[permission]
+      }
+
+      return permissions.includes(permission)
+    }
 
     res.locals.canAccess = req.canAccess
 

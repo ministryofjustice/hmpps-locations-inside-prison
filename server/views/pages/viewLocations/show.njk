@@ -12,9 +12,9 @@
 {% from "../../macros/miniSummary.njk" import miniSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set locationType = residentialSummary.location.locationType %}
-{% set locationName = residentialSummary.location.localName or residentialSummary.location.pathHierarchy %}
-{% set title = (residentialSummary.location.displayName | capFirst) + ' - View and update locations' %}
+{% set locationType = decoratedResidentialSummary.location.locationType %}
+{% set locationName = decoratedResidentialSummary.location.localName or decoratedResidentialSummary.location.pathHierarchy %}
+{% set title = (decoratedResidentialSummary.location.displayName | capFirst) + ' - View and update locations' %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -49,7 +49,7 @@
       <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
       <h1 class="govuk-heading-l">
         {{ locationName }}
-        {% if residentialSummary.location.leafLevel and residentialSummary.location.certification and residentialSummary.location.certification.certified %}
+        {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certification and decoratedResidentialSummary.location.certification.certified %}
           {{ govukTag({
             text: 'Certified',
             classes: "govuk-tag--hollow",
@@ -58,7 +58,7 @@
             }
           }) }}
         {% endif %}
-        {{ locationStatusTag(residentialSummary.location) }}
+        {{ locationStatusTag(decoratedResidentialSummary.location) }}
 
         {% if actionButton %}
           {{ govukButton(actionButton) }}
@@ -88,15 +88,15 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-three-quarters">
-        {% if residentialSummary.location.status == 'INACTIVE' %}
-          {{ inactiveLocationBanner(residentialSummary, canAccess) }}
+        {% if decoratedResidentialSummary.location.status == 'INACTIVE' %}
+          {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess) }}
         {% endif %}
 
-        {% if residentialSummary.summaryCards | length %}
+        {% if decoratedResidentialSummary.summaryCards | length %}
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
               <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
-                {% for summary in residentialSummary.summaryCards %}
+                {% for summary in decoratedResidentialSummary.summaryCards %}
                   <div class="govuk-grid-column-one-third" data-qa="{{ summary.type }}-card">
                     {{ miniSummary({
                       bottomLabel: summary.type | title | replace('-', ' '),
@@ -113,10 +113,10 @@
           </div>
         {% endif %}
 
-        {{ locationDetails(residentialSummary.location, residentialSummary.locationDetails, residentialSummary.locationHistory) }}
+        {{ locationDetails(decoratedResidentialSummary.location, decoratedResidentialSummary.locationDetails, decoratedResidentialSummary.locationHistory) }}
       </div>
     </div>
 
-    {{ locationsTable(actionButton, residentialSummary.subLocationName, residentialSummary.subLocations) }}
+    {{ locationsTable(decoratedResidentialSummary.subLocationName, decoratedResidentialSummary.subLocations) }}
   </div>
 {% endblock %}

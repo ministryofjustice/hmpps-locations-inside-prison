@@ -2,8 +2,8 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
-import { Location } from '../../data/types/locationsApi'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
+import { TypedLocals } from '../../@types/express'
 
 export default class ChangeCellCapacity extends FormInitialStep {
   middlewareSetup() {
@@ -12,15 +12,15 @@ export default class ChangeCellCapacity extends FormInitialStep {
   }
 
   getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
-    return res.locals.location.capacity
+    return res.locals.decoratedLocation.capacity
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
-      const { location } = res.locals
-      const { accommodationTypes, specialistCellTypes }: Location = location.raw
-      const occupants = res.locals.prisonerLocation?.prisoners || []
+      const { decoratedLocation, prisonerLocation } = res.locals
+      const { accommodationTypes, specialistCellTypes } = decoratedLocation.raw
+      const occupants = prisonerLocation?.prisoners || []
 
       const validationErrors: FormWizard.Errors = {}
 
@@ -47,21 +47,24 @@ export default class ChangeCellCapacity extends FormInitialStep {
   }
 
   validate(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap } = req.form.values
-    const { maxCapacity, workingCapacity } = location.capacity
+    const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
-    if (Number(newMaxCap) === maxCapacity && Number(newWorkingCap) === workingCapacity) {
+    if (
+      (!req.canAccess('change_max_capacity') || Number(newMaxCap) === maxCapacity) &&
+      Number(newWorkingCap) === workingCapacity
+    ) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
 
     return next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     const cancelLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,

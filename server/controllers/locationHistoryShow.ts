@@ -38,15 +38,15 @@ function formatValue(attribute: string, values: string[]) {
   return { text: '' }
 }
 
-export default ({ authService, manageUsersService }: Services) =>
+export default ({ manageUsersService }: Services) =>
   async (req: Request, res: Response) => {
-    const { changeHistory, id: locationId, prisonId }: Location = res.locals.location
-
-    const token = await authService.getSystemClientToken(res.locals.user.username)
+    const { systemToken } = req.session
+    const { location } = res.locals
+    const { changeHistory, id: locationId, prisonId }: Location = location
 
     const tableRows = await Promise.all(
       changeHistory.map(async ({ amendedBy, amendedDate, attribute, newValues, oldValues }) => {
-        const user = await manageUsersService.getUser(token, amendedBy)
+        const user = await manageUsersService.getUser(systemToken, amendedBy)
         const name = user?.name || 'Unknown'
 
         return [

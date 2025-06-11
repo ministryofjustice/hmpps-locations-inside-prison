@@ -3,21 +3,21 @@ import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import CellConversionSetCellCapacity from './setCellCapacity'
 import fields from '../../routes/cellConversion/fields'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('CellConversionSetCellCapacity', () => {
   const controller = new CellConversionSetCellCapacity({ route: '/' })
-  let req: FormWizard.Request
-  let res: DeepPartial<Response>
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let sessionModelSet: jest.Mock
   const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   beforeEach(() => {
     sessionModelSet = jest.fn()
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -43,15 +43,15 @@ describe('CellConversionSetCellCapacity', () => {
         set: sessionModelSet,
         unset: jest.fn(),
       },
-    } as unknown as FormWizard.Request
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build(),
+        decoratedLocation: buildDecoratedLocation(),
         options: {
           fields,
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -70,7 +70,7 @@ describe('CellConversionSetCellCapacity', () => {
 
   describe('locals', () => {
     it('returns the expected locals', () => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'workingCapacity',
           type: 'lessThanOrEqualTo',
@@ -80,7 +80,7 @@ describe('CellConversionSetCellCapacity', () => {
           },
         },
       ]
-      const result = controller.locals(req, res as Response)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -98,17 +98,17 @@ describe('CellConversionSetCellCapacity', () => {
   describe('validateFields', () => {
     describe('when working capacity is zero and it is NORMAL_ACCOMMODATION and has no specialist cell type', () => {
       beforeEach(() => {
-        req.sessionModel.get = jest
+        deepReq.sessionModel.get = jest
           .fn()
           .mockImplementation(
             (key: string) => ({ accommodationType: 'NORMAL_ACCOMMODATION', specialistCellTypes: [] })[key],
           )
-        req.form.values = { maxCapacity: '3', workingCapacity: '0' }
+        deepReq.form.values = { maxCapacity: '3', workingCapacity: '0' }
       })
 
       it('calls back with the expected error', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res as Response, callback)
+        controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({
           workingCapacity: {
@@ -122,17 +122,17 @@ describe('CellConversionSetCellCapacity', () => {
 
     describe('when working capacity is not zero', () => {
       beforeEach(() => {
-        req.sessionModel.get = jest
+        deepReq.sessionModel.get = jest
           .fn()
           .mockImplementation(
             (key: string) => ({ accommodationType: 'NORMAL_ACCOMMODATION', specialistCellTypes: [] })[key],
           )
-        req.form.values = { maxCapacity: '3', workingCapacity: '1' }
+        deepReq.form.values = { maxCapacity: '3', workingCapacity: '1' }
       })
 
       it('calls back with no errors', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res as Response, callback)
+        controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({})
       })
@@ -140,18 +140,18 @@ describe('CellConversionSetCellCapacity', () => {
 
     describe('when working capacity is zero and it is NORMAL_ACCOMMODATION and has a specialist cell type', () => {
       beforeEach(() => {
-        req.sessionModel.get = jest
+        deepReq.sessionModel.get = jest
           .fn()
           .mockImplementation(
             (key: string) =>
               ({ accommodationType: 'NORMAL_ACCOMMODATION', specialistCellTypes: ['ACCESSIBLE_CELL'] })[key],
           )
-        req.form.values = { maxCapacity: '3', workingCapacity: '0' }
+        deepReq.form.values = { maxCapacity: '3', workingCapacity: '0' }
       })
 
       it('calls back with no errors', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res as Response, callback)
+        controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({})
       })
@@ -159,17 +159,17 @@ describe('CellConversionSetCellCapacity', () => {
 
     describe('when working capacity is zero and it is not NORMAL_ACCOMMODATION', () => {
       beforeEach(() => {
-        req.sessionModel.get = jest
+        deepReq.sessionModel.get = jest
           .fn()
           .mockImplementation(
             (key: string) => ({ accommodationType: 'CARE_AND_SEPARATION', specialistCellTypes: undefined })[key],
           )
-        req.form.values = { maxCapacity: '3', workingCapacity: '0' }
+        deepReq.form.values = { maxCapacity: '3', workingCapacity: '0' }
       })
 
       it('calls back with no errors', () => {
         const callback = jest.fn()
-        controller.validateFields(req, res as Response, callback)
+        controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
         expect(callback).toHaveBeenCalledWith({})
       })

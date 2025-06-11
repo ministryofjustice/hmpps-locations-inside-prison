@@ -2,30 +2,25 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../../utils/backUrl'
-import { Location, ResidentialSummary } from '../../../data/types/locationsApi'
+import { Location, LocationType } from '../../../data/types/locationsApi'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
-import { DecoratedLocation } from '../../../decorators/decoratedLocation'
 import getResidentialSummaries from './middleware/getResidentialSummaries'
-import populateLocations, { LocationMap } from './middleware/populateLocations'
-import { PrisonResidentialSummary } from '../../../data/types/locationsApi/prisonResidentialSummary'
-import { LocationResidentialSummary } from '../../../data/types/locationsApi/locationResidentialSummary'
+import populateLocationTree from './middleware/populateLocationTree'
 import nonOxfordJoin from '../../../formatters/nonOxfordJoin'
 
 export default class ReactivateParentConfirm extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
     this.use(getResidentialSummaries)
-    this.use(populateLocations(false))
+    this.use(populateLocationTree(false))
     this.use(populateInactiveParentLocations)
     this.use(this.stripInactiveSelectedLoctaions)
   }
 
   stripInactiveSelectedLoctaions(req: FormWizard.Request, res: Response, next: NextFunction) {
     const selectedLocationIds = req.sessionModel.get<string[]>('selectLocations') || []
-    const { inactiveParentLocations }: { inactiveParentLocations: DecoratedLocation[] } = res.locals as unknown as {
-      inactiveParentLocations: DecoratedLocation[]
-    }
+    const { inactiveParentLocations } = res.locals
 
     res.locals.inactiveParentLocations = inactiveParentLocations.filter(l => !selectedLocationIds.includes(l.id))
 
@@ -43,19 +38,10 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const {
-      cells,
-      location,
-      prisonResidentialSummary,
-    }: { cells: DecoratedLocation[]; location: DecoratedLocation; prisonResidentialSummary: PrisonResidentialSummary } =
-      res.locals as unknown as {
-        cells: DecoratedLocation[]
-        location: DecoratedLocation
-        prisonResidentialSummary: PrisonResidentialSummary
-      }
+    const { cells, decoratedLocation, prisonResidentialSummary } = res.locals
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${location.id}/check-capacity` })
+    const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${decoratedLocation.id}/check-capacity` })
     const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
     const { maxCapacity, workingCapacity } = prisonResidentialSummary.prisonSummary
     let newMaxCapacity = maxCapacity
@@ -67,7 +53,8 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
       const changes = capacityChanges[cell.id] || {}
       const originalCellMaxCapacity = cell.capacity.maxCapacity
       const originalCellWorkingCapacity = cell.oldWorkingCapacity
-      const newCellMaxCapacity = 'maxCapacity' in changes ? changes.maxCapacity : originalCellMaxCapacity
+      const newCellMaxCapacity =
+        'maxCapacity' in changes && req.canAccess('change_max_capacity') ? changes.maxCapacity : originalCellMaxCapacity
       const newCellWorkingCapacity =
         'workingCapacity' in changes ? changes.workingCapacity : originalCellWorkingCapacity
       newMaxCapacity += newCellMaxCapacity - originalCellMaxCapacity
@@ -89,16 +76,8 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const {
-      cells,
-      locationResidentialSummary,
-      user,
-    }: { cells?: Location[]; locationResidentialSummary: ResidentialSummary; user: Express.User } =
-      res.locals as unknown as {
-        cells?: Location[]
-        locationResidentialSummary: ResidentialSummary
-        user: Express.User
-      }
+    const { systemToken } = req.session
+    const { cells, locationResidentialSummary } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
     const allCellChanges = Object.fromEntries(
@@ -109,14 +88,26 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
             return null
           }
 
+          if (!req.canAccess('change_max_capacity')) {
+            delete changes.maxCapacity
+          }
+
+          const newCapacity = {
+            workingCapacity: cell?.oldWorkingCapacity,
+            maxCapacity: cell?.capacity?.maxCapacity,
+            ...changes,
+          }
+          if (
+            newCapacity.workingCapacity === cell?.oldWorkingCapacity &&
+            newCapacity.maxCapacity === cell?.capacity?.maxCapacity
+          ) {
+            return null
+          }
+
           return [
             cell.id,
             {
-              capacity: {
-                workingCapacity: cell?.oldWorkingCapacity,
-                maxCapacity: cell?.capacity?.maxCapacity,
-                ...capacityChanges[cell.id],
-              },
+              capacity: newCapacity,
             },
           ]
         })
@@ -127,9 +118,8 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
       selectedLocationIds = locationResidentialSummary.subLocations.map(l => l.id)
     }
 
-    const { authService, locationsService } = req.services
-    const token = await authService.getSystemClientToken(user.username)
-    await locationsService.reactivateBulk(token, {
+    const { locationsService } = req.services
+    await locationsService.reactivateBulk(systemToken, {
       ...Object.fromEntries(selectedLocationIds.map(id => [id, { cascadeReactivation: true }])),
       ...allCellChanges,
     })
@@ -138,41 +128,31 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
   }
 
   async successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const {
-      location,
-      locationResidentialSummary,
-      locations,
-      user,
-    }: {
-      location: DecoratedLocation
-      locationResidentialSummary: LocationResidentialSummary
-      locations: LocationMap[]
-      user: Express.User
-    } = res.locals as unknown as {
-      location: DecoratedLocation
-      locationResidentialSummary: LocationResidentialSummary
-      locations: LocationMap[]
-      user: Express.User
-    }
-    const redirectUrl = `/view-and-update-locations/${location.prisonId}/${location.id}`
+    const { systemToken } = req.session
+    const { decoratedLocation, locationResidentialSummary, locationTree } = res.locals
+    const redirectUrl = `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`
 
     const selectLocations = req.sessionModel.get<string[]>('selectLocations') || []
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
-    let { locationType } = location
+    let { locationType } = decoratedLocation
     if (selectLocations.length) {
       if (selectLocations.length === 1) {
-        const { authService, locationsService } = req.services
-        const systemToken = await authService.getSystemClientToken(user.username)
-        locationType = await locationsService.getLocationType(systemToken, locations[0].location.locationType)
+        const { locationsService } = req.services
+        locationType = (await locationsService.getLocationType(
+          systemToken,
+          locationTree[0].location.locationType,
+        )) as LocationType
       } else {
-        locationType = locationResidentialSummary.subLocationName
+        locationType = locationResidentialSummary.subLocationName as LocationType
       }
     }
     const locationNames = nonOxfordJoin(
-      (selectLocations.length ? locations.map(l => l.location) : [location]).map(l => l.localName || l.pathHierarchy),
+      (selectLocations.length ? locationTree.map(l => l.location) : [decoratedLocation]).map(
+        l => l.localName || l.pathHierarchy,
+      ),
     )
 
     req.flash('success', {

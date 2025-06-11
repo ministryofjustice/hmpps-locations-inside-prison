@@ -1,14 +1,14 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
-import LocationFactory from '../../testutils/factories/location'
 import CellConversionSpecificCellType from './specificCellType'
 import fields from '../../routes/cellConversion/fields'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('CellConversionSpecificCellType', () => {
   const controller = new CellConversionSpecificCellType({ route: '/' })
-  let req: FormWizard.Request
-  let res: DeepPartial<Response>
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
   let sessionModelSave: jest.Mock
   let sessionModelSet: jest.Mock
@@ -70,7 +70,7 @@ describe('CellConversionSpecificCellType', () => {
     updateSessionData = jest.fn()
     journeyModelSet = jest.fn()
     journeyModelGet = jest.fn().mockReturnValue(initialJourneyHistory())
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -92,15 +92,15 @@ describe('CellConversionSpecificCellType', () => {
         unset: sessionModelUnset,
         updateSessionData,
       },
-    } as unknown as FormWizard.Request
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build(),
+        decoratedLocation: buildDecoratedLocation(),
         options: {
           fields,
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -120,7 +120,7 @@ describe('CellConversionSpecificCellType', () => {
 
   describe('locals', () => {
     beforeEach(() => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'hasSpecificCellType',
           type: 'required',
@@ -131,7 +131,7 @@ describe('CellConversionSpecificCellType', () => {
     })
 
     it('returns the expected locals', () => {
-      const result = controller.locals(req, res as Response)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -147,11 +147,11 @@ describe('CellConversionSpecificCellType', () => {
 
     describe('when edititng', () => {
       beforeEach(() => {
-        req.isEditing = true
+        deepReq.isEditing = true
       })
 
       it('returns the expected locals', () => {
-        const result = controller.locals(req, res as Response)
+        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
         expect(result).toEqual({
           cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -167,7 +167,9 @@ describe('CellConversionSpecificCellType', () => {
 
       describe('when the specialist cell types have been set already', () => {
         beforeEach(() => {
-          req.sessionModel.get = jest.fn().mockImplementation(key => (key === 'specialistCellTypes' ? ['CAT_A'] : null))
+          deepReq.sessionModel.get = jest
+            .fn()
+            .mockImplementation(key => (key === 'specialistCellTypes' ? ['CAT_A'] : null))
         })
 
         it('makes the next step valid in so that the journey is valid if we click back', () => {
@@ -175,37 +177,37 @@ describe('CellConversionSpecificCellType', () => {
           newHistory[4].invalid = false
           newHistory[4].revalidate = false
 
-          controller.locals(req, res as Response)
+          controller.locals(deepReq as FormWizard.Request, deepRes as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
       })
 
       describe('when the specialist cell types have not yet been set', () => {
         beforeEach(() => {
-          req.sessionModel.get = jest.fn().mockReturnValue(undefined)
+          deepReq.sessionModel.get = jest.fn().mockReturnValue(undefined)
         })
 
         it('sets the next step back to /set-cell-capacity so that the journey is valid if we click back', () => {
           const newJourneyHistory = initialJourneyHistory()
           newJourneyHistory[3].next = '/location/44711e6c-7b06-451e-95fe-c454e6957744/cell-conversion/set-cell-capacity'
-          controller.locals(req, res as Response)
+          controller.locals(deepReq as FormWizard.Request, deepRes as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newJourneyHistory)
         })
 
         it('sets the answer back to no in the session', () => {
-          controller.locals(req, res as Response)
+          controller.locals(deepReq as FormWizard.Request, deepRes as Response)
           expect(sessionModelSet).toHaveBeenCalledWith('hasSpecificCellType', 'no', { silent: true })
         })
 
         it('sets the answer as no in the locals', () => {
-          controller.locals(req, res as Response)
-          expect(res.locals.values.hasSpecificCellType).toEqual('no')
+          controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+          expect(deepRes.locals.values.hasSpecificCellType).toEqual('no')
         })
       })
 
       describe('when the cell capacity has been set already', () => {
         beforeEach(() => {
-          req.sessionModel.get = jest
+          deepReq.sessionModel.get = jest
             .fn()
             .mockImplementation((key: string) => ({ maxCapacity: '2', workingCapacity: '1' })[key])
         })
@@ -216,7 +218,7 @@ describe('CellConversionSpecificCellType', () => {
           newHistory[5].invalid = false
           newHistory[5].revalidate = false
 
-          controller.locals(req, res as Response)
+          controller.locals(deepReq as FormWizard.Request, deepRes as Response)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
       })
@@ -226,16 +228,16 @@ describe('CellConversionSpecificCellType', () => {
   describe('saveValues', () => {
     describe('when edititng', () => {
       beforeEach(() => {
-        req.isEditing = true
+        deepReq.isEditing = true
       })
 
       describe('when the answer is yes', () => {
         beforeEach(() => {
-          req.form.values.hasSpecificCellType = 'yes'
+          deepReq.form.values.hasSpecificCellType = 'yes'
         })
 
         it('clears the saved cell types', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('previousCellTypes')
         })
 
@@ -244,39 +246,39 @@ describe('CellConversionSpecificCellType', () => {
           newHistory[4].invalid = true
           newHistory[4].revalidate = true
 
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(next).toHaveBeenCalled()
         })
       })
 
       describe('when the answer is no', () => {
         beforeEach(() => {
-          req.form.values.hasSpecificCellType = 'no'
+          deepReq.form.values.hasSpecificCellType = 'no'
         })
 
         it('unsets the specialist cell types', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('specialistCellTypes')
         })
 
         it('clears the saved cell types', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(sessionModelUnset).toHaveBeenCalledWith('previousCellTypes')
         })
 
         it('calls next', () => {
-          controller.saveValues(req, res as Response, next)
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
           expect(next).toHaveBeenCalled()
         })
 
         describe('when the working capacity is zero and is NORMAL_ACCOMMODATION', () => {
           beforeEach(() => {
-            req.sessionModel.get = jest.fn().mockImplementation(
+            deepReq.sessionModel.get = jest.fn().mockImplementation(
               (key: string) =>
                 ({
                   maxCapacity: '2',
@@ -292,19 +294,19 @@ describe('CellConversionSpecificCellType', () => {
             newHistory[5].invalid = true
             newHistory[5].revalidate = true
 
-            controller.saveValues(req, res as Response, next)
+            controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
             expect(journeyModelSet).toHaveBeenCalledWith('history', newHistory)
           })
 
           it('saves the cell types in case we need to restore them', () => {
-            controller.saveValues(req, res as Response, next)
+            controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
             expect(sessionModelSet).toHaveBeenCalledWith('previousCellTypes', ['ACCESSIBLE_CELL'])
           })
         })
 
         describe('when the working capacity is zero and is not NORMAL_ACCOMMODATION', () => {
           beforeEach(() => {
-            req.sessionModel.get = jest
+            deepReq.sessionModel.get = jest
               .fn()
               .mockImplementation(
                 (key: string) =>
@@ -317,7 +319,7 @@ describe('CellConversionSpecificCellType', () => {
             newHistory[5].invalid = true
             newHistory[5].revalidate = true
 
-            controller.saveValues(req, res as Response, next)
+            controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
             expect(journeyModelSet).not.toHaveBeenCalledWith('history', newHistory)
           })
         })

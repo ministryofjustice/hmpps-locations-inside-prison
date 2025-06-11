@@ -123,6 +123,6 @@ export default {
   loadReportDefinitionsOnStartup: get('LOAD_DPR_ON_STARTUP', 'false') === 'true',
   featureFlags: {
     permanentDeactivation: get('FLAG_MVP2_PERMANENT_DEACTIVATION', 'disabled') === 'enabled',
-    manageLocations: get('FLAG_MANAGE_LOCATIONS_ENABLED', 'false') === 'true',
+    createAndCertify: get('FLAG_CREATE_AND_CERTIFY', 'disabled') === 'enabled',
   },
 }

@@ -1,14 +1,18 @@
+import { DeepPartial } from 'fishery'
+import { Response } from 'express'
+import FormWizard from 'hmpo-form-wizard'
 import LocationFactory from '../../../../testutils/factories/location'
-import populateLocations from './populateLocations'
+import populateLocationTree from './populateLocationTree'
 import LocationResidentialSummaryFactory from '../../../../testutils/factories/locationResidentialSummary'
 import { Location } from '../../../../data/types/locationsApi'
 import decorateLocation from '../../../../decorators/location'
+import LocationsService from '../../../../services/locationsService'
 
-const populateLocationsFunc = populateLocations(false)
+const populateLocationsFunc = populateLocationTree(false)
 
 describe('populateLocations', () => {
-  let req: any
-  let res: any
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: any
 
   let sessionModelValues: { [k: string]: any }
@@ -143,7 +147,7 @@ describe('populateLocations', () => {
       systemToken: 'token',
       userToken: '', // not required when limited: true
       manageUsersService: null, // not required when limited: true
-      locationsService: req.services.locationsService,
+      locationsService: deepReq.services.locationsService as LocationsService,
       limited: true,
     })
   }
@@ -151,27 +155,25 @@ describe('populateLocations', () => {
   beforeEach(() => {
     sessionModelValues = {}
     next = jest.fn()
-    req = {
-      session: {},
+    deepReq = {
+      session: { systemToken: 'token' },
       sessionModel: {
         get: (key: string) => sessionModelValues[key],
       },
       services: {
-        authService: {
-          getSystemClientToken: jest.fn().mockResolvedValue('token'),
-        },
         locationsService: {
-          getResidentialSummary: (_token: string, prisonId: string, id: string) => residentialSummaries[prisonId][id],
-          getAccommodationType: (_token: string, type: string) => `Resolved ${type}`,
-          getConvertedCellType: (_token: string, type: string) => `Resolved ${type}`,
-          getDeactivatedReason: (_token: string, type: string) => `Resolved ${type}`,
-          getLocationType: (_token: string, type: string) => `Resolved ${type}`,
-          getSpecialistCellType: (_token: string, type: string) => `Resolved ${type}`,
-          getUsedForType: (_token: string, type: string) => `Resolved ${type}`,
+          getResidentialSummary: (_token: string, prisonId: string, id: string) =>
+            Promise.resolve(residentialSummaries[prisonId][id]),
+          getAccommodationType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+          getConvertedCellType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+          getDeactivatedReason: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+          getLocationType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+          getSpecialistCellType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
+          getUsedForType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
         },
       },
     }
-    res = {
+    deepRes = {
       locals: {
         location,
         locationResidentialSummary: residentialSummaries.TST.location,
@@ -188,10 +190,10 @@ describe('populateLocations', () => {
     })
 
     it('populates the locations', async () => {
-      await populateLocationsFunc(req, res, next)
+      await populateLocationsFunc(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(res.locals.cells).toEqual([location1b1])
-      expect(res.locals.locations).toEqual([
+      expect(deepRes.locals.cells).toEqual([location1b1])
+      expect(deepRes.locals.locationTree).toEqual([
         {
           location: location1,
           subLocations: [
@@ -203,20 +205,20 @@ describe('populateLocations', () => {
     })
 
     describe('when decorate: true', () => {
-      const populateLocationsDecorateFunc = populateLocations(true)
+      const populateLocationsDecorateFunc = populateLocationTree(true)
 
       it('populates the locations with DecoratedLocations', async () => {
-        await populateLocationsDecorateFunc(req, res, next)
+        await populateLocationsDecorateFunc(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(res.locals.cells).toEqual([await decorate(location1b1)])
-        expect(res.locals.locations).toEqual([
+        expect(deepRes.locals.decoratedCells).toEqual([await decorate(location1b1)])
+        expect(deepRes.locals.decoratedLocationTree).toEqual([
           {
-            location: await decorate(location1),
-            subLocations: [
-              { location: await decorate(location1a), subLocations: [] },
+            decoratedLocation: await decorate(location1),
+            decoratedSubLocations: [
+              { decoratedLocation: await decorate(location1a), decoratedSubLocations: [] },
               {
-                location: await decorate(location1b),
-                subLocations: [{ location: await decorate(location1b1), subLocations: [] }],
+                decoratedLocation: await decorate(location1b),
+                decoratedSubLocations: [{ decoratedLocation: await decorate(location1b1), decoratedSubLocations: [] }],
               },
             ],
           },
@@ -227,9 +229,9 @@ describe('populateLocations', () => {
 
   describe('when selectLocations is not populated', () => {
     it('populates the locations', async () => {
-      await populateLocationsFunc(req, res, next)
+      await populateLocationsFunc(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(res.locals.cells.sort((a: Location, b: Location) => a.id.localeCompare(b.id))).toEqual([
+      expect(deepRes.locals.cells.sort((a: Location, b: Location) => a.id.localeCompare(b.id))).toEqual([
         location1b1,
         location2a,
         location2b,
@@ -238,7 +240,7 @@ describe('populateLocations', () => {
         location3c,
         location3d,
       ])
-      expect(res.locals.locations).toEqual([
+      expect(deepRes.locals.locationTree).toEqual([
         {
           location: location1,
           subLocations: [

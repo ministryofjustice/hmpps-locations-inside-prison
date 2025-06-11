@@ -7,7 +7,7 @@ export default function createErrorHandler(production: boolean) {
   return (error: SanitisedError | ResponseError, req: Request, res: Response, next: NextFunction): void => {
     const status = 'responseStatus' in error ? error.responseStatus : (error as ResponseError).status
     logger.error(
-      `${'isApiError' in error ? 'API ' : ''}Error (${status}) handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`,
+      `Error (${status}) handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`,
       error,
     )
 
@@ -16,7 +16,14 @@ export default function createErrorHandler(production: boolean) {
       error_code: ((error as SanitisedError).data as { errorCode?: string })?.errorCode,
     })
 
-    if (!('isApiError' in error) && (status === 401 || status === 403)) {
+    if (
+      (status === 401 || status === 403) &&
+      (error.message.includes('Missing permission') ||
+        ('headers' in error &&
+          ((error as SanitisedError).headers as { [header: string]: string })['www-authenticate']?.includes(
+            'invalid_token',
+          )))
+    ) {
       logger.info('Logging user out')
       return res.redirect('/sign-out')
     }
@@ -26,8 +33,8 @@ export default function createErrorHandler(production: boolean) {
     }
 
     if (!production) {
-      res.locals.message = [status, error.message].filter(s => s).join(' - ')
-      res.locals.stack = error.stack
+      res.locals.errorMessage = [status, error.message].filter(s => s).join(' - ')
+      res.locals.errorStack = error.stack
     }
 
     res.status(status || 500)

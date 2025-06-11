@@ -2,7 +2,7 @@ import Page, { PageElement } from '../../page'
 
 export default class ReactivateParentChangeCapacityPage extends Page {
   constructor() {
-    super('Change cell capacity')
+    super('')
   }
 
   workingCapacityInput = (): PageElement => cy.get('#workingCapacity')

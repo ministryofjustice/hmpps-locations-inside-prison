@@ -1,18 +1,17 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import SetCellType from '.'
 import fields from '../../routes/setCellType/fields'
-import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import AnalyticsService from '../../services/analyticsService'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('SetCellType', () => {
   const controller = new SetCellType({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
@@ -33,16 +32,12 @@ describe('SetCellType', () => {
     },
   ]
 
-  const location = LocationFactory.build({
-    specialistCellTypes: ['Biohazard / dirty protest cell'],
-  })
-  location.raw = {
-    ...location,
+  const decoratedLocation = buildDecoratedLocation({
     specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
-  }
+  })
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       flash: jest.fn(),
       form: {
         options: {
@@ -57,28 +52,30 @@ describe('SetCellType', () => {
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       session: {
         referrerUrl: '/referrer-url',
+        systemToken: 'token',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName]),
+        get: jest.fn(
+          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
         reset: jest.fn(),
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location,
+        decoratedLocation,
         options: {
           fields,
         },
         prisonerLocation: {
           prisoners: [],
         },
-        residentialSummary: {
+        prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
             workingCapacity: 20,
@@ -92,10 +89,9 @@ describe('SetCellType', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getSpecialistCellTypes = jest.fn().mockResolvedValue(allCellTypes)
     locationsService.updateSpecialistCellTypes = jest.fn()
     analyticsService.sendEvent = jest.fn()
@@ -103,8 +99,8 @@ describe('SetCellType', () => {
 
   describe('configure', () => {
     it('adds the options to the field', async () => {
-      await controller.configure(req, res, next)
-      expect(req.form.options.fields.specialistCellTypes.items).toEqual([
+      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(deepReq.form.options.fields.specialistCellTypes.items).toEqual([
         {
           hint: {
             text: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
@@ -132,7 +128,7 @@ describe('SetCellType', () => {
 
   describe('locals', () => {
     it('returns the expected locals when there are errors', () => {
-      res.locals.errorlist = [
+      deepRes.locals.errorlist = [
         {
           key: 'specialistCellTypes',
           type: 'required',
@@ -140,7 +136,7 @@ describe('SetCellType', () => {
           args: {},
         },
       ]
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -181,10 +177,10 @@ describe('SetCellType', () => {
           ],
         },
       }
-      req.form.values = {}
-      res.locals.fields = checkboxFields
+      deepReq.form.values = {}
+      deepRes.locals.fields = checkboxFields
 
-      const result = controller.locals(req, res)
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
@@ -233,17 +229,19 @@ describe('SetCellType', () => {
 
   describe('validate', () => {
     it('cancels and redirects to the show location page when there are no changes', () => {
-      req.form.values = { specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'] }
-      res.redirect = jest.fn()
-      controller.validate(req, res, jest.fn())
+      deepReq.form.values = { specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'] }
+      deepRes.redirect = jest.fn()
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+      )
     })
   })
 
   describe('saveValues', () => {
     it('saves the values via the locations API', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(locationsService.updateSpecialistCellTypes).toHaveBeenCalledWith(
         'token',
         '7e570000-0000-0000-0000-000000000001',
@@ -252,44 +250,46 @@ describe('SetCellType', () => {
     })
 
     it('sends an analytics event when setting cell type', async () => {
-      res.locals.location.specialistCellTypes = []
+      deepRes.locals.decoratedLocation.specialistCellTypes = []
 
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'set_cell_type', { prison_id: 'TST' })
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'set_cell_type', { prison_id: 'TST' })
     })
 
     it('sends an analytics event when changing cell type', async () => {
-      res.locals.location.specialistCellTypes = ['EXISTING_TYPE']
+      deepRes.locals.decoratedLocation.specialistCellTypes = ['EXISTING_TYPE']
 
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_cell_type', { prison_id: 'TST' })
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'change_cell_type', { prison_id: 'TST' })
     })
   })
 
   describe('successHandler', () => {
     beforeEach(() => {
-      controller.successHandler(req, res, next)
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('resets the journey model', () => {
-      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
     })
 
     it('resets the session model', () => {
-      expect(req.sessionModel.reset).toHaveBeenCalled()
+      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
     })
 
     it('sets the flash correctly', () => {
-      expect(req.flash).toHaveBeenCalledWith('success', {
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
         content: 'You have set a specific cell type for this location.',
         title: 'Cell type set',
       })
     })
 
     it('redirects to the view location page', () => {
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001')
+      expect(deepRes.redirect).toHaveBeenCalledWith(
+        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+      )
     })
   })
 })

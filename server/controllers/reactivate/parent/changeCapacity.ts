@@ -30,24 +30,28 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
   }
 
   getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
-    const { cell } = res.locals
+    const { decoratedCell } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
 
     return {
-      maxCapacity: cell.capacity.maxCapacity,
-      workingCapacity: cell.oldWorkingCapacity,
-      ...capacityChanges[cell.id],
+      maxCapacity: decoratedCell.capacity.maxCapacity,
+      workingCapacity: decoratedCell.oldWorkingCapacity,
+      ...capacityChanges[decoratedCell.id],
     }
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
-    super.validateFields(req, res, errors => {
-      const { values } = req.form
-      const { cell } = res.locals
-      const { accommodationTypes, specialistCellTypes }: Location = cell.raw
-      const validationErrors: FormWizard.Errors = {}
+    const { values } = req.form
+    const { decoratedCell } = res.locals
+    const { accommodationTypes, specialistCellTypes }: Location = decoratedCell.raw
+    const validationErrors: FormWizard.Errors = {}
 
+    if (!req.canAccess('change_max_capacity')) {
+      values.maxCapacity = decoratedCell.capacity.maxCapacity.toString()
+    }
+
+    super.validateFields(req, res, errors => {
       if (!errors.workingCapacity) {
         if (
           values?.workingCapacity === '0' &&
@@ -64,9 +68,16 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response) {
     const locals = super.locals(req, res)
-    const { location } = res.locals
-    const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${location.id}/check-capacity` })
-    const cancelLink = `/view-and-update-locations/${[location.prisonId, location.id].join('/')}`
+    const { decoratedCell, decoratedLocation, values } = res.locals
+    const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${decoratedLocation.id}/check-capacity` })
+    const cancelLink = `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
+
+    const { maxCapacity } = decoratedCell.capacity
+
+    if (!req.canAccess('change_max_capacity')) {
+      req.sessionModel.set('maxCapacity', maxCapacity)
+      values.maxCapacity = maxCapacity
+    }
 
     return {
       ...locals,
@@ -76,23 +87,23 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { cell } = res.locals
+    const { decoratedCell } = res.locals
     const maxCapacity = Number(req.form.values.maxCapacity)
     const workingCapacity = Number(req.form.values.workingCapacity)
 
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
     const cellChanges: Partial<Location['capacity']> = {}
-    if (maxCapacity !== cell.capacity?.maxCapacity) {
+    if (maxCapacity !== decoratedCell.capacity?.maxCapacity && req.canAccess('change_max_capacity')) {
       cellChanges.maxCapacity = maxCapacity
     }
-    if (workingCapacity !== cell.capacity?.workingCapacity) {
+    if (workingCapacity !== decoratedCell.capacity?.workingCapacity) {
       cellChanges.workingCapacity = workingCapacity
     }
     if (Object.keys(cellChanges).length) {
-      capacityChanges[cell.id] = cellChanges
+      capacityChanges[decoratedCell.id] = cellChanges
     } else {
-      delete capacityChanges[cell.id]
+      delete capacityChanges[decoratedCell.id]
     }
 
     req.sessionModel.set('capacityChanges', capacityChanges)

@@ -1,4 +1,4 @@
-import { Request, RequestHandler } from 'express'
+import { type NextFunction, Request, type Response } from 'express'
 import logger from '../../logger'
 import { Services } from '../services'
 import formatDaysAgo from '../formatters/formatDaysAgo'
@@ -167,18 +167,13 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
   return details
 }
 
-export default function populateResidentialSummary({
-  authService,
-  locationsService,
-  manageUsersService,
-}: Services): RequestHandler {
-  return async (req, res, next) => {
-    const { user, prisonId } = res.locals
+export default function populateDecoratedResidentialSummary({ locationsService, manageUsersService }: Services) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { systemToken } = req.session
+    const { prisonId, user } = res.locals
 
     try {
-      const token = await authService.getSystemClientToken(user.username)
-
-      const apiData = await locationsService.getResidentialSummary(token, prisonId, req.params.locationId)
+      const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, req.params.locationId)
       const residentialSummary: {
         location?: DecoratedLocation
         locationDetails?: SummaryListRow[]
@@ -194,8 +189,8 @@ export default function populateResidentialSummary({
               location,
               locationsService,
               manageUsersService,
-              systemToken: token,
-              userToken: res.locals.user.token,
+              systemToken,
+              userToken: user.token,
               limited: true,
             })
           }),
@@ -211,8 +206,8 @@ export default function populateResidentialSummary({
           location: apiData.parentLocation,
           locationsService,
           manageUsersService,
-          systemToken: token,
-          userToken: res.locals.user.token,
+          systemToken,
+          userToken: user.token,
         })
 
         residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, req)
@@ -275,7 +270,7 @@ export default function populateResidentialSummary({
           { type: 'maximum-capacity', text: apiData.prisonSummary.maxCapacity.toString() },
         )
       }
-      res.locals.residentialSummary = residentialSummary
+      res.locals.decoratedResidentialSummary = residentialSummary
 
       next()
     } catch (error) {

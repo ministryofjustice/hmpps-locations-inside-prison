@@ -1,26 +1,26 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import ChangeUsedForDetails from './details'
-import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/changeUsedFor/fields'
 import AnalyticsService from '../../services/analyticsService'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('ChangeUsedForDetails', () => {
   const controller = new ChangeUsedForDetails({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const authService = new AuthService(null) as jest.Mocked<AuthService>
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
-    req = {
+    deepReq = {
       flash: jest.fn(),
       session: {
         referrerUrl: '',
+        systemToken: 'token',
       },
       form: {
         options: {
@@ -32,7 +32,6 @@ describe('ChangeUsedForDetails', () => {
       },
       services: {
         analyticsService,
-        authService,
         locationsService,
       },
       sessionModel: {
@@ -42,13 +41,13 @@ describe('ChangeUsedForDetails', () => {
             ({
               usedFor: [{ text: 'Remand', value: 'REMAND' }],
             })[fieldName],
-        ),
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         errorlist: [],
-        location: LocationFactory.build({
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           localName: 'A-1-001',
           capacity: {
@@ -73,10 +72,9 @@ describe('ChangeUsedForDetails', () => {
         },
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
     next = jest.fn()
 
-    authService.getSystemClientToken = jest.fn().mockResolvedValue('token')
     locationsService.getUsedForTypes = jest.fn().mockResolvedValue([
       { key: 'REMAND', description: 'Remand' },
       { key: 'THERAPEUTIC_COMMUNITY', description: 'Therapeutic community' },
@@ -87,11 +85,11 @@ describe('ChangeUsedForDetails', () => {
 
   describe('setOptions', () => {
     beforeEach(async () => {
-      await controller.setOptions(req, res, next)
+      await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('sets the correct checkbox items', () => {
-      expect(req.form.options.fields.usedFor.items).toEqual([
+      expect(deepReq.form.options.fields.usedFor.items).toEqual([
         {
           value: 'REMAND',
           text: 'Remand',
@@ -104,16 +102,16 @@ describe('ChangeUsedForDetails', () => {
     })
 
     it('calls next', () => {
-      controller.saveValues(req, res, next)
+      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalled()
     })
   })
 
   describe('locals', () => {
     it('returns the correct locals', () => {
-      controller.setOptions(req, res, jest.fn())
+      controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(controller.locals(req, res)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
@@ -153,27 +151,27 @@ describe('ChangeUsedForDetails', () => {
 
   describe('saveValues', () => {
     beforeEach(() => {
-      req.form.options.fields.usedFor.items = [
+      deepReq.form.options.fields.usedFor.items = [
         {
           value: 'REMAND',
           text: 'Remand',
         },
       ]
-      controller.saveValues(req, res, next)
+      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('calls locationsService', () => {
       expect(locationsService.updateUsedForTypes).toHaveBeenCalledWith(
         'token',
-        res.locals.location.id,
-        req.form.values.usedFor,
+        deepRes.locals.decoratedLocation.id,
+        deepReq.form.values.usedFor,
       )
     })
 
     it('sends an analytics event', async () => {
-      await controller.saveValues(req, res, next)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(req, 'change_used_for', { prison_id: 'TST' })
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'change_used_for', { prison_id: 'TST' })
     })
 
     it('calls next', () => {

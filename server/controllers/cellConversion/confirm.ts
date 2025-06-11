@@ -3,32 +3,32 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import FormInitialStep from '../base/formInitialStep'
 import generateChangeSummary from '../../lib/generateChangeSummary'
-import getResidentialSummary from '../../middleware/getResidentialSummary'
+import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { SummaryListRow } from '../../@types/govuk'
+import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionConfirm extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(getResidentialSummary)
+    this.use(getPrisonResidentialSummary)
   }
 
   async get(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
     const { locationsService } = req.services
 
-    const token = await req.services.authService.getSystemClientToken(user.username)
-
+    const { systemToken } = req.session
     const accommodationType = await locationsService.getAccommodationType(
-      token,
+      systemToken,
       req.sessionModel.get<string>('accommodationType'),
     )
     const specialistCellTypeKeys = req.sessionModel.get<string[]>('specialistCellTypes')
     const specialistCellTypes =
       specialistCellTypeKeys &&
-      (await Promise.all(specialistCellTypeKeys.map(key => locationsService.getSpecialistCellType(token, key))))
+      (await Promise.all(specialistCellTypeKeys.map(key => locationsService.getSpecialistCellType(systemToken, key))))
     const usedForTypeKeys = req.sessionModel.get<string[]>('usedForTypes')
     const usedForTypes =
-      usedForTypeKeys && (await Promise.all(usedForTypeKeys.map(key => locationsService.getUsedForType(token, key))))
+      usedForTypeKeys &&
+      (await Promise.all(usedForTypeKeys.map(key => locationsService.getUsedForType(systemToken, key))))
 
     res.locals = {
       ...res.locals,
@@ -67,11 +67,18 @@ export default class CellConversionConfirm extends FormInitialStep {
     }
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { sessionModel } = req
-    const { location, maxCapacity, workingCapacity } = res.locals
-    const { id: locationId, prisonId } = location
-    const { accommodationType, residentialSummary, specialistCellTypes, usedForTypes } = res.locals
+    const {
+      accommodationType,
+      decoratedLocation,
+      maxCapacity,
+      prisonResidentialSummary,
+      specialistCellTypes,
+      usedForTypes,
+      workingCapacity,
+    } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     sessionModel.unset('previousCellTypes')
     sessionModel.unset('previousAccommodationType')
@@ -91,9 +98,14 @@ export default class CellConversionConfirm extends FormInitialStep {
         'working capacity',
         0,
         Number(workingCapacity),
-        residentialSummary.prisonSummary.workingCapacity,
+        prisonResidentialSummary.prisonSummary.workingCapacity,
       ),
-      generateChangeSummary('maximum capacity', 0, Number(maxCapacity), residentialSummary.prisonSummary.maxCapacity),
+      generateChangeSummary(
+        'maximum capacity',
+        0,
+        Number(maxCapacity),
+        prisonResidentialSummary.prisonSummary.maxCapacity,
+      ),
     ])
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
@@ -107,7 +119,7 @@ export default class CellConversionConfirm extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { location, user } = res.locals
+      const { decoratedLocation } = res.locals
       const { services, sessionModel } = req
       const { locationsService } = services
       const accommodationType = sessionModel.get<string>('accommodationType')
@@ -116,10 +128,9 @@ export default class CellConversionConfirm extends FormInitialStep {
       const workingCapacity = sessionModel.get<number>('workingCapacity')
       const usedForTypes = sessionModel.get<string[]>('usedForTypes')
 
-      const token = await req.services.authService.getSystemClientToken(user.username)
       await locationsService.convertToCell(
-        token,
-        res.locals.location.id,
+        req.session.systemToken,
+        decoratedLocation.id,
         accommodationType,
         specialistCellTypes,
         maxCapacity,
@@ -128,7 +139,7 @@ export default class CellConversionConfirm extends FormInitialStep {
       )
 
       req.services.analyticsService.sendEvent(req, 'convert_to_cell', {
-        prison_id: location.prisonId,
+        prison_id: decoratedLocation.prisonId,
         accommodation_type: accommodationType,
       })
 
@@ -139,7 +150,7 @@ export default class CellConversionConfirm extends FormInitialStep {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.location
+    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 
     req.journeyModel.reset()

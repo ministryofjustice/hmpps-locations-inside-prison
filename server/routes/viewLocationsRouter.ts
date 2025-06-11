@@ -1,7 +1,7 @@
 import express from 'express'
 import viewLocationsIndex from '../controllers/viewLocations/viewLocationsIndex'
 import populatePrisonId from '../middleware/populatePrisonId'
-import populateResidentialSummary from '../middleware/populateResidentialSummary'
+import populateDecoratedResidentialSummary from '../middleware/populateDecoratedResidentialSummary'
 import logPageView from '../middleware/logPageView'
 import { Page } from '../services/auditService'
 import type { Services } from '../services'
@@ -10,13 +10,12 @@ import validateCaseload from '../middleware/validateCaseload'
 import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsForLocation'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import addAction from '../middleware/addAction'
-import { DecoratedLocation } from '../decorators/decoratedLocation'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 
 const router = express.Router({ mergeParams: true })
 
 export const addActions = asyncMiddleware(async (req, res, next) => {
-  const { location }: { location: DecoratedLocation } = res.locals.residentialSummary
+  const { location } = res.locals.decoratedResidentialSummary
 
   const { active, isResidential, leafLevel, raw } = location
   const { locationType } = raw
@@ -43,7 +42,7 @@ const controller = (services: Services) => {
 
   router.get(
     '/',
-    populateResidentialSummary(services),
+    populateDecoratedResidentialSummary(services),
     populateBreadcrumbsForLocation,
     addBreadcrumb({ title: '', href: '/' }),
     logPageView(services.auditService, Page.LOCATIONS_INDEX),
@@ -52,7 +51,7 @@ const controller = (services: Services) => {
 
   router.get(
     '/:locationId',
-    populateResidentialSummary(services),
+    populateDecoratedResidentialSummary(services),
     populateBreadcrumbsForLocation,
     logPageView(services.auditService, Page.LOCATIONS_SHOW),
     addActions,

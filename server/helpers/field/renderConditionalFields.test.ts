@@ -1,13 +1,14 @@
 import FormWizard from 'hmpo-form-wizard'
+import { DeepPartial } from 'fishery'
 import renderConditionalFields, { FieldEntry } from './renderConditionalFields'
 import FeComponentsService from '../../services/feComponentsService'
 
 const feComponentsService = jest.mocked(new FeComponentsService(null))
-const req: FormWizard.Request = {
+const deepReq: DeepPartial<FormWizard.Request> = {
   services: {
     feComponentsService,
   },
-} as unknown as typeof req
+}
 
 describe('Field helpers', () => {
   describe('#renderConditionalFields()', () => {
@@ -20,7 +21,7 @@ describe('Field helpers', () => {
     describe("when field doesn't contain items", () => {
       it('should return the original field as object', () => {
         const field = ['court', { name: 'court' }] as FieldEntry
-        const response = renderConditionalFields(req, field, [field])
+        const response = renderConditionalFields(deepReq as FormWizard.Request, field, [field])
 
         expect(response).toEqual(['court', { name: 'court' }])
       })
@@ -67,7 +68,7 @@ describe('Field helpers', () => {
           let response: ReturnType<typeof renderConditionalFields>
 
           beforeEach(() => {
-            response = renderConditionalFields(req, field, fields)
+            response = renderConditionalFields(deepReq as FormWizard.Request, field, fields)
           })
 
           it('should call component service for each item', () => {
@@ -125,7 +126,7 @@ describe('Field helpers', () => {
           let response: ReturnType<typeof renderConditionalFields>
 
           beforeEach(() => {
-            response = renderConditionalFields(req, field, [field])
+            response = renderConditionalFields(deepReq as FormWizard.Request, field, [field])
           })
 
           it('should not call component service for each item', () => {
@@ -164,7 +165,7 @@ describe('Field helpers', () => {
         let response: ReturnType<typeof renderConditionalFields>
 
         beforeEach(() => {
-          response = renderConditionalFields(req, field, [field])
+          response = renderConditionalFields(deepReq as FormWizard.Request, field, [field])
         })
 
         it('should not call component service for each item', () => {
@@ -223,7 +224,7 @@ describe('Field helpers', () => {
         let response: ReturnType<typeof renderConditionalFields>
 
         beforeEach(() => {
-          response = renderConditionalFields(req, field, fields)
+          response = renderConditionalFields(deepReq as FormWizard.Request, field, fields)
         })
 
         it('should call component service for each item', () => {

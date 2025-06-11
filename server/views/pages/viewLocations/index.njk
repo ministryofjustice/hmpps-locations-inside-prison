@@ -44,7 +44,7 @@
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
             <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">
-              {% for summary in residentialSummary.summaryCards %}
+              {% for summary in decoratedResidentialSummary.summaryCards %}
                 <div class="govuk-grid-column-one-third" data-qa="{{ summary.type }}-card">
                   {{ miniSummary({bottomLabel: summary.type | title | replace('-', ' '), bottomClass: 'big', bottomContentLine1: summary.text,
                   linkHref: summary.linkHref if summary.linkHref, linkLabel: summary.linkLabel if summary.linkLabel}) }}
@@ -66,6 +66,6 @@
       </div>
     </div>
 
-    {{ locationsTable(actionButton, residentialSummary.subLocationName, residentialSummary.subLocations) }}
+    {{ locationsTable(residentialSummary.subLocationName, residentialSummary.subLocations) }}
   </div>
 {% endblock %}

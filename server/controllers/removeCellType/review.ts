@@ -12,7 +12,7 @@ export default class ReviewCellCapacity extends FormInitialStep {
   }
 
   getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
-    return res.locals.location.capacity
+    return res.locals.decoratedLocation.capacity
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
@@ -39,8 +39,8 @@ export default class ReviewCellCapacity extends FormInitialStep {
   }
 
   locals(req: FormWizard.Request, res: Response) {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     return {
       ...super.locals(req, res),

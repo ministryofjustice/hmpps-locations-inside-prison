@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 
 export default async (req: Request, res: Response) => {
-  const { location } = res.locals.residentialSummary
+  const { location } = res.locals.decoratedResidentialSummary
   const { active, isResidential, leafLevel } = location
   let actionButton
 

@@ -30,19 +30,19 @@
           }) }}
         {% endif %}
 
-        <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+        <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
         <h1 class="govuk-heading-l">{{ title }}</h1>
       </div>
     </div>
   </div>
 {% endblock %}
 
-{% macro capacityTable(locations) %}
-  {% set cells = locations.filter(propEquals.bind(null, 'location.raw.locationType', 'CELL')) %}
+{% macro capacityTable(decoratedLocationTree) %}
+  {% set cells = decoratedLocationTree.filter(propEquals.bind(null, 'decoratedLocation.raw.locationType', 'CELL')) %}
   {% if cells | length %}
     {% set rows = [] %}
     {% for cellData in cells %}
-      {% set cell = cellData.location %}
+      {% set cell = cellData.decoratedLocation %}
       {% set workingCapacity = (cell.oldWorkingCapacity or 0) | string %}
       {% set maxCapacity = (cell.capacity.maxCapacity or 0) | string %}
       {% if values.capacityChanges and values.capacityChanges[cell.id] %}
@@ -59,7 +59,7 @@
           { text: cell.pathHierarchy },
           { html: workingCapacity },
           { html: maxCapacity },
-          { html: '<a href="/reactivate/parent/' + location.id + '/change-capacity/' + cell.id  + '" id="' + cell.id + '">Change</a>' }
+          { html: '<a href="/reactivate/parent/' + decoratedLocation.id + '/change-capacity/' + cell.id  + '" id="' + cell.id + '">Change</a>' }
         ]
       ), rows) %}
     {% endfor %}
@@ -77,7 +77,7 @@
       rows: rows
     }) }}
   {% else %}
-    {% for subData in data.subLocations %}
+    {% for subData in data.decoratedSubLocations %}
       {{ explodeLocation(subData, false) }}
     {% endfor %}
   {% endif %}
@@ -85,10 +85,10 @@
 
 {% macro explodeLocation(data, topLevel) %}
   <h{{ 2 if topLevel else 3 }} class="govuk-heading-{{ "m" if topLevel else "s" }}">
-    {{ data.location.displayName | capFirst }}
+    {{ data.decoratedLocation.displayName | capFirst }}
   </h{{ 2 if topLevel else 3 }}>
 
-  {{ capacityTable(data.subLocations) }}
+  {{ capacityTable(data.decoratedSubLocations) }}
 {% endmacro %}
 
 {% block content %}
@@ -100,9 +100,9 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-half">
         {% if locationResidentialSummary.subLocationName == 'Cells' %}
-          {{ capacityTable(locations) }}
+          {{ capacityTable(decoratedLocationTree) }}
         {% else %}
-          {% for data in locations %}
+          {% for data in decoratedLocationTree %}
             {{ explodeLocation(data, true) }}
           {% endfor %}
         {% endif %}

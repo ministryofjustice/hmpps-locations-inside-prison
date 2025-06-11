@@ -9,15 +9,12 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
-{% from "../../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../../macros/miniSummary.njk" import miniSummary %}
-
 {% set title = "Permanent deactivation details" %}
 
 {% block heading %}
   <div class="govuk-grid-row govuk-!-margin-bottom-0">
     <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+      <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
       <h1 class="govuk-heading-l">{{ title }}</h1>
     </div>
   </div>

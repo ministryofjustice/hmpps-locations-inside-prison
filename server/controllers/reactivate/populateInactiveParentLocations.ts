@@ -50,14 +50,19 @@ export default async function populateInactiveParentLocations(
   res: Response,
   next: NextFunction,
 ) {
-  const { cells, location, user }: { cells?: Location[]; location?: DecoratedLocation; user: Express.User } = res.locals
-  const { authService, locationsService } = req.services
+  const { systemToken } = req.session
+  const { cells, location } = res.locals
+  const { locationsService } = req.services
   const childLocations = cells || [location].filter(l => l)
 
   if (childLocations.length) {
     res.locals.inactiveParentLocations = []
-    const token = await authService.getSystemClientToken(user.username)
-    await addInactiveParentLocations(locationsService, token, res.locals.inactiveParentLocations, cells || [location])
+    await addInactiveParentLocations(
+      locationsService,
+      systemToken,
+      res.locals.inactiveParentLocations,
+      cells || [location],
+    )
   }
 
   next()

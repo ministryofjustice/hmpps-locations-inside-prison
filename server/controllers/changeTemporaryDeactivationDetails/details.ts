@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
-import { DecoratedLocation } from '../../decorators/decoratedLocation'
+import { TypedLocals } from '../../@types/express'
 
 export default class ChangeTemporaryDeactivationDetails extends FormInitialStep {
   middlewareSetup() {
@@ -11,8 +11,8 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
   }
 
   getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
-    const { location } = res.locals
-    const { deactivatedReason } = location.raw
+    const { decoratedLocation } = res.locals
+    const { deactivatedReason } = decoratedLocation.raw
 
     let descriptionFieldKey: string
     if (deactivatedReason === 'OTHER') {
@@ -23,18 +23,17 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
 
     return {
       deactivationReason: deactivatedReason,
-      [`deactivationReason${descriptionFieldKey}`]: location.deactivationReasonDescription,
-      estimatedReactivationDate: location.proposedReactivationDate,
-      planetFmReference: location.planetFmReference,
+      [`deactivationReason${descriptionFieldKey}`]: decoratedLocation.deactivationReasonDescription,
+      estimatedReactivationDate: decoratedLocation.proposedReactivationDate,
+      planetFmReference: decoratedLocation.planetFmReference,
     }
   }
 
   async populateItems(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { user } = res.locals
-    const { authService, locationsService } = req.services
+    const { systemToken } = req.session
+    const { locationsService } = req.services
     const { deactivationReason } = req.form.options.fields
-    const token = await authService.getSystemClientToken(user.username)
-    const deactivationReasons = await locationsService.getDeactivatedReasons(token)
+    const deactivationReasons = await locationsService.getDeactivatedReasons(systemToken)
 
     deactivationReason.items = Object.entries(deactivationReasons)
       .sort(([a, _], [b, __]) => {
@@ -71,10 +70,10 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     super.validateFields(req, res, callback)
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
 
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     const backLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
@@ -98,8 +97,8 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
   }
 
   validate(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     const valuesHaveChanged = this.compareInitialAndSubmittedValues({
       initialValues: this.getInitialValues(req, res),
@@ -134,16 +133,14 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { user, location } = res.locals
+      const { decoratedLocation } = res.locals
       const { locationsService } = req.services
 
       const submittedValues = this.getSubmittedValues(req)
 
-      const token = await req.services.authService.getSystemClientToken(user.username)
-
       await locationsService.updateTemporaryDeactivation(
-        token,
-        location.id,
+        req.session.systemToken,
+        decoratedLocation.id,
         submittedValues.deactivationReason,
         submittedValues[this.getDeactivationReasonDesc(submittedValues.deactivationReason as string)],
         submittedValues.estimatedReactivationDate,
@@ -151,8 +148,8 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
       )
 
       req.services.analyticsService.sendEvent(req, 'change_temp_deactivation', {
-        prison_id: location.prisonId,
-        location_type: location.locationType,
+        prison_id: decoratedLocation.prisonId,
+        location_type: decoratedLocation.locationType,
         deactivation_reason: submittedValues.deactivationReason,
       })
 
@@ -163,8 +160,8 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location as DecoratedLocation
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()

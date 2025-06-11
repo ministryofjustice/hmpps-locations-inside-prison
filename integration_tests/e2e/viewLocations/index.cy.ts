@@ -53,7 +53,7 @@ context('View Locations Index', () => {
       const expectedRows = [
         {
           location: {
-            text: 'Wing A',
+            text: 'A-1-001',
             href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
           },
           status: {

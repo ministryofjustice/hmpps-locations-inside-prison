@@ -8,7 +8,7 @@ import populateInactiveCells from '../middleware/populateInactiveCells'
 import inactiveCellsIndex from '../controllers/inactiveCellsIndex'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsForLocation'
-import populateResidentialSummary from '../middleware/populateResidentialSummary'
+import populateDecoratedResidentialSummary from '../middleware/populateDecoratedResidentialSummary'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 
 const router = express.Router({ mergeParams: true })
@@ -23,7 +23,7 @@ const controller = (services: Services) => {
       res.locals.options = { action: '/reactivate/cells', method: 'get' }
       if (req.params.locationId) {
         res.locals.locationId = req.params.locationId
-        await populateResidentialSummary(services)(req, res, next)
+        await populateDecoratedResidentialSummary(services)(req, res, next)
         return
       }
 

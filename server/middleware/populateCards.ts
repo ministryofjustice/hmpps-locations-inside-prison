@@ -1,8 +1,7 @@
-import { RequestHandler } from 'express'
 import asyncMiddleware from './asyncMiddleware'
 import config from '../config'
 
-export default function populateCards(): RequestHandler {
+export default function populateCards() {
   return asyncMiddleware((_req, res, next) => {
     res.locals.cards = [
       ...(config.featureFlags.manageLocations

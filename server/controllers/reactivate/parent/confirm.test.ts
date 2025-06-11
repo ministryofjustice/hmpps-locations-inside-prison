@@ -1,13 +1,15 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import { Services } from '../../../services'
+import { DeepPartial } from 'fishery'
 import ReactivateParentConfirm from './confirm'
 import fields from '../../../routes/reactivate/parent/fields'
+import LocationFactory from '../../../testutils/factories/location'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('ReactivateParentConfirm', () => {
   const controller = new ReactivateParentConfirm({ route: '/' })
-  let req: FormWizard.Request
-  let res: Response
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
   let sessionModelValues: {
     referrerPrisonId: string
     referrerLocationId: string
@@ -20,7 +22,7 @@ describe('ReactivateParentConfirm', () => {
       referrerLocationId: 'l0',
       selectedLocations: ['l1', 'l2'],
     }
-    req = {
+    deepReq = {
       form: {
         options: {
           fields,
@@ -31,29 +33,31 @@ describe('ReactivateParentConfirm', () => {
         referrerUrl: '/referrer-url',
       },
       sessionModel: {
-        get: jest.fn((fieldName?: keyof typeof sessionModelValues) => sessionModelValues[fieldName]),
+        get: jest.fn(
+          (fieldName?: keyof typeof sessionModelValues) => sessionModelValues[fieldName],
+        ) as FormWizard.Request['sessionModel']['get'],
       },
-    } as unknown as typeof req
-    res = {
+    }
+    deepRes = {
       locals: {
         user: { username: 'username' },
         errorlist: [],
-        location: {
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
           capacity: {
             maxCapacity: 1,
             workingCapacity: 0,
           },
-        },
+        }),
         cells: [
-          {
+          LocationFactory.build({
             id: 'l1',
             oldWorkingCapacity: 2,
             capacity: {
               maxCapacity: 3,
             },
-          },
+          }),
         ],
         options: {
           fields,
@@ -70,7 +74,7 @@ describe('ReactivateParentConfirm', () => {
         values: sessionModelValues,
       },
       redirect: jest.fn(),
-    } as unknown as typeof res
+    }
   })
 
   describe('generateChangeSummary', () => {
@@ -86,19 +90,16 @@ describe('ReactivateParentConfirm', () => {
 
   describe('locals', () => {
     beforeEach(() => {
-      req.services = {
-        authService: {
-          getSystemClientToken: () => 'token',
-        },
+      deepReq.services = {
         locationsService: {
           getDeactivatedReason: jest.fn(),
         },
-      } as unknown as Services
+      }
     })
 
     it('sets the correct locals', async () => {
-      expect(controller.locals(req, res)).toEqual({
-        backLink: `/reactivate/parent/${res.locals.location.id}/check-capacity`,
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
+        backLink: `/reactivate/parent/${deepRes.locals.decoratedLocation.id}/check-capacity`,
         cancelLink: `/inactive-cells/${sessionModelValues.referrerPrisonId}/${sessionModelValues.referrerLocationId}`,
         changeSummary: `The establishment’s total working capacity will increase from 20 to 22.`,
       })

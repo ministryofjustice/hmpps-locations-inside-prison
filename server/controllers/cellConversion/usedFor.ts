@@ -1,12 +1,12 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionUsedFor extends FormInitialStep {
   async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const token = await req.services.authService.getSystemClientToken(res.locals.user.username)
-    const { prisonId } = res.locals.location
-    const usedForTypes = await req.services.locationsService.getUsedForTypesForPrison(token, prisonId)
+    const { prisonId } = res.locals.decoratedLocation
+    const usedForTypes = await req.services.locationsService.getUsedForTypesForPrison(req.session.systemToken, prisonId)
 
     req.form.options.fields.usedForTypes.items = Object.values(usedForTypes).map(({ key, description }) => ({
       text: description,
@@ -16,10 +16,10 @@ export default class CellConversionUsedFor extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
     const usedForTypes = req.form.values.usedForTypes || req.sessionModel.get<string[]>('usedForTypes')
     const fields = { ...(locals.fields as FormWizard.Fields) }
 

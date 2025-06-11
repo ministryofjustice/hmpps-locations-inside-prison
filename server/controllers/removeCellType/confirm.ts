@@ -3,38 +3,43 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../utils/backUrl'
 import generateChangeSummary from '../../lib/generateChangeSummary'
-import getResidentialSummary from '../../middleware/getResidentialSummary'
+import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
 
 export default class ConfirmRemoveCellType extends FormWizard.Controller {
   middlewareSetup() {
     super.middlewareSetup()
-    this.use(getResidentialSummary)
+    this.use(getPrisonResidentialSummary)
     this.use(populateLocation({ decorate: true }))
   }
 
   locals(req: FormWizard.Request, res: Response): object {
-    const { location } = res.locals
-    const { id: locationId, prisonId } = location
-    const { maxCapacity, workingCapacity } = location.capacity
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
+    const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
     const newMaxCap = Number(req.sessionModel.get('maxCapacity'))
-    const { residentialSummary } = res.locals
+    const { prisonResidentialSummary } = res.locals
 
     const changeSummaries = compact([
       generateChangeSummary(
         'working capacity',
         workingCapacity,
         newWorkingCap,
-        residentialSummary.prisonSummary.workingCapacity,
+        prisonResidentialSummary.prisonSummary.workingCapacity,
       ),
-      generateChangeSummary('maximum capacity', maxCapacity, newMaxCap, residentialSummary.prisonSummary.maxCapacity),
+      generateChangeSummary(
+        'maximum capacity',
+        maxCapacity,
+        newMaxCap,
+        prisonResidentialSummary.prisonSummary.maxCapacity,
+      ),
     ])
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/location/${location.id}/remove-cell-type/review` })
+    const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/remove-cell-type/review` })
 
     return {
       backLink,
@@ -45,20 +50,20 @@ export default class ConfirmRemoveCellType extends FormWizard.Controller {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { location, user } = res.locals
+      const { decoratedLocation } = res.locals
       const { locationsService } = req.services
 
-      const token = await req.services.authService.getSystemClientToken(user.username)
+      const token = req.session.systemToken
       await locationsService.updateCapacity(
         token,
-        location.id,
+        decoratedLocation.id,
         Number(req.sessionModel.get('maxCapacity')),
         Number(req.sessionModel.get('workingCapacity')),
       )
 
-      await locationsService.updateSpecialistCellTypes(token, res.locals.location.id, [])
+      await locationsService.updateSpecialistCellTypes(token, decoratedLocation.id, [])
 
-      req.services.analyticsService.sendEvent(req, 'remove_cell_type', { prison_id: location.prisonId })
+      req.services.analyticsService.sendEvent(req, 'remove_cell_type', { prison_id: decoratedLocation.prisonId })
 
       next()
     } catch (error) {
@@ -67,7 +72,7 @@ export default class ConfirmRemoveCellType extends FormWizard.Controller {
   }
 
   successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.location
+    const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()

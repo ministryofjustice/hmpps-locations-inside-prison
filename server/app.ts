@@ -25,6 +25,7 @@ import type { Services } from './services'
 import setCanAccess from './middleware/setCanAccess'
 import config from './config'
 import setUpFeatureFlags from './middleware/setUpFeatureFlags'
+import refreshSystemToken from './middleware/refreshSystemToken'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -54,6 +55,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
+  app.use(refreshSystemToken(services))
   app.use(setCanAccess())
 
   if (config.environmentName !== 'Training') {

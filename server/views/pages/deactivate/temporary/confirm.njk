@@ -8,15 +8,12 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% from "../../../macros/locationsTable.njk" import locationsTable %}
-{% from "../../../macros/miniSummary.njk" import miniSummary %}
-
 {% set title = "Check your answers before deactivating this location" %}
 
 {% block heading %}
   <div class="govuk-grid-row govuk-!-margin-bottom-0">
     <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-m" data-qa="cell-name">{{ location.displayName | capFirst }}</span>
+      <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
       <h1 class="govuk-heading-l">Check your answers before deactivating this location</h1>
     </div>
   </div>
@@ -98,9 +95,9 @@
         <div class="govuk-!-padding-bottom-2 change-summary">
           <h2 class="govuk-heading-m">Change to establishment capacity</h2>
 
-          {% if location.raw.locationType != 'CELL' %}
+          {% if decoratedLocation.raw.locationType != 'CELL' %}
             {{ govukWarningText({
-              text: "Every cell in " + location.displayName + " will be deactivated.",
+              text: "Every cell in " + decoratedLocation.displayName + " will be deactivated.",
               iconFallbackText: "Warning"
             }) }}
           {% endif %}

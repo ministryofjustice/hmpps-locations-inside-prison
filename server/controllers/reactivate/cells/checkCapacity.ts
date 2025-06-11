@@ -30,10 +30,7 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
     const backLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
-    const { cells, errorlist } = res.locals as unknown as {
-      cells: Location[]
-      errorlist: FormWizard.Controller.Error[]
-    }
+    const { cells, errorlist } = res.locals
 
     res.locals.options.fields = Object.fromEntries(
       errorlist.map(error => {
@@ -65,7 +62,7 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
-      const { cells } = res.locals as unknown as { cells: Location[] }
+      const { cells } = res.locals
       const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get(
         'capacityChanges',
       ) || {}) as typeof capacityChanges

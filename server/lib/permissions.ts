@@ -22,12 +22,14 @@ const manageResidentialLocationsPermissions: string[] = [
 
 const manageResLocationsOpCapPermissions: string[] = [
   ...manageResidentialLocationsPermissions,
+  'change_max_capacity',
   'change_signed_operational_capacity',
   'deactivate:permanent',
 ]
 
 const permissionsByRole: { [key: string]: string[] } = {
   VIEW_INTERNAL_LOCATION: viewInternalLocationPermissions,
+  // VIEW_INTERNAL_LOCATION: manageResidentialLocationsPermissions,
   MANAGE_RESIDENTIAL_LOCATIONS: manageResidentialLocationsPermissions,
   MANAGE_RES_LOCATIONS_OP_CAP: manageResLocationsOpCapPermissions,
   REPORTING_LOCATION_INFORMATION: reportingLocationInformationPermissions,
