@@ -1,4 +1,3 @@
-import IndexPage from '../../pages/index'
 import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import ManageLocationsIndexPage from '../../pages/manageLocations'
