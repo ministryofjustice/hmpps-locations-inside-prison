@@ -1,8 +1,8 @@
 import Page, { PageElement } from '../page'
 
-export default class ViewLocationsIndexPage extends Page {
+export default class ManageLocationsIndexPage extends Page {
   constructor() {
-    super('View and update locations')
+    super('Manage locations')
   }
 
   capacity = {
@@ -17,6 +17,8 @@ export default class ViewLocationsIndexPage extends Page {
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 
   locationsHeader = (): PageElement => cy.get('[data-qa=locations-table-caption]')
+
+  locationsCreateWingButton = (): PageElement => cy.get('[data-qa=create-button]')
 
   locationsTableRows = (): PageElement => this.locationsTable().find('tbody tr')
 
