@@ -1,13 +1,12 @@
 import express from 'express'
 import manageLocationsIndex from '../controllers/manageLocations/manageLocationsIndex'
 import populatePrisonId from '../middleware/populatePrisonId'
-import populateResidentialSummary from '../middleware/populateResidentialSummary'
-import type { Services } from '../services'
-import { Page } from '../services/auditService'
-import validateCaseload from '../middleware/validateCaseload'
+import populateDecoratedResidentialSummary from '../middleware/populateDecoratedResidentialSummary'
 import logPageView from '../middleware/logPageView'
+import { Page } from '../services/auditService'
+import type { Services } from '../services'
+import validateCaseload from '../middleware/validateCaseload'
 import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsForLocation'
-
 import addBreadcrumb from '../middleware/addBreadcrumb'
 
 const router = express.Router({ mergeParams: true })
@@ -18,12 +17,14 @@ const controller = (services: Services) => {
 
   router.get(
     '/',
-    populateResidentialSummary(services),
+    populateDecoratedResidentialSummary(services),
     populateBreadcrumbsForLocation,
     addBreadcrumb({ title: '', href: '/' }),
     logPageView(services.auditService, Page.LOCATION_CREATE),
     manageLocationsIndex,
   )
+
   return router
 }
+
 export default controller

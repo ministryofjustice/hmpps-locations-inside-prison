@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { singularizeString } from '../../utils/utils'
 
 export default async (req: Request, res: Response) => {
-  const { residentialSummary: location, prisonId } = res.locals
+  const { decoratedResidentialSummary: location, prisonId } = res.locals
 
   const banner: {
     success?: {

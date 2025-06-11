@@ -48,24 +48,31 @@ describe('GET /manage-locations/PRISON_ID', () => {
       topLevelLocationType: 'Wings',
       locationHierarchy: [],
       prisonSummary: {
-        workingCapacity: 85,
-        signedOperationalCapacity: 90,
-        maxCapacity: 95,
+        workingCapacity: 95,
+        signedOperationalCapacity: 102,
+        maxCapacity: 100,
       },
-      subLocationName: 'Test Wing',
+      subLocationName: 'TestWings',
       subLocations: [],
     })
 
-    const res = await request(app).get('/manage-locations/TST').expect(200)
+    return request(app)
+      .get('/manage-locations/TST')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        // Check that breadcrumbs are present
+        expect(res.text).toContain('govuk-breadcrumbs')
 
-    expect(res.text).toContain('govuk-breadcrumbs')
-    expect(res.text).toMatch(/>\s+85\s+</)
-    expect(res.text).toMatch(/>\s+90\s+</)
-    expect(res.text).toMatch(/>\s+95\s+</)
+        // Check that capacity values are present
+        expect(res.text).toMatch(/>\s+95\s+</)
+        expect(res.text).toMatch(/>\s+102\s+</)
+        expect(res.text).toMatch(/>\s+100\s+</)
 
-    expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_CREATE, {
-      who: user.username,
-      correlationId: expect.any(String),
-    })
+        expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_CREATE, {
+          who: user.username,
+          correlationId: expect.any(String),
+        })
+      })
   })
 })

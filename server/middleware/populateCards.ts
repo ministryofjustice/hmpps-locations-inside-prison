@@ -4,7 +4,7 @@ import config from '../config'
 export default function populateCards() {
   return asyncMiddleware((_req, res, next) => {
     res.locals.cards = [
-      ...(config.featureFlags.manageLocations
+      ...(config.featureFlags.createAndCertify
         ? [
             {
               clickable: true,
