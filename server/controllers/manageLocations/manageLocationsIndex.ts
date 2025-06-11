@@ -16,7 +16,7 @@ export default async (req: Request, res: Response) => {
     ;[banner.success] = success
   }
   return res.render('pages/manageLocations/index', {
-    actionButton: {
+    createButton: {
       text: `Create new ${singularizeString(String(location.subLocationName)).toLowerCase()}`,
       href: `/manage-locations/${prisonId}/create-new-wing`,
       classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
