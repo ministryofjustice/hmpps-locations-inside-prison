@@ -1,17 +1,31 @@
 import { RequestHandler } from 'express'
 import asyncMiddleware from './asyncMiddleware'
+import config from '../config'
 
 export default function populateCards(): RequestHandler {
   return asyncMiddleware((_req, res, next) => {
     res.locals.cards = [
-      {
-        clickable: true,
-        visible: true,
-        heading: 'View and update locations',
-        href: `/view-and-update-locations`,
-        description: 'View and update information about existing residential locations.',
-        'data-qa': 'view-locations-card',
-      },
+      ...(config.featureFlags.manageLocations
+        ? [
+            {
+              clickable: true,
+              visible: true,
+              heading: 'Manage locations',
+              href: `/manage-locations`,
+              description: 'View and update information about existing locations or create new residential locations',
+              'data-qa': 'manage-locations-card',
+            },
+          ]
+        : [
+            {
+              clickable: true,
+              visible: true,
+              heading: 'View and update locations',
+              href: `/view-and-update-locations`,
+              description: 'View and update information about existing residential locations.',
+              'data-qa': 'view-locations-card',
+            },
+          ]),
       {
         clickable: true,
         visible: true,
