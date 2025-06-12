@@ -10,20 +10,20 @@ const reportingLocationInformationPermissions: string[] = [
 const manageResidentialLocationsPermissions: string[] = [
   ...viewInternalLocationPermissions,
   'change_cell_capacity',
-  'convert_non_residential',
+  'change_local_name',
+  'change_non_residential_type',
+  'change_temporary_deactivation_details',
+  'change_used_for',
+  'deactivate',
   'reactivate',
   'set_cell_type',
-  'change_non_residential_type',
-  'change_used_for',
-  'change_local_name',
-  'change_temporary_deactivation_details',
-  'deactivate',
 ]
 
 const manageResLocationsOpCapPermissions: string[] = [
   ...manageResidentialLocationsPermissions,
   'change_max_capacity',
   'change_signed_operational_capacity',
+  'convert_non_residential',
   'deactivate:permanent',
 ]
 

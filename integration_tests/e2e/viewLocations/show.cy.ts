@@ -534,17 +534,59 @@ context('View Locations Show', () => {
         })
 
         describe('Actions button', () => {
-          before(() => {
-            cy.task('stubSignIn', {
-              roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
+          context('when the createAndCertify feature flag is disabled', () => {
+            beforeEach(() => {
+              cy.task('setFeatureFlag', { createAndCertify: false })
             })
-            cy.signIn()
+
+            before(() => {
+              cy.task('stubSignIn', {
+                roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
+              })
+              cy.signIn()
+            })
+
+            it('shows the actions menu', () => {
+              ViewLocationsShowPage.goTo(location.prisonId, location.id)
+              Page.verifyOnPage(ViewLocationsShowPage)
+              cy.get('.moj-button-menu').should('exist')
+            })
           })
 
-          it('Shows the Action button if actions are provided', () => {
-            ViewLocationsShowPage.goTo(location.prisonId, location.id)
-            Page.verifyOnPage(ViewLocationsShowPage)
-            cy.get('.govuk-button').contains('Actions')
+          context('when the createAndCertify feature flag is enabled', () => {
+            beforeEach(() => {
+              cy.task('setFeatureFlag', { createAndCertify: true })
+            })
+
+            context('when the user has MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+              before(() => {
+                cy.task('stubSignIn', {
+                  roles: ['MANAGE_RESIDENTIAL_LOCATIONS'],
+                })
+                cy.signIn()
+              })
+
+              it('does not show the actions menu', () => {
+                ViewLocationsShowPage.goTo(location.prisonId, location.id)
+                Page.verifyOnPage(ViewLocationsShowPage)
+                cy.get('.moj-button-menu').should('not.exist')
+              })
+            })
+
+            context('when the user has MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+              before(() => {
+                cy.task('stubSignIn', {
+                  roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
+                })
+                cy.signIn()
+              })
+
+              it('shows the actions menu', () => {
+                ViewLocationsShowPage.goTo(location.prisonId, location.id)
+                Page.verifyOnPage(ViewLocationsShowPage)
+                cy.get('.moj-button-menu').should('exist')
+              })
+            })
           })
         })
       })
