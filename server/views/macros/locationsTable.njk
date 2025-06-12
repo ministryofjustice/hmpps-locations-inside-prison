@@ -1,8 +1,16 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% from "./locationStatusTag.njk" import locationStatusTag %}
 
-{% macro locationsTable(locationType, locations) %}
+{% macro locationsTable (createButton, locationType, locations) %}
+
+<h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
+
+  {% if createButton %}
+    {{ govukButton(createButton) }}
+  {% endif %}
+
   {% if locations | length %}
     {% set rows = [] %}
     {% set leafLevel = locations[0].leafLevel %}
@@ -45,8 +53,6 @@
         "data-qa": "locations-table",
         "id": "locations-table"
       },
-      caption: locationType,
-      captionClasses: "govuk-table__caption--m",
       firstCellIsHeader: true,
       head: [
         { text: "Location" },

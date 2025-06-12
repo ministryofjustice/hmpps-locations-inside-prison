@@ -27,6 +27,7 @@ import locationHistoryRouter from './locationHistoryRouter'
 import setLocalNameRouter from './setLocalName'
 import changeLocalNameRouter from './changeLocalName'
 import removeLocalNameRouter from './removeLocalName'
+import manageLocationsRouter from './manageLocationsRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -47,6 +48,7 @@ export default function routes(services: Services): Router {
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
+  router.use('/manage-locations/:prisonId?', manageLocationsRouter(services))
 
   router.use('/location-history', locationHistoryRouter(services))
 

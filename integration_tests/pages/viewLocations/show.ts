@@ -83,7 +83,7 @@ export default class ViewLocationsShowPage extends Page {
 
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 
-  locationsHeader = (): PageElement => this.locationsTable().find('caption')
+  locationsHeader = (): PageElement => cy.get('[data-qa=locations-table-caption')
 
   locationsTableRows = (): PageElement => this.locationsTable().find('tbody tr')
 
