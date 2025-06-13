@@ -4,6 +4,7 @@ import FormInitialStep from '../../base/formInitialStep'
 import backUrl from '../../../utils/backUrl'
 import { Location } from '../../../data/types/locationsApi'
 import populateLocation from '../../../middleware/populateLocation'
+import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateParentChangeCapacity extends FormInitialStep {
   middlewareSetup() {
@@ -83,6 +84,10 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink,
+      title: `Change ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      insetText:
+        'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
+      titleCaption: capFirst(decoratedCell.displayName),
     }
   }
 
