@@ -31,7 +31,7 @@ const steps = {
     controller: ReactivateParentChangeCapacity,
     fields: ['workingCapacity', 'maxCapacity'],
     next: 'check-capacity',
-    template: 'changeCapacity',
+    template: '../../../partials/formStep',
   },
   '/confirm': {
     controller: ReactivateParentConfirm,

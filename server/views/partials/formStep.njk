@@ -1,4 +1,4 @@
-{% extends "../../partials/layout.njk" %}
+{% extends "./layout.njk" %}
 
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -7,11 +7,11 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
-{% set title = "Change cell capacity" %}
-
 {% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
-  <h1 class="govuk-heading-l">Change cell capacity</h1>
+  {% if titleCaption %}
+    <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
+  {% endif %}
+  <h1 class="govuk-heading-l">{{ title }}</h1>
 {% endblock %}
 
 {% block beforeContent %}
@@ -24,8 +24,6 @@
         }) }}
 
         {% if errorlist.length %}
-          {{ errorlist | dump }}
-          {{ validationErrors | dump }}
           {{ govukErrorSummary({
             titleText: "There is a problem",
             errorList: validationErrors,
@@ -47,15 +45,17 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
 
-        {{ govukInsetText({
-          text: "Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.",
-          classes: "govuk-!-margin-top-0"
-        }) }}
+        {% if insetText %}
+          {{ govukInsetText({
+            text: insetText,
+            classes: "govuk-!-margin-top-0"
+          }) }}
+        {% endif %}
 
         <form method="{{ formMethod }}" action="{{ formAction }}"
-        {% if formEnctype %}
-          enctype="{{ formEnctype }}"
-        {% endif %}
+          {% if formEnctype %}
+            enctype="{{ formEnctype }}"
+          {% endif %}
         >
 
           {% if formMethod == 'post' %}
@@ -65,7 +65,19 @@
           {% block fields %}
             {% for key, fieldsOptions in fields %}
               {% if fieldsOptions.component and not fieldsOptions.skip %}
-                {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+                {% if fieldsOptions.removed %}
+                  <div class="govuk-form-group">
+                    <span class="govuk-label {{ fieldsOptions.label.classes }}">{{ fieldsOptions.label.text }}</span>
+
+                    <div class="govuk-hint">
+                      {{ fieldsOptions.hint.text }}
+                    </div>
+
+                    <span class="govuk-label">{{ fieldsOptions.value }}</span>
+                  </div>
+                {% else %}
+                  {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+                {% endif %}
               {% endif %}
             {% endfor %}
           {% endblock %}
