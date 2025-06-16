@@ -193,6 +193,7 @@ services:
       - DPS_URL=http://localhost:3000
       - LOCATIONS_API_URL=http://localhost:8090
       - NO_HTTPS=true
+      - LOAD_DPR_ON_STARTUP=false
 
 networks:
   hmpps:
