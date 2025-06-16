@@ -86,6 +86,7 @@ interface TypedLocals {
   fields?: FormWizard.Fields
   inactiveCells?: DecoratedLocation[]
   inactiveParentLocations?: DecoratedLocation[]
+  insetText?: string
   lastUpdate: { time: string; date: string; updatedBy: string }
   leafLevel?: boolean
   location?: Location
@@ -103,15 +104,17 @@ interface TypedLocals {
   }
   pageTitleText?: string
   pathSuffix?: string
-  routePrefix?: string
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary
   recentlyViewedReports?: StoredReportData[]
   referrerRootUrl?: string
   requestedReports?: StoredReportData[]
+  routePrefix?: string
   specialistCellTypes?: string[]
   summaryListRows?: SummaryListRow[]
+  title?: string
+  titleCaption?: string
   topLevelLocationType?: string
   usedForTypes?: string[]
   user?: HmppsUser

@@ -176,6 +176,10 @@ describe('ChangeCellCapacity', () => {
             text: 'Working capacity cannot be more than 99',
           },
         ],
+        insetText:
+          'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
+        title: 'Change cell capacity',
+        titleCaption: 'Cell A-1-001',
       })
     })
   })

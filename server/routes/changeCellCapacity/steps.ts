@@ -17,6 +17,7 @@ const steps = {
     fields: ['workingCapacity', 'maxCapacity'],
     next: 'confirm',
     controller: ChangeCellCapacity,
+    template: '../../partials/formStep',
   },
 }
 
