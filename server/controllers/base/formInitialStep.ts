@@ -49,7 +49,7 @@ export default class FormInitialStep extends FormWizard.Controller {
 
     const { decoratedLocation } = res.locals
     const { locationType } = decoratedLocation || {}
-    const decoratedLocationType = locationType?.toLowerCase?.() || 'location'
+    const decoratedLocationType = locationType?.toString?.() || 'location'
 
     const errorMessages: Record<string, string> = {
       alphanumeric: `${fieldName} must not contain special characters`,
