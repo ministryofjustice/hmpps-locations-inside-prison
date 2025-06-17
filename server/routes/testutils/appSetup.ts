@@ -11,7 +11,6 @@ import { HmppsUser } from '../../interfaces/hmppsUser'
 import setUpWebSession from '../../middleware/setUpWebSession'
 import setCanAccess from '../../middleware/setCanAccess'
 import { ApplicationInfo } from '../../applicationInfo'
-import setUpFeatureFlags from '../../middleware/setUpFeatureFlags'
 
 jest.mock('../../services/auditService')
 
