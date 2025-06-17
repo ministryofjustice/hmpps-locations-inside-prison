@@ -5,6 +5,7 @@ import ManageLocationsIndexPage from '../../pages/manageLocations'
 context('View Locations Index', () => {
   context('Without the VIEW_INTERNAL_LOCATION role', () => {
     beforeEach(() => {
+      cy.task('setFeatureFlag', { createAndCertify: true })
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
     })
