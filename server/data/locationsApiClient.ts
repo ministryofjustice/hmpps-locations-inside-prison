@@ -1,12 +1,19 @@
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import BaseApiClient from './baseApiClient'
-import { Location, PrisonerLocation, LocationForLocalName, SignedOperationalCapacity } from './types/locationsApi'
-import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
-import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
+import {
+  Location,
+  PrisonerLocation,
+  LocationForLocalName,
+  SignedOperationalCapacity,
+  LocationResidentialSummary,
+  PrisonResidentialSummary,
+} from './types/locationsApi'
+
 import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
 
 import { RedisClient } from './redisClient'
+import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(
@@ -153,6 +160,10 @@ export default class LocationsApiClient extends BaseApiClient {
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
       queryParams: ['includeHistory'],
+      requestType: 'get',
+    }),
+    getResidentialHierarchy: this.apiCall<ResidentialHierarchy, { prisonId: string }>({
+      path: '/locations/prison/:prisonId/residential-hierarchy',
       requestType: 'get',
     }),
     getResidentialSummary: this.apiCall<

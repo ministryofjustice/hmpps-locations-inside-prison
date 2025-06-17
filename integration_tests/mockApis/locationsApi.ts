@@ -104,6 +104,7 @@ const stubLocationsConstantsLocationType = () =>
       jsonBody: {
         locationTypes: [
           { key: 'WING', description: 'Wing' },
+          { key: 'TESTWING', description: 'Testwing' },
           { key: 'LANDING', description: 'Landing' },
           { key: 'SPUR', description: 'Spur' },
           { key: 'CELL', description: 'Cell' },
@@ -511,6 +512,21 @@ const stubUpdateCapacity = () =>
     },
   })
 
+const stubLocationsResidentialHierarchy = ({ prisonId, residentialHierarchy }) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/locations-api/locations/prison/${prisonId}/residential-hierarchy`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: residentialHierarchy,
+    },
+  })
+
 const stubLocationsCheckLocalNameDoesntExist = () =>
   stubFor({
     request: {
@@ -766,6 +782,7 @@ const stubLocationsHealthPing = () =>
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
+  stubLocationsResidentialHierarchy,
   stubLocationsCheckLocalNameDoesntExist,
   stubLocationsCheckLocalNameExists,
   stubLocationsConstantsAccommodationType,
