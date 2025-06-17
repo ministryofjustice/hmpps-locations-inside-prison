@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class ChangeCellCapacityPage extends Page {
   constructor() {
-    super('Change cell capacity')
+    super('')
   }
 
   static goTo = (locationId: string) => cy.visit(`/location/${locationId}/change-cell-capacity`)

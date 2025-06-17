@@ -4,6 +4,7 @@ import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class ChangeCellCapacity extends FormInitialStep {
   middlewareSetup() {
@@ -16,14 +17,18 @@ export default class ChangeCellCapacity extends FormInitialStep {
   }
 
   validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+    const { values } = req.form
+    const { decoratedLocation, prisonerLocation } = res.locals
+    const { accommodationTypes, specialistCellTypes } = decoratedLocation.raw
+    const occupants = prisonerLocation?.prisoners || []
+
+    const validationErrors: FormWizard.Errors = {}
+
+    if (!req.canAccess('change_max_capacity')) {
+      values.maxCapacity = decoratedLocation.capacity.maxCapacity.toString()
+    }
+
     super.validateFields(req, res, errors => {
-      const { values } = req.form
-      const { decoratedLocation, prisonerLocation } = res.locals
-      const { accommodationTypes, specialistCellTypes } = decoratedLocation.raw
-      const occupants = prisonerLocation?.prisoners || []
-
-      const validationErrors: FormWizard.Errors = {}
-
       if (!errors.workingCapacity) {
         if (
           values?.workingCapacity === '0' &&
@@ -64,17 +69,29 @@ export default class ChangeCellCapacity extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { id: locationId, prisonId } = res.locals.decoratedLocation
+    const { decoratedLocation, values } = res.locals
+    const { capacity, displayName, id: locationId, prisonId } = decoratedLocation
 
     const cancelLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
       nextStepUrl: `/location/${locationId}/change-cell-capacity/confirm`,
     })
 
+    const { maxCapacity } = capacity
+
+    if (!req.canAccess('change_max_capacity')) {
+      req.sessionModel.set('maxCapacity', maxCapacity)
+      values.maxCapacity = maxCapacity
+    }
+
     return {
       ...locals,
       backLink: cancelLink,
       cancelLink,
+      title: `Change ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      insetText:
+        'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
+      titleCaption: capFirst(displayName),
     }
   }
 }
