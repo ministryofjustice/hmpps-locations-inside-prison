@@ -15,6 +15,7 @@ export default function setCanAccess() {
     }
 
     if (!req.featureFlags?.createAndCertify) {
+      permissionOverrides.create_location = false
       permissionOverrides.change_max_capacity = true
       permissionOverrides.convert_non_residential = {
         MANAGE_RESIDENTIAL_LOCATIONS: true,

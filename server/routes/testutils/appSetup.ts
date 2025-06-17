@@ -11,6 +11,7 @@ import { HmppsUser } from '../../interfaces/hmppsUser'
 import setUpWebSession from '../../middleware/setUpWebSession'
 import setCanAccess from '../../middleware/setCanAccess'
 import { ApplicationInfo } from '../../applicationInfo'
+import setUpFeatureFlags from '../../middleware/setUpFeatureFlags'
 
 jest.mock('../../services/auditService')
 
@@ -45,6 +46,28 @@ export const user: HmppsUser = {
   ],
 }
 
+export const manageUser: HmppsUser = {
+  uuid: 'xxxx-xxxx-xxxx-xxxx',
+  name: 'FIRST LAST',
+  userId: 'id',
+  token: 'token',
+  username: 'manageUser1',
+  displayName: 'manage user',
+  authSource: 'nomis',
+  staffId: 1234,
+  userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'],
+  activeCaseload: {
+    id: 'TST',
+    name: 'Test (HMP)',
+  },
+  caseloads: [
+    {
+      id: 'TST',
+      name: 'Test (HMP)',
+    },
+  ],
+}
+
 export const flashProvider = jest.fn()
 
 function appSetup(services: Services, production: boolean, userSupplier: () => HmppsUser): Express {
@@ -61,6 +84,10 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
     res.locals = {
       user: { ...req.user } as HmppsUser,
     }
+    req.featureFlags = {
+      permanentDeactivation: false,
+      createAndCertify: true,
+    }
     next()
   })
   app.use((req, res, next) => {
@@ -70,6 +97,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use(setCanAccess())
+  app.use(setUpFeatureFlags())
   app.use(routes(services))
   app.use((req, res, next) => next(new NotFound()))
   app.use(errorHandler(production))

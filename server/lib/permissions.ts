@@ -9,6 +9,7 @@ const reportingLocationInformationPermissions: string[] = [
 
 const manageResidentialLocationsPermissions: string[] = [
   ...viewInternalLocationPermissions,
+  'create_location',
   'change_cell_capacity',
   'change_local_name',
   'change_non_residential_type',
