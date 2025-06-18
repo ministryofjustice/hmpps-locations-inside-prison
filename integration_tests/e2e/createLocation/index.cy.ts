@@ -51,7 +51,7 @@ context('Set Wing Location Details', () => {
       return Page.verifyOnPage(CreateLocationDetailsPage)
     }
 
-    it('shows the correct validation error for location code when submitting alphanumeric characters', () => {
+    it('shows the correct validation error for location code when submitting non-alphanumeric characters', () => {
       const page = goToCreateLocationDetailsPage()
 
       page.locationCodeInput().clear().type('!@£$')
@@ -104,6 +104,7 @@ context('Set Wing Location Details', () => {
       cy.get('#locationCode-error').contains('A location with this testwing code already exists')
     })
 
+    // TODO: tweak stub to simulate localName exists
     it.skip('shows the correct validation error when submitting a localName that already exists', () => {
       cy.task('stubLocationsResidentialHierarchy', {
         prisonId: 'TST',
