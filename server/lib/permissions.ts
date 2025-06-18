@@ -17,6 +17,7 @@ const manageResidentialLocationsPermissions: string[] = [
   'deactivate',
   'reactivate',
   'set_cell_type',
+  'create_location',
 ]
 
 const manageResLocationsOpCapPermissions: string[] = [

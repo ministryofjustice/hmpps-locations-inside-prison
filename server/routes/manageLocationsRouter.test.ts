@@ -1,6 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { appWithAllRoutes, user } from './testutils/appSetup'
+import { appWithAllRoutes, manageUser } from './testutils/appSetup'
 import AuditService, { Page } from '../services/auditService'
 import AuthService from '../services/authService'
 import LocationsService from '../services/locationsService'
@@ -22,7 +22,7 @@ beforeEach(() => {
       authService,
       locationsService,
     },
-    userSupplier: () => user,
+    userSupplier: () => manageUser,
   })
   authService.getSystemClientToken.mockResolvedValue('token')
 })
@@ -61,16 +61,14 @@ describe('GET /manage-locations/PRISON_ID', () => {
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        // Check that breadcrumbs are present
         expect(res.text).toContain('govuk-breadcrumbs')
 
-        // Check that capacity values are present
         expect(res.text).toMatch(/>\s+95\s+</)
         expect(res.text).toMatch(/>\s+102\s+</)
         expect(res.text).toMatch(/>\s+100\s+</)
 
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_CREATE, {
-          who: user.username,
+          who: manageUser.username,
           correlationId: expect.any(String),
         })
       })

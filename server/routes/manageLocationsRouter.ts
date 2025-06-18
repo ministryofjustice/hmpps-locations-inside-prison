@@ -8,6 +8,7 @@ import type { Services } from '../services'
 import validateCaseload from '../middleware/validateCaseload'
 import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsForLocation'
 import addBreadcrumb from '../middleware/addBreadcrumb'
+import protectRoute from '../middleware/protectRoute'
 
 const router = express.Router({ mergeParams: true })
 
@@ -17,6 +18,7 @@ const controller = (services: Services) => {
 
   router.get(
     '/',
+    protectRoute('create_location'),
     populateDecoratedResidentialSummary(services),
     populateBreadcrumbsForLocation,
     addBreadcrumb({ title: '', href: '/' }),
