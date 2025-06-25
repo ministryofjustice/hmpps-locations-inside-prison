@@ -5,11 +5,18 @@ import { DeepPartial } from 'fishery'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
 import createErrorHandler from './errorHandler'
 import AnalyticsService from './services/analyticsService'
+import LocationsService from './services/locationsService'
+
+jest.mock('./services/locationsService')
 
 let app: Express
 
+const MockedLocationsService = LocationsService as jest.MockedClass<typeof LocationsService>
+let locationsService: jest.Mocked<LocationsService>
+
 beforeEach(() => {
-  app = appWithAllRoutes({})
+  locationsService = new MockedLocationsService(null) as unknown as jest.Mocked<LocationsService>
+  app = appWithAllRoutes({ services: { locationsService: locationsService as unknown as LocationsService } })
 })
 
 afterEach(() => {
@@ -42,6 +49,13 @@ describe('error handler', () => {
   let error: SanitisedError<object>
 
   beforeEach(() => {
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: false,
+      includeSegregationInRollCount: false,
+      certificationApprovalRequired: true,
+    })
+
     analyticsService.sendEvent = jest.fn()
     res.render = jest.fn()
     res.status = jest.fn()
@@ -62,7 +76,14 @@ describe('error handler', () => {
     })
 
     it('should render content without stack in production mode', () => {
-      return request(appWithAllRoutes({ production: true }))
+      return request(
+        appWithAllRoutes({
+          production: true,
+          services: {
+            locationsService: locationsService as unknown as LocationsService,
+          },
+        }),
+      )
         .get('/unknown')
         .expect(404)
         .expect('Content-Type', /html/)

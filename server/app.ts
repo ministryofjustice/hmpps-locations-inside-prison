@@ -56,7 +56,7 @@ export default function createApp(services: Services): express.Application {
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
   app.use(refreshSystemToken(services))
-  app.use(setCanAccess())
+  app.use(setCanAccess(services.locationsService))
 
   if (config.environmentName !== 'Training') {
     app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))

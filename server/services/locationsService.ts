@@ -229,4 +229,8 @@ export default class LocationsService {
   async getManagementReportDefinitions(token: string): Promise<ManagementReportDefinition[]> {
     return this.locationsApiClient.managementReportDefinitions.get(token)
   }
+
+  async getPrisonConfiguration(token: string, prisonId: string) {
+    return this.locationsApiClient.prisonConfiguration.get(token, { prisonId })
+  }
 }

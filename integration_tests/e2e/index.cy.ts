@@ -7,6 +7,7 @@ context('Index', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -26,6 +27,8 @@ context('Index', () => {
       cy.task('stubSignIn')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
+      cy.task('setFeatureFlag', { createAndCertify: false })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
     })
 
     it('Displays the tiles', () => {
@@ -44,6 +47,26 @@ context('Index', () => {
         'href',
         'http://feedback-form',
       )
+    })
+  })
+
+  context('With createAndCertify featureFlag and MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('setFeatureFlag', { createAndCertify: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+    })
+
+    it('Displays the tiles', () => {
+      cy.signIn()
+      const indexPage = Page.verifyOnPage(IndexPage)
+
+      indexPage.cards.manageLocations().contains('Manage locations')
+      indexPage.cards.inactiveCells().contains('View all inactive cells')
+      indexPage.cards.archivedLocations().contains('Archived locations')
     })
   })
 })

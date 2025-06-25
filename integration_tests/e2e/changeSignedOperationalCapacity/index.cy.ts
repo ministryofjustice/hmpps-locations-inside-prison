@@ -13,6 +13,7 @@ context('Change signed operational capacity', () => {
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
     })
 
     it('redirects user to sign in page', () => {
@@ -68,6 +69,7 @@ context('Change signed operational capacity', () => {
       cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
       cy.task('stubSignedOperationalCapacityGet', signedOperationalCapacity)
       cy.task('stubSignedOperationalCapacityUpdate')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
       cy.signIn()
     })
 
