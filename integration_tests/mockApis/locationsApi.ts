@@ -763,6 +763,32 @@ const stubLocationsHealthPing = () =>
     },
   })
 
+const stubGetPrisonConfiguration = ({
+  prisonId,
+  certificationActive,
+}: {
+  prisonId: string
+  certificationActive: boolean
+}) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPath: `/locations-api/prison-configuration/${prisonId}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        prisonId,
+        resiLocationServiceActive: false,
+        includeSegregationInRollCount: false,
+        certificationApprovalRequired: certificationActive,
+      },
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -802,4 +828,5 @@ export default {
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
+  stubGetPrisonConfiguration,
 }

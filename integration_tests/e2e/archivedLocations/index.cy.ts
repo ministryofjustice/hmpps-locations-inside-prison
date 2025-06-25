@@ -37,6 +37,7 @@ context('Archived Locations Index', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
     })
     let locations: Location[]
 

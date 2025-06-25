@@ -68,6 +68,7 @@ context('View Locations Show', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
     })
 
     function testShow({
@@ -534,9 +535,9 @@ context('View Locations Show', () => {
         })
 
         describe('Actions button', () => {
-          context('when the createAndCertify feature flag is disabled', () => {
+          context('when the map2380 feature flag is disabled', () => {
             beforeEach(() => {
-              cy.task('setFeatureFlag', { createAndCertify: false })
+              cy.task('setFeatureFlag', { map2380: false })
             })
 
             before(() => {
@@ -553,9 +554,9 @@ context('View Locations Show', () => {
             })
           })
 
-          context('when the createAndCertify feature flag is enabled', () => {
+          context('when the map2380 feature flag is enabled', () => {
             beforeEach(() => {
-              cy.task('setFeatureFlag', { createAndCertify: true })
+              cy.task('setFeatureFlag', { map2380: true })
             })
 
             context('when the user has MANAGE_RESIDENTIAL_LOCATIONS role', () => {

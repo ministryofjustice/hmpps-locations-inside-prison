@@ -1,10 +1,16 @@
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import BaseApiClient from './baseApiClient'
-import { Location, PrisonerLocation, LocationForLocalName, SignedOperationalCapacity } from './types/locationsApi'
-import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
-import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
+import {
+  Location,
+  PrisonerLocation,
+  LocationForLocalName,
+  SignedOperationalCapacity,
+  LocationResidentialSummary,
+  PrisonResidentialSummary,
+} from './types/locationsApi'
 import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
+import { PrisonConfiguration } from './types/locationsApi/prisonConfiguration'
 
 import { RedisClient } from './redisClient'
 
@@ -239,6 +245,14 @@ export default class LocationsApiClient extends BaseApiClient {
     get: this.apiCall<ManagementReportDefinition[], null>({
       path: '/definitions',
       requestType: 'get',
+    }),
+  }
+
+  prisonConfiguration = {
+    get: this.apiCall<PrisonConfiguration, { prisonId: string }>({
+      path: '/prison-configuration/:prisonId',
+      requestType: 'get',
+      options: { cacheDuration: 3600 },
     }),
   }
 }

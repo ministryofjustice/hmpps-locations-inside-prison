@@ -35,7 +35,7 @@ export default function routes(services: Services): Router {
   router.use(addBreadcrumb({ title: 'Residential locations', href: '/' }))
   router.get(
     '/',
-    populateCards(),
+    populateCards(services.locationsService),
     logPageView(services.auditService, Page.INDEX),
     asyncMiddleware(async (req, res) => {
       res.render('pages/index')

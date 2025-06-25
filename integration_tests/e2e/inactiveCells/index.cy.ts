@@ -57,6 +57,7 @@ context('Inactive Cells Index', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
     })
     let locations: ReturnType<typeof LocationFactory.build>[]
 
