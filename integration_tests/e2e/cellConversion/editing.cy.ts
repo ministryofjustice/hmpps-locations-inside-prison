@@ -32,6 +32,8 @@ context('Cell conversion', () => {
     cy.task('stubLocations', location)
     cy.task('stubPrisonerLocationsId', [])
     cy.task('stubLocationsConvertToCell')
+    cy.task('setFeatureFlag', { map2380: false })
+    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
     cy.signIn()
   })
 
