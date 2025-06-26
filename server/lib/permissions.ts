@@ -27,11 +27,14 @@ const manageResLocationsOpCapPermissions: string[] = [
   'deactivate:permanent',
 ]
 
+const administerResLocationsPermissions: string[] = [...manageResLocationsOpCapPermissions, 'administer_residential']
+
 const permissionsByRole: { [key: string]: string[] } = {
   VIEW_INTERNAL_LOCATION: viewInternalLocationPermissions,
   MANAGE_RESIDENTIAL_LOCATIONS: manageResidentialLocationsPermissions,
   MANAGE_RES_LOCATIONS_OP_CAP: manageResLocationsOpCapPermissions,
   REPORTING_LOCATION_INFORMATION: reportingLocationInformationPermissions,
+  ROLES_ADMIN: administerResLocationsPermissions, // FIXME need an admin role
 }
 
 const rolesToPermissions = (roles: string[], mapping = permissionsByRole) =>

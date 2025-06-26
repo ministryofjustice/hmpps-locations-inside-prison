@@ -1,7 +1,14 @@
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import BaseApiClient from './baseApiClient'
-import { Location, PrisonerLocation, LocationForLocalName, SignedOperationalCapacity } from './types/locationsApi'
+import {
+  Location,
+  PrisonerLocation,
+  LocationForLocalName,
+  SignedOperationalCapacity,
+  PrisonConfiguration,
+  StatusType,
+} from './types/locationsApi'
 import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
 import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
 import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
@@ -209,6 +216,21 @@ export default class LocationsApiClient extends BaseApiClient {
       { convertedCellType: string; otherConvertedCellType?: string }
     >({
       path: '/locations/:locationId/update-non-res-cell',
+      requestType: 'put',
+    }),
+  }
+
+  prisonConfiguration = {
+    getPrisonConfiguration: this.apiCall<PrisonConfiguration, { prisonId: string }>({
+      path: '/prison-configuration/:prisonId',
+      requestType: 'get',
+    }),
+    updateResiStatus: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/resi-service/:status',
+      requestType: 'put',
+    }),
+    updateCertificationApproval: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/certification-approval-required/:status',
       requestType: 'put',
     }),
   }

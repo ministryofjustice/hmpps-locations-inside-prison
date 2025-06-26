@@ -249,6 +249,33 @@ describe('locationsApiClient', () => {
     })
   })
 
+  describe('prisonConfiguration', () => {
+    testCall(
+      'getPrisonConfiguration',
+      '/prison-configuration/LEI',
+      false,
+      () => apiClient.prisonConfiguration.getPrisonConfiguration,
+      { prisonId: 'LEI' },
+      'get',
+    )
+    testCall(
+      'updateResiService',
+      '/prison-configuration/LEI/resi-service/INACTIVE',
+      false,
+      () => apiClient.prisonConfiguration.updateResiStatus,
+      { prisonId: 'LEI', status: 'INACTIVE' },
+      'put',
+    )
+    testCall(
+      'updateCertificationApproval',
+      '/prison-configuration/LEI/certification-approval-required/ACTIVE',
+      false,
+      () => apiClient.prisonConfiguration.updateCertificationApproval,
+      { prisonId: 'LEI', status: 'ACTIVE' },
+      'put',
+    )
+  })
+
   describe('prisonerLocations', () => {
     testCall(
       'getPrisonersInLocation',

@@ -1,6 +1,7 @@
 import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
 import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
+import { StatusType } from '../data/types/locationsApi'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -228,5 +229,17 @@ export default class LocationsService {
 
   async getManagementReportDefinitions(token: string): Promise<ManagementReportDefinition[]> {
     return this.locationsApiClient.managementReportDefinitions.get(token)
+  }
+
+  async getPrisonConfiguration(token: string, prisonId: string) {
+    return this.locationsApiClient.prisonConfiguration.getPrisonConfiguration(token, { prisonId })
+  }
+
+  async updateResiStatus(token: string, prisonId: string, status: StatusType) {
+    return this.locationsApiClient.prisonConfiguration.updateResiStatus(token, { prisonId, status })
+  }
+
+  async updateCertificationApproval(token: string, prisonId: string, status: StatusType) {
+    return this.locationsApiClient.prisonConfiguration.updateCertificationApproval(token, { prisonId, status })
   }
 }

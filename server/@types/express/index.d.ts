@@ -8,6 +8,7 @@ import {
   LocationResidentialSummary,
   PrisonerLocation,
   PrisonResidentialSummary,
+  PrisonConfiguration,
 } from '../../data/types/locationsApi'
 import { FeComponentsMeta } from '../../data/feComponentsClient'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
@@ -104,6 +105,8 @@ interface TypedLocals {
   }
   pageTitleText?: string
   pathSuffix?: string
+  prisonConfiguration?: PrisonConfiguration
+  prisonNonHousingDisplayEnabled?: boolean
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary

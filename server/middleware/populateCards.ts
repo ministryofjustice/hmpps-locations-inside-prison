@@ -49,6 +49,14 @@ export default function populateCards() {
         description: 'Run management reports for printing or exporting.',
         'data-qa': 'management-reporting-card',
       },
+      {
+        clickable: true,
+        visible: true,
+        heading: 'Admin',
+        href: '/admin',
+        description: 'Administer residential locations.',
+        'data-qa': 'admin-card',
+      },
     ]
 
     next()
