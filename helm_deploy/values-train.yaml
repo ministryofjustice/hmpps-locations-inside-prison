@@ -20,4 +20,3 @@ generic-service:
     AUDIT_ENABLED: "false"
     PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
     FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
-    FLAG_CREATE_AND_CERTIFY: enabled

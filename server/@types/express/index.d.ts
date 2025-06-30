@@ -52,6 +52,7 @@ interface TypedLocals {
   cellCount?: number
   cells?: Locations[]
   changeSummary?: string
+  continueLink?: string
   cspNonce?: string
   csrfToken?: string
   currentSignedOperationalCapacity?: number
