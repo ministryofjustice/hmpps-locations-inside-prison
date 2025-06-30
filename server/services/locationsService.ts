@@ -1,6 +1,7 @@
 import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
 import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
+import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -124,6 +125,11 @@ export default class LocationsService {
 
   async getResidentialAttributeType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getResidentialAttributeTypes'))[key] || 'Unknown'
+  }
+
+  async getResidentialHierarchy(token: string, prisonId: string): Promise<ResidentialHierarchy[]> {
+    // @ts-expect-error error
+    return this.locationsApiClient.locations.getResidentialHierarchy(token, { prisonId })
   }
 
   async getResidentialHousingType(token: string, key: string) {

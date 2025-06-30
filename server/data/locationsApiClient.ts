@@ -13,6 +13,7 @@ import { ManagementReportDefinition } from './types/locationsApi/managementRepor
 import { PrisonConfiguration } from './types/locationsApi/prisonConfiguration'
 
 import { RedisClient } from './redisClient'
+import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(
@@ -159,6 +160,10 @@ export default class LocationsApiClient extends BaseApiClient {
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
       queryParams: ['includeHistory'],
+      requestType: 'get',
+    }),
+    getResidentialHierarchy: this.apiCall<ResidentialHierarchy, { prisonId: string }>({
+      path: '/locations/prison/:prisonId/residential-hierarchy',
       requestType: 'get',
     }),
     getResidentialSummary: this.apiCall<

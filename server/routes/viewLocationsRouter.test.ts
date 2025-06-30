@@ -25,6 +25,12 @@ beforeEach(() => {
     userSupplier: () => user,
   })
   authService.getSystemClientToken.mockResolvedValue('token')
+  locationsService.getPrisonConfiguration.mockResolvedValue({
+    prisonId: 'TST',
+    resiLocationServiceActive: true,
+    includeSegregationInRollCount: false,
+    certificationApprovalRequired: true,
+  })
 })
 
 afterEach(() => {
