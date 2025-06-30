@@ -30,9 +30,9 @@ describe('GET / with view and update locations tile', () => {
   beforeEach(() => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
-      resiLocationServiceActive: false,
-      includeSegregationInRollCount: false,
-      certificationApprovalRequired: false,
+      resiLocationServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
     })
 
     app = appWithAllRoutes({
@@ -66,9 +66,9 @@ describe('GET / with manage locations tile', () => {
   beforeEach(() => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
-      resiLocationServiceActive: false,
-      includeSegregationInRollCount: false,
-      certificationApprovalRequired: true,
+      resiLocationServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
     })
     app = appWithAllRoutes({
       services: {
