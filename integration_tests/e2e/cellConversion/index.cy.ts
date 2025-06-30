@@ -32,7 +32,7 @@ context('Cell conversion', () => {
       cy.task('stubLocationsConstantsUsedForTypeForPrison')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
-       cy.task('setFeatureFlag', { map2380: false })
+      cy.task('setFeatureFlag', { map2380: false })
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
