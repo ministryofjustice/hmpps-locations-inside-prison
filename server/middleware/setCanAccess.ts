@@ -25,7 +25,6 @@ export default function setCanAccess(locationService: LocationsService) {
         MANAGE_RESIDENTIAL_LOCATIONS: true,
       }
     }
-
     if (!req.featureFlags?.createAndCertify || !prisonConfiguration.certificationApprovalRequired) {
       permissionOverrides.create_location = false
     }
