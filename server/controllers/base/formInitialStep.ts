@@ -47,6 +47,10 @@ export default class FormInitialStep extends FormWizard.Controller {
     const fieldName: string = field?.nameForErrors || field?.label?.text
     const errorMessageOverrides = field?.errorMessages || {}
 
+    const { decoratedLocation } = res.locals
+    const { locationType } = decoratedLocation || {}
+    const decoratedLocationType = locationType?.toString?.() || 'location'
+
     const errorMessages: Record<string, string> = {
       alphanumeric: `${fieldName} must not contain special characters`,
       dateTodayOrInFuture: `${fieldName} must be today or in the future`,
@@ -65,6 +69,10 @@ export default class FormInitialStep extends FormWizard.Controller {
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
       lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo as number, fields)}`,
       localNameExists: 'A location with this name already exists',
+      locationCodeAlphanumeric: `${decoratedLocationType} code can only include numbers or letters`,
+      locationCodeLength: `${decoratedLocationType} code must be 5 characters or less`,
+      locationCodeMissing: `Enter a ${decoratedLocationType?.toLowerCase()} code`,
+      locationCodeExists: `A location with this ${decoratedLocationType?.toLowerCase()} code already exists`,
       maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
       minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
       numericString: `${fieldName} must only include numbers`,
