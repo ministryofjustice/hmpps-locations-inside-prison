@@ -26,7 +26,7 @@ export default function setCanAccess(locationService: LocationsService) {
       }
     }
 
-    if (!req.featureFlags?.createAndCertify || !prisonConfiguration.certificationApprovalRequired) {
+    if (!req.featureFlags?.createAndCertify || prisonConfiguration.certificationApprovalRequired === 'INACTIVE') {
       permissionOverrides.create_location = false
     }
 

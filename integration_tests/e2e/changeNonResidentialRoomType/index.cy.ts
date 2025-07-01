@@ -59,7 +59,7 @@ context('Change non-residential rooms', () => {
       cy.task('stubPrisonerLocationsId', [])
       cy.task('stubLocationsUpdateNonResCell')
       cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
 
       cy.signIn()
       NonResidentialRoomPage.goTo(location.prisonId, location.id)

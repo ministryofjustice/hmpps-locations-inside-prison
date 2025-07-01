@@ -13,7 +13,7 @@ context('Change cell capacity', () => {
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('redirects user to sign in page', () => {
@@ -103,7 +103,7 @@ context('Change cell capacity', () => {
         cy.task('stubLocations', location)
         cy.task('stubPrisonerLocationsId', prisonerLocations)
         cy.task('stubUpdateCapacity')
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
         cy.signIn()
       })
 
@@ -380,7 +380,7 @@ context('Change cell capacity', () => {
         cy.task('stubLocations', location)
         cy.task('stubPrisonerLocationsId', prisonerLocations)
         cy.task('stubUpdateCapacity')
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
       })
 
@@ -680,7 +680,7 @@ context('Change cell capacity', () => {
         cy.task('stubLocations', location)
         cy.task('stubPrisonerLocationsId', prisonerLocations)
         cy.task('stubUpdateCapacity')
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
         cy.signIn()
       })
 

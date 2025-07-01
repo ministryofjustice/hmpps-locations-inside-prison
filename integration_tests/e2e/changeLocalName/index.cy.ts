@@ -36,7 +36,7 @@ context('change local name', () => {
     cy.task('stubLocationsConstantsUsedForType')
     cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsWing })
     cy.task('stubLocations', locationAsWing)
-    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
   describe('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {

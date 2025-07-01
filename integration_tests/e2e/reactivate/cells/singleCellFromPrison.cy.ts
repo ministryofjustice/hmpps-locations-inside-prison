@@ -133,7 +133,7 @@ context('Reactivate cell (from reactivate cells)', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsPrisonInactiveCells', locations)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 
@@ -167,7 +167,7 @@ context('Reactivate cell (from reactivate cells)', () => {
       cy.task('stubLocations', genericLocation)
       cy.task('stubLocationsBulkReactivate')
       cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

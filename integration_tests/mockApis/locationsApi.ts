@@ -784,7 +784,7 @@ const stubGetPrisonConfiguration = ({
   certificationActive,
 }: {
   prisonId: string
-  certificationActive: boolean
+  certificationActive: string
 }) =>
   stubFor({
     request: {
@@ -798,8 +798,8 @@ const stubGetPrisonConfiguration = ({
       },
       jsonBody: {
         prisonId,
-        resiLocationServiceActive: false,
-        includeSegregationInRollCount: false,
+        resiLocationServiceActive: 'INACTIVE',
+        includeSegregationInRollCount: 'INACTIVE',
         certificationApprovalRequired: certificationActive,
       },
     },
