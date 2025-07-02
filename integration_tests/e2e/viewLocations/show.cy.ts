@@ -143,21 +143,31 @@ context('View Locations Show', () => {
         viewLocationsShowPage.summaryCards.all().should('have.length', 0)
       } else {
         viewLocationsShowPage.summaryCards.all().should('have.length', location.leafLevel ? 2 : 3)
-        viewLocationsShowPage.summaryCards.workingCapacityText().contains(`${location.capacity.workingCapacity}`)
-        viewLocationsShowPage.summaryCards.maximumCapacityText().contains(`${location.capacity.maxCapacity}`)
         if (location.status === 'DRAFT') {
-          viewLocationsShowPage.summaryCards.cnaText().contains(`${location.certification.capacityOfCertifiedCell}`)
-        } else if (!location.leafLevel) {
-          viewLocationsShowPage.summaryCards.inactiveCellsText().contains(`${location.inactiveCells}`)
-
           viewLocationsShowPage.summaryCards
-            .inactiveCellsViewLink()
-            .should(`${location.inactiveCells > 0 ? '' : 'not.'}exist`)
-          if (location.inactiveCells > 0) {
+            .cnaText()
+            .contains(`${location.numberOfCellLocations > 0 ? location.certification.capacityOfCertifiedCell : '-'}`)
+          viewLocationsShowPage.summaryCards
+            .workingCapacityText()
+            .contains(`${location.numberOfCellLocations > 0 ? location.capacity.workingCapacity : '-'}`)
+          viewLocationsShowPage.summaryCards
+            .maximumCapacityText()
+            .contains(`${location.numberOfCellLocations > 0 ? location.capacity.maxCapacity : '-'}`)
+        } else {
+          viewLocationsShowPage.summaryCards.workingCapacityText().contains(`${location.capacity.workingCapacity}`)
+          viewLocationsShowPage.summaryCards.maximumCapacityText().contains(`${location.capacity.maxCapacity}`)
+          if (!location.leafLevel) {
+            viewLocationsShowPage.summaryCards.inactiveCellsText().contains(`${location.inactiveCells}`)
+
             viewLocationsShowPage.summaryCards
               .inactiveCellsViewLink()
-              .should('have.attr', 'href')
-              .and('equal', `/inactive-cells/${location.prisonId}/${location.id}`)
+              .should(`${location.inactiveCells > 0 ? '' : 'not.'}exist`)
+            if (location.inactiveCells > 0) {
+              viewLocationsShowPage.summaryCards
+                .inactiveCellsViewLink()
+                .should('have.attr', 'href')
+                .and('equal', `/inactive-cells/${location.prisonId}/${location.id}`)
+            }
           }
         }
       }
