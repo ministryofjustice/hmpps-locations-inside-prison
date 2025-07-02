@@ -5,6 +5,7 @@
 
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
 
+{% from "../../macros/draftLocationBanner.njk" import draftLocationBanner %}
 {% from "../../macros/inactiveLocationBanner.njk" import inactiveLocationBanner %}
 {% from "../../macros/locationDetails.njk" import locationDetails %}
 {% from "../../macros/locationsTable.njk" import locationsTable %}
@@ -90,6 +91,8 @@
       <div class="govuk-grid-column-three-quarters">
         {% if decoratedResidentialSummary.location.status == 'INACTIVE' %}
           {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess) }}
+        {% elseif decoratedResidentialSummary.location.status == 'DRAFT' %}
+          {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
         {% endif %}
 
         {% if decoratedResidentialSummary.summaryCards | length %}
@@ -99,7 +102,7 @@
                 {% for summary in decoratedResidentialSummary.summaryCards %}
                   <div class="govuk-grid-column-one-third" data-qa="{{ summary.type }}-card">
                     {{ miniSummary({
-                      bottomLabel: summary.type | title | replace('-', ' '),
+                      bottomLabel: summary.title,
                       bottomClass: 'big',
                       bottomContentLine1: summary.text,
                       linkHref: summary.linkHref if summary.linkHref,

@@ -16,6 +16,8 @@ import formatTime from '../formatters/formatTime'
 import capFirst from '../formatters/capFirst'
 import nonOxfordJoin from '../formatters/nonOxfordJoin'
 import logger from '../../logger'
+import locationStatusTagClass from '../formatters/locationStatusTagClass'
+import locationStatusTagLabel from '../formatters/locationStatusTagLabel'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -107,6 +109,8 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('formatDate', formatDate)
   njkEnv.addFilter('formatTime', formatTime)
   njkEnv.addFilter('formatDateWithTime', formatDateWithTime)
+  njkEnv.addFilter('locationStatusTagClass', locationStatusTagClass)
+  njkEnv.addFilter('locationStatusTagLabel', locationStatusTagLabel)
   njkEnv.addFilter('nonOxfordJoin', nonOxfordJoin)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
 }
