@@ -50,7 +50,7 @@ export default function createApp(services: Services): express.Application {
       'MANAGE_RES_LOCATIONS_OP_CAP',
       'MANAGE_RESIDENTIAL_LOCATIONS',
       'VIEW_INTERNAL_LOCATION',
-      'LOCATIONS_ADMIN',
+      'MANAGE_RES_LOCATIONS_ADMIN',
     ]),
   )
   app.use(setUpCsrf())

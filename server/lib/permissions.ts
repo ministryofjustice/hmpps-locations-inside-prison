@@ -34,7 +34,7 @@ const permissionsByRole: { [key: string]: string[] } = {
   MANAGE_RESIDENTIAL_LOCATIONS: manageResidentialLocationsPermissions,
   MANAGE_RES_LOCATIONS_OP_CAP: manageResLocationsOpCapPermissions,
   REPORTING_LOCATION_INFORMATION: reportingLocationInformationPermissions,
-  ROLES_ADMIN: administerResLocationsPermissions, // FIXME need an admin role
+  MANAGE_RES_LOCATIONS_ADMIN: administerResLocationsPermissions,
 }
 
 const rolesToPermissions = (roles: string[], mapping = permissionsByRole) =>

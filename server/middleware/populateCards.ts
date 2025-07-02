@@ -51,7 +51,7 @@ export default function populateCards() {
       },
       {
         clickable: true,
-        visible: true,
+        visible: _req.canAccess('administer_residential'),
         heading: 'Admin',
         href: '/admin',
         description: 'Administer residential locations.',

@@ -10,11 +10,9 @@ export default function getServicePrisonsNonHousingDisplay() {
       await req.services.prisonService.getServiceStatus(systemToken, prisonId, 'DISPLAY_HOUSING_CHECKBOX')
       // set switched off
       res.locals.prisonNonHousingDisplayEnabled = true
-      // console.log('switched on')
       next()
     } catch (error) {
       if (error.responseStatus === 404) {
-        // console.log(`prisonId: ${prisonId} (If the service is not switched on then 404 is returned.)`)
         res.locals.prisonNonHousingDisplayEnabled = false
         next()
       } else {

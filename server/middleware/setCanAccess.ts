@@ -2,7 +2,7 @@ import { type NextFunction, Request, type Response } from 'express'
 import { rolesToPermissions } from '../lib/permissions'
 
 const rolePriority = [
-  'ROLES_ADMIN',
+  'MANAGE_RES_LOCATIONS_ADMIN',
   'MANAGE_RES_LOCATIONS_OP_CAP',
   'MANAGE_RESIDENTIAL_LOCATIONS',
   'VIEW_INTERNAL_LOCATION',

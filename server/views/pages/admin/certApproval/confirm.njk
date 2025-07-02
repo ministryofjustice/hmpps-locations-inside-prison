@@ -46,7 +46,7 @@
         },
         {
           key: {
-            text: 'Certifcation approval required'
+            text: 'Certification approval required'
           },
           value: {
             text: prisonConfiguration.certificationApprovalRequired
@@ -83,7 +83,7 @@
                 {% if prisonConfiguration.certificationApprovalRequired == 'INACTIVE' %}
                   <input type="hidden" name="activation" value="{{ 'ACTIVE' }}">
                   {{ govukButton({
-                    text: "Activate certifcation approval",
+                    text: "Activate certification approval",
                     classes: options.buttonClasses,
                     preventDoubleClick: true,
                     type: "submit"
@@ -91,7 +91,7 @@
                 {% else %}
                   <input type="hidden" name="activation" value="{{ 'INACTIVE' }}">
                   {{ govukButton({
-                    text: "Inactivate certifcation approval",
+                    text: "Inactivate certification approval",
                     classes: options.buttonClasses,
                     preventDoubleClick: true,
                     type: "submit"

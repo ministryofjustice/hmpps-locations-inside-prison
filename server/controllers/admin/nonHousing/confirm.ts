@@ -4,10 +4,12 @@ import { TypedLocals } from '../../../@types/express'
 import backUrl from '../../../utils/backUrl'
 import FormInitialStep from '../../base/formInitialStep'
 import { ServiceCode } from '../../../data/types/locationsApi/serviceCode'
+import getServicePrisonsNonHousingDisplay from '../../../middleware/getServicePrisonsNonHousingDisplay'
 
 export default class NonHousingCheckboxChangeConfirm extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
+    this.use(getServicePrisonsNonHousingDisplay())
   }
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
