@@ -116,6 +116,7 @@ interface TypedLocals {
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string
+  topLevelDraftLocationSummary?: LocationResidentialSummary
   topLevelLocationType?: string
   usedForTypes?: string[]
   user?: HmppsUser

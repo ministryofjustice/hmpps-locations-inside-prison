@@ -11,6 +11,7 @@ import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsFor
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import addAction from '../middleware/addAction'
 import addBreadcrumb from '../middleware/addBreadcrumb'
+import populateTopLevelDraftLocationSummary from '../middleware/populateTopLevelDraftLocationSummary'
 
 const router = express.Router({ mergeParams: true })
 
@@ -52,6 +53,7 @@ const controller = (services: Services) => {
   router.get(
     '/:locationId',
     populateDecoratedResidentialSummary(services),
+    populateTopLevelDraftLocationSummary,
     populateBreadcrumbsForLocation,
     logPageView(services.auditService, Page.LOCATIONS_SHOW),
     addActions,

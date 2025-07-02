@@ -180,7 +180,14 @@ export default function populateDecoratedResidentialSummary({ locationsService, 
         locationHistory?: boolean // TODO: change this type when location history tab is implemented
         subLocationName: string
         subLocations: DecoratedLocation[]
-        summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string; linkAriaLabel?: string }[]
+        summaryCards: {
+          title: string
+          type: string
+          text: string
+          linkHref?: string
+          linkLabel?: string
+          linkAriaLabel?: string
+        }[]
       } = {
         subLocationName: apiData.subLocationName,
         subLocations: await Promise.all(
@@ -224,34 +231,48 @@ export default function populateDecoratedResidentialSummary({ locationsService, 
             workingCapLink.linkAriaLabel = 'Change working capacity'
             maxCapLink.linkAriaLabel = 'Change maximum capacity'
           }
+
+          const { numberOfCellLocations } = residentialSummary.location
+          const { workingCapacity, maxCapacity } = residentialSummary.location.capacity
+          const { capacityOfCertifiedCell } = residentialSummary.location.certification
+          if (residentialSummary.location.status === 'DRAFT') {
+            residentialSummary.summaryCards.push({
+              title: 'CNA',
+              type: 'cna',
+              text: numberOfCellLocations ? capacityOfCertifiedCell.toString() : '-',
+            })
+          }
+
           residentialSummary.summaryCards.push(
             {
+              title: 'Working capacity',
               type: 'working-capacity',
-              text: residentialSummary.location.capacity.workingCapacity.toString(),
+              text: numberOfCellLocations ? workingCapacity.toString() : '-',
               ...changeLink,
               ...workingCapLink,
             },
             {
+              title: 'Maximum capacity',
               type: 'maximum-capacity',
-              text: residentialSummary.location.capacity.maxCapacity.toString(),
+              text: numberOfCellLocations ? maxCapacity.toString() : '-',
               ...changeLink,
               ...maxCapLink,
             },
-            ...(!residentialSummary.location.leafLevel
-              ? [
-                  {
-                    type: 'inactive-cells',
-                    text: apiData.parentLocation.inactiveCells.toString(),
-                    ...(apiData.parentLocation.inactiveCells > 0
-                      ? {
-                          linkHref: `/inactive-cells/${prisonId}/${apiData.parentLocation.id}`,
-                          linkLabel: 'View',
-                        }
-                      : {}),
-                  },
-                ]
-              : []),
           )
+
+          if (residentialSummary.location.status !== 'DRAFT' && !residentialSummary.location.leafLevel) {
+            residentialSummary.summaryCards.push({
+              title: 'Inactive cells',
+              type: 'inactive-cells',
+              text: apiData.parentLocation.inactiveCells.toString(),
+              ...(apiData.parentLocation.inactiveCells > 0
+                ? {
+                    linkHref: `/inactive-cells/${prisonId}/${apiData.parentLocation.id}`,
+                    linkLabel: 'View',
+                  }
+                : {}),
+            })
+          }
         }
       } else if ('prisonSummary' in apiData) {
         const changeLink: { linkHref?: string; linkLabel?: string; linkAriaLabel?: string } = {}
@@ -261,13 +282,18 @@ export default function populateDecoratedResidentialSummary({ locationsService, 
           changeLink.linkAriaLabel = 'Change signed operational capacity'
         }
         residentialSummary.summaryCards.push(
-          { type: 'working-capacity', text: apiData.prisonSummary.workingCapacity.toString() },
           {
+            title: 'Working capacity',
+            type: 'working-capacity',
+            text: apiData.prisonSummary.workingCapacity.toString(),
+          },
+          {
+            title: 'Signed operational capacity',
             type: 'signed-operational-capacity',
             text: apiData.prisonSummary.signedOperationalCapacity.toString(),
             ...changeLink,
           },
-          { type: 'maximum-capacity', text: apiData.prisonSummary.maxCapacity.toString() },
+          { title: 'Maximum capacity', type: 'maximum-capacity', text: apiData.prisonSummary.maxCapacity.toString() },
         )
       }
       res.locals.decoratedResidentialSummary = residentialSummary

@@ -1,0 +1,46 @@
+{% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% macro draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) %}
+  {% set topLevelDraftLocation = topLevelDraftLocationSummary.parentLocation %}
+  {% set location = decoratedResidentialSummary.location %}
+  {% set locationName = location.displayName | capFirst %}
+  {% set locationType = location.locationType | lower %}
+
+  {% set bannerHtml %}
+    <h3 class="govuk-heading-m">{{ locationName }} in draft</h3>
+    <p>
+      {% if location.id != topLevelDraftLocation.id %}
+        This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
+      {% endif %}
+
+      {% if topLevelDraftLocation.numberOfCellLocations == 0 %}
+        You can add the {{ topLevelDraftLocation.locationType | lower }} to the cell certificate once cells have been created.
+        You can activate the {{ locationType }} once it is on the cell certificate.
+      {% else %}
+        The {{ topLevelDraftLocation.locationType | lower }} must be added to the cell certificate before cells in the {{ topLevelDraftLocation.locationType | lower }} can be activated and used.
+      {% endif %}
+    </p>
+
+    {% if topLevelDraftLocation.numberOfCellLocations > 0 %}
+      {{ govukButton({
+        text: "Add " + (topLevelDraftLocation.locationType | lower) + " to cell certificate",
+        preventDoubleClick: true,
+        href: "#",
+        attributes: {
+          'data-qa': 'add-to-cell-certificate'
+        }
+      }) }}
+    {% endif %}
+  {% endset %}
+
+  {{ mojTicketPanel({
+    attributes: {
+      'data-qa': 'draft-location-banner'
+    },
+    items: [{
+      html: bannerHtml,
+      classes: 'moj-ticket-panel__content--orange govuk-!-margin-bottom-7'
+    }]
+  }) }}
+{% endmacro %}
