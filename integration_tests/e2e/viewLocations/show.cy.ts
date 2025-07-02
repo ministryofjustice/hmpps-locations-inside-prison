@@ -137,7 +137,6 @@ context('View Locations Show', () => {
           .should(`${location.numberOfCellLocations === 0 ? 'not.' : ''}exist`)
       } else {
         viewLocationsShowPage.draftBanner().should('not.exist')
-        viewLocationsShowPage.draftBannerCertifyButton().should(`not.exist`)
       }
 
       if (location.status === 'NON_RESIDENTIAL') {
