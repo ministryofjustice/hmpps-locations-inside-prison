@@ -104,6 +104,7 @@ const stubLocationsConstantsLocationType = () =>
       jsonBody: {
         locationTypes: [
           { key: 'WING', description: 'Wing' },
+          { key: 'TESTWING', description: 'Testwing' },
           { key: 'LANDING', description: 'Landing' },
           { key: 'SPUR', description: 'Spur' },
           { key: 'CELL', description: 'Cell' },
@@ -577,6 +578,21 @@ const stubUpdateCapacity = () =>
     },
   })
 
+const stubLocationsResidentialHierarchy = ({ prisonId, residentialHierarchy }) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/locations-api/locations/prison/${prisonId}/residential-hierarchy`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: residentialHierarchy,
+    },
+  })
+
 const stubLocationsCheckLocalNameDoesntExist = () =>
   stubFor({
     request: {
@@ -595,7 +611,7 @@ const stubLocationsCheckLocalNameExists = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/locations-api/locations/[\\w-%]+/local-name/[\\w-%]+(?:\\?parentLocationId=[0-9a-fA-F-]+)?$',
+      urlPathPattern: '/locations-api/locations/.*/local-name/.*',
     },
     response: {
       status: 200,
@@ -829,9 +845,36 @@ const stubLocationsHealthPing = () =>
     },
   })
 
+const stubGetPrisonConfiguration = ({
+  prisonId,
+  certificationActive,
+}: {
+  prisonId: string
+  certificationActive: string
+}) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPath: `/locations-api/prison-configuration/${prisonId}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        prisonId,
+        resiLocationServiceActive: 'INACTIVE',
+        includeSegregationInRollCount: 'INACTIVE',
+        certificationApprovalRequired: certificationActive,
+      },
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
+  stubLocationsResidentialHierarchy,
   stubLocationsCheckLocalNameDoesntExist,
   stubLocationsCheckLocalNameExists,
   stubLocationsConstantsAccommodationType,
@@ -871,4 +914,5 @@ export default {
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
+  stubGetPrisonConfiguration,
 }

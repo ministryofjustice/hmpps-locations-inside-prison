@@ -343,7 +343,7 @@ describe('Locations service', () => {
     it('calls the correct client function', async () => {
       await locationsService.getPrisonConfiguration('token', 'MDI')
 
-      expect(locationsApiClient.prisonConfiguration.getPrisonConfiguration).toHaveBeenCalledWith('token', {
+      expect(locationsApiClient.prisonConfiguration.get).toHaveBeenCalledWith('token', {
         prisonId: 'MDI',
       })
     })

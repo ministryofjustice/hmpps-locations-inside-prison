@@ -53,6 +53,7 @@ interface TypedLocals {
   cellCount?: number
   cells?: Locations[]
   changeSummary?: string
+  continueLink?: string
   cspNonce?: string
   csrfToken?: string
   currentSignedOperationalCapacity?: number
@@ -118,6 +119,7 @@ interface TypedLocals {
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string
+  topLevelDraftLocationSummary?: LocationResidentialSummary
   topLevelLocationType?: string
   usedForTypes?: string[]
   user?: HmppsUser

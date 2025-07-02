@@ -1,6 +1,7 @@
 import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
 import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
+import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
 import { StatusType } from '../data/types/locationsApi'
 
 export default class LocationsService {
@@ -127,6 +128,11 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getResidentialAttributeTypes'))[key] || 'Unknown'
   }
 
+  async getResidentialHierarchy(token: string, prisonId: string): Promise<ResidentialHierarchy[]> {
+    // @ts-expect-error error
+    return this.locationsApiClient.locations.getResidentialHierarchy(token, { prisonId })
+  }
+
   async getResidentialHousingType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getResidentialHousingTypes'))[key] || 'Unknown'
   }
@@ -232,7 +238,7 @@ export default class LocationsService {
   }
 
   async getPrisonConfiguration(token: string, prisonId: string) {
-    return this.locationsApiClient.prisonConfiguration.getPrisonConfiguration(token, { prisonId })
+    return this.locationsApiClient.prisonConfiguration.get(token, { prisonId })
   }
 
   async updateResiStatus(token: string, prisonId: string, status: StatusType) {

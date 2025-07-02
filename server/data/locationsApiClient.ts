@@ -6,14 +6,15 @@ import {
   PrisonerLocation,
   LocationForLocalName,
   SignedOperationalCapacity,
+  LocationResidentialSummary,
+  PrisonResidentialSummary,
   PrisonConfiguration,
   StatusType,
 } from './types/locationsApi'
-import { LocationResidentialSummary } from './types/locationsApi/locationResidentialSummary'
-import { PrisonResidentialSummary } from './types/locationsApi/prisonResidentialSummary'
 import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
 
 import { RedisClient } from './redisClient'
+import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(
@@ -162,6 +163,10 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['includeHistory'],
       requestType: 'get',
     }),
+    getResidentialHierarchy: this.apiCall<ResidentialHierarchy, { prisonId: string }>({
+      path: '/locations/prison/:prisonId/residential-hierarchy',
+      requestType: 'get',
+    }),
     getResidentialSummary: this.apiCall<
       LocationResidentialSummary | PrisonResidentialSummary,
       { prisonId: string; parentLocationId?: string }
@@ -220,21 +225,6 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
   }
 
-  prisonConfiguration = {
-    getPrisonConfiguration: this.apiCall<PrisonConfiguration, { prisonId: string }>({
-      path: '/prison-configuration/:prisonId',
-      requestType: 'get',
-    }),
-    updateResiStatus: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
-      path: '/prison-configuration/:prisonId/resi-service/:status',
-      requestType: 'put',
-    }),
-    updateCertificationApproval: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
-      path: '/prison-configuration/:prisonId/certification-approval-required/:status',
-      requestType: 'put',
-    }),
-  }
-
   prisonerLocations = {
     getPrisonersInLocation: this.apiCall<PrisonerLocation[], { locationId: string }>({
       path: '/prisoner-locations/id/:locationId',
@@ -261,6 +251,22 @@ export default class LocationsApiClient extends BaseApiClient {
     get: this.apiCall<ManagementReportDefinition[], null>({
       path: '/definitions',
       requestType: 'get',
+    }),
+  }
+
+  prisonConfiguration = {
+    get: this.apiCall<PrisonConfiguration, { prisonId: string }>({
+      path: '/prison-configuration/:prisonId',
+      requestType: 'get',
+      options: { cacheDuration: 3600 },
+    }),
+    updateResiStatus: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/resi-service/:status',
+      requestType: 'put',
+    }),
+    updateCertificationApproval: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/certification-approval-required/:status',
+      requestType: 'put',
     }),
   }
 }

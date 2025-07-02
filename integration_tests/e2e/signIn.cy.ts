@@ -32,6 +32,7 @@ context('Sign In', () => {
       cy.task('stubSignIn')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('Unauthenticated user directed to auth', () => {

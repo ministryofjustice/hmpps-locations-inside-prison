@@ -32,6 +32,7 @@ context('Remove cell type', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('does not show the remove link on the show location page', () => {
@@ -110,6 +111,7 @@ context('Remove cell type', () => {
       cy.task('stubUpdateCapacity')
       cy.task('stubUpdateSpecialistCellTypes')
       cy.task('stubPrisonerLocationsId', prisonerLocations)
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('does not show the remove cell type link when the cell is inactive', () => {

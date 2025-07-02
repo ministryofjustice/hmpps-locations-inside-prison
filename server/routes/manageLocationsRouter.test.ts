@@ -1,6 +1,6 @@
-import type { Express } from 'express'
+import { Express } from 'express'
 import request from 'supertest'
-import { appWithAllRoutes, user } from './testutils/appSetup'
+import { appWithAllRoutes, manageUser } from './testutils/appSetup'
 import AuditService, { Page } from '../services/auditService'
 import AuthService from '../services/authService'
 import LocationsService from '../services/locationsService'
@@ -15,16 +15,22 @@ const locationsService = new LocationsService(null) as jest.Mocked<LocationsServ
 
 let app: Express
 
-beforeEach(() => {
+beforeEach(async () => {
+  locationsService.getPrisonConfiguration.mockResolvedValue({
+    prisonId: 'TST',
+    resiLocationServiceActive: 'INACTIVE',
+    includeSegregationInRollCount: 'INACTIVE',
+    certificationApprovalRequired: 'ACTIVE',
+  })
+
   app = appWithAllRoutes({
     services: {
       auditService,
       authService,
       locationsService,
     },
-    userSupplier: () => user,
+    userSupplier: () => manageUser,
   })
-  authService.getSystemClientToken.mockResolvedValue('token')
 })
 
 afterEach(() => {
@@ -70,7 +76,7 @@ describe('GET /manage-locations/PRISON_ID', () => {
         expect(res.text).toMatch(/>\s+100\s+</)
 
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_CREATE, {
-          who: user.username,
+          who: manageUser.username,
           correlationId: expect.any(String),
         })
       })

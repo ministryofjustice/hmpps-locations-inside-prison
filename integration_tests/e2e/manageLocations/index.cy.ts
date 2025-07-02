@@ -3,8 +3,9 @@ import Page, { PageElement } from '../../pages/page'
 import ManageLocationsIndexPage from '../../pages/manageLocations'
 
 context('View Locations Index', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
+      cy.task('setFeatureFlag', { createAndCertify: true })
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
     })
@@ -20,10 +21,10 @@ context('View Locations Index', () => {
     })
   })
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  context('With the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
+      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
@@ -34,6 +35,8 @@ context('View Locations Index', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary')
+      cy.task('setFeatureFlag', { createAndCertify: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('Correctly presents the API data', () => {

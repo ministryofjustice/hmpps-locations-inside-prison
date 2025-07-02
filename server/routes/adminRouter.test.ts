@@ -40,6 +40,12 @@ afterEach(() => {
 describe('GET /admin', () => {
   it('should redirect to /admin/PRISON_ID', () => {
     auditService.logPageView.mockResolvedValue(null)
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'ACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
+    })
 
     return request(app).get('/admin').expect(302).expect('Location', '/admin/TST')
   })

@@ -253,8 +253,8 @@ describe('locationsApiClient', () => {
     testCall(
       'getPrisonConfiguration',
       '/prison-configuration/LEI',
-      false,
-      () => apiClient.prisonConfiguration.getPrisonConfiguration,
+      true,
+      () => apiClient.prisonConfiguration.get,
       { prisonId: 'LEI' },
       'get',
     )

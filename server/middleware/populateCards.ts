@@ -1,10 +1,12 @@
 import asyncMiddleware from './asyncMiddleware'
-import config from '../config'
+import setCanAccess from './setCanAccess'
+import LocationsService from '../services/locationsService'
 
-export default function populateCards() {
+export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((_req, res, next) => {
+    setCanAccess(locationsService)
     res.locals.cards = [
-      ...(config.featureFlags.createAndCertify
+      ...(_req.featureFlags.createAndCertify && _req.canAccess('create_location')
         ? [
             {
               clickable: true,

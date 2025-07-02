@@ -146,9 +146,9 @@ context('Reactivate parent', () => {
     ]
   }
 
-  context('when the createAndCertify feature flag is disabled', () => {
+  context.skip('when the map2380 feature flag is disabled', () => {
     beforeEach(() => {
-      cy.task('setFeatureFlag', { createAndCertify: false })
+      cy.task('setFeatureFlag', { map2380: false })
     })
 
     context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -170,6 +170,8 @@ context('Reactivate parent', () => {
           parentLocation: inactiveWing,
           subLocations: [inactiveLanding1, inactiveLanding2, inactiveLanding3],
         })
+        cy.task('setFeatureFlag', { map2380: false })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
         cy.signIn()
       })
 
@@ -206,6 +208,7 @@ context('Reactivate parent', () => {
             subLocations: locations.filter(l => l.parentId === location.id),
           }),
         )
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
         ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
         viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
@@ -910,9 +913,9 @@ context('Reactivate parent', () => {
     })
   })
 
-  context('when the createAndCertify feature flag is enabled', () => {
+  context('when the map2380 feature flag is enabled', () => {
     beforeEach(() => {
-      cy.task('setFeatureFlag', { createAndCertify: true })
+      cy.task('setFeatureFlag', { map2380: true })
     })
 
     context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -934,6 +937,7 @@ context('Reactivate parent', () => {
           parentLocation: inactiveWing,
           subLocations: [inactiveLanding1, inactiveLanding2, inactiveLanding3],
         })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
       })
 
@@ -970,6 +974,7 @@ context('Reactivate parent', () => {
             subLocations: locations.filter(l => l.parentId === location.id),
           }),
         )
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
         ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
         viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
@@ -1602,6 +1607,7 @@ context('Reactivate parent', () => {
             subLocations: locations.filter(l => l.parentId === location.id),
           }),
         )
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
         ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
         viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)

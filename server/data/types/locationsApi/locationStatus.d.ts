@@ -1,1 +1,10 @@
-export declare type LocationStatus = 'ACTIVE' | 'INACTIVE' | 'NON_RESIDENTIAL'
+export declare type LocationStatus =
+  | 'ACTIVE'
+  | 'INACTIVE'
+  | 'ARCHIVED'
+  | 'DRAFT'
+  | 'NON_RESIDENTIAL'
+  | 'LOCKED_ACTIVE'
+  | 'LOCKED_INACTIVE'
+  | 'LOCKED_DRAFT'
+  | 'LOCKED_NON_RESIDENTIAL'

@@ -68,6 +68,7 @@ context('View Locations Show', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
     })
 
     function testShow({
@@ -128,23 +129,45 @@ context('View Locations Show', () => {
         viewLocationsShowPage.inactiveBanner().should('not.exist')
       }
 
+      if (location.status === 'DRAFT') {
+        viewLocationsShowPage.draftBanner().should('exist')
+
+        viewLocationsShowPage
+          .draftBannerCertifyButton()
+          .should(`${location.numberOfCellLocations === 0 ? 'not.' : ''}exist`)
+      } else {
+        viewLocationsShowPage.draftBanner().should('not.exist')
+      }
+
       if (location.status === 'NON_RESIDENTIAL') {
         viewLocationsShowPage.summaryCards.all().should('have.length', 0)
       } else {
         viewLocationsShowPage.summaryCards.all().should('have.length', location.leafLevel ? 2 : 3)
-        viewLocationsShowPage.summaryCards.workingCapacityText().contains(`${location.capacity.workingCapacity}`)
-        viewLocationsShowPage.summaryCards.maximumCapacityText().contains(`${location.capacity.maxCapacity}`)
-        if (!location.leafLevel) {
-          viewLocationsShowPage.summaryCards.inactiveCellsText().contains(`${location.inactiveCells}`)
-
+        if (location.status === 'DRAFT') {
           viewLocationsShowPage.summaryCards
-            .inactiveCellsViewLink()
-            .should(`${location.inactiveCells > 0 ? '' : 'not.'}exist`)
-          if (location.inactiveCells > 0) {
+            .cnaText()
+            .contains(`${location.numberOfCellLocations > 0 ? location.certification.capacityOfCertifiedCell : '-'}`)
+          viewLocationsShowPage.summaryCards
+            .workingCapacityText()
+            .contains(`${location.numberOfCellLocations > 0 ? location.capacity.workingCapacity : '-'}`)
+          viewLocationsShowPage.summaryCards
+            .maximumCapacityText()
+            .contains(`${location.numberOfCellLocations > 0 ? location.capacity.maxCapacity : '-'}`)
+        } else {
+          viewLocationsShowPage.summaryCards.workingCapacityText().contains(`${location.capacity.workingCapacity}`)
+          viewLocationsShowPage.summaryCards.maximumCapacityText().contains(`${location.capacity.maxCapacity}`)
+          if (!location.leafLevel) {
+            viewLocationsShowPage.summaryCards.inactiveCellsText().contains(`${location.inactiveCells}`)
+
             viewLocationsShowPage.summaryCards
               .inactiveCellsViewLink()
-              .should('have.attr', 'href')
-              .and('equal', `/inactive-cells/${location.prisonId}/${location.id}`)
+              .should(`${location.inactiveCells > 0 ? '' : 'not.'}exist`)
+            if (location.inactiveCells > 0) {
+              viewLocationsShowPage.summaryCards
+                .inactiveCellsViewLink()
+                .should('have.attr', 'href')
+                .and('equal', `/inactive-cells/${location.prisonId}/${location.id}`)
+            }
           }
         }
       }
@@ -290,6 +313,7 @@ context('View Locations Show', () => {
         sortName: 'A',
         isResidential: true,
         capacity: { maxCapacity: 100, workingCapacity: 94 },
+        numberOfCellLocations: 4,
       }
       const locationHierarchy = [
         {
@@ -352,6 +376,64 @@ context('View Locations Show', () => {
           testShow({ location, locationHierarchy })
         })
       })
+
+      context('When the location is Draft', () => {
+        context('When numberOfCellLocations is 0', () => {
+          beforeEach(() => {
+            location = LocationFactory.build({
+              ...locationDetails,
+              status: 'DRAFT',
+              numberOfCellLocations: 0,
+            })
+
+            cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+              parentLocation: location,
+              locationHierarchy,
+            })
+
+            cy.task(
+              'stubLocations',
+              LocationFactory.build({
+                parentId: undefined,
+                id: location.parentId,
+                status: 'ACTIVE',
+              }),
+            )
+          })
+
+          it('Correctly presents the API data', () => {
+            testShow({ location, locationHierarchy })
+          })
+        })
+
+        context('When numberOfCellLocations is 1', () => {
+          beforeEach(() => {
+            location = LocationFactory.build({
+              ...locationDetails,
+              status: 'DRAFT',
+              numberOfCellLocations: 1,
+            })
+
+            cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+              parentLocation: location,
+              locationHierarchy,
+            })
+
+            cy.task(
+              'stubLocations',
+              LocationFactory.build({
+                parentId: undefined,
+                id: location.parentId,
+                status: 'ACTIVE',
+              }),
+            )
+          })
+
+          it('Correctly presents the API data', () => {
+            testShow({ location, locationHierarchy })
+          })
+        })
+      })
     })
 
     context('When the location is a Landing', () => {
@@ -384,6 +466,7 @@ context('View Locations Show', () => {
         sortName: 'A-1',
         isResidential: true,
         capacity: { maxCapacity: 20, workingCapacity: 14 },
+        numberOfCellLocations: 4,
       }
       const locationHierarchy = [
         {
@@ -487,6 +570,7 @@ context('View Locations Show', () => {
         sortName: 'A-1-001',
         isResidential: true,
         capacity: { maxCapacity: 2, workingCapacity: 1 },
+        numberOfCellLocations: 1,
       }
       const locationHierarchy = [
         {
@@ -534,9 +618,9 @@ context('View Locations Show', () => {
         })
 
         describe('Actions button', () => {
-          context('when the createAndCertify feature flag is disabled', () => {
+          context('when the map2380 feature flag is disabled', () => {
             beforeEach(() => {
-              cy.task('setFeatureFlag', { createAndCertify: false })
+              cy.task('setFeatureFlag', { map2380: false })
             })
 
             before(() => {
@@ -553,9 +637,9 @@ context('View Locations Show', () => {
             })
           })
 
-          context('when the createAndCertify feature flag is enabled', () => {
+          context('when the map2380 feature flag is enabled', () => {
             beforeEach(() => {
-              cy.task('setFeatureFlag', { createAndCertify: true })
+              cy.task('setFeatureFlag', { map2380: true })
             })
 
             context('when the user has MANAGE_RESIDENTIAL_LOCATIONS role', () => {

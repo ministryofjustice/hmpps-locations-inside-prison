@@ -13,6 +13,7 @@ context('Change cell capacity', () => {
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('redirects user to sign in page', () => {
@@ -22,9 +23,9 @@ context('Change cell capacity', () => {
     })
   })
 
-  context('when the createAndCertify feature flag is disabled', () => {
+  context('when the map2380 feature flag is disabled', () => {
     beforeEach(() => {
-      cy.task('setFeatureFlag', { createAndCertify: false })
+      cy.task('setFeatureFlag', { map2380: false })
     })
 
     context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -102,6 +103,7 @@ context('Change cell capacity', () => {
         cy.task('stubLocations', location)
         cy.task('stubPrisonerLocationsId', prisonerLocations)
         cy.task('stubUpdateCapacity')
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
         cy.signIn()
       })
 
@@ -298,9 +300,9 @@ context('Change cell capacity', () => {
     })
   })
 
-  context('when the createAndCertify feature flag is enabled', () => {
+  context('when the map2380 feature flag is enabled', () => {
     beforeEach(() => {
-      cy.task('setFeatureFlag', { createAndCertify: true })
+      cy.task('setFeatureFlag', { map2380: true })
     })
 
     context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -378,6 +380,7 @@ context('Change cell capacity', () => {
         cy.task('stubLocations', location)
         cy.task('stubPrisonerLocationsId', prisonerLocations)
         cy.task('stubUpdateCapacity')
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
       })
 
@@ -677,6 +680,7 @@ context('Change cell capacity', () => {
         cy.task('stubLocations', location)
         cy.task('stubPrisonerLocationsId', prisonerLocations)
         cy.task('stubUpdateCapacity')
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
         cy.signIn()
       })
 
