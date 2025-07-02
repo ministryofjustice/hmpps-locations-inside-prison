@@ -42,8 +42,8 @@ describe('populateTopLevelDraftLocationSummary', () => {
       session: { systemToken: 'token' },
       services: {
         locationsService: {
-          getLocation: (token, id, includeHistory) => Promise.resolve(locations[id]),
-          getResidentialSummary: (token, prisonId, id) =>
+          getLocation: (_token, id, _includeHistory) => Promise.resolve(locations[id]),
+          getResidentialSummary: (_token, _prisonId, id) =>
             Promise.resolve(
               LocationResidentialSummaryFactory.build({
                 parentLocation: locations[id],
