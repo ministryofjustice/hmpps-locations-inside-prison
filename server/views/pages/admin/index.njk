@@ -1,0 +1,141 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set title = 'Prison configuration' %}
+
+{% set rows = [] %}
+{% set rows = (rows.push(
+  [
+    { text: prisonConfiguration.prisonId },
+    { text: prisonConfiguration.resiLocationServiceActive },
+    { text: prisonConfiguration.includeSegregationInRollCount },
+    { text: prisonConfiguration.certificationApprovalRequired }
+  ]
+), rows) %}
+
+{% set housingMessage %}
+  {% if prisonNonHousingDisplayEnabled %}
+    Enabled
+  {% else %}
+    Disabled
+  {% endif %}
+{% endset %}
+
+{% block beforeContent %}
+  {{ super() }}
+
+  {% if banner.success %}
+    {% set html %}
+      <h3 class="govuk-notification-banner__heading">
+        {{ banner.success.title }}
+      </h3>
+      <p class="govuk-body">
+        {{ banner.success.content }}
+      </p>
+    {% endset %}
+
+    <div class="govuk-width-container">
+      <div class="govuk-grid-row govuk-!-margin-bottom-0">
+        <div class="govuk-grid-column-two-thirds">
+          {{ govukNotificationBanner({
+            html: html,
+            type: "success",
+            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+          }) }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% set resiHtml %}
+  <span class="hmpps-inactive-location-banner">
+        {{ govukSummaryList({rows:[
+        {
+          key: {
+            text: 'Prison'
+          },
+          value: {
+            text: prisonConfiguration.prisonId
+          }
+        },
+        {
+          key: {
+            text: 'Residential location'
+          },
+          value: {
+            text: prisonConfiguration.resiLocationServiceActive
+          },
+          actions: {
+            items: [
+              {
+                href: '/admin/' + prisonConfiguration.prisonId + '/change-resi-status',
+                text: "Change",
+                visuallyHiddenText: "resi",
+                classes: "govuk-link--no-visited-state"}
+            ]
+          }
+        },
+        {
+          key: {
+            text: 'Include seg in roll count'
+          },
+          value: {
+            text: prisonConfiguration.includeSegregationInRollCount
+          }
+        },
+        {
+          key: {
+            text: 'Certification approval required'
+          },
+          value: {
+            text: prisonConfiguration.certificationApprovalRequired
+          },
+          actions: {
+            items: [
+              {
+                href: '/admin/' + prisonConfiguration.prisonId + '/change-certification-status',
+                text: "Change",
+                visuallyHiddenText: "resi",
+                classes: "govuk-link--no-visited-state"}
+            ]
+          }
+        },
+        {
+          key: {
+            text: 'Prison non housing checkboxes'
+          },
+          value: {
+            text: housingMessage
+          },
+          actions: {
+            items: [
+              {
+                href: '/admin/' + prisonConfiguration.prisonId + '/change-non-housing-checkboxes',
+                text: "Change",
+                visuallyHiddenText: "non-housing",
+                classes: "govuk-link--no-visited-state"}
+            ]
+          }
+        }
+        ],
+        classes: 'hmpps-inactive-location-banner-summary-list' }) }}
+  </span>
+{% endset %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    {% if rows | length %}
+      {{ govukNotificationBanner({
+        html: resiHtml,
+        classes: 'govuk-notification-banner__headerless',
+        attributes: {
+          'data-qa': 'inactive-location-banner'
+        }
+      }) }}
+    {% else %}
+      <p data-qa="empty-state-message">There is no prison configuration.</p>
+    {% endif %}
+  </div>
+{% endblock %}

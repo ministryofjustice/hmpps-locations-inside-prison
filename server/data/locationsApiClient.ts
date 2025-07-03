@@ -8,9 +8,10 @@ import {
   SignedOperationalCapacity,
   LocationResidentialSummary,
   PrisonResidentialSummary,
+  PrisonConfiguration,
+  StatusType,
 } from './types/locationsApi'
 import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
-import { PrisonConfiguration } from './types/locationsApi/prisonConfiguration'
 
 import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
@@ -258,6 +259,14 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/prison-configuration/:prisonId',
       requestType: 'get',
       options: { cacheDuration: 3600 },
+    }),
+    updateResiStatus: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/resi-service/:status',
+      requestType: 'put',
+    }),
+    updateCertificationApproval: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/certification-approval-required/:status',
+      requestType: 'put',
     }),
   }
 }

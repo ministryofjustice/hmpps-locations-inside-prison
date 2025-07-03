@@ -19,6 +19,7 @@ import HmppsAuditClient from './hmppsAuditClient'
 import LocationsApiClient from './locationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
 import logger from '../../logger'
+import PrisonApiClient from './prisonApiClient'
 
 export const dataAccess = () => {
   const hmppsAuthClient = new AuthenticationClient(
@@ -35,6 +36,7 @@ export const dataAccess = () => {
     hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
     locationsApiClient: new LocationsApiClient(redisClient, hmppsAuthClient),
     manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
+    prisonApiClient: new PrisonApiClient(redisClient, hmppsAuthClient),
     redisClient,
   }
 }
