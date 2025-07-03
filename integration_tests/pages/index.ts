@@ -15,5 +15,6 @@ export default class IndexPage extends Page {
     inactiveCells: (): PageElement => cy.get('[data-qa=inactive-cells-card]'),
     archivedLocations: (): PageElement => cy.get('[data-qa=archived-locations-card]'),
     locationHistory: (): PageElement => cy.get('[data-qa=location-history-card]'),
+    adminster: (): PageElement => cy.get('[data-qa=admin-card]'),
   }
 }

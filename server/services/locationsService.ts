@@ -2,6 +2,7 @@ import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
 import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
+import { StatusType } from '../data/types/locationsApi'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -238,5 +239,15 @@ export default class LocationsService {
 
   async getPrisonConfiguration(token: string, prisonId: string) {
     return this.locationsApiClient.prisonConfiguration.get(token, { prisonId })
+  }
+
+  async updateResiStatus(token: string, prisonId: string, status: StatusType) {
+    await this.locationsApiClient.prisonConfiguration.updateResiStatus(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
+  }
+
+  async updateCertificationApproval(token: string, prisonId: string, status: StatusType) {
+    await this.locationsApiClient.prisonConfiguration.updateCertificationApproval(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
   }
 }

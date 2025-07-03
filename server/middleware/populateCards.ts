@@ -51,6 +51,14 @@ export default function populateCards(locationsService: LocationsService) {
         description: 'Run management reports for printing or exporting.',
         'data-qa': 'management-reporting-card',
       },
+      {
+        clickable: true,
+        visible: _req.canAccess('administer_residential'),
+        heading: 'Admin',
+        href: '/admin',
+        description: 'Administer residential locations.',
+        'data-qa': 'admin-card',
+      },
     ]
 
     next()

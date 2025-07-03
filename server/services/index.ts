@@ -5,6 +5,7 @@ import LocationsService from './locationsService'
 import AuthService from './authService'
 import ManageUsersService from './manageUsersService'
 import AnalyticsService from './analyticsService'
+import PrisonService from './prisonService'
 
 export const services = () => {
   const {
@@ -15,6 +16,7 @@ export const services = () => {
     googleAnalyticsClient,
     locationsApiClient,
     manageUsersApiClient,
+    prisonApiClient,
   } = dataAccess()
 
   const analyticsService = new AnalyticsService(googleAnalyticsClient)
@@ -23,6 +25,7 @@ export const services = () => {
   const feComponentsService = new FeComponentsService(feComponentsClient)
   const locationsService = new LocationsService(locationsApiClient)
   const manageUsersService = new ManageUsersService(manageUsersApiClient)
+  const prisonService = new PrisonService(prisonApiClient)
 
   return {
     analyticsService,
@@ -32,6 +35,7 @@ export const services = () => {
     feComponentsService,
     locationsService,
     manageUsersService,
+    prisonService,
   }
 }
 

@@ -102,6 +102,15 @@ services:
       - POSTGRES_USER=locations_inside_prison
       - POSTGRES_DB=locations_inside_prison
 
+  prison-api:
+    image: wiremock/wiremock:latest
+    container_name: prison-api
+    ports:
+      - "8091:8081"
+    volumes:
+      - $PWD/wiremock-docker:/home/wiremock
+    command: --verbose --global-response-templating --port=8081
+
   prisoner-search:
     image: wiremock/wiremock:latest
     networks:
@@ -192,6 +201,7 @@ services:
       - COMMON_COMPONENTS_ENABLED=false
       - DPS_URL=http://localhost:3000
       - LOCATIONS_API_URL=http://localhost:8090
+      - PRISON_API_URL=http://localhost:8091
       - NO_HTTPS=true
       - LOAD_DPR_ON_STARTUP=false
 

@@ -23,8 +23,8 @@ describe('Locations service', () => {
     locationsApiClient.constants = deepMock(locationsApiClient.constants, {
       a: [{ key: 'KEY', description: 'description' }],
     }) as typeof locationsApiClient.constants
-    ;['locations', 'prisonerLocations', 'signedOperationalCapacity'].forEach(
-      (k: 'locations' | 'prisonerLocations' | 'signedOperationalCapacity') => {
+    ;['locations', 'prisonerLocations', 'signedOperationalCapacity', 'prisonConfiguration'].forEach(
+      (k: 'locations' | 'prisonerLocations' | 'signedOperationalCapacity' | 'prisonConfiguration') => {
         locationsApiClient[k] = deepMock(locationsApiClient[k]) as any
       },
     )
@@ -335,6 +335,46 @@ describe('Locations service', () => {
         locations: {
           'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
         },
+      })
+    })
+  })
+
+  describe('getPrisonConfiguration', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getPrisonConfiguration('token', 'MDI')
+
+      expect(locationsApiClient.prisonConfiguration.get).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+      })
+    })
+  })
+
+  describe('updateResiStatus', () => {
+    it('calls the correct client function', async () => {
+      locationsApiClient.prisonConfiguration.get.clearCache = jest.fn()
+      await locationsService.updateResiStatus('token', 'MDI', 'ACTIVE')
+
+      expect(locationsApiClient.prisonConfiguration.updateResiStatus).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        status: 'ACTIVE',
+      })
+      expect(locationsApiClient.prisonConfiguration.get.clearCache).toHaveBeenCalledWith({
+        prisonId: 'MDI',
+      })
+    })
+  })
+
+  describe('updateCertificationApproval', () => {
+    it('calls the correct client function', async () => {
+      locationsApiClient.prisonConfiguration.get.clearCache = jest.fn()
+      await locationsService.updateCertificationApproval('token', 'MDI', 'INACTIVE')
+
+      expect(locationsApiClient.prisonConfiguration.updateCertificationApproval).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        status: 'INACTIVE',
+      })
+      expect(locationsApiClient.prisonConfiguration.get.clearCache).toHaveBeenCalledWith({
+        prisonId: 'MDI',
       })
     })
   })

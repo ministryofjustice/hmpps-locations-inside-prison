@@ -11,10 +11,10 @@ describe('Manage users service', () => {
     apiClient = new ManageUsersApiClient(null, null) as jest.Mocked<ManageUsersApiClient>
     apiClient.users = {
       me: {
-        get: jest.fn(),
-        getCaseloads: jest.fn(),
+        get: jest.fn() as jest.Mocked<any>,
+        getCaseloads: jest.fn() as jest.Mocked<any>,
       },
-      get: jest.fn(),
+      get: jest.fn() as jest.Mocked<any>,
     }
     service = new ManageUsersService(apiClient)
   })

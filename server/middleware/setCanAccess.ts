@@ -2,7 +2,12 @@ import { type NextFunction, Request, type Response } from 'express'
 import { rolesToPermissions } from '../lib/permissions'
 import LocationsService from '../services/locationsService'
 
-const rolePriority = ['MANAGE_RES_LOCATIONS_OP_CAP', 'MANAGE_RESIDENTIAL_LOCATIONS', 'VIEW_INTERNAL_LOCATION']
+const rolePriority = [
+  'MANAGE_RES_LOCATIONS_ADMIN',
+  'MANAGE_RES_LOCATIONS_OP_CAP',
+  'MANAGE_RESIDENTIAL_LOCATIONS',
+  'VIEW_INTERNAL_LOCATION',
+]
 
 export default function setCanAccess(locationService: LocationsService) {
   return async (req: Request, res: Response, next: NextFunction) => {

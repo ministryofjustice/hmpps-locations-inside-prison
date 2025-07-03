@@ -4,3 +4,5 @@ export declare interface PrisonConfiguration {
   includeSegregationInRollCount: string
   certificationApprovalRequired: string
 }
+
+export declare type StatusType = 'ACTIVE' | 'INACTIVE'

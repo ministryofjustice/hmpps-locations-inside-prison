@@ -15,6 +15,7 @@ generic-service:
     COMPONENT_API_URL: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk"
+    PRISON_API_URL: "https://prison-api-dev.prison.service.justice.gov.uk"
     ENVIRONMENT_NAME: DEV
     AUDIT_ENABLED: "false"
     FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
