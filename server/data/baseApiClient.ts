@@ -77,7 +77,9 @@ export default class BaseApiClient extends RestClient {
     }
     func.clearCache = async (parameters: Parameters = {} as never) => {
       const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
-      await this.redisClient.del(filledPath)
+      if (this.redisClient) {
+        await this.redisClient.del(filledPath)
+      }
     }
     return func as typeof func & { clearCache: typeof func.clearCache }
   }
