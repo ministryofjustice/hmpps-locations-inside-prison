@@ -351,22 +351,30 @@ describe('Locations service', () => {
 
   describe('updateResiStatus', () => {
     it('calls the correct client function', async () => {
+      locationsApiClient.prisonConfiguration.get.clearCache = jest.fn()
       await locationsService.updateResiStatus('token', 'MDI', 'ACTIVE')
 
       expect(locationsApiClient.prisonConfiguration.updateResiStatus).toHaveBeenCalledWith('token', {
         prisonId: 'MDI',
         status: 'ACTIVE',
       })
+      expect(locationsApiClient.prisonConfiguration.get.clearCache).toHaveBeenCalledWith({
+        prisonId: 'MDI',
+      })
     })
   })
 
   describe('updateCertificationApproval', () => {
     it('calls the correct client function', async () => {
+      locationsApiClient.prisonConfiguration.get.clearCache = jest.fn()
       await locationsService.updateCertificationApproval('token', 'MDI', 'INACTIVE')
 
       expect(locationsApiClient.prisonConfiguration.updateCertificationApproval).toHaveBeenCalledWith('token', {
         prisonId: 'MDI',
         status: 'INACTIVE',
+      })
+      expect(locationsApiClient.prisonConfiguration.get.clearCache).toHaveBeenCalledWith({
+        prisonId: 'MDI',
       })
     })
   })

@@ -10,8 +10,8 @@ describe('Prison service', () => {
   beforeEach(() => {
     apiClient = new PrisonApiClient(null, null) as jest.Mocked<PrisonApiClient>
     apiClient.servicePrisons = {
-      activatePrisonService: jest.fn(),
-      getServiceStatus: jest.fn(),
+      activatePrisonService: jest.fn() as jest.Mocked<any>,
+      getServiceStatus: jest.fn() as jest.Mocked<any>,
     }
 
     service = new PrisonService(apiClient)

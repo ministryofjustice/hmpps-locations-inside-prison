@@ -242,10 +242,12 @@ export default class LocationsService {
   }
 
   async updateResiStatus(token: string, prisonId: string, status: StatusType) {
-    return this.locationsApiClient.prisonConfiguration.updateResiStatus(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.updateResiStatus(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
   }
 
   async updateCertificationApproval(token: string, prisonId: string, status: StatusType) {
-    return this.locationsApiClient.prisonConfiguration.updateCertificationApproval(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.updateCertificationApproval(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
   }
 }
