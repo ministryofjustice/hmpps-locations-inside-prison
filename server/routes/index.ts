@@ -29,6 +29,10 @@ import changeLocalNameRouter from './changeLocalName'
 import removeLocalNameRouter from './removeLocalName'
 import manageLocationsRouter from './manageLocationsRouter'
 import createLocationRouter from './createLocation'
+import adminRouter from './adminRouter'
+import changeResiStatusRouter from './admin/resi'
+import changeCertApprovalStatusRouter from './admin/certApproval'
+import changeNonHousingCheckboxRouter from './admin/nonHousing'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -73,6 +77,12 @@ export default function routes(services: Services): Router {
 
   // Digital Prison Reporting
   dprRouter(router, services)
+
+  // admin
+  router.use('/admin/:prisonId?', adminRouter(services))
+  router.use('/admin/:prisonId/change-resi-status', changeResiStatusRouter)
+  router.use('/admin/:prisonId/change-certification-status', changeCertApprovalStatusRouter)
+  router.use('/admin/:prisonId/change-non-housing-checkboxes', changeNonHousingCheckboxRouter)
 
   return router
 }
