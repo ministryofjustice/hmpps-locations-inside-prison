@@ -44,10 +44,25 @@ const stubDisplayHousingCheckboxesDisabled = () =>
     },
   })
 
-const stubDisplayHousingCheckboxesUpdate = (returnData: { prisonid: 'TST'; prison: 'Test prison' }) =>
+const stubDisplayHousingCheckboxesDelete = (returnData: { prisonid: 'TST'; prison: 'Test prison' }) =>
   stubFor({
     request: {
       method: 'DELETE',
+      urlPattern: '/prison-api/api/service-prisons/DISPLAY_HOUSING_CHECKBOX/prison/[\\w-]+',
+    },
+    response: {
+      status: 204,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+    },
+    jsonBody: returnData,
+  })
+
+const stubDisplayHousingCheckboxesPost = (returnData: { prisonid: 'TST'; prison: 'Test prison' }) =>
+  stubFor({
+    request: {
+      method: 'POST',
       urlPattern: '/prison-api/api/service-prisons/DISPLAY_HOUSING_CHECKBOX/prison/[\\w-]+',
     },
     response: {
@@ -63,5 +78,6 @@ export default {
   stubPrisonHealthPing,
   stubDisplayHousingCheckboxesDisabled,
   stubDisplayHousingCheckboxesEnabled,
-  stubDisplayHousingCheckboxesUpdate,
+  stubDisplayHousingCheckboxesDelete,
+  stubDisplayHousingCheckboxesPost,
 }

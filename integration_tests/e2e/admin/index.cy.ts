@@ -94,7 +94,7 @@ context('Admin Index', () => {
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubPrisonConfiguration')
       cy.task('stubDisplayHousingCheckboxesEnabled')
-      cy.task('stubDisplayHousingCheckboxesUpdate')
+      cy.task('stubDisplayHousingCheckboxesPost')
       cy.signIn()
     })
 
@@ -128,7 +128,7 @@ context('Admin Index', () => {
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubPrisonConfiguration')
       cy.task('stubDisplayHousingCheckboxesDisabled')
-      cy.task('stubDisplayHousingCheckboxesUpdate')
+      cy.task('stubDisplayHousingCheckboxesDelete')
       cy.signIn()
     })
 
