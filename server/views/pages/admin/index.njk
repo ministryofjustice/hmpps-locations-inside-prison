@@ -15,10 +15,10 @@
 ), rows) %}
 
 {% set housingMessage %}
-  {% if prisonNonHousingDisplayEnabled %}
-    Enabled
-  {% else %}
+  {% if prisonNonHousingDisabled %}
     Disabled
+  {% else %}
+    Enabled
   {% endif %}
 {% endset %}
 

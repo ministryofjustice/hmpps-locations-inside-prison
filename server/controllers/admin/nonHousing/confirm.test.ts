@@ -66,14 +66,14 @@ describe('adminNoHousingSwitch', () => {
     })
   })
 
-  describe('saveValues for deactivating checkboxes', () => {
+  describe('saveValues for disabling checkboxes', () => {
     beforeEach(() => {
       deepReq.form.values.disableNonHousingCheckboxes = 'true'
       controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
     it('calls prisonService', () => {
-      expect(prisonService.deactivatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
+      expect(prisonService.activatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
     })
 
     it('sends an analytics event', async () => {
@@ -90,14 +90,14 @@ describe('adminNoHousingSwitch', () => {
     })
   })
 
-  describe('saveValues for activating checkboxes', () => {
+  describe('saveValues for enabling checkboxes', () => {
     beforeEach(() => {
       deepReq.form.values.disableNonHousingCheckboxes = 'false'
       controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
-    it('calls locationsService', () => {
-      expect(prisonService.activatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
+    it('calls prisonService', () => {
+      expect(prisonService.deactivatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
     })
 
     it('sends an analytics event', async () => {

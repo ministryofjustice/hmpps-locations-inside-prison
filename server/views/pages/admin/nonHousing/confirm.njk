@@ -9,10 +9,10 @@
 {% set title = "Update NOMIS non housing checkboxes" %}
 
 {% set housingMessage %}
-  {% if prisonNonHousingDisplayEnabled %}
-    Enabled
-  {% else %}
+  {% if prisonNonHousingDisabled %}
     Disabled
+  {% else %}
+    Enabled
   {% endif %}
 {% endset %}
 
@@ -88,18 +88,18 @@
           <div class="govuk-button-group">
             {% block formActions %}
               {% block submitAction %}
-                {% if prisonNonHousingDisplayEnabled %}
-                  <input type="hidden" name="disableNonHousingCheckboxes" value="{{ 'true' }}">
+                {% if prisonNonHousingDisabled %}
+                  <input type="hidden" name="disableNonHousingCheckboxes" value="{{ 'false' }}">
                   {{ govukButton({
-                    text: "Disable non housing checkboxes",
+                    text: "Enable non housing checkboxes",
                     classes: options.buttonClasses,
                     preventDoubleClick: true,
                     type: "submit"
                   }) }}
                 {% else %}
-                  <input type="hidden" name="disableNonHousingCheckboxes" value="{{ 'false' }}">
+                  <input type="hidden" name="disableNonHousingCheckboxes" value="{{ 'true' }}">
                   {{ govukButton({
-                    text: "Enable non housing checkboxes",
+                    text: "Disable non housing checkboxes",
                     classes: options.buttonClasses,
                     preventDoubleClick: true,
                     type: "submit"

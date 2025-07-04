@@ -9,11 +9,11 @@ export default function getServicePrisonsNonHousingDisplay() {
     try {
       await req.services.prisonService.getServiceStatus(systemToken, prisonId, 'DISPLAY_HOUSING_CHECKBOX')
       // set switched off
-      res.locals.prisonNonHousingDisplayEnabled = true
+      res.locals.prisonNonHousingDisabled = true
       next()
     } catch (error) {
       if (error.responseStatus === 404) {
-        res.locals.prisonNonHousingDisplayEnabled = false
+        res.locals.prisonNonHousingDisabled = false
         next()
       } else {
         logger.error(error, `Failed to check prison service non housing display for prisonId: ${prisonId}`)

@@ -35,7 +35,7 @@ export default class NonHousingCheckboxChangeConfirm extends FormInitialStep {
     if (disableNonHousingCheckboxes === 'true') {
       const serviceCode: ServiceCode = 'DISPLAY_HOUSING_CHECKBOX'
       try {
-        await prisonService.deactivatePrisonService(req.session.systemToken, prisonId, serviceCode)
+        await prisonService.activatePrisonService(req.session.systemToken, prisonId, serviceCode)
 
         analyticsService.sendEvent(req, 'disable_non_housing_checkboxes', {
           prison_id: prisonId,
@@ -48,8 +48,7 @@ export default class NonHousingCheckboxChangeConfirm extends FormInitialStep {
     } else if (disableNonHousingCheckboxes === 'false') {
       const serviceCode: ServiceCode = 'DISPLAY_HOUSING_CHECKBOX'
       try {
-        await prisonService.activatePrisonService(req.session.systemToken, prisonId, serviceCode)
-
+        await prisonService.deactivatePrisonService(req.session.systemToken, prisonId, serviceCode)
         analyticsService.sendEvent(req, 'disable_non_housing_checkboxes', {
           prison_id: prisonId,
           disableCheckboxes: false,
@@ -70,7 +69,7 @@ export default class NonHousingCheckboxChangeConfirm extends FormInitialStep {
 
     req.flash('success', {
       title: 'Non-housing checkboxes',
-      content: `You have turned off the NOMIS checkboxes in non-housing location screen.`,
+      content: `You have updated the NOMIS checkboxes in non-housing location screen.`,
     })
 
     res.redirect(`/admin/${prisonId}`)

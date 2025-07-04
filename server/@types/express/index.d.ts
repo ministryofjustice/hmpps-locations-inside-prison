@@ -107,7 +107,7 @@ interface TypedLocals {
   pageTitleText?: string
   pathSuffix?: string
   prisonConfiguration?: PrisonConfiguration
-  prisonNonHousingDisplayEnabled?: boolean
+  prisonNonHousingDisabled?: boolean
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary

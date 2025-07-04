@@ -11,7 +11,7 @@ const stubPrisonHealthPing = () =>
     },
   })
 
-const stubDisplayHousingCheckboxesDisabled = (returnData: {
+const stubDisplayHousingCheckboxesEnabled = (returnData: {
   status: 404
   userMessage: 'Service DISPLAY_HOUSING_CHECKBOX not turned on for prison TST'
   developerMessage: 'Service DISPLAY_HOUSING_CHECKBOX not turned on for prison TST'
@@ -30,7 +30,7 @@ const stubDisplayHousingCheckboxesDisabled = (returnData: {
     },
   })
 
-const stubDisplayHousingCheckboxesEnabled = () =>
+const stubDisplayHousingCheckboxesDisabled = () =>
   stubFor({
     request: {
       method: 'GET',
