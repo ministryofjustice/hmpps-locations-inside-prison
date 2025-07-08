@@ -19,15 +19,15 @@ export default class PrisonApiClient extends BaseApiClient {
 
   servicePrisons = {
     getServiceStatus: this.apiCall<'', { serviceCode: ServiceCode; prisonId: string }>({
-      path: '/api/service-prisons/:serviceCode/prison/:prisonId',
+      path: '/api/agency-switches/:serviceCode/agency/:prisonId',
       requestType: 'get',
     }),
     activatePrisonService: this.apiCall<PrisonDetails, { serviceCode: ServiceCode; prisonId: string }>({
-      path: '/api/service-prisons/:serviceCode/prison/:prisonId',
+      path: '/api/agency-switches/:serviceCode/agency/:prisonId',
       requestType: 'post',
     }),
     deactivatePrisonService: this.apiCall<PrisonDetails, { serviceCode: ServiceCode; prisonId: string }>({
-      path: '/api/service-prisons/:serviceCode/prison/:prisonId',
+      path: '/api/agency-switches/:serviceCode/agency/:prisonId',
       requestType: 'delete',
     }),
   }
