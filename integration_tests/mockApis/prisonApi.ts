@@ -19,7 +19,7 @@ const stubDisplayHousingCheckboxesEnabled = (returnData: {
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/prison-api/api/service-prisons/DISPLAY_HOUSING_CHECKBOX/prison/[\\w-]+',
+      urlPattern: '/prison-api/api/agency-switches/DISPLAY_HOUSING_CHECKBOX/agency/[\\w-]+',
     },
     response: {
       status: 404,
@@ -34,7 +34,7 @@ const stubDisplayHousingCheckboxesDisabled = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/prison-api/api/service-prisons/DISPLAY_HOUSING_CHECKBOX/prison/[\\w-]+',
+      urlPattern: '/prison-api/api/agency-switches/DISPLAY_HOUSING_CHECKBOX/agency/[\\w-]+',
     },
     response: {
       status: 204,
@@ -48,7 +48,7 @@ const stubDisplayHousingCheckboxesDelete = (returnData: { prisonid: 'TST'; priso
   stubFor({
     request: {
       method: 'DELETE',
-      urlPattern: '/prison-api/api/service-prisons/DISPLAY_HOUSING_CHECKBOX/prison/[\\w-]+',
+      urlPattern: '/prison-api/api/agency-switches/DISPLAY_HOUSING_CHECKBOX/agency/[\\w-]+',
     },
     response: {
       status: 204,
@@ -63,7 +63,7 @@ const stubDisplayHousingCheckboxesPost = (returnData: { prisonid: 'TST'; prison:
   stubFor({
     request: {
       method: 'POST',
-      urlPattern: '/prison-api/api/service-prisons/DISPLAY_HOUSING_CHECKBOX/prison/[\\w-]+',
+      urlPattern: '/prison-api/api/agency-switches/DISPLAY_HOUSING_CHECKBOX/agency/[\\w-]+',
     },
     response: {
       status: 201,
