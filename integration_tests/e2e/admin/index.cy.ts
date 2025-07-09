@@ -4,7 +4,6 @@ import Page from '../../pages/page'
 import PrisonConfigurationIndexPage from '../../pages/admin'
 import ResiStatusConfirmPage from '../../pages/admin/resi/confirm'
 import CertApprovalConfirmPage from '../../pages/admin/certApproval/confirm'
-import NonHousingConfirmPage from '../../pages/admin/nonHousing/confirm'
 
 context('Admin Index', () => {
   context('Without the MANAGE_RES_LOCATIONS_ADMIN role', () => {
