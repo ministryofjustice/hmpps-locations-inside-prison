@@ -1,4 +1,5 @@
 import Details from '../../controllers/createLocation/details'
+import Structure from '../../controllers/createLocation/structure'
 
 const steps = {
   '/': {
@@ -12,8 +13,15 @@ const steps = {
     editable: true,
     fields: ['locationCode', 'localName'],
     controller: Details,
-    next: ['structure'],
+    next: 'structure',
   },
+  '/structure': {
+    editable: true,
+    fields: ['levelType'],
+    controller: Structure,
+    next: 'confirm',
+  },
+  '/confirm': {},
 }
 
 export default steps

@@ -54,6 +54,8 @@ export default class FormInitialStep extends FormWizard.Controller {
     const errorMessages: Record<string, string> = {
       alphanumeric: `${fieldName} must not contain special characters`,
       dateTodayOrInFuture: `${fieldName} must be today or in the future`,
+      createLevelDuplicate: 'You cannot have two of the same level type',
+      createLevelHierarchy: 'You cannot have levels below cells',
       dateInvalid: `${fieldName} must be a real date`,
       dateInvalidDay: `${fieldName} must be a real date`,
       dateInvalidMonth: `${fieldName} must be a real date`,

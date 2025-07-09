@@ -90,6 +90,9 @@ interface TypedLocals {
   insetText?: string
   lastUpdate: { time: string; date: string; updatedBy: string }
   leafLevel?: boolean
+  level2?: string
+  level3?: string
+  level4?: string
   location?: Location
   locationId?: string
   locationHierarchy?: LocationSummary[]
