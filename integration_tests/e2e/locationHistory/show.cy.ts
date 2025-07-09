@@ -33,7 +33,7 @@ context('show location history', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

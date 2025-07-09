@@ -37,7 +37,7 @@ context('Set cell type', () => {
     cy.task('stubLocationsConstantsUsedForType')
     cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsWing })
     cy.task('stubLocations', locationAsWing)
-    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
   context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {

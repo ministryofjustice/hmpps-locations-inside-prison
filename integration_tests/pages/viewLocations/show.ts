@@ -21,6 +21,10 @@ export default class ViewLocationsShowPage extends Page {
 
   statusTag = (): PageElement => cy.get('[data-qa=status-tag]')
 
+  draftBanner = (): PageElement => cy.get('[data-qa=draft-location-banner]')
+
+  draftBannerCertifyButton = (): PageElement => this.draftBanner().get('[data-qa=add-to-cell-certificate]')
+
   inactiveBanner = (): PageElement => cy.get('[data-qa=inactive-location-banner]')
 
   inactiveBannerRows = (): PageElement => this.inactiveBanner().find('.govuk-summary-list__row')
@@ -45,6 +49,7 @@ export default class ViewLocationsShowPage extends Page {
 
   summaryCards = {
     all: (): PageElement => cy.get('.hmpps-summary-card'),
+    cnaText: (): PageElement => cy.get('[data-qa=cna-card]').find('[data-qa=bottom-content-line-1]'),
     workingCapacityText: (): PageElement =>
       cy.get('[data-qa=working-capacity-card]').find('[data-qa=bottom-content-line-1]'),
     maximumCapacityText: (): PageElement =>

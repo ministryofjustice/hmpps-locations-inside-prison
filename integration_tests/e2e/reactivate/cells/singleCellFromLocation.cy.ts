@@ -137,7 +137,7 @@ context('Reactivate cell (from reactivate cells)', () => {
         parentLocation: inactiveParent,
         subLocations: locations,
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 
@@ -175,7 +175,7 @@ context('Reactivate cell (from reactivate cells)', () => {
         parentLocation: inactiveParent,
         subLocations: locations,
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

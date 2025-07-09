@@ -46,12 +46,12 @@ context('Reactivate cell', () => {
     })
     cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
     cy.task('stubLocations', location)
-    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
   })
 
   context('when the map2380 feature flag is disabled', () => {
     beforeEach(() => {
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.task('setFeatureFlag', { map2380: false })
     })
 
@@ -73,7 +73,7 @@ context('Reactivate cell', () => {
         cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
         cy.task('stubLocations', genericLocation)
         cy.task('stubLocationsBulkReactivate')
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
       })
 
@@ -338,7 +338,7 @@ context('Reactivate cell', () => {
   context('when the map2380 feature flag is enabled', () => {
     beforeEach(() => {
       cy.task('setFeatureFlag', { map2380: true })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -568,7 +568,7 @@ context('Reactivate cell', () => {
         cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
         cy.task('stubLocations', genericLocation)
         cy.task('stubLocationsBulkReactivate')
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
       })
 

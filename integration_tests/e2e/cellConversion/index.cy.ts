@@ -33,7 +33,7 @@ context('Cell conversion', () => {
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
       cy.task('setFeatureFlag', { map2380: false })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -69,7 +69,7 @@ context('Cell conversion', () => {
       cy.task('stubPrisonerLocationsId', [])
       cy.task('stubLocationsConvertToCell')
       cy.task('setFeatureFlag', { map2380: false })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

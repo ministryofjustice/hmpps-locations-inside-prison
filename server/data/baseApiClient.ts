@@ -26,12 +26,16 @@ export default class BaseApiClient extends RestClient {
   }: {
     path: string
     queryParams?: string[]
-    requestType: 'get' | 'post' | 'put'
+    requestType: 'get' | 'post' | 'put' | 'delete'
     options?: {
       cacheDuration: number
     }
   }) {
-    return async (token: string, parameters: Parameters = {} as never, data: Data = undefined): Promise<ReturnType> => {
+    const func = async (
+      token: string,
+      parameters: Parameters = {} as never,
+      data: Data = undefined,
+    ): Promise<ReturnType> => {
       const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
       const query = queryParams?.length ? Object.fromEntries(queryParams.map(p => [p, parameters[p]])) : undefined
 
@@ -71,5 +75,12 @@ export default class BaseApiClient extends RestClient {
 
       return result
     }
+    func.clearCache = async (parameters: Parameters = {} as never) => {
+      const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
+      if (this.redisClient) {
+        await this.redisClient.del(filledPath)
+      }
+    }
+    return func as typeof func & { clearCache: typeof func.clearCache }
   }
 }

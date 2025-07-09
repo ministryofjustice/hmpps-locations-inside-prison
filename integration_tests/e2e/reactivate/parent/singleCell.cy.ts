@@ -88,7 +88,7 @@ context('Reactivate cell (from reactivate parent)', () => {
         parentLocation: inactiveLanding,
         subLocations: [inactiveCell1, inactiveCell2, inactiveCell3],
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 
@@ -127,7 +127,7 @@ context('Reactivate cell (from reactivate parent)', () => {
           subLocationName: `${subLocations[0]?.locationType?.toLowerCase()?.replace(/^\w/, a => a.toUpperCase()) || 'subLocationName'}s`,
         })
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
       ViewLocationsShowPage.goTo(inactiveLanding.prisonId, inactiveLanding.id)
       viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)

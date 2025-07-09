@@ -34,7 +34,7 @@ context('Non-residential conversion', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 
@@ -68,7 +68,7 @@ context('Non-residential conversion', () => {
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
       cy.task('stubLocationsConvertCellToNonResCell')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

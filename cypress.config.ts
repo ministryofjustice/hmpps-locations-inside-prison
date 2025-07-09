@@ -8,6 +8,7 @@ import locationsApi from './integration_tests/mockApis/locationsApi'
 import manageUsersApi from './integration_tests/mockApis/manageUsersApi'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import logAccessibilityViolations from './integration_tests/support/accessibilityViolations'
+import prisonApi from './integration_tests/mockApis/prisonApi'
 
 async function setFeatureFlag(flags: Record<string, boolean>): Promise<null> {
   const query = mapValues(flags, val => (val ? 'enabled' : 'disabled'))
@@ -36,6 +37,7 @@ export default defineConfig({
         ...manageUsersApi,
         ...tokenVerification,
         ...logAccessibilityViolations,
+        ...prisonApi,
         setFeatureFlag,
       })
     },

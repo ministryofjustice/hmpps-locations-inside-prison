@@ -171,7 +171,7 @@ context('Reactivate parent', () => {
           subLocations: [inactiveLanding1, inactiveLanding2, inactiveLanding3],
         })
         cy.task('setFeatureFlag', { map2380: false })
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
         cy.signIn()
       })
 
@@ -208,7 +208,7 @@ context('Reactivate parent', () => {
             subLocations: locations.filter(l => l.parentId === location.id),
           }),
         )
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
         ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
         viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
@@ -937,7 +937,7 @@ context('Reactivate parent', () => {
           parentLocation: inactiveWing,
           subLocations: [inactiveLanding1, inactiveLanding2, inactiveLanding3],
         })
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
       })
 
@@ -974,7 +974,7 @@ context('Reactivate parent', () => {
             subLocations: locations.filter(l => l.parentId === location.id),
           }),
         )
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
         ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
         viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
@@ -1607,7 +1607,7 @@ context('Reactivate parent', () => {
             subLocations: locations.filter(l => l.parentId === location.id),
           }),
         )
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
         cy.signIn()
         ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
         viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)

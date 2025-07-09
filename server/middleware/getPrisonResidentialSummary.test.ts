@@ -4,7 +4,7 @@ import { DeepPartial } from 'fishery'
 import getPrisonResidentialSummary from './getPrisonResidentialSummary'
 import LocationFactory from '../testutils/factories/location'
 
-describe('getResidentialSummary', () => {
+describe('getPrisonResidentialSummary', () => {
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
 

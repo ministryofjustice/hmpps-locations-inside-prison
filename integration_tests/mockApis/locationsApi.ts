@@ -497,6 +497,72 @@ const stubPrisonerLocations = (prisonerLocations: PrisonerLocation[]) =>
     },
   })
 
+const stubPrisonConfiguration = (
+  returnData = {
+    prisonId: 'TST',
+    resiLocationServiceActive: 'INACTIVE',
+    certificationApprovalRequired: 'INACTIVE',
+    includeSegregationInRollCount: 'INACTIVE',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/prison-configuration/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const stubPrisonConfigurationCertApproval = (
+  returnData = {
+    prisonId: 'TST',
+    resiLocationServiceActive: 'INACTIVE',
+    certificationApprovalRequired: 'ACTIVE',
+    includeSegregationInRollCount: 'INACTIVE',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/prison-configuration/\\w+/certification-approval-required/ACTIVE',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const stubPrisonConfigurationResi = (
+  returnData = {
+    prisonId: 'TST',
+    resiLocationServiceActive: 'ACTIVE',
+    certificationApprovalRequired: 'INACTIVE',
+    includeSegregationInRollCount: 'INACTIVE',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/prison-configuration/\\w+/resi-service/ACTIVE',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubUpdateCapacity = () =>
   stubFor({
     request: {
@@ -784,7 +850,7 @@ const stubGetPrisonConfiguration = ({
   certificationActive,
 }: {
   prisonId: string
-  certificationActive: boolean
+  certificationActive: string
 }) =>
   stubFor({
     request: {
@@ -798,8 +864,8 @@ const stubGetPrisonConfiguration = ({
       },
       jsonBody: {
         prisonId,
-        resiLocationServiceActive: false,
-        includeSegregationInRollCount: false,
+        resiLocationServiceActive: 'INACTIVE',
+        includeSegregationInRollCount: 'INACTIVE',
         certificationApprovalRequired: certificationActive,
       },
     },
@@ -834,6 +900,9 @@ export default {
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
+  stubPrisonConfiguration,
+  stubPrisonConfigurationCertApproval,
+  stubPrisonConfigurationResi,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,

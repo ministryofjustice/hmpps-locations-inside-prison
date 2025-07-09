@@ -31,9 +31,9 @@ describe('setCanAccess', () => {
 
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
-      resiLocationServiceActive: false,
-      includeSegregationInRollCount: false,
-      certificationApprovalRequired: true,
+      resiLocationServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
     })
   })
 
