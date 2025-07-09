@@ -13,11 +13,6 @@
 
 {% set errors = validationErrors[0].text %}
 
-{% block head %}
-  {{ super() }}
-  <script src="/assets/js/textInputWithCharacterCount.js"></script>
-{% endblock %}
-
 {% block beforeContent %}
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
