@@ -73,7 +73,6 @@ describe('GET /admin/PRISON_ID', () => {
         // check links
         expect(res.text).toContain('/admin/TST/change-resi-status')
         expect(res.text).toContain('/admin/TST/change-certification-status')
-        expect(res.text).toContain('/admin/TST/change-non-housing-checkboxes')
 
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
@@ -107,7 +106,6 @@ describe('GET /admin/PRISON_ID', () => {
         // check links
         expect(res.text).toContain('/admin/TST/change-resi-status')
         expect(res.text).toContain('/admin/TST/change-certification-status')
-        expect(res.text).toContain('/admin/TST/change-non-housing-checkboxes')
 
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,

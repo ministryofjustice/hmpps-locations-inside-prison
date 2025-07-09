@@ -519,6 +519,28 @@ const stubPrisonConfiguration = (
     },
   })
 
+const stubPrisonConfigurationResiActive = (
+  returnData = {
+    prisonId: 'TST',
+    resiLocationServiceActive: 'ACTIVE',
+    certificationApprovalRequired: 'INACTIVE',
+    includeSegregationInRollCount: 'INACTIVE',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/prison-configuration/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubPrisonConfigurationCertApproval = (
   returnData = {
     prisonId: 'TST',
@@ -541,7 +563,7 @@ const stubPrisonConfigurationCertApproval = (
     },
   })
 
-const stubPrisonConfigurationResi = (
+const stubPrisonConfigurationActivateResi = (
   returnData = {
     prisonId: 'TST',
     resiLocationServiceActive: 'ACTIVE',
@@ -553,6 +575,28 @@ const stubPrisonConfigurationResi = (
     request: {
       method: 'PUT',
       urlPattern: '/locations-api/prison-configuration/\\w+/resi-service/ACTIVE',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const stubPrisonConfigurationDeactivateResi = (
+  returnData = {
+    prisonId: 'TST',
+    resiLocationServiceActive: 'ACTIVE',
+    certificationApprovalRequired: 'INACTIVE',
+    includeSegregationInRollCount: 'INACTIVE',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/prison-configuration/\\w+/resi-service/INACTIVE',
     },
     response: {
       status: 200,
@@ -902,7 +946,8 @@ export default {
   stubLocationsPrisonInactiveCellsForLocation,
   stubPrisonConfiguration,
   stubPrisonConfigurationCertApproval,
-  stubPrisonConfigurationResi,
+  stubPrisonConfigurationActivateResi,
+  stubPrisonConfigurationDeactivateResi,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,
@@ -915,4 +960,5 @@ export default {
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
   stubGetPrisonConfiguration,
+  stubPrisonConfigurationResiActive,
 }

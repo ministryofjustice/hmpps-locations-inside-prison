@@ -37,9 +37,10 @@ context('Admin Index', () => {
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubPrisonConfiguration')
-      cy.task('stubPrisonConfigurationResi')
+      cy.task('stubPrisonConfigurationActivateResi')
       cy.task('stubPrisonConfigurationCertApproval')
       cy.task('stubDisplayHousingCheckboxesDisabled')
+      cy.task('stubDisplayHousingCheckboxesPost')
       cy.signIn()
     })
 
@@ -55,11 +56,12 @@ context('Admin Index', () => {
       indexPage.cards.adminster().find('a').click()
       const prisonConfigurationIndexPage = Page.verifyOnPage(PrisonConfigurationIndexPage)
       prisonConfigurationIndexPage.checkOnPage()
+      cy.get('.govuk-summary-list__value').eq(1).contains('INACTIVE')
       prisonConfigurationIndexPage.changeResiLink().click()
 
       const resiStatusIndexPage = Page.verifyOnPage(ResiStatusConfirmPage)
       resiStatusIndexPage.checkOnPage()
-      resiStatusIndexPage.confirmButton().click()
+      resiStatusIndexPage.confirmButton('Activate').click()
 
       Page.verifyOnPage(PrisonConfigurationIndexPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
@@ -92,64 +94,30 @@ context('Admin Index', () => {
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubPrisonConfiguration')
+      cy.task('stubPrisonConfigurationResiActive')
+      cy.task('stubPrisonConfigurationDeactivateResi')
       cy.task('stubDisplayHousingCheckboxesEnabled')
-      cy.task('stubDisplayHousingCheckboxesPost')
-      cy.signIn()
-    })
-
-    it('Can disable NOMIS screen', () => {
-      const indexPage = Page.verifyOnPage(IndexPage)
-      indexPage.cards.adminster().find('a').click()
-      const prisonConfigurationIndexPage = Page.verifyOnPage(PrisonConfigurationIndexPage)
-      cy.get('.govuk-summary-list__value').eq(4).contains('Enabled')
-      prisonConfigurationIndexPage.changePrisonNonHousing().click()
-
-      const nonHousingConfirmPage = Page.verifyOnPage(NonHousingConfirmPage)
-      nonHousingConfirmPage.checkOnPage()
-      cy.get('.govuk-summary-list__value').eq(1).contains('Enabled')
-      nonHousingConfirmPage.confirmButton('Disable').click()
-
-      Page.verifyOnPage(PrisonConfigurationIndexPage)
-      cy.get('#govuk-notification-banner-title').contains('Success')
-      cy.get('.govuk-notification-banner__content h3').contains('Non-housing checkboxes')
-      cy.get('.govuk-notification-banner__content p').contains(
-        'You have updated the NOMIS checkboxes in non-housing location screen.',
-      )
-    })
-  })
-
-  context('With the MANAGE_RES_LOCATIONS_ADMIN role and NOMIS checkboxes disabled', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubPrisonConfiguration')
-      cy.task('stubDisplayHousingCheckboxesDisabled')
       cy.task('stubDisplayHousingCheckboxesDelete')
       cy.signIn()
     })
 
-    it('Can enable NOMIS screen', () => {
+    it('Can disable resi location', () => {
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.cards.adminster().find('a').click()
       const prisonConfigurationIndexPage = Page.verifyOnPage(PrisonConfigurationIndexPage)
-      cy.get('.govuk-summary-list__value').eq(4).contains('Disabled')
-      prisonConfigurationIndexPage.changePrisonNonHousing().click()
+      prisonConfigurationIndexPage.checkOnPage()
+      cy.get('.govuk-summary-list__value').eq(1).contains('ACTIVE')
 
-      const nonHousingConfirmPage = Page.verifyOnPage(NonHousingConfirmPage)
-      nonHousingConfirmPage.checkOnPage()
-      cy.get('.govuk-summary-list__value').eq(1).contains('Disabled')
-      nonHousingConfirmPage.confirmButton('Enable').click()
+      prisonConfigurationIndexPage.changeResiLink().click()
+
+      const resiStatusIndexPage = Page.verifyOnPage(ResiStatusConfirmPage)
+      resiStatusIndexPage.checkOnPage()
+      resiStatusIndexPage.confirmButton('Inactivate').click()
 
       Page.verifyOnPage(PrisonConfigurationIndexPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
-      cy.get('.govuk-notification-banner__content h3').contains('Non-housing checkboxes')
-      cy.get('.govuk-notification-banner__content p').contains(
-        'You have updated the NOMIS checkboxes in non-housing location screen.',
-      )
+      cy.get('.govuk-notification-banner__content h3').contains('Residential location status')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed the residential location status.')
     })
   })
 })

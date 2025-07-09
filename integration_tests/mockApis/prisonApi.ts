@@ -44,7 +44,7 @@ const stubDisplayHousingCheckboxesDisabled = () =>
     },
   })
 
-const stubDisplayHousingCheckboxesDelete = (returnData: { prisonid: 'TST'; prison: 'Test prison' }) =>
+const stubDisplayHousingCheckboxesDelete = () =>
   stubFor({
     request: {
       method: 'DELETE',
@@ -56,7 +56,6 @@ const stubDisplayHousingCheckboxesDelete = (returnData: { prisonid: 'TST'; priso
         'Content-Type': 'application/json;charset=UTF-8',
       },
     },
-    jsonBody: returnData,
   })
 
 const stubDisplayHousingCheckboxesPost = (returnData: { prisonid: 'TST'; prison: 'Test prison' }) =>
