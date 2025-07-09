@@ -1,5 +1,5 @@
 import FormWizard from 'hmpo-form-wizard'
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
@@ -88,5 +88,12 @@ export default class Details extends FormInitialStep {
       }
       return callback({ ...errors, ...validationErrors })
     })
+  }
+
+  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { values } = req.form
+    req.sessionModel.set('locationCode', values.locationCode)
+    req.sessionModel.set('localName', values.localName)
+    next()
   }
 }
