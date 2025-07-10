@@ -122,6 +122,19 @@ describe('Create location (WING)', () => {
             autocomplete: 'off',
             value: null,
           },
+          levelType: {
+            component: 'govukSelect',
+            errorMessages: {},
+            id: 'levelType',
+            items: [
+              {
+                text: 'Set at runtime',
+                value: 'Set at runtime',
+              },
+            ],
+            name: 'levelType',
+            value: undefined,
+          },
         },
         validationErrors: [],
       })

@@ -37,6 +37,18 @@ const fields = {
     },
     autocomplete: 'off',
   },
+  levelType: {
+    component: 'govukSelect',
+    errorMessages: {},
+    id: 'levelType',
+    name: 'levelType',
+    items: [
+      {
+        value: 'Set at runtime',
+        text: 'Set at runtime',
+      },
+    ],
+  },
 }
 
 export default fields

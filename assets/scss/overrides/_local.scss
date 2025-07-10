@@ -175,3 +175,37 @@ $sticky-footer-vertical-spacing: govuk-spacing(2);
 #locations-table tbody tr th {
   vertical-align: middle
 }
+
+// location structure preview
+
+.structurePreview {
+  position: relative;
+}
+
+.structureLevel {
+  position: absolute;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 5px;
+}
+
+.structureLevel p {
+  margin-bottom: 0;
+}
+
+.line-vertical, .line-horizontal {
+  position: absolute;
+  background: black;
+}
+
+.line-vertical {
+  width: 1px;
+}
+
+.line-horizontal {
+  height: 1px;
+}
+
+.hidden {
+  display: none
+}

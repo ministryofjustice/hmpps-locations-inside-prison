@@ -1,5 +1,6 @@
 import Page from '../../pages/page'
 import CreateLocationDetailsPage from '../../pages/createLocation/index'
+import CreateLocationStructurePage from '../../pages/createLocation/structure'
 import ManageLocationsIndexPage from '../../pages/manageLocations'
 import buildDecoratedLocation from '../../../server/testutils/buildDecoratedLocation'
 import LocationFactory from '../../../server/testutils/factories/location'
@@ -52,96 +53,200 @@ context('Set Wing Location Details', () => {
       return Page.verifyOnPage(CreateLocationDetailsPage)
     }
 
-    it('shows the correct validation error for location code when submitting non-alphanumeric characters', () => {
-      const page = goToCreateLocationDetailsPage()
+    const goToLocationStructurePage = () => {
+      const detailsPage = goToCreateLocationDetailsPage()
+      detailsPage.locationCodeInput().clear().type('ABC1')
+      detailsPage.localNameTextInput().clear().type('testW')
+      detailsPage.continueButton().click()
 
-      page.locationCodeInput().clear().type('!@£$')
-      page.continueButton().click()
+      CreateLocationStructurePage.goTo(prisonId)
+      return Page.verifyOnPage(CreateLocationStructurePage)
+    }
 
-      cy.get('.govuk-error-summary__title').contains('There is a problem')
-      cy.get('.govuk-error-summary__list').contains('Testwing code can only include numbers or letters')
-      cy.get('#locationCode-error').contains('Testwing code can only include numbers or letters')
-    })
+    describe('Details', () => {
+      it('shows the correct validation error for location code when submitting non-alphanumeric characters', () => {
+        const detailsPage = goToCreateLocationDetailsPage()
 
-    it('shows the correct validation error for location code when submitting nothing', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear()
-      page.continueButton().click()
+        detailsPage.locationCodeInput().clear().type('!@£$')
+        detailsPage.continueButton().click()
 
-      cy.get('.govuk-error-summary__list').contains('Enter a testwing code')
-      cy.get('#locationCode-error').contains('Enter a testwing code')
-    })
-
-    it('shows the correct validation error for location code when submitting more than 5 characters', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear().type('thisistoolong')
-      page.continueButton().click()
-
-      cy.get('.govuk-error-summary__list').contains('Testwing code must be 5 characters or less')
-      cy.get('#locationCode-error').contains('Testwing code must be 5 characters or less')
-    })
-
-    it('shows the correct validation error when submitting a code that already exists', () => {
-      cy.task('stubLocationsResidentialHierarchy', {
-        prisonId: 'TST',
-        residentialHierarchy: [
-          {
-            locationId: '123',
-            locationType: 'WING',
-            locationCode: 'ABC01',
-            fullLocationPath: 'A-ABC01',
-            localName: 'A Wing',
-            level: 1,
-            status: 'ACTIVE',
-            subLocations: [],
-          },
-        ],
+        cy.get('.govuk-error-summary__title').contains('There is a problem')
+        cy.get('.govuk-error-summary__list').contains('Testwing code can only include numbers or letters')
+        cy.get('#locationCode-error').contains('Testwing code can only include numbers or letters')
       })
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear().type('ABC01')
-      page.continueButton().click()
 
-      cy.get('.govuk-error-summary__list').contains('A location with this testwing code already exists')
-      cy.get('#locationCode-error').contains('A location with this testwing code already exists')
-    })
+      it('shows the correct validation error for location code when submitting nothing', () => {
+        const detailsPage = goToCreateLocationDetailsPage()
+        detailsPage.locationCodeInput().clear()
+        detailsPage.continueButton().click()
 
-    it('shows the correct validation error when submitting a localName that already exists', () => {
-      cy.task('stubLocationsResidentialHierarchy', {
-        prisonId: 'TST',
-        residentialHierarchy: [
-          {
-            locationId: '123',
-            locationType: 'WING',
-            locationCode: 'ABC01',
-            fullLocationPath: 'A-ABC01',
-            localName: 'A Wing',
-            level: 1,
-            status: 'ACTIVE',
-            subLocations: [],
-          },
-        ],
+        cy.get('.govuk-error-summary__list').contains('Enter a testwing code')
+        cy.get('#locationCode-error').contains('Enter a testwing code')
       })
-      cy.task('stubLocationsCheckLocalNameExists')
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear().type('new1')
-      page.localNameTextInput().clear().type('exists')
 
-      page.continueButton().click()
+      it('shows the correct validation error for location code when submitting more than 5 characters', () => {
+        const detailsPage = goToCreateLocationDetailsPage()
+        detailsPage.locationCodeInput().clear().type('thisistoolong')
+        detailsPage.continueButton().click()
 
-      cy.get('.govuk-error-summary__list').contains('A location with this name already exists')
-      cy.get('#localName-error').contains('A location with this name already exists')
+        cy.get('.govuk-error-summary__list').contains('Testwing code must be 5 characters or less')
+        cy.get('#locationCode-error').contains('Testwing code must be 5 characters or less')
+      })
+
+      it('shows the correct validation error when submitting a code that already exists', () => {
+        cy.task('stubLocationsResidentialHierarchy', {
+          prisonId: 'TST',
+          residentialHierarchy: [
+            {
+              locationId: '123',
+              locationType: 'WING',
+              locationCode: 'ABC01',
+              fullLocationPath: 'A-ABC01',
+              localName: 'A Wing',
+              level: 1,
+              status: 'ACTIVE',
+              subLocations: [],
+            },
+          ],
+        })
+        const detailsPage = goToCreateLocationDetailsPage()
+        detailsPage.locationCodeInput().clear().type('ABC01')
+        detailsPage.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('A location with this testwing code already exists')
+        cy.get('#locationCode-error').contains('A location with this testwing code already exists')
+      })
+
+      it('shows the correct validation error when submitting a localName that already exists', () => {
+        cy.task('stubLocationsResidentialHierarchy', {
+          prisonId: 'TST',
+          residentialHierarchy: [
+            {
+              locationId: '123',
+              locationType: 'WING',
+              locationCode: 'ABC01',
+              fullLocationPath: 'A-ABC01',
+              localName: 'A Wing',
+              level: 1,
+              status: 'ACTIVE',
+              subLocations: [],
+            },
+          ],
+        })
+        cy.task('stubLocationsCheckLocalNameExists')
+        const detailsPage = goToCreateLocationDetailsPage()
+        detailsPage.locationCodeInput().clear().type('new1')
+        detailsPage.localNameTextInput().clear().type('exists')
+
+        detailsPage.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('A location with this name already exists')
+        cy.get('#localName-error').contains('A location with this name already exists')
+      })
+
+      it('has a back link to the manage location page', () => {
+        const detailsPage = goToCreateLocationDetailsPage()
+        detailsPage.backLink().click()
+        Page.verifyOnPage(ManageLocationsIndexPage)
+      })
+
+      it('has a cancel link to the manage location page', () => {
+        const detailsPage = goToCreateLocationDetailsPage()
+        detailsPage.cancelLink().click()
+        Page.verifyOnPage(ManageLocationsIndexPage)
+      })
     })
 
-    it('has a back link to the manage location page', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.backLink().click()
-      Page.verifyOnPage(ManageLocationsIndexPage)
-    })
+    describe('Structure', () => {
+      it('shows the correct validation error if structure levels contain duplicates', () => {
+        const structurePage = goToLocationStructurePage()
+        structurePage.level2Select().select('Cells')
+        structurePage.addLevelButton().click()
+        structurePage.level3Select().select('Cells')
 
-    it('has a cancel link to the manage location page', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.cancelLink().click()
-      Page.verifyOnPage(ManageLocationsIndexPage)
+        structurePage.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('You cannot have two of the same level type')
+      })
+
+      it('shows the correct validation error if cells is not the last structure item', () => {
+        const structurePage = goToLocationStructurePage()
+        structurePage.level2Select().select('Cells')
+        structurePage.addLevelButton().click()
+        structurePage.level3Select().select('Landings')
+
+        structurePage.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('You cannot have levels below cells')
+      })
+
+      it('shows the correct default values for select options and preview updates', () => {
+        const structurePage = goToLocationStructurePage()
+
+        // Check level 2
+        structurePage.level2Select().should('have.value', 'Landings')
+        structurePage.level3Select().should('not.be.visible')
+        structurePage.level4Select().should('not.be.visible')
+
+        // Add level 3
+        structurePage.addLevelButton().click()
+        structurePage.level3Select().should('be.visible').and('have.value', 'Cells')
+
+        // Check preview
+        structurePage.structurePreviewLevel2().find('p').should('have.text', 'Landings')
+        structurePage.structurePreviewLevel3().find('p').should('have.text', 'Cells')
+
+        // Check updated preview
+        structurePage.level3Select().select('Landings')
+        structurePage.structurePreviewLevel3().find('p').should('have.text', 'Landings')
+      })
+
+      it('shows correct order and updates structure preview when removing a level', () => {
+        const structurePage = goToLocationStructurePage()
+
+        // Check level 2 preview
+        structurePage.structurePreviewLevel2().should('contain.text', 'Landings')
+        structurePage.structurePreviewLevel3().should('contain.text', '')
+        structurePage.structurePreviewLevel4().should('contain.text', '')
+
+        // Change first level, add remaining levels
+        structurePage.level2Select().select('Spurs')
+        structurePage.addLevelButton().click()
+        structurePage.level3Select().select('Landings')
+        structurePage.addLevelButton().click()
+        structurePage.level4Select().select('Cells')
+
+        // Check full preview and values
+        structurePage.structurePreviewLevel1().should('contain.text', 'Testwing')
+        structurePage.structurePreviewLevel2().should('contain.text', 'Spurs')
+        structurePage.structurePreviewLevel3().should('contain.text', 'Landings')
+        structurePage.structurePreviewLevel4().should('contain.text', 'Cells')
+
+        structurePage.level2Select().should('have.value', 'Spurs')
+        structurePage.level3Select().should('have.value', 'Landings')
+        structurePage.level4Select().should('have.value', 'Cells')
+
+        // Remove level 3 and check updated preview
+        structurePage.removeLevel3().click()
+
+        structurePage.structurePreviewLevel1().should('contain.text', 'Testwing')
+        structurePage.structurePreviewLevel2().should('contain.text', 'Spurs')
+        structurePage.structurePreviewLevel3().should('contain.text', 'Cells')
+        structurePage.structurePreviewLevel4().should('not.contain.text', 'Landings')
+        structurePage.structurePreviewLevel4().should('not.contain.text', 'Cells')
+      })
+
+      it('has a back link to the enter details page', () => {
+        const structurePage = goToLocationStructurePage()
+        structurePage.backLink().click()
+        Page.verifyOnPage(CreateLocationDetailsPage)
+      })
+
+      it('has a cancel link to the manage location page', () => {
+        const structurePage = goToLocationStructurePage()
+        structurePage.cancelLink().click()
+        Page.verifyOnPage(ManageLocationsIndexPage)
+      })
     })
   })
 })
