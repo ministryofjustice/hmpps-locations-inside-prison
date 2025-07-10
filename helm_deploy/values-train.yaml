@@ -16,7 +16,7 @@ generic-service:
     COMPONENT_API_URL: "http://not-used"
     DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-train.hmpps.service.justice.gov.uk"
-    PRISON_API_URL: "http://localhost:8091"
+    PRISON_API_URL: "http://localhost:8090"
     ENVIRONMENT_NAME: Training
     AUDIT_ENABLED: "false"
     PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
