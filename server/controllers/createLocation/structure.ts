@@ -1,5 +1,5 @@
 import FormWizard from 'hmpo-form-wizard'
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import { capitalize } from 'lodash'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
@@ -93,18 +93,5 @@ export default class Structure extends FormInitialStep {
 
       return callback({ ...errors, ...validationErrors })
     })
-  }
-
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { values } = req.form
-    const { locationType } = res.locals.decoratedLocation
-
-    const structureLevels = Array.isArray(values.structureLevels) ? [...values.structureLevels] : []
-
-    // prepend 'locationType' value before saving as the first level in structure
-    const fullStructure = [locationType.toUpperCase(), ...structureLevels]
-    req.sessionModel.set('structureLevels', fullStructure)
-
-    next()
   }
 }

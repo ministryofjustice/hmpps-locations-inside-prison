@@ -152,17 +152,4 @@ describe('Create location structure', () => {
       expect(callback).toHaveBeenCalled()
     })
   })
-
-  describe('saveValues', () => {
-    it('prepends locationType to structureLevels when saving', done => {
-      deepReq.form.values = {
-        structureLevels: ['LANDINGS', 'SPURS', 'CELLS'],
-      }
-
-      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, () => {
-        expect(deepReq.sessionModel.set).toHaveBeenCalledWith('structureLevels', ['WING', 'LANDINGS', 'SPURS', 'CELLS'])
-        done()
-      })
-    })
-  })
 })
