@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "^/api/agency-switches/DISPLAY_HOUSING_CHECKBOX/agency/[\\w-]+$"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "display-housing-result.json"
+  }
+}

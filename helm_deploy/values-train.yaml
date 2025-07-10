@@ -16,9 +16,18 @@ generic-service:
     COMPONENT_API_URL: "http://not-used"
     DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-train.hmpps.service.justice.gov.uk"
-    PRISON_API_URL: "https://prison-api-train.prison.service.justice.gov.uk"
+    PRISON_API_URL: "http://localhost:8091"
     ENVIRONMENT_NAME: Training
     AUDIT_ENABLED: "false"
     PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
     FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
     FLAG_CREATE_AND_CERTIFY: disabled
+
+  extraContainers:
+    - name: wiremock
+      image: "ghcr.io/ministryofjustice/hmpps-wiremock:latest"
+      imagePullPolicy: IfNotPresent
+      ports:
+        - name: http
+          containerPort: 8091
+          protocol: TCP

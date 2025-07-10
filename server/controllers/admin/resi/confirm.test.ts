@@ -4,6 +4,7 @@ import { DeepPartial } from 'fishery'
 import LocationsService from '../../../services/locationsService'
 import AnalyticsService from '../../../services/analyticsService'
 import ResiStatusChangeConfirm from './confirm'
+import PrisonService from '../../../services/prisonService'
 
 describe('adminResiSwitch', () => {
   const controller = new ResiStatusChangeConfirm({ route: '/' })
@@ -11,6 +12,7 @@ describe('adminResiSwitch', () => {
   let deepRes: DeepPartial<Response>
   let next: NextFunction
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+  const prisonService = new PrisonService(null) as jest.Mocked<PrisonService>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
 
   beforeEach(() => {
@@ -28,6 +30,7 @@ describe('adminResiSwitch', () => {
       services: {
         analyticsService,
         locationsService,
+        prisonService,
       },
       sessionModel: {
         set: jest.fn(),
@@ -51,6 +54,8 @@ describe('adminResiSwitch', () => {
     next = jest.fn()
 
     locationsService.updateResiStatus = jest.fn()
+    prisonService.activatePrisonService = jest.fn()
+    prisonService.deactivatePrisonService = jest.fn()
     analyticsService.sendEvent = jest.fn()
   })
 
@@ -65,7 +70,7 @@ describe('adminResiSwitch', () => {
     })
   })
 
-  describe('saveValues', () => {
+  describe('saveValues for activiating RESI', () => {
     beforeEach(() => {
       deepReq.form.values.activation = 'ACTIVE'
       controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -73,6 +78,7 @@ describe('adminResiSwitch', () => {
 
     it('calls locationsService', () => {
       expect(locationsService.updateResiStatus).toHaveBeenCalledWith('token', 'MDI', 'ACTIVE')
+      expect(prisonService.activatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
     })
 
     it('sends an analytics event', async () => {
@@ -81,6 +87,31 @@ describe('adminResiSwitch', () => {
       expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'resi_status', {
         prison_id: 'MDI',
         status: 'ACTIVE',
+      })
+    })
+
+    it('calls next', () => {
+      expect(next).toHaveBeenCalled()
+    })
+  })
+
+  describe('saveValues for de-activiating RESI', () => {
+    beforeEach(() => {
+      deepReq.form.values.activation = 'INACTIVE'
+      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+    })
+
+    it('calls locationsService', () => {
+      expect(locationsService.updateResiStatus).toHaveBeenCalledWith('token', 'MDI', 'INACTIVE')
+      expect(prisonService.deactivatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
+    })
+
+    it('sends an analytics event', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'resi_status', {
+        prison_id: 'MDI',
+        status: 'INACTIVE',
       })
     })
 

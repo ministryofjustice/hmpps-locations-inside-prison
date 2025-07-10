@@ -4,6 +4,7 @@ import { TypedLocals } from '../../../@types/express'
 import backUrl from '../../../utils/backUrl'
 import FormInitialStep from '../../base/formInitialStep'
 import { StatusType } from '../../../data/types/locationsApi'
+import { ServiceCode } from '../../../data/types/locationsApi/serviceCode'
 
 export default class ResiStatusChangeConfirm extends FormInitialStep {
   middlewareSetup() {
@@ -28,12 +29,19 @@ export default class ResiStatusChangeConfirm extends FormInitialStep {
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { prisonId } = res.locals.prisonConfiguration
-    const { analyticsService, locationsService } = req.services
+    const { analyticsService, locationsService, prisonService } = req.services
     const { activation } = req.form.values
     const status = activation as StatusType
 
     try {
       await locationsService.updateResiStatus(req.session.systemToken, prisonId, status)
+
+      const serviceCode: ServiceCode = 'DISPLAY_HOUSING_CHECKBOX'
+      if (status === 'ACTIVE') {
+        await prisonService.activatePrisonService(req.session.systemToken, prisonId, serviceCode)
+      } else {
+        await prisonService.deactivatePrisonService(req.session.systemToken, prisonId, serviceCode)
+      }
 
       analyticsService.sendEvent(req, 'resi_status', {
         prison_id: prisonId,
