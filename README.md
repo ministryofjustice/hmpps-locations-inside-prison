@@ -48,11 +48,12 @@ docker compose -f docker-compose.yml --profile include-frontend up --build
 ```
 
 #### Dev logins
-| username          | password       | roles                                                                                                                      |
-|-------------------|----------------|----------------------------------------------------------------------------------------------------------------------------|
-| LOCATION_RO       | password123456 | VIEW_INTERNAL_LOCATION                                                                                                     |
-| LOCATION_CAP      | password123456 | VIEW_INTERNAL_LOCATION<br/>MANAGE_RES_LOCATIONS_OP_CAP                                                                     |
-| LOCATION_MAINTAIN | password123456 | VIEW_INTERNAL_LOCATION<br/>MANAGE_RES_LOCATIONS_OP_CAP<br/>MANAGE_RESIDENTIAL_LOCATIONS<br/>REPORTING_LOCATION_INFORMATION |
+| username          | password       | roles                                                                                         |
+|-------------------|----------------|-----------------------------------------------------------------------------------------------|
+| LOCATION_RO       | password123456 | VIEW_INTERNAL_LOCATION                                                                        |
+| LOCATION_CAP      | password123456 | MANAGE_RES_LOCATIONS_OP_CAP                                                                   |
+| LOCATION_MAINTAIN | password123456 | MANAGE_RESIDENTIAL_LOCATIONS                                                                  |
+| LOCATION_ADMIN    | password123456 | MANAGE_RES_LOCATIONS_OP_CAP<br/>REPORTING_LOCATION_INFORMATION<br/>MANAGE_RES_LOCATIONS_ADMIN |
 
 
 ### Updating dependencies
