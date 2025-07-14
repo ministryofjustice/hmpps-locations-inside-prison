@@ -1,38 +1,61 @@
 import FormWizard from 'hmpo-form-wizard'
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
-import maxLength from '../../validators/maxLength'
-import alphanumeric from '../../validators/alphanumeric'
-import { ResidentialHierarchy } from '../../data/types/locationsApi/residentialHierarchy'
+import capFirst from '../../formatters/capFirst'
 
 export default class Details extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
-    const locals = super.locals(req, res)
-    const { prisonId } = res.locals
+  // eslint-disable-next-line no-underscore-dangle
+  async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const formLocationCode = req.form.options.fields.locationCode
-    const { locationType } = res.locals.decoratedLocation
+    const formCreateCellsNow = req.form.options.fields.createCellsNow
+    const locationType = req.sessionModel.get<string>('locationType')
+    const { decoratedResidentialSummary } = res.locals
 
-    formLocationCode.label.text = `${locationType} code`
+    if (decoratedResidentialSummary.location) {
+      formLocationCode.formGroup = {
+        beforeInput: {
+          html: `<span class="govuk-label govuk-input-prefix--plain">${decoratedResidentialSummary.location.pathHierarchy}-</span>`,
+        },
+      }
+
+      formCreateCellsNow.fieldset.legend.text = formCreateCellsNow.fieldset.legend.text.replace(
+        'LOCATION_TYPE',
+        locationType.toLowerCase(),
+      )
+    }
+    formLocationCode.label.text = `${capFirst(locationType.toLowerCase())} code`
+    const locationExample = locationType === 'WING' ? `${capFirst(locationType.toLowerCase())} A` : 'A-1'
     formLocationCode.hint = {
-      text: `The letter or number used to identify the location, for example ${locationType} A.`,
+      text: `The letter or number used to identify the location, for example ${locationExample}.`,
     }
 
+    // eslint-disable-next-line no-underscore-dangle
+    await super._locals(req, res, next)
+  }
+
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+    const locals = super.locals(req, res)
+    const { prisonId, locationId } = res.locals
+    const locationType = req.sessionModel.get<string>('locationType')
+
+    locals.title = `Enter ${locationType.toLowerCase()} details`
+    locals.titleCaption = `Create new ${locationType.toLowerCase()}`
+
     const backLink = backUrl(req, {
-      fallbackUrl: `/manage-locations/${prisonId}`,
+      fallbackUrl: `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`,
     })
 
     return {
       ...locals,
       backLink,
-      cancelLink: `/manage-locations/${prisonId}`,
-      continueLink: `/manage-locations/${prisonId}/create-new-${locationType.toLowerCase()}/structure`,
+      cancelLink: `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`,
     }
   }
 
@@ -41,32 +64,21 @@ export default class Details extends FormInitialStep {
       const { locationsService } = req.services
       const { values } = req.form
 
-      const { prisonId } = res.locals
+      const { prisonId, decoratedResidentialSummary } = res.locals
 
       const sanitizedLocalName = sanitizeString(String(values.localName))
 
       const validationErrors: FormWizard.Errors = {}
-      const validator = maxLength(5)
-
-      if (!values.locationCode) {
-        validationErrors.locationCode = this.formError('locationCode', 'locationCodeMissing')
-      } else if (!validator.fn(String(values.locationCode), 5)) {
-        validationErrors.locationCode = this.formError('locationCode', 'locationCodeLength')
-      } else if (!alphanumeric(String(values.locationCode))) {
-        validationErrors.locationCode = this.formError('locationCode', 'locationCodeAlphanumeric')
-      }
 
       try {
         if (!validationErrors.locationCode) {
-          const residentialHierarchy: ResidentialHierarchy[] = await locationsService.getResidentialHierarchy(
-            req.session.systemToken,
-            String(prisonId),
-          )
-          const locationCodeExists = residentialHierarchy.some(
-            location => location.locationCode === values.locationCode,
+          const locationCodePrefix = decoratedResidentialSummary.location?.pathHierarchy
+          const locationCode = (locationCodePrefix ? `${locationCodePrefix}-` : '') + values.locationCode
+          const locationCodeExists = decoratedResidentialSummary.subLocations.some(
+            location => location.pathHierarchy === locationCode,
           )
           if (locationCodeExists) {
-            validationErrors.locationCode = this.formError('locationCode', 'locationCodeExists')
+            validationErrors.locationCode = this.formError('locationCode', 'taken')
           }
         }
 
@@ -78,13 +90,11 @@ export default class Details extends FormInitialStep {
             null,
           )
           if (localNameExists) {
-            validationErrors.localName = this.formError('localName', 'localNameExists')
+            validationErrors.localName = this.formError('localName', 'taken')
           }
         }
-      } catch (error) {
-        if (error.data.errorCode === 101) {
-          return callback({ ...errors, ...validationErrors })
-        }
+      } catch {
+        // handled below
       }
       return callback({ ...errors, ...validationErrors })
     })

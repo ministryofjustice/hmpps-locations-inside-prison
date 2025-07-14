@@ -27,7 +27,6 @@ import locationHistoryRouter from './locationHistoryRouter'
 import setLocalNameRouter from './setLocalName'
 import changeLocalNameRouter from './changeLocalName'
 import removeLocalNameRouter from './removeLocalName'
-import manageLocationsRouter from './manageLocationsRouter'
 import createLocationRouter from './createLocation'
 import adminRouter from './adminRouter'
 import changeResiStatusRouter from './admin/resi'
@@ -50,10 +49,9 @@ export default function routes(services: Services): Router {
 
   router.use('/archived-locations/:prisonId?', archivedLocationsRouter(services))
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
+  router.use('/create-new/:prisonOrLocationId', createLocationRouter)
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
-  router.use('/manage-locations/:prisonId?', manageLocationsRouter(services))
-  router.use('/manage-locations/:prisonId/create-new-:locationType', createLocationRouter)
 
   router.use('/location-history', locationHistoryRouter(services))
 

@@ -1,6 +1,6 @@
 import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
-import ManageLocationsIndexPage from '../../pages/manageLocations'
+import ViewLocationsIndexPage from '../../pages/viewLocations'
 
 context('View Locations Index', () => {
   context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -41,16 +41,16 @@ context('View Locations Index', () => {
 
     it('Correctly presents the API data', () => {
       cy.signIn()
-      cy.visit('/manage-locations/TST')
-      const manageLocationsIndexPage = Page.verifyOnPage(ManageLocationsIndexPage)
+      cy.visit('/view-and-update-locations/TST')
+      const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsIndexPage)
 
-      manageLocationsIndexPage.capacity.working().contains('8')
-      manageLocationsIndexPage.capacity.signedOperational().contains('10')
-      manageLocationsIndexPage.capacity.maximum().contains('9')
+      viewLocationsIndexPage.capacity.working().contains('8')
+      viewLocationsIndexPage.capacity.signedOperational().contains('10')
+      viewLocationsIndexPage.capacity.maximum().contains('9')
 
-      manageLocationsIndexPage.locationsHeader().contains('TestWings')
+      viewLocationsIndexPage.locationsHeader().contains('TestWings')
 
-      manageLocationsIndexPage.locationsCreateWingButton().contains('Create new testwing')
+      viewLocationsIndexPage.locationsCreateButton().contains('Create new testwing')
 
       const expectedRows = [
         {
@@ -104,9 +104,9 @@ context('View Locations Index', () => {
         },
       ]
 
-      const rows = manageLocationsIndexPage.locationsTableRows()
+      const rows = viewLocationsIndexPage.locationsTableRows()
       rows.each((row, index) => {
-        const cells = manageLocationsIndexPage.locationsTableCells(row as unknown as PageElement)
+        const cells = viewLocationsIndexPage.locationsTableCells(row as unknown as PageElement)
 
         Object.entries(expectedRows[index]).forEach(([key, value]) => {
           const cell = cells[key]

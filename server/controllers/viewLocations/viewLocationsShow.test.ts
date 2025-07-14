@@ -22,11 +22,13 @@ describe('view locations show', () => {
     deepReq = {
       canAccess: jest.fn().mockReturnValue(false),
       flash: jest.fn(),
+      featureFlags: {},
     }
     deepRes = {
       locals: {
         decoratedResidentialSummary: {
           location: buildDecoratedLocation({ isResidential: true, leafLevel: true }),
+          subLocationName: 'Landings',
         },
       },
       render: jest.fn(),
@@ -37,7 +39,8 @@ describe('view locations show', () => {
     controller(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-      banner: {},
+      banner: undefined,
+      title: 'View and update locations',
     })
   })
 
@@ -54,6 +57,7 @@ describe('view locations show', () => {
       banner: {
         success,
       },
+      title: 'View and update locations',
     })
   })
 
@@ -181,13 +185,15 @@ describe('view locations show', () => {
     it('renders the page with the action button', () => {
       controller(deepReq as Request, deepRes as Response)
 
-      expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-        actionButton: {
+      expect(deepRes.locals.actions).toEqual([
+        {
           text: 'Convert to cell',
           href: `/location/7e570000-0000-0000-0000-000000000001/cell-conversion`,
-          classes: 'govuk-!-float-right',
         },
-        banner: {},
+      ])
+      expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+        banner: undefined,
+        title: 'View and update locations',
       })
     })
 
@@ -199,8 +205,10 @@ describe('view locations show', () => {
       it('renders the page without the action button', () => {
         controller(deepReq as Request, deepRes as Response)
 
+        expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-          banner: {},
+          banner: undefined,
+          title: 'View and update locations',
         })
       })
     })
@@ -217,8 +225,10 @@ describe('view locations show', () => {
       it('renders the page without the action button', () => {
         controller(deepReq as Request, deepRes as Response)
 
+        expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-          banner: {},
+          banner: undefined,
+          title: 'View and update locations',
         })
       })
     })
@@ -235,8 +245,10 @@ describe('view locations show', () => {
       it('renders the page without the action button', () => {
         controller(deepReq as Request, deepRes as Response)
 
+        expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-          banner: {},
+          banner: undefined,
+          title: 'View and update locations',
         })
       })
     })
@@ -253,8 +265,112 @@ describe('view locations show', () => {
       it('renders the page without the action button', () => {
         controller(deepReq as Request, deepRes as Response)
 
+        expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-          banner: {},
+          banner: undefined,
+          title: 'View and update locations',
+        })
+      })
+    })
+  })
+
+  describe('createButton', () => {
+    describe('when the location is leafLevel', () => {
+      describe('when req.featureFlags.createAndCertify is true', () => {
+        beforeEach(() => {
+          deepReq.featureFlags.createAndCertify = true
+        })
+
+        describe('when canAccess("create_location") is true', () => {
+          beforeEach(() => {
+            deepReq.canAccess = (permission: string) => permission === 'create_location'
+          })
+
+          it('renders the page without the create button', () => {
+            controller(deepReq as Request, deepRes as Response)
+
+            expect(deepRes.locals.actions).toEqual(undefined)
+            expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+              banner: undefined,
+              createButton: undefined,
+              title: 'Manage locations',
+            })
+          })
+        })
+      })
+    })
+
+    describe('when the location is not leafLevel', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedResidentialSummary.location.leafLevel = false
+      })
+
+      describe('when req.featureFlags.createAndCertify is not set', () => {
+        it('renders the page without the create button', () => {
+          controller(deepReq as Request, deepRes as Response)
+
+          expect(deepRes.locals.actions).toEqual(undefined)
+          expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+            banner: undefined,
+            createButton: undefined,
+            title: 'View and update locations',
+          })
+        })
+      })
+
+      describe('when canAccess("create_location") is false', () => {
+        it('renders the page without the create button', () => {
+          controller(deepReq as Request, deepRes as Response)
+
+          expect(deepRes.locals.actions).toEqual(undefined)
+          expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+            banner: undefined,
+            createButton: undefined,
+            title: 'View and update locations',
+          })
+        })
+      })
+
+      describe('when req.featureFlags.createAndCertify is true', () => {
+        beforeEach(() => {
+          deepReq.featureFlags.createAndCertify = true
+        })
+
+        describe('when canAccess("create_location") is false', () => {
+          it('renders the page without the create button', () => {
+            controller(deepReq as Request, deepRes as Response)
+
+            expect(deepRes.locals.actions).toEqual(undefined)
+            expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+              banner: undefined,
+              createButton: undefined,
+              title: 'View and update locations',
+            })
+          })
+        })
+
+        describe('when canAccess("create_location") is true', () => {
+          beforeEach(() => {
+            deepReq.canAccess = (permission: string) => permission === 'create_location'
+          })
+
+          it('renders the page with the create button', () => {
+            controller(deepReq as Request, deepRes as Response)
+
+            expect(deepRes.locals.actions).toEqual(undefined)
+            expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+              banner: undefined,
+              createButton: {
+                attributes: {
+                  'data-qa': 'create-button',
+                },
+                classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
+                href: '/create-new/7e570000-0000-0000-0000-000000000001',
+                text: 'Create new landing',
+              },
+              title: 'Manage locations',
+            })
+          })
         })
       })
     })

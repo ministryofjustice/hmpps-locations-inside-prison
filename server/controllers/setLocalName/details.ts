@@ -45,7 +45,7 @@ export default class Details extends FormInitialStep {
           parentId,
         )
         if (localNameExists) {
-          validationErrors.localName = this.formError('localName', 'localNameExists')
+          validationErrors.localName = this.formError('localName', 'taken')
           return callback({ ...errors, ...validationErrors })
         }
       } catch (error) {

@@ -254,6 +254,7 @@ declare module 'hmpo-form-wizard' {
       text?: string
       component?: string
       remove?: (req: FormWizard.Request) => boolean
+      hideWhenRemoved?: boolean
       removed?: boolean
       prefix?: string
       code?: string
@@ -277,6 +278,13 @@ declare module 'hmpo-form-wizard' {
       label?: {
         text: string
         classes?: string
+        for?: string
+      }
+      formGroup?: {
+        beforeInput?: {
+          html?: string
+          text?: string
+        }
       }
       autocomplete?: string
       labelClasses?: string
@@ -289,6 +297,8 @@ declare module 'hmpo-form-wizard' {
         displayAlways?: boolean
       }
       errorMessage?: { href: string; text: string }
+      rows?: number
+      maxlength?: number
     }
 
     interface Fields {

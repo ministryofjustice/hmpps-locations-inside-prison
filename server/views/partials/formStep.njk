@@ -3,9 +3,11 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 
 {% block heading %}
   {% if titleCaption %}
@@ -66,15 +68,17 @@
             {% for key, fieldsOptions in fields %}
               {% if fieldsOptions.component and not fieldsOptions.skip %}
                 {% if fieldsOptions.removed %}
-                  <div class="govuk-form-group">
-                    <span class="govuk-label {{ fieldsOptions.label.classes }}">{{ fieldsOptions.label.text }}</span>
+                  {% if not fieldsOptions.hideWhenRemoved %}
+                    <div class="govuk-form-group">
+                      <span class="govuk-label {{ fieldsOptions.label.classes }}">{{ fieldsOptions.label.text }}</span>
 
-                    <div class="govuk-hint">
-                      {{ fieldsOptions.hint.text }}
+                      <div class="govuk-hint">
+                        {{ fieldsOptions.hint.text }}
+                      </div>
+
+                      <span class="govuk-label">{{ fieldsOptions.value }}</span>
                     </div>
-
-                    <span class="govuk-label">{{ fieldsOptions.value }}</span>
-                  </div>
+                  {% endif %}
                 {% else %}
                   {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
                 {% endif %}

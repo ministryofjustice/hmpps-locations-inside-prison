@@ -176,6 +176,11 @@ $sticky-footer-vertical-spacing: govuk-spacing(2);
   vertical-align: middle
 }
 
+.govuk-input-prefix--plain {
+  margin-right: 7px;
+  margin-top: 7px;
+}
+
 // location structure preview
 
 .structurePreview {

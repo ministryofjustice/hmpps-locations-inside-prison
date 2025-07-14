@@ -1,19 +1,34 @@
 import { Request, Response } from 'express'
+import { TypedLocals } from '../../@types/express'
+import { singularizeString } from '../../utils/utils'
 
 export default async (req: Request, res: Response) => {
-  const banner: {
-    success?: {
-      title: string
-      content: string
-    }
-  } = {}
+  const locals: TypedLocals = {
+    title: 'View and update locations',
+  }
 
   const success = req.flash('success')
   if (success?.length) {
-    ;[banner.success] = success
+    locals.banner = {
+      success: success[0],
+    }
   }
 
-  return res.render('pages/viewLocations/index', {
-    banner,
-  })
+  if (req.featureFlags.createAndCertify && req.canAccess('create_location')) {
+    locals.title = 'Manage locations'
+
+    const { decoratedResidentialSummary: summary } = res.locals
+    const singularizedLocationType = singularizeString(String(summary.subLocationName)).toLowerCase()
+
+    locals.createButton = {
+      text: `Create new ${singularizedLocationType}`,
+      href: `/create-new/${res.locals.prisonId}`,
+      classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
+      attributes: {
+        'data-qa': 'create-button',
+      },
+    }
+  }
+
+  return res.render('pages/viewLocations/index', locals)
 }

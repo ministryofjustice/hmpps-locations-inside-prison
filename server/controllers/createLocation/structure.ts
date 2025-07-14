@@ -12,31 +12,21 @@ export default class Structure extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { prisonId } = res.locals
-    const { locationType } = res.locals.decoratedLocation
+    const { locationId, prisonId } = res.locals
     const { values } = req.form
 
-    const formatLevelValue = (value: string) => {
-      if (!value) return ''
-      return capitalize(value)
-    }
+    locals.locationType = req.sessionModel.get<string>('locationType')
 
-    const level2 = formatLevelValue(String(values['level-2'] || 'Landings'))
-    const level3 = formatLevelValue(String(values['level-3'] || ''))
-    const level4 = formatLevelValue(String(values['level-4'] || ''))
+    locals.level2 = capitalize(String(values['level-2'] || 'Landings'))
+    locals.level3 = capitalize(String(values['level-3'] || ''))
+    locals.level4 = capitalize(String(values['level-4'] || ''))
 
-    const backLink = backUrl(req, {
-      fallbackUrl: `/manage-locations/${prisonId}/create-new-${locationType.toLowerCase()}/details`,
+    locals.backLink = backUrl(req, {
+      fallbackUrl: `/create-new/${locationId || prisonId}/details`,
     })
+    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
 
-    return {
-      ...locals,
-      level2,
-      level3,
-      level4,
-      backLink,
-      cancelLink: `/manage-locations/${prisonId}`,
-    }
+    return locals
   }
 
   async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
