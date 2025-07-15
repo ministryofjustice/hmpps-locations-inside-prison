@@ -44,7 +44,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
     environment:
       - SERVER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=dev,local-docker
       - HMPPS_AUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth
       - HMPPS_AUTH_EXTERNAL_ENDPOINT_URL=http://localhost:8080/auth
       - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
@@ -67,11 +67,13 @@ services:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=seed
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://locations-inside-prison-db:5432/locations_inside_prison?sslmode=prefer
-      - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
       - API_BASE_URL_PRISONER_SEARCH=http://prisoner-search:8080
       - API_BASE_URL_PRISON_REGISTER=http://prison-register:8080
-      - LOCATIONS_INSIDE_PRISON_API_CLIENT_ID=hmpps-locations-inside-prison-system
+      - API_BASE_URL_PRISON_API=http://prison-api:8081
+      - API_BASE_URL_MANAGE_USERS=http://manage-users-api:8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://locations-inside-prison-db:5432/locations_inside_prison?sslmode=prefer
+      - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
+      - LOCATIONS_INSIDE_PRISON_API_CLIENT_ID=hmpps-locations-inside-prison-api
       - LOCATIONS_INSIDE_PRISON_API_CLIENT_SECRET=clientsecret
 
   localstack:
@@ -203,7 +205,9 @@ services:
       - LOCATIONS_API_URL=http://localhost:8090
       - PRISON_API_URL=http://localhost:8091
       - NO_HTTPS=true
-      - LOAD_DPR_ON_STARTUP=false
+      - LOAD_DPR_ON_STARTUP=true
+      - FLAG_MVP2_PERMANENT_DEACTIVATION=enabled
+      - FLAG_CREATE_AND_CERTIFY=enabled
 
 networks:
   hmpps:
