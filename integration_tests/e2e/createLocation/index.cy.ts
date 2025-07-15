@@ -1,9 +1,11 @@
 import Page from '../../pages/page'
 import CreateLocationDetailsPage from '../../pages/createLocation/index'
 import CreateLocationStructurePage from '../../pages/createLocation/structure'
+import CreateLocationConfirmPage from '../../pages/createLocation/confirm'
 import ManageLocationsIndexPage from '../../pages/manageLocations'
 import buildDecoratedLocation from '../../../server/testutils/buildDecoratedLocation'
 import LocationFactory from '../../../server/testutils/factories/location'
+import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
 context('Set Wing Location Details', () => {
   const prisonId = 'TST'
@@ -61,6 +63,18 @@ context('Set Wing Location Details', () => {
 
       CreateLocationStructurePage.goTo(prisonId)
       return Page.verifyOnPage(CreateLocationStructurePage)
+    }
+
+    const goToConfirmPage = () => {
+      const structurePage = goToLocationStructurePage()
+      structurePage.level2Select().select('Landings')
+      structurePage.addLevelButton().click()
+      structurePage.level3Select().select('Cells')
+
+      structurePage.continueButton().click()
+
+      CreateLocationConfirmPage.goTo(prisonId)
+      return Page.verifyOnPage(CreateLocationConfirmPage)
     }
 
     describe('Details', () => {
@@ -246,6 +260,54 @@ context('Set Wing Location Details', () => {
         const structurePage = goToLocationStructurePage()
         structurePage.cancelLink().click()
         Page.verifyOnPage(ManageLocationsIndexPage)
+      })
+    })
+
+    describe('Confirm', () => {
+      it('shows the correct information and successfully creates draft wing', () => {
+        cy.task('reset')
+        setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+        cy.task('stubCreateWing')
+        cy.task('stubManageUsers')
+        cy.task('stubManageUsersMe')
+        cy.task('stubManageUsersMeCaseloads')
+        cy.task('stubLocationsResidentialSummaryForCreateWing')
+        cy.task('stubLocationById')
+        cy.task('stubLocations', decorated)
+        cy.task('setFeatureFlag', { createAndCertify: true })
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
+
+        const confirmPage = goToConfirmPage()
+        Page.verifyOnPage(CreateLocationConfirmPage)
+
+        confirmPage.detailsTitle().contains('Wing details')
+        confirmPage.structureDetails().contains('Testwing → Landings → Cells')
+        confirmPage
+          .structureChangeLink()
+          .should('have.attr', 'href')
+          .and('include', '/manage-locations/TST/create-new-testwing/structure')
+
+        confirmPage.codeDetails().contains('ABC1')
+        confirmPage
+          .codeChangeLink()
+          .should('have.attr', 'href')
+          .and('include', '/manage-locations/TST/create-new-testwing/details')
+
+        confirmPage.localNameDetails().contains('testW')
+        confirmPage
+          .localNameChangeLink()
+          .should('have.attr', 'href')
+          .and('include', '/manage-locations/TST/create-new-testwing/details')
+        confirmPage.createButton().click()
+
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.successBanner().contains('Testwing created')
+        viewLocationsShowPage.draftBanner().should('exist')
+        viewLocationsShowPage.summaryCards.cnaText().contains('-')
+        viewLocationsShowPage.summaryCards.workingCapacityText().contains('-')
+        viewLocationsShowPage.summaryCards.maximumCapacityText().contains('-')
+        viewLocationsShowPage.locationDetailsRows().eq(0).contains('ABC1')
+        viewLocationsShowPage.locationDetailsRows().eq(1).contains('Test W')
       })
     })
   })

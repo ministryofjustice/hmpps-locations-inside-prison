@@ -250,4 +250,19 @@ export default class LocationsService {
     await this.locationsApiClient.prisonConfiguration.updateCertificationApproval(token, { prisonId, status })
     await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
   }
+
+  async createWing(
+    token: string,
+    prisonId: string,
+    wingCode: string,
+    wingStructure: string[],
+    wingDescription?: string,
+  ) {
+    return this.locationsApiClient.locations.createWing(token, undefined, {
+      prisonId,
+      wingCode,
+      wingStructure,
+      wingDescription,
+    })
+  }
 }

@@ -94,26 +94,26 @@ describe('Create location structure', () => {
   describe('validateFields', () => {
     it('sets structure levels correctly in sessionModel and values', async () => {
       deepReq.body = {
-        'level-2': 'LANDINGS',
-        'level-3': 'SPURS',
-        'level-4': 'CELLS',
+        'level-2': 'Landings',
+        'level-3': 'Spurs',
+        'level-4': 'Cells',
       }
 
       const callback = jest.fn()
 
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('structureLevels', ['LANDINGS', 'SPURS', 'CELLS'])
-      expect(deepReq.form.values['level-2']).toBe('LANDINGS')
-      expect(deepReq.form.values['level-3']).toBe('SPURS')
-      expect(deepReq.form.values['level-4']).toBe('CELLS')
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('structureLevels', ['LANDING', 'SPUR', 'CELL'])
+      expect(deepReq.form.values['level-2']).toBe('LANDING')
+      expect(deepReq.form.values['level-3']).toBe('SPUR')
+      expect(deepReq.form.values['level-4']).toBe('CELL')
       expect(callback).toHaveBeenCalled()
     })
 
     it('returns an error if structure levels contain duplicates', async () => {
       deepReq.body = {
-        'level-2': 'LANDINGS',
-        'level-3': 'LANDINGS',
+        'level-2': 'Landings',
+        'level-3': 'Landings',
       }
 
       const callback = jest.fn()
@@ -127,8 +127,8 @@ describe('Create location structure', () => {
 
     it('returns an error if "Cells" is not the last item', async () => {
       deepReq.body = {
-        'level-2': 'CELLS',
-        'level-3': 'LANDINGS',
+        'level-2': 'Cells',
+        'level-3': 'Landings',
       }
 
       const callback = jest.fn()

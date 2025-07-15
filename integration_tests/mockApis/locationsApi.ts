@@ -311,6 +311,167 @@ const stubLocationsLocationsResidentialSummary = (
     },
   })
 
+const stubLocationsResidentialSummaryForCreateWing = (
+  returnData = {
+    prisonSummary: {
+      prisonName: 'string',
+      workingCapacity: 0,
+      signedOperationalCapacity: 0,
+      maxCapacity: 0,
+      numberOfCellLocations: 0,
+    },
+    topLevelLocationType: 'Wings',
+    subLocationName: 'Wings',
+    locationHierarchy: [
+      {
+        id: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
+        prisonId: 'TST',
+        code: '001',
+        type: 'WING',
+        localName: 'Wing A',
+        pathHierarchy: 'ABC1',
+        level: 1,
+      },
+    ],
+    subLocations: [],
+    parentLocation: {
+      id: '2475f250-434a-4257-afe7-b911f1773a4d',
+      prisonId: 'TST',
+      code: '001',
+      cellMark: 'A1',
+      pathHierarchy: 'ABC1',
+      locationType: 'WING',
+      localName: 'Test W',
+      wingStructure: ['WING'],
+      comments: '',
+      permanentlyInactive: false,
+      permanentlyInactiveReason: '',
+      capacity: {
+        maxCapacity: 0,
+        workingCapacity: 0,
+      },
+      pendingChanges: {
+        maxCapacity: 0,
+        certifiedNormalAccommodation: 0,
+      },
+      oldWorkingCapacity: 0,
+      certification: {
+        certified: false,
+        certifiedNormalAccommodation: 0,
+      },
+      usage: [],
+      accommodationTypes: [],
+      specialistCellTypes: [],
+      usedFor: [],
+      status: 'DRAFT',
+      locked: false,
+      convertedCellType: '',
+      otherConvertedCellType: 'string',
+      inCellSanitation: true,
+      deactivatedByParent: false,
+      deactivatedDate: '',
+      deactivatedReason: '',
+      deactivationReasonDescription: '',
+      deactivatedBy: 'string',
+      proposedReactivationDate: '',
+      planetFmReference: '',
+      topLevelId: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
+      level: 1,
+      leafLevel: false,
+      parentId: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
+      parentLocation: 'string',
+      inactiveCells: 0,
+      numberOfCellLocations: 0,
+      changeHistory: [],
+      transactionHistory: [],
+      lastModifiedBy: 'string',
+      lastModifiedDate: '',
+      key: '',
+      isResidential: true,
+    },
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/residential-summary/TST\\?parentLocationId=.*',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const stubLocationById = (
+  returnData = {
+    id: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
+    prisonId: 'TST',
+    code: 'ABC1',
+    cellMark: 'A1',
+    pathHierarchy: 'ABC1',
+    locationType: 'WING',
+    localName: 'testW',
+    wingStructure: ['WING'],
+    comments: '',
+    permanentlyInactive: false,
+    permanentlyInactiveReason: '',
+    capacity: {
+      maxCapacity: 0,
+      workingCapacity: 0,
+    },
+    pendingChanges: {},
+    oldWorkingCapacity: 0,
+    certification: {
+      certified: false,
+      certifiedNormalAccommodation: 0,
+    },
+    usage: [],
+    accommodationTypes: [],
+    specialistCellTypes: [],
+    usedFor: [],
+    status: 'ACTIVE',
+    locked: false,
+    convertedCellType: '',
+    otherConvertedCellType: 'string',
+    inCellSanitation: false,
+    deactivatedByParent: false,
+    deactivatedDate: '',
+    deactivatedReason: '',
+    deactivationReasonDescription: '',
+    deactivatedBy: '',
+    proposedReactivationDate: '2026-01-24',
+    planetFmReference: '',
+    topLevelId: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
+    level: 1,
+    leafLevel: false,
+    parentId: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
+    parentLocation: 'string',
+    inactiveCells: 0,
+    numberOfCellLocations: 0,
+    childLocations: [],
+    changeHistory: [],
+    transactionHistory: [],
+    lastModifiedBy: 'string',
+    lastModifiedDate: '',
+    key: '',
+    isResidential: true,
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/locations/${returnData.parentId}\\?includeHistory=false`,
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: returnData,
+    },
+  })
+
 const stubLocationsLocationsResidentialSummaryForLocation = ({
   parentLocation = LocationFactory.build(),
   subLocationName = 'Landings',
@@ -915,6 +1076,29 @@ const stubGetPrisonConfiguration = ({
     },
   })
 
+const stubCreateWing = () =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern: '/locations-api/locations/create-wing',
+    },
+    response: {
+      status: 201,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        id: 'abc123',
+        locationId: 'abc123',
+        prisonId: 'TST',
+        code: 'ABC1',
+        localName: 'testW',
+        wingStructure: ['WING', 'LANDING', 'CELL'],
+        status: 'DRAFT',
+      },
+    },
+  })
+
 export default {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -944,10 +1128,13 @@ export default {
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
+  stubCreateWing,
+  stubGetPrisonConfiguration,
   stubPrisonConfiguration,
   stubPrisonConfigurationCertApproval,
   stubPrisonConfigurationActivateResi,
   stubPrisonConfigurationDeactivateResi,
+  stubPrisonConfigurationResiActive,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,
@@ -959,6 +1146,6 @@ export default {
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
-  stubGetPrisonConfiguration,
-  stubPrisonConfigurationResiActive,
+  stubLocationsResidentialSummaryForCreateWing,
+  stubLocationById,
 }

@@ -1,5 +1,6 @@
 import Details from '../../controllers/createLocation/details'
 import Structure from '../../controllers/createLocation/structure'
+import ConfirmCreateLocation from '../../controllers/createLocation/confirm'
 
 const steps = {
   '/': {
@@ -21,7 +22,9 @@ const steps = {
     controller: Structure,
     next: 'confirm',
   },
-  '/confirm': {},
+  '/confirm': {
+    controller: ConfirmCreateLocation,
+  },
 }
 
 export default steps
