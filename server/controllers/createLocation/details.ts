@@ -1,5 +1,5 @@
 import FormWizard from 'hmpo-form-wizard'
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
@@ -11,19 +11,12 @@ export default class Details extends FormInitialStep {
     super.middlewareSetup()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
-    const locals = super.locals(req, res)
-    const { decoratedResidentialSummary, prisonId, locationId } = res.locals
-    const { locationCode: formLocationCode, createCellsNow: formCreateCellsNow } = req.form.options.fields
+  // eslint-disable-next-line no-underscore-dangle
+  async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const formLocationCode = req.form.options.fields.locationCode
+    const formCreateCellsNow = req.form.options.fields.createCellsNow
     const locationType = req.sessionModel.get<string>('locationType')
-
-    locals.title = `Enter ${locationType.toLowerCase()} details`
-    locals.titleCaption = `Create new ${locationType.toLowerCase()}`
-
-    locals.backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`,
-    })
-    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
+    const { decoratedResidentialSummary } = res.locals
 
     if (decoratedResidentialSummary.location) {
       formLocationCode.formGroup = {
@@ -42,6 +35,23 @@ export default class Details extends FormInitialStep {
     formLocationCode.hint = {
       text: `The letter or number used to identify the location, for example ${locationExample}.`,
     }
+
+    // eslint-disable-next-line no-underscore-dangle
+    await super._locals(req, res, next)
+  }
+
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+    const locals = super.locals(req, res)
+    const { prisonId, locationId } = res.locals
+    const locationType = req.sessionModel.get<string>('locationType')
+
+    locals.title = `Enter ${locationType.toLowerCase()} details`
+    locals.titleCaption = `Create new ${locationType.toLowerCase()}`
+
+    locals.backLink = backUrl(req, {
+      fallbackUrl: `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`,
+    })
+    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
 
     return locals
   }
