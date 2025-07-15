@@ -163,7 +163,7 @@ context('Reactivate cell (from reactivate parent)', () => {
         })
 
         it('has the correct main heading and a caption showing the cell description', () => {
-          cy.get('h1').contains('Check working capacity')
+          cy.get('h1').contains('Check cell capacity')
           cy.get('.govuk-caption-m').contains('Cell A-1-001')
         })
 
@@ -198,7 +198,7 @@ context('Reactivate cell (from reactivate parent)', () => {
             reactivateCellConfirmPage.confirmButton().click()
 
             Page.verifyOnPage(ViewLocationsShowPage)
-            cy.title().should('eq', 'Landing A-1 - Manage locations - Residential locations')
+            cy.title().should('eq', 'Landing A-1 - View and update locations - Residential locations')
 
             cy.get('#govuk-notification-banner-title').contains('Success')
             cy.get('.govuk-notification-banner__content h3').contains('Cell activated')
