@@ -22,8 +22,8 @@ export default async (req: Request, res: Response) => {
   if (req.featureFlags.createAndCertify && req.canAccess('create_location')) {
     locals.title = 'Manage locations'
 
-    if (!leafLevel) {
-      const singularizedLocationType = singularizeString(String(summary.subLocationName)).toLowerCase()
+    if (!leafLevel && summary.subLocationName !== 'Cells') {
+      const singularizedLocationType = singularizeString(summary.subLocationName).toLowerCase()
 
       locals.createButton = {
         text: `Create new ${singularizedLocationType}`,
