@@ -1,6 +1,6 @@
 import express from 'express'
 import viewLocationsIndex from '../controllers/viewLocations/viewLocationsIndex'
-import populatePrisonId from '../middleware/populatePrisonId'
+import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
 import populateDecoratedResidentialSummary from '../middleware/populateDecoratedResidentialSummary'
 import logPageView from '../middleware/logPageView'
 import { Page } from '../services/auditService'
@@ -12,6 +12,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import addAction from '../middleware/addAction'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import populateTopLevelDraftLocationSummary from '../middleware/populateTopLevelDraftLocationSummary'
+import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
 
 const router = express.Router({ mergeParams: true })
 
@@ -27,7 +28,12 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     })(req, res, null)
   }
 
-  if (active && ['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType) && req.canAccess('deactivate')) {
+  if (
+    active &&
+    isResidential &&
+    ['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType) &&
+    req.canAccess('deactivate')
+  ) {
     addAction({
       text: `Deactivate ${location.locationType.toLowerCase()}`,
       href: `/location/${location.id}/deactivate`,
@@ -38,12 +44,13 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
 })
 
 const controller = (services: Services) => {
-  router.use(populatePrisonId())
+  router.use(populatePrisonAndLocationId)
+  router.use(redirectToAddPrisonId)
   router.use(validateCaseload())
 
   router.get(
     '/',
-    populateDecoratedResidentialSummary(services),
+    populateDecoratedResidentialSummary,
     populateBreadcrumbsForLocation,
     addBreadcrumb({ title: '', href: '/' }),
     logPageView(services.auditService, Page.LOCATIONS_INDEX),
@@ -52,7 +59,7 @@ const controller = (services: Services) => {
 
   router.get(
     '/:locationId',
-    populateDecoratedResidentialSummary(services),
+    populateDecoratedResidentialSummary,
     populateTopLevelDraftLocationSummary,
     populateBreadcrumbsForLocation,
     logPageView(services.auditService, Page.LOCATIONS_SHOW),

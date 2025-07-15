@@ -1,4 +1,5 @@
 import Details from '../../controllers/createLocation/details'
+import CreateLocationInit from '../../controllers/createLocation/init'
 import Structure from '../../controllers/createLocation/structure'
 
 const steps = {
@@ -6,14 +7,23 @@ const steps = {
     entryPoint: true,
     reset: true,
     resetJourney: true,
-    skip: true,
+    controller: CreateLocationInit,
     next: 'details',
   },
   '/details': {
     editable: true,
-    fields: ['locationCode', 'localName'],
+    fields: ['locationCode', 'localName', 'createCellsNow'],
     controller: Details,
-    next: 'structure',
+    template: '../../partials/formStep',
+    next: [
+      { field: 'createCellsNow', value: 'yes', next: 'create-cells' },
+      {
+        field: 'createCellsNow',
+        value: 'no',
+        next: 'confirm',
+      },
+      'structure',
+    ],
   },
   '/structure': {
     editable: true,

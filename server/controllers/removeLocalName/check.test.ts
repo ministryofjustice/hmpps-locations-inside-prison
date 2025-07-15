@@ -91,6 +91,7 @@ describe('RemoveLocalName', () => {
             component: 'govukCharacterCount',
             errorMessages: {
               required: 'Enter a local name',
+              taken: 'A location with this name already exists',
             },
             validate: [
               'required',

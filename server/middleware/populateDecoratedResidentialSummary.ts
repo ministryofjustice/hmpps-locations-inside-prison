@@ -1,6 +1,5 @@
 import { type NextFunction, Request, type Response } from 'express'
 import logger from '../../logger'
-import { Services } from '../services'
 import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
@@ -48,6 +47,7 @@ function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow
 
   return row
 }
+
 function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { specialistCellTypes } = location
   const setCellTypeUrl = `/location/${location.id}/set-cell-type`
@@ -167,144 +167,144 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
   return details
 }
 
-export default function populateDecoratedResidentialSummary({ locationsService, manageUsersService }: Services) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const { systemToken } = req.session
-    const { prisonId, user } = res.locals
+export default async function populateDecoratedResidentialSummary(req: Request, res: Response, next: NextFunction) {
+  const { locationsService, manageUsersService } = req.services
+  const { systemToken } = req.session
+  const { prisonId, user } = res.locals
+  const locationId = req.params.locationId || res.locals.locationId
 
-    try {
-      const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, req.params.locationId)
-      const residentialSummary: {
-        location?: DecoratedLocation
-        locationDetails?: SummaryListRow[]
-        locationHistory?: boolean // TODO: change this type when location history tab is implemented
-        subLocationName: string
-        subLocations: DecoratedLocation[]
-        summaryCards: {
-          title: string
-          type: string
-          text: string
-          linkHref?: string
-          linkLabel?: string
-          linkAriaLabel?: string
-        }[]
-      } = {
-        subLocationName: apiData.subLocationName,
-        subLocations: await Promise.all(
-          apiData.subLocations.map(location => {
-            return decorateLocation({
-              location,
-              locationsService,
-              manageUsersService,
-              systemToken,
-              userToken: user.token,
-              limited: true,
-            })
-          }),
-        ),
-        summaryCards: [],
-      }
+  try {
+    const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, locationId)
+    const residentialSummary: {
+      location?: DecoratedLocation
+      locationDetails?: SummaryListRow[]
+      locationHistory?: boolean // TODO: change this type when location history tab is implemented
+      subLocationName: string
+      subLocations: DecoratedLocation[]
+      summaryCards: {
+        title: string
+        type: string
+        text: string
+        linkHref?: string
+        linkLabel?: string
+        linkAriaLabel?: string
+      }[]
+    } = {
+      subLocationName: apiData.subLocationName,
+      subLocations: await Promise.all(
+        apiData.subLocations.map(location => {
+          return decorateLocation({
+            location,
+            locationsService,
+            manageUsersService,
+            systemToken,
+            userToken: user.token,
+            limited: true,
+          })
+        }),
+      ),
+      summaryCards: [],
+    }
 
-      res.locals.topLevelLocationType = apiData.topLevelLocationType
-      res.locals.locationHierarchy = apiData.locationHierarchy
+    res.locals.topLevelLocationType = apiData.topLevelLocationType
+    res.locals.locationHierarchy = apiData.locationHierarchy
 
-      if ('parentLocation' in apiData) {
-        residentialSummary.location = await decorateLocation({
-          location: apiData.parentLocation,
-          locationsService,
-          manageUsersService,
-          systemToken,
-          userToken: user.token,
-        })
+    if ('parentLocation' in apiData) {
+      residentialSummary.location = await decorateLocation({
+        location: apiData.parentLocation,
+        locationsService,
+        manageUsersService,
+        systemToken,
+        userToken: user.token,
+      })
 
-        residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, req)
-        residentialSummary.locationHistory = true
+      residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, req)
+      residentialSummary.locationHistory = true
 
-        if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
-          const changeLink: { linkHref?: string; linkLabel?: string } = {}
-          const workingCapLink: { linkAriaLabel?: string } = {}
-          const maxCapLink: { linkAriaLabel?: string } = {}
+      if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
+        const changeLink: { linkHref?: string; linkLabel?: string } = {}
+        const workingCapLink: { linkAriaLabel?: string } = {}
+        const maxCapLink: { linkAriaLabel?: string } = {}
 
-          if (showChangeCapacityLink(residentialSummary.location, req)) {
-            changeLink.linkHref = `/location/${req.params.locationId}/change-cell-capacity`
-            changeLink.linkLabel = 'Change'
-            workingCapLink.linkAriaLabel = 'Change working capacity'
-            maxCapLink.linkAriaLabel = 'Change maximum capacity'
-          }
-
-          const { numberOfCellLocations } = residentialSummary.location
-          const { workingCapacity, maxCapacity } = residentialSummary.location.capacity
-          const { capacityOfCertifiedCell } = residentialSummary.location.certification
-          if (residentialSummary.location.status === 'DRAFT') {
-            residentialSummary.summaryCards.push({
-              title: 'CNA',
-              type: 'cna',
-              text: numberOfCellLocations ? capacityOfCertifiedCell.toString() : '-',
-            })
-          }
-
-          residentialSummary.summaryCards.push(
-            {
-              title: 'Working capacity',
-              type: 'working-capacity',
-              text: numberOfCellLocations ? workingCapacity.toString() : '-',
-              ...changeLink,
-              ...workingCapLink,
-            },
-            {
-              title: 'Maximum capacity',
-              type: 'maximum-capacity',
-              text: numberOfCellLocations ? maxCapacity.toString() : '-',
-              ...changeLink,
-              ...maxCapLink,
-            },
-          )
-
-          if (residentialSummary.location.status !== 'DRAFT' && !residentialSummary.location.leafLevel) {
-            residentialSummary.summaryCards.push({
-              title: 'Inactive cells',
-              type: 'inactive-cells',
-              text: apiData.parentLocation.inactiveCells.toString(),
-              ...(apiData.parentLocation.inactiveCells > 0
-                ? {
-                    linkHref: `/inactive-cells/${prisonId}/${apiData.parentLocation.id}`,
-                    linkLabel: 'View',
-                  }
-                : {}),
-            })
-          }
-        }
-      } else if ('prisonSummary' in apiData) {
-        const changeLink: { linkHref?: string; linkLabel?: string; linkAriaLabel?: string } = {}
-        if (req.canAccess('change_signed_operational_capacity')) {
-          changeLink.linkHref = `/change-signed-operational-capacity/${prisonId}`
+        if (showChangeCapacityLink(residentialSummary.location, req)) {
+          changeLink.linkHref = `/location/${req.params.locationId}/change-cell-capacity`
           changeLink.linkLabel = 'Change'
-          changeLink.linkAriaLabel = 'Change signed operational capacity'
+          workingCapLink.linkAriaLabel = 'Change working capacity'
+          maxCapLink.linkAriaLabel = 'Change maximum capacity'
         }
+
+        const { numberOfCellLocations } = residentialSummary.location
+        const { workingCapacity, maxCapacity } = residentialSummary.location.capacity
+        const { capacityOfCertifiedCell } = residentialSummary.location.certification
+        if (residentialSummary.location.status === 'DRAFT') {
+          residentialSummary.summaryCards.push({
+            title: 'CNA',
+            type: 'cna',
+            text: numberOfCellLocations ? capacityOfCertifiedCell.toString() : '-',
+          })
+        }
+
         residentialSummary.summaryCards.push(
           {
             title: 'Working capacity',
             type: 'working-capacity',
-            text: apiData.prisonSummary.workingCapacity.toString(),
+            text: numberOfCellLocations ? workingCapacity.toString() : '-',
+            ...changeLink,
+            ...workingCapLink,
           },
           {
-            title: 'Signed operational capacity',
-            type: 'signed-operational-capacity',
-            text: apiData.prisonSummary.signedOperationalCapacity.toString(),
+            title: 'Maximum capacity',
+            type: 'maximum-capacity',
+            text: numberOfCellLocations ? maxCapacity.toString() : '-',
             ...changeLink,
+            ...maxCapLink,
           },
-          { title: 'Maximum capacity', type: 'maximum-capacity', text: apiData.prisonSummary.maxCapacity.toString() },
         )
-      }
-      res.locals.decoratedResidentialSummary = residentialSummary
 
-      next()
-    } catch (error) {
-      logger.error(
-        error,
-        `Failed to populate residential summary for: prisonId: ${prisonId}, locationId: ${req.params.locationId}`,
+        if (residentialSummary.location.status !== 'DRAFT' && !residentialSummary.location.leafLevel) {
+          residentialSummary.summaryCards.push({
+            title: 'Inactive cells',
+            type: 'inactive-cells',
+            text: apiData.parentLocation.inactiveCells.toString(),
+            ...(apiData.parentLocation.inactiveCells > 0
+              ? {
+                  linkHref: `/inactive-cells/${prisonId}/${apiData.parentLocation.id}`,
+                  linkLabel: 'View',
+                }
+              : {}),
+          })
+        }
+      }
+    } else if ('prisonSummary' in apiData) {
+      const changeLink: { linkHref?: string; linkLabel?: string; linkAriaLabel?: string } = {}
+      if (req.canAccess('change_signed_operational_capacity')) {
+        changeLink.linkHref = `/change-signed-operational-capacity/${prisonId}`
+        changeLink.linkLabel = 'Change'
+        changeLink.linkAriaLabel = 'Change signed operational capacity'
+      }
+      residentialSummary.summaryCards.push(
+        {
+          title: 'Working capacity',
+          type: 'working-capacity',
+          text: apiData.prisonSummary.workingCapacity.toString(),
+        },
+        {
+          title: 'Signed operational capacity',
+          type: 'signed-operational-capacity',
+          text: apiData.prisonSummary.signedOperationalCapacity.toString(),
+          ...changeLink,
+        },
+        { title: 'Maximum capacity', type: 'maximum-capacity', text: apiData.prisonSummary.maxCapacity.toString() },
       )
-      next(error)
     }
+    res.locals.decoratedResidentialSummary = residentialSummary
+
+    next()
+  } catch (error) {
+    logger.error(
+      error,
+      `Failed to populate residential summary for: prisonId: ${prisonId}, locationId: ${req.params.locationId}`,
+    )
+    next(error)
   }
 }

@@ -2,7 +2,12 @@ import Page, { PageElement } from '../page'
 
 export default class ViewLocationsIndexPage extends Page {
   constructor() {
-    super('View and update locations')
+    super('')
+    this.checkOnPage()
+  }
+
+  checkOnPage() {
+    cy.location('pathname').should('contain', '/view-and-update-locations/')
   }
 
   capacity = {
@@ -13,6 +18,8 @@ export default class ViewLocationsIndexPage extends Page {
       cy.get('[data-qa=signed-operational-capacity-card]').find('.hmpps-mini-card__link a'),
     maximum: (): PageElement => cy.get('[data-qa=maximum-capacity-card]').find('[data-qa=bottom-content-line-1]'),
   }
+
+  locationsCreateButton = (): PageElement => cy.get('[data-qa=create-button]')
 
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 

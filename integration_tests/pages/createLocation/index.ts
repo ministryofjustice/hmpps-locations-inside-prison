@@ -2,14 +2,17 @@ import Page, { PageElement } from '../page'
 
 export default class CreateLocationDetailsPage extends Page {
   constructor() {
-    super(/Enter testwing details/)
+    super('')
   }
 
-  static goTo = (locationId: string) => cy.visit(`/manage-locations/${locationId}/create-new-testwing/details`)
+  static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/details`)
 
   localNameTextInput = (): PageElement => cy.get('#localName')
 
   locationCodeInput = (): PageElement => cy.get('#locationCode')
+
+  createCellsNowRadio = (value: string): PageElement =>
+    cy.get(`input[name="createCellsNow"][type="radio"][value="${value}"]`)
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 

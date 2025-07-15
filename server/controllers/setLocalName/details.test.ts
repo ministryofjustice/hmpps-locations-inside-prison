@@ -91,6 +91,7 @@ describe('SetLocalName', () => {
             component: 'govukCharacterCount',
             errorMessages: {
               required: 'Enter a local name',
+              taken: 'A location with this name already exists',
             },
             validate: [
               'required',
@@ -123,7 +124,7 @@ describe('SetLocalName', () => {
       deepReq.form.values.localName = 'existing local name'
       locationsService.getLocationByLocalName = jest.fn().mockResolvedValue(true)
 
-      const expectedError = controller.formError('localName', 'localNameExists')
+      const expectedError = controller.formError('localName', 'taken')
 
       const callback = jest.fn()
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
