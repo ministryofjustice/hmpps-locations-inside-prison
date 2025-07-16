@@ -1076,7 +1076,7 @@ const stubGetPrisonConfiguration = ({
     },
   })
 
-const stubCreateWing = () =>
+const stubCreateWing = (location: Location) =>
   stubFor({
     request: {
       method: 'POST',
@@ -1087,15 +1087,7 @@ const stubCreateWing = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: {
-        id: 'abc123',
-        locationId: 'abc123',
-        prisonId: 'TST',
-        code: 'ABC1',
-        localName: 'testW',
-        wingStructure: ['WING', 'LANDING', 'CELL'],
-        status: 'DRAFT',
-      },
+      jsonBody: location,
     },
   })
 

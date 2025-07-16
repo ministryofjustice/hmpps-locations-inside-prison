@@ -10,10 +10,11 @@ context('Set Wing Location Structure', () => {
   const prisonId = 'TST'
   const residentialSummary = {
     prisonSummary: {
-      workingCapacity: 8,
-      signedOperationalCapacity: 10,
-      maxCapacity: 9,
+      workingCapacity: 0,
+      signedOperationalCapacity: 0,
+      maxCapacity: 0,
     },
+    locationType: 'WING',
     subLocationName: 'TestWings',
     active: true,
     subLocations: [LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000002', pathHierarchy: 'ABC01' })],
@@ -76,13 +77,13 @@ context('Set Wing Location Structure', () => {
     it('shows the correct information and successfully creates draft wing', () => {
       cy.task('reset')
       setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
-      cy.task('stubCreateWing')
+      cy.task('stubCreateWing', LocationFactory.build({ locationType: 'WING' }))
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubLocationsResidentialSummaryForCreateWing')
       cy.task('stubLocationById')
-      // cy.task('stubLocations', decorated)
+      cy.task('stubLocations', residentialSummary)
       cy.task('setFeatureFlag', { createAndCertify: true })
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: false })
 
@@ -91,26 +92,17 @@ context('Set Wing Location Structure', () => {
 
       confirmPage.detailsTitle().contains('Wing details')
       confirmPage.structureDetails().contains('Testwing → Landings → Cells')
-      confirmPage
-        .structureChangeLink()
-        .should('have.attr', 'href')
-        .and('include', '/manage-locations/TST/create-new-testwing/structure')
+      confirmPage.structureChangeLink().should('have.attr', 'href').and('include', '/create-new/TST/structure')
 
       confirmPage.codeDetails().contains('ABC1')
-      confirmPage
-        .codeChangeLink()
-        .should('have.attr', 'href')
-        .and('include', '/manage-locations/TST/create-new-testwing/details')
+      confirmPage.codeChangeLink().should('have.attr', 'href').and('include', '/create-new/TST/details')
 
       confirmPage.localNameDetails().contains('testW')
-      confirmPage
-        .localNameChangeLink()
-        .should('have.attr', 'href')
-        .and('include', '/manage-locations/TST/create-new-testwing/details')
+      confirmPage.localNameChangeLink().should('have.attr', 'href').and('include', '/create-new/TST/details')
       confirmPage.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBanner().contains('Testwing created')
+      viewLocationsShowPage.successBanner().contains('Wing created')
       viewLocationsShowPage.draftBanner().should('exist')
       viewLocationsShowPage.summaryCards.cnaText().contains('-')
       viewLocationsShowPage.summaryCards.workingCapacityText().contains('-')

@@ -5,7 +5,7 @@ export default class CreateLocationConfirmPage extends Page {
     super(/Check and confirm the testwing details/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/manage-locations/${locationId}/create-new-testwing/confirm`)
+  static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/confirm`)
 
   detailsTitle = (): PageElement => cy.get('.govuk-summary-card__title')
 
@@ -21,7 +21,7 @@ export default class CreateLocationConfirmPage extends Page {
 
   localNameChangeLink = (): PageElement => cy.get('.govuk-link').eq(2)
 
-  createButton = (): PageElement => cy.get('button:contains("Create wing")')
+  createButton = (): PageElement => cy.get('button:contains("Create")')
 
   backLink = (): PageElement => cy.get('.govuk-back-link')
 
