@@ -31,7 +31,7 @@
   <div class="govuk-grid-row govuk-!-margin-bottom-0">
     <div class="govuk-grid-column-two-thirds">
       <span class="govuk-caption-m" data-qa="cell-name">
-        Create new {{ locationType | lower }}
+        Create new {{ values.locationType | lower }}
       </span>
       <h1 class="govuk-heading-l">
         Check and confirm the {{ locationType | lower }} details
@@ -130,7 +130,7 @@
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Create wing",
+                  text: "Create " + values.locationType | lower,
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"

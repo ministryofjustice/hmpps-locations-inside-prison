@@ -4,7 +4,6 @@ import { capitalize } from 'lodash'
 import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
-import displayName from '../../formatters/displayName'
 import { Location } from '../../data/types/locationsApi'
 import decorateLocation from '../../decorators/location'
 
@@ -92,7 +91,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
 
     req.flash('success', {
       title: `${decoratedLocation.locationType} created`,
-      content: `You have created ${decoratedLocation.locationType.toLowerCase()} ${displayName}.`,
+      content: `You have created ${decoratedLocation.locationType.toLowerCase()} ${decoratedLocation.localName || decoratedLocation.code}`,
     })
 
     res.redirect(`/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`)

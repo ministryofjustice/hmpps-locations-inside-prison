@@ -5,7 +5,6 @@ import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
 import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
-import buildDecoratedLocation from '../../../../server/testutils/buildDecoratedLocation'
 
 context('Set Wing Location Structure', () => {
   const prisonId = 'TST'
