@@ -10,8 +10,12 @@ describe('Create location structure', () => {
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   const analyticsService = new AnalyticsService(null) as jest.Mocked<AnalyticsService>
+  let sessionModelData: { [key: string]: any }
 
   beforeEach(() => {
+    sessionModelData = {
+      locationType: 'WING',
+    }
     deepReq = {
       flash: jest.fn(),
       session: {
@@ -28,8 +32,14 @@ describe('Create location structure', () => {
         analyticsService,
       },
       sessionModel: {
-        set: jest.fn(),
-        unset: jest.fn(),
+        set: (key: string, value: any) => {
+          sessionModelData[key] = value
+        },
+        get: (key: string) => sessionModelData[key],
+        reset: () => {
+          sessionModelData = {}
+        },
+        unset: (key: string) => delete sessionModelData[key],
       },
       journeyModel: {
         reset: jest.fn(),
@@ -41,9 +51,6 @@ describe('Create location structure', () => {
       locals: {
         errorlist: [],
         prisonId: 'TST',
-        decoratedLocation: {
-          locationType: 'Wing',
-        },
         options: {
           fields,
         },
@@ -70,8 +77,8 @@ describe('Create location structure', () => {
           level2: 'Landings',
           level3: '',
           level4: '',
-          backLink: '/manage-locations/TST/create-new-wing/details',
-          cancelLink: '/manage-locations/TST',
+          backLink: '/create-new/TST/details',
+          cancelLink: '/view-and-update-locations/TST',
         }),
       )
     })
@@ -103,7 +110,13 @@ describe('Create location structure', () => {
 
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('structureLevels', ['LANDING', 'SPUR', 'CELL'])
+      expect(sessionModelData).toEqual({
+        'level-2': 'LANDING',
+        'level-3': 'SPUR',
+        'level-4': 'CELL',
+        locationType: 'WING',
+        structureLevels: ['LANDING', 'SPUR', 'CELL'],
+      })
       expect(deepReq.form.values['level-2']).toBe('LANDING')
       expect(deepReq.form.values['level-3']).toBe('SPUR')
       expect(deepReq.form.values['level-4']).toBe('CELL')

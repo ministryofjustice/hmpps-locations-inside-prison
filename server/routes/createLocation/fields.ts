@@ -1,9 +1,14 @@
+import FormWizard from 'hmpo-form-wizard'
 import maxLength from '../../validators/maxLength'
+import alphanumeric from '../../validators/alphanumeric'
 
-const fields = {
+const fields: FormWizard.Fields = {
   locationCode: {
+    validate: ['required', alphanumeric, maxLength(5)],
     component: 'govukInput',
-    errorMessages: {},
+    errorMessages: {
+      alphanumeric: ':fieldName can only include numbers or letters',
+    },
     id: 'locationCode',
     name: 'locationCode',
     classes: 'govuk-input--width-5 local-name-text-input',
@@ -22,7 +27,9 @@ const fields = {
     component: 'govukCharacterCount',
     validate: [maxLength(30)],
     maxlength: 30,
-    errorMessages: {},
+    errorMessages: {
+      taken: 'A location with this name already exists',
+    },
     id: 'localName',
     name: 'localName',
     classes: 'govuk-!-width-one-half local-name-text-input',
@@ -35,6 +42,28 @@ const fields = {
     hint: {
       text: 'This will change how the name displays on location lists but won’t change the location code.',
     },
+    autocomplete: 'off',
+  },
+  createCellsNow: {
+    component: 'govukRadios',
+    validate: ['required'],
+    remove: req => !req.sessionModel.get('locationId'),
+    hideWhenRemoved: true,
+    id: 'createCellsNow',
+    name: 'createCellsNow',
+    errorMessages: {
+      required: 'Select yes if you want to create cells now',
+    },
+    fieldset: {
+      legend: {
+        text: 'Do you want to create cells on the LOCATION_TYPE now?',
+        classes: 'govuk-fieldset__legend--m',
+      },
+    },
+    items: [
+      { text: 'Yes', value: 'yes' },
+      { text: "No, I'll create them later", value: 'no' },
+    ],
     autocomplete: 'off',
   },
   levelType: {

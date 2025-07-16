@@ -15,7 +15,7 @@
 
 {% set locationType = decoratedResidentialSummary.location.locationType %}
 {% set locationName = decoratedResidentialSummary.location.localName or decoratedResidentialSummary.location.pathHierarchy %}
-{% set title = (decoratedResidentialSummary.location.displayName | capFirst) + ' - View and update locations' %}
+{% set title = (decoratedResidentialSummary.location.displayName | capFirst) + ' - ' + title %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -60,10 +60,6 @@
           }) }}
         {% endif %}
         {{ locationStatusTag(decoratedResidentialSummary.location) }}
-
-        {% if actionButton %}
-          {{ govukButton(actionButton) }}
-        {% endif %}
 
         {% if actions | length %}
           <div class="govuk-!-float-right">

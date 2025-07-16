@@ -1,5 +1,4 @@
 import express from 'express'
-import populatePrisonId from '../middleware/populatePrisonId'
 import logPageView from '../middleware/logPageView'
 import { Page } from '../services/auditService'
 import type { Services } from '../services'
@@ -8,11 +7,14 @@ import addBreadcrumb from '../middleware/addBreadcrumb'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 import adminIndex from '../controllers/adminIndex'
 import getServicePrisonsNonHousingDisplay from '../middleware/getServicePrisonsNonHousingDisplay'
+import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
+import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
 
 const router = express.Router({ mergeParams: true })
 
 const controller = (services: Services) => {
-  router.use(populatePrisonId())
+  router.use(populatePrisonAndLocationId)
+  router.use(redirectToAddPrisonId)
   router.use(validateCaseload())
 
   router.get(

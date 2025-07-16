@@ -47,10 +47,6 @@ export default class FormInitialStep extends FormWizard.Controller {
     const fieldName: string = field?.nameForErrors || field?.label?.text
     const errorMessageOverrides = field?.errorMessages || {}
 
-    const { decoratedLocation } = res.locals
-    const { locationType } = decoratedLocation || {}
-    const decoratedLocationType = locationType?.toString?.() || 'location'
-
     const errorMessages: Record<string, string> = {
       alphanumeric: `${fieldName} must not contain special characters`,
       dateTodayOrInFuture: `${fieldName} must be today or in the future`,
@@ -70,20 +66,19 @@ export default class FormInitialStep extends FormWizard.Controller {
       doesNotExceedMaxCap: `${fieldName} cannot be more than the maximum capacity`,
       isNoLessThanOccupancy: `${fieldName} cannot be less than the number of people currently occupying the cell`,
       lessThanOrEqualTo: `${fieldName} cannot be more than ${this.valueOrFieldName(error.args?.lessThanOrEqualTo as number, fields)}`,
-      localNameExists: 'A location with this name already exists',
-      locationCodeAlphanumeric: `${decoratedLocationType} code can only include numbers or letters`,
-      locationCodeLength: `${decoratedLocationType} code must be 5 characters or less`,
-      locationCodeMissing: `Enter a ${decoratedLocationType?.toLowerCase()} code`,
-      locationCodeExists: `A location with this ${decoratedLocationType?.toLowerCase()} code already exists`,
       maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
       minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
       numericString: `${fieldName} must only include numbers`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${fieldName?.toLowerCase()}`,
+      taken: `A location with this ${fieldName?.toLowerCase()} already exists`,
     }
 
-    const errorMessage = errorMessageOverrides[error.type] || errorMessages[error.type] || `${fieldName} is invalid`
+    const errorMessage =
+      errorMessageOverrides[error.type]?.replace(':fieldName', fieldName) ||
+      errorMessages[error.type] ||
+      `${fieldName} is invalid`
     return {
       text: errorMessage,
       href: `#${field?.id}`,
@@ -117,14 +112,12 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   setupRemovedFields(req: FormWizard.Request, _res: Response, next: NextFunction) {
-    const { options } = req.form
+    const { fields } = req.form.options
 
-    Object.values(options.fields)
-      .filter(f => 'remove' in f && f.remove(req))
-      .forEach(field => {
-        // eslint-disable-next-line no-param-reassign
-        field.removed = true
-      })
+    Object.values(fields).forEach(f => {
+      // eslint-disable-next-line no-param-reassign
+      f.removed = 'remove' in f && f.remove(req)
+    })
 
     next()
   }
@@ -155,8 +148,8 @@ export default class FormInitialStep extends FormWizard.Controller {
     }
   }
 
-  formError(fieldName: string, type: string): FormWizard.Controller.Error {
-    return new FormWizard.Controller.Error(fieldName, { args: {}, type, url: '/' })
+  formError(fieldName: string, type: string, args?: unknown): FormWizard.Controller.Error {
+    return new FormWizard.Controller.Error(fieldName, { arguments: args, type, url: '/' })
   }
 
   setupDateInputFields(fields: FormWizard.Fields, errorlist: FormWizard.Controller.Error[]): FormWizard.Fields {

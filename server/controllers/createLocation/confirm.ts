@@ -2,17 +2,21 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { capitalize } from 'lodash'
 import backUrl from '../../utils/backUrl'
+import { TypedLocals } from '../../@types/express'
+import FormInitialStep from '../base/formInitialStep'
+import displayName from '../../formatters/displayName'
+import { Location } from '../../data/types/locationsApi'
+import decorateLocation from '../../decorators/location'
 
-export default class ConfirmCreateLocation extends FormWizard.Controller {
+export default class ConfirmCreateLocation extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
-    const { values, prisonId } = res.locals
-    const { locationType } = res.locals.decoratedLocation
-    const displayLocalName =
-      typeof values.localName === 'string' && values.localName.trim() !== '' ? values.localName.trim() : 'Not set'
+  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+    const locals = super.locals(req, res)
+    const { prisonId, locationId } = res.locals
+    const { locationType, structureLevels } = res.locals.values
 
     // locations API uses singular types; UI needs to display them as plural.
     const singularToPluralMap: Record<string, string> = {
@@ -23,29 +27,21 @@ export default class ConfirmCreateLocation extends FormWizard.Controller {
 
     const pluralize = (level: string) => singularToPluralMap[level] || capitalize(level.toLowerCase())
 
-    const fullStructure = [locationType.toUpperCase(), ...values.structureLevels]
-    const decoratedFullStructure = fullStructure
+    const fullStructure = [locationType, ...structureLevels]
+    locals.decoratedLocationStructure = fullStructure
       .map((level, i) => (i === 0 ? capitalize(level) : pluralize(level)))
       .join(' → ')
 
-    const backLink = backUrl(req, {
-      fallbackUrl: `/manage-locations/${prisonId}/create-new-${locationType.toLowerCase()}/structure`,
+    locals.backLink = backUrl(req, {
+      fallbackUrl: `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/structure`,
     })
-    const detailsLink = backUrl(req, {
-      fallbackUrl: `/manage-locations/${prisonId}/create-new-${locationType.toLowerCase()}/details`,
-    })
-
-    return {
-      decoratedFullStructure,
-      displayLocalName,
-      backLink,
-      detailsLink,
-      cancelLink: `/manage-locations/${prisonId}`,
-    }
+    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
+    locals.createStructureLink = `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/structure`
+    locals.createDetailsLink = `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/details`
+    return locals
   }
 
   async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { decoratedLocation } = res.locals
     const { analyticsService, locationsService } = req.services
 
     try {
@@ -53,10 +49,10 @@ export default class ConfirmCreateLocation extends FormWizard.Controller {
       const structureLevels = sessionModel.get<string>('structureLevels')
       const localName = sessionModel.get<string>('localName')
       const locationCode = sessionModel.get<string>('locationCode')
-      const { locationType } = res.locals.decoratedLocation
+      const locationType = sessionModel.get<string>('locationType')
       const { prisonId } = res.locals
 
-      const fullStructure: string[] = [locationType.toUpperCase(), ...structureLevels]
+      const fullStructure: string[] = [locationType, ...structureLevels]
 
       const response = await locationsService.createWing(
         req.session.systemToken,
@@ -65,37 +61,40 @@ export default class ConfirmCreateLocation extends FormWizard.Controller {
         fullStructure,
         localName,
       )
-      Object.assign(res.locals.decoratedLocation, {
-        id: response.id,
-        prisonId: response.prisonId,
-        code: response.code,
-        localName: response.localName,
-      })
+      req.sessionModel.set('newLocation', response)
 
       analyticsService.sendEvent(req, `create_${locationType}_location`, {
-        prison_id: decoratedLocation.prisonId,
-        code: decoratedLocation.code,
-        localName: decoratedLocation.localName,
+        prison_id: prisonId,
+        code: locationCode,
+        localName,
       })
+
       next()
     } catch (error) {
       next(error)
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, code: locationCode, localName, prisonId } = res.locals.decoratedLocation
-    const { locationType } = res.locals.decoratedLocation
-    const displayName: string = localName || locationCode
+  async successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
+    const { systemToken } = req.session
+    const location = req.sessionModel.get<Location>('newLocation')
+    const decoratedLocation = await decorateLocation({
+      location,
+      systemToken,
+      userToken: '', // not required when limited: true
+      manageUsersService: null, // not required when limited: true
+      locationsService: req.services.locationsService,
+      limited: true,
+    })
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
     req.flash('success', {
-      title: `${locationType} created`,
-      content: `You have created ${locationType.toLowerCase()} ${displayName}.`,
+      title: `${decoratedLocation.locationType} created`,
+      content: `You have created ${decoratedLocation.locationType.toLowerCase()} ${displayName}.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(`/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`)
   }
 }

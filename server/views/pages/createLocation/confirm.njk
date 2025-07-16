@@ -65,12 +65,12 @@
                 text: "Wing structure"
               },
               value: {
-                html: decoratedFullStructure
+                text: decoratedLocationStructure
               },
               actions: {
                 items: [
                   {
-                    href: backLink,
+                    href: createStructureLink,
                     text: "Change"
                   }
                 ]
@@ -81,12 +81,12 @@
                 text: "Wing code"
               },
               value: {
-                html: values.locationCode
+                text: values.locationCode
               },
               actions: {
                 items: [
                   {
-                    href: detailsLink,
+                    href: createDetailsLink,
                     text: "Change"
                   }
                 ]
@@ -97,12 +97,12 @@
                 text: "Local name"
               },
               value: {
-                html: displayLocalName
+                text: values.localName or 'Not set'
               },
               actions: {
                 items: [
                   {
-                    href: detailsLink,
+                    href: createDetailsLink,
                     text: "Change"
                   }
                 ]
@@ -142,7 +142,7 @@
 
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel
+            Cancel and return to location details
           </a>
         </p>
       </div>

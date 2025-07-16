@@ -6,7 +6,6 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
-{% set locationType = decoratedLocation.locationType %}
 {% set title = "Set " + locationType | lower + " structure" %}
 
 {% block beforeContent %}
@@ -58,7 +57,7 @@
           </p>
 
           <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Level 1 type</h2>
-          <p class="govuk-body">{{ locationType }}</p>
+          <p class="govuk-body">{{ locationType | lower | capFirst }}</p>
 
           <div id="levelType" class="{% if errors.levelType %}govuk-form-group--error{% endif %}">
             {% if errors.levelType %}
@@ -150,7 +149,7 @@
 
           <div class="govuk-inset-text">
             <div class="structurePreview" id="structurePreview">
-              <div class="structureLevel" id="level1"><p>{{ locationType }}</p></div>
+              <div class="structureLevel" id="level1"><p>{{ locationType | lower | capFirst }}</p></div>
               <div class="structureLevel" id="level2"><p></p></div>
               <div class="structureLevel" id="level3"><p></p></div>
               <div class="structureLevel" id="level4"><p></p></div>
@@ -176,7 +175,7 @@
 
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel
+            Cancel and return to location details
           </a>
         </p>
 

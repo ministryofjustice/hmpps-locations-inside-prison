@@ -31,6 +31,12 @@ interface TypedLocals {
   actions?: { text: string; href: string }[]
   archivedLocations?: DecoratedLocation[]
   backLink?: string
+  banner?: {
+    success?: {
+      title: string
+      content: string
+    }
+  }
   baseUrl?: string
   bookmarkingEnabled?: boolean
   bookmarks?: BookmarkStoreData[]
@@ -54,6 +60,14 @@ interface TypedLocals {
   cells?: Locations[]
   changeSummary?: string
   continueLink?: string
+  createButton?: {
+    text: string
+    href: string
+    classes: string
+    attributes: { [attr: string]: string }
+  }
+  createStructureLink?: string
+  createDetailsLink?: string
   cspNonce?: string
   csrfToken?: string
   currentSignedOperationalCapacity?: number
@@ -62,6 +76,7 @@ interface TypedLocals {
   decoratedCells?: DecoratedLocation[]
   decoratedLocation?: DecoratedLocation
   decoratedLocationTree?: DecoratedLocationTree[]
+  decoratedLocationStructure?: string
   decoratedResidentialSummary?: {
     location?: DecoratedLocation
     locationDetails?: SummaryListRow[]
@@ -89,7 +104,7 @@ interface TypedLocals {
   inactiveCells?: DecoratedLocation[]
   inactiveParentLocations?: DecoratedLocation[]
   insetText?: string
-  lastUpdate: { time: string; date: string; updatedBy: string }
+  lastUpdate?: { time: string; date: string; updatedBy: string }
   leafLevel?: boolean
   level2?: string
   level3?: string
@@ -99,6 +114,7 @@ interface TypedLocals {
   locationHierarchy?: LocationSummary[]
   locationResidentialSummary?: LocationResidentialSummary
   locationTree?: LocationTree[]
+  locationType?: string
   maxCapacity?: string
   options?: {
     action: string
@@ -119,6 +135,7 @@ interface TypedLocals {
   requestedReports?: StoredReportData[]
   routePrefix?: string
   specialistCellTypes?: string[]
+
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string

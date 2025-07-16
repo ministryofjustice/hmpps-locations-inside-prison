@@ -12,8 +12,7 @@ export default class Structure extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { prisonId } = res.locals
-    const { locationType } = res.locals.decoratedLocation
+    const { locationId, prisonId } = res.locals
     const { values } = req.form
 
     // locationsAPI uses singular types. UI needs to display them as plural.
@@ -22,25 +21,20 @@ export default class Structure extends FormInitialStep {
       CELL: 'Cells',
       SPUR: 'Spurs',
     }
+    locals.locationType = req.sessionModel.get<string>('locationType')
 
     const pluralize = (level: string) => singularToPluralMap[level.toUpperCase()] || capitalize(level.toLowerCase())
 
-    const level2 = pluralize(String(values['level-2'] || 'Landings'))
-    const level3 = pluralize(String(values['level-3'] || ''))
-    const level4 = pluralize(String(values['level-4'] || ''))
+    locals.level2 = pluralize(String(values['level-2'] || 'Landings'))
+    locals.level3 = pluralize(String(values['level-3'] || ''))
+    locals.level4 = pluralize(String(values['level-4'] || ''))
 
-    const backLink = backUrl(req, {
-      fallbackUrl: `/manage-locations/${prisonId}/create-new-${locationType.toLowerCase()}/details`,
+    locals.backLink = backUrl(req, {
+      fallbackUrl: `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/details`,
     })
+    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
 
-    return {
-      ...locals,
-      level2,
-      level3,
-      level4,
-      backLink,
-      cancelLink: `/manage-locations/${prisonId}`,
-    }
+    return locals
   }
 
   async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {

@@ -3,16 +3,16 @@ import setCanAccess from './setCanAccess'
 import LocationsService from '../services/locationsService'
 
 export default function populateCards(locationsService: LocationsService) {
-  return asyncMiddleware((_req, res, next) => {
+  return asyncMiddleware((req, res, next) => {
     setCanAccess(locationsService)
     res.locals.cards = [
-      ...(_req.featureFlags.createAndCertify && _req.canAccess('create_location')
+      ...(req.featureFlags.createAndCertify && req.canAccess('create_location')
         ? [
             {
               clickable: true,
               visible: true,
               heading: 'Manage locations',
-              href: `/manage-locations`,
+              href: `/view-and-update-locations`,
               description: 'View and update information about existing locations or create new residential locations',
               'data-qa': 'manage-locations-card',
             },
@@ -21,7 +21,7 @@ export default function populateCards(locationsService: LocationsService) {
             {
               clickable: true,
               visible: true,
-              heading: 'View and update locations',
+              heading: `View and update locations`,
               href: `/view-and-update-locations`,
               description: 'View and update information about existing residential locations.',
               'data-qa': 'view-locations-card',
@@ -45,7 +45,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible: _req.canAccess('reporting_location_information'),
+        visible: req.canAccess('reporting_location_information'),
         heading: 'Management reporting',
         href: '/management-reporting',
         description: 'Run management reports for printing or exporting.',
@@ -53,7 +53,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible: _req.canAccess('administer_residential'),
+        visible: req.canAccess('administer_residential'),
         heading: 'Admin',
         href: '/admin',
         description: 'Administer residential locations.',
