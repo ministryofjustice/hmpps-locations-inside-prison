@@ -5,6 +5,8 @@
 
 {% macro locationsTable (createButton, locationType, locations) %}
 
+<h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
+
   {% if createButton %}
     {{ govukButton(createButton) }}
   {% endif %}
