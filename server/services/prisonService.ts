@@ -1,4 +1,4 @@
-import PrisonApiClient from '../data/prisonApiClient'
+import { PrisonApiClient } from '../data/prisonApiClient'
 import { ServiceCode } from '../data/types/locationsApi/serviceCode'
 
 export default class PrisonService {
@@ -14,5 +14,36 @@ export default class PrisonService {
 
   async deactivatePrisonService(token: string, prisonId: string, serviceCode: ServiceCode) {
     return this.prisonApiClient.servicePrisons.deactivatePrisonService(token, { prisonId, serviceCode })
+  }
+
+  async getScreenStatus(token: string, prisonId: string) {
+    return this.prisonApiClient.splashScreen.getScreenStatus(token, { prisonId, moduleName: 'OIDCHOLO' })
+  }
+
+  async addCondition(token: string, prisonId: string, block: boolean = true) {
+    return this.prisonApiClient.splashScreen.addCondition(
+      token,
+      {
+        prisonId,
+        moduleName: 'OIDCHOLO',
+      },
+      {
+        conditionType: 'CASELOAD',
+        conditionValue: `${prisonId}`,
+        blockAccess: block,
+      },
+    )
+  }
+
+  async removeCondition(token: string, prisonId: string) {
+    return this.prisonApiClient.splashScreen.removeCondition(token, { prisonId, moduleName: 'OIDCHOLO' })
+  }
+
+  async updateScreen(token: string, prisonId: string, block: boolean) {
+    return this.prisonApiClient.splashScreen.updateScreen(token, {
+      prisonId,
+      moduleName: 'OIDCHOLO',
+      blockScreen: block === true ? 'true' : 'false',
+    })
   }
 }

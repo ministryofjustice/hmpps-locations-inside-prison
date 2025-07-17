@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPattern": "^/api/splash-screen/OIDCHOLO/condition/CASELOAD/[A-Z]{3}/[\\w-]+$"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "splash-screen-result.json"
+  }
+}
