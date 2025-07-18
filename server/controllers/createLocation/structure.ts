@@ -1,6 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
-import { capitalize } from 'lodash'
+import pluralize from '../../formatters/pluralize'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
@@ -15,22 +15,15 @@ export default class Structure extends FormInitialStep {
     const { locationId, prisonId } = res.locals
     const { values } = req.form
 
-    // locationsAPI uses singular types. UI needs to display them as plural.
-    const singularToPluralMap: Record<string, string> = {
-      LANDING: 'Landings',
-      CELL: 'Cells',
-      SPUR: 'Spurs',
-    }
     locals.locationType = req.sessionModel.get<string>('locationType')
 
-    const pluralize = (level: string) => singularToPluralMap[level.toUpperCase()] || capitalize(level.toLowerCase())
-
+    // locationsAPI uses singular types. UI needs to display them as plural.
     locals.level2 = pluralize(String(values['level-2'] || 'Landings'))
     locals.level3 = pluralize(String(values['level-3'] || ''))
     locals.level4 = pluralize(String(values['level-4'] || ''))
 
     locals.backLink = backUrl(req, {
-      fallbackUrl: `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/details`,
+      fallbackUrl: `/create-new/${locationId || prisonId}/details`,
     })
     locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
 

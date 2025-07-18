@@ -5,6 +5,7 @@ import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
 import { Location } from '../../data/types/locationsApi'
+import pluralize from '../../formatters/pluralize'
 import decorateLocation from '../../decorators/location'
 
 export default class ConfirmCreateLocation extends FormInitialStep {
@@ -17,26 +18,18 @@ export default class ConfirmCreateLocation extends FormInitialStep {
     const { prisonId, locationId } = res.locals
     const { locationType, structureLevels } = res.locals.values
 
-    // locations API uses singular types; UI needs to display them as plural.
-    const singularToPluralMap: Record<string, string> = {
-      LANDING: 'Landings',
-      CELL: 'Cells',
-      SPUR: 'Spurs',
-    }
-
-    const pluralize = (level: string) => singularToPluralMap[level] || capitalize(level.toLowerCase())
-
     const fullStructure = [locationType, ...structureLevels]
+    // locations API uses singular types; UI needs to display them as plural.
     locals.decoratedLocationStructure = fullStructure
       .map((level, i) => (i === 0 ? capitalize(level) : pluralize(level)))
       .join(' → ')
 
     locals.backLink = backUrl(req, {
-      fallbackUrl: `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/structure`,
+      fallbackUrl: `/create-new/${locationId || prisonId}/structure`,
     })
     locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
-    locals.createStructureLink = `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/structure`
-    locals.createDetailsLink = `/create-new/${[prisonId, locationId].filter(i => i).join('/')}/details`
+    locals.createStructureLink = `/create-new/${locationId || prisonId}/structure`
+    locals.createDetailsLink = `/create-new/${locationId || prisonId}/details`
     return locals
   }
 
