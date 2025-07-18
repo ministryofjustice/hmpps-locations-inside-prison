@@ -40,6 +40,8 @@ context('Admin Index', () => {
       cy.task('stubPrisonConfigurationCertApproval')
       cy.task('stubDisplayHousingCheckboxesDisabled')
       cy.task('stubDisplayHousingCheckboxesPost')
+      cy.task('stubGetSplashScreenCondition')
+      cy.task('stubUpdateSplashScreenCondition')
       cy.signIn()
     })
 
