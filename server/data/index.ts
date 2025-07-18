@@ -19,7 +19,7 @@ import HmppsAuditClient from './hmppsAuditClient'
 import LocationsApiClient from './locationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
 import logger from '../../logger'
-import PrisonApiClient from './prisonApiClient'
+import { PrisonApiClient } from './prisonApiClient'
 
 export const dataAccess = () => {
   const hmppsAuthClient = new AuthenticationClient(

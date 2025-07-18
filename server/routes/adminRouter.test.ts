@@ -61,7 +61,11 @@ describe('GET /admin/PRISON_ID', () => {
       certificationApprovalRequired: 'INACTIVE',
     })
     prisonService.getServiceStatus.mockResolvedValue('')
-
+    prisonService.getScreenStatus.mockResolvedValue({
+      conditionType: 'CASELOAD',
+      conditionValue: 'TST',
+      blockAccess: true,
+    })
     return request(app)
       .get('/admin/TST')
       .expect(200)
@@ -94,7 +98,11 @@ describe('GET /admin/PRISON_ID', () => {
     const error: SanitisedError<object> = new Error('Not Found')
     error.responseStatus = 404
     prisonService.getServiceStatus.mockImplementationOnce(() => Promise.reject(error))
-
+    prisonService.getScreenStatus.mockResolvedValue({
+      conditionType: 'CASELOAD',
+      conditionValue: 'TST',
+      blockAccess: false,
+    })
     return request(app)
       .get('/admin/TST')
       .expect(200)
@@ -111,6 +119,86 @@ describe('GET /admin/PRISON_ID', () => {
           who: user.username,
           correlationId: expect.any(String),
         })
+      })
+  })
+
+  it('should use getFallbackScreenStatus when getScreenStatus returns 404 for specific prison', async () => {
+    auditService.logPageView.mockResolvedValue(null)
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'ACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
+    })
+    prisonService.getServiceStatus.mockResolvedValue('')
+
+    // First call to getScreenStatus fails with 404
+    const error: SanitisedError<object> = new Error('Not Found')
+    error.responseStatus = 404
+    prisonService.getScreenStatus.mockImplementationOnce(() => Promise.reject(error))
+
+    // Second call to getScreenStatus (with **ALL**) succeeds
+    prisonService.getScreenStatus.mockImplementationOnce(() =>
+      Promise.resolve({
+        conditionType: 'CASELOAD',
+        conditionValue: '**ALL**',
+        blockAccess: true,
+      }),
+    )
+
+    return request(app)
+      .get('/admin/TST')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        // Check that getScreenStatus was called twice
+        // First with 'TST', then with '**ALL**'
+        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
+        expect(prisonService.getScreenStatus.mock.calls[0][1]).toBe('TST')
+        expect(prisonService.getScreenStatus.mock.calls[1][1]).toBe('**ALL**')
+
+        // Check that the page was rendered with blockAccess=true from the fallback
+        expect(res.text).toContain('govuk-breadcrumbs')
+        expect(res.text).toContain('/admin/TST/change-resi-status')
+        expect(res.text).toContain('/admin/TST/change-certification-status')
+      })
+  })
+
+  it('should default to blockAccess=false when both specific prison and **ALL** return 404', async () => {
+    auditService.logPageView.mockResolvedValue(null)
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'ACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
+    })
+    prisonService.getServiceStatus.mockResolvedValue('')
+
+    // Create a 404 error
+    const error: SanitisedError<object> = new Error('Not Found')
+    error.responseStatus = 404
+
+    // First call to getScreenStatus fails with 404
+    prisonService.getScreenStatus.mockImplementationOnce(() => Promise.reject(error))
+
+    // Second call to getScreenStatus (with **ALL**) also fails with 404
+    prisonService.getScreenStatus.mockImplementationOnce(() => Promise.reject(error))
+
+    return request(app)
+      .get('/admin/TST')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        // Check that getScreenStatus was called twice
+        // First with 'TST', then with '**ALL**'
+        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
+        expect(prisonService.getScreenStatus.mock.calls[0][1]).toBe('TST')
+        expect(prisonService.getScreenStatus.mock.calls[1][1]).toBe('**ALL**')
+
+        // Check that the page was rendered (blockAccess should default to false)
+        expect(res.text).toContain('govuk-breadcrumbs')
+        expect(res.text).toContain('/admin/TST/change-resi-status')
+        expect(res.text).toContain('/admin/TST/change-certification-status')
       })
   })
 })

@@ -6,7 +6,9 @@ import validateCaseload from '../middleware/validateCaseload'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 import adminIndex from '../controllers/adminIndex'
-import getServicePrisonsNonHousingDisplay from '../middleware/getServicePrisonsNonHousingDisplay'
+import getServicePrisonsNonHousingDisplay, {
+  getSplashScreenStatus,
+} from '../middleware/getServicePrisonsNonHousingDisplay'
 import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
 import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
 
@@ -22,6 +24,7 @@ const controller = (services: Services) => {
     addBreadcrumb({ title: '', href: '/' }),
     populatePrisonConfiguration(),
     getServicePrisonsNonHousingDisplay(),
+    getSplashScreenStatus(),
     logPageView(services.auditService, Page.LOCATION_ADMIN),
     adminIndex,
   )

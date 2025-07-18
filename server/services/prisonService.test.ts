@@ -1,5 +1,5 @@
 import PrisonService from './prisonService'
-import PrisonApiClient from '../data/prisonApiClient'
+import { PrisonApiClient } from '../data/prisonApiClient'
 
 jest.mock('../data/prisonApiClient')
 

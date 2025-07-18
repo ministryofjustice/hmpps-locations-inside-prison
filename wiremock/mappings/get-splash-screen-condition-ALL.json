@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/splash-screen/OIDCHOLO/condition/CASELOAD/**ALL**"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "splash-condition-ALL-result.json"
+  }
+}

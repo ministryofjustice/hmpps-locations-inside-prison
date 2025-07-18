@@ -43,6 +43,16 @@ export default class ResiStatusChangeConfirm extends FormInitialStep {
         await prisonService.deactivatePrisonService(req.session.systemToken, prisonId, serviceCode)
       }
 
+      // block or unblock the screen
+      try {
+        await prisonService.getScreenStatus(req.session.systemToken, prisonId)
+        await prisonService.updateScreen(req.session.systemToken, prisonId, status === 'ACTIVE')
+      } catch (error) {
+        if (error.responseStatus === 404) {
+          await prisonService.addCondition(req.session.systemToken, prisonId, status === 'ACTIVE')
+        }
+      }
+
       analyticsService.sendEvent(req, 'resi_status', {
         prison_id: prisonId,
         status,
