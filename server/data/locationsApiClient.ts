@@ -117,6 +117,14 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
+    createWing: this.apiCall<
+      Location,
+      undefined,
+      { prisonId: string; wingCode: string; wingDescription?: string; wingStructure: string[] }
+    >({
+      path: '/locations/create-wing',
+      requestType: 'post',
+    }),
     convertCellToNonResCell: this.apiCall<
       Location,
       { locationId: string },

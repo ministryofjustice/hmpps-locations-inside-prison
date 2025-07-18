@@ -1,6 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
-import { capitalize } from 'lodash'
+import pluralize from '../../formatters/pluralize'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
@@ -17,9 +17,10 @@ export default class Structure extends FormInitialStep {
 
     locals.locationType = req.sessionModel.get<string>('locationType')
 
-    locals.level2 = capitalize(String(values['level-2'] || 'Landings'))
-    locals.level3 = capitalize(String(values['level-3'] || ''))
-    locals.level4 = capitalize(String(values['level-4'] || ''))
+    // locationsAPI uses singular types. UI needs to display them as plural.
+    locals.level2 = pluralize(String(values['level-2'] || 'Landings'))
+    locals.level3 = pluralize(String(values['level-3'] || ''))
+    locals.level4 = pluralize(String(values['level-4'] || ''))
 
     locals.backLink = backUrl(req, {
       fallbackUrl: `/create-new/${locationId || prisonId}/details`,
@@ -47,14 +48,20 @@ export default class Structure extends FormInitialStep {
       // set structureLevels
       const toUpper = (string: string) => string.toUpperCase()
 
+      const pluralToSingularMap: Record<string, string> = {
+        LANDINGS: 'LANDING',
+        CELLS: 'CELL',
+        SPURS: 'SPUR',
+      }
+
       const structureLevels: string[] = []
-      structureLevels.push(toUpper(body['level-2'] || 'LANDINGS'))
+      structureLevels.push(pluralToSingularMap[toUpper(body['level-2'] || 'LANDING')] || '')
 
       if (body['level-3']) {
-        structureLevels.push(toUpper(body['level-3']))
+        structureLevels.push(pluralToSingularMap[toUpper(body['level-3'])] || '')
       }
       if (body['level-4']) {
-        structureLevels.push(toUpper(body['level-4']))
+        structureLevels.push(pluralToSingularMap[toUpper(body['level-4'])] || '')
       }
 
       // persist levels for re-rendering if there are validation errors
@@ -74,8 +81,8 @@ export default class Structure extends FormInitialStep {
       }
 
       const lastSelected = structureLevels[structureLevels.length - 1]
-      const hasCells = structureLevels.includes('CELLS')
-      const cellIsNotLast = hasCells && lastSelected !== 'CELLS'
+      const hasCells = structureLevels.includes('CELL')
+      const cellIsNotLast = hasCells && lastSelected !== 'CELL'
 
       if (cellIsNotLast) {
         validationErrors.levelType = this.formError('levelType', 'createLevelHierarchy')
