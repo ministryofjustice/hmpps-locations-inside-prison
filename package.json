@@ -87,7 +87,7 @@
     "@ministryofjustice/hmpps-auth-clients": "^0.0.1-alpha.4",
     "@ministryofjustice/hmpps-digital-prison-reporting-frontend": "^4.4.3",
     "@ministryofjustice/hmpps-monitoring": "^0.0.1-beta.2",
-    "@ministryofjustice/hmpps-rest-client": "^0.0.1-alpha.11",
+    "@ministryofjustice/hmpps-rest-client": "^0.0.1",
     "applicationinsights": "^2.9.7",
     "axe-core": "^4.10.3",
     "body-parser": "^2.2.0",
