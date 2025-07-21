@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "urlPath": "/api/splash-screen/OIDCHOLO/condition"
+    "urlPath": "/api/splash-screen/OIMMHOLO/condition"
   },
   "response": {
     "status": 200,

@@ -1,1 +1,1 @@
-export declare type ModuleName = 'OIDCHOLO'
+export declare type ModuleName = 'OIMMHOLO'
