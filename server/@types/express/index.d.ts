@@ -124,6 +124,7 @@ interface TypedLocals {
   pathSuffix?: string
   prisonConfiguration?: PrisonConfiguration
   prisonNonHousingDisabled?: boolean
+  nomisScreenBlocked?: boolean
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary

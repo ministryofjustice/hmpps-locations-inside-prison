@@ -18,6 +18,8 @@ export default class PrisonConfigurationIndexPage extends Page {
     cy.get('.govuk-summary-list__key').eq(3).contains('Certification approval required')
     cy.get('.govuk-summary-list__value').eq(3).contains('INACTIVE')
     cy.get('.govuk-summary-list__key').eq(4).contains('Prison non housing checkboxes')
+    cy.get('.govuk-summary-list__key').eq(5).contains('OIDCHOLO screen blocked')
+    cy.get('.govuk-summary-list__value').eq(5).contains('Not-Blocked')
   }
 
   changeResiLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(0).contains('Change')

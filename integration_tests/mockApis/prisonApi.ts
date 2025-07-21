@@ -1,4 +1,5 @@
 import { stubFor } from './wiremock'
+import { SplashCondition, SplashScreen } from '../../server/data/prisonApiClient'
 
 const stubPrisonHealthPing = () =>
   stubFor({
@@ -73,10 +74,72 @@ const stubDisplayHousingCheckboxesPost = (returnData: { prisonid: 'TST'; prison:
     jsonBody: returnData,
   })
 
+const stubGetSplashScreenCondition = (
+  prisonId: string = 'TST',
+  returnData: SplashCondition = { conditionType: 'CASELOAD', conditionValue: 'TST', blockAccess: false },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPath: `/prison-api/api/splash-screen/OIDCHOLO/condition/CASELOAD/${prisonId}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const sampleSplashResult = {
+  moduleName: 'OIDCHOLO',
+  conditions: [{ conditionType: 'CASELOAD', conditionValue: 'TST', blockAccess: false }],
+  warningText: 'WARN',
+  blockedText: 'BLOCKED',
+  blockAccessType: 'COND',
+}
+const stubCreateSplashScreenCondition = (returnData: SplashScreen = sampleSplashResult) =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPath: '/prison-api/api/splash-screen/OIDCHOLO/condition',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const stubUpdateSplashScreenCondition = (
+  prisonId: string = 'TST',
+  blockScreen: boolean = false,
+  returnData: SplashScreen = sampleSplashResult,
+) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: `/prison-api/api/splash-screen/OIDCHOLO/condition/CASELOAD/${prisonId}/${blockScreen}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 export default {
   stubPrisonHealthPing,
   stubDisplayHousingCheckboxesDisabled,
   stubDisplayHousingCheckboxesEnabled,
   stubDisplayHousingCheckboxesDelete,
   stubDisplayHousingCheckboxesPost,
+  stubGetSplashScreenCondition,
+  stubCreateSplashScreenCondition,
+  stubUpdateSplashScreenCondition,
 }

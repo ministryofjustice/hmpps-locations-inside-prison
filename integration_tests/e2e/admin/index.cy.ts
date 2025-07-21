@@ -40,6 +40,9 @@ context('Admin Index', () => {
       cy.task('stubPrisonConfigurationCertApproval')
       cy.task('stubDisplayHousingCheckboxesDisabled')
       cy.task('stubDisplayHousingCheckboxesPost')
+      cy.task('stubGetSplashScreenCondition')
+      cy.task('stubCreateSplashScreenCondition')
+      cy.task('stubUpdateSplashScreenCondition')
       cy.signIn()
     })
 
@@ -97,6 +100,9 @@ context('Admin Index', () => {
       cy.task('stubPrisonConfigurationDeactivateResi')
       cy.task('stubDisplayHousingCheckboxesEnabled')
       cy.task('stubDisplayHousingCheckboxesDelete')
+      cy.task('stubGetSplashScreenCondition')
+      cy.task('stubCreateSplashScreenCondition')
+      cy.task('stubUpdateSplashScreenCondition')
       cy.signIn()
     })
 

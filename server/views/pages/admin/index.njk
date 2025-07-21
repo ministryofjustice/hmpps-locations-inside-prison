@@ -22,6 +22,14 @@
   {% endif %}
 {% endset %}
 
+{% set screenBlocked %}
+  {% if nomisScreenBlocked %}
+    Blocked
+  {% else %}
+    Not-Blocked
+  {% endif %}
+{% endset %}
+
 {% block beforeContent %}
   {{ super() }}
 
@@ -108,6 +116,14 @@
           },
           value: {
             text: housingMessage
+          }
+        },
+        {
+          key: {
+          text: 'OIDCHOLO screen blocked'
+        },
+          value: {
+            text: screenBlocked
           }
         }
         ],
