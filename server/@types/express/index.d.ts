@@ -66,6 +66,8 @@ interface TypedLocals {
     classes: string
     attributes: { [attr: string]: string }
   }
+  createStructureLink?: string
+  createDetailsLink?: string
   cspNonce?: string
   csrfToken?: string
   currentSignedOperationalCapacity?: number
@@ -74,6 +76,7 @@ interface TypedLocals {
   decoratedCells?: DecoratedLocation[]
   decoratedLocation?: DecoratedLocation
   decoratedLocationTree?: DecoratedLocationTree[]
+  decoratedLocationStructure?: string
   decoratedResidentialSummary?: {
     location?: DecoratedLocation
     locationDetails?: SummaryListRow[]
@@ -133,6 +136,7 @@ interface TypedLocals {
   requestedReports?: StoredReportData[]
   routePrefix?: string
   specialistCellTypes?: string[]
+
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string
