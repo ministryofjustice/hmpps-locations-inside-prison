@@ -81,7 +81,7 @@ const stubGetSplashScreenCondition = (
   stubFor({
     request: {
       method: 'GET',
-      urlPath: `/prison-api/api/splash-screen/OIDCHOLO/condition/CASELOAD/${prisonId}`,
+      urlPath: `/prison-api/api/splash-screen/OIMMHOLO/condition/CASELOAD/${prisonId}`,
     },
     response: {
       status: 200,
@@ -93,7 +93,7 @@ const stubGetSplashScreenCondition = (
   })
 
 const sampleSplashResult = {
-  moduleName: 'OIDCHOLO',
+  moduleName: 'OIMMHOLO',
   conditions: [{ conditionType: 'CASELOAD', conditionValue: 'TST', blockAccess: false }],
   warningText: 'WARN',
   blockedText: 'BLOCKED',
@@ -103,7 +103,7 @@ const stubCreateSplashScreenCondition = (returnData: SplashScreen = sampleSplash
   stubFor({
     request: {
       method: 'POST',
-      urlPath: '/prison-api/api/splash-screen/OIDCHOLO/condition',
+      urlPath: '/prison-api/api/splash-screen/OIMMHOLO/condition',
     },
     response: {
       status: 200,
@@ -122,7 +122,7 @@ const stubUpdateSplashScreenCondition = (
   stubFor({
     request: {
       method: 'PUT',
-      urlPattern: `/prison-api/api/splash-screen/OIDCHOLO/condition/CASELOAD/${prisonId}/${blockScreen}`,
+      urlPattern: `/prison-api/api/splash-screen/OIMMHOLO/condition/CASELOAD/${prisonId}/${blockScreen}`,
     },
     response: {
       status: 200,
