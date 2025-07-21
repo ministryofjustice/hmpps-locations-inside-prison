@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "PUT",
-    "urlPattern": "^/api/splash-screen/OIDCHOLO/condition/CASELOAD/[A-Z]{3}/[\\w-]+$"
+    "urlPattern": "^/api/splash-screen/OIMMHOLO/condition/CASELOAD/[A-Z]{3}/[\\w-]+$"
   },
   "response": {
     "status": 200,

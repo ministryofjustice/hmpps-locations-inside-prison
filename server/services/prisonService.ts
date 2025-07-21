@@ -17,7 +17,7 @@ export default class PrisonService {
   }
 
   async getScreenStatus(token: string, prisonId: string) {
-    return this.prisonApiClient.splashScreen.getScreenStatus(token, { prisonId, moduleName: 'OIDCHOLO' })
+    return this.prisonApiClient.splashScreen.getScreenStatus(token, { prisonId, moduleName: 'OIMMHOLO' })
   }
 
   async addCondition(token: string, prisonId: string, block: boolean = true) {
@@ -25,7 +25,7 @@ export default class PrisonService {
       token,
       {
         prisonId,
-        moduleName: 'OIDCHOLO',
+        moduleName: 'OIMMHOLO',
       },
       {
         conditionType: 'CASELOAD',
@@ -36,13 +36,13 @@ export default class PrisonService {
   }
 
   async removeCondition(token: string, prisonId: string) {
-    return this.prisonApiClient.splashScreen.removeCondition(token, { prisonId, moduleName: 'OIDCHOLO' })
+    return this.prisonApiClient.splashScreen.removeCondition(token, { prisonId, moduleName: 'OIMMHOLO' })
   }
 
   async updateScreen(token: string, prisonId: string, block: boolean) {
     return this.prisonApiClient.splashScreen.updateScreen(token, {
       prisonId,
-      moduleName: 'OIDCHOLO',
+      moduleName: 'OIMMHOLO',
       blockScreen: block === true ? 'true' : 'false',
     })
   }
