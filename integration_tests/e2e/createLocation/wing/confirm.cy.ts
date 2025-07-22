@@ -64,12 +64,7 @@ context('Set Wing Location Structure', () => {
 
     const goToConfirmPage = () => {
       const structurePage = goToLocationStructurePage()
-      structurePage.level2Select().select('Landings')
-      structurePage.addLevelButton().click()
-      structurePage.level3Select().select('Cells')
-
       structurePage.continueButton().click()
-
       CreateLocationConfirmPage.goTo(prisonId)
       return Page.verifyOnPage(CreateLocationConfirmPage)
     }

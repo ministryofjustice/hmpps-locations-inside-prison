@@ -72,13 +72,11 @@ context('Set Wing Location Structure', () => {
 
     it('shows the correct validation error if cells is not the last structure item', () => {
       const structurePage = goToLocationStructurePage()
-      structurePage.level2Select().select('Cells')
-      structurePage.addLevelButton().click()
-      structurePage.level3Select().select('Landings')
+      structurePage.level3Select().select('Spurs')
 
       structurePage.continueButton().click()
 
-      cy.get('.govuk-error-summary__list').contains('You cannot have levels below cells')
+      cy.get('.govuk-error-summary__list').contains('The level 3 type must be cells')
     })
 
     it('shows the correct default values for select options and preview updates', () => {
@@ -86,12 +84,8 @@ context('Set Wing Location Structure', () => {
 
       // Check level 2
       structurePage.level2Select().should('have.value', 'Landings')
-      structurePage.level3Select().should('not.be.visible')
+      structurePage.level3Select().should('have.value', 'Cells')
       structurePage.level4Select().should('not.be.visible')
-
-      // Add level 3
-      structurePage.addLevelButton().click()
-      structurePage.level3Select().should('be.visible').and('have.value', 'Cells')
 
       // Check preview
       structurePage.structurePreviewLevel2().find('p').should('have.text', 'Landings')
@@ -107,12 +101,11 @@ context('Set Wing Location Structure', () => {
 
       // Check level 2 preview
       structurePage.structurePreviewLevel2().should('contain.text', 'Landings')
-      structurePage.structurePreviewLevel3().should('contain.text', '')
+      structurePage.structurePreviewLevel3().should('contain.text', 'Cells')
       structurePage.structurePreviewLevel4().should('contain.text', '')
 
-      // Change first level, add remaining levels
+      // Change level 2 and level 3. Add 4th level
       structurePage.level2Select().select('Spurs')
-      structurePage.addLevelButton().click()
       structurePage.level3Select().select('Landings')
       structurePage.addLevelButton().click()
       structurePage.level4Select().select('Cells')

@@ -17,10 +17,25 @@ export default class Structure extends FormInitialStep {
 
     locals.locationType = req.sessionModel.get<string>('locationType')
 
-    // locationsAPI uses singular types. UI needs to display them as plural.
-    locals.level2 = pluralize(String(values['level-2'] || 'Landings'))
-    locals.level3 = pluralize(String(values['level-3'] || ''))
-    locals.level4 = pluralize(String(values['level-4'] || ''))
+    const isFirstLoad = !values['level-2'] && !values['level-3']
+
+    if (values['level-2']) {
+      locals.level2 = pluralize(String(values['level-2']))
+    } else if (isFirstLoad) {
+      locals.level2 = 'Landings'
+    } else {
+      locals.level2 = ''
+    }
+
+    if (values['level-3']) {
+      locals.level3 = pluralize(String(values['level-3']))
+    } else if (isFirstLoad) {
+      locals.level3 = 'Cells'
+    } else {
+      locals.level3 = ''
+    }
+
+    locals.level4 = values['level-4'] ? pluralize(String(values['level-4'])) : ''
 
     locals.backLink = backUrl(req, {
       fallbackUrl: `/create-new/${locationId || prisonId}/details`,
@@ -78,14 +93,14 @@ export default class Structure extends FormInitialStep {
       const hasDuplicates = new Set(structureLevels).size !== structureLevels.length
       if (hasDuplicates) {
         validationErrors.levelType = this.formError('levelType', 'createLevelDuplicate')
+        return callback({ ...errors, ...validationErrors })
       }
 
-      const lastSelected = structureLevels[structureLevels.length - 1]
-      const hasCells = structureLevels.includes('CELL')
-      const cellIsNotLast = hasCells && lastSelected !== 'CELL'
-
-      if (cellIsNotLast) {
-        validationErrors.levelType = this.formError('levelType', 'createLevelHierarchy')
+      const lastIndex = structureLevels.length - 1
+      if (structureLevels[lastIndex] !== 'CELL') {
+        const errorLevelNumber = structureIndexStart + lastIndex
+        validationErrors.levelType = this.formError('levelType', 'createLevelHierarchy', errorLevelNumber)
+        return callback({ ...errors, ...validationErrors })
       }
 
       return callback({ ...errors, ...validationErrors })
