@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class CreateLocationStructurePage extends Page {
   constructor() {
-    super(/Set testwing structure/)
+    super(/Set \w+ structure/)
   }
 
   static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/structure`)

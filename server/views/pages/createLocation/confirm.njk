@@ -8,7 +8,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% set locationType = decoratedLocation.locationType %}
+{% set formattedLocationType = locationType | lower | capFirst %}
 {% set title = "Check and confirm the " + locationType | lower + " details" %}
 
 {% block beforeContent %}
@@ -31,10 +31,10 @@
   <div class="govuk-grid-row govuk-!-margin-bottom-0">
     <div class="govuk-grid-column-two-thirds">
       <span class="govuk-caption-m" data-qa="cell-name">
-        Create new {{ values.locationType | lower }}
+        Create new {{ locationType | lower }}
       </span>
       <h1 class="govuk-heading-l">
-        Check and confirm the {{ values.locationType | lower }} details
+        {{ title }}
       </h1>
     </div>
   </div>
@@ -49,67 +49,86 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
+        {% if locationType == 'WING' %}
+          <p class="govuk-body"> You are about to create a new wing.</p>
+          <p class="govuk-body">You can add landings and cells to the wing once it is created.</p>
 
-       <p class="govuk-body"> You are about to create a new wing.</p>
-         <p class="govuk-body">You can add landings and cells to the wing once it is created.</p>
-
-        {{ govukSummaryList({
-          card: {
-            title: {
-              text: "Wing details"
-            }
-          },
-          rows: [
-            {
-              key: {
-                text: "Wing structure"
+          {{ govukSummaryList({
+            card: {
+              title: {
+                text: "Wing details"
+              }
+            },
+            rows: [
+              {
+                key: { text: "Wing structure" },
+                value: { text: decoratedLocationStructure },
+                actions: {
+                  items: [
+                    {
+                      href: createStructureLink,
+                      text: "Change"
+                    }
+                  ]
+                }
               },
-              value: {
-                text: decoratedLocationStructure
+              {
+                key: { text: "Wing code" },
+                value: { text: values.locationCode },
+                actions: {
+                  items: [
+                    {
+                      href: createDetailsLink,
+                      text: "Change"
+                    }
+                  ]
+                }
+              },
+              {
+                key: { text: "Local name" },
+                value: { text: values.localName or 'Not set' },
+                actions: {
+                  items: [
+                    {
+                      href: createDetailsLink,
+                      text: "Change"
+                    }
+                  ]
+                }
+              }
+            ]
+          }) }}
+        {% else %}
+          {{ govukSummaryList({
+            card: {
+              title: {
+                text: formattedLocationType + " details"
               },
               actions: {
                 items: [
                   {
-                    href: createStructureLink,
-                    text: "Change"
+                    text: 'Change',
+                    href: createDetailsLink
                   }
                 ]
               }
             },
-            {
-              key: {
-                text: "Wing code"
+            rows: [
+              {
+                key: { text: formattedLocationType + " code" },
+                value: { text: decoratedResidentialSummary.location.pathHierarchy + '-' + values.locationCode }
               },
-              value: {
-                text: values.locationCode
+              {
+                key: { text: "Local name" },
+                value: { text: values.localName or 'Not set' }
               },
-              actions: {
-                items: [
-                  {
-                    href: createDetailsLink,
-                    text: "Change"
-                  }
-                ]
-              }
-            },
-            {
-              key: {
-                text: "Local name"
-              },
-              value: {
-                text: values.localName or 'Not set'
-              },
-              actions: {
-                items: [
-                  {
-                    href: createDetailsLink,
-                    text: "Change"
-                  }
-                ]
-              }
-            }
-          ]
-        }) }}
+              {
+                key: { text: "Create cells on landing now" },
+                value: { text: values.createCellsNow | capFirst }
+              } if values.createCellsNow
+            ]
+          }) }}
+        {% endif %}
 
         {{ govukWarningText({
           text: "This location will be in draft until it is added to the cell certificate.",
@@ -117,9 +136,9 @@
         }) }}
 
         <form method="{{ formMethod }}" action="{{ formAction }}"
-        {% if formEnctype %}
-          enctype="{{ formEnctype }}"
-        {% endif %}
+          {% if formEnctype %}
+            enctype="{{ formEnctype }}"
+          {% endif %}
         >
 
           {% if formMethod == 'post' %}
@@ -130,7 +149,7 @@
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Create " + values.locationType | lower,
+                  text: "Create " + locationType | lower,
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"

@@ -42,6 +42,7 @@ const LocationResidentialSummaryFactory = Factory.define<LocationResidentialSumm
       }),
     ],
     locationHierarchy: [],
+    wingStructure: [],
   }
 })
 

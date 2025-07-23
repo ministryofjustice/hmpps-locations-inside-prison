@@ -198,7 +198,7 @@ context('Reactivate cell (from reactivate parent)', () => {
             reactivateCellConfirmPage.confirmButton().click()
 
             Page.verifyOnPage(ViewLocationsShowPage)
-            cy.title().should('eq', 'Landing A-1 - View and update locations - Residential locations')
+            cy.title().should('eq', 'Landing A-1 - Manage locations - Residential locations')
 
             cy.get('#govuk-notification-banner-title').contains('Success')
             cy.get('.govuk-notification-banner__content h3').contains('Cell activated')

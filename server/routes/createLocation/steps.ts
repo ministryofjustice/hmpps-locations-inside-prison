@@ -1,9 +1,10 @@
+import FormWizard from 'hmpo-form-wizard'
 import Details from '../../controllers/createLocation/details'
 import CreateLocationInit from '../../controllers/createLocation/init'
 import Structure from '../../controllers/createLocation/structure'
 import ConfirmCreateLocation from '../../controllers/createLocation/confirm'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
@@ -19,11 +20,10 @@ const steps = {
     next: [
       { field: 'createCellsNow', value: 'yes', next: 'create-cells' },
       {
-        field: 'createCellsNow',
-        value: 'no',
-        next: 'confirm',
+        fn: (req, _res) => !req.sessionModel.get<string>('locationId'),
+        next: 'structure',
       },
-      'structure',
+      'confirm',
     ],
   },
   '/structure': {

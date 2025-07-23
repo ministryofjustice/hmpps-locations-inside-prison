@@ -6,27 +6,14 @@ export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
     setCanAccess(locationsService)
     res.locals.cards = [
-      ...(req.featureFlags.createAndCertify && req.canAccess('create_location')
-        ? [
-            {
-              clickable: true,
-              visible: true,
-              heading: 'Manage locations',
-              href: `/view-and-update-locations`,
-              description: 'View and update information about existing locations or create new residential locations',
-              'data-qa': 'manage-locations-card',
-            },
-          ]
-        : [
-            {
-              clickable: true,
-              visible: true,
-              heading: `View and update locations`,
-              href: `/view-and-update-locations`,
-              description: 'View and update information about existing residential locations.',
-              'data-qa': 'view-locations-card',
-            },
-          ]),
+      {
+        clickable: true,
+        visible: true,
+        heading: 'Manage locations',
+        href: `/view-and-update-locations`,
+        description: 'View and update information about existing locations or create new residential locations',
+        'data-qa': 'manage-locations-card',
+      },
       {
         clickable: true,
         visible: true,

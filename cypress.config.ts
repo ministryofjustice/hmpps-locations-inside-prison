@@ -1,7 +1,7 @@
 import { defineConfig } from 'cypress'
 import superagent from 'superagent'
 import { mapValues } from 'lodash'
-import { resetStubs } from './integration_tests/mockApis/wiremock'
+import { resetStubs, stubFor } from './integration_tests/mockApis/wiremock'
 import auth from './integration_tests/mockApis/auth'
 import components from './integration_tests/mockApis/components'
 import locationsApi from './integration_tests/mockApis/locationsApi'
@@ -30,10 +30,26 @@ export default defineConfig({
   e2e: {
     setupNodeEvents(on) {
       on('task', {
-        reset: resetStubs,
+        reset: async () => {
+          await resetStubs()
+          await stubFor({
+            request: {
+              method: 'GET',
+              urlPattern: '/components-api/components.*',
+            },
+            response: {
+              status: 404,
+              headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+              },
+            },
+          })
+
+          return null
+        },
         ...auth,
         ...components,
-        ...locationsApi,
+        ...locationsApi.allStubs,
         ...manageUsersApi,
         ...tokenVerification,
         ...logAccessibilityViolations,

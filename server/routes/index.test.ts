@@ -1,6 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { appWithAllRoutes, manageUser, user } from './testutils/appSetup'
+import { appWithAllRoutes, user } from './testutils/appSetup'
 import AuditService, { Page } from '../services/auditService'
 import LocationsService from '../services/locationsService'
 
@@ -26,7 +26,7 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('GET / with view and update locations tile', () => {
+describe('GET /', () => {
   beforeEach(() => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
@@ -48,50 +48,14 @@ describe('GET / with view and update locations tile', () => {
     auditService.logPageView.mockResolvedValue(null)
 
     const res = await request(app).get('/')
-    expect(res.text).not.toContain('Manage locations')
 
     expect(res.text).toContain('govuk-breadcrumbs')
-    expect(res.text).toContain('View and update locations')
+    expect(res.text).toContain('Manage locations')
     expect(res.text).toContain('View all inactive cells')
     expect(res.text).toContain('Archived locations')
 
     expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
       who: user.username,
-      correlationId: expect.any(String),
-    })
-  })
-})
-
-describe('GET / with manage locations tile', () => {
-  beforeEach(() => {
-    locationsService.getPrisonConfiguration.mockResolvedValue({
-      prisonId: 'TST',
-      resiLocationServiceActive: 'INACTIVE',
-      includeSegregationInRollCount: 'INACTIVE',
-      certificationApprovalRequired: 'ACTIVE',
-    })
-    app = appWithAllRoutes({
-      services: {
-        auditService,
-        locationsService,
-      },
-      userSupplier: () => manageUser,
-    })
-  })
-
-  it('should render index page', async () => {
-    auditService.logPageView.mockResolvedValue(null)
-
-    const res = await request(app).get('/')
-    expect(res.text).toContain('Manage locations')
-
-    expect(res.text).toContain('govuk-breadcrumbs')
-    expect(res.text).not.toContain('View and update locations')
-    expect(res.text).toContain('View all inactive cells')
-    expect(res.text).toContain('Archived locations')
-
-    expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
-      who: manageUser.username,
       correlationId: expect.any(String),
     })
   })

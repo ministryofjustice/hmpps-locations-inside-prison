@@ -2,6 +2,7 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import SetLocalNamePage from '../../pages/setLocalName'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Set local name', () => {
   const locationAsWing = LocationFactory.build({
@@ -95,10 +96,7 @@ context('Set local name', () => {
     })
 
     it('shows validation error when no local name is set', () => {
-      cy.task('stubLocationsCheckLocalNameDoesntExist', {
-        localName: null,
-        updatedBy: 'TEST_USER',
-      })
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.setLocalNameLink().click()
@@ -109,10 +107,7 @@ context('Set local name', () => {
     })
 
     it('shows validation error when local name exceeds 30 characters', () => {
-      cy.task('stubLocationsCheckLocalNameDoesntExist', {
-        localName: '1234567890123456789012345678901',
-        updatedBy: 'TEST_USER',
-      })
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.setLocalNameLink().click()
@@ -126,7 +121,7 @@ context('Set local name', () => {
     })
 
     it('shows validation error when local name already exists', () => {
-      cy.task('stubLocationsCheckLocalNameExists')
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: true })
       cy.task('stubUpdateLocalName', {
         localName: 'new local name',
         updatedBy: 'TEST_USER',
@@ -142,7 +137,7 @@ context('Set local name', () => {
     })
 
     it('shows success banner when setting a local name is complete', () => {
-      cy.task('stubLocationsCheckLocalNameDoesntExist', { prisonId: 'TST', localName: 'new local name' })
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
       cy.task('stubUpdateLocalName', {
         localName: 'new local name',
         updatedBy: 'TEST_USER',

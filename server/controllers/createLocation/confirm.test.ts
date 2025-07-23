@@ -5,6 +5,7 @@ import ConfirmCreateLocation from './confirm'
 import fields from '../../routes/createLocation/fields'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
+import LocationFactory from '../../testutils/factories/location'
 
 describe('Confirm create location (WING)', () => {
   const controller = new ConfirmCreateLocation({ route: '/' })
@@ -25,13 +26,22 @@ describe('Confirm create location (WING)', () => {
     }
 
     locationsService = {
-      createWing: jest.fn().mockResolvedValue({
-        id: 'uuid-123',
-        prisonId: 'TST',
-        code: 'WW',
-        localName: 'West Wing',
-        wingStructure: ['WING', 'LANDING', 'CELL'],
-      }),
+      createWing: jest.fn().mockResolvedValue(
+        LocationFactory.build({
+          id: 'uuid-123',
+          prisonId: 'TST',
+          code: 'WW',
+          pathHierarchy: 'WW',
+          localName: 'West Wing',
+          wingStructure: ['WING', 'LANDING', 'CELL'],
+          locationType: 'WING',
+        }),
+      ),
+      getLocationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getAccommodationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getConvertedCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getSpecialistCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getUsedForType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
     } as unknown as jest.Mocked<LocationsService>
 
     analyticsService = {
@@ -148,37 +158,213 @@ describe('Confirm create location (WING)', () => {
     })
   })
 
-  // TODO: TESTS NOT PASSING - locationsService.getLocationType is not a function
+  describe('successHandler', () => {
+    beforeEach(async () => {
+      sessionModelData.newLocation = await locationsService.createWing('', '', '', [])
+    })
 
-  // describe('successHandler', () => {
-  //   beforeEach(() => {
-  //     sessionModelData.newLocation = {
-  //       id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-  //       code: 'WW',
-  //       localName: '',
-  //       locationType: 'Wing',
-  //       prisonId: 'TST',
-  //     }
-  //   })
-  //
-  //   it('resets the journey model', async () => {
-  //     expect(deepReq.flash).toHaveBeenCalledWith('success', {
-  //       title: 'Wing created',
-  //       content: 'You have created wing WW.',
-  //     })
-  //
-  //     expect(deepRes.redirect).toHaveBeenCalledWith(
-  //       '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-  //     )
-  //   })
-  //
-  //   it('flashes success with localName if available', async () => {
-  //     sessionModelData.newLocation.localName = 'West Wing'
-  //
-  //     expect(deepReq.flash).toHaveBeenCalledWith('success', {
-  //       title: 'Wing created',
-  //       content: 'You have created wing West Wing.',
-  //     })
-  //   })
-  // })
+    it('resets the journey model', async () => {
+      const { newLocation } = sessionModelData
+      newLocation.localName = undefined
+
+      await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'resolved.WING created',
+        content: 'You have created resolved.wing WW.',
+      })
+
+      expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/TST/${newLocation.id}`)
+    })
+
+    it('flashes success with localName if available', async () => {
+      sessionModelData.newLocation.localName = 'West Wing'
+
+      await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'resolved.WING created',
+        content: 'You have created resolved.wing West Wing.',
+      })
+    })
+  })
+})
+
+describe('Confirm create location (LANDING)', () => {
+  const controller = new ConfirmCreateLocation({ route: '/' })
+  let deepReq: DeepPartial<FormWizard.Request>
+  let deepRes: DeepPartial<Response>
+  const next = jest.fn()
+  let sessionModelData: { [key: string]: any }
+
+  let locationsService: jest.Mocked<LocationsService>
+  let analyticsService: jest.Mocked<AnalyticsService>
+
+  beforeEach(() => {
+    sessionModelData = {
+      locationType: 'LANDING',
+      localName: 'North Landing',
+      locationCode: 'NL',
+      locationId: 'parentId',
+    }
+
+    locationsService = {
+      createCells: jest.fn().mockResolvedValue(
+        LocationFactory.build({
+          id: 'uuid-123',
+          prisonId: 'TST',
+          code: 'NL',
+          pathHierarchy: 'WW-NL',
+          localName: 'North Landing',
+          locationType: 'LANDING',
+        }),
+      ),
+      getLocationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getAccommodationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getConvertedCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getSpecialistCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+      getUsedForType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+    } as unknown as jest.Mocked<LocationsService>
+
+    analyticsService = {
+      sendEvent: jest.fn(),
+    } as unknown as jest.Mocked<AnalyticsService>
+
+    deepReq = {
+      flash: jest.fn(),
+      session: {
+        referrerUrl: '',
+        systemToken: 'token',
+      },
+      form: {
+        options: {
+          fields,
+        },
+        values: {},
+      },
+      services: {
+        analyticsService,
+        locationsService,
+      },
+      sessionModel: {
+        set: (key: string, value: any) => {
+          sessionModelData[key] = value
+        },
+        get: (key: string) => sessionModelData[key],
+        reset: () => {
+          sessionModelData = {}
+        },
+        unset: (key: string) => delete sessionModelData[key],
+      },
+      journeyModel: {
+        reset: jest.fn(),
+      },
+      body: {},
+    }
+
+    deepRes = {
+      locals: {
+        errorlist: [],
+        prisonId: 'TST',
+        locationId: '7e570000-0000-1000-8000-000000000001',
+        options: {
+          fields,
+        },
+        user: {
+          username: 'JTIMPSON',
+        },
+        values: {
+          locationType: 'LANDING',
+        },
+      },
+      redirect: jest.fn(),
+    }
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  describe('locals', () => {
+    it('returns correct locals', () => {
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect(result).toEqual(
+        expect.objectContaining({
+          backLink: '/create-new/7e570000-0000-1000-8000-000000000001/details',
+          cancelLink: '/view-and-update-locations/TST/7e570000-0000-1000-8000-000000000001',
+          createDetailsLink: '/create-new/7e570000-0000-1000-8000-000000000001/details',
+        }),
+      )
+    })
+  })
+
+  describe('saveValues', () => {
+    it('calls locationsService and updates res.locals', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.createCells).toHaveBeenCalledWith('token', {
+        accommodationType: 'NORMAL_ACCOMMODATION',
+        cells: [],
+        cellsUsedFor: [],
+        newLevelAboveCells: {
+          levelCode: 'NL',
+          levelLocalName: 'North Landing',
+          locationType: 'LANDING',
+        },
+        parentLocation: 'parentId',
+        prisonId: 'TST',
+      })
+
+      expect(sessionModelData.newLocation).toEqual(await locationsService.createCells('', {} as any))
+
+      expect(analyticsService.sendEvent).toHaveBeenCalledWith(
+        deepReq,
+        'create_LANDING_location',
+        expect.objectContaining({
+          prison_id: 'TST',
+          code: 'WW-NL',
+          localName: 'North Landing',
+        }),
+      )
+    })
+
+    it('calls next with error if Api error', async () => {
+      const error = new Error('some error')
+      locationsService.createCells.mockRejectedValue(error)
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(next).toHaveBeenCalledWith(error)
+    })
+  })
+
+  describe('successHandler', () => {
+    beforeEach(async () => {
+      sessionModelData.newLocation = await locationsService.createCells('', {} as any)
+    })
+
+    it('resets the journey model', async () => {
+      const { newLocation } = sessionModelData
+      newLocation.localName = undefined
+
+      await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'resolved.LANDING created',
+        content: 'You have created resolved.landing WW-NL.',
+      })
+
+      expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/TST/${newLocation.id}`)
+    })
+
+    it('flashes success with localName if available', async () => {
+      sessionModelData.newLocation.localName = 'North Landing'
+
+      await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'resolved.LANDING created',
+        content: 'You have created resolved.landing North Landing.',
+      })
+    })
+  })
 })

@@ -35,7 +35,7 @@ context('Index', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.viewLocations().contains('View and update locations')
+      indexPage.cards.manageLocations().contains('Manage locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
     })

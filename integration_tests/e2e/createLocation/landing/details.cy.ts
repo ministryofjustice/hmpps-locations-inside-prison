@@ -3,10 +3,12 @@ import CreateLocationDetailsPage from '../../../pages/createLocation'
 import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
+import LocationsApiStubber from '../../../mockApis/locationsApi'
+import { LocationResidentialSummary } from '../../../../server/data/types/locationsApi'
 
-context('Set Landing Location Details', () => {
+context('Create Landing Details', () => {
   const prisonId = 'TST'
-  const residentialSummary = {
+  const residentialSummary: LocationResidentialSummary = {
     parentLocation: LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000002', pathHierarchy: 'A' }),
     subLocationName: 'Landings',
     subLocations: [LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000003', pathHierarchy: 'A-ABC01' })],
@@ -21,6 +23,24 @@ context('Set Landing Location Details', () => {
         level: 1,
       },
     ],
+    wingStructure: ['WING', 'LANDING', 'CELL'],
+  }
+  const residentialSummaryWithoutCellChild: LocationResidentialSummary = {
+    parentLocation: LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000002', pathHierarchy: 'A' }),
+    subLocationName: 'Spurs',
+    subLocations: [LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000003', pathHierarchy: 'A-ABC01' })],
+    topLevelLocationType: 'Wings',
+    locationHierarchy: [
+      {
+        id: '7e570000-0000-1000-8000-000000000001',
+        prisonId: 'TST',
+        code: '1',
+        type: 'WING',
+        pathHierarchy: '1',
+        level: 1,
+      },
+    ],
+    wingStructure: ['WING', 'SPUR', 'LANDING', 'CELL'],
   }
 
   const setupStubs = (roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) => {
@@ -29,16 +49,16 @@ context('Set Landing Location Details', () => {
     cy.task('stubManageUsers')
     cy.task('stubManageUsersMe')
     cy.task('stubManageUsersMeCaseloads')
-    cy.task('stubLocationsConstantsAccommodationType')
-    cy.task('stubLocationsConstantsConvertedCellType')
-    cy.task('stubLocationsConstantsDeactivatedReason')
-    cy.task('stubLocationsConstantsLocationType')
-    cy.task('stubLocationsConstantsSpecialistCellType')
-    cy.task('stubLocationsConstantsUsedForType')
-    cy.task('stubLocationsLocationsResidentialSummaryForLocation', residentialSummary)
-    cy.task('stubLocations', residentialSummary.parentLocation)
     cy.task('setFeatureFlag', { createAndCertify: true })
     cy.task('stubGetPrisonConfiguration', { prisonId, certificationActive: true })
+    LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+    LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(residentialSummary)
+    LocationsApiStubber.stub.stubLocations(residentialSummary.parentLocation)
   }
 
   context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -51,9 +71,7 @@ context('Set Landing Location Details', () => {
       cy.visit(`/view-and-update-locations/${prisonId}/${residentialSummary.parentLocation.id}`)
       const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsIndexPage)
       viewLocationsIndexPage.locationsCreateButton().click()
-      const createLocationDetailsPage = Page.verifyOnPage(CreateLocationDetailsPage)
-      cy.get('h1').contains('Enter landing details')
-      return createLocationDetailsPage
+      return Page.verifyOnPage(CreateLocationDetailsPage)
     }
 
     it('shows the correct validation error for location code when submitting non-alphanumeric characters', () => {
@@ -98,7 +116,7 @@ context('Set Landing Location Details', () => {
     })
 
     it('shows the correct validation error when submitting a localName that already exists', () => {
-      cy.task('stubLocationsCheckLocalNameExists')
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: true })
       const page = goToCreateLocationDetailsPage()
       page.locationCodeInput().clear().type('new1')
       page.localNameTextInput().clear().type('exists')
@@ -120,6 +138,13 @@ context('Set Landing Location Details', () => {
       cy.get('#createCellsNow-error').contains('Select yes if you want to create cells now')
     })
 
+    it('does not show create cells for non-cell child type', () => {
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(residentialSummaryWithoutCellChild)
+
+      const page = goToCreateLocationDetailsPage()
+      page.createCellsNowRadio('no').should('not.exist')
+    })
+
     it('has a back link to the manage location page', () => {
       const page = goToCreateLocationDetailsPage()
       page.backLink().click()
@@ -132,7 +157,6 @@ context('Set Landing Location Details', () => {
       Page.verifyOnPage(ViewLocationsShowPage)
     })
 
-    // TODO: write tests for transition to next step
-    // TODO: write tests for create cells field
+    // TODO: write tests for create cells field "yes"
   })
 })
