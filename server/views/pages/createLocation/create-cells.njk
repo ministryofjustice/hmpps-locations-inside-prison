@@ -1,0 +1,22 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% block pageTitle %}{{ 'Enter cell details - ' + applicationName }} {% endblock %}
+
+{% block heading %}
+  <div class="govuk-grid-row govuk-!-margin-bottom-0">
+    <div class="govuk-grid-column-two-thirds">
+      <span class="govuk-caption-m" data-qa="cell-name">
+        Create cells on {{ locationType | lower }} {{ pageTitleText }}
+      </span>
+      <h1 class="govuk-heading-l">
+        Enter cell details
+      </h1>
+    </div>
+  </div>
+  <p class="govuk-body">Cells will be in draft until they are added to the cell certificate.</p>
+{% endblock %}
+
+
+
+
+
