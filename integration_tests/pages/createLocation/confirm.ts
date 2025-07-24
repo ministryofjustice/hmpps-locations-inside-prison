@@ -2,24 +2,18 @@ import Page, { PageElement } from '../page'
 
 export default class CreateLocationConfirmPage extends Page {
   constructor() {
-    super(/Check and confirm the testwing details/)
+    super(/Check and confirm the \w+ details/)
   }
 
   static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/confirm`)
 
   detailsTitle = (): PageElement => cy.get('.govuk-summary-card__title')
 
-  structureDetails = (): PageElement => cy.get('.govuk-summary-list__value').eq(0)
+  changeDetailsKey = (i: number): PageElement => cy.get('.govuk-summary-list__key').eq(i)
 
-  structureChangeLink = (): PageElement => cy.get('.govuk-link').eq(0)
+  changeDetailsValue = (i: number): PageElement => cy.get('.govuk-summary-list__value').eq(i)
 
-  codeDetails = (): PageElement => cy.get('.govuk-summary-list__value').eq(1)
-
-  codeChangeLink = (): PageElement => cy.get('.govuk-link').eq(1)
-
-  localNameDetails = (): PageElement => cy.get('.govuk-summary-list__value').eq(2)
-
-  localNameChangeLink = (): PageElement => cy.get('.govuk-link').eq(2)
+  changeDetailsLink = (i: number): PageElement => cy.get('.govuk-link').eq(i)
 
   createButton = (): PageElement => cy.get('button:contains("Create")')
 

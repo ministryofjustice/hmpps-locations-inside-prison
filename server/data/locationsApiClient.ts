@@ -10,6 +10,7 @@ import {
   PrisonResidentialSummary,
   PrisonConfiguration,
   StatusType,
+  LocationType,
 } from './types/locationsApi'
 import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
 
@@ -111,7 +112,7 @@ export default class LocationsApiClient extends BaseApiClient {
     },
     getLocationByLocalName: this.apiCall<
       LocationForLocalName,
-      { prisonId: string; localName?: string; parentLocationId?: string }
+      { prisonId: string; localName: string; parentLocationId?: string }
     >({
       path: '/locations/:prisonId/local-name/:localName',
       queryParams: ['parentLocationId'],
@@ -120,9 +121,36 @@ export default class LocationsApiClient extends BaseApiClient {
     createWing: this.apiCall<
       Location,
       undefined,
-      { prisonId: string; wingCode: string; wingDescription?: string; wingStructure: string[] }
+      { prisonId: string; wingCode: string; wingDescription?: string; wingStructure: LocationType[] }
     >({
       path: '/locations/create-wing',
+      requestType: 'post',
+    }),
+    createCells: this.apiCall<
+      Location,
+      undefined,
+      {
+        prisonId: string
+        parentLocation: string
+        newLevelAboveCells: {
+          levelCode: string
+          levelLocalName?: string
+          locationType: 'LANDING' | 'SPUR'
+        }
+        cellsUsedFor: string[]
+        accommodationType: string
+        cells: {
+          code: string
+          cellMark: string
+          certifiedNormalAccommodation: number
+          maxCapacity: number
+          workingCapacity: number
+          specialistCellTypes: string[]
+          inCellSanitation: boolean
+        }[]
+      }
+    >({
+      path: '/locations/create-cells',
       requestType: 'post',
     }),
     convertCellToNonResCell: this.apiCall<

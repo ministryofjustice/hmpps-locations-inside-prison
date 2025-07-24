@@ -75,7 +75,7 @@ describe('Create location structure', () => {
       expect(result).toEqual(
         expect.objectContaining({
           level2: 'Landings',
-          level3: '',
+          level3: 'Cells',
           level4: '',
           backLink: '/create-new/TST/details',
           cancelLink: '/view-and-update-locations/TST',
@@ -148,7 +148,7 @@ describe('Create location structure', () => {
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          levelType: controller.formError('levelType', 'createLevelHierarchy'),
+          levelType: controller.formError('levelType', 'createLevelHierarchy', 3),
         }),
       )
     })

@@ -209,7 +209,7 @@ context('Inactive Cells Index', () => {
         cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
         const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
-        cy.title().should('eq', 'Wing B - Inactive cells - View and update locations - Residential locations')
+        cy.title().should('eq', 'Wing B - Inactive cells - Manage locations - Residential locations')
         cy.get('h1').contains('Inactive cells (1)')
 
         testInactiveCellsTable(inactiveCellsIndexPage, locations)
@@ -238,7 +238,7 @@ context('Inactive Cells Index', () => {
         Page.verifyOnPage(IndexPage)
         cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
         const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
-        cy.title().should('eq', 'Wing B - Inactive cells - View and update locations - Residential locations')
+        cy.title().should('eq', 'Wing B - Inactive cells - Manage locations - Residential locations')
         cy.get('h1').contains('Inactive cells (0)')
         cy.contains('There are no inactive locations')
         inactiveCellsIndexPage.locationsTable().should('not.exist')

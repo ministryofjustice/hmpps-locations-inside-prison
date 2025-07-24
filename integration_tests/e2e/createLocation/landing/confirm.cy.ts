@@ -1,16 +1,15 @@
 import Page from '../../../pages/page'
 import CreateLocationDetailsPage from '../../../pages/createLocation/index'
-import CreateLocationStructurePage from '../../../pages/createLocation/structure'
 import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
 import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
-import { PrisonResidentialSummary } from '../../../../server/data/types/locationsApi'
-import AuthStubber from '../../../mockApis/auth'
+import { LocationResidentialSummary } from '../../../../server/data/types/locationsApi'
 import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import AuthStubber from '../../../mockApis/auth'
 
-context('Create Wing Confirm', () => {
+context('Create Landing Confirm', () => {
   const prisonId = 'TST'
   const existingWingLocation = LocationFactory.build({
     id: '7e570000-0000-1000-8000-000000000002',
@@ -19,27 +18,31 @@ context('Create Wing Confirm', () => {
     locationType: 'WING',
     localName: undefined,
   })
-  const newWingLocation = LocationFactory.build({
+  const existingLandingLocation = LocationFactory.build({
     id: '7e570000-0000-1000-8000-000000000003',
-    pathHierarchy: 'B',
-    parentId: undefined,
-    locationType: 'WING',
-    status: 'DRAFT',
-    localName: 'testW',
+    pathHierarchy: 'A-1',
+    parentId: '7e570000-0000-1000-8000-000000000002',
+    locationType: 'LANDING',
+    localName: undefined,
   })
-  const residentialSummary: PrisonResidentialSummary = {
-    prisonSummary: {
-      workingCapacity: 0,
-      signedOperationalCapacity: 0,
-      maxCapacity: 0,
-    },
-    subLocationName: 'Wings',
-    subLocations: [existingWingLocation],
+  const newLandingLocation = LocationFactory.build({
+    id: '7e570000-0000-1000-8000-000000000004',
+    pathHierarchy: 'A-2',
+    parentId: '7e570000-0000-1000-8000-000000000003',
+    locationType: 'LANDING',
+    status: 'DRAFT',
+    localName: 'testL',
+  })
+  const residentialSummary: LocationResidentialSummary = {
+    parentLocation: existingWingLocation,
+    subLocationName: 'Landings',
+    subLocations: [existingLandingLocation],
     topLevelLocationType: 'Wings',
     locationHierarchy: [],
+    wingStructure: ['WING', 'LANDING', 'CELL'],
   }
   const createdLocationResidentialSummary = {
-    parentLocation: newWingLocation,
+    parentLocation: newLandingLocation,
     subLocationName: 'Cells',
     subLocations: [],
     topLevelLocationType: 'Wings',
@@ -52,7 +55,16 @@ context('Create Wing Confirm', () => {
         pathHierarchy: existingWingLocation.pathHierarchy,
         level: 1,
       },
+      {
+        id: newLandingLocation.id,
+        prisonId: newLandingLocation.prisonId,
+        code: newLandingLocation.code,
+        type: newLandingLocation.locationType,
+        pathHierarchy: newLandingLocation.pathHierarchy,
+        level: 1,
+      },
     ],
+    wingStructure: [],
   }
 
   const setupStubs = (roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) => {
@@ -60,14 +72,16 @@ context('Create Wing Confirm', () => {
     cy.task('setFeatureFlag', { createAndCertify: true })
     AuthStubber.stub.stubSignIn({ roles })
     LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
+    LocationsApiStubber.stub.stubLocations(existingLandingLocation)
+    LocationsApiStubber.stub.stubLocations(existingWingLocation)
     LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
     LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
     LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
     LocationsApiStubber.stub.stubLocationsConstantsLocationType()
     LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
     LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
-    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
-    LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false, name: 'testW', prisonId: 'TST' })
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(residentialSummary)
+    LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false, name: 'testL', prisonId: 'TST' })
     ManageUsersApiStubber.stub.stubManageUsers()
     ManageUsersApiStubber.stub.stubManageUsersMe()
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
@@ -80,75 +94,68 @@ context('Create Wing Confirm', () => {
 
     const goToCreateLocationDetailsPage = () => {
       cy.signIn()
-      cy.visit(`/view-and-update-locations/${prisonId}`)
-      const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsIndexPage)
+      cy.visit(`/view-and-update-locations/${prisonId}/${existingWingLocation.id}`)
+      const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsShowPage)
 
       viewLocationsIndexPage.locationsCreateButton().click()
 
       return Page.verifyOnPage(CreateLocationDetailsPage)
     }
 
-    const goToLocationStructurePage = () => {
+    const goToConfirmPage = () => {
       const detailsPage = goToCreateLocationDetailsPage()
-      detailsPage.locationCodeInput().clear().type('B')
-      detailsPage.localNameTextInput().clear().type('testW')
+      detailsPage.locationCodeInput().clear().type('2')
+      detailsPage.localNameTextInput().clear().type('testL')
+      detailsPage.createCellsNowRadio('no').click()
 
       detailsPage.continueButton().click()
-
-      return Page.verifyOnPage(CreateLocationStructurePage)
-    }
-
-    const goToConfirmPage = () => {
-      const structurePage = goToLocationStructurePage()
-
-      structurePage.continueButton().click()
 
       return Page.verifyOnPage(CreateLocationConfirmPage)
     }
 
-    it('shows the correct information and successfully creates draft wing', () => {
+    it('shows the correct information and successfully creates draft landing', () => {
       setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
-      LocationsApiStubber.stub.stubLocationsCreateWing(newWingLocation)
+      LocationsApiStubber.stub.stubLocationsCreateCells(newLandingLocation)
       LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(createdLocationResidentialSummary)
-      LocationsApiStubber.stub.stubLocations(newWingLocation)
+      LocationsApiStubber.stub.stubLocations(newLandingLocation)
 
       const confirmPage = goToConfirmPage()
 
-      confirmPage.detailsTitle().contains('Wing details')
+      confirmPage.detailsTitle().contains('Landing details')
+      confirmPage
+        .changeDetailsLink(0)
+        .should('have.attr', 'href')
+        .and('include', `/create-new/${existingWingLocation.id}/details`)
 
-      confirmPage.changeDetailsKey(0).contains('Wing structure')
-      confirmPage.changeDetailsValue(0).contains('Wing → Landings → Cells')
-      confirmPage.changeDetailsLink(0).should('have.attr', 'href').and('include', '/create-new/TST/structure')
+      confirmPage.changeDetailsKey(0).contains('Landing code')
+      confirmPage.changeDetailsValue(0).contains('2')
 
-      confirmPage.changeDetailsKey(1).contains('Wing code')
-      confirmPage.changeDetailsValue(1).contains('B')
-      confirmPage.changeDetailsLink(1).should('have.attr', 'href').and('include', '/create-new/TST/details')
+      confirmPage.changeDetailsKey(1).contains('Local name')
+      confirmPage.changeDetailsValue(1).contains('testL')
 
-      confirmPage.changeDetailsKey(2).contains('Local name')
-      confirmPage.changeDetailsValue(2).contains('testW')
-      confirmPage.changeDetailsLink(2).should('have.attr', 'href').and('include', '/create-new/TST/details')
-
+      confirmPage.changeDetailsKey(2).contains('Create cells on landing now')
+      confirmPage.changeDetailsValue(2).contains('No')
       confirmPage.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBanner().contains('Wing created')
+      viewLocationsShowPage.successBanner().contains('Landing created')
       viewLocationsShowPage.draftBanner().should('exist')
       viewLocationsShowPage.summaryCards.cnaText().contains('-')
       viewLocationsShowPage.summaryCards.workingCapacityText().contains('-')
       viewLocationsShowPage.summaryCards.maximumCapacityText().contains('-')
-      viewLocationsShowPage.locationDetailsRows().eq(0).contains('B')
-      viewLocationsShowPage.locationDetailsRows().eq(1).contains('testW')
+      viewLocationsShowPage.locationDetailsRows().eq(0).contains('A-2')
+      viewLocationsShowPage.locationDetailsRows().eq(1).contains('testL')
     })
 
     it('has a back link to the enter details page', () => {
-      const structurePage = goToConfirmPage()
-      structurePage.backLink().click()
-      Page.verifyOnPage(CreateLocationStructurePage)
+      const page = goToConfirmPage()
+      page.backLink().click()
+      Page.verifyOnPage(CreateLocationDetailsPage)
     })
 
     it('has a cancel link to the view location index page', () => {
-      const structurePage = goToConfirmPage()
-      structurePage.cancelLink().click()
+      const page = goToConfirmPage()
+      page.cancelLink().click()
       Page.verifyOnPage(ViewLocationsIndexPage)
     })
   })

@@ -51,7 +51,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       alphanumeric: `${fieldName} must not contain special characters`,
       dateTodayOrInFuture: `${fieldName} must be today or in the future`,
       createLevelDuplicate: 'You cannot have two of the same level type',
-      createLevelHierarchy: 'You cannot have levels below cells',
+      createLevelHierarchy: `The level ${error.args?.createLevelHierarchy} type must be cells`,
       dateInvalid: `${fieldName} must be a real date`,
       dateInvalidDay: `${fieldName} must be a real date`,
       dateInvalidMonth: `${fieldName} must be a real date`,
@@ -111,12 +111,12 @@ export default class FormInitialStep extends FormWizard.Controller {
     next()
   }
 
-  setupRemovedFields(req: FormWizard.Request, _res: Response, next: NextFunction) {
+  setupRemovedFields(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { fields } = req.form.options
 
     Object.values(fields).forEach(f => {
       // eslint-disable-next-line no-param-reassign
-      f.removed = 'remove' in f && f.remove(req)
+      f.removed = 'remove' in f && f.remove(req, res)
     })
 
     next()

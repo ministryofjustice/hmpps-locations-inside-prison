@@ -253,7 +253,7 @@ declare module 'hmpo-form-wizard' {
       name?: string
       text?: string
       component?: string
-      remove?: (req: FormWizard.Request) => boolean
+      remove?: (req: FormWizard.Request, res: Response) => boolean
       hideWhenRemoved?: boolean
       removed?: boolean
       prefix?: string
@@ -317,6 +317,8 @@ declare module 'hmpo-form-wizard' {
     interface Step {
       pageTitle?: string
       reset?: boolean
+      editable?: boolean
+      resetJourney?: boolean
       entryPoint?: boolean
       template?: string
       next?: FormWizard.Step.NextStep

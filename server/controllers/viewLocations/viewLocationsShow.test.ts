@@ -40,7 +40,7 @@ describe('view locations show', () => {
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
-      title: 'View and update locations',
+      title: 'Manage locations',
     })
   })
 
@@ -57,7 +57,7 @@ describe('view locations show', () => {
       banner: {
         success,
       },
-      title: 'View and update locations',
+      title: 'Manage locations',
     })
   })
 
@@ -193,7 +193,7 @@ describe('view locations show', () => {
       ])
       expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
         banner: undefined,
-        title: 'View and update locations',
+        title: 'Manage locations',
       })
     })
 
@@ -208,7 +208,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
-          title: 'View and update locations',
+          title: 'Manage locations',
         })
       })
     })
@@ -228,7 +228,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
-          title: 'View and update locations',
+          title: 'Manage locations',
         })
       })
     })
@@ -248,7 +248,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
-          title: 'View and update locations',
+          title: 'Manage locations',
         })
       })
     })
@@ -268,7 +268,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
-          title: 'View and update locations',
+          title: 'Manage locations',
         })
       })
     })
@@ -313,7 +313,7 @@ describe('view locations show', () => {
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
-            title: 'View and update locations',
+            title: 'Manage locations',
           })
         })
       })
@@ -326,7 +326,7 @@ describe('view locations show', () => {
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
-            title: 'View and update locations',
+            title: 'Manage locations',
           })
         })
       })
@@ -344,7 +344,7 @@ describe('view locations show', () => {
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
               banner: undefined,
               createButton: undefined,
-              title: 'View and update locations',
+              title: 'Manage locations',
             })
           })
         })

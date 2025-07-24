@@ -2,6 +2,7 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeLocalNamePage from '../../pages/changeLocalName'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('change local name', () => {
   const locationAsWing = LocationFactory.build({
@@ -107,10 +108,7 @@ context('change local name', () => {
     })
 
     it('shows the correct validation error when no local name is set', () => {
-      cy.task('stubLocationsCheckLocalNameDoesntExist', {
-        localName: null,
-        updatedBy: 'TEST_USER',
-      })
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.changeLocalNameLink().click()
@@ -122,10 +120,7 @@ context('change local name', () => {
     })
 
     it('shows the correct validation error when local name is over 30 characters', () => {
-      cy.task('stubLocationsCheckLocalNameDoesntExist', {
-        localName: '1234567890123456789012345678901',
-        updatedBy: 'TEST_USER',
-      })
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.changeLocalNameLink().click()
@@ -140,7 +135,7 @@ context('change local name', () => {
     })
 
     it('shows the correct validation error when there is a matching local name', () => {
-      cy.task('stubLocationsCheckLocalNameExists')
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: true, locationId: '.*' })
       cy.task('stubUpdateLocalName', {
         localName: 'changed local name',
         updatedBy: 'TEST_USER',
@@ -164,7 +159,7 @@ context('change local name', () => {
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       cy.get('.govuk-heading-l').contains('Local Name')
       viewLocationsShowPage.changeLocalNameLink().click()
-      cy.task('stubLocationsCheckLocalNameDoesntExist', { prisonId: 'TST', localName: 'new local name' })
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
       cy.task('stubUpdateLocalName', {
         localName: 'new local name',
         updatedBy: 'TEST_USER',

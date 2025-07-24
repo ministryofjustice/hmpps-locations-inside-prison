@@ -1,7 +1,13 @@
 import { stubFor } from './wiremock'
 
-import { Location, PrisonerLocation } from '../../server/data/types/locationsApi'
+import {
+  Location,
+  LocationResidentialSummary,
+  PrisonerLocation,
+  PrisonResidentialSummary,
+} from '../../server/data/types/locationsApi'
 import LocationFactory from '../../server/testutils/factories/location'
+import TypedStubber from './typedStubber'
 
 const stubLocationsConstantsAccommodationType = (
   accommodationTypes = [
@@ -273,14 +279,13 @@ const stubLocationsConstantsUsedForTypeForPrison = (
   })
 
 const stubLocationsLocationsResidentialSummary = (
-  returnData = {
+  returnData: PrisonResidentialSummary = {
     prisonSummary: {
       workingCapacity: 8,
       signedOperationalCapacity: 10,
       maxCapacity: 9,
     },
     subLocationName: 'TestWings',
-    active: true,
     subLocations: [
       LocationFactory.build(),
       LocationFactory.build({
@@ -405,73 +410,6 @@ const stubLocationsResidentialSummaryForCreateWing = (
     },
   })
 
-const stubLocationById = (
-  returnData = {
-    id: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
-    prisonId: 'TST',
-    code: 'ABC1',
-    cellMark: 'A1',
-    pathHierarchy: 'ABC1',
-    locationType: 'WING',
-    localName: 'testW',
-    wingStructure: ['WING'],
-    comments: '',
-    permanentlyInactive: false,
-    permanentlyInactiveReason: '',
-    capacity: {
-      maxCapacity: 0,
-      workingCapacity: 0,
-    },
-    pendingChanges: {},
-    oldWorkingCapacity: 0,
-    certification: {
-      certified: false,
-      certifiedNormalAccommodation: 0,
-    },
-    usage: [],
-    accommodationTypes: [],
-    specialistCellTypes: [],
-    usedFor: [],
-    status: 'ACTIVE',
-    locked: false,
-    convertedCellType: '',
-    otherConvertedCellType: 'string',
-    inCellSanitation: false,
-    deactivatedByParent: false,
-    deactivatedDate: '',
-    deactivatedReason: '',
-    deactivationReasonDescription: '',
-    deactivatedBy: '',
-    proposedReactivationDate: '2026-01-24',
-    planetFmReference: '',
-    topLevelId: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
-    level: 1,
-    leafLevel: false,
-    parentId: 'c73e8ad1-191b-42b8-bfce-2550cc858dab',
-    parentLocation: 'string',
-    inactiveCells: 0,
-    numberOfCellLocations: 0,
-    childLocations: [],
-    changeHistory: [],
-    transactionHistory: [],
-    lastModifiedBy: 'string',
-    lastModifiedDate: '',
-    key: '',
-    isResidential: true,
-  },
-) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: `/locations-api/locations/${returnData.parentId}\\?includeHistory=false`,
-    },
-    response: {
-      status: 200,
-      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-      jsonBody: returnData,
-    },
-  })
-
 const stubLocationsLocationsResidentialSummaryForLocation = ({
   parentLocation = LocationFactory.build(),
   subLocationName = 'Landings',
@@ -487,7 +425,8 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
       level: 1,
     },
   ],
-} = {}) =>
+  wingStructure = ['WING', 'LANDING', 'CELL'],
+}: Partial<LocationResidentialSummary> = {}) =>
   stubFor({
     request: {
       method: 'GET',
@@ -504,6 +443,7 @@ const stubLocationsLocationsResidentialSummaryForLocation = ({
         subLocations,
         topLevelLocationType,
         locationHierarchy,
+        wingStructure,
       },
     },
   })
@@ -798,36 +738,42 @@ const stubLocationsResidentialHierarchy = ({ prisonId, residentialHierarchy }) =
     },
   })
 
-const stubLocationsCheckLocalNameDoesntExist = () =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/locations-api/locations/[\\w-%]+/local-name/[\\w-%]+',
-    },
-    response: {
-      status: 404,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-    },
-  })
+const stubLocationsPrisonLocalName = ({
+  exists,
+  name = '[^?]+',
+  prisonId = '\\w+',
+  locationId,
+}: {
+  exists: boolean
+  name?: string
+  prisonId?: string
+  locationId?: string
+}) => {
+  const response = exists
+    ? {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        body: JSON.stringify({
+          exists: true,
+        }),
+      }
+    : {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+      }
 
-const stubLocationsCheckLocalNameExists = () =>
-  stubFor({
+  return stubFor({
     request: {
       method: 'GET',
-      urlPathPattern: '/locations-api/locations/.*/local-name/.*',
+      urlPattern: `/locations-api/locations/${prisonId}/local-name/${name.replace(/ /g, '%20')}${locationId ? `\\?parentLocationId=${locationId}` : '(\\?.+)?'}`,
     },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      body: JSON.stringify({
-        exists: true,
-      }),
-    },
+    response,
   })
+}
 
 const stubUpdateLocalName = () =>
   stubFor({
@@ -1076,7 +1022,7 @@ const stubGetPrisonConfiguration = ({
     },
   })
 
-const stubCreateWing = (location: Location) =>
+const stubLocationsCreateWing = (location: Location) =>
   stubFor({
     request: {
       method: 'POST',
@@ -1091,12 +1037,25 @@ const stubCreateWing = (location: Location) =>
     },
   })
 
-export default {
+const stubLocationsCreateCells = (location: Location) =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern: '/locations-api/locations/create-cells',
+    },
+    response: {
+      status: 201,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location,
+    },
+  })
+
+const allStubs = {
   stubLocations,
   stubLocationsBulkReactivate,
   stubLocationsResidentialHierarchy,
-  stubLocationsCheckLocalNameDoesntExist,
-  stubLocationsCheckLocalNameExists,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -1110,6 +1069,8 @@ export default {
   stubLocationsConvertCellToNonResCell,
   stubLocationsConvertCellToNonResCellOccupied,
   stubLocationsConvertToCell,
+  stubLocationsCreateCells,
+  stubLocationsCreateWing,
   stubLocationsDeactivatePermanent,
   stubLocationsDeactivatePermanentOccupied,
   stubLocationsDeactivateTemporary,
@@ -1120,7 +1081,7 @@ export default {
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
-  stubCreateWing,
+  stubLocationsPrisonLocalName,
   stubGetPrisonConfiguration,
   stubPrisonConfiguration,
   stubPrisonConfigurationCertApproval,
@@ -1139,5 +1100,7 @@ export default {
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
   stubLocationsResidentialSummaryForCreateWing,
-  stubLocationById,
 }
+
+const LocationsApiStubber = new TypedStubber<typeof allStubs>(allStubs)
+export default LocationsApiStubber
