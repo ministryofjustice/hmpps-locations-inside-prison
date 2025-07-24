@@ -1,5 +1,6 @@
 import Page from '../../../pages/page'
 import CreateLocationDetailsPage from '../../../pages/createLocation'
+import CreateCellsPage from '../../../pages/createLocation/createCells'
 import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
@@ -56,83 +57,141 @@ context('Set Landing Location Details', () => {
       return createLocationDetailsPage
     }
 
-    it('shows the correct validation error for location code when submitting non-alphanumeric characters', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear().type('!@£$')
-      page.createCellsNowRadio('no').click()
-      page.continueButton().click()
-
-      cy.get('.govuk-error-summary__title').contains('There is a problem')
-      cy.get('.govuk-error-summary__list').contains('Landing code can only include numbers or letters')
-      cy.get('#locationCode-error').contains('Landing code can only include numbers or letters')
-    })
-
-    it('shows the correct validation error for location code when submitting nothing', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear()
-      page.createCellsNowRadio('no').click()
-      page.continueButton().click()
-
-      cy.get('.govuk-error-summary__list').contains('Enter a landing code')
-      cy.get('#locationCode-error').contains('Enter a landing code')
-    })
-
-    it('shows the correct validation error for location code when submitting more than 5 characters', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear().type('thisistoolong')
-      page.createCellsNowRadio('no').click()
-      page.continueButton().click()
-
-      cy.get('.govuk-error-summary__list').contains('Landing code must be 5 characters or less')
-      cy.get('#locationCode-error').contains('Landing code must be 5 characters or less')
-    })
-
-    it('shows the correct validation error when submitting a code that already exists', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear().type('ABC01')
-      page.createCellsNowRadio('no').click()
-      page.continueButton().click()
-
-      cy.get('.govuk-error-summary__list').contains('A location with this landing code already exists')
-      cy.get('#locationCode-error').contains('A location with this landing code already exists')
-    })
-
-    it('shows the correct validation error when submitting a localName that already exists', () => {
-      cy.task('stubLocationsCheckLocalNameExists')
+    const goToCreateCellsPage = () => {
       const page = goToCreateLocationDetailsPage()
       page.locationCodeInput().clear().type('new1')
-      page.localNameTextInput().clear().type('exists')
-      page.createCellsNowRadio('no').click()
-
+      page.createCellsNowRadio('yes').click()
       page.continueButton().click()
+      const createCellsPage = Page.verifyOnPage(CreateCellsPage)
+      cy.get('h1').should('contain.text', 'Enter cell details')
+      return createCellsPage
+    }
 
-      cy.get('.govuk-error-summary__list').contains('A location with this name already exists')
-      cy.get('#localName-error').contains('A location with this name already exists')
+    context('Enter landing details', () => {
+      it('shows the correct validation error for location code when submitting non-alphanumeric characters', () => {
+        const page = goToCreateLocationDetailsPage()
+        page.locationCodeInput().clear().type('!@£$')
+        page.createCellsNowRadio('no').click()
+        page.continueButton().click()
+
+        cy.get('.govuk-error-summary__title').contains('There is a problem')
+        cy.get('.govuk-error-summary__list').contains('Landing code can only include numbers or letters')
+        cy.get('#locationCode-error').contains('Landing code can only include numbers or letters')
+      })
+
+      it('shows the correct validation error for location code when submitting nothing', () => {
+        const page = goToCreateLocationDetailsPage()
+        page.locationCodeInput().clear()
+        page.createCellsNowRadio('no').click()
+        page.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('Enter a landing code')
+        cy.get('#locationCode-error').contains('Enter a landing code')
+      })
+
+      it('shows the correct validation error for location code when submitting more than 5 characters', () => {
+        const page = goToCreateLocationDetailsPage()
+        page.locationCodeInput().clear().type('thisistoolong')
+        page.createCellsNowRadio('no').click()
+        page.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('Landing code must be 5 characters or less')
+        cy.get('#locationCode-error').contains('Landing code must be 5 characters or less')
+      })
+
+      it('shows the correct validation error when submitting a code that already exists', () => {
+        const page = goToCreateLocationDetailsPage()
+        page.locationCodeInput().clear().type('ABC01')
+        page.createCellsNowRadio('no').click()
+        page.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('A location with this landing code already exists')
+        cy.get('#locationCode-error').contains('A location with this landing code already exists')
+      })
+
+      it('shows the correct validation error when submitting a localName that already exists', () => {
+        cy.task('stubLocationsCheckLocalNameExists')
+        const page = goToCreateLocationDetailsPage()
+        page.locationCodeInput().clear().type('new1')
+        page.localNameTextInput().clear().type('exists')
+        page.createCellsNowRadio('no').click()
+
+        page.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('A location with this name already exists')
+        cy.get('#localName-error').contains('A location with this name already exists')
+      })
+
+      it('shows the correct validation error when create cells has no selected value', () => {
+        const page = goToCreateLocationDetailsPage()
+        page.locationCodeInput().clear().type('new1')
+
+        page.continueButton().click()
+
+        cy.get('.govuk-error-summary__list').contains('Select yes if you want to create cells now')
+        cy.get('#createCellsNow-error').contains('Select yes if you want to create cells now')
+      })
+
+      it('has a back link to the manage location page', () => {
+        const page = goToCreateLocationDetailsPage()
+        page.backLink().click()
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a cancel link to the view location show page', () => {
+        const page = goToCreateLocationDetailsPage()
+        page.cancelLink().click()
+        Page.verifyOnPage(ViewLocationsShowPage)
+      })
     })
 
-    it('shows the correct validation error when create cells has no selected value', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.locationCodeInput().clear().type('new1')
+    context('Enter cell details', () => {
+      it('navigates to create cells page when selecting yes for create cells', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('1')
+        cy.get('.govuk-radios__item label').eq(0).should('contain.text', 'Normal accommodation')
+        cy.get('.govuk-radios__item label').eq(1).should('contain.text', 'Care and separation')
+        cy.get('.govuk-radios__item label').eq(2).should('contain.text', 'Healthcare inpatients')
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+      })
 
-      page.continueButton().click()
+      it('shows the correct validation error when create cells has no input value', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear()
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('Enter how many cells you want to create')
+        cy.get('#cellsToCreate-error').contains('Enter how many cells you want to create')
+      })
 
-      cy.get('.govuk-error-summary__list').contains('Select yes if you want to create cells now')
-      cy.get('#createCellsNow-error').contains('Select yes if you want to create cells now')
-    })
+      it('shows the correct validation error when create cells has non numeric input', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('loads of cells')
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('Cells must be a number')
+        cy.get('#cellsToCreate-error').contains('Cells must be a number')
+      })
 
-    it('has a back link to the manage location page', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.backLink().click()
-      Page.verifyOnPage(ViewLocationsIndexPage)
-    })
+      it('shows the correct validation error when create cells input is over 999', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('1000')
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('You can create a maximum of 999 cells at once')
+        cy.get('#cellsToCreate-error').contains('You can create a maximum of 999 cells at once')
+      })
 
-    it('has a cancel link to the view location show page', () => {
-      const page = goToCreateLocationDetailsPage()
-      page.cancelLink().click()
-      Page.verifyOnPage(ViewLocationsShowPage)
+      it('shows the correct validation error when no accommodation type is selected', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('1')
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('Select an accommodation type')
+        cy.get('#accommodationType-error').contains('Select an accommodation type')
+      })
     })
 
     // TODO: write tests for transition to next step
-    // TODO: write tests for create cells field
+    // TODO: write tests for door numbers
   })
 })
