@@ -5,7 +5,7 @@ import addAction from '../../middleware/addAction'
 
 export default async (req: Request, res: Response) => {
   const locals: TypedLocals = {
-    title: 'View and update locations',
+    title: 'Manage locations',
   }
 
   const { decoratedResidentialSummary: summary } = res.locals
@@ -20,14 +20,21 @@ export default async (req: Request, res: Response) => {
   }
 
   if (req.featureFlags.createAndCertify && req.canAccess('create_location')) {
-    locals.title = 'Manage locations'
-
     if (!leafLevel && summary.subLocationName !== 'Cells') {
       const singularizedLocationType = singularizeString(summary.subLocationName).toLowerCase()
 
       locals.createButton = {
         text: `Create new ${singularizedLocationType}`,
         href: `/create-new/${location.id}`,
+        classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
+        attributes: {
+          'data-qa': 'create-button',
+        },
+      }
+    } else if (summary.subLocationName === 'Cells') {
+      locals.createButton = {
+        text: 'Create new cells',
+        href: `/create-cells/${location.id}`,
         classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
         attributes: {
           'data-qa': 'create-button',

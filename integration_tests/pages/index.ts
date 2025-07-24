@@ -10,8 +10,8 @@ export default class IndexPage extends Page {
   headerPhaseBanner = (): PageElement => cy.get('[data-qa=header-phase-banner]')
 
   cards = {
-    manageLocations: (): PageElement => cy.get('[data-qa=manage-locations-card]'),
     viewLocations: (): PageElement => cy.get('[data-qa=view-locations-card]'),
+    manageLocations: (): PageElement => cy.get('[data-qa=manage-locations-card]'),
     inactiveCells: (): PageElement => cy.get('[data-qa=inactive-cells-card]'),
     archivedLocations: (): PageElement => cy.get('[data-qa=archived-locations-card]'),
     locationHistory: (): PageElement => cy.get('[data-qa=location-history-card]'),

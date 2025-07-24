@@ -2,6 +2,7 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import RemoveLocalNamePage from '../../pages/removeLocalName'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Remove Local Name', () => {
   const locationAsWing = LocationFactory.build({
@@ -88,7 +89,7 @@ context('Remove Local Name', () => {
     })
 
     it('displays a success banner after removing the local name', () => {
-      cy.task('stubLocationsCheckLocalNameDoesntExist', { prisonId: 'TST', localName: 'new local name' })
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
       cy.task('stubUpdateLocalName', {
         localName: 'new local name',
         updatedBy: 'TEST_USER',

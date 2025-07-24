@@ -84,7 +84,6 @@ export default class Details extends FormInitialStep {
             req.session.systemToken,
             String(prisonId),
             sanitizedLocalName,
-            null,
           )
           if (localNameExists) {
             validationErrors.localName = this.formError('localName', 'taken')

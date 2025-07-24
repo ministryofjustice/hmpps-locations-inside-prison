@@ -11,7 +11,7 @@ function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
 }
 
 function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
-  return location.active && req.canAccess('change_local_name')
+  return (location.active || location.status === 'DRAFT') && req.canAccess('change_local_name')
 }
 
 function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
@@ -83,24 +83,23 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
 function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { usedFor } = location
   const changeUsedForUrl = `/location/${location.id}/change-used-for`
-  const row: SummaryListRow = { key: { text: 'Used for' } }
-  if (usedFor.length) {
-    row.value = {
-      html: location.usedFor.join('<br>'),
-    }
-    if (showChangeUsedForLink(location, req)) {
-      row.actions = {
-        items: [
-          {
-            href: changeUsedForUrl,
-            text: 'Change',
-          },
-        ],
-      }
-    }
-    return row
+  const row: SummaryListRow = {
+    key: { text: 'Used for' },
+    value: {
+      html: usedFor.join('<br>') || '-',
+    },
   }
-  return null
+  if (showChangeUsedForLink(location, req)) {
+    row.actions = {
+      items: [
+        {
+          href: changeUsedForUrl,
+          text: 'Change',
+        },
+      ],
+    }
+  }
+  return row
 }
 
 function showChangeNonResLink(location: DecoratedLocation, req: Request) {
@@ -143,7 +142,7 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
 
     details.push({
       key: { text: 'Accommodation type' },
-      value: { html: location.accommodationTypes.join('<br>') },
+      value: { html: location.accommodationTypes.join('<br>') || '-' },
     })
 
     details.push(usedForRow(location, req))
@@ -189,6 +188,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         linkLabel?: string
         linkAriaLabel?: string
       }[]
+      wingStructure?: string[]
     } = {
       subLocationName: apiData.subLocationName,
       subLocations: await Promise.all(
@@ -210,6 +210,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
     res.locals.locationHierarchy = apiData.locationHierarchy
 
     if ('parentLocation' in apiData) {
+      residentialSummary.wingStructure = apiData.wingStructure
       residentialSummary.location = await decorateLocation({
         location: apiData.parentLocation,
         locationsService,

@@ -232,6 +232,18 @@ context('View Locations Show', () => {
           .find('.govuk-summary-list__value')
           .contains('Normal accommodation')
         detailsRows += 1
+
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__key')
+          .contains('Used for')
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__value')
+          .contains(location.usedFor.length ? 'Close Supervision Centre (CSC)' : '-')
+        detailsRows += 1
       } else {
         viewLocationsShowPage
           .locationDetailsRows()
@@ -243,20 +255,6 @@ context('View Locations Show', () => {
           .eq(detailsRows)
           .find('.govuk-summary-list__value')
           .contains('Office')
-        detailsRows += 1
-      }
-
-      if (location.usedFor.length) {
-        viewLocationsShowPage
-          .locationDetailsRows()
-          .eq(detailsRows)
-          .find('.govuk-summary-list__key')
-          .contains('Used for')
-        viewLocationsShowPage
-          .locationDetailsRows()
-          .eq(detailsRows)
-          .find('.govuk-summary-list__value')
-          .contains('Close Supervision Centre (CSC)')
         detailsRows += 1
       }
 

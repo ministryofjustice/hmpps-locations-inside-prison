@@ -47,7 +47,23 @@ const fields: FormWizard.Fields = {
   createCellsNow: {
     component: 'govukRadios',
     validate: ['required'],
-    remove: req => !req.sessionModel.get('locationId'),
+    remove: (req, res) => {
+      const { sessionModel } = req
+      if (!sessionModel.get<string>('locationId')) {
+        return true
+      }
+
+      const { decoratedResidentialSummary } = res.locals
+      if (decoratedResidentialSummary.location) {
+        const locationType = sessionModel.get<string>('locationType')
+        const currentTypeIndex = decoratedResidentialSummary.wingStructure.indexOf(locationType)
+        const childType = decoratedResidentialSummary.wingStructure[currentTypeIndex + 1]
+
+        return childType !== 'CELL'
+      }
+
+      return false
+    },
     hideWhenRemoved: true,
     id: 'createCellsNow',
     name: 'createCellsNow',
