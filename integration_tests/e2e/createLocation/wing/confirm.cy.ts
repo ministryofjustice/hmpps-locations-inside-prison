@@ -7,6 +7,8 @@ import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
 import { PrisonResidentialSummary } from '../../../../server/data/types/locationsApi'
+import AuthStubber from '../../../mockApis/auth'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
 
 context('Create Wing Confirm', () => {
   const prisonId = 'TST'
@@ -55,12 +57,9 @@ context('Create Wing Confirm', () => {
 
   const setupStubs = (roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
     cy.task('setFeatureFlag', { createAndCertify: true })
-    cy.task('stubGetPrisonConfiguration', { prisonId, certificationActive: true })
+    AuthStubber.stub.stubSignIn({ roles })
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
     LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
     LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
     LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
@@ -69,6 +68,9 @@ context('Create Wing Confirm', () => {
     LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
     LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
     LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false, name: 'testW', prisonId: 'TST' })
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
   }
 
   context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {

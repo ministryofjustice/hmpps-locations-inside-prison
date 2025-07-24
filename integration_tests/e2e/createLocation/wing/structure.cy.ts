@@ -4,6 +4,8 @@ import CreateLocationStructurePage from '../../../pages/createLocation/structure
 import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import AuthStubber from '../../../mockApis/auth'
 
 context('Create Wing Structure', () => {
   const prisonId = 'TST'
@@ -22,12 +24,9 @@ context('Create Wing Structure', () => {
 
   const setupStubs = (roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
     cy.task('setFeatureFlag', { createAndCertify: true })
-    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+    AuthStubber.stub.stubSignIn({ roles })
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
     LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
     LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
     LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
@@ -35,6 +34,9 @@ context('Create Wing Structure', () => {
     LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
     LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
     LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
   }
 
   context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {

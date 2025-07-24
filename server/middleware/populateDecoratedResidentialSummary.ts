@@ -210,7 +210,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
     res.locals.locationHierarchy = apiData.locationHierarchy
 
     if ('parentLocation' in apiData) {
-      residentialSummary.wingStructure = apiData.wingStructure || ['WING', 'SPUR', 'LANDING', 'CELL']
+      residentialSummary.wingStructure = apiData.wingStructure
       residentialSummary.location = await decorateLocation({
         location: apiData.parentLocation,
         locationsService,

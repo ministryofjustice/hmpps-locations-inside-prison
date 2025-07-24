@@ -6,6 +6,8 @@ import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
 import { LocationResidentialSummary } from '../../../../server/data/types/locationsApi'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import AuthStubber from '../../../mockApis/auth'
 
 context('Create Landing Confirm', () => {
   const prisonId = 'TST'
@@ -37,7 +39,7 @@ context('Create Landing Confirm', () => {
     subLocations: [existingLandingLocation],
     topLevelLocationType: 'Wings',
     locationHierarchy: [],
-    wingStructure: [],
+    wingStructure: ['WING', 'LANDING', 'CELL'],
   }
   const createdLocationResidentialSummary = {
     parentLocation: newLandingLocation,
@@ -67,12 +69,11 @@ context('Create Landing Confirm', () => {
 
   const setupStubs = (roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
     cy.task('setFeatureFlag', { createAndCertify: true })
-    cy.task('stubGetPrisonConfiguration', { prisonId, certificationActive: true })
+    AuthStubber.stub.stubSignIn({ roles })
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
+    LocationsApiStubber.stub.stubLocations(existingLandingLocation)
+    LocationsApiStubber.stub.stubLocations(existingWingLocation)
     LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
     LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
     LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
@@ -81,8 +82,9 @@ context('Create Landing Confirm', () => {
     LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
     LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(residentialSummary)
     LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false, name: 'testL', prisonId: 'TST' })
-    LocationsApiStubber.stub.stubLocations(existingWingLocation)
-    LocationsApiStubber.stub.stubLocations(existingLandingLocation)
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
   }
 
   context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -111,7 +113,7 @@ context('Create Landing Confirm', () => {
       return Page.verifyOnPage(CreateLocationConfirmPage)
     }
 
-    it('shows the correct information and successfully creates draft wing', () => {
+    it('shows the correct information and successfully creates draft landing', () => {
       setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
       LocationsApiStubber.stub.stubLocationsCreateCells(newLandingLocation)
       LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(createdLocationResidentialSummary)

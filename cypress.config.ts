@@ -47,10 +47,10 @@ export default defineConfig({
 
           return null
         },
-        ...auth,
+        ...auth.allStubs,
         ...components,
         ...locationsApi.allStubs,
-        ...manageUsersApi,
+        ...manageUsersApi.allStubs,
         ...tokenVerification,
         ...logAccessibilityViolations,
         ...prisonApi,

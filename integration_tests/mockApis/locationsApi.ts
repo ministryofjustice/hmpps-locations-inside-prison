@@ -7,6 +7,7 @@ import {
   PrisonResidentialSummary,
 } from '../../server/data/types/locationsApi'
 import LocationFactory from '../../server/testutils/factories/location'
+import TypedStubber from './typedStubber'
 
 const stubLocationsConstantsAccommodationType = (
   accommodationTypes = [
@@ -1101,14 +1102,5 @@ const allStubs = {
   stubLocationsResidentialSummaryForCreateWing,
 }
 
-class LocationsApiStubber {
-  get stub() {
-    return Object.fromEntries(
-      Object.entries(allStubs).map(([k, _v]) => [k, (...args: unknown[]) => cy.task(k, ...args)]),
-    ) as unknown as typeof allStubs
-  }
-
-  allStubs = allStubs
-}
-
-export = new LocationsApiStubber()
+const LocationsApiStubber = new TypedStubber<typeof allStubs>(allStubs)
+export default LocationsApiStubber
