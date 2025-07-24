@@ -13,9 +13,12 @@ export default class CellDetails extends FormInitialStep {
     const locals = super.locals(req, res)
     const { locationId, prisonId, decoratedResidentialSummary } = res.locals
     const localName = req.sessionModel.get<string>('localName')
-    const locationName = localName || req.sessionModel.get<string>('locationCode')
+    const locationName =
+      localName ||
+      `${decoratedResidentialSummary.location.pathHierarchy}-${req.sessionModel.get<string>('locationCode')}`
     locals.locationType = req.sessionModel.get<string>('locationType')
-    locals.pageTitleText = `${decoratedResidentialSummary.location.pathHierarchy}-${locationName}`
+    locals.title = 'Enter cell details'
+    locals.titleCaption = `Create cells on ${locals.locationType.toLowerCase()} ${locationName}`
 
     locals.backLink = backUrl(req, {
       fallbackUrl: `/create-new/${locationId || prisonId}/details`,

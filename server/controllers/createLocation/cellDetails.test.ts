@@ -53,7 +53,7 @@ describe('CellDetails', () => {
         prisonId: 'TST',
         decoratedResidentialSummary: {
           location: {
-            pathHierarchy: 'LandingName',
+            pathHierarchy: 'L',
           },
         },
         options: {},
@@ -72,19 +72,27 @@ describe('CellDetails', () => {
 
   describe('locals', () => {
     it('returns correct locals, with a localName set', () => {
+      sessionModelData.localName = 'WEST'
+      sessionModelData.locationType = 'LANDING'
+
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
-      expect(result.locationType).toBe('LANDING')
-      expect(result.pageTitleText).toBe('LandingName-WEST')
-      expect(result.backLink).toBe('/create-new/uuid-123/details')
-      expect(result.cancelLink).toBe('/view-and-update-locations/TST/uuid-123')
+      expect(result).toMatchObject({
+        locationType: 'LANDING',
+        titleCaption: 'Create cells on landing WEST',
+        backLink: '/create-new/uuid-123/details',
+        cancelLink: '/view-and-update-locations/TST/uuid-123',
+      })
     })
 
-    it('text falls back to locationCode if localName is blank', () => {
+    it('falls back to locationCode and pathHierarchy when localName is blank', () => {
       sessionModelData.localName = ''
+      sessionModelData.locationCode = '1'
+      sessionModelData.locationType = 'LANDING'
+
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
-      expect(result.pageTitleText).toBe('LandingName-W')
+      expect(result.titleCaption).toBe('Create cells on landing L-1')
     })
   })
 })
