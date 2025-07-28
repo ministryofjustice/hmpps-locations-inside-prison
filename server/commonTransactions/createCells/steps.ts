@@ -1,18 +1,16 @@
 import FormWizard from 'hmpo-form-wizard'
+import CellDetails from './cellDetails'
 
 const steps: FormWizard.Steps = {
   '/': {
-    next: 'step2',
-    fields: ['text1'],
-    pageTitle: 'Create Cells Page 1',
+    editable: true,
+    pageTitle: 'Enter cell details',
+    fields: ['cellsToCreate', 'accommodationType'],
+    controller: CellDetails,
+    next: 'door-numbers',
   },
-  '/step2': {
-    next: 'step3',
-    fields: ['text2'],
-    pageTitle: 'Create Cells Page 2',
-  },
-  '/step3': {
-    pageTitle: 'Create Cells Page 3',
+  '/door-numbers': {
+    pageTitle: 'DOOR_NUMBERS',
   },
 }
 

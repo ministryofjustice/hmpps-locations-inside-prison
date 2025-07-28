@@ -37,11 +37,6 @@ export default class Structure extends FormInitialStep {
 
     locals.level4 = values['level-4'] ? pluralize(String(values['level-4'])) : ''
 
-    locals.backLink = backUrl(req, {
-      fallbackUrl: `/create-new/${locationId || prisonId}/details`,
-    })
-    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
-
     return locals
   }
 
