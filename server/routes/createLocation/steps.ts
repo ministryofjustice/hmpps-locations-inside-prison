@@ -3,6 +3,7 @@ import Details from '../../controllers/createLocation/details'
 import CreateLocationInit from '../../controllers/createLocation/init'
 import Structure from '../../controllers/createLocation/structure'
 import ConfirmCreateLocation from '../../controllers/createLocation/confirm'
+import CellDetails from '../../controllers/createLocation/cellDetails'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -25,6 +26,12 @@ const steps: FormWizard.Steps = {
       },
       'confirm',
     ],
+  },
+  '/create-cells': {
+    editable: true,
+    fields: ['cellsToCreate', 'accommodationType'],
+    controller: CellDetails,
+    next: 'door-numbers',
   },
   '/structure': {
     editable: true,

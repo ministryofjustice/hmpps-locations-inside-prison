@@ -159,6 +159,7 @@ context('Create Landing Details', () => {
       Page.verifyOnPage(ViewLocationsShowPage)
     })
 
-    // TODO: write tests for create cells field "yes"
+    // TODO: write tests for transition to next step
+    // TODO: write tests for create cells field
   })
 })

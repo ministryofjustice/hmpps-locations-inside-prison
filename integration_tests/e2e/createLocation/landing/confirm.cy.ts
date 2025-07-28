@@ -1,5 +1,6 @@
 import Page from '../../../pages/page'
 import CreateLocationDetailsPage from '../../../pages/createLocation/index'
+import CreateCellsPage from '../../../pages/createLocation/createCells'
 import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
 import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
@@ -113,6 +114,15 @@ context('Create Landing Confirm', () => {
       return Page.verifyOnPage(CreateLocationConfirmPage)
     }
 
+    const goToCreateCellsPage = () => {
+      const detailsPage = goToCreateLocationDetailsPage()
+      detailsPage.locationCodeInput().clear().type('2')
+      detailsPage.localNameTextInput().clear().type('testL')
+      detailsPage.createCellsNowRadio('yes').click()
+      detailsPage.continueButton().click()
+      return Page.verifyOnPage(CreateCellsPage)
+    }
+
     it('shows the correct information and successfully creates draft landing', () => {
       setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
       LocationsApiStubber.stub.stubLocationsCreateCells(newLandingLocation)
@@ -157,6 +167,52 @@ context('Create Landing Confirm', () => {
       const page = goToConfirmPage()
       page.cancelLink().click()
       Page.verifyOnPage(ViewLocationsIndexPage)
+    })
+
+    context('Enter cell details', () => {
+      it('navigates to create cells page when selecting yes for create cells', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('1')
+        cy.get('.govuk-radios__item label').eq(0).should('contain.text', 'Normal accommodation')
+        cy.get('.govuk-radios__item label').eq(1).should('contain.text', 'Care and separation')
+        cy.get('.govuk-radios__item label').eq(2).should('contain.text', 'Healthcare inpatients')
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+      })
+
+      it('shows the correct validation error when create cells has no input value', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear()
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('Enter how many cells you want to create')
+        cy.get('#cellsToCreate-error').contains('Enter how many cells you want to create')
+      })
+
+      it('shows the correct validation error when create cells has non numeric input', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('loads of cells')
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('Cells must be a number')
+        cy.get('#cellsToCreate-error').contains('Cells must be a number')
+      })
+
+      it('shows the correct validation error when create cells input is over 999', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('1000')
+        createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('You can create a maximum of 999 cells at once')
+        cy.get('#cellsToCreate-error').contains('You can create a maximum of 999 cells at once')
+      })
+
+      it('shows the correct validation error when no accommodation type is selected', () => {
+        const createCellsPage = goToCreateCellsPage()
+        createCellsPage.cellsToCreateInput().clear().type('1')
+        createCellsPage.continueButton().click()
+        cy.get('.govuk-error-summary__list').contains('Select an accommodation type')
+        cy.get('#accommodationType-error').contains('Select an accommodation type')
+      })
     })
   })
 })
