@@ -111,12 +111,12 @@ export default class FormInitialStep extends FormWizard.Controller {
     next()
   }
 
-  setupRemovedFields(req: FormWizard.Request, _res: Response, next: NextFunction) {
+  setupRemovedFields(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { fields } = req.form.options
 
     Object.values(fields).forEach(f => {
       // eslint-disable-next-line no-param-reassign
-      f.removed = 'remove' in f && f.remove(req)
+      f.removed = 'remove' in f && f.remove(req, res)
     })
 
     next()

@@ -4,7 +4,7 @@ import { singularizeString } from '../../utils/utils'
 
 export default async (req: Request, res: Response) => {
   const locals: TypedLocals = {
-    title: 'View and update locations',
+    title: 'Manage locations',
   }
 
   const success = req.flash('success')
@@ -15,8 +15,6 @@ export default async (req: Request, res: Response) => {
   }
 
   if (req.featureFlags.createAndCertify && req.canAccess('create_location')) {
-    locals.title = 'Manage locations'
-
     const { decoratedResidentialSummary: summary } = res.locals
     const singularizedLocationType = singularizeString(String(summary.subLocationName)).toLowerCase()
 

@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class CreateLocationDetailsPage extends Page {
   constructor() {
-    super('')
+    super(/Enter \w+ details/)
   }
 
   static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/details`)

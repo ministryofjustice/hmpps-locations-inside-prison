@@ -13,6 +13,8 @@ export default class ViewLocationsShowPage extends Page {
     cy.location('pathname').should('contain', '/view-and-update-locations/')
   }
 
+  locationsCreateButton = (): PageElement => cy.get('[data-qa=create-button]')
+
   breadcrumbs = (): PageElement => cy.get('.govuk-breadcrumbs__link')
 
   locationType = (): PageElement => cy.get('[data-qa=location-type]')

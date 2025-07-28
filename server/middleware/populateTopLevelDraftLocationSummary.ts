@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import logger from '../../logger'
-import { Location } from '../data/types/locationsApi'
+import { Location, LocationResidentialSummary } from '../data/types/locationsApi'
 import LocationsService from '../services/locationsService'
 
 const getTopLevelDraftLocation = async (
@@ -34,11 +34,11 @@ export default async function populateTopLevelDraftLocationSummary(
     const { systemToken } = req.session
 
     const topLevelDraftLocation = await getTopLevelDraftLocation(locationsService, systemToken, location.raw)
-    res.locals.topLevelDraftLocationSummary = await locationsService.getResidentialSummary(
+    res.locals.topLevelDraftLocationSummary = (await locationsService.getResidentialSummary(
       systemToken,
       topLevelDraftLocation.prisonId,
       topLevelDraftLocation.id,
-    )
+    )) as LocationResidentialSummary
   } catch (error) {
     logger.error(
       error,

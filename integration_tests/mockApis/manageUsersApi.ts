@@ -1,4 +1,5 @@
 import { stubFor } from './wiremock'
+import TypedStubber from './typedStubber'
 
 const stubManageUsers = (name: string = 'john smith') =>
   stubFor({
@@ -93,10 +94,13 @@ const stubManageHealthPing = () =>
     },
   })
 
-export default {
+const allStubs = {
   stubManageHealthPing,
   stubManageUsers,
   stubManageUsersMe,
   stubManageUsersMeCaseloads,
   stubManageUsersMeRoles,
 }
+
+const ManageUsersApiStubber = new TypedStubber<typeof allStubs>(allStubs)
+export default ManageUsersApiStubber

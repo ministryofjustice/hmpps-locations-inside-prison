@@ -84,6 +84,7 @@ interface TypedLocals {
     subLocationName: string
     subLocations: DecoratedLocation[]
     summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string; linkAriaLabel?: string }[]
+    wingStructure?: string[]
   }
   definitions?: string[]
   definitionsPath?: string

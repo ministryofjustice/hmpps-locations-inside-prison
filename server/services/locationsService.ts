@@ -2,7 +2,7 @@ import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
 import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
-import { StatusType } from '../data/types/locationsApi'
+import { LocationType, StatusType } from '../data/types/locationsApi'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -112,7 +112,7 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getLocationTypes'))[key] || 'Unknown'
   }
 
-  async getLocationByLocalName(token: string, prisonId: string, localName: string, parentLocationId: string) {
+  async getLocationByLocalName(token: string, prisonId: string, localName: string, parentLocationId?: string) {
     return this.locationsApiClient.locations.getLocationByLocalName(token, { prisonId, localName, parentLocationId })
   }
 
@@ -255,7 +255,7 @@ export default class LocationsService {
     token: string,
     prisonId: string,
     wingCode: string,
-    wingStructure: string[],
+    wingStructure: LocationType[],
     wingDescription?: string,
   ) {
     return this.locationsApiClient.locations.createWing(token, undefined, {
@@ -264,5 +264,9 @@ export default class LocationsService {
       wingStructure,
       wingDescription,
     })
+  }
+
+  async createCells(token: string, data: Parameters<LocationsApiClient['locations']['createCells']>[2]) {
+    return this.locationsApiClient.locations.createCells(token, undefined, data)
   }
 }

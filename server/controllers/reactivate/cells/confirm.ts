@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../../utils/backUrl'
-import { Location } from '../../../data/types/locationsApi'
+import { Location, PrisonResidentialSummary } from '../../../data/types/locationsApi'
 import populateCells from './populateCells'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
@@ -19,10 +19,10 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     const { systemToken } = req.session
     const { locationsService } = req.services
 
-    res.locals.prisonResidentialSummary = await locationsService.getResidentialSummary(
+    res.locals.prisonResidentialSummary = (await locationsService.getResidentialSummary(
       systemToken,
       req.sessionModel.get('referrerPrisonId') as string,
-    )
+    )) as PrisonResidentialSummary
 
     next()
   }

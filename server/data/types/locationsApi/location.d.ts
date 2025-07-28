@@ -62,4 +62,5 @@ export declare interface Location {
   planetFmReference: string
   numberOfCellLocations: number
   oldWorkingCapacity: number
+  wingStructure: LocationType[]
 }

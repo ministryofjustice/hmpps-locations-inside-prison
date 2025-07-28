@@ -2,8 +2,11 @@ import Page from '../../../pages/page'
 import CreateLocationDetailsPage from '../../../pages/createLocation'
 import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
+import LocationsApiStubber from '../../../mockApis/locationsApi'
+import AuthStubber from '../../../mockApis/auth'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
 
-context('Set Wing Location Details', () => {
+context('Create Wing Details', () => {
   const prisonId = 'TST'
   const residentialSummary = {
     prisonSummary: {
@@ -20,19 +23,19 @@ context('Set Wing Location Details', () => {
 
   const setupStubs = (roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
-    cy.task('stubLocationsConstantsAccommodationType')
-    cy.task('stubLocationsConstantsConvertedCellType')
-    cy.task('stubLocationsConstantsDeactivatedReason')
-    cy.task('stubLocationsConstantsLocationType')
-    cy.task('stubLocationsConstantsSpecialistCellType')
-    cy.task('stubLocationsConstantsUsedForType')
-    cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
     cy.task('setFeatureFlag', { createAndCertify: true })
-    cy.task('stubGetPrisonConfiguration', { prisonId, certificationActive: true })
+    AuthStubber.stub.stubSignIn({ roles })
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
+    LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+    LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
   }
 
   context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -87,7 +90,7 @@ context('Set Wing Location Details', () => {
     })
 
     it('shows the correct validation error when submitting a localName that already exists', () => {
-      cy.task('stubLocationsCheckLocalNameExists')
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: true })
       const page = goToCreateLocationDetailsPage()
       page.locationCodeInput().clear().type('new1')
       page.localNameTextInput().clear().type('exists')
