@@ -47,7 +47,7 @@ jobs:
   helm_lint:
     strategy:
       matrix:
-        environments: ['development', 'train', 'preprod', 'production']
+        environments: ['dev', 'train', 'preprod', 'prod']
     name: helm lint
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
@@ -67,7 +67,7 @@ jobs:
       push: ${{ inputs.push || true }}
       docker_multiplatform: true
   deploy_dev:
-    name: Deploy to the development environment
+    name: Deploy to the dev environment
     if: github.ref == 'refs/heads/main'
     needs:
       - build
@@ -75,7 +75,7 @@ jobs:
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
-      environment: 'development'
+      environment: 'dev'
       app_version: '${{ needs.build.outputs.app_version }}'
   deploy_train:
     name: Deploy to the training environment
