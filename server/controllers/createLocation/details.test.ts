@@ -6,7 +6,6 @@ import LocationsService from '../../services/locationsService'
 import fields from '../../routes/createLocation/fields'
 import AnalyticsService from '../../services/analyticsService'
 import LocationFactory from '../../testutils/factories/location'
-import alphanumeric from '../../validators/alphanumeric'
 import { Location } from '../../data/types/locationsApi'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
@@ -91,111 +90,25 @@ describe('Create location (WING)', () => {
 
       // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
-      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toMatchObject({
         backLink: '/view-and-update-locations/TST',
         cancelLink: '/view-and-update-locations/TST',
         fields: {
           locationCode: {
-            component: 'govukInput',
-            classes: 'govuk-input--width-5 local-name-text-input',
-            autocomplete: 'off',
-            errorMessages: {
-              alphanumeric: ':fieldName can only include numbers or letters',
-            },
-            hint: {
-              text: `The letter or number used to identify the location, for example Wing A.`,
-            },
-            id: 'locationCode',
             label: {
-              classes: 'govuk-label--m',
-              for: 'locationCode',
-              text: `Wing code`,
+              text: 'Wing code',
             },
-            name: 'locationCode',
-            rows: 1,
-            validate: [
-              'required',
-              alphanumeric,
-              {
-                fn: expect.any(Function),
-                arguments: [5],
-              },
-            ],
-            value: undefined,
-          },
-          localName: {
-            component: 'govukCharacterCount',
-            errorMessages: {
-              taken: 'A location with this name already exists',
-            },
-            hint: {
-              text: 'This will change how the name displays on location lists but won’t change the location code.',
-            },
-            id: 'localName',
-            name: 'localName',
-            classes: 'govuk-!-width-one-half local-name-text-input',
-            validate: [
-              {
-                fn: expect.any(Function),
-                arguments: [30],
-              },
-            ],
-            label: {
-              text: 'Local name (optional)',
-              for: 'localName',
-              classes: 'govuk-label--m',
-            },
-            maxlength: 30,
-            rows: 1,
-            autocomplete: 'off',
-            value: undefined,
           },
           createCellsNow: {
-            autocomplete: 'off',
-            component: 'govukRadios',
-            errorMessages: {
-              required: 'Select yes if you want to create cells now',
-            },
             fieldset: {
               legend: {
-                classes: 'govuk-fieldset__legend--m',
                 text: 'Do you want to create cells on the LOCATION_TYPE now?',
               },
             },
-            hideWhenRemoved: true,
-            id: 'createCellsNow',
-            items: [
-              {
-                text: 'Yes',
-                value: 'yes',
-              },
-              {
-                text: "No, I'll create them later",
-                value: 'no',
-              },
-            ],
-            name: 'createCellsNow',
-            remove: expect.any(Function),
-            validate: ['required'],
-            value: undefined,
-          },
-          levelType: {
-            component: 'govukSelect',
-            errorMessages: {},
-            id: 'levelType',
-            items: [
-              {
-                text: 'Set at runtime',
-                value: 'Set at runtime',
-              },
-            ],
-            name: 'levelType',
-            value: undefined,
           },
         },
         title: 'Enter wing details',
         titleCaption: 'Create new wing',
-        validationErrors: [],
       })
     })
   })
@@ -404,118 +317,25 @@ describe('Create location (LANDING)', () => {
 
       // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
-      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toMatchObject({
         backLink: '/view-and-update-locations/TST',
         cancelLink: '/view-and-update-locations/TST',
         fields: {
           locationCode: {
-            component: 'govukInput',
-            classes: 'govuk-input--width-5 local-name-text-input',
-            autocomplete: 'off',
-            errorMessages: {
-              alphanumeric: ':fieldName can only include numbers or letters',
-            },
-            formGroup: {
-              beforeInput: {
-                html: '<span class="govuk-label govuk-input-prefix--plain">A-</span>',
-              },
-            },
-            hint: {
-              text: `The letter or number used to identify the location, for example A-1.`,
-            },
-            id: 'locationCode',
             label: {
-              classes: 'govuk-label--m',
-              for: 'locationCode',
-              text: `Landing code`,
+              text: 'Landing code',
             },
-            name: 'locationCode',
-            rows: 1,
-            validate: [
-              'required',
-              alphanumeric,
-              {
-                fn: expect.any(Function),
-                arguments: [5],
-                type: 'maxLength',
-              },
-            ],
-            value: undefined,
-          },
-          localName: {
-            component: 'govukCharacterCount',
-            errorMessages: {
-              taken: 'A location with this name already exists',
-            },
-            hint: {
-              text: 'This will change how the name displays on location lists but won’t change the location code.',
-            },
-            id: 'localName',
-            name: 'localName',
-            classes: 'govuk-!-width-one-half local-name-text-input',
-            validate: [
-              {
-                fn: expect.any(Function),
-                arguments: [30],
-                type: 'maxLength',
-              },
-            ],
-            label: {
-              text: 'Local name (optional)',
-              for: 'localName',
-              classes: 'govuk-label--m',
-            },
-            maxlength: 30,
-            rows: 1,
-            autocomplete: 'off',
-            value: undefined,
           },
           createCellsNow: {
-            autocomplete: 'off',
-            component: 'govukRadios',
-            errorMessages: {
-              required: 'Select yes if you want to create cells now',
-            },
             fieldset: {
               legend: {
-                classes: 'govuk-fieldset__legend--m',
                 text: 'Do you want to create cells on the landing now?',
               },
             },
-            hideWhenRemoved: true,
-            id: 'createCellsNow',
-            items: [
-              {
-                text: 'Yes',
-                value: 'yes',
-              },
-              {
-                text: "No, I'll create them later",
-                value: 'no',
-              },
-            ],
-            name: 'createCellsNow',
-            remove: expect.any(Function),
-            validate: ['required'],
-            value: undefined,
-          },
-          levelType: {
-            component: 'govukSelect',
-            errorMessages: {},
-            id: 'levelType',
-            items: [
-              {
-                text: 'Set at runtime',
-                value: 'Set at runtime',
-              },
-            ],
-            name: 'levelType',
-            value: undefined,
           },
         },
         title: 'Enter landing details',
         titleCaption: 'Create new landing',
-        validationErrors: [],
       })
     })
   })

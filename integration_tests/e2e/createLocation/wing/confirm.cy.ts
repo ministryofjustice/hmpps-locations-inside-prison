@@ -116,17 +116,17 @@ context('Create Wing Confirm', () => {
 
       confirmPage.detailsTitle().contains('Wing details')
 
-      confirmPage.changeDetailsKey(0).contains('Wing structure')
-      confirmPage.changeDetailsValue(0).contains('Wing → Landings → Cells')
-      confirmPage.changeDetailsLink(0).should('have.attr', 'href').and('include', '/create-new/TST/structure')
+      confirmPage.changeDetailsKey(0).contains('Wing code')
+      confirmPage.changeDetailsValue(0).contains('B')
+      confirmPage.changeDetailsLink(0).should('have.attr', 'href').and('include', '/create-new/TST/details')
 
-      confirmPage.changeDetailsKey(1).contains('Wing code')
-      confirmPage.changeDetailsValue(1).contains('B')
+      confirmPage.changeDetailsKey(1).contains('Local name')
+      confirmPage.changeDetailsValue(1).contains('testW')
       confirmPage.changeDetailsLink(1).should('have.attr', 'href').and('include', '/create-new/TST/details')
 
-      confirmPage.changeDetailsKey(2).contains('Local name')
-      confirmPage.changeDetailsValue(2).contains('testW')
-      confirmPage.changeDetailsLink(2).should('have.attr', 'href').and('include', '/create-new/TST/details')
+      confirmPage.changeDetailsKey(2).contains('Wing structure')
+      confirmPage.changeDetailsValue(2).contains('Wing → Landings → Cells')
+      confirmPage.changeDetailsLink(2).should('have.attr', 'href').and('include', '/create-new/TST/structure')
 
       confirmPage.createButton().click()
 

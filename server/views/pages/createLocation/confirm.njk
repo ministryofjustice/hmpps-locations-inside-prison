@@ -61,18 +61,6 @@
             },
             rows: [
               {
-                key: { text: "Wing structure" },
-                value: { text: decoratedLocationStructure },
-                actions: {
-                  items: [
-                    {
-                      href: createStructureLink,
-                      text: "Change"
-                    }
-                  ]
-                }
-              },
-              {
                 key: { text: "Wing code" },
                 value: { text: values.locationCode },
                 actions: {
@@ -91,6 +79,18 @@
                   items: [
                     {
                       href: createDetailsLink,
+                      text: "Change"
+                    }
+                  ]
+                }
+              },
+              {
+                key: { text: "Wing structure" },
+                value: { text: decoratedLocationStructure },
+                actions: {
+                  items: [
+                    {
+                      href: createStructureLink,
                       text: "Change"
                     }
                   ]
