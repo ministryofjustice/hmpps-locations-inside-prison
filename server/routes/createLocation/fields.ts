@@ -55,7 +55,7 @@ const fields: FormWizard.Fields = {
       }
 
       const { decoratedResidentialSummary } = res.locals
-      if (decoratedResidentialSummary.location) {
+      if (decoratedResidentialSummary.wingStructure && decoratedResidentialSummary.location) {
         const locationType = sessionModel.get<string>('locationType')
         const currentTypeIndex = decoratedResidentialSummary.wingStructure.indexOf(locationType)
         const childType = decoratedResidentialSummary.wingStructure[currentTypeIndex + 1]

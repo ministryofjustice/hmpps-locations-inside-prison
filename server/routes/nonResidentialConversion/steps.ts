@@ -4,18 +4,26 @@ import NonResidentialConversionOccupied from '../../controllers/nonResidentialCo
 import NonResidentialConversionWarning from '../../controllers/nonResidentialConversion/warning'
 import NonResidentialConversionDetails from '../../controllers/nonResidentialConversion/details'
 import NonResidentialConversionConfirm from '../../controllers/nonResidentialConversion/confirm'
+import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
+import capFirst from '../../formatters/capFirst'
 
-function isCellOccupied(req: FormWizard.Request, res: Response) {
+function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
+    backLink: (_req, res) =>
+      `/view-and-update-locations/${res.locals.decoratedLocation.prisonId}/${res.locals.decoratedLocation.id}`,
     entryPoint: true,
     reset: true,
     resetJourney: true,
     skip: true,
     next: [
+      {
+        fn: (req, _res) => req.featureFlags.createAndCertify,
+        next: 'cert-change-disclaimer',
+      },
       {
         fn: isCellOccupied,
         next: 'occupied',
@@ -23,6 +31,18 @@ const steps = {
       'warning',
     ],
   },
+  ...CertChangeDisclaimer.getSteps({
+    next: [
+      {
+        fn: isCellOccupied,
+        next: 'occupied',
+      },
+      'warning',
+    ],
+    title: (_req, _res) => `Non-residential conversion`,
+    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)} conversion`,
+    description: (_req, res) => `converting a cell to non-residential`,
+  }),
   '/occupied': {
     controller: NonResidentialConversionOccupied,
     checkJourney: false,

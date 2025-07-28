@@ -123,7 +123,7 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
-    const { options, values } = res.locals
+    const { options, values, backLink, cancelLink } = res.locals
     if (!options?.fields) {
       return {}
     }
@@ -141,6 +141,23 @@ export default class FormInitialStep extends FormWizard.Controller {
         fields[error.key].errorMessage = errorDetail
       }
     })
+
+    if (options.pageTitle) {
+      res.locals.title = options.pageTitle
+    }
+
+    if (!cancelLink) {
+      const firstStep = (Object.values(options.steps) as FormWizard.Step[]).find(step => step.entryPoint && step.skip)
+
+      if (firstStep) {
+        res.locals.cancelLink =
+          typeof firstStep.backLink === 'function' ? firstStep.backLink(req, res) : firstStep.backLink
+      }
+    }
+
+    if (!backLink) {
+      res.locals.backLink = res.locals.cancelLink
+    }
 
     return {
       fields,

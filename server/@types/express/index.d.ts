@@ -117,12 +117,14 @@ interface TypedLocals {
   locationTree?: LocationTree[]
   locationType?: string
   maxCapacity?: string
-  options?: {
+  certAction?: string
+  options?: FormWizard.Step & {
     action: string
     allFields?: FormWizard.Fields
     enctype?: string
     fields?: FormWizard.Fields
     method: string
+    steps: FormWizard.Steps
   }
   pageTitleText?: string
   pathSuffix?: string

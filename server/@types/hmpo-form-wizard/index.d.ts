@@ -317,20 +317,23 @@ declare module 'hmpo-form-wizard' {
     interface Step {
       pageTitle?: string
       reset?: boolean
+      skip?: boolean
       editable?: boolean
       resetJourney?: boolean
+      checkJourney?: boolean
       entryPoint?: boolean
       template?: string
       next?: FormWizard.Step.NextStep
       fields?: string[]
       controller?: typeof FormWizard.Controller
       navigationOrder?: number
-      backLink?: string
+      backLink?: string | ((req: Request, res: Response) => string)
       section?: string
       sectionProgressRules?: Array<SectionProgressRule>
       noPost?: boolean
       locals?: Record<string, boolean | string>
       invalid?: boolean
+      fullPath?: string
     }
 
     interface RenderedStep {

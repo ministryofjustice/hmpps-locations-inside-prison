@@ -42,16 +42,10 @@ export default class Details extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { prisonId, locationId } = res.locals
     const locationType = req.sessionModel.get<string>('locationType')
 
     locals.title = `Enter ${locationType.toLowerCase()} details`
     locals.titleCaption = `Create new ${locationType.toLowerCase()}`
-
-    locals.backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`,
-    })
-    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
 
     return locals
   }
