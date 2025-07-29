@@ -7,9 +7,37 @@ import { TypedLocals } from '../../@types/express'
 
 export default class FormInitialStep extends FormWizard.Controller {
   middlewareSetup() {
+    this.use(this.setCancelLink)
     super.middlewareSetup()
+    this.use(this.setPageTitle)
     this.use(this.setupConditionalFields)
     this.use(this.setupRemovedFields)
+  }
+
+  override getBackLink(req: FormWizard.Request, res: Response) {
+    const backLink = super.getBackLink(req, res)
+
+    return backLink || res.locals.cancelLink
+  }
+
+  setPageTitle(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { options } = req.form
+    if (options?.pageTitle) {
+      res.locals.title = options.pageTitle
+    }
+
+    next()
+  }
+
+  setCancelLink(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const firstStep = (Object.values(req.form.options.steps || {}) as FormWizard.Step[]).find(step => step.entryPoint)
+
+    if (firstStep) {
+      res.locals.cancelLink =
+        typeof firstStep.backLink === 'function' ? firstStep.backLink(req, res) : firstStep.backLink
+    }
+
+    next()
   }
 
   getInitialValues(_req: FormWizard.Request, _res: Response): FormWizard.Values {
@@ -89,7 +117,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     const { options } = req.form
 
     options.fields = Object.fromEntries(
-      Object.entries(options.fields).map(([key, field]: FieldEntry, _, obj: FieldEntry[]) =>
+      Object.entries(options.fields || {}).map(([key, field]: FieldEntry, _, obj: FieldEntry[]) =>
         renderConditionalFields(req, [key, field], obj),
       ),
     )
@@ -122,30 +150,30 @@ export default class FormInitialStep extends FormWizard.Controller {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  locals(req: FormWizard.Request, res: Response) {
+    const locals: Partial<TypedLocals> = {}
     const { options, values } = res.locals
-    if (!options?.fields) {
-      return {}
+
+    if (options?.fields) {
+      const { allFields } = options
+      const fields = this.setupFields(req, allFields, options.fields, values, res.locals.errorlist)
+
+      const validationErrors: { text: string; href: string }[] = []
+
+      res.locals.errorlist.forEach((error: { args: FormWizard.Values; key: string; type: string }) => {
+        const errorDetail = this.getErrorDetail(error, res)
+        validationErrors.push(errorDetail)
+        const field = fields[error.key]
+        if (field) {
+          fields[error.key].errorMessage = errorDetail
+        }
+      })
+
+      locals.fields = fields
+      locals.validationErrors = validationErrors
     }
 
-    const { allFields } = options
-    const fields = this.setupFields(req, allFields, options.fields, values, res.locals.errorlist)
-
-    const validationErrors: { text: string; href: string }[] = []
-
-    res.locals.errorlist.forEach((error: { args: FormWizard.Values; key: string; type: string }) => {
-      const errorDetail = this.getErrorDetail(error, res)
-      validationErrors.push(errorDetail)
-      const field = fields[error.key]
-      if (field) {
-        fields[error.key].errorMessage = errorDetail
-      }
-    })
-
-    return {
-      fields,
-      validationErrors,
-    }
+    return locals
   }
 
   formError(fieldName: string, type: string, args?: unknown): FormWizard.Controller.Error {

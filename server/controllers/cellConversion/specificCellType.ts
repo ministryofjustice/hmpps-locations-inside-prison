@@ -6,8 +6,6 @@ import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionSpecificCellType extends FormInitialStep {
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
-    const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     const { sessionModel } = req
 
     if (req.isEditing) {
@@ -46,7 +44,6 @@ export default class CellConversionSpecificCellType extends FormInitialStep {
 
     return {
       ...locals,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
     }
   }
 

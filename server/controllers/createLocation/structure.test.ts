@@ -77,8 +77,6 @@ describe('Create location structure', () => {
           level2: 'Landings',
           level3: 'Cells',
           level4: '',
-          backLink: '/create-new/TST/details',
-          cancelLink: '/view-and-update-locations/TST',
         }),
       )
     })

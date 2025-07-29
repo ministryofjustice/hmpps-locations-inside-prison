@@ -1,0 +1,53 @@
+// eslint-disable-next-line max-classes-per-file
+import FormWizard from 'hmpo-form-wizard'
+import { Response } from 'express'
+import CommonTransaction from '../commonTransaction'
+import steps from './steps'
+import FormInitialStep from '../../controllers/base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
+
+class ExtendedTransaction extends CommonTransaction {
+  getSteps({
+    next,
+    title,
+    caption,
+    description,
+  }: {
+    next: FormWizard.Step['next']
+    title?: (req: FormWizard.Request, res: Response) => string
+    caption?: (req: FormWizard.Request, res: Response) => string
+    description?: (req: FormWizard.Request, res: Response) => string
+  }) {
+    const modifiedSteps = super.getSteps({ next })
+
+    // Avoid modifying the original step object, to protect against unintended changes occurring
+    modifiedSteps[`${this.pathPrefix}/`] = {
+      ...modifiedSteps[`${this.pathPrefix}/`],
+      controller: class extends FormInitialStep {
+        locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+          const locals = super.locals(req, res)
+
+          if (title) {
+            locals.title = res.locals.title.replace('This', title(req, res))
+          }
+          if (caption) {
+            locals.titleCaption = caption(req, res)
+          }
+          if (description) {
+            locals.certAction = description(req, res)
+          }
+
+          return locals
+        }
+      },
+    }
+
+    return modifiedSteps
+  }
+}
+
+const CertChangeDisclaimer = new ExtendedTransaction({
+  steps,
+  pathPrefix: '/cert-change-disclaimer',
+})
+export default CertChangeDisclaimer

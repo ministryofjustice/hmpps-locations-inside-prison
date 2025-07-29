@@ -117,13 +117,8 @@ interface TypedLocals {
   locationTree?: LocationTree[]
   locationType?: string
   maxCapacity?: string
-  options?: {
-    action: string
-    allFields?: FormWizard.Fields
-    enctype?: string
-    fields?: FormWizard.Fields
-    method: string
-  }
+  certAction?: string
+  options?: FormWizard.Request['form']['options']
   pageTitleText?: string
   pathSuffix?: string
   prisonConfiguration?: PrisonConfiguration

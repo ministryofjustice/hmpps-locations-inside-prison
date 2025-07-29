@@ -5,12 +5,10 @@ export default class CreateCellsPage extends Page {
     super(/Enter cell details/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/crate-cells`)
-
-  cellsToCreateInput = (): PageElement => cy.get('#cellsToCreate')
+  cellsToCreateInput = (): PageElement => cy.get('#create-cells_cellsToCreate')
 
   accommodationTypeRadios = (value: string): PageElement =>
-    cy.get(`input[name="accommodationType"][type="radio"][value="${value}"]`)
+    cy.get(`input[name="create-cells_accommodationType"][type="radio"][value="${value}"]`)
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 

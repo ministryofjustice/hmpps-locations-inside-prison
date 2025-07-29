@@ -125,7 +125,6 @@ describe('CellConversionConfirm', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         changeSummary:
           'This will increase the establishment’s working capacity from 20 to 21.\n<br/><br/>\nThis will increase the establishment’s maximum capacity from 30 to 32.',
         summaryListRows: [
