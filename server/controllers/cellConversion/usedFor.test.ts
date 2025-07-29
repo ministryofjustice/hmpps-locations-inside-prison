@@ -118,7 +118,6 @@ describe('CellConversionUsedFor', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         fields,
         validationErrors: [
           {

@@ -91,8 +91,6 @@ describe('Create location (WING)', () => {
       // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toMatchObject({
-        backLink: '/view-and-update-locations/TST',
-        cancelLink: '/view-and-update-locations/TST',
         fields: {
           locationCode: {
             label: {
@@ -111,12 +109,6 @@ describe('Create location (WING)', () => {
         titleCaption: 'Create new wing',
       })
     })
-  })
-
-  it('sets the correct backLink and cancelLink in locals', () => {
-    const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-    expect(result.backLink).toBe('/view-and-update-locations/TST')
-    expect(result.cancelLink).toBe('/view-and-update-locations/TST')
   })
 
   describe('locationCode validation', () => {
@@ -318,8 +310,6 @@ describe('Create location (LANDING)', () => {
       // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toMatchObject({
-        backLink: '/view-and-update-locations/TST',
-        cancelLink: '/view-and-update-locations/TST',
         fields: {
           locationCode: {
             label: {
@@ -338,12 +328,6 @@ describe('Create location (LANDING)', () => {
         titleCaption: 'Create new landing',
       })
     })
-  })
-
-  it('sets the correct backLink and cancelLink in locals', () => {
-    const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-    expect(result.backLink).toBe('/view-and-update-locations/TST')
-    expect(result.cancelLink).toBe('/view-and-update-locations/TST')
   })
 
   describe('locationCode validation', () => {

@@ -18,8 +18,6 @@ export default class CellConversionUsedFor extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     const usedForTypes = req.form.values.usedForTypes || req.sessionModel.get<string[]>('usedForTypes')
     const fields = { ...(locals.fields as FormWizard.Fields) }
 
@@ -32,7 +30,6 @@ export default class CellConversionUsedFor extends FormInitialStep {
 
     return {
       ...locals,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       fields,
     }
   }

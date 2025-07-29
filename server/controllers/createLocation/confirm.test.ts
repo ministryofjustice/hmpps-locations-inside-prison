@@ -3,6 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import ConfirmCreateLocation from './confirm'
 import fields from '../../routes/createLocation/fields'
+import steps from '../../routes/createLocation/steps'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import LocationFactory from '../../testutils/factories/location'
@@ -57,6 +58,7 @@ describe('Confirm create location (WING)', () => {
       form: {
         options: {
           fields,
+          steps,
         },
         values: {},
       },
@@ -84,9 +86,7 @@ describe('Confirm create location (WING)', () => {
       locals: {
         errorlist: [],
         prisonId: 'TST',
-        options: {
-          fields,
-        },
+        options: deepReq.form.options,
         user: {
           username: 'JTIMPSON',
         },
@@ -109,8 +109,6 @@ describe('Confirm create location (WING)', () => {
       expect(result).toEqual(
         expect.objectContaining({
           decoratedLocationStructure: 'Wing → Landings → Cells',
-          backLink: '/create-new/TST/structure',
-          cancelLink: '/view-and-update-locations/TST',
           createStructureLink: '/create-new/TST/structure',
           createDetailsLink: '/create-new/TST/details',
         }),
@@ -290,8 +288,6 @@ describe('Confirm create location (LANDING)', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual(
         expect.objectContaining({
-          backLink: '/create-new/7e570000-0000-1000-8000-000000000001/details',
-          cancelLink: '/view-and-update-locations/TST/7e570000-0000-1000-8000-000000000001',
           createDetailsLink: '/create-new/7e570000-0000-1000-8000-000000000001/details',
         }),
       )

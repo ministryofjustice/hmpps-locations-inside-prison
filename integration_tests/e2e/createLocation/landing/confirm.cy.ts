@@ -185,7 +185,7 @@ context('Create Landing Confirm', () => {
         createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
         createCellsPage.continueButton().click()
         cy.get('.govuk-error-summary__list').contains('Enter how many cells you want to create')
-        cy.get('#cellsToCreate-error').contains('Enter how many cells you want to create')
+        cy.get('#create-cells_cellsToCreate-error').contains('Enter how many cells you want to create')
       })
 
       it('shows the correct validation error when create cells has non numeric input', () => {
@@ -194,7 +194,7 @@ context('Create Landing Confirm', () => {
         createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
         createCellsPage.continueButton().click()
         cy.get('.govuk-error-summary__list').contains('Cells must be a number')
-        cy.get('#cellsToCreate-error').contains('Cells must be a number')
+        cy.get('#create-cells_cellsToCreate-error').contains('Cells must be a number')
       })
 
       it('shows the correct validation error when create cells input is over 999', () => {
@@ -203,7 +203,7 @@ context('Create Landing Confirm', () => {
         createCellsPage.accommodationTypeRadios('NORMAL_ACCOMMODATION').click()
         createCellsPage.continueButton().click()
         cy.get('.govuk-error-summary__list').contains('You can create a maximum of 999 cells at once')
-        cy.get('#cellsToCreate-error').contains('You can create a maximum of 999 cells at once')
+        cy.get('#create-cells_cellsToCreate-error').contains('You can create a maximum of 999 cells at once')
       })
 
       it('shows the correct validation error when no accommodation type is selected', () => {
@@ -211,7 +211,7 @@ context('Create Landing Confirm', () => {
         createCellsPage.cellsToCreateInput().clear().type('1')
         createCellsPage.continueButton().click()
         cy.get('.govuk-error-summary__list').contains('Select an accommodation type')
-        cy.get('#accommodationType-error').contains('Select an accommodation type')
+        cy.get('#create-cells_accommodationType-error').contains('Select an accommodation type')
       })
     })
   })

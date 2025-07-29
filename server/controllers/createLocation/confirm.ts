@@ -1,7 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { capitalize } from 'lodash'
-import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
 import { Location, LocationType } from '../../data/types/locationsApi'

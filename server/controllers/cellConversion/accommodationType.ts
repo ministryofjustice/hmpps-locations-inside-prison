@@ -19,8 +19,6 @@ export default class CellConversionAccommodationType extends FormInitialStep {
   }
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
-    const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     const { sessionModel } = req
 
     if (req.isEditing) {
@@ -60,17 +58,7 @@ export default class CellConversionAccommodationType extends FormInitialStep {
       }
     }
 
-    const backLink = req.isEditing
-      ? `/location/${locationId}/cell-conversion/confirm`
-      : `/view-and-update-locations/${prisonId}/${locationId}`
-
-    const locals = super.locals(req, res)
-
-    return {
-      ...locals,
-      backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-    }
+    return super.locals(req, res)
   }
 
   saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {

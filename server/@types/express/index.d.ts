@@ -118,14 +118,7 @@ interface TypedLocals {
   locationType?: string
   maxCapacity?: string
   certAction?: string
-  options?: FormWizard.Step & {
-    action: string
-    allFields?: FormWizard.Fields
-    enctype?: string
-    fields?: FormWizard.Fields
-    method: string
-    steps: FormWizard.Steps
-  }
+  options?: FormWizard.Request['form']['options']
   pageTitleText?: string
   pathSuffix?: string
   prisonConfiguration?: PrisonConfiguration

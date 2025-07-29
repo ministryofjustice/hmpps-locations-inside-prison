@@ -9,9 +9,9 @@ export default class CommonTransaction {
   protected readonly pathPrefix: string
 
   constructor({
+    pathPrefix,
     steps,
     fields = {},
-    pathPrefix,
   }: {
     pathPrefix: string
     steps: FormWizard.Steps
@@ -30,7 +30,7 @@ export default class CommonTransaction {
         }
 
         if (modifiedStep.fields) {
-          modifiedStep.fields = modifiedStep.fields.map(field => `${strippedPrefix}/${field}`)
+          modifiedStep.fields = modifiedStep.fields.map(field => `${strippedPrefix}_${field}`)
         }
 
         return [`${pathPrefix}${path}`, modifiedStep]
@@ -42,18 +42,18 @@ export default class CommonTransaction {
         const modifiedField = { ...field }
 
         if (modifiedField.id) {
-          modifiedField.id = `${strippedPrefix}/${modifiedField.id}`
+          modifiedField.id = `${strippedPrefix}_${modifiedField.id}`
         }
 
         if (modifiedField.name) {
-          modifiedField.name = `${strippedPrefix}/${modifiedField.name}`
+          modifiedField.name = `${strippedPrefix}_${modifiedField.name}`
         }
 
         if (modifiedField.label?.for) {
-          modifiedField.label.for = `${strippedPrefix}/${modifiedField.label.for}`
+          modifiedField.label.for = `${strippedPrefix}_${modifiedField.label.for}`
         }
 
-        return [`${strippedPrefix}/${id}`, modifiedField]
+        return [`${strippedPrefix}_${id}`, modifiedField]
       }),
     )
   }

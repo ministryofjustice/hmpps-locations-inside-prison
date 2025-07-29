@@ -80,8 +80,6 @@ describe('CellDetails', () => {
       expect(result).toMatchObject({
         locationType: 'LANDING',
         titleCaption: 'Create cells on landing WEST',
-        backLink: '/create-new/uuid-123/details',
-        cancelLink: '/view-and-update-locations/TST/uuid-123',
       })
     })
 

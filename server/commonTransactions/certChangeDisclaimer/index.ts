@@ -1,8 +1,10 @@
+// eslint-disable-next-line max-classes-per-file
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import CommonTransaction from '../commonTransaction'
 import steps from './steps'
-import CertChangeDisclaimerController from './controller'
+import FormInitialStep from '../../controllers/base/formInitialStep'
+import { TypedLocals } from '../../@types/express'
 
 class ExtendedTransaction extends CommonTransaction {
   getSteps({
@@ -16,13 +18,31 @@ class ExtendedTransaction extends CommonTransaction {
     caption?: (req: FormWizard.Request, res: Response) => string
     description?: (req: FormWizard.Request, res: Response) => string
   }) {
-    ;(this.steps[`${this.pathPrefix}/`].controller as unknown as typeof CertChangeDisclaimerController).setData({
-      title,
-      caption,
-      description,
-    })
+    const modifiedSteps = super.getSteps({ next })
 
-    return super.getSteps({ next })
+    // Avoid modifying the original step object, to protect against unintended changes occurring
+    modifiedSteps[`${this.pathPrefix}/`] = {
+      ...modifiedSteps[`${this.pathPrefix}/`],
+      controller: class extends FormInitialStep {
+        locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+          const locals = super.locals(req, res)
+
+          if (title) {
+            locals.title = res.locals.title.replace('This', title(req, res))
+          }
+          if (caption) {
+            locals.titleCaption = caption(req, res)
+          }
+          if (description) {
+            locals.certAction = description(req, res)
+          }
+
+          return locals
+        }
+      },
+    }
+
+    return modifiedSteps
   }
 }
 

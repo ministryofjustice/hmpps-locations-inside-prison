@@ -8,11 +8,10 @@ export default class CellConversionSetCellCapacity extends FormInitialStep {
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
-    const { displayName, id: locationId, prisonId } = decoratedLocation
+    const { displayName } = decoratedLocation
 
     return {
       ...locals,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       title: 'Set cell capacity',
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',

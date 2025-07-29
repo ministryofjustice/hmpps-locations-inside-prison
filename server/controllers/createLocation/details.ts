@@ -1,7 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
-import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
