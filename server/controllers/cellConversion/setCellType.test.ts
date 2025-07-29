@@ -132,7 +132,6 @@ describe('CellConversionSetCellType', () => {
 
       expect(result).toEqual({
         buttonText: 'Continue',
-        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         fields,
         validationErrors: [
           {

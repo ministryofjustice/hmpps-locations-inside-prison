@@ -183,8 +183,6 @@ describe('CellConversionAccommodationType', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         fields,
         validationErrors: [
           {
@@ -204,8 +202,6 @@ describe('CellConversionAccommodationType', () => {
         const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
         expect(result).toEqual({
-          backLink: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/confirm',
-          cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
           fields,
           validationErrors: [
             {

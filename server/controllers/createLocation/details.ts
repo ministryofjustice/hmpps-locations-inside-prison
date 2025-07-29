@@ -1,7 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
-import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
@@ -42,16 +41,10 @@ export default class Details extends FormInitialStep {
 
   locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
-    const { prisonId, locationId } = res.locals
     const locationType = req.sessionModel.get<string>('locationType')
 
     locals.title = `Enter ${locationType.toLowerCase()} details`
     locals.titleCaption = `Create new ${locationType.toLowerCase()}`
-
-    locals.backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`,
-    })
-    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
 
     return locals
   }

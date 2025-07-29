@@ -33,9 +33,9 @@ describe('CreateLocationInit', () => {
     }
   })
 
-  describe('render', () => {
+  describe('successHandler', () => {
     it('sets values on the sessionModel', () => {
-      controller.render(deepReq as FormWizard.Request, deepRes as Response, next)
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepReq.sessionModel.set).toHaveBeenCalledWith('locationType', 'WING')
       expect(deepReq.sessionModel.set).toHaveBeenCalledWith('locationId', 'locationId')

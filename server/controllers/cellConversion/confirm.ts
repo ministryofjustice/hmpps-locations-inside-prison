@@ -78,7 +78,7 @@ export default class CellConversionConfirm extends FormInitialStep {
       usedForTypes,
       workingCapacity,
     } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
+    const { id: locationId } = decoratedLocation
 
     sessionModel.unset('previousCellTypes')
     sessionModel.unset('previousAccommodationType')
@@ -111,7 +111,6 @@ export default class CellConversionConfirm extends FormInitialStep {
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     return {
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
       summaryListRows,
     }

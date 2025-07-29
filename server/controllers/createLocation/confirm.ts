@@ -1,7 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { capitalize } from 'lodash'
-import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
 import { Location, LocationType } from '../../data/types/locationsApi'
@@ -21,10 +20,6 @@ export default class ConfirmCreateLocation extends FormInitialStep {
     locals.locationType = req.sessionModel.get<LocationType>('locationType')
 
     locals.createDetailsLink = `/create-new/${locationId || prisonId}/details`
-    locals.backLink = backUrl(req, {
-      fallbackUrl: locals.createDetailsLink,
-    })
-    locals.cancelLink = `/view-and-update-locations/${[prisonId, locationId].filter(i => i).join('/')}`
 
     if (structureLevels?.length) {
       const fullStructure = [locationType, ...structureLevels]
@@ -33,9 +28,6 @@ export default class ConfirmCreateLocation extends FormInitialStep {
         .map((level, i) => (i === 0 ? capitalize(level) : pluralize(level)))
         .join(' → ')
       locals.createStructureLink = `/create-new/${locationId || prisonId}/structure`
-      locals.backLink = backUrl(req, {
-        fallbackUrl: locals.createStructureLink,
-      })
     }
 
     return locals
