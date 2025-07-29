@@ -116,6 +116,8 @@
       </div>
     </div>
 
-    {{ locationsTable(createButton, decoratedResidentialSummary.subLocationName, decoratedResidentialSummary.subLocations) }}
+    {% if not decoratedResidentialSummary.location.leafLevel %}
+      {{ locationsTable(createButton, decoratedResidentialSummary.subLocationName, decoratedResidentialSummary.subLocations) }}
+    {% endif %}
   </div>
 {% endblock %}
