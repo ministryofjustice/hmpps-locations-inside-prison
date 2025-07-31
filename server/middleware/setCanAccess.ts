@@ -12,10 +12,8 @@ const rolePriority = [
 export default function setCanAccess(locationService: LocationsService) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { userRoles } = res.locals.user
-    const prisonId = res.locals.user.activeCaseload.id
     const { systemToken } = req.session
     const permissions = rolesToPermissions(userRoles)
-    const prisonConfiguration = await locationService.getPrisonConfiguration(systemToken, prisonId)
     const prisonIdFromParams = req.params.prisonId
 
     // A map of permission overrides, false = always disabled, true = always enabled
@@ -32,20 +30,13 @@ export default function setCanAccess(locationService: LocationsService) {
       }
     }
 
-    if (!req.featureFlags?.createAndCertify || prisonConfiguration.certificationApprovalRequired === 'INACTIVE') {
+    if (!req.featureFlags?.createAndCertify) {
       permissionOverrides.create_location = false
     }
 
-    // check here to avoid create_location actions showing for prisons without createAndCertify enabled.
-    if (prisonId !== prisonIdFromParams && prisonIdFromParams !== undefined) {
-      const secondaryPrisonConfigurationCheck = await locationService.getPrisonConfiguration(
-        systemToken,
-        prisonIdFromParams,
-      )
-      if (
-        !req.featureFlags?.createAndCertify ||
-        secondaryPrisonConfigurationCheck.certificationApprovalRequired === 'INACTIVE'
-      ) {
+    if (prisonIdFromParams !== undefined) {
+      const prisonConfiguration = await locationService.getPrisonConfiguration(systemToken, prisonIdFromParams)
+      if (prisonConfiguration.certificationApprovalRequired === 'INACTIVE') {
         permissionOverrides.create_location = false
       }
     }
