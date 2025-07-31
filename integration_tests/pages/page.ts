@@ -50,4 +50,13 @@ export default abstract class Page {
 
     cy.task('logAccessibilityViolationsTable', violationData)
   }
+
+  checkForError(fieldName: string | null, errorText: string) {
+    cy.get('.govuk-error-summary__title').contains('There is a problem')
+    cy.get('.govuk-error-summary__list').contains(errorText)
+
+    if (fieldName) {
+      cy.get(`#${fieldName}-error`).contains(errorText)
+    }
+  }
 }

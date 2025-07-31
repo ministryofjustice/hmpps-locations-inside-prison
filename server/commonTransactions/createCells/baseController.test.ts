@@ -1,11 +1,11 @@
 import { DeepPartial } from 'fishery'
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import CellDetails from './cellDetails'
+import BaseController from './baseController'
 import LocationsService from '../../services/locationsService'
 
-describe('CellDetails', () => {
-  const controller = new CellDetails({ route: '/' })
+describe('BaseController', () => {
+  const controller = new BaseController({ route: '/' })
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   let sessionModelData: Record<string, any>

@@ -4,6 +4,7 @@ import { flattenConditionalFields, reduceDependentFields, renderConditionalField
 import validateDateInput from '../../helpers/field/validateDateInput'
 import { FieldEntry } from '../../helpers/field/renderConditionalFields'
 import { TypedLocals } from '../../@types/express'
+import unCapFirst from '../../formatters/unCapFirst'
 
 export default class FormInitialStep extends FormWizard.Controller {
   middlewareSetup() {
@@ -63,7 +64,7 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   valueOrFieldName(arg: number | { field: string }, fields: Record<string, { label: { text: string } }>) {
-    return typeof arg === 'number' ? arg : `the ${fields[arg?.field]?.label?.text?.toLowerCase()}`
+    return typeof arg === 'number' ? arg : `the ${unCapFirst(fields[arg?.field]?.label?.text)}`
   }
 
   getErrorDetail(
@@ -99,8 +100,8 @@ export default class FormInitialStep extends FormWizard.Controller {
       numericString: `${fieldName} must only include numbers`,
       nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
       numeric: `${fieldName} must be a number`,
-      required: `Enter a ${fieldName?.toLowerCase()}`,
-      taken: `A location with this ${fieldName?.toLowerCase()} already exists`,
+      required: `Enter a ${unCapFirst(fieldName)}`,
+      taken: `A location with this ${unCapFirst(fieldName)} already exists`,
     }
 
     const errorMessage =
