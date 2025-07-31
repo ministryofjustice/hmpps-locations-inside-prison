@@ -13,6 +13,7 @@ import addAction from '../middleware/addAction'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import populateTopLevelDraftLocationSummary from '../middleware/populateTopLevelDraftLocationSummary'
 import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
+import setCanAccess from '../middleware/setCanAccess'
 
 const router = express.Router({ mergeParams: true })
 
@@ -47,6 +48,8 @@ const controller = (services: Services) => {
   router.use(populatePrisonAndLocationId)
   router.use(redirectToAddPrisonId)
   router.use(validateCaseload())
+  // set can access here to avoid create_location actions showing for prisons without createAndCertify enabled.
+  router.use(setCanAccess(services.locationsService))
 
   router.get(
     '/',
