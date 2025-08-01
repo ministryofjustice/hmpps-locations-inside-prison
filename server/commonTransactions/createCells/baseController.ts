@@ -1,9 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
-export default class CellDetails extends FormInitialStep {
+export default class BaseController extends FormInitialStep {
   middlewareSetup() {
     super.middlewareSetup()
   }
@@ -19,9 +19,5 @@ export default class CellDetails extends FormInitialStep {
     locals.titleCaption = `Create cells on ${locals.locationType.toLowerCase()} ${locationName}`
 
     return locals
-  }
-
-  validate(req: FormWizard.Request, res: Response, next: NextFunction) {
-    return next()
   }
 }

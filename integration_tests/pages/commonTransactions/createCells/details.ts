@@ -1,6 +1,6 @@
-import Page, { PageElement } from '../page'
+import Page, { PageElement } from '../../page'
 
-export default class CreateCellsPage extends Page {
+export default class CreateCellsDetailsPage extends Page {
   constructor() {
     super(/Enter cell details/)
   }
@@ -15,4 +15,17 @@ export default class CreateCellsPage extends Page {
   backLink = (): PageElement => cy.get('.govuk-back-link')
 
   cancelLink = (): PageElement => cy.get('a:contains("Cancel")')
+
+  submit = ({ cellsToCreate, accommodationType }: { cellsToCreate?: number; accommodationType?: string }) => {
+    this.cellsToCreateInput().clear()
+    if (cellsToCreate) {
+      this.cellsToCreateInput().type(cellsToCreate.toString())
+    }
+
+    if (accommodationType) {
+      this.accommodationTypeRadios(accommodationType).click()
+    }
+
+    this.continueButton().click()
+  }
 }

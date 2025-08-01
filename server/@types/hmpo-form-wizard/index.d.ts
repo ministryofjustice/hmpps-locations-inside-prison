@@ -182,6 +182,15 @@ declare module 'hmpo-form-wizard' {
       setStepComplete(req: FormWizard.Request, res: Express.Response, path?: string)
 
       getBackLink(req: Request, res: Express.Response): string | undefined
+
+      // eslint-disable-next-line no-underscore-dangle
+      _process(req: Request, res: Express.Response, next: Express.NextFunction)
+
+      // eslint-disable-next-line no-underscore-dangle
+      _getErrors(req: Request, res: Express.Response, next: Express.NextFunction)
+
+      // eslint-disable-next-line no-underscore-dangle
+      _resetErrors(req: Request, res: Express.Response, next: Express.NextFunction)
     }
 
     namespace Controller {
@@ -253,6 +262,7 @@ declare module 'hmpo-form-wizard' {
       attributes?: { [attribute: string]: string | number }
       default?: string | number | []
       name?: string
+      nameForErrors?: string
       text?: string
       component?: string
       remove?: (req: FormWizard.Request, res: Response) => boolean
@@ -283,7 +293,13 @@ declare module 'hmpo-form-wizard' {
         for?: string
       }
       formGroup?: {
+        classes?: string
+        attributes?: object
         beforeInput?: {
+          html?: string
+          text?: string
+        }
+        afterInput?: {
           html?: string
           text?: string
         }

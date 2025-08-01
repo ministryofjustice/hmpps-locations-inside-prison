@@ -43,6 +43,22 @@ const fields: FormWizard.Fields = {
     },
     autocomplete: 'off',
   },
+  doorNumber: {
+    errorMessages: {
+      notUnique: 'A cell with this door number already exists',
+      taken: 'A cell with this door number already exists',
+    },
+    validate: ['required'],
+    component: 'govukInput',
+    id: 'doorNumber',
+    name: 'doorNumber',
+    classes: 'govuk-input--width-5',
+    rows: 1,
+    autocomplete: 'off',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
 }
 
 export default fields

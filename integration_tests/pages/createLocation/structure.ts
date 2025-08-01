@@ -13,6 +13,8 @@ export default class CreateLocationStructurePage extends Page {
 
   level4Select = (): PageElement => cy.get('#level-4')
 
+  levelSelect = (level: number): PageElement => cy.get(`#level-${level}`)
+
   addLevelButton = (): PageElement => cy.get('#addLevel')
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
@@ -32,4 +34,16 @@ export default class CreateLocationStructurePage extends Page {
   backLink = (): PageElement => cy.get('.govuk-back-link')
 
   cancelLink = (): PageElement => cy.get('a:contains("Cancel")')
+
+  submit({ levels = [] }: { levels?: [string?, string?, string?] } = {}) {
+    for (let i = 0; i < levels.length; i += 1) {
+      if (i > 1) {
+        this.addLevelButton().click()
+      }
+
+      this.levelSelect(i + 2).select(levels[i])
+    }
+
+    this.continueButton().click()
+  }
 }
