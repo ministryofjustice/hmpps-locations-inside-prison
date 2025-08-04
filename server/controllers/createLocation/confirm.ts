@@ -32,7 +32,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
 
       const pluralLevels = structureLevels.map((level: string) => pluralize(level))
 
-      locals.createYouCanAddText = nonOxfordJoin(pluralLevels).toString()
+      locals.createYouCanAddText = nonOxfordJoin(pluralLevels)
     }
 
     return locals

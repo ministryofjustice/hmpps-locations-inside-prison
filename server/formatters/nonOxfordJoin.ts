@@ -9,7 +9,7 @@
  */
 export default function nonOxfordJoin(arr: string[] = [], lastDelimiter = 'and') {
   if (!arr || !Array.isArray(arr)) {
-    return arr
+    return arr as unknown as string
   }
 
   if (arr.length === 1) {
