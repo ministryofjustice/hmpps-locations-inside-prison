@@ -5,7 +5,7 @@ import backUrl from '../../utils/backUrl'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 
 export default class ConfirmCellCapacity extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
   }
@@ -24,7 +24,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  override locals(req: FormWizard.Request, res: Response): object {
     const { decoratedLocation, values } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
@@ -64,7 +64,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -88,7 +88,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 

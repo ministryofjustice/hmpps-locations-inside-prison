@@ -8,11 +8,7 @@ import pluralize from '../../formatters/pluralize'
 import decorateLocation from '../../decorators/location'
 
 export default class ConfirmCreateLocation extends FormInitialStep {
-  middlewareSetup() {
-    super.middlewareSetup()
-  }
-
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { prisonId, locationId, values } = res.locals
     const { locationType, structureLevels } = values
@@ -33,7 +29,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
     return locals
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { analyticsService, locationsService } = req.services
 
     try {
@@ -87,7 +83,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
     }
   }
 
-  async successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
+  override async successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { systemToken } = req.session
     const location = req.sessionModel.get<Location>('newLocation')
     const decoratedLocation = await decorateLocation({

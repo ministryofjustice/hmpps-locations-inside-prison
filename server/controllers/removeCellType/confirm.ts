@@ -7,13 +7,13 @@ import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSu
 import populateLocation from '../../middleware/populateLocation'
 
 export default class ConfirmRemoveCellType extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
     this.use(populateLocation({ decorate: true }))
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  override locals(req: FormWizard.Request, res: Response): object {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
@@ -48,7 +48,7 @@ export default class ConfirmRemoveCellType extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -71,7 +71,7 @@ export default class ConfirmRemoveCellType extends FormWizard.Controller {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     req.journeyModel.reset()

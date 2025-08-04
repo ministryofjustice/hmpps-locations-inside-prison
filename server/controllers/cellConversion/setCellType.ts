@@ -4,7 +4,7 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionSetCellType extends FormInitialStep {
-  async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
     const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
 
     req.form.options.fields.specialistCellTypes.items = Object.values(specialistCellTypes).map(
@@ -20,7 +20,7 @@ export default class CellConversionSetCellType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { sessionModel } = req
     const fields = { ...(locals.fields as FormWizard.Fields) }

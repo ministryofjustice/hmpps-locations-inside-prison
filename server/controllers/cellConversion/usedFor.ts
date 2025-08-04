@@ -4,7 +4,7 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionUsedFor extends FormInitialStep {
-  async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { prisonId } = res.locals.decoratedLocation
     const usedForTypes = await req.services.locationsService.getUsedForTypesForPrison(req.session.systemToken, prisonId)
 
@@ -16,7 +16,7 @@ export default class CellConversionUsedFor extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const usedForTypes = req.form.values.usedForTypes || req.sessionModel.get<string[]>('usedForTypes')
     const fields = { ...(locals.fields as FormWizard.Fields) }

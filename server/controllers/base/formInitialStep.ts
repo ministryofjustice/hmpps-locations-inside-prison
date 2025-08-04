@@ -7,7 +7,7 @@ import { TypedLocals } from '../../@types/express'
 import unCapFirst from '../../formatters/unCapFirst'
 
 export default class FormInitialStep extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     this.use(this.setCancelLink)
     super.middlewareSetup()
     this.use(this.setPageTitle)
@@ -46,7 +46,11 @@ export default class FormInitialStep extends FormWizard.Controller {
     return {}
   }
 
-  getValues(req: FormWizard.Request, res: Response, callback: (err: Error, values?: FormWizard.Values) => void) {
+  override getValues(
+    req: FormWizard.Request,
+    res: Response,
+    callback: (err: Error, values?: FormWizard.Values) => void,
+  ) {
     return super.getValues(req, res, (err, values) => {
       if (err) return callback(err)
 
@@ -151,13 +155,12 @@ export default class FormInitialStep extends FormWizard.Controller {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(_req: FormWizard.Request, res: Response) {
     const locals: Partial<TypedLocals> = {}
     const { options, values } = res.locals
 
     if (options?.fields) {
-      const { allFields } = options
-      const fields = this.setupFields(req, allFields, options.fields, values, res.locals.errorlist)
+      const fields = this.setupFields(options.fields, values, res.locals.errorlist)
 
       const validationErrors: { text: string; href: string }[] = []
 
@@ -223,8 +226,6 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   setupFields(
-    req: FormWizard.Request,
-    allFields: { [field: string]: FormWizard.Field },
     originalFields: FormWizard.Fields,
     values: FormWizard.Values | { [field: string]: { value: string } },
     errorlist: FormWizard.Controller.Error[],
@@ -244,7 +245,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     return this.setupDateInputFields(fields, errorlist)
   }
 
-  render(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override render(req: FormWizard.Request, res: Response, next: NextFunction) {
     this.renderConditionalFields(req, res)
 
     return super.render(req, res, next)
@@ -290,7 +291,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       })
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     this.populateDateInputFieldValues(req)
 
     Object.entries(req.form.options.fields).forEach(([key, field]) => {

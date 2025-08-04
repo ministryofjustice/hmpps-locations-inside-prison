@@ -25,10 +25,7 @@ export interface SplashCondition {
 }
 
 export class PrisonApiClient extends BaseApiClient {
-  constructor(
-    protected readonly redisClient: RedisClient,
-    authenticationClient: AuthenticationClient,
-  ) {
+  constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
     super('prisonApiClient', redisClient, config.apis.prisonApi, authenticationClient)
   }
 

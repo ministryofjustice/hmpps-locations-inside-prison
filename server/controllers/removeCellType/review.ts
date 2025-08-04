@@ -5,17 +5,17 @@ import populatePrisonersInLocation from '../../middleware/populatePrisonersInLoc
 import populateLocation from '../../middleware/populateLocation'
 
 export default class ReviewCellCapacity extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
     this.use(populateLocation({ decorate: true }))
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
+  override getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
     return res.locals.decoratedLocation.capacity
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const occupants = res.locals.prisonerLocation?.prisoners || []
@@ -38,7 +38,7 @@ export default class ReviewCellCapacity extends FormInitialStep {
     })
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 

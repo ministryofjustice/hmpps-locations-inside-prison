@@ -10,7 +10,7 @@ import populateLocationTree from './middleware/populateLocationTree'
 import nonOxfordJoin from '../../../formatters/nonOxfordJoin'
 
 export default class ReactivateParentConfirm extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getResidentialSummaries)
     this.use(populateLocationTree(false))
@@ -37,7 +37,7 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { cells, decoratedLocation, prisonResidentialSummary } = res.locals
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
@@ -75,7 +75,7 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
     const { cells, locationResidentialSummary } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
@@ -127,7 +127,7 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
     next()
   }
 
-  async successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
     const { decoratedLocation, locationResidentialSummary, locationTree } = res.locals
     const redirectUrl = `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`

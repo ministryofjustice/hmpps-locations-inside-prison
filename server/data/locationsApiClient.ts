@@ -18,10 +18,7 @@ import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 
 export default class LocationsApiClient extends BaseApiClient {
-  constructor(
-    protected readonly redisClient: RedisClient,
-    authenticationClient: AuthenticationClient,
-  ) {
+  constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
     super('LocationsApiClient', redisClient, config.apis.locationsApi, authenticationClient)
   }
 

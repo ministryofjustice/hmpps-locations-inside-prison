@@ -4,12 +4,12 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class NonResidentialConversionDetails extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     this.use(this.setOptions)
     super.middlewareSetup()
   }
 
-  async setOptions(req: FormWizard.Request, res: Response, next: NextFunction) {
+  async setOptions(req: FormWizard.Request, _res: Response, next: NextFunction) {
     const convertedCellTypes = await req.services.locationsService.getConvertedCellTypes(req.session.systemToken)
 
     req.form.options.fields.convertedCellType.items = Object.values(convertedCellTypes).map(({ key, description }) => ({
@@ -21,7 +21,7 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
 
     const { decoratedLocation } = res.locals
@@ -33,7 +33,7 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, _res: Response, next: NextFunction) {
     const { options, values } = req.form
     const { items } = options.fields.convertedCellType
     const convertedCellType = items.find(item => item.value === values.convertedCellType)

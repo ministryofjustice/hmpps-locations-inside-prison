@@ -5,7 +5,7 @@ import getCellCount from '../../../middleware/getCellCount'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 
 export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
     this.use(getCellCount)
@@ -24,7 +24,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   }
 
   // eslint-disable-next-line no-underscore-dangle
-  async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
     const { locationsService } = req.services
     const { deactivationReason, deactivationReasonOther, deactivationReasonDescription } = req.form.values
@@ -44,7 +44,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     await super._locals(req, res, next)
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
     const { workingCapacity } = decoratedLocation.capacity
     const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/deactivate/temporary/details` })
@@ -61,7 +61,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { analyticsService, locationsService } = req.services
 
@@ -96,7 +96,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { displayName, id: locationId, locationType, prisonId } = decoratedLocation
 

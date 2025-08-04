@@ -7,11 +7,7 @@ import { StatusType } from '../../../data/types/locationsApi'
 import { ServiceCode } from '../../../data/types/locationsApi/serviceCode'
 
 export default class ResiStatusChangeConfirm extends FormInitialStep {
-  middlewareSetup() {
-    super.middlewareSetup()
-  }
-
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { prisonConfiguration } = res.locals
     const { prisonId } = prisonConfiguration
@@ -27,7 +23,7 @@ export default class ResiStatusChangeConfirm extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { prisonId } = res.locals.prisonConfiguration
     const { analyticsService, locationsService, prisonService } = req.services
     const { activation } = req.form.values
@@ -63,7 +59,7 @@ export default class ResiStatusChangeConfirm extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { prisonId } = res.locals.prisonConfiguration
 
     req.journeyModel.reset()

@@ -6,7 +6,7 @@ import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
 
 export default class ChangeUsedForDetails extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     this.use(this.setOptions)
     super.middlewareSetup()
   }
@@ -21,7 +21,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId, leafLevel } = decoratedLocation
@@ -48,7 +48,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -63,7 +63,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
     }
   }
 
-  async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
     if (isEqual(sortBy(req.form.values.usedFor as string[]), sortBy(decoratedLocation.raw.usedFor))) {
@@ -72,7 +72,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
     return next()
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { id: locationId, prisonId, localName, pathHierarchy } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 

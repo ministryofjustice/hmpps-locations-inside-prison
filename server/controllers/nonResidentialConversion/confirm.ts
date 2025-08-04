@@ -3,14 +3,15 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
+import { TypedLocals } from '../../@types/express'
 
 export default class NonResidentialConversionConfirm extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const convertedCellType = req.sessionModel.get('convertedCellType') as { text: string; value: string }
     let convertedCellTypeDetails = convertedCellType?.text
     const otherConvertedCellType = req.sessionModel.get('otherConvertedCellType') as string
@@ -42,7 +43,7 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { analyticsService, locationsService } = req.services
 
@@ -79,7 +80,7 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 

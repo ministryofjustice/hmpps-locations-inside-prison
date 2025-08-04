@@ -4,13 +4,13 @@ import FormInitialStep from '../base/formInitialStep'
 import populateLocation from '../../middleware/populateLocation'
 
 export default class CheckRemoveCellType extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     // decorate the location now that the steps config has been processed
     this.use(populateLocation({ decorate: true }))
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId, specialistCellTypes } = decoratedLocation
 
@@ -40,7 +40,7 @@ export default class CheckRemoveCellType extends FormInitialStep {
     }
   }
 
-  validate(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
     const { areYouSure } = req.form.values
