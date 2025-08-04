@@ -29,7 +29,7 @@ context('Create landing - Create cells - Details', () => {
         accommodationType: 'NORMAL_ACCOMMODATION',
       })
 
-      page.checkForError('create-cells_cellsToCreate', 'Cells must be a number')
+      page.checkForError('create-cells_cellsToCreate', 'Enter the number of cells you want to create')
     })
 
     it('shows the correct validation error when create cells input is over 999', () => {

@@ -6,6 +6,7 @@ import multiSelect from './multiSelect'
 import localNameInputSubmit from './localNameInputSubmit'
 import updateStructurePreview from './structurePreview'
 import structureAddRemoveLevel from './structureAddRemoveLevel'
+import cellCreateNumbering from './cellCreateNumbering'
 
 govukFrontend.initAll()
 mojFrontend.initAll()
@@ -15,3 +16,4 @@ multiSelect()
 localNameInputSubmit()
 updateStructurePreview()
 structureAddRemoveLevel()
+cellCreateNumbering()

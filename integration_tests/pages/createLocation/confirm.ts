@@ -9,6 +9,9 @@ export default class CreateLocationConfirmPage extends Page {
 
   detailsTitle = (): PageElement => cy.get('.govuk-summary-card__title')
 
+  detailsAdditionalText = (): PageElement =>
+    cy.get('p').filter((_, p) => p.textContent.trim().startsWith('You can add'))
+
   changeDetailsKey = (i: number): PageElement => cy.get('.govuk-summary-list__key').eq(i)
 
   changeDetailsValue = (i: number): PageElement => cy.get('.govuk-summary-list__value').eq(i)

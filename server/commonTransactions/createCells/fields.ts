@@ -29,7 +29,7 @@ const fields: FormWizard.Fields = {
     component: 'govukInput',
     errorMessages: {
       required: 'Enter how many cells you want to create',
-      numeric: 'Cells must be a number',
+      numeric: 'Enter the number of cells you want to create',
       lessThanOrEqualTo: 'You can create a maximum of 999 cells at once',
     },
     id: 'cellsToCreate',
@@ -41,6 +41,18 @@ const fields: FormWizard.Fields = {
       classes: 'govuk-label--m',
       for: 'cellsToCreate',
     },
+    autocomplete: 'off',
+  },
+  cellNumber: {
+    validate: ['required', 'numeric'],
+    component: 'govukInput',
+    id: 'cellNumber',
+    name: 'cellNumber',
+    errorMessages: {
+      notUnique: 'Two cells have the same number',
+    },
+    classes: 'govuk-input--width-5',
+    rows: 1,
     autocomplete: 'off',
   },
   doorNumber: {

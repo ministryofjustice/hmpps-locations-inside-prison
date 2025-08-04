@@ -15,24 +15,36 @@ context('Create landing - Create cells - Cell numbers', () => {
       page = goToCreateCellsCellNumbersPage()
     })
 
-    // it('shows the correct error when 2 or more cells have the same door number', () => {
-    //   page.submit({
-    //     doorNumbers: ['0', '0', '0', '3'],
-    //   })
-    //
-    //   page.checkForError('create-cells_doorNumber0', 'Cell A-001 and cell A-002 have the same cell door number')
-    //   page.checkForError('create-cells_doorNumber1', 'Cell A-001 and cell A-002 have the same cell door number')
-    //   page.checkForError('create-cells_doorNumber2', 'Cell A-001 and cell A-003 have the same cell door number')
-    // })
-    //
-    // it('shows the correct error when a door number is not present', () => {
-    //   page.submit({
-    //     doorNumbers: ['', '', '2', '3'],
-    //   })
-    //
-    //   page.checkForError('create-cells_doorNumber0', 'Enter a cell door number for A-001')
-    //   page.checkForError('create-cells_doorNumber1', 'Enter a cell door number for A-002')
-    // })
+    it('shows the correct error when 2 or more cells have the same cell number', () => {
+      page.submit({
+        cellNumbers: ['0', '0', '0', '3'],
+      })
+
+      page.checkForError('create-cells_cellNumber0', 'Cell 0 and cell 1 have the same cell number')
+      page.checkForError('create-cells_cellNumber1', 'Cell 0 and cell 1 have the same cell number')
+      page.checkForError('create-cells_cellNumber2', 'Cell 0 and cell 2 have the same cell number')
+    })
+
+    it('shows the correct error when a cell number is not present', () => {
+      page.submit({
+        cellNumbers: ['', '', '2', '3'],
+      })
+
+      page.checkForError('create-cells_cellNumber0', 'Enter a cell number for cell 1')
+      page.checkForError('create-cells_cellNumber1', 'Enter a cell number for cell 2')
+    })
+
+    it('shows the correct error when start numbering value is not a number', () => {
+      page.startCreateCellInput().type('x')
+      page.applyLink().click()
+      page.checkForError('startCreateCellNumber', 'Enter a valid starting cell number')
+    })
+
+    it('navigates to the next step with js populated numbers', () => {
+      page.submitWithNumberingFrom('1')
+
+      Page.verifyOnPage(CreateCellsDoorNumbersPage)
+    })
 
     it('navigates to the next step when validation passes', () => {
       page.submit({

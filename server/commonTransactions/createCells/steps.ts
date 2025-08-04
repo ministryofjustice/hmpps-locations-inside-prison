@@ -1,5 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
+import CellNumbers from './cellNumbers'
 import CellDoorNumbers from './cellDoorNumbers'
 
 const steps: FormWizard.Steps = {
@@ -11,7 +12,9 @@ const steps: FormWizard.Steps = {
     next: 'cell-numbers',
   },
   '/cell-numbers': {
-    pageTitle: 'CELL_NUMBERS',
+    pageTitle: 'Enter cell numbers',
+    template: '../../pages/createLocation/cell-numbers',
+    controller: CellNumbers,
     next: 'door-numbers',
   },
   '/door-numbers': {
