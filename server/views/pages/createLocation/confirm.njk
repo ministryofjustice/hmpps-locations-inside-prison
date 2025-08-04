@@ -51,7 +51,7 @@
       <div class="govuk-grid-column-two-thirds">
         {% if locationType == 'WING' %}
           <p class="govuk-body"> You are about to create a new wing.</p>
-          <p class="govuk-body">You can add landings and cells to the wing once it is created.</p>
+          <p class="govuk-body"> You can add {{ createYouCanAddText | lower }} to the wing once it is created.</p>
 
           {{ govukSummaryList({
             card: {

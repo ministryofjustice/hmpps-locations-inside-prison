@@ -5,10 +5,7 @@ import capFirst from '../../formatters/capFirst'
 
 const getCellPath = (req: FormWizard.Request, res: Response, index: number) => {
   const { pathHierarchy } = res.locals.decoratedResidentialSummary.location
-  // TODO: remove the fallback (index + 1) when cellNumbers page is complete
-  const cellNumber = (
-    req.sessionModel.get<string>(`create-cells_cellNumber${index}`) || (index + 1).toString()
-  ).padStart(3, '0')
+  const cellNumber = req.sessionModel.get<string>(`create-cells_cellNumber${index}`).padStart(3, '0')
 
   return `${pathHierarchy}-${cellNumber}`
 }

@@ -1,0 +1,63 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
+
+{% block fields %}
+
+  {{ mojTicketPanel({
+    attributes: {
+      'data-qa': 'draft-location-banner'
+    },
+    items: [{
+      html: govukInput({
+        validate: ['numeric'],
+        component: 'govukInput',
+        id: 'startCreateCellNumber',
+        name: 'startCreateCellNumber',
+        classes: 'govuk-input--width-5 ',
+        rows: 1,
+        label: {
+          text: 'Start cell numbering from',
+          classes: 'govuk-label--m ',
+          for: 'startCreateCellNumber'
+        },
+        autocomplete: 'off',
+        formGroup: {
+          afterInput: {
+            html: '<a href="" class="govuk-link govuk-link--no-visited-state govuk-input-suffix--plain" id="apply-cell-numbering">Apply</a>'
+          }
+        }
+      }),
+      classes: 'govuk-!-margin-bottom-5'
+    }]
+  }) }}
+
+  {% set rows = [] %}
+  {% for key, fieldsOptions in fields %}
+    {% set rows = (rows.push([
+      {
+        text: fieldsOptions.text
+      },
+      {
+        html: callAsMacro(fieldsOptions.component)(fieldsOptions)
+      }
+    ]), rows) %}
+  {% endfor %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-one-half">
+        {{ govukTable({
+          head: [
+            { text: "Cell" },
+            { text: "Cell number" }
+          ],
+          rows: rows
+        }) }}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

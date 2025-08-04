@@ -6,6 +6,7 @@ import FormInitialStep from '../base/formInitialStep'
 import { Location, LocationType } from '../../data/types/locationsApi'
 import pluralize from '../../formatters/pluralize'
 import decorateLocation from '../../decorators/location'
+import nonOxfordJoin from '../../formatters/nonOxfordJoin'
 
 export default class ConfirmCreateLocation extends FormInitialStep {
   middlewareSetup() {
@@ -28,6 +29,10 @@ export default class ConfirmCreateLocation extends FormInitialStep {
         .map((level, i) => (i === 0 ? capitalize(level) : pluralize(level)))
         .join(' → ')
       locals.createStructureLink = `/create-new/${locationId || prisonId}/structure`
+
+      const pluralLevels = structureLevels.map((level: string) => pluralize(level))
+
+      locals.createYouCanAddText = nonOxfordJoin(pluralLevels)
     }
 
     return locals
