@@ -60,6 +60,7 @@ interface TypedLocals {
   cells?: Locations[]
   changeSummary?: string
   continueLink?: string
+  convertedCellTypeDetails?: string
   createButton?: {
     text: string
     href: string

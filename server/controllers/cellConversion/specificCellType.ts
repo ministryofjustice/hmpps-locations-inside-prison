@@ -5,7 +5,7 @@ import setStepValidity from '../../lib/setStepValidity'
 import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionSpecificCellType extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { sessionModel } = req
 
     if (req.isEditing) {
@@ -47,7 +47,7 @@ export default class CellConversionSpecificCellType extends FormInitialStep {
     }
   }
 
-  saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { sessionModel } = req
 
     if (req.isEditing) {

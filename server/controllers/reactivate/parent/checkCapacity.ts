@@ -6,14 +6,14 @@ import populateLocationTree from './middleware/populateLocationTree'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
 
 export default class ReactivateParentCheckCapacity extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.resetCapacity)
     this.use(getLocationResidentialSummary)
     this.use(populateLocationTree(true))
   }
 
-  resetCapacity(req: FormWizard.Request, res: Response, next: NextFunction) {
+  resetCapacity(req: FormWizard.Request, _res: Response, next: NextFunction) {
     req.sessionModel.unset('workingCapacity')
     req.sessionModel.unset('maxCapacity')
     req.sessionModel.unset('errorValues')
@@ -28,7 +28,7 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
     const isSelect = !!req.sessionModel.get('selectLocations')
     const backLink = isSelect
@@ -60,11 +60,11 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
     }
   }
 
-  getErrors(req: FormWizard.Request, res: Response) {
+  override getErrors(req: FormWizard.Request, _res: Response) {
     return req.sessionModel.get('errors')
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { decoratedCells } = res.locals
       const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get(

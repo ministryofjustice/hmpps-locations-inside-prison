@@ -5,12 +5,12 @@ import protectRoute from '../../../middleware/protectRoute'
 import { TypedLocals } from '../../../@types/express'
 
 export default class DeactivatePermanentWarning extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(protectRoute('deactivate:permanent'))
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(_req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 

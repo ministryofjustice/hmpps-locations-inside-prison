@@ -6,11 +6,7 @@ import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
 
 export default class Details extends FormInitialStep {
-  middlewareSetup() {
-    super.middlewareSetup()
-  }
-
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
@@ -26,7 +22,7 @@ export default class Details extends FormInitialStep {
     }
   }
 
-  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { locationsService } = req.services
       const { values } = req.form
@@ -57,7 +53,7 @@ export default class Details extends FormInitialStep {
     })
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { user, decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -81,7 +77,7 @@ export default class Details extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     req.journeyModel.reset()

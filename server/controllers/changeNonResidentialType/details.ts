@@ -4,12 +4,12 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     this.use(this.setOptions)
     super.middlewareSetup()
   }
 
-  async setOptions(req: FormWizard.Request, res: Response, next: NextFunction) {
+  async setOptions(req: FormWizard.Request, _res: Response, next: NextFunction) {
     const convertedCellType = await req.services.locationsService.getConvertedCellTypes(req.session.systemToken)
 
     req.form.options.fields.convertedCellType.items = Object.values(convertedCellType).map(({ key, description }) => ({
@@ -21,7 +21,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
@@ -50,7 +50,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     }
   }
 
-  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { decoratedLocation } = res.locals
       const { prisonId, id: locationId } = decoratedLocation
@@ -73,7 +73,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     })
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -108,7 +108,7 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, prisonId, localName, pathHierarchy } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 

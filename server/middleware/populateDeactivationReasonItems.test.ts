@@ -1,12 +1,11 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
-import fields from '../../../routes/deactivate/fields'
-import DeactivateTemporaryDetails from './details'
-import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
+import fields from '../routes/deactivate/fields'
+import buildDecoratedLocation from '../testutils/buildDecoratedLocation'
+import populateDeactivationReasonItems from './populateDeactivationReasonItems'
 
-describe('DeactivateTemporaryDetails', () => {
-  const controller = new DeactivateTemporaryDetails({ route: '/' })
+describe('populateDeactivationReasonItems', () => {
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   let formValues: {
@@ -82,55 +81,51 @@ describe('DeactivateTemporaryDetails', () => {
     }
   })
 
-  describe('validateFields', () => {
-    it('sets deactivationReasonDescription to the correct value', () => {
-      deepReq.body = {
-        'deactivationReasonDescription-TEST1': 'test1',
-        'deactivationReasonDescription-TEST2': 'test2',
-        'deactivationReasonDescription-TEST3': 'test3',
-      }
-      deepReq.form.values.deactivationReason = 'TEST2'
-      const callback = jest.fn()
-      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+  it('populates the items ', async () => {
+    deepReq.services = {
+      locationsService: {
+        getDeactivatedReasons: () => Promise.resolve({ ATEST1: 'A test 1', OTHER: 'Other', TEST2: 'Test 2' }),
+      },
+    }
 
-      expect(deepReq.form.values.deactivationReasonDescription).toEqual('test2')
-    })
-  })
+    const callback = jest.fn()
+    await populateDeactivationReasonItems(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-  describe('locals', () => {
-    it('returns the expected locals', () => {
-      deepRes.locals.errorlist = [
-        {
-          key: 'deactivationReasonOther',
-          type: 'required',
-          url: '/',
-        },
-      ]
-      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+    expect(deepReq.form.options.fields.deactivationReason.items).toEqual([
+      {
+        conditional: 'deactivationReasonDescription-ATEST1',
+        text: 'A test 1',
+        value: 'ATEST1',
+      },
+      {
+        conditional: 'deactivationReasonDescription-TEST2',
+        text: 'Test 2',
+        value: 'TEST2',
+      },
+      {
+        conditional: 'deactivationReasonOther',
+        text: 'Other',
+        value: 'OTHER',
+      },
+    ])
 
-      expect(result).toEqual({
-        backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-        fields,
-        validationErrors: [
-          {
-            href: '#deactivationReasonOther',
-            text: 'Enter a deactivation reason',
-          },
-        ],
-      })
-    })
-
-    it('returns the expected locals when the back link is already set', () => {
-      deepRes.locals.backLink = '/last/step'
-      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-
-      expect(result).toEqual({
-        backLink: '/last/step',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-        fields,
-        validationErrors: [],
-      })
+    expect(
+      Object.fromEntries(
+        Object.entries(deepReq.form.options.allFields).filter(([n, _]) =>
+          n.startsWith('deactivationReasonDescription'),
+        ),
+      ),
+    ).toEqual({
+      'deactivationReasonDescription-ATEST1': {
+        ...fields.deactivationReasonDescription,
+        id: 'deactivationReasonDescription-ATEST1',
+        name: 'deactivationReasonDescription-ATEST1',
+      },
+      'deactivationReasonDescription-TEST2': {
+        ...fields.deactivationReasonDescription,
+        id: 'deactivationReasonDescription-TEST2',
+        name: 'deactivationReasonDescription-TEST2',
+      },
     })
   })
 })

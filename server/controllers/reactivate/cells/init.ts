@@ -3,7 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
 
 export default class ReactivateCellsInit extends FormInitialStep {
-  render(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override render(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { locationId, prisonId, selectedLocations } = req.query
 
     if (typeof selectedLocations === 'string') {

@@ -2,11 +2,11 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
-import { PrisonResidentialSummary } from '../../data/types/locationsApi/prisonResidentialSummary'
+import { PrisonResidentialSummary } from '../../data/types/locationsApi'
 import { TypedLocals } from '../../@types/express'
 
 export default class ChangeSignedOperationalCapacity extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.getSignedOperationalCapacity)
   }
@@ -52,7 +52,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     next()
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, (errors: FormWizard.Errors) => {
       const { values } = req.form
       const { maxCapacity } = res.locals
@@ -73,7 +73,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     })
   }
 
-  validate(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { prisonId } = res.locals
     const { newSignedOperationalCapacity } = req.form.values
     const { currentSignedOperationalCapacity } = res.locals
@@ -88,7 +88,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     return next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals
 
@@ -103,7 +103,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { prisonId, user } = res.locals
       const { locationsService } = req.services
@@ -123,7 +123,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { prisonId } = res.locals
 
     req.journeyModel.reset()

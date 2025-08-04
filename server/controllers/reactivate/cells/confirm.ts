@@ -8,7 +8,7 @@ import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 
 export default class ReactivateCellsConfirm extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.getPrisonResidentialSummary)
     this.use(populateCells)
@@ -37,7 +37,7 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { cells, prisonResidentialSummary } = res.locals
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
@@ -74,7 +74,7 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
     const { cells, user } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
@@ -105,7 +105,7 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     next()
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
     const redirectUrl = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`

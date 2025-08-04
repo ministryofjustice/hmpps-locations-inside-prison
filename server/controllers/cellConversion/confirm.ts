@@ -8,12 +8,12 @@ import { SummaryListRow } from '../../@types/govuk'
 import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionConfirm extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
   }
 
-  async get(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async get(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { locationsService } = req.services
 
     const { systemToken } = req.session
@@ -67,7 +67,7 @@ export default class CellConversionConfirm extends FormInitialStep {
     }
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { sessionModel } = req
     const {
       accommodationType,
@@ -116,7 +116,7 @@ export default class CellConversionConfirm extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { services, sessionModel } = req
@@ -148,7 +148,7 @@ export default class CellConversionConfirm extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
     const locationName = localName || pathHierarchy
 

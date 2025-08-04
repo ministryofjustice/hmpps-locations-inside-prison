@@ -3,13 +3,13 @@ import FormWizard from 'hmpo-form-wizard'
 import populateLocation from '../../middleware/populateLocation'
 
 export default class RemoveCellType extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     // decorate the location now that the steps config has been processed
     this.use(populateLocation({ decorate: true }))
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(_req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId, specialistCellTypes } = decoratedLocation
 
@@ -34,7 +34,7 @@ export default class RemoveCellType extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -49,7 +49,7 @@ export default class RemoveCellType extends FormWizard.Controller {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     req.journeyModel.reset()

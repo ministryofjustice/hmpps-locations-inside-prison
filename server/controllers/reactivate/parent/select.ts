@@ -4,7 +4,7 @@ import FormInitialStep from '../../base/formInitialStep'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
 
 export default class ReactivateParentSelect extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     this.use(getLocationResidentialSummary)
     this.use(this.populateItems)
     super.middlewareSetup()
@@ -33,7 +33,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
     const backLink = `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
 
@@ -55,7 +55,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation, locationResidentialSummary } = res.locals
     const { selectLocations } = req.form.values as { selectLocations: string[] }
     if (locationResidentialSummary.subLocationName === 'Cells' && selectLocations.length === 1) {

@@ -8,7 +8,7 @@ import { isValidUUID } from '../../../utils/isValidUUID'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 
 export default class ReactivateCellConfirm extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
     this.use(populateInactiveParentLocations)
@@ -27,7 +27,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  locals(req: FormWizard.Request, res: Response): object {
+  override locals(req: FormWizard.Request, res: Response): object {
     const { decoratedLocation, prisonResidentialSummary, referrerRootUrl, values } = res.locals
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
@@ -65,7 +65,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -90,7 +90,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { displayName, id: locationId, locationType, prisonId } = res.locals.decoratedLocation
     const referrerFlow = req.sessionModel.get<string>('referrerFlow')
     const referrerPrisonId = req.sessionModel.get<string>('referrerPrisonId')

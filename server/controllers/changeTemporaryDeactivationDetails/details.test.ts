@@ -166,57 +166,6 @@ describe('ChangeTemporaryDeactivationDetails', () => {
     })
   })
 
-  describe('populateItems', () => {
-    it('populates the items ', async () => {
-      deepReq.services = {
-        locationsService: {
-          getDeactivatedReasons: () => Promise.resolve({ ATEST1: 'A test 1', OTHER: 'Other', TEST2: 'Test 2' }),
-        },
-      }
-
-      const callback = jest.fn()
-      await controller.populateItems(deepReq as FormWizard.Request, deepRes as Response, callback)
-
-      expect(deepReq.form.options.fields.deactivationReason.items).toEqual([
-        {
-          conditional: 'deactivationReasonDescription-ATEST1',
-          text: 'A test 1',
-          value: 'ATEST1',
-        },
-        {
-          conditional: 'deactivationReasonDescription-TEST2',
-          text: 'Test 2',
-          value: 'TEST2',
-        },
-        {
-          conditional: 'deactivationReasonOther',
-          text: 'Other',
-          value: 'OTHER',
-        },
-      ])
-
-      expect(
-        Object.fromEntries(
-          Object.entries(deepReq.form.options.allFields).filter(([n, _]) =>
-            n.startsWith('deactivationReasonDescription'),
-          ),
-        ),
-      ).toEqual({
-        'deactivationReasonDescription-ATEST1': {
-          ...fields.deactivationReasonDescription,
-          id: 'deactivationReasonDescription-ATEST1',
-          name: 'deactivationReasonDescription-ATEST1',
-          value: 'Description',
-        },
-        'deactivationReasonDescription-TEST2': {
-          ...fields.deactivationReasonDescription,
-          id: 'deactivationReasonDescription-TEST2',
-          name: 'deactivationReasonDescription-TEST2',
-        },
-      })
-    })
-  })
-
   describe('validate', () => {
     it('cancels and redirects to the show location page when there are no changes', () => {
       jest.spyOn(controller, 'getInitialValues').mockReturnValue({

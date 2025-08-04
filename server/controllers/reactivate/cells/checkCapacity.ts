@@ -5,7 +5,7 @@ import populateCells from './populateCells'
 import { Location } from '../../../data/types/locationsApi'
 
 export default class ReactivateCellsCheckCapacity extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCells)
     this.use(this.resetCapacity)
@@ -26,7 +26,7 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
     const backLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
@@ -56,11 +56,11 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
     }
   }
 
-  getErrors(req: FormWizard.Request, res: Response) {
+  override getErrors(req: FormWizard.Request, _res: Response) {
     return req.sessionModel.get('errors')
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { cells } = res.locals
       const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get(

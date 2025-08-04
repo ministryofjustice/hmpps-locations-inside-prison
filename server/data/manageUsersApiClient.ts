@@ -31,10 +31,7 @@ export interface UserRole {
 }
 
 export default class ManageUsersApiClient extends BaseApiClient {
-  constructor(
-    protected readonly redisClient: RedisClient,
-    authenticationClient: AuthenticationClient,
-  ) {
+  constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
     super('ManageUsersApiClient', redisClient, config.apis.manageUsersApi, authenticationClient)
   }
 

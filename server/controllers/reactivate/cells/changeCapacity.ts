@@ -6,7 +6,7 @@ import backUrl from '../../../utils/backUrl'
 import { Location } from '../../../data/types/locationsApi'
 
 export default class ReactivateCellsChangeCapacity extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateLocation())
     this.use(this.resetErrors)
@@ -25,7 +25,7 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
     next()
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
+  override getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
     const { location } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
@@ -37,7 +37,7 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
     }
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { values } = req.form
       const { location } = res.locals
@@ -58,7 +58,7 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
     })
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const locals = super.locals(req, res)
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
@@ -72,7 +72,7 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
     const maxCapacity = Number(req.form.values.maxCapacity)
     const workingCapacity = Number(req.form.values.workingCapacity)

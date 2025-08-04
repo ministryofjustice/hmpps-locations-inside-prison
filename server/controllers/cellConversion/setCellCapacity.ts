@@ -5,7 +5,7 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class CellConversionSetCellCapacity extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
     const { displayName } = decoratedLocation
@@ -19,7 +19,7 @@ export default class CellConversionSetCellCapacity extends FormInitialStep {
     }
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, errors => {
       const { sessionModel } = req
       const { values } = req.form

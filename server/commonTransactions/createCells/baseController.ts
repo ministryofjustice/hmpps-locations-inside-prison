@@ -4,11 +4,7 @@ import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class BaseController extends FormInitialStep {
-  middlewareSetup() {
-    super.middlewareSetup()
-  }
-
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals
     const localName = req.sessionModel.get<string>('localName')

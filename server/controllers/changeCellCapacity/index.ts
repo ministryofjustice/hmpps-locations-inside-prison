@@ -7,16 +7,16 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class ChangeCellCapacity extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
+  override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     return res.locals.decoratedLocation.capacity
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     const { values } = req.form
     const { decoratedLocation, prisonerLocation } = res.locals
     const { accommodationTypes, specialistCellTypes } = decoratedLocation.raw
@@ -51,7 +51,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     })
   }
 
-  validate(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap } = req.form.values
@@ -67,7 +67,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     return next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation, values } = res.locals
     const { capacity, displayName, id: locationId, prisonId } = decoratedLocation
