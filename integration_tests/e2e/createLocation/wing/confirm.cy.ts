@@ -47,6 +47,8 @@ context('Create Wing Confirm', () => {
 
       page.detailsTitle().contains('Wing details')
 
+      page.detailsAdditionalText().contains('You can add landings and cells to the wing once it is created.')
+
       page.changeDetailsKey(0).contains('Wing code')
       page.changeDetailsValue(0).contains('B')
       page.changeDetailsLink(0).should('have.attr', 'href').and('include', '/create-new/TST/details')

@@ -28,6 +28,16 @@ export default class ConfirmCreateLocation extends FormInitialStep {
         .map((level, i) => (i === 0 ? capitalize(level) : pluralize(level)))
         .join(' → ')
       locals.createStructureLink = `/create-new/${locationId || prisonId}/structure`
+
+      const pluralLevels = structureLevels.map((level: string) => pluralize(level))
+
+      if (structureLevels?.length === 1) {
+        locals.createYouCanAddText = `${pluralLevels[0]}`
+      } else if (structureLevels?.length === 2) {
+        locals.createYouCanAddText = `${pluralLevels[0]} and ${pluralLevels[1]}`
+      } else if (structureLevels?.length === 3) {
+        locals.createYouCanAddText = `${pluralLevels[0]}, ${pluralLevels[1]} and ${pluralLevels[2]}`
+      }
     }
 
     return locals

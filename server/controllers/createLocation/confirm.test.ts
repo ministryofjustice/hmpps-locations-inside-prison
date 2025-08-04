@@ -108,9 +108,28 @@ describe('Confirm create location (WING)', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual(
         expect.objectContaining({
+          createYouCanAddText: 'Landings and Cells',
           decoratedLocationStructure: 'Wing → Landings → Cells',
           createStructureLink: '/create-new/TST/structure',
           createDetailsLink: '/create-new/TST/details',
+        }),
+      )
+    })
+
+    it('returns correct createYouCanAddText when the structure is different', () => {
+      deepRes = {
+        locals: {
+          values: {
+            locationType: 'WING',
+            structureLevels: ['SPURS', 'LANDINGS', 'CELLS'],
+          },
+        },
+      }
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect(result).toEqual(
+        expect.objectContaining({
+          createYouCanAddText: 'Spurs, Landings and Cells',
+          decoratedLocationStructure: 'Wing → Spurs → Landings → Cells',
         }),
       )
     })
