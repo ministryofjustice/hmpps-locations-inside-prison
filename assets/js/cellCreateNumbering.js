@@ -65,5 +65,7 @@ module.exports = () => {
     $('input[id^="create-cells_cellNumber"]').each(function (index) {
       $(this).val(numberToStartFrom + index)
     })
+
+    return true
   })
 }
