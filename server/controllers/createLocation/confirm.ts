@@ -6,6 +6,7 @@ import FormInitialStep from '../base/formInitialStep'
 import { Location, LocationType } from '../../data/types/locationsApi'
 import pluralize from '../../formatters/pluralize'
 import decorateLocation from '../../decorators/location'
+import nonOxfordJoin from '../../formatters/nonOxfordJoin'
 
 export default class ConfirmCreateLocation extends FormInitialStep {
   middlewareSetup() {
@@ -31,13 +32,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
 
       const pluralLevels = structureLevels.map((level: string) => pluralize(level))
 
-      if (structureLevels?.length === 1) {
-        locals.createYouCanAddText = `${pluralLevels[0]}`
-      } else if (structureLevels?.length === 2) {
-        locals.createYouCanAddText = `${pluralLevels[0]} and ${pluralLevels[1]}`
-      } else if (structureLevels?.length === 3) {
-        locals.createYouCanAddText = `${pluralLevels[0]}, ${pluralLevels[1]} and ${pluralLevels[2]}`
-      }
+      locals.createYouCanAddText = nonOxfordJoin(pluralLevels).toString()
     }
 
     return locals
