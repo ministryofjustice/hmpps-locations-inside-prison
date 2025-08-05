@@ -67,7 +67,7 @@ export default class CellDoorNumbers extends BaseController {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals
     const localName = req.sessionModel.get<string>('localName')
@@ -80,7 +80,7 @@ export default class CellDoorNumbers extends BaseController {
     return locals
   }
 
-  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const cellsToCreate = req.sessionModel.get<number>('create-cells_cellsToCreate')
       const { values } = req.form
