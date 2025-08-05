@@ -20,9 +20,9 @@ context('Create landing - Create cells - Cell numbers', () => {
         cellNumbers: ['0', '0', '0', '3'],
       })
 
-      page.checkForError('create-cells_cellNumber0', 'Cell 0 and cell 1 have the same cell number')
-      page.checkForError('create-cells_cellNumber1', 'Cell 0 and cell 1 have the same cell number')
-      page.checkForError('create-cells_cellNumber2', 'Cell 0 and cell 2 have the same cell number')
+      page.checkForError('create-cells_cellNumber0', 'Cell 1 and cell 2 have the same cell number')
+      page.checkForError('create-cells_cellNumber1', 'Cell 1 and cell 2 have the same cell number')
+      page.checkForError('create-cells_cellNumber2', 'Cell 1 and cell 3 have the same cell number')
     })
 
     it('shows the correct error when a cell number is not present', () => {
@@ -38,6 +38,11 @@ context('Create landing - Create cells - Cell numbers', () => {
       page.startCreateCellInput().type('x')
       page.applyLink().click()
       page.checkForError('startCreateCellNumber', 'Enter a valid starting cell number')
+    })
+
+    it('shows the correct error when start numbering value is empty', () => {
+      page.applyLink().click()
+      page.checkForError('startCreateCellNumber', 'Enter a number to start cell numbering from')
     })
 
     it('navigates to the next step with js populated numbers', () => {
