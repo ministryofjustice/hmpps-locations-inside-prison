@@ -57,7 +57,7 @@ export default class CellDoorNumbers extends BaseController {
           options.fields[`create-cells_cellNumber${i}`].errorMessages.notUnique = `${capFirst(
             [i, otherCellIndex]
               .toSorted()
-              .map(path => `cell ${path}`)
+              .map(path => `cell ${path + 1}`)
               .join(' and '),
           )} have the same cell number`
         }
