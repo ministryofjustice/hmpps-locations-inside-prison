@@ -1,5 +1,4 @@
 import FormWizard from 'hmpo-form-wizard'
-import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 
 const fields: FormWizard.Fields = {
   accommodationType: {
