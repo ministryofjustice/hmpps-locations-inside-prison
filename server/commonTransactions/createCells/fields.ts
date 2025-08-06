@@ -1,5 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
+import SetCellType from '../setCellType'
 
 const fields: FormWizard.Fields = {
   accommodationType: {
@@ -71,6 +72,7 @@ const fields: FormWizard.Fields = {
       classes: 'govuk-!-margin-bottom-0',
     },
   },
+  ...SetCellType.getFields(),
 }
 
 export default fields
