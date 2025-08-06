@@ -2,9 +2,9 @@ import setupStubs from '../setupStubs'
 import CreateCellsDoorNumbersPage from '../../../../pages/commonTransactions/createCells/doorNumbers'
 import goToCreateCellsDoorNumbersPage from './goToCreateCellsDoorNumbersPage'
 import Page from '../../../../pages/page'
-import CreateLocationConfirmPage from '../../../../pages/createLocation/confirm'
 import CreateCellsCellNumbersPage from '../../../../pages/commonTransactions/createCells/cellNumbers'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
+import CreateCellsCapacitiesPage from '../../../../pages/commonTransactions/createCells/capacities'
 
 context('Create landing - Create cells - Door numbers', () => {
   let page: CreateCellsDoorNumbersPage
@@ -40,7 +40,7 @@ context('Create landing - Create cells - Door numbers', () => {
       })
 
       // TODO: change this page when the next step is added
-      Page.verifyOnPage(CreateLocationConfirmPage)
+      Page.verifyOnPage(CreateCellsCapacitiesPage)
     })
 
     it('has a back link to the previous step', () => {

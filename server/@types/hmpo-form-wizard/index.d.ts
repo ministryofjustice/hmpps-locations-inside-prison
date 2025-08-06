@@ -99,6 +99,9 @@ declare module 'hmpo-form-wizard' {
       wizard: string
       invalid?: boolean
       revalidate?: boolean
+      skip?: boolean
+      editing?: boolean
+      continueOnEdit?: boolean
     }
 
     interface Request extends Omit<Express.Request, 'flash'> {
@@ -119,10 +122,15 @@ declare module 'hmpo-form-wizard' {
           locals: Record<string, boolean | string>
           next?: string
           fullPath?: string
+          name?: string
+          revalidate?: boolean
+          route?: string
         }
         persistedAnswers: FormWizard.Values
       }
       isEditing: boolean
+      notRevalidated?: boolean
+      baseUrl?: string
       journeyModel: {
         set: (key: string, value: unknown) => void
         get: (key: string) => unknown
@@ -191,6 +199,25 @@ declare module 'hmpo-form-wizard' {
 
       // eslint-disable-next-line no-underscore-dangle
       _resetErrors(req: Request, res: Express.Response, next: Express.NextFunction)
+
+      getNextStep(req: FormWizard.Request, res: Response): string
+
+      addJourneyHistoryStep(req: FormWizard.Request, res: Response, step: HistoryStep): void
+
+      checkJourneyProgress(req: FormWizard.Request, res: Response, next: NextFunction)
+
+      allowedJourneyStep(req: FormWizard.Request, res: Response, path: string): boolean
+
+      walkJourneyHistory(
+        req: FormWizard.Request,
+        res: Response,
+        func: (step: HistoryStep, next: HistoryStep) => boolean,
+      ): boolean
+
+      resolvePath(base: string, url: string, forceRelative: boolean): string
+
+      // eslint-disable-next-line no-underscore-dangle
+      _backlinksGetHistoryStep(req: FormWizard.Request, res: Response): string
     }
 
     namespace Controller {
@@ -352,6 +379,8 @@ declare module 'hmpo-form-wizard' {
       locals?: Record<string, boolean | string>
       invalid?: boolean
       fullPath?: string
+      prereqStep?: string
+      prereqPath?: string
     }
 
     interface RenderedStep {

@@ -1,0 +1,11 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% block fields %}
+  {% for i in range(0, values['create-cells_cellsToCreate']) -%}
+    <p>
+      <a href="/create-new/{{ locationId }}/create-cells/set-cell-type/{{ i }}">
+        Set cell {{ i + 1 }} ({{ decoratedResidentialSummary.location.pathHierarchy + '-' + values['create-cells_cellNumber' + i].padStart(3, '0') }}) type test
+      </a>
+    </p>
+  {% endfor %}
+{% endblock %}

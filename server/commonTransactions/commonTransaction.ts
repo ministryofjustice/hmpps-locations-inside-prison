@@ -1,5 +1,41 @@
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../controllers/base/formInitialStep'
+import modifyFieldName from '../helpers/field/modifyFieldName'
+
+function convertNext(
+  next: FormWizard.Step.NextStep,
+  strippedPrefix: string,
+  endNext: FormWizard.Step.NextStep,
+): FormWizard.Step.NextStep {
+  if (typeof next === 'string') {
+    if (next === '$END_OF_TRANSACTION$') {
+      return endNext
+    }
+
+    return `${strippedPrefix}/${next}`
+  }
+
+  if (typeof next === 'object') {
+    if (Array.isArray(next)) {
+      return next.map(n => convertNext(n, strippedPrefix, endNext))
+    }
+
+    if ('fn' in next) {
+      return {
+        ...next,
+        next: convertNext(next.next, strippedPrefix, endNext) as string,
+      }
+    }
+
+    return {
+      ...next,
+      field: `${strippedPrefix}_${next.field}`,
+      next: convertNext(next.next, strippedPrefix, endNext),
+    }
+  }
+
+  return next
+}
 
 export default class CommonTransaction {
   protected readonly steps: FormWizard.Steps
@@ -23,10 +59,10 @@ export default class CommonTransaction {
 
     this.steps = Object.fromEntries(
       Object.entries(steps).map(([path, step]) => {
-        const modifiedStep = { template: '../../partials/formStep', controller: FormInitialStep, ...step }
-
-        if (modifiedStep.next) {
-          modifiedStep.next = `${strippedPrefix}/${modifiedStep.next}`
+        const modifiedStep: FormWizard.Step = {
+          template: '../../partials/formStep',
+          controller: FormInitialStep,
+          ...step,
         }
 
         if (modifiedStep.fields) {
@@ -38,31 +74,30 @@ export default class CommonTransaction {
     )
 
     this.fields = Object.fromEntries(
-      Object.entries(fields).map(([id, field]) => {
-        const modifiedField = { ...field }
-
-        if (modifiedField.id) {
-          modifiedField.id = `${strippedPrefix}_${modifiedField.id}`
-        }
-
-        if (modifiedField.name) {
-          modifiedField.name = `${strippedPrefix}_${modifiedField.name}`
-        }
-
-        if (modifiedField.label?.for) {
-          modifiedField.label.for = `${strippedPrefix}_${modifiedField.label.for}`
-        }
-
-        return [`${strippedPrefix}_${id}`, modifiedField]
-      }),
+      Object.entries(fields).map(([id, field]) => [
+        `${strippedPrefix}_${id}`,
+        modifyFieldName(field, o => `${strippedPrefix}_${o}`),
+      ]),
     )
   }
 
   getSteps({ next }: { next: FormWizard.Step['next'] }) {
     const keys = Object.keys(this.steps)
     const lastStepKey = keys[keys.length - 1]
+    const strippedPrefix = this.pathPrefix.replace(/^\//, '')
 
-    return { ...this.steps, [lastStepKey]: { ...this.steps[lastStepKey], next } }
+    return {
+      ...Object.fromEntries(
+        Object.entries(this.steps).map(([k, step]) => {
+          if (!step.next) {
+            return [k, step]
+          }
+
+          return [k, { ...step, next: convertNext(step.next, strippedPrefix, next) }]
+        }),
+      ),
+      [lastStepKey]: { ...this.steps[lastStepKey], next },
+    } as unknown as { [key: string]: Omit<FormWizard.Step, 'controller'> & { controller: typeof FormInitialStep } }
   }
 
   getFields() {

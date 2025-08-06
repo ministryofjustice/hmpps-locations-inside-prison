@@ -16,9 +16,13 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   override getBackLink(req: FormWizard.Request, res: Response) {
-    const backLink = super.getBackLink(req, res)
+    const backLink = super.getBackLink(req, res) || res.locals.cancelLink
 
-    return backLink || res.locals.cancelLink
+    if (typeof backLink === 'string') {
+      return backLink.replace(/:(\w+)/g, (_, param) => req.params[param])
+    }
+
+    return backLink
   }
 
   setPageTitle(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -307,5 +311,9 @@ export default class FormInitialStep extends FormWizard.Controller {
 
       callback({ ...errors, ...validationErrors })
     })
+  }
+
+  override getNextStep(req: FormWizard.Request, res: Response) {
+    return super.getNextStep(req, res)?.replace(/:(\w+)/g, (_, param) => req.params[param])
   }
 }
