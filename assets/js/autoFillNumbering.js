@@ -1,7 +1,15 @@
-module.exports = () => {
-  $('#apply-cell-numbering').on('click', function (e) {
+/**
+ * @param {string} applyButtonId the id of the apply button
+ * @param {string} inputId the id of the input that the user inputs the value into
+ * @param {string} inputsToFillId the start of the id that will be auto-filled
+ * @param {(previousNumber: number) => number} fillFunction a function which returns the number to fill with,
+ *   previousNumber is the last number that was filled, so to increment each input by 1, you would do something
+ *   like (n) => n + 1
+ */
+module.exports = (applyButtonId, inputId, inputsToFillId, fillFunction) => {
+  $(`#${applyButtonId}`).on('click', function (e) {
     e.preventDefault()
-    const $input = $('#startCreateCellNumber')
+    const $input = $(`#${inputId}`)
     const $formGroup = $input.parent('.govuk-form-group')
     const $inputVal = $input.val()
     const numberToStartFrom = Number($input.val())
@@ -16,15 +24,15 @@ module.exports = () => {
     $errorSummary.remove()
 
     $('.govuk-error-summary__list li').each(function () {
-      if ($(this).find('a').attr('href') === '#startCreateCellNumber') {
+      if ($(this).find('a').attr('href') === `#${inputId}`) {
         $(this).remove()
       }
     })
 
     if (!$inputVal || Number.isNaN(numberToStartFrom)) {
       $errorSummary = $('.govuk-error-summary')
-      const numeric = 'Enter a valid starting cell number'
-      const required = 'Enter a number to start cell numbering from'
+      const numeric = 'Enter a valid number'
+      const required = 'Enter a number'
 
       errorMessage = !$inputVal ? required : numeric
 
@@ -32,10 +40,10 @@ module.exports = () => {
       $formGroup.addClass('govuk-form-group--error')
       $input.addClass('govuk-input--error')
 
-      if (!$input.prev().is('#startCreateCellNumber-error')) {
+      if (!$input.prev().is(`#${inputId}-error`)) {
         $input.before(
           `<div class="govuk-form-group govuk-form-group--error govuk-!-margin-bottom-0">
-        <p id="startCreateCellNumber-error" class="govuk-error-message govuk-input-prefix--plain">
+        <p id="${inputId}-error" class="govuk-error-message govuk-input-prefix--plain">
           <span class="govuk-visually-hidden">Error:</span> ${errorMessage}
         </p>
       </div>`,
@@ -69,14 +77,16 @@ module.exports = () => {
 
       // If there is, add error to end of error list
       $errorSummary.find('.govuk-error-summary__list').prepend(`
-        <li><a href="#startCreateCellNumber">${errorMessage}</a></li>
+        <li><a href="#${inputId}">${errorMessage}</a></li>
       `)
 
       return false
     }
 
-    $('input[id^="create-cells_cellNumber"]').each(function (index) {
-      $(this).val(numberToStartFrom + index)
+    let previousNumber = numberToStartFrom
+    $(`input[id^="${inputsToFillId}"]`).each(function () {
+      $(this).val(previousNumber)
+      previousNumber = fillFunction(previousNumber)
     })
 
     return true

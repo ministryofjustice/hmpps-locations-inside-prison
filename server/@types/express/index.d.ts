@@ -115,6 +115,7 @@ interface TypedLocals {
   location?: Location
   locationId?: string
   locationHierarchy?: LocationSummary[]
+  locationPathPrefix?: string
   locationResidentialSummary?: LocationResidentialSummary
   locationTree?: LocationTree[]
   locationType?: string
@@ -134,7 +135,6 @@ interface TypedLocals {
   requestedReports?: StoredReportData[]
   routePrefix?: string
   specialistCellTypes?: string[]
-
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string

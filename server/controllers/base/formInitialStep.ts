@@ -71,8 +71,15 @@ export default class FormInitialStep extends FormWizard.Controller {
     })
   }
 
-  valueOrFieldName(arg: number | { field: string }, fields: Record<string, { label: { text: string } }>) {
-    return typeof arg === 'number' ? arg : `the ${unCapFirst(fields[arg?.field]?.label?.text)}`
+  valueOrFieldName(arg: number | { field: string }, fields: FormWizard.Fields) {
+    if (typeof arg === 'number') {
+      return arg
+    }
+
+    const field = fields[arg?.field]
+    const fieldName: string = field?.nameForErrors || field?.label?.text
+
+    return `the ${unCapFirst(fieldName)}`
   }
 
   getErrorDetail(
@@ -170,11 +177,18 @@ export default class FormInitialStep extends FormWizard.Controller {
 
       res.locals.errorlist.forEach((error: { args: FormWizard.Values; key: string; type: string }) => {
         const errorDetail = this.getErrorDetail(error, res)
-        validationErrors.push(errorDetail)
+        const errorSummary = { ...errorDetail }
         const field = fields[error.key]
         if (field) {
           fields[error.key].errorMessage = errorDetail
+
+          if (field.errorSummaryPrefix) {
+            if (errorSummary.text) {
+              errorSummary.text = field.errorSummaryPrefix + errorSummary.text
+            }
+          }
         }
+        validationErrors.push(errorSummary)
       })
 
       locals.fields = fields

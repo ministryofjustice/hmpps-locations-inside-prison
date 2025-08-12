@@ -51,9 +51,11 @@ export default abstract class Page {
     cy.task('logAccessibilityViolationsTable', violationData)
   }
 
-  checkForError(fieldName: string | null, errorText: string) {
+  checkForError(fieldName: string | null, errorText: string, summaryPrefix?: string) {
+    const summaryText = summaryPrefix ? summaryPrefix + errorText : errorText
+
     cy.get('.govuk-error-summary__title').contains('There is a problem')
-    cy.get('.govuk-error-summary__list').contains(errorText)
+    cy.get('.govuk-error-summary__list').contains(summaryText)
 
     if (fieldName) {
       cy.get(`#${fieldName}-error`).contains(errorText)
