@@ -2,13 +2,7 @@ import { Response, NextFunction } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import capFirst from '../../formatters/capFirst'
-
-const getCellPath = (req: FormWizard.Request, res: Response, index: number) => {
-  const { pathHierarchy } = res.locals.decoratedResidentialSummary.location
-  const cellNumber = req.sessionModel.get<string>(`create-cells_cellNumber${index}`).padStart(3, '0')
-
-  return `${pathHierarchy}-${cellNumber}`
-}
+import getCellPath from './getCellPath'
 
 export default class CellDoorNumbers extends BaseController {
   override middlewareSetup() {

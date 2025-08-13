@@ -342,6 +342,7 @@ declare module 'hmpo-form-wizard' {
         displayAlways?: boolean
       }
       errorMessage?: { href: string; text: string }
+      errorSummaryPrefix?: string
       rows?: number
       maxlength?: number
     }

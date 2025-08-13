@@ -67,6 +67,7 @@ const steps: FormWizard.Steps = {
     pageTitle: 'Enter cell capacities and type',
     controller: Capacities,
     template: '../../commonTransactions/createCells/capacities',
+    fields: ['baselineCna', 'workingCapacity', 'maximumCapacity'],
     next: [
       { field: 'accommodationType', op: '==', value: 'NORMAL_ACCOMMODATION', next: 'used-for' },
       'bulk-sanitation',

@@ -54,6 +54,9 @@
           }) }}
         {% endif %}
 
+        {% block innerContent %}
+        {% endblock %}
+
         <form method="{{ formMethod }}" action="{{ formAction }}"
           {% if formEnctype %}
             enctype="{{ formEnctype }}"
