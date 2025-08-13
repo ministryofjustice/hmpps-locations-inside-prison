@@ -76,8 +76,11 @@ context('Create Landing Details', () => {
       page.checkForError('locationCode', 'A location with this landing code already exists')
     })
 
-    it('shows the correct validation error when submitting a localName that already exists', () => {
-      LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: true })
+    it('shows the correct validation error when submitting a local name that already exists', () => {
+      LocationsApiStubber.stub.stubLocationsPrisonLocalName({
+        exists: true,
+        locationId: '7e570000-0000-1000-8000-000000000002',
+      })
 
       page.submit({
         locationCode: 'new1',
@@ -86,6 +89,16 @@ context('Create Landing Details', () => {
       })
 
       page.checkForError('localName', 'A location with this name already exists')
+    })
+
+    it('shows the correct validation error for local name when submitting more than 30 characters', () => {
+      page.submit({
+        locationCode: 'new1',
+        localName: 'thisistoolongthisistoolongthisistoolong',
+        createCellsNow: false,
+      })
+
+      page.checkForError('localName', 'Local name must be 30 characters or less')
     })
 
     it('shows the correct validation error when create cells has no selected value', () => {
