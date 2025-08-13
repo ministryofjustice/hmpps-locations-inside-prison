@@ -37,12 +37,12 @@ context('Create landing - Create cells - Cell numbers', () => {
     it('shows the correct error when start numbering value is not a number', () => {
       page.startCreateCellInput().type('x')
       page.applyLink().click()
-      page.checkForError('startCreateCellNumber', 'Enter a valid starting cell number')
+      page.checkForError('startCreateCellNumber', 'Enter a valid number')
     })
 
     it('shows the correct error when start numbering value is empty', () => {
       page.applyLink().click()
-      page.checkForError('startCreateCellNumber', 'Enter a number to start cell numbering from')
+      page.checkForError('startCreateCellNumber', 'Enter a number')
     })
 
     it('navigates to the next step with js populated numbers', () => {
