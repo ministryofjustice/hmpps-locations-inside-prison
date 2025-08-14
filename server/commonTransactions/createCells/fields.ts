@@ -7,7 +7,6 @@ const fields: FormWizard.Fields = {
   accommodationType: {
     component: 'govukRadios',
     validate: ['required'],
-    hideWhenRemoved: true,
     id: 'accommodationType',
     name: 'accommodationType',
     errorMessages: {
@@ -129,6 +128,23 @@ const fields: FormWizard.Fields = {
     nameForErrors: 'Maximum capacity',
     formGroup: {
       classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  bulkSanitation: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'bulkSanitation',
+    name: 'bulkSanitation',
+    errorMessages: {
+      required: 'Select yes if all cells have in-cell sanitation',
+    },
+    items: [
+      { text: 'Yes', value: 'YES' },
+      { text: 'No', value: 'NO' },
+    ],
+    autocomplete: 'off',
+    hint: {
+      text: 'This means a cell includes both a toilet and wash basin.',
     },
   },
 }
