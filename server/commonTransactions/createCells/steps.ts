@@ -83,8 +83,8 @@ const steps: FormWizard.Steps = {
   '/bulk-sanitation': {
     pageTitle: 'Do all cells have in-cell sanitation?',
     controller: BaseController,
-    template: '../../commonTransactions/createCells/bulkSanitation',
-    next: [{ field: 'bulkSanitation', op: '==', value: 'no', next: 'without-sanitation' }, '$END_OF_TRANSACTION$'],
+    fields: ['bulkSanitation'],
+    next: [{ field: 'bulkSanitation', op: '==', value: 'NO', next: 'without-sanitation' }, '$END_OF_TRANSACTION$'],
   },
   '/without-sanitation': {
     pageTitle: 'Select any cells without in-cell sanitation',
