@@ -1,8 +1,8 @@
 import Page, { PageElement } from '../../page'
 
-export default class CreateCellsUsedForPage extends Page {
+export default class CreateCellsWithoutSanitationPage extends Page {
   constructor() {
-    super('What are the cells used for?')
+    super('Select any cells without in-cell sanitation')
   }
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
