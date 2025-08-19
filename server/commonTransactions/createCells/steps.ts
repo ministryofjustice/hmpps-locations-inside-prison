@@ -6,6 +6,7 @@ import CellDoorNumbers from './cellDoorNumbers'
 import SetCellType from '../setCellType'
 import Capacities from './capacities'
 import modifyFieldName from '../../helpers/field/modifyFieldName'
+import WithoutSanitation from './withoutSanitation'
 
 // Wrap the setCellType steps controller with another controller that appends the field names with cellId
 const setCellTypeSteps = Object.fromEntries(
@@ -88,8 +89,8 @@ const steps: FormWizard.Steps = {
   },
   '/without-sanitation': {
     pageTitle: 'Select any cells without in-cell sanitation',
-    controller: BaseController,
-    template: '../../commonTransactions/createCells/withoutSanitation',
+    controller: WithoutSanitation,
+    fields: ['withoutSanitation'],
   },
 }
 

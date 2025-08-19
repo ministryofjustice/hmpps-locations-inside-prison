@@ -147,6 +147,18 @@ const fields: FormWizard.Fields = {
       text: 'This means a cell includes both a toilet and wash basin.',
     },
   },
+  withoutSanitation: {
+    component: 'govukCheckboxes',
+    multiple: true,
+    validate: ['required'],
+    errorMessages: { required: 'Select any cells without in-cell sanitation' },
+    id: 'withoutSanitation',
+    name: 'withoutSanitation',
+    hint: {
+      text: 'This means a cell doesn’t have a toilet or a wash basin.',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
+  },
 }
 
 export default fields
