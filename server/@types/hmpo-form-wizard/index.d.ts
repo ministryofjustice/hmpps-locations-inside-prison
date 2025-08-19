@@ -120,7 +120,7 @@ declare module 'hmpo-form-wizard' {
           fields: Fields
           steps: Steps
           locals: Record<string, boolean | string>
-          next?: string
+          next?: FormWizard.Step['next']
           fullPath?: string
           name?: string
           revalidate?: boolean

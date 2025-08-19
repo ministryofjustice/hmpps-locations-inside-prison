@@ -1,5 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import Init from './init'
+import SetCellType from './setCellType'
 
 const steps: FormWizard.Steps = {
   '/:cellId': {
@@ -9,17 +10,25 @@ const steps: FormWizard.Steps = {
     next: ':cellId/type',
   },
   '/:cellId/type': {
-    pageTitle: 'Is this a normal or special accommodation cell type?',
+    pageTitle: 'Is it a normal or special cell type?',
     fields: ['accommodationType'],
-    next: [{ field: 'accommodationType', op: '==', value: 'normal', next: ':cellId/normal' }, ':cellId/special'],
+    next: [
+      { field: 'accommodationType', op: '==', value: 'NORMAL_ACCOMMODATION', next: ':cellId/normal' },
+      ':cellId/special',
+    ],
   },
   '/:cellId/normal': {
-    pageTitle: 'Select normal accommodation cell type',
+    pageTitle: 'Select normal cell type',
+    template: '../../commonTransactions/setCellType/normal',
+    fields: ['normalCellTypes'],
+    controller: SetCellType,
     next: '$END_OF_TRANSACTION$',
   },
   '/:cellId/special': {
-    pageTitle: 'Select special accommodation cell type',
+    pageTitle: 'Select special cell type',
     template: '../../commonTransactions/setCellType/special',
+    fields: ['specialistCellTypes'],
+    controller: SetCellType,
     next: '$END_OF_TRANSACTION$',
   },
 }

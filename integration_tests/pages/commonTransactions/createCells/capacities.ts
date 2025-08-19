@@ -11,6 +11,14 @@ export default class CreateCellsCapacitiesPage extends Page {
 
   maximumInput = (index: number): PageElement => cy.get(`#create-cells_maximumCapacity${index}`)
 
+  removeCellType = (index: number): PageElement => cy.get(`#create-cells_removeCellType-${index} a`)
+
+  setCellType = (index: number): PageElement => cy.get(`#create-cells_setCellType-${index} a`)
+
+  addCellType = (index: number): PageElement => cy.get(`#create-cells_addCellType-${index} a`)
+
+  cellTypes = (index: number): PageElement => cy.get(`#create-cells_setCellType-${index}`).parent('td')
+
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 
   backLink = (): PageElement => cy.get('.govuk-back-link')
