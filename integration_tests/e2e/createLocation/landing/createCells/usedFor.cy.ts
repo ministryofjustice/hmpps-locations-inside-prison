@@ -15,8 +15,14 @@ context('Create landing - Create cells - Used for', () => {
       page = goToCreateCellsUsedForPage()
     })
 
+    it('shows the correct error when no types are picked', () => {
+      page.submit({ usedFor: [] })
+
+      page.checkForError('create-cells_usedFor', 'Select what the location is used for')
+    })
+
     it('navigates to the next step when validation passes', () => {
-      page.submit()
+      page.submit({ usedFor: ['STANDARD_ACCOMMODATION'] })
 
       Page.verifyOnPage(CreateCellsBulkSanitationPage)
     })

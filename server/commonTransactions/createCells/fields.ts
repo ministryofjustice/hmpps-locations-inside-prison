@@ -159,6 +159,18 @@ const fields: FormWizard.Fields = {
     },
     items: [{ text: 'set at runtime', value: '' }],
   },
+  usedFor: {
+    component: 'govukCheckboxes',
+    multiple: true,
+    validate: ['required'],
+    errorMessages: { required: 'Select what the location is used for' },
+    id: 'usedFor',
+    name: 'usedFor',
+    hint: {
+      text: 'Select any that apply to all cells.',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
+  },
 }
 
 export default fields
