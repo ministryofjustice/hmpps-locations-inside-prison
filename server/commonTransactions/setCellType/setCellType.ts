@@ -2,24 +2,51 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../../controllers/base/formInitialStep'
+import getCellPath from '../createCells/getCellPath'
 
 export default class SetCellType extends FormInitialStep {
-  getCellPath = (req: FormWizard.Request, res: Response, index: number) => {
-    const { pathHierarchy } = res.locals.decoratedResidentialSummary.location
-    const newLocationCode = req.sessionModel.get<string>(`locationCode`)
-    const cellNumber = req.sessionModel.get<string>(`create-cells_cellNumber${index}`).padStart(3, '0')
-
-    return [pathHierarchy, newLocationCode, cellNumber].filter(s => s).join('-')
-  }
-
   override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
+    const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
+
+    const typesToExclude = ['BIOHAZARD_DIRTY_PROTEST', 'CSU', 'DRY', 'UNFURNISHED']
+
+    const filteredSpecialistCellTypes = (type: string) => {
+      if (type === 'specialist') {
+        return specialistCellTypes.filter(obj => typesToExclude.includes(obj.key))
+      }
+      if (type === 'normal') {
+        return specialistCellTypes.filter(obj => !typesToExclude.includes(obj.key))
+      }
+      return specialistCellTypes
+    }
+    if (req.form.options.fields['create-cells_set-cell-type_normalCellTypes']) {
+      req.form.options.fields['create-cells_set-cell-type_normalCellTypes'].items = Object.values(
+        filteredSpecialistCellTypes('normal'),
+      ).map(({ key, description, additionalInformation }) => ({
+        text: description,
+        value: key,
+        hint: {
+          text: additionalInformation,
+        },
+      }))
+    } else {
+      req.form.options.fields['create-cells_set-cell-type_specialistCellTypes'].items = Object.values(
+        filteredSpecialistCellTypes('specialist'),
+      ).map(({ key, description, additionalInformation }) => ({
+        text: description,
+        value: key,
+        hint: {
+          text: additionalInformation,
+        },
+      }))
+    }
     next()
   }
 
   override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { cellId } = req.params
-    const cellName = this.getCellPath(req, res, Number(cellId))
+    const cellName = getCellPath(req, res, Number(cellId))
     locals.titleCaption = ` Cell ${cellName}`
 
     const fields = locals.fields as FormWizard.Fields

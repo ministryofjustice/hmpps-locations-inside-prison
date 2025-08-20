@@ -1,12 +1,12 @@
 import FormWizard from 'hmpo-form-wizard'
-import Init from './init'
 import SetCellType from './setCellType'
+import FormInitialStep from '../../controllers/base/formInitialStep'
 
 const steps: FormWizard.Steps = {
   '/:cellId': {
     entryPoint: true,
     skip: true,
-    controller: Init,
+    controller: FormInitialStep,
     next: ':cellId/type',
   },
   '/:cellId/type': {

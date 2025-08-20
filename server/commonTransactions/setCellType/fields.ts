@@ -35,28 +35,7 @@ const fields: FormWizard.Fields = {
     errorMessages: {
       required: 'Select a cell type',
     },
-    items: [
-      {
-        text: 'Biohazard cell',
-        value: 'BIOHAZARD_DIRTY_PROTEST',
-        hint: {
-          text: 'Previously known as a dirty protest cell',
-        },
-      },
-      {
-        text: 'Care and separation cell',
-        value: 'CSU',
-      },
-      {
-        text: 'Dry cell',
-        value: 'DRY',
-      },
-      {
-        text: 'Unfurnished cell',
-        value: 'UNFURNISHED',
-      },
-    ],
-    autocomplete: 'off',
+    items: [{ text: 'set at runtime', value: '' }],
   },
   normalCellTypes: {
     component: 'govukCheckboxes',
@@ -66,51 +45,7 @@ const fields: FormWizard.Fields = {
     validate: ['required'],
     errorMessages: { required: 'Select a cell type' },
     hint: { text: 'Select all that apply.' },
-    items: [
-      {
-        text: 'Accessible cell',
-        value: 'ACCESSIBLE_CELL',
-        hint: {
-          text: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
-        },
-      },
-      {
-        text: 'Cat A cell',
-        value: 'CAT_A',
-      },
-      {
-        text: 'Constant supervision cell',
-        value: 'CONSTANT_SUPERVISION',
-      },
-      {
-        text: 'Escape list cell',
-        value: 'ESCAPE_LIST',
-      },
-      {
-        text: 'Isolation for communicable diseases cell',
-        value: 'ISOLATION_DISEASES',
-      },
-      {
-        text: 'Listener/crisis cell',
-        value: 'LISTENER_CRISIS',
-      },
-      {
-        text: 'Locate flat cell',
-        value: 'LOCATE_FLAT_CELL',
-      },
-      {
-        text: 'Medical cell',
-        value: 'MEDICAL',
-      },
-      {
-        text: 'Mother and baby cell',
-        value: 'MOTHER_AND_BABY',
-      },
-      {
-        text: 'Safe cell',
-        value: 'SAFE_CELL',
-      },
-    ],
+    items: [{ text: 'set at runtime', value: '' }],
   },
 }
 

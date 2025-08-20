@@ -102,6 +102,17 @@ h1 .govuk-caption-l {
   vertical-align: middle;
 }
 
+.change-remove-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.change-remove-actions {
+  display: flex;
+  align-items: center;
+  padding-left: 10px
+}
+
 #top-banner {
   background-color: govuk-colour("purple");
 
