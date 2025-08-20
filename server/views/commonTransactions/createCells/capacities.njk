@@ -88,18 +88,18 @@
        {% endif %}
        {% set cellTypeColumn =
          {  html:
-         '<div class="change-remove-container">' +
+         '<div data-qa="cell-types-' + i + '" class="change-remove-container">' +
          cellTypesText +
            '<div class="change-remove-actions">' +
-           '<a class="govuk-!-padding-right-1" href="/create-new/' + locationId + '/create-cells/remove-cell-type/' + i + '">Remove</a>' + '  |  ' +
-           '<a class="govuk-!-padding-left-1" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Change</a>' + '</div>' + '</div>'
+           '<a data-qa="remove-cell-type-' + i + '" class="govuk-!-padding-right-1" href="/create-new/' + locationId + '/create-cells/remove-cell-type/' + i + '">Remove</a>' + '  |  ' +
+           '<a data-qa="change-cell-type-' + i + '" class="govuk-!-padding-left-1" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Change</a>' + '</div>' + '</div>'
 
          }
        %}
    {% else %}
      {% set cellTypeColumn = {
        html:
-             '<a id="add-cell-type" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Add</a>'
+             '<a data-qa="add-cell-type-' + i + '" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Add</a>'
              }
      %}
    {% endif %}

@@ -1,7 +1,6 @@
 import { Response, NextFunction } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
-import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class CellDoorNumbers extends BaseController {
@@ -65,19 +64,6 @@ export default class CellDoorNumbers extends BaseController {
     }
 
     next()
-  }
-
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
-    const locals = super.locals(req, res)
-    const { decoratedResidentialSummary } = res.locals
-    const localName = req.sessionModel.get<string>('localName')
-    const locationName =
-      localName ||
-      `${decoratedResidentialSummary.location.pathHierarchy}-${req.sessionModel.get<string>('locationCode')}`
-    locals.locationType = req.sessionModel.get<string>('locationType')
-    locals.titleCaption = `Create cells on ${locals.locationType.toLowerCase()} ${locationName}`
-
-    return locals
   }
 
   override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {

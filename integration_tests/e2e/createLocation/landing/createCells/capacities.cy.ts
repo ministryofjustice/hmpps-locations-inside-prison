@@ -7,7 +7,7 @@ import goToCreateCellsCapacitiesPage from './goToCreateCellsCapacitiesPage'
 import CreateCellsUsedForPage from '../../../../pages/commonTransactions/createCells/usedFor'
 import CreateCellsDetailsPage from '../../../../pages/commonTransactions/createCells/details'
 import CreateCellsCellNumbersPage from '../../../../pages/commonTransactions/createCells/cellNumbers'
-import CreateCellsBulkSanitationPage from '../../../../pages/commonTransactions/createCells/bulk-sanitation'
+import CreateCellsBulkSanitationPage from '../../../../pages/commonTransactions/createCells/bulkSanitation'
 
 context('Create landing - Create cells - Capacities', () => {
   let page: CreateCellsCapacitiesPage

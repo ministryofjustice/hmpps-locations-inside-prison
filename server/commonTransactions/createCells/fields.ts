@@ -7,7 +7,6 @@ const fields: FormWizard.Fields = {
   accommodationType: {
     component: 'govukRadios',
     validate: ['required'],
-    hideWhenRemoved: true,
     id: 'accommodationType',
     name: 'accommodationType',
     errorMessages: {
@@ -130,6 +129,47 @@ const fields: FormWizard.Fields = {
     formGroup: {
       classes: 'govuk-!-margin-bottom-0',
     },
+  },
+  bulkSanitation: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'bulkSanitation',
+    name: 'bulkSanitation',
+    errorMessages: {
+      required: 'Select yes if all cells have in-cell sanitation',
+    },
+    items: [
+      { text: 'Yes', value: 'YES' },
+      { text: 'No', value: 'NO' },
+    ],
+    autocomplete: 'off',
+    hint: {
+      text: 'This means a cell includes both a toilet and wash basin.',
+    },
+  },
+  withoutSanitation: {
+    component: 'govukCheckboxes',
+    multiple: true,
+    validate: ['required'],
+    errorMessages: { required: 'Select any cells without in-cell sanitation' },
+    id: 'withoutSanitation',
+    name: 'withoutSanitation',
+    hint: {
+      text: 'This means a cell doesn’t have a toilet or a wash basin.',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
+  },
+  usedFor: {
+    component: 'govukCheckboxes',
+    multiple: true,
+    validate: ['required'],
+    errorMessages: { required: 'Select what the location is used for' },
+    id: 'usedFor',
+    name: 'usedFor',
+    hint: {
+      text: 'Select any that apply to all cells.',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
   },
 }
 
