@@ -7,6 +7,7 @@ import SetCellType from '../setCellType'
 import Capacities from './capacities'
 import modifyFieldName from '../../helpers/field/modifyFieldName'
 import WithoutSanitation from './withoutSanitation'
+import UsedFor from './usedFor'
 
 // Wrap the setCellType steps controller with another controller that appends the field names with cellId
 const setCellTypeSteps = Object.fromEntries(
@@ -77,8 +78,8 @@ const steps: FormWizard.Steps = {
   ...setCellTypeSteps,
   '/used-for': {
     pageTitle: 'What are the cells used for?',
-    controller: BaseController,
-    template: '../../commonTransactions/createCells/usedFor',
+    controller: UsedFor,
+    fields: ['usedFor'],
     next: 'bulk-sanitation',
   },
   '/bulk-sanitation': {
