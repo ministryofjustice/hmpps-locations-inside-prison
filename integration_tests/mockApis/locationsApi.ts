@@ -177,15 +177,18 @@ const stubLocationsConstantsSpecialistCellType = (
       key: 'ACCESSIBLE_CELL',
       description: 'Accessible cell',
       additionalInformation: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
+      attributes: { affectsCapacity: false },
     },
     {
       key: 'BIOHAZARD_DIRTY_PROTEST',
       description: 'Biohazard / dirty protest cell',
       additionalInformation: 'Previously known as a dirty protest cell',
+      attributes: { affectsCapacity: true },
     },
     {
       key: 'CONSTANT_SUPERVISION',
       description: 'Constant Supervision Cell',
+      attributes: { affectsCapacity: false },
     },
   ],
 ) =>
