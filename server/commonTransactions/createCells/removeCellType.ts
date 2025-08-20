@@ -3,8 +3,7 @@ import { NextFunction, Response } from 'express'
 import FormInitialStep from '../../controllers/base/formInitialStep'
 
 export default class RemoveCellType extends FormInitialStep {
-  override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId } = res.locals.decoratedResidentialSummary.location
+  override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { sessionModel } = req
     const { cellId } = req.params
     const normalCellTypes = `create-cells_set-cell-type_normalCellTypes${cellId}`
@@ -15,6 +14,6 @@ export default class RemoveCellType extends FormInitialStep {
     sessionModel.unset(cellAccommodationType)
     sessionModel.unset(specialCellTypes)
 
-    res.redirect(`/create-new/${locationId}/create-cells/capacities`)
+    super.successHandler(req, res, next)
   }
 }

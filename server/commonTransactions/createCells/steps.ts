@@ -9,7 +9,7 @@ import Capacities from './capacities'
 import modifyFieldName from '../../helpers/field/modifyFieldName'
 import WithoutSanitation from './withoutSanitation'
 import UsedFor from './usedFor'
-import RemoveCellType from '../removeCellType'
+import RemoveCellType from './removeCellType'
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/set-cell-type/:cellId') {
@@ -26,27 +26,6 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
           wizard: req.form.options.name,
           revalidate: false,
           skip: false,
-          editing: req.isEditing && !req.notRevalidated ? true : undefined,
-          continueOnEdit: req.isEditing && !req.notRevalidated ? true : undefined,
-        })
-        super.successHandler(req, res, next)
-      }
-    }
-  }
-  if (path === '/remove-cell-type/:cellId') {
-    return class WrappedRemoveCellTypeController extends step.controller {
-      override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-        const pathPrefix = req.form.options.fullPath.replace(/\/remove-cell-type\/.*/, '')
-        const history = req.journeyModel.get('history') as FormWizard.HistoryStep[]
-
-        this.addJourneyHistoryStep(req, res, {
-          path: history.find(item => {
-            return item.next.endsWith('/capacities')
-          }).next,
-          next: `${pathPrefix}/capacities`,
-          wizard: req.form.options.name,
-          revalidate: false,
-          skip: true,
           editing: req.isEditing && !req.notRevalidated ? true : undefined,
           continueOnEdit: req.isEditing && !req.notRevalidated ? true : undefined,
         })
@@ -103,21 +82,6 @@ const setCellTypeSteps = Object.fromEntries(
   ]),
 )
 
-const removeCellTypeSteps = Object.fromEntries(
-  Object.entries(
-    RemoveCellType.getSteps({
-      next: 'capacities',
-    }),
-  ).map(([k, step]) => [
-    k,
-    {
-      ...step,
-      controller: wrapSetCellTypeController(k, step),
-      editable: true,
-    },
-  ]),
-)
-
 const steps: FormWizard.Steps = {
   '/': {
     editable: true,
@@ -149,7 +113,12 @@ const steps: FormWizard.Steps = {
     ],
   },
   ...setCellTypeSteps,
-  ...removeCellTypeSteps,
+  '/remove-cell-type/:cellId': {
+    entryPoint: true,
+    skip: true,
+    controller: RemoveCellType,
+    next: 'capacities',
+  },
   '/used-for': {
     pageTitle: 'What are the cells used for?',
     controller: UsedFor,
