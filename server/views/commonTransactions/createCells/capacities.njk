@@ -87,23 +87,26 @@
            {% set cellTypesText = matchedCell %}
        {% endif %}
        {% set cellTypeColumn =
-         {  html: cellTypesText +
-           '<div id="create-cells_removeCellType-' + i + '">' +
-           '<a href="/create-new/' + locationId + '/create-cells/remove-cell-type/' + i + '">Remove</a>' + '</div>' +
-           '<div id="create-cells_setCellType-' + i + '">' +
-           '<a href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Change</a>' +'</div>'
+         {  html:
+         '<div class="change-remove-container">' +
+         cellTypesText +
+           '<div class="change-remove-actions">' +
+           '<a class="govuk-!-padding-right-1" href="/create-new/' + locationId + '/create-cells/remove-cell-type/' + i + '">Remove</a>' + '  |  ' +
+           '<a class="govuk-!-padding-left-1" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Change</a>' + '</div>' + '</div>'
+
          }
        %}
    {% else %}
      {% set cellTypeColumn = {
-       html: '<div id="create-cells_addCellType-' + i + '">' +
-             '<a href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Add</a>' + '</div>'
+       html:
+             '<a id="add-cell-type" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Add</a>'
              }
      %}
    {% endif %}
 
     {% set tableRows = (tableRows.push([
       {
+        classes: 'govuk-table__cell',
         text: locationPathPrefix + '-' + values['create-cells_cellNumber' + i].padStart(3, '0')
       },
       {

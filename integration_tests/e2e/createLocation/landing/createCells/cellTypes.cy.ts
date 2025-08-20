@@ -62,9 +62,21 @@ context('Create landing - Create cells - Types', () => {
         })
 
         const capacitiesPage = Page.verifyOnPage(CreateCellsCapacitiesPage)
-        capacitiesPage.cellTypes(0).should('contain.text', 'Accessible cell, Constant Supervision Cell')
-        capacitiesPage.removeCellType(0).should('exist')
-        capacitiesPage.setCellType(0).should('exist')
+        capacitiesPage.cellTypes().should('contain.text', 'Accessible cell, Constant Supervision Cell')
+        capacitiesPage.removeCellType().should('exist')
+        capacitiesPage.setCellType().should('exist')
+      })
+
+      it('correctly removes the normal set cell type and shows it on the capacity page', () => {
+        normalTypesPage = goToCreateCellsTypesNormalPage()
+        normalTypesPage.submit({
+          cellType: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
+        })
+
+        const capacitiesPage = Page.verifyOnPage(CreateCellsCapacitiesPage)
+        capacitiesPage.removeCellType().click()
+        capacitiesPage.cellTypes().should('not.exist')
+        capacitiesPage.addCellType(0).should('exist')
       })
 
       it('has a back link to the previous step', () => {
@@ -98,7 +110,7 @@ context('Create landing - Create cells - Types', () => {
         })
 
         const capacitiesPage = Page.verifyOnPage(CreateCellsCapacitiesPage)
-        capacitiesPage.cellTypes(0).should('contain.text', 'Biohazard / dirty protest cell')
+        capacitiesPage.cellTypes().should('contain.text', 'Biohazard / dirty protest cell')
       })
 
       it('correctly changes from special type to normal type and shows it on the capacity page', () => {
@@ -108,9 +120,9 @@ context('Create landing - Create cells - Types', () => {
         })
 
         const capacitiesPage = Page.verifyOnPage(CreateCellsCapacitiesPage)
-        capacitiesPage.cellTypes(0).should('contain.text', 'Biohazard / dirty protest cell')
+        capacitiesPage.cellTypes().should('contain.text', 'Biohazard / dirty protest cell')
 
-        capacitiesPage.setCellType(0).click()
+        capacitiesPage.setCellType().click()
 
         typesPage = Page.verifyOnPage(CreateCellsTypesPage)
         typesPage.normalAccommodationType().click()
@@ -122,7 +134,7 @@ context('Create landing - Create cells - Types', () => {
         })
 
         Page.verifyOnPage(CreateCellsCapacitiesPage)
-        capacitiesPage.cellTypes(0).should('contain.text', 'Constant Supervision Cell')
+        capacitiesPage.cellTypes().should('contain.text', 'Constant Supervision Cell')
       })
 
       it('has a back link to the previous step', () => {

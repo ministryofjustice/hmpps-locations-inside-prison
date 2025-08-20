@@ -11,13 +11,13 @@ export default class CreateCellsCapacitiesPage extends Page {
 
   maximumInput = (index: number): PageElement => cy.get(`#create-cells_maximumCapacity${index}`)
 
-  removeCellType = (index: number): PageElement => cy.get(`#create-cells_removeCellType-${index} a`)
+  removeCellType = (): PageElement => cy.get(`.change-remove-actions a`).first()
 
-  setCellType = (index: number): PageElement => cy.get(`#create-cells_setCellType-${index} a`)
+  setCellType = (): PageElement => cy.get(`.change-remove-actions a`).last()
 
   addCellType = (index: number): PageElement => cy.get(`#create-cells_addCellType-${index} a`)
 
-  cellTypes = (index: number): PageElement => cy.get(`#create-cells_setCellType-${index}`).parent('td')
+  cellTypes = (): PageElement => cy.get(`.change-remove-container`)
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 
