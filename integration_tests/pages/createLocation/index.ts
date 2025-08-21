@@ -40,7 +40,7 @@ export default class CreateLocationDetailsPage extends Page {
     }
 
     if (createCellsNow !== undefined) {
-      this.createCellsNowRadio(createCellsNow ? 'yes' : 'no').click()
+      this.createCellsNowRadio(createCellsNow ? 'YES' : 'NO').click()
     }
 
     this.continueButton().click()

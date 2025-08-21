@@ -19,6 +19,12 @@ export declare interface Location {
   certification: {
     certified: boolean
     capacityOfCertifiedCell: number
+    certifiedNormalAccommodation: number
+  }
+  pendingChanges?: {
+    maxCapacity?: number
+    workingCapacity?: number
+    certifiedNormalAccommodation?: number
   }
   attributes: string[]
   usage: {

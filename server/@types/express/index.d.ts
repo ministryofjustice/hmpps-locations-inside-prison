@@ -69,6 +69,7 @@ interface TypedLocals {
   }
   createStructureLink?: string
   createDetailsLink?: string
+  createRootLink?: string
   createYouCanAddText?: string
   cspNonce?: string
   csrfToken?: string
@@ -135,6 +136,7 @@ interface TypedLocals {
   requestedReports?: StoredReportData[]
   routePrefix?: string
   specialistCellTypes?: string[]
+  specialistCellTypesObject?: SpecialistCellTypesObject[]
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string

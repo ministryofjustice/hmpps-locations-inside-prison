@@ -69,6 +69,10 @@ export default class CommonTransaction {
           modifiedStep.fields = modifiedStep.fields.map(field => `${strippedPrefix}_${field}`)
         }
 
+        if (modifiedStep.editBackStep) {
+          modifiedStep.editBackStep = `${pathPrefix}${modifiedStep.editBackStep}`
+        }
+
         return [`${pathPrefix}${path}`, modifiedStep]
       }),
     )
