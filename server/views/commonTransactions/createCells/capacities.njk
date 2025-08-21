@@ -56,27 +56,57 @@
 
 {% block fields %}
   {% set tableRows = [] %}
+  {% set cellTypesObject = [] %}
   {% for i in range(0, values['create-cells_cellsToCreate']) -%}
     {% set cellAccommodationType = values['create-cells_set-cell-type_accommodationType' + i] %}
-    {% set cellTypes = values['create-cells_set-cell-type_normalAccommodation' + i] if cellAccommodationType == 'normal' else values['create-cells_set-cell-type_specialAccommodation' + i] %}
-    {% if cellTypes %}
-      {% set cellTypeColumn = {
-        html: (cellTypes | join(', ')) + ' <a href="/create-new/' + locationId + '/create-cells/remove-cell-type/' + i + '">
-                 Remove
-               </a> | <a href="/create-new/' + locationId + '/create-cells/add-cell-type/' + i + '">
-                 Change
-               </a>'
-      } %}
+    {% set cellTypes = values['create-cells_set-cell-type_normalCellTypes' + i] if cellAccommodationType == 'NORMAL_ACCOMMODATION' else values['create-cells_set-cell-type_specialistCellTypes' + i] %}
+
+    {% set matchedCells = [] %}
+    {% set matchedCell = '' %}
+
+  {% if cellTypes | isArray %}
+     {% for selected in cellTypes %}
+        {% for cell in specialistCellTypesObject %}
+          {% if cell.key == selected %}
+            {% set matchedCells = matchedCells.concat(cell.description) %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
     {% else %}
-      {% set cellTypeColumn = {
-        html: '<a href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">
-                 Add
-               </a>'
-      } %}
-    {% endif %}
+     {% for cell in specialistCellTypesObject %}
+       {% if cell.key == cellTypes %}
+         {% set matchedCell = cell.description %}
+       {% endif %}
+     {% endfor %}
+  {% endif %}
+
+   {% if cellTypes %}
+       {% if matchedCells.length %}
+           {% set cellTypesText = matchedCells | join(', ') %}
+       {% else %}
+           {% set cellTypesText = matchedCell %}
+       {% endif %}
+       {% set cellTypeColumn =
+         {  html:
+         '<div data-qa="cell-types-' + i + '" class="change-remove-container">' +
+         cellTypesText +
+           '<div class="change-remove-actions">' +
+           '<a data-qa="remove-cell-type-' + i + '" class="govuk-!-padding-right-1" href="/create-new/' + locationId + '/create-cells/remove-cell-type/' + i + '">Remove</a>' + '  |  ' +
+           '<a data-qa="change-cell-type-' + i + '" class="govuk-!-padding-left-1" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Change</a>' + '</div>' + '</div>'
+
+         }
+       %}
+   {% else %}
+     {% set cellTypeColumn = {
+       html:
+             '<a data-qa="add-cell-type-' + i + '" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Add</a>'
+             }
+     %}
+   {% endif %}
 
     {% set tableRows = (tableRows.push([
       {
+        classes: 'govuk-table__cell',
         text: locationPathPrefix + '-' + values['create-cells_cellNumber' + i].padStart(3, '0')
       },
       {

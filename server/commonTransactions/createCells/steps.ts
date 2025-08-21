@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import BaseController from './baseController'
@@ -8,6 +9,62 @@ import Capacities from './capacities'
 import modifyFieldName from '../../helpers/field/modifyFieldName'
 import WithoutSanitation from './withoutSanitation'
 import UsedFor from './usedFor'
+import RemoveCellType from './removeCellType'
+
+function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
+  if (path === '/set-cell-type/:cellId') {
+    return class WrappedSetCellTypeController extends step.controller {
+      override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+        const pathPrefix = req.form.options.fullPath.replace(/\/set-cell-type\/.*/, '')
+        const history = req.journeyModel.get('history') as FormWizard.HistoryStep[]
+
+        this.addJourneyHistoryStep(req, res, {
+          path: history.find(item => {
+            return item.next.endsWith('/capacities')
+          }).next,
+          next: `${pathPrefix}/set-cell-type/:cellId/type`,
+          wizard: req.form.options.name,
+          revalidate: false,
+          skip: false,
+          editing: req.isEditing && !req.notRevalidated ? true : undefined,
+          continueOnEdit: req.isEditing && !req.notRevalidated ? true : undefined,
+        })
+        super.successHandler(req, res, next)
+      }
+    }
+  }
+
+  return class extends step.controller {
+    override middlewareSetup() {
+      super.middlewareSetup()
+      this.use(this.appendCellIdToFields)
+    }
+
+    appendCellIdToFields(req: FormWizard.Request, _res: Response, next: NextFunction) {
+      const { options } = req.form
+      const { cellId } = req.params
+
+      if (options.fields) {
+        options.fields = Object.fromEntries(
+          Object.entries(options.fields).map(([id, field]) => [
+            `${id}${cellId}`,
+            modifyFieldName(field, o => `${o}${cellId}`),
+          ]),
+        )
+      }
+      if (Array.isArray(options.next)) {
+        options.next = options.next.map(o => {
+          if (typeof o === 'string') return o
+          if ('field' in o) {
+            return { ...o, field: `${o.field}${cellId}` }
+          }
+          return o
+        })
+      }
+      next()
+    }
+  }
+}
 
 // Wrap the setCellType steps controller with another controller that appends the field names with cellId
 const setCellTypeSteps = Object.fromEntries(
@@ -19,28 +76,8 @@ const setCellTypeSteps = Object.fromEntries(
     k,
     {
       ...step,
-      controller: class extends step.controller {
-        override middlewareSetup() {
-          super.middlewareSetup()
-          this.use(this.appendCellIdToFields)
-        }
-
-        appendCellIdToFields(req: FormWizard.Request, _res: Response, next: NextFunction) {
-          const { options } = req.form
-          const { cellId } = req.params
-
-          if (options.fields) {
-            options.fields = Object.fromEntries(
-              Object.entries(options.fields).map(([id, field]) => [
-                `${id}${cellId}`,
-                modifyFieldName(field, o => `${o}${cellId}`),
-              ]),
-            )
-          }
-
-          next()
-        }
-      },
+      controller: wrapSetCellTypeController(k, step),
+      editable: true,
     },
   ]),
 )
@@ -76,6 +113,12 @@ const steps: FormWizard.Steps = {
     ],
   },
   ...setCellTypeSteps,
+  '/remove-cell-type/:cellId': {
+    entryPoint: true,
+    skip: true,
+    controller: RemoveCellType,
+    next: 'capacities',
+  },
   '/used-for': {
     pageTitle: 'What are the cells used for?',
     controller: UsedFor,

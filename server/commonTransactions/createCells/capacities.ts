@@ -12,6 +12,14 @@ export default class Capacities extends BaseController {
     this.use(this.createDynamicFields)
   }
 
+  override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
+    const { locals } = _res
+    locals.specialistCellTypesObject = await req.services.locationsService.getSpecialistCellTypes(
+      req.session.systemToken,
+    )
+    next()
+  }
+
   createDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { options } = req.form
     const cellsToCreate = Number(req.sessionModel.get<number>('create-cells_cellsToCreate')) || 0
@@ -50,10 +58,11 @@ export default class Capacities extends BaseController {
 
   override locals(req: FormWizard.Request, res: Response) {
     const locals = super.locals(req, res)
-
     const { pathHierarchy } = res.locals.decoratedResidentialSummary.location
     const newLocationCode = req.sessionModel.get<string>(`locationCode`)
+
     locals.locationPathPrefix = [pathHierarchy, newLocationCode].filter(s => s).join('-')
+    locals.specialistCellTypesObject = res.locals.specialistCellTypesObject
 
     return locals
   }

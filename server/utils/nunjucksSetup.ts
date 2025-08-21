@@ -113,4 +113,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('locationStatusTagLabel', locationStatusTagLabel)
   njkEnv.addFilter('nonOxfordJoin', nonOxfordJoin)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
+  njkEnv.addFilter('isArray', function isArrayFilter(value) {
+    return Array.isArray(value)
+  })
 }

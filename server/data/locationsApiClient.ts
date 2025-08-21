@@ -67,7 +67,14 @@ export default class LocationsApiClient extends BaseApiClient {
       },
     ),
     getSpecialistCellTypes: this.apiCall<
-      { specialistCellTypes: { key: string; description: string; additionalInformation?: string }[] },
+      {
+        specialistCellTypes: {
+          key: string
+          description: string
+          additionalInformation?: string
+          attributes?: { affectsCapacity: boolean }
+        }[]
+      },
       null
     >({
       path: '/constants/specialist-cell-type',

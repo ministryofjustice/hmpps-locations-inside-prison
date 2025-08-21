@@ -15,6 +15,7 @@ import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
 import config from '../../config'
+import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -135,6 +136,7 @@ interface TypedLocals {
   requestedReports?: StoredReportData[]
   routePrefix?: string
   specialistCellTypes?: string[]
+  specialistCellTypesObject?: SpecialistCellTypesObject[]
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string
