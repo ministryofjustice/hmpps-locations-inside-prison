@@ -95,12 +95,14 @@ const steps: FormWizard.Steps = {
     template: '../../commonTransactions/createCells/cellNumbers',
     controller: CellNumbers,
     next: 'door-numbers',
+    editable: true,
   },
   '/door-numbers': {
     pageTitle: 'Enter cell door numbers',
     controller: CellDoorNumbers,
     template: '../../commonTransactions/createCells/doorNumbers',
     next: 'capacities',
+    editable: true,
   },
   '/capacities': {
     pageTitle: 'Enter cell capacities and type',
@@ -111,6 +113,7 @@ const steps: FormWizard.Steps = {
       { field: 'accommodationType', op: '==', value: 'NORMAL_ACCOMMODATION', next: 'used-for' },
       'bulk-sanitation',
     ],
+    editable: true,
   },
   ...setCellTypeSteps,
   '/remove-cell-type/:cellId': {
@@ -124,17 +127,23 @@ const steps: FormWizard.Steps = {
     controller: UsedFor,
     fields: ['usedFor'],
     next: 'bulk-sanitation',
+    editable: true,
   },
   '/bulk-sanitation': {
     pageTitle: 'Do all cells have in-cell sanitation?',
     controller: BaseController,
     fields: ['bulkSanitation'],
-    next: [{ field: 'bulkSanitation', op: '==', value: 'NO', next: 'without-sanitation' }, '$END_OF_TRANSACTION$'],
+    next: [
+      { field: 'bulkSanitation', op: '==', value: 'NO', next: 'without-sanitation', continueOnEdit: true },
+      '$END_OF_TRANSACTION$',
+    ],
+    editable: true,
   },
   '/without-sanitation': {
     pageTitle: 'Select any cells without in-cell sanitation',
     controller: WithoutSanitation,
     fields: ['withoutSanitation'],
+    editable: true,
   },
 }
 

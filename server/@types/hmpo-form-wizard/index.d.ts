@@ -355,7 +355,13 @@ declare module 'hmpo-form-wizard' {
     namespace Step {
       type NextStepCondition = (req: Request, res: Response) => boolean
       type Op = (fieldValue, req, res, con) => boolean
-      type FieldValueCondition = { field: string; op?: string | Op; value: string | string[]; next: NextStep }
+      type FieldValueCondition = {
+        field: string
+        op?: string | Op
+        value: string | string[]
+        next: NextStep
+        continueOnEdit?: boolean
+      }
       type CallbackCondition = { fn: NextStepCondition; next: string }
 
       type NextStep = FieldValueCondition | CallbackCondition | string | NextStep[]
@@ -365,7 +371,9 @@ declare module 'hmpo-form-wizard' {
       pageTitle?: string
       reset?: boolean
       skip?: boolean
+      continueOnEdit?: boolean
       editable?: boolean
+      editBackStep?: string
       resetJourney?: boolean
       checkJourney?: boolean
       entryPoint?: boolean

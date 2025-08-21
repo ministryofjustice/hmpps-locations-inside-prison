@@ -79,8 +79,8 @@ const fields: FormWizard.Fields = {
       },
     },
     items: [
-      { text: 'Yes', value: 'yes' },
-      { text: "No, I'll create them later", value: 'no' },
+      { text: 'Yes', value: 'YES' },
+      { text: "No, I'll create them later", value: 'NO' },
     ],
     autocomplete: 'off',
   },

@@ -5,6 +5,7 @@ body {
 .govuk-main-wrapper {
   min-height: 600px;
   margin-bottom: -40px;
+  padding-bottom: 100px;
 }
 
 .body-tiles {
@@ -229,4 +230,10 @@ $sticky-footer-vertical-spacing: govuk-spacing(2);
 
 .hidden {
   display: none
+}
+
+.govuk-table__header {
+  a {
+    font-weight: normal
+  }
 }

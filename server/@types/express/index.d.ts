@@ -71,6 +71,7 @@ interface TypedLocals {
   }
   createStructureLink?: string
   createDetailsLink?: string
+  createRootLink?: string
   createYouCanAddText?: string
   cspNonce?: string
   csrfToken?: string
