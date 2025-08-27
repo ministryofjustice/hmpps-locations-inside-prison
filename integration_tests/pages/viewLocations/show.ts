@@ -47,6 +47,10 @@ export default class ViewLocationsShowPage extends Page {
 
   convertToCellButton = (): PageElement => cy.get('.govuk-button:contains("Convert to cell")')
 
+  deleteButton = (): PageElement => cy.get('.govuk-button:contains("Delete")')
+
+  deactivateButton = (): PageElement => cy.get('.govuk-button:contains("Deactivate")')
+
   deactivateAction = (): PageElement => cy.get('.moj-button-menu__wrapper a:contains("Deactivate cell")')
 
   summaryCards = {

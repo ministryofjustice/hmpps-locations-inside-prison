@@ -198,6 +198,10 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
+    deleteDraftLocation: this.apiCall<Location, { locationId: string }>({
+      path: '/locations/:locationId',
+      requestType: 'delete',
+    }),
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
       queryParams: ['includeHistory'],
