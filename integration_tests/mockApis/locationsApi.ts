@@ -1055,6 +1055,21 @@ const stubLocationsCreateCells = (location: Location) =>
     },
   })
 
+const stubLocationsDeleteLocation = () =>
+  stubFor({
+    request: {
+      method: 'DELETE',
+      urlPattern: '/locations-api/locations/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const allStubs = {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -1103,6 +1118,7 @@ const allStubs = {
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
   stubLocationsResidentialSummaryForCreateWing,
+  stubLocationsDeleteLocation,
 }
 
 const LocationsApiStubber = new TypedStubber<typeof allStubs>(allStubs)
