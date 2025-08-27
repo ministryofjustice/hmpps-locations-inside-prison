@@ -46,7 +46,6 @@ export default async (req: Request, res: Response) => {
   if (req.canAccess('convert_non_residential') && active && !isResidential && leafLevel) {
     addAction({
       text: 'Convert to cell',
-      class: 'govuk-button--secondary',
       href: `/location/${location.id}/cell-conversion`,
     })(req, res, null)
   }

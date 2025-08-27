@@ -1,25 +1,20 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
+import capFirst from '../../formatters/capFirst'
 
 export default class ConfirmDeleteDraftLocation extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals
-    const { id: locationId, prisonId } = decoratedResidentialSummary.location
     const locationType = decoratedResidentialSummary.location.locationType.toLowerCase()
-
-    const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-    })
 
     return {
       ...locals,
-      backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       locationType,
+      titleCaption: capFirst(decoratedResidentialSummary.location.displayName),
+      title: `Are you sure you want to delete this ${locationType}?`,
     }
   }
 
@@ -54,10 +49,6 @@ export default class ConfirmDeleteDraftLocation extends FormInitialStep {
       content: `You have deleted ${displayName}.`,
     })
 
-    if (!parentId) {
-      res.redirect(`/view-and-update-locations/${prisonId}`)
-    } else {
-      res.redirect(`/view-and-update-locations/${prisonId}/${parentId}`)
-    }
+    res.redirect(`/view-and-update-locations/${[prisonId, parentId].filter(i => i).join('/')}`)
   }
 }

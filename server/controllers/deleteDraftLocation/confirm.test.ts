@@ -68,9 +68,9 @@ describe('ConfirmDeleteDraftLocation', () => {
   describe('locals', () => {
     it('sets the correct locals', () => {
       const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response) as TypedLocals
-      expect(locals.backLink).toEqual(`/view-and-update-locations/TST/${locationId}`)
-      expect(locals.cancelLink).toEqual(`/view-and-update-locations/${prisonId}/${locationId}`)
       expect(locals.locationType).toEqual('wing')
+      expect(locals.titleCaption).toEqual('Wing A-1-001')
+      expect(locals.title).toEqual('Are you sure you want to delete this wing?')
     })
   })
 
