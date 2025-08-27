@@ -24,6 +24,7 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
   if (req.canAccess('convert_non_residential') && active && isResidential && leafLevel) {
     addAction({
       text: `Convert to non-residential room`,
+      class: 'govuk-button--secondary',
       href: `/location/${location.id}/non-residential-conversion`,
     })(req, res, null)
   }
@@ -36,11 +37,13 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
   ) {
     addAction({
       text: `Deactivate ${location.locationType.toLowerCase()}`,
+      class: 'govuk-button--secondary',
       href: `/location/${location.id}/deactivate`,
     })(req, res, null)
   } else if (!active && status === 'DRAFT' && req.canAccess('create_location')) {
     addAction({
       text: `Delete ${location.locationType.toLowerCase()}`,
+      class: 'govuk-button--warning',
       href: `/delete-draft/${location.id}`,
     })(req, res, null)
   }

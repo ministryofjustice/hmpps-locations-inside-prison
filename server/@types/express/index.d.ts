@@ -29,7 +29,7 @@ export declare module 'express-session' {
 
 interface TypedLocals {
   accommodationType?: string
-  actions?: { text: string; href: string }[]
+  actions?: { text: string; href: string; class: string }[]
   archivedLocations?: DecoratedLocation[]
   backLink?: string
   banner?: {
