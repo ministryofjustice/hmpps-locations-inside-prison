@@ -339,6 +339,46 @@ describe('Locations service', () => {
     })
   })
 
+  describe('updateCapacityBulk', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.updateBulkCapacity('token', {
+        'BRI-RES1-1-001': {
+          maxCapacity: 1,
+          workingCapacity: 1,
+          certifiedNormalAccommodation: 1,
+          cellMark: '1-01',
+          inCellSanitation: true,
+        },
+        'BRI-RES1-1-002': {
+          maxCapacity: 2,
+          workingCapacity: 3,
+          certifiedNormalAccommodation: 2,
+          cellMark: '1-02',
+          inCellSanitation: false,
+        },
+      })
+
+      expect(locationsApiClient.locations.bulk.capacityUpdate).toHaveBeenCalledWith('token', null, {
+        locations: {
+          'BRI-RES1-1-001': {
+            maxCapacity: 1,
+            workingCapacity: 1,
+            certifiedNormalAccommodation: 1,
+            cellMark: '1-01',
+            inCellSanitation: true,
+          },
+          'BRI-RES1-1-002': {
+            maxCapacity: 2,
+            workingCapacity: 3,
+            certifiedNormalAccommodation: 2,
+            cellMark: '1-02',
+            inCellSanitation: false,
+          },
+        },
+      })
+    })
+  })
+
   describe('getPrisonConfiguration', () => {
     it('calls the correct client function', async () => {
       await locationsService.getPrisonConfiguration('token', 'MDI')

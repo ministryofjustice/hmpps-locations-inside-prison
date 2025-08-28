@@ -26,6 +26,7 @@ import setCanAccess from './middleware/setCanAccess'
 import config from './config'
 import setUpFeatureFlags from './middleware/setUpFeatureFlags'
 import refreshSystemToken from './middleware/refreshSystemToken'
+import setUpMultipartFormDataParsing from './middleware/setUpMultipartFormDataParsing'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -37,6 +38,7 @@ export default function createApp(services: Services): express.Application {
   app.use(appInsightsMiddleware())
   app.use(cookieParser())
   app.use(setUpHealthChecks(services.applicationInfo))
+  app.use(setUpMultipartFormDataParsing())
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
   app.use(setUpWebRequestParsing())
