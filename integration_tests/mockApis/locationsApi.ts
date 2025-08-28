@@ -177,15 +177,18 @@ const stubLocationsConstantsSpecialistCellType = (
       key: 'ACCESSIBLE_CELL',
       description: 'Accessible cell',
       additionalInformation: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
+      attributes: { affectsCapacity: false },
     },
     {
       key: 'BIOHAZARD_DIRTY_PROTEST',
       description: 'Biohazard / dirty protest cell',
       additionalInformation: 'Previously known as a dirty protest cell',
+      attributes: { affectsCapacity: true },
     },
     {
       key: 'CONSTANT_SUPERVISION',
       description: 'Constant Supervision Cell',
+      attributes: { affectsCapacity: false },
     },
   ],
 ) =>
@@ -1052,6 +1055,21 @@ const stubLocationsCreateCells = (location: Location) =>
     },
   })
 
+const stubLocationsDeleteLocation = () =>
+  stubFor({
+    request: {
+      method: 'DELETE',
+      urlPattern: '/locations-api/locations/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const allStubs = {
   stubLocations,
   stubLocationsBulkReactivate,
@@ -1100,6 +1118,7 @@ const allStubs = {
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
   stubLocationsResidentialSummaryForCreateWing,
+  stubLocationsDeleteLocation,
 }
 
 const LocationsApiStubber = new TypedStubber<typeof allStubs>(allStubs)

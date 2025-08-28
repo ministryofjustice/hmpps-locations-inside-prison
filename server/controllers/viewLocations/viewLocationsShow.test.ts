@@ -11,11 +11,19 @@ describe('view locations show', () => {
   const convertToNonResAction = {
     text: 'Convert to non-residential room',
     href: '/location/7e570000-0000-0000-0000-000000000001/non-residential-conversion',
+    class: 'govuk-button--secondary',
   }
 
   const deactivateCellAction = {
     text: 'Deactivate cell',
     href: '/location/7e570000-0000-0000-0000-000000000001/deactivate',
+    class: 'govuk-button--secondary',
+  }
+
+  const deleteWingAction = {
+    text: 'Delete wing',
+    href: '/delete-draft/7e570000-0000-0000-0000-000000000001',
+    class: 'govuk-button--warning',
   }
 
   beforeEach(() => {
@@ -170,6 +178,49 @@ describe('view locations show', () => {
         })
       })
     })
+
+    describe('delete wing', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+          active: false,
+          status: 'DRAFT',
+          locationType: 'WING',
+        })
+      })
+
+      describe('without the correct permissions', () => {
+        beforeEach(() => {
+          deepReq.canAccess = jest.fn().mockReturnValue(false)
+        })
+
+        it('does not add the action', async () => {
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
+
+          expect(deepRes.locals.actions || []).not.toContainEqual(deleteWingAction)
+        })
+      })
+
+      describe('with the correct permissions', () => {
+        beforeEach(() => {
+          deepReq.canAccess = jest.fn().mockReturnValue(true)
+        })
+
+        it('adds the action', async () => {
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
+
+          expect(deepRes.locals.actions).toContainEqual(deleteWingAction)
+        })
+
+        it('does not add the action when location is active', async () => {
+          deepRes.locals.decoratedResidentialSummary.location.active = true
+          deepRes.locals.decoratedResidentialSummary.location.status = 'ACTIVE'
+
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
+
+          expect(deepRes.locals.actions || []).not.toContainEqual(deleteWingAction)
+        })
+      })
+    })
   })
 
   describe('actionButton', () => {
@@ -187,6 +238,7 @@ describe('view locations show', () => {
 
       expect(deepRes.locals.actions).toEqual([
         {
+          class: 'govuk-button--secondary',
           text: 'Convert to cell',
           href: `/location/7e570000-0000-0000-0000-000000000001/cell-conversion`,
         },

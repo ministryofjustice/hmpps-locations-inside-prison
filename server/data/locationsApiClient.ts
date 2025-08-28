@@ -68,7 +68,14 @@ export default class LocationsApiClient extends BaseApiClient {
       },
     ),
     getSpecialistCellTypes: this.apiCall<
-      { specialistCellTypes: { key: string; description: string; additionalInformation?: string }[] },
+      {
+        specialistCellTypes: {
+          key: string
+          description: string
+          additionalInformation?: string
+          attributes?: { affectsCapacity: boolean }
+        }[]
+      },
       null
     >({
       path: '/constants/specialist-cell-type',
@@ -210,6 +217,10 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
+    deleteDraftLocation: this.apiCall<Location, { locationId: string }>({
+      path: '/locations/:locationId',
+      requestType: 'delete',
+    }),
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
       queryParams: ['includeHistory'],

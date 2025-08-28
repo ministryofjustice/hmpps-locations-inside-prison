@@ -69,6 +69,10 @@ export default class LocationsService {
     )
   }
 
+  async deleteDraftLocation(token: string, locationId: string) {
+    return this.locationsApiClient.locations.deleteDraftLocation(token, { locationId })
+  }
+
   async getAccommodationType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getAccommodationTypes'))[key] || 'Unknown'
   }

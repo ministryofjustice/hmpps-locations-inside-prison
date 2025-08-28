@@ -7,25 +7,45 @@ const fields: FormWizard.Fields = {
     id: 'accommodationType',
     name: 'accommodationType',
     errorMessages: {
-      required: 'Select if it is a normal or special accommodation cell',
+      required: 'Select if it is a normal or special cell type',
     },
     items: [
       {
-        text: 'Normal accommodation cell',
-        value: 'normal',
+        text: 'Normal cell type',
+        value: 'NORMAL_ACCOMMODATION',
         hint: {
           text: 'For example, an accessible cell or constant supervision cell.',
         },
       },
       {
-        text: 'Special accommodation cell',
-        value: 'special',
+        text: 'Special cell type',
+        value: 'SPECIAL_ACCOMMODATION',
         hint: {
           text: 'For example, a dry cell or unfurnished cell.',
         },
       },
     ],
     autocomplete: 'off',
+  },
+  specialistCellTypes: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'specialistCellTypes',
+    name: 'specialistCellTypes',
+    errorMessages: {
+      required: 'Select a cell type',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
+  },
+  normalCellTypes: {
+    component: 'govukCheckboxes',
+    multiple: true,
+    id: 'normalCellTypes',
+    name: 'normalCellTypes',
+    validate: ['required'],
+    errorMessages: { required: 'Select a cell type' },
+    hint: { text: 'Select all that apply.' },
+    items: [{ text: 'set at runtime', value: '' }],
   },
 }
 

@@ -1,12 +1,12 @@
 import FormWizard from 'hmpo-form-wizard'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 import SetCellType from '../setCellType'
+import greaterThan from '../../validators/greaterThan'
 
 const fields: FormWizard.Fields = {
   accommodationType: {
     component: 'govukRadios',
     validate: ['required'],
-    hideWhenRemoved: true,
     id: 'accommodationType',
     name: 'accommodationType',
     errorMessages: {
@@ -73,6 +73,104 @@ const fields: FormWizard.Fields = {
     },
   },
   ...SetCellType.getFields(),
+  baselineCna: {
+    validate: ['required', 'numeric', lessThanOrEqualTo(99)],
+    errorMessages: {
+      greaterThan: 'Baseline CNA cannot be 0 for a normal accommodation cell',
+    },
+    component: 'govukInput',
+    id: 'baselineCna',
+    name: 'baselineCna',
+    label: {
+      text: 'Baseline CNA',
+      classes: 'govuk-visually-hidden',
+      for: 'baselineCna',
+    },
+    classes: 'govuk-input--width-3',
+    rows: 1,
+    autocomplete: 'off',
+    nameForErrors: 'Baseline CNA',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  workingCapacity: {
+    validate: ['required', 'numeric', lessThanOrEqualTo(99)],
+    component: 'govukInput',
+    id: 'workingCapacity',
+    name: 'workingCapacity',
+    label: {
+      text: 'Working capacity',
+      classes: 'govuk-visually-hidden',
+      for: 'workingCapacity',
+    },
+    classes: 'govuk-input--width-3',
+    rows: 1,
+    autocomplete: 'off',
+    nameForErrors: 'Working capacity',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  maximumCapacity: {
+    validate: ['required', 'numeric', greaterThan(0), lessThanOrEqualTo(99)],
+    component: 'govukInput',
+    id: 'maximumCapacity',
+    name: 'maximumCapacity',
+    label: {
+      text: 'Maximum capacity',
+      classes: 'govuk-visually-hidden',
+      for: 'maximumCapacity',
+    },
+    classes: 'govuk-input--width-3',
+    rows: 1,
+    autocomplete: 'off',
+    nameForErrors: 'Maximum capacity',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  bulkSanitation: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'bulkSanitation',
+    name: 'bulkSanitation',
+    errorMessages: {
+      required: 'Select yes if all cells have in-cell sanitation',
+    },
+    items: [
+      { text: 'Yes', value: 'YES' },
+      { text: 'No', value: 'NO' },
+    ],
+    autocomplete: 'off',
+    hint: {
+      text: 'This means a cell includes both a toilet and wash basin.',
+    },
+  },
+  withoutSanitation: {
+    component: 'govukCheckboxes',
+    multiple: true,
+    validate: ['required'],
+    errorMessages: { required: 'Select any cells without in-cell sanitation' },
+    id: 'withoutSanitation',
+    name: 'withoutSanitation',
+    hint: {
+      text: 'This means a cell doesn’t have a toilet or a wash basin.',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
+  },
+  usedFor: {
+    component: 'govukCheckboxes',
+    multiple: true,
+    validate: ['required'],
+    errorMessages: { required: 'Select what the location is used for' },
+    id: 'usedFor',
+    name: 'usedFor',
+    hint: {
+      text: 'Select any that apply to all cells.',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
+  },
 }
 
 export default fields

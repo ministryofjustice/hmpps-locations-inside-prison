@@ -16,6 +16,7 @@ import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
 import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
+import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -29,7 +30,7 @@ export declare module 'express-session' {
 
 interface TypedLocals {
   accommodationType?: string
-  actions?: { text: string; href: string }[]
+  actions?: { text: string; href: string; class: string }[]
   archivedLocations?: DecoratedLocation[]
   backLink?: string
   banner?: {
@@ -116,6 +117,7 @@ interface TypedLocals {
   location?: Location
   locationId?: string
   locationHierarchy?: LocationSummary[]
+  locationPathPrefix?: string
   locationResidentialSummary?: LocationResidentialSummary
   locationTree?: LocationTree[]
   locationType?: string
@@ -135,7 +137,7 @@ interface TypedLocals {
   requestedReports?: StoredReportData[]
   routePrefix?: string
   specialistCellTypes?: string[]
-
+  specialistCellTypesObject?: SpecialistCellTypesObject[]
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string

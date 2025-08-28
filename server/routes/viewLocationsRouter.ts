@@ -19,8 +19,7 @@ const router = express.Router({ mergeParams: true })
 
 export const addActions = asyncMiddleware(async (req, res, next) => {
   const { location } = res.locals.decoratedResidentialSummary
-
-  const { active, isResidential, leafLevel, raw } = location
+  const { active, isResidential, leafLevel, raw, status } = location
   const { locationType } = raw
   if (req.canAccess('convert_non_residential') && active && isResidential && leafLevel) {
     addAction({
@@ -38,6 +37,12 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     addAction({
       text: `Deactivate ${location.locationType.toLowerCase()}`,
       href: `/location/${location.id}/deactivate`,
+    })(req, res, null)
+  } else if (!active && status === 'DRAFT' && req.canAccess('create_location')) {
+    addAction({
+      text: `Delete ${location.locationType.toLowerCase()}`,
+      href: `/delete-draft/${location.id}`,
+      class: 'govuk-button--warning',
     })(req, res, null)
   }
 

@@ -33,6 +33,7 @@ const fields: FormWizard.Fields = {
     },
     id: 'localName',
     name: 'localName',
+    nameForErrors: 'Local name',
     classes: 'govuk-!-width-one-half local-name-text-input',
     rows: 1,
     label: {

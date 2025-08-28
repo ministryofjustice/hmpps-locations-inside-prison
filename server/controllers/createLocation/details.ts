@@ -50,7 +50,7 @@ export default class Details extends FormInitialStep {
       const { locationsService } = req.services
       const { values } = req.form
 
-      const { prisonId, decoratedResidentialSummary } = res.locals
+      const { prisonId, locationId, decoratedResidentialSummary } = res.locals
 
       const sanitizedLocalName = sanitizeString(String(values.localName))
 
@@ -71,8 +71,9 @@ export default class Details extends FormInitialStep {
         if (values.localName) {
           const localNameExists = await locationsService.getLocationByLocalName(
             req.session.systemToken,
-            String(prisonId),
+            prisonId,
             sanitizedLocalName,
+            locationId,
           )
           if (localNameExists) {
             validationErrors.localName = this.formError('localName', 'taken')
