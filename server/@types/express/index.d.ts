@@ -15,6 +15,7 @@ import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
 import config from '../../config'
+import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
 
 export declare module 'express-session' {
@@ -148,6 +149,8 @@ interface TypedLocals {
   values?: FormWizard.Values
   valuesHaveChanged?: boolean
   workingCapacity?: string
+  capacityData?: BulkCapacityUpdate
+  capacitySummary?: CapacitySummary
 }
 
 export declare module 'express' {

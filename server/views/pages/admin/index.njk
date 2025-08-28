@@ -39,7 +39,16 @@
         {{ banner.success.title }}
       </h3>
       <p class="govuk-body">
-        {{ banner.success.content }}
+       {% if banner.success.content is string %}
+         {{ banner.success.content }}
+       {% else %}
+        {# will be an array of data #}
+        <ul>
+          {% for line in banner.success.content %}
+            <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+       {% endif %}
       </p>
     {% endset %}
 
@@ -124,6 +133,23 @@
         },
           value: {
             text: screenBlocked
+          }
+        },
+        {
+          key: {
+          text: 'Ingest certs'
+        },
+          value: {
+          text: ''
+        },
+          actions: {
+          items: [
+            {
+              href: '/admin/' + prisonConfiguration.prisonId + '/ingest-cert',
+              text: "Ingest",
+              visuallyHiddenText: "ingest",
+              classes: "govuk-link--no-visited-state"}
+          ]
           }
         }
         ],

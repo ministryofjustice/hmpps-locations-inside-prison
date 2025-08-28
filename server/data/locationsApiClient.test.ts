@@ -247,6 +247,17 @@ describe('locationsApiClient', () => {
         { prisonId: 'TST', parentLocationId: 'parent-id' },
       )
     })
+
+    describe('bulk', () => {
+      testCall(
+        'capacityUpdate',
+        '/locations/bulk/capacity-update',
+        false,
+        () => apiClient.locations.bulk.capacityUpdate,
+        null,
+        'put',
+      )
+    })
   })
 
   describe('prisonConfiguration', () => {

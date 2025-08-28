@@ -345,6 +345,7 @@ declare module 'hmpo-form-wizard' {
       errorSummaryPrefix?: string
       rows?: number
       maxlength?: number
+      file?: Express.Multer.File
     }
 
     interface Fields {

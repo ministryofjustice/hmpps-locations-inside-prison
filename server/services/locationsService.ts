@@ -3,6 +3,7 @@ import LocationsApiClient from '../data/locationsApiClient'
 import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
 import { LocationType, StatusType } from '../data/types/locationsApi'
+import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -182,6 +183,10 @@ export default class LocationsService {
 
   async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
+  }
+
+  async updateBulkCapacity(token: string, bulkCapacityUpdate: BulkCapacityUpdate) {
+    return this.locationsApiClient.locations.bulk.capacityUpdate(token, null, { locations: bulkCapacityUpdate })
   }
 
   async updateSignedOperationalCapacity(

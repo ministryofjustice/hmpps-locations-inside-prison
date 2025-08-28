@@ -16,6 +16,7 @@ import { ManagementReportDefinition } from './types/locationsApi/managementRepor
 
 import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
+import { BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
@@ -111,6 +112,24 @@ export default class LocationsApiClient extends BaseApiClient {
         }
       >({
         path: '/locations/bulk/reactivate',
+        requestType: 'put',
+      }),
+      capacityUpdate: this.apiCall<
+        BulkCapacityUpdateChanges,
+        null,
+        {
+          locations: {
+            [id: string]: {
+              maxCapacity: number
+              workingCapacity: number
+              certifiedNormalAccommodation: number
+              cellMark: string
+              inCellSanitation?: boolean
+            }
+          }
+        }
+      >({
+        path: '/locations/bulk/capacity-update',
         requestType: 'put',
       }),
     },
