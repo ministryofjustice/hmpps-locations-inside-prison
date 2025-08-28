@@ -195,10 +195,16 @@ describe('Upload file csv', () => {
       expect(result['EYI-HB1-1-003'].workingCapacity).toBe(0)
     })
 
-    it('handles null inCellSanitation as false', () => {
+    it('handles null inCellSanitation', () => {
       const input = ['HB2,EYI-HB2-1-004,A1-04,1,1,1,Normal Accommodation,null']
       const result = parseCsvRow(input)
-      expect(result['EYI-HB2-1-004'].inCellSanitation).toBe(false)
+      expect(result['EYI-HB2-1-004'].inCellSanitation).toBe(undefined)
+    })
+
+    it('handles undefined inCellSanitation', () => {
+      const input = ['HB2,EYI-HB2-1-004,A1-04,1,1,1,Normal Accommodation,']
+      const result = parseCsvRow(input)
+      expect(result['EYI-HB2-1-004'].inCellSanitation).toBe(undefined)
     })
 
     it('parses multiple rows correctly', () => {
@@ -239,7 +245,7 @@ describe('Upload file csv', () => {
           workingCapacity: 1,
           certifiedNormalAccommodation: 1,
           cellMark: 'A1-04',
-          inCellSanitation: false, // null becomes false
+          inCellSanitation: undefined,
         },
         'EYI-HB2-1-005': {
           maxCapacity: 2,

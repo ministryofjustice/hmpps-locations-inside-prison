@@ -95,6 +95,13 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
         inCellSanitation,
       ] = row.split(',')
 
+      const sanitation = ['true', 'false'].includes(inCellSanitation?.toLowerCase())
+        ? inCellSanitation.toLowerCase() === 'true'
+        : undefined
+
+      assertIsValidNumber(maxCapacity)
+      assertIsValidNumber(certifiedNormalAccommodation)
+
       return [
         cellNumber,
         {
@@ -102,11 +109,17 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
           workingCapacity: parseInt(workingCapacity, 10) ? parseInt(workingCapacity, 10) : 0,
           certifiedNormalAccommodation: parseInt(certifiedNormalAccommodation, 10),
           cellMark,
-          inCellSanitation: inCellSanitation.toLowerCase() === 'true',
+          inCellSanitation: sanitation,
         },
       ]
     }),
   )
+}
+
+function assertIsValidNumber(value: string): asserts value is string {
+  if (value === undefined || value.trim() === '' || Number.isNaN(Number(value))) {
+    throw new Error('Value must be a defined numeric string')
+  }
 }
 
 export function invalidDataForPrison(prisonId: string, data: BulkCapacityUpdate): boolean {
