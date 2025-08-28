@@ -116,7 +116,7 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
   )
 }
 
-function assertIsValidNumber(value: string): asserts value is string {
+function assertIsValidNumber(value: string) {
   if (value === undefined || value.trim() === '' || Number.isNaN(Number(value))) {
     throw new Error('Value must be a defined numeric string')
   }
