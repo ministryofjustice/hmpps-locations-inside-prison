@@ -159,7 +159,7 @@ describe('Change Location Code', () => {
     })
 
     it('calls back with error if locationCode exists on a sibling', async () => {
-      locationsService.getResidentialHierarchyForParent = jest.fn().mockResolvedValue([
+      locationsService.getResidentialHierarchyForPath = jest.fn().mockResolvedValue([
         { locationType: 'LANDING', locationCode: 'LAND1' },
         { locationType: 'LANDING', locationCode: 'LAND2' },
       ])
@@ -205,7 +205,7 @@ describe('Change Location Code', () => {
     })
 
     it('calls back without error if the locationCode is unique', async () => {
-      locationsService.getResidentialHierarchyForParent = jest.fn().mockResolvedValue([{ locationCode: 'C' }])
+      locationsService.getResidentialHierarchyForPath = jest.fn().mockResolvedValue([{ locationCode: 'C' }])
       locationsService.getResidentialSummary = jest.fn().mockResolvedValue({
         subLocations: [{ pathHierarchy: 'C' }],
       })

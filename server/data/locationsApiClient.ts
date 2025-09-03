@@ -211,12 +211,10 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/prison/:prisonId/residential-hierarchy',
       requestType: 'get',
     }),
-    getResidentialHierarchyForParent: this.apiCall<ResidentialHierarchy[], { prisonId: string; pathHierarchy: string }>(
-      {
-        path: '/locations/prison/:prisonId/residential-hierarchy/:pathHierarchy?includeInactive=true',
-        requestType: 'get',
-      },
-    ),
+    getResidentialHierarchyForPath: this.apiCall<ResidentialHierarchy[], { prisonId: string; pathHierarchy: string }>({
+      path: '/locations/prison/:prisonId/residential-hierarchy/:pathHierarchy?includeInactive=true',
+      requestType: 'get',
+    }),
     getResidentialSummary: this.apiCall<
       LocationResidentialSummary | PrisonResidentialSummary,
       { prisonId: string; parentLocationId?: string }

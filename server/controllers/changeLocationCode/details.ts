@@ -70,11 +70,11 @@ export default class Details extends FormInitialStep {
           let existsOnSibling = false
           // location is not top level, so check if locationCode exits on another sibling
           if (decoratedResidentialSummary.location.level !== 1) {
-            const locationPathPrefix: string = locationHierarchy[locationHierarchy.length - 2].pathHierarchy
-            const siblingLocations: ResidentialHierarchy[] = await locationsService.getResidentialHierarchyForParent(
+            const parentPath: string = locationHierarchy[locationHierarchy.length - 2].pathHierarchy
+            const siblingLocations: ResidentialHierarchy[] = await locationsService.getResidentialHierarchyForPath(
               systemToken,
               prisonId,
-              locationPathPrefix,
+              parentPath,
             )
             existsOnSibling = siblingLocations.some(location => location.locationCode === values.locationCode)
           } else {
