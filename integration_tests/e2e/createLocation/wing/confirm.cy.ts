@@ -71,6 +71,8 @@ context('Create Wing Confirm', () => {
       viewLocationsShowPage.summaryCards.maximumCapacityText().contains('-')
       viewLocationsShowPage.locationDetailsRows().eq(0).contains('B')
       viewLocationsShowPage.locationDetailsRows().eq(1).contains('testW')
+      viewLocationsShowPage.changeLocalNameLink().should('exist')
+      viewLocationsShowPage.changeCellUsedForLink().should('exist')
     })
 
     it('has a back link to the enter details page', () => {
