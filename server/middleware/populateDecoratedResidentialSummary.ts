@@ -10,6 +10,10 @@ function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
+function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
+  return location.status === 'DRAFT' && req.canAccess('change_location_code')
+}
+
 function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
   return (location.active || location.status === 'DRAFT') && req.canAccess('change_local_name')
 }
@@ -102,6 +106,28 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
   return row
 }
 
+function locationCodeRow(location: DecoratedLocation, req: Request): SummaryListRow {
+  const { pathHierarchy } = location
+  const changeLocationCodeUrl = `/location/${location.id}/change-location-code`
+  const row: SummaryListRow = {
+    key: { text: 'Location' },
+    value: {
+      html: pathHierarchy || '-',
+    },
+  }
+  if (showChangeLocationCodeLink(location, req)) {
+    row.actions = {
+      items: [
+        {
+          href: changeLocationCodeUrl,
+          text: 'Change',
+        },
+      ],
+    }
+  }
+  return row
+}
+
 function showChangeNonResLink(location: DecoratedLocation, req: Request) {
   return !location.isResidential && req.canAccess('change_non_residential_type')
 }
@@ -127,7 +153,13 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
 }
 
 function getLocationDetails(location: DecoratedLocation, req: Request) {
-  const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
+  const details: SummaryListRow[] = []
+
+  if (location.status === 'DRAFT') {
+    details.push(locationCodeRow(location, req))
+  } else {
+    details.push({ key: { text: 'Location' }, value: { text: location.pathHierarchy } })
+  }
 
   if (!location.leafLevel) {
     details.push(localNameRow(location, req))

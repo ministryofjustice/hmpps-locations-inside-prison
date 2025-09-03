@@ -133,8 +133,15 @@ export default class LocationsService {
   }
 
   async getResidentialHierarchy(token: string, prisonId: string): Promise<ResidentialHierarchy[]> {
-    // @ts-expect-error error
     return this.locationsApiClient.locations.getResidentialHierarchy(token, { prisonId })
+  }
+
+  async getResidentialHierarchyForParent(
+    token: string,
+    prisonId: string,
+    pathHierarchy: string,
+  ): Promise<ResidentialHierarchy[]> {
+    return this.locationsApiClient.locations.getResidentialHierarchyForParent(token, { prisonId, pathHierarchy })
   }
 
   async getResidentialHousingType(token: string, key: string) {
@@ -222,6 +229,10 @@ export default class LocationsService {
 
   async updateLocalName(token: string, locationId: string, localName?: string, updatedBy?: string) {
     return this.locationsApiClient.locations.updateLocalName(token, { locationId }, { localName, updatedBy })
+  }
+
+  async updateLocationCode(token: string, locationId: string, code: string) {
+    return this.locationsApiClient.locations.updateLocationCode(token, { locationId }, { code })
   }
 
   async changeNonResType(

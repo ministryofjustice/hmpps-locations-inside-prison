@@ -207,10 +207,16 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['includeHistory'],
       requestType: 'get',
     }),
-    getResidentialHierarchy: this.apiCall<ResidentialHierarchy, { prisonId: string }>({
+    getResidentialHierarchy: this.apiCall<ResidentialHierarchy[], { prisonId: string }>({
       path: '/locations/prison/:prisonId/residential-hierarchy',
       requestType: 'get',
     }),
+    getResidentialHierarchyForParent: this.apiCall<ResidentialHierarchy[], { prisonId: string; pathHierarchy: string }>(
+      {
+        path: '/locations/prison/:prisonId/residential-hierarchy/:pathHierarchy?includeInactive=true',
+        requestType: 'get',
+      },
+    ),
     getResidentialSummary: this.apiCall<
       LocationResidentialSummary | PrisonResidentialSummary,
       { prisonId: string; parentLocationId?: string }
@@ -245,6 +251,10 @@ export default class LocationsApiClient extends BaseApiClient {
     updateLocalName: this.apiCall<Location, { locationId: string }, { localName?: string; updatedBy?: string }>({
       path: '/locations/:locationId/change-local-name',
       requestType: 'put',
+    }),
+    updateLocationCode: this.apiCall<Location, { locationId: string }, { code: string }>({
+      path: '/locations/residential/:locationId',
+      requestType: 'patch',
     }),
     updateTemporaryDeactivation: this.apiCall<
       Location,

@@ -741,6 +741,29 @@ const stubLocationsResidentialHierarchy = ({ prisonId, residentialHierarchy }) =
     },
   })
 
+const stubLocationsResidentialHierarchyWithDrafts = ({
+  prisonId,
+  locationHierarchy,
+  returnData,
+}: {
+  prisonId: string
+  locationHierarchy: string
+  returnData: object[]
+}) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/locations-api/locations/prison/${prisonId}/residential-hierarchy/${locationHierarchy}?includeInactive=true`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubLocationsPrisonLocalName = ({
   exists,
   name = '[^?]+',
@@ -813,6 +836,21 @@ const stubUpdateSpecialistCellTypes = () =>
     request: {
       method: 'PUT',
       urlPattern: '/locations-api/locations/[\\w-]+/specialist-cell-types',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+const stubUpdateLocationCode = () =>
+  stubFor({
+    request: {
+      method: 'PATCH',
+      urlPattern: '/locations-api/locations/residential/[\\w-]+',
     },
     response: {
       status: 200,
@@ -1074,6 +1112,7 @@ const allStubs = {
   stubLocations,
   stubLocationsBulkReactivate,
   stubLocationsResidentialHierarchy,
+  stubLocationsResidentialHierarchyWithDrafts,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -1114,6 +1153,7 @@ const allStubs = {
   stubUpdateCapacity,
   stubUpdateLocalName,
   stubUpdateSpecialistCellTypes,
+  stubUpdateLocationCode,
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
