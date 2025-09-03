@@ -23,20 +23,10 @@ describe('Change Location Code', () => {
       status: 'INACTIVE',
       active: false,
       code: 'A',
+      key: 'WINGA',
       level: 1,
     },
   }
-
-  const locationHierarchyMock = [
-    {
-      id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      prisonId: 'ABC',
-      code: 'TEST',
-      type: 'WING',
-      pathHierarchy: 'A',
-      level: 1,
-    },
-  ]
 
   beforeEach(() => {
     deepReq = {
@@ -69,7 +59,6 @@ describe('Change Location Code', () => {
       locals: {
         errorlist: [],
         decoratedResidentialSummary: decoratedResidentialSummaryMock,
-        locationHierarchy: locationHierarchyMock,
         prisonId: 'TST',
         locationId: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
       },
@@ -77,13 +66,6 @@ describe('Change Location Code', () => {
     }
 
     next = jest.fn()
-
-    locationsService.getResidentialSummary = jest.fn().mockResolvedValue({
-      subLocations: [
-        { locationType: 'WING', code: 'WING1' },
-        { locationType: 'WING', code: 'WING2' },
-      ],
-    })
     analyticsService.sendEvent = jest.fn()
   })
 
@@ -106,12 +88,7 @@ describe('Change Location Code', () => {
     it('returns the correct locals for a non-top-level location', () => {
       deepRes.locals.decoratedResidentialSummary.location.locationType = 'LANDING'
       deepRes.locals.decoratedResidentialSummary.location.level = 2
-      deepRes.locals.locationHierarchy = [
-        { pathHierarchy: 'A' },
-        { pathHierarchy: 'A-1', locationType: 'LANDING' },
-      ] as DeepPartial<typeof deepRes.locals.locationHierarchy>
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-
       expect(result.locationType).toBe('landing')
       expect(result.title).toBe('Change landing code')
 
@@ -158,44 +135,9 @@ describe('Change Location Code', () => {
       )
     })
 
-    it('calls back with error if locationCode exists on a sibling', async () => {
-      locationsService.getResidentialHierarchyForPath = jest.fn().mockResolvedValue([
-        { locationType: 'LANDING', locationCode: 'LAND1' },
-        { locationType: 'LANDING', locationCode: 'LAND2' },
-      ])
-      deepRes.locals.decoratedResidentialSummary.location.level = 2
-      deepRes.locals.locationHierarchy = [
-        {
-          locationId: '019904bb-43b5-7291-9834-d1b7682ccf2a',
-          locationType: 'WING',
-          locationCode: 'WING1',
-          fullLocationPath: '',
-          level: 1,
-          status: 'DRAFT',
-        },
-        {
-          locationId: '0198f114-6042-7083-95bc-9e5fc5b0bdfa',
-          locationType: 'LANDING',
-          locationCode: 'LAND2',
-          fullLocationPath: '',
-          level: 2,
-          status: 'DRAFT',
-        },
-      ] as DeepPartial<any>
-      deepReq.form.values.locationCode = 'LAND1'
-
-      const expectedError = controller.formError('locationCode', 'taken')
-
-      const callback = jest.fn()
-      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ locationCode: expectedError }))
-    })
-
-    it('calls back with error if locationCode exists on the top level', async () => {
-      deepRes.locals.decoratedResidentialSummary.location.level = 1
-      deepReq.form.values.locationCode = 'WING1'
+    it('calls back with error if a locationCode exists', async () => {
+      deepReq.form.values.locationCode = 'WINGA'
+      locationsService.getLocationByKey = jest.fn().mockResolvedValue({ code: 'WINGA' })
 
       const expectedError = controller.formError('locationCode', 'taken')
       const callback = jest.fn()
@@ -205,11 +147,8 @@ describe('Change Location Code', () => {
     })
 
     it('calls back without error if the locationCode is unique', async () => {
-      locationsService.getResidentialHierarchyForPath = jest.fn().mockResolvedValue([{ locationCode: 'C' }])
-      locationsService.getResidentialSummary = jest.fn().mockResolvedValue({
-        subLocations: [{ pathHierarchy: 'C' }],
-      })
-      deepReq.form.values.locationCode = 'D'
+      deepReq.form.values.locationCode = 'WINGD'
+      locationsService.getLocationByKey = jest.fn()
 
       const callback = jest.fn()
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)

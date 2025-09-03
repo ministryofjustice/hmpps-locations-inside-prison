@@ -319,6 +319,25 @@ const stubLocationsLocationsResidentialSummary = (
     },
   })
 
+const stubLocationsLocationsResidentialSummaryByKey = (
+  returnData: Partial<Location> = {
+    key: 'WING1',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/key/[\\w-]+\\?includeChildren',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubLocationsResidentialSummaryForCreateWing = (
   returnData = {
     prisonSummary: {
@@ -741,29 +760,6 @@ const stubLocationsResidentialHierarchy = ({ prisonId, residentialHierarchy }) =
     },
   })
 
-const stubLocationsResidentialHierarchyWithDrafts = ({
-  prisonId,
-  locationHierarchy,
-  returnData,
-}: {
-  prisonId: string
-  locationHierarchy: string
-  returnData: object[]
-}) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      url: `/locations-api/locations/prison/${prisonId}/residential-hierarchy/${locationHierarchy}?includeInactive=true`,
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: returnData,
-    },
-  })
-
 const stubLocationsPrisonLocalName = ({
   exists,
   name = '[^?]+',
@@ -1112,7 +1108,6 @@ const allStubs = {
   stubLocations,
   stubLocationsBulkReactivate,
   stubLocationsResidentialHierarchy,
-  stubLocationsResidentialHierarchyWithDrafts,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -1134,6 +1129,7 @@ const allStubs = {
   stubLocationsDeactivateTemporaryOccupied,
   stubLocationsHealthPing,
   stubLocationsLocationsResidentialSummary,
+  stubLocationsLocationsResidentialSummaryByKey,
   stubLocationsLocationsResidentialSummaryForLocation,
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,

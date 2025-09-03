@@ -120,28 +120,6 @@ context('Change draft location code', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsDeleteLocation')
       cy.task('stubUpdateLocationCode')
-      cy.task('stubLocationsResidentialHierarchyWithDrafts', {
-        prisonId: 'TST',
-        locationHierarchy: 'WING1',
-        returnData: [
-          {
-            locationId: '019904bb-43b5-7291-9834-d1b7682ccf2a',
-            locationType: 'LANDING',
-            locationCode: 'LAND1',
-            fullLocationPath: 'WING1-LAND1',
-            level: 2,
-            status: 'DRAFT',
-          },
-          {
-            locationId: '0198f114-6042-7083-95bc-9e5fc5b0bdfa',
-            locationType: 'LANDING',
-            locationCode: 'LAND2',
-            fullLocationPath: 'WING1-LAND2',
-            level: 2,
-            status: 'ACTIVE',
-          },
-        ],
-      })
       cy.task('stubLocationsLocationsResidentialSummary')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
         parentLocation: draftWing,
@@ -202,6 +180,7 @@ context('Change draft location code', () => {
       })
 
       it('shows the correct error if the landing code already exists on a DRAFT wing', () => {
+        cy.task('stubLocationsLocationsResidentialSummaryByKey')
         ViewLocationsShowPage.goTo(draftWing.prisonId, draftWing.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeLocationCodeLink().click()
@@ -210,6 +189,8 @@ context('Change draft location code', () => {
         const page = new ChangeLocationCodePage('wing')
         page.locationCodeInputPrefix().should('not.exist')
         page.submit({ locationCode: '002' })
+
+        page.checkForError('locationCode', 'A location with this wing code already exists')
       })
 
       it('shows the success banner after changing the location code of a DRAFT wing ', () => {
@@ -243,21 +224,7 @@ context('Change draft location code', () => {
         ChangeLocationCodePage.goTo(draftLanding.id)
       })
 
-      it('shows the correct error if the landing code already exists on a DRAFT sibling', () => {
-        const page = new ChangeLocationCodePage('landing')
-        page.submit({ locationCode: 'LAND1' })
-
-        page.checkForError('locationCode', 'A location with this landing code already exists')
-      })
-
-      it('shows the correct error if the landing code already exists on an ACTIVE sibling', () => {
-        const page = new ChangeLocationCodePage('landing')
-        page.submit({ locationCode: 'LAND2' })
-
-        page.checkForError('locationCode', 'A location with this landing code already exists')
-      })
-
-      it('shows the success banner after changing the location code of a DRAFT landing ', () => {
+      it('shows the input prefix when changing the location code of a DRAFT landing', () => {
         const page = new ChangeLocationCodePage('landing')
 
         page.locationCodeInputPrefix().should('exist')

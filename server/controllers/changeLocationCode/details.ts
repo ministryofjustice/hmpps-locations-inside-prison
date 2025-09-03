@@ -3,7 +3,6 @@ import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
-import { ResidentialHierarchy } from '../../data/types/locationsApi/residentialHierarchy'
 
 export default class Details extends FormInitialStep {
   // eslint-disable-next-line no-underscore-dangle
@@ -57,39 +56,28 @@ export default class Details extends FormInitialStep {
       const { systemToken } = req.session
       const { decoratedResidentialSummary, prisonId, locationId } = res.locals
       const { locationsService } = req.services
-      const { locationHierarchy } = res.locals
       const validationErrors: FormWizard.Errors = {}
 
       if (values.locationCode === decoratedResidentialSummary.location.code) {
         return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
       }
 
+      // Replace last suffix in the location key with new location code, to see if it exists when calling getLocationByKey
+      const createNewKey = (existingLocationCode: string, newLocationCode: string) => {
+        const lastDashInString = existingLocationCode.lastIndexOf('-')
+        return existingLocationCode.substring(0, lastDashInString + 1) + newLocationCode
+      }
+
+      const newKey = createNewKey(decoratedResidentialSummary.location.key, values.locationCode.toString())
+
       try {
         if (!validationErrors.locationCode) {
-          let existsOnTopLevel = false
-          let existsOnSibling = false
-          // location is not top level, so check if locationCode exits on another sibling
-          if (decoratedResidentialSummary.location.level !== 1) {
-            const parentPath: string = locationHierarchy[locationHierarchy.length - 2].pathHierarchy
-            const siblingLocations: ResidentialHierarchy[] = await locationsService.getResidentialHierarchyForPath(
-              systemToken,
-              prisonId,
-              parentPath,
-            )
-            existsOnSibling = siblingLocations.some(location => location.locationCode === values.locationCode)
-          } else {
-            // location is top level, so check if locationCode exits on another top level
-            const topLevelSummary = await locationsService.getResidentialSummary(systemToken, prisonId)
-            const topLevelLocations = topLevelSummary.subLocations
-            existsOnTopLevel = topLevelLocations.some(location => location.code === values.locationCode)
-          }
-          const locationCodeExists = existsOnSibling || existsOnTopLevel
-
-          if (locationCodeExists) {
+          const locationExists = await locationsService.getLocationByKey(systemToken, newKey)
+          if (locationExists) {
             validationErrors.locationCode = this.formError('locationCode', 'taken')
           }
-          return callback({ ...errors, ...validationErrors })
         }
+        return callback({ ...errors, ...validationErrors })
       } catch {
         // handled below
       }

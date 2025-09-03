@@ -122,6 +122,10 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
+    getLocationByKey: this.apiCall<LocationForLocalName, { key: string }>({
+      path: '/locations/key/:key?includeChildren',
+      requestType: 'get',
+    }),
     createWing: this.apiCall<
       Location,
       undefined,
@@ -209,10 +213,6 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     getResidentialHierarchy: this.apiCall<ResidentialHierarchy[], { prisonId: string }>({
       path: '/locations/prison/:prisonId/residential-hierarchy',
-      requestType: 'get',
-    }),
-    getResidentialHierarchyForPath: this.apiCall<ResidentialHierarchy[], { prisonId: string; pathHierarchy: string }>({
-      path: '/locations/prison/:prisonId/residential-hierarchy/:pathHierarchy?includeInactive=true',
       requestType: 'get',
     }),
     getResidentialSummary: this.apiCall<
