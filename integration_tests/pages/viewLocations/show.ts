@@ -94,7 +94,9 @@ export default class ViewLocationsShowPage extends Page {
 
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 
-  successBanner = (): PageElement => cy.get('.govuk-notification-banner__heading')
+  successBannerHeading = (): PageElement => cy.get('.govuk-notification-banner__heading')
+
+  successBannerBody = (): PageElement => cy.get('.govuk-notification-banner__content > p.govuk-body')
 
   locationsTableRows = (): PageElement => this.locationsTable().find('tbody tr')
 

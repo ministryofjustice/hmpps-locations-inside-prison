@@ -14,6 +14,8 @@ export default class CreateCellsUsedForPage extends Page {
   cancelLink = (): PageElement => cy.get('a:contains("Cancel")')
 
   submit = ({ usedFor }: { usedFor: string[] }) => {
+    cy.get(`input[name="create-cells_usedFor"]`).uncheck()
+
     usedFor.forEach(type => {
       this.usedForInput(type).click()
     })

@@ -1,14 +1,14 @@
-import Page from '../../../pages/page'
-import CreateLocationDetailsPage from '../../../pages/createLocation/index'
-import ViewLocationsIndexPage from '../../../pages/viewLocations'
-import LocationFactory from '../../../../server/testutils/factories/location'
-import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
-import ViewLocationsShowPage from '../../../pages/viewLocations/show'
-import LocationsApiStubber from '../../../mockApis/locationsApi'
-import setupStubs, { existingWingLocation } from './setupStubs'
-import goToCreateLocationConfirmPage from './goToCreateLocationConfirmPage'
+import Page from '../../../../pages/page'
+import LocationFactory from '../../../../../server/testutils/factories/location'
+import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
+import LocationsApiStubber from '../../../../mockApis/locationsApi'
+import setupStubs, { existingWingLocation } from '../setupStubs'
+import goToCreateCellsConfirmPage from './goToCreateCellsConfirmPage'
+import CreateLocationConfirmPage from '../../../../pages/createLocation/confirm'
+import CreateCellsWithoutSanitationPage from '../../../../pages/commonTransactions/createCells/withoutSanitation'
+import checkCellInformation from './checkCellInformation'
 
-context('Create Landing Confirm', () => {
+context('Create Landing - Create cells - Confirm', () => {
   const newLandingLocation = LocationFactory.build({
     id: '7e570000-0000-1000-8000-000000000004',
     pathHierarchy: 'A-2',
@@ -16,6 +16,12 @@ context('Create Landing Confirm', () => {
     locationType: 'LANDING',
     status: 'DRAFT',
     localName: 'testL',
+    numberOfCellLocations: 4,
+    pendingChanges: {
+      certifiedNormalAccommodation: 4,
+      workingCapacity: 8,
+      maxCapacity: 12,
+    },
   })
   const createdLocationResidentialSummary = {
     parentLocation: newLandingLocation,
@@ -47,7 +53,7 @@ context('Create Landing Confirm', () => {
   context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
       setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
-      page = goToCreateLocationConfirmPage()
+      page = goToCreateCellsConfirmPage()
     })
 
     it('shows the correct information and successfully creates draft landing', () => {
@@ -63,35 +69,53 @@ context('Create Landing Confirm', () => {
         .and('include', `/create-new/${existingWingLocation.id}/details`)
 
       page.changeDetailsKey(0).contains('Landing code')
-      page.changeDetailsValue(0).contains('2')
+      page.changeDetailsValue(0).contains('A-2')
 
       page.changeDetailsKey(1).contains('Local name')
       page.changeDetailsValue(1).contains('testL')
 
-      page.changeDetailsKey(2).contains('Create cells on landing now')
-      page.changeDetailsValue(2).contains('No')
+      page.changeDetailsKey(2).should('not.exist')
+
+      page.cellDetailsKey(0).contains('Number of cells')
+      page.cellDetailsValue(0).contains('4')
+
+      page.cellDetailsKey(1).contains('Accommodation type')
+      page.cellDetailsValue(1).contains('Normal accommodation')
+
+      page.cellDetailsKey(2).contains('Used for')
+      page.cellDetailsValue(2).contains('First night centre / Induction')
+      page.cellDetailsValue(2).contains('Standard accommodation')
+
+      checkCellInformation(page, [
+        ['A-2-100', '1', '1', '2', '3', 'Accessible cell', 'No'],
+        ['A-2-101', '2', '1', '2', '3', '-', 'Yes'],
+        ['A-2-102', '3', '1', '2', '3', '-', 'No'],
+        ['A-2-103', '4', '1', '2', '3', '-', 'Yes'],
+      ])
+
       page.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.successBannerHeading().contains('Landing created')
+      viewLocationsShowPage.successBannerBody().contains('You have created landing testL with 4 cells.')
       viewLocationsShowPage.draftBanner().should('exist')
-      viewLocationsShowPage.summaryCards.cnaText().contains('-')
-      viewLocationsShowPage.summaryCards.workingCapacityText().contains('-')
-      viewLocationsShowPage.summaryCards.maximumCapacityText().contains('-')
+      viewLocationsShowPage.summaryCards.cnaText().contains('4')
+      viewLocationsShowPage.summaryCards.workingCapacityText().contains('8')
+      viewLocationsShowPage.summaryCards.maximumCapacityText().contains('12')
       viewLocationsShowPage.locationDetailsRows().eq(0).contains('A-2')
       viewLocationsShowPage.locationDetailsRows().eq(1).contains('testL')
     })
 
-    it('has a back link to the enter details page', () => {
+    it('has a back link to the without sanitation page', () => {
       page.backLink().click()
 
-      Page.verifyOnPage(CreateLocationDetailsPage)
+      Page.verifyOnPage(CreateCellsWithoutSanitationPage)
     })
 
-    it('has a cancel link to the view location index page', () => {
+    it('has a cancel link to the view location show page', () => {
       page.cancelLink().click()
 
-      Page.verifyOnPage(ViewLocationsIndexPage)
+      Page.verifyOnPage(ViewLocationsShowPage)
     })
   })
 })

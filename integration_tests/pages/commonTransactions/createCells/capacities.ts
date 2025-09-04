@@ -11,11 +11,9 @@ export default class CreateCellsCapacitiesPage extends Page {
 
   maximumInput = (index: number): PageElement => cy.get(`#create-cells_maximumCapacity${index}`)
 
-  removeCellType = (index: number): PageElement => cy.get(`[data-qa=remove-cell-type-${index}]`)
+  removeCellType = (index: number): PageElement => cy.get(`button[name="cellTypeAction"][value="remove/${index}"]`)
 
-  setCellType = (index: number): PageElement => cy.get(`[data-qa=change-cell-type-${index}]`)
-
-  addCellType = (index: number): PageElement => cy.get(`[data-qa=add-cell-type-${index}]`)
+  setCellType = (index: number): PageElement => cy.get(`button[name="cellTypeAction"][value="set/${index}"]`)
 
   cellTypes = (index: number): PageElement => cy.get(`[data-qa=cell-types-${index}]`)
 
@@ -26,6 +24,12 @@ export default class CreateCellsCapacitiesPage extends Page {
   cancelLink = (): PageElement => cy.get('a:contains("Cancel")')
 
   submit = ({ capacities }: { capacities?: [string, string, string][] }) => {
+    this.inputValues({ capacities })
+
+    this.continueButton().click()
+  }
+
+  inputValues = ({ capacities }: { capacities?: [string, string, string][] }) => {
     for (let i = 0; i < capacities.length; i += 1) {
       const capacity = capacities[i]
       const inputs = [this.cnaInput(i), this.workingInput(i), this.maximumInput(i)]
@@ -40,7 +44,5 @@ export default class CreateCellsCapacitiesPage extends Page {
         }
       }
     }
-
-    this.continueButton().click()
   }
 }

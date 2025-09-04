@@ -3,7 +3,7 @@ import CreateCellsTypesPage from '../../../../pages/commonTransactions/createCel
 import goToCreateCellsCapacitiesPage from './goToCreateCellsCapacitiesPage'
 
 const goToCreateCellsTypesPage = () => {
-  goToCreateCellsCapacitiesPage().addCellType(0).click()
+  goToCreateCellsCapacitiesPage().setCellType(0).click()
 
   return Page.verifyOnPage(CreateCellsTypesPage)
 }

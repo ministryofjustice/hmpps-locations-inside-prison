@@ -43,6 +43,11 @@ export default function createErrorHandler(production: boolean) {
       return res.render('pages/errors/404')
     }
 
+    if (res.locals.errorMessage === 'Missing prereq for this step') {
+      // @ts-expect-error not typing locals for error cases
+      res.locals.journeyModel = req.journeyModel
+    }
+
     return res.render('pages/errors/generic')
   }
 }
