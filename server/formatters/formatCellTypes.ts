@@ -9,7 +9,7 @@ export default function formatCellTypes(
   }
 
   if (Array.isArray(cellTypes)) {
-    return cellTypes.map(cellType => formatCellTypes(specialistCellTypesObject, cellType)).join(', ')
+    return cellTypes.map(cellType => formatCellTypes(specialistCellTypesObject, cellType)).join('<br>')
   }
 
   return specialistCellTypesObject.find(o => o.key === cellTypes).description

@@ -64,7 +64,7 @@ context('Create Wing Confirm', () => {
       page.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBanner().contains('Wing created')
+      viewLocationsShowPage.successBannerHeading().contains('Wing created')
       viewLocationsShowPage.draftBanner().should('exist')
       viewLocationsShowPage.summaryCards.cnaText().contains('-')
       viewLocationsShowPage.summaryCards.workingCapacityText().contains('-')

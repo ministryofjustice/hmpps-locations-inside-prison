@@ -6,7 +6,7 @@ const goToCreateLocationConfirmPage = () => {
   const detailsPage = goToCreateLocationDetailsPage('7e570000-0000-1000-8000-000000000002')
   detailsPage.locationCodeInput().clear().type('2')
   detailsPage.localNameTextInput().clear().type('testL')
-  detailsPage.createCellsNowRadio('no').click()
+  detailsPage.createCellsNowRadio('NO').click()
 
   detailsPage.continueButton().click()
 

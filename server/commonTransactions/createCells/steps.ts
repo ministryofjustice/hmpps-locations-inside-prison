@@ -34,7 +34,7 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
     }
   }
 
-  return class extends step.controller {
+  let controller = class extends step.controller {
     override middlewareSetup() {
       super.middlewareSetup()
       this.use(this.appendCellIdToFields)
@@ -64,6 +64,55 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
       next()
     }
   }
+
+  if (path === '/set-cell-type/:cellId/type') {
+    controller = class extends controller {
+      override async getValues(
+        req: FormWizard.Request,
+        res: Response,
+        callback: (err: Error, values?: FormWizard.Values) => void,
+      ) {
+        const specialistCellTypesObject = await req.services.locationsService.getSpecialistCellTypes(
+          req.session.systemToken,
+        )
+
+        return super.getValues(req, res, (err: Error, values?: FormWizard.Values) => {
+          const { cellId } = req.params
+          const accommodationTypeKey = Object.keys(req.form.options.fields).find(f => f.includes('accommodationType'))
+
+          const types =
+            req.sessionModel.get<string[]>(`temp-cellTypes${cellId}`) ||
+            req.sessionModel.get<string[]>(`saved-cellTypes${cellId}`) ||
+            []
+          let typeType: string = null
+          if (types.length) {
+            typeType = `${specialistCellTypesObject.find(sct => sct.key === types[0])?.attributes?.affectsCapacity ? 'SPECIAL' : 'NORMAL'}_ACCOMMODATION`
+          }
+
+          callback(err, {
+            [accommodationTypeKey]: typeType,
+            ...values,
+          })
+        })
+      }
+    }
+  }
+
+  if (path === '/set-cell-type/:cellId/normal' || path === '/set-cell-type/:cellId/special') {
+    controller = class extends controller {
+      override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+        const { cellId } = req.params
+        const [, cellTypes] = Object.entries(req.body).find(([key]) => key.endsWith(`CellTypes${cellId}`))
+        const cellTypesFlat = [cellTypes].flat()
+
+        req.sessionModel.set(`temp-cellTypes${cellId}`, cellTypesFlat)
+        req.sessionModel.unset('errorValues')
+        next()
+      }
+    }
+  }
+
+  return controller
 }
 
 // Wrap the setCellType steps controller with another controller that appends the field names with cellId
@@ -121,6 +170,8 @@ const steps: FormWizard.Steps = {
     skip: true,
     controller: RemoveCellType,
     next: 'capacities',
+    editable: true,
+    continueOnEdit: true,
   },
   '/used-for': {
     pageTitle: 'What are the cells used for?',

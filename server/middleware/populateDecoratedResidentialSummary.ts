@@ -240,24 +240,23 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
 
         const { pendingChanges } = residentialSummary.location
 
-        if (pendingChanges.certifiedNormalAccommodation !== undefined) {
+        if (pendingChanges?.certifiedNormalAccommodation !== undefined) {
           cna = pendingChanges.certifiedNormalAccommodation
         }
 
-        if (pendingChanges.maxCapacity !== undefined) {
+        if (pendingChanges?.maxCapacity !== undefined) {
           maxCapacity = pendingChanges.maxCapacity
         }
 
-        if (pendingChanges.workingCapacity !== undefined) {
+        if (pendingChanges?.workingCapacity !== undefined) {
           workingCapacity = pendingChanges.workingCapacity
         }
 
-        const { certifiedNormalAccommodation: pendingCna } = residentialSummary.location.pendingChanges
         if (residentialSummary.location.status === 'DRAFT') {
           residentialSummary.summaryCards.push({
             title: 'CNA',
             type: 'cna',
-            text: numberOfCellLocations ? `${pendingCna !== undefined ? pendingCna : cna}` : '-',
+            text: numberOfCellLocations ? `${cna}` : '-',
           })
         }
 

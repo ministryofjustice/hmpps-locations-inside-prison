@@ -232,8 +232,19 @@ $sticky-footer-vertical-spacing: govuk-spacing(2);
   display: none
 }
 
-.govuk-table__header {
-  a {
-    font-weight: normal
+.govuk-table__head {
+  .govuk-table__header {
+    a {
+      font-weight: normal
+    }
   }
+}
+
+button.govuk-link {
+  outline: none;
+  border: none;
+  background: none;
+  color: #1d70b8;
+  cursor: pointer;
+  font-size: 1.1875rem;
 }

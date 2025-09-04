@@ -56,18 +56,4 @@ export default class SetCellType extends FormInitialStep {
     }
     return locals
   }
-
-  override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { sessionModel } = req
-    const { cellId } = req.params
-    const normalCellTypes = `create-cells_set-cell-type_normalCellTypes${cellId}`
-    const specialCellTypes = `create-cells_set-cell-type_specialistCellTypes${cellId}`
-    const accommodationType = `create-cells_set-cell-type_accommodationType${cellId}`
-    if (sessionModel.get<string>(accommodationType) === 'NORMAL_ACCOMMODATION') {
-      sessionModel.unset(specialCellTypes)
-    } else if (sessionModel.get<string>(accommodationType) === 'SPECIAL_ACCOMMODATION') {
-      sessionModel.unset(normalCellTypes)
-    }
-    super.saveValues(req, res, next)
-  }
 }

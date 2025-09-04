@@ -5,9 +5,8 @@ import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import CreateCellsCapacitiesPage from '../../../../pages/commonTransactions/createCells/capacities'
 import goToCreateCellsCapacitiesPage from './goToCreateCellsCapacitiesPage'
 import CreateCellsUsedForPage from '../../../../pages/commonTransactions/createCells/usedFor'
-import CreateCellsDetailsPage from '../../../../pages/commonTransactions/createCells/details'
-import CreateCellsCellNumbersPage from '../../../../pages/commonTransactions/createCells/cellNumbers'
-import CreateCellsBulkSanitationPage from '../../../../pages/commonTransactions/createCells/bulkSanitation'
+import CreateCellsTypesPage from '../../../../pages/commonTransactions/createCells/cellTypes'
+import CreateCellsTypesSpecialPage from '../../../../pages/commonTransactions/createCells/specialCellTypes'
 
 context('Create landing - Create cells - Capacities', () => {
   let page: CreateCellsCapacitiesPage
@@ -18,7 +17,7 @@ context('Create landing - Create cells - Capacities', () => {
       page = goToCreateCellsCapacitiesPage()
     })
 
-    it('shows the correct error when CNA is 0 for normal accommodation', () => {
+    it('shows the correct error when CNA is 0 for non-special cell', () => {
       page.submit({
         capacities: [
           ['0', '1', '2'],
@@ -30,51 +29,47 @@ context('Create landing - Create cells - Capacities', () => {
 
       page.checkForError(
         'create-cells_baselineCna0',
-        'Baseline CNA cannot be 0 for a normal accommodation cell',
+        'Baseline CNA cannot be 0 for a non-special cell',
         'Cell A-2-100: ',
       )
       page.checkForError(
         'create-cells_baselineCna1',
-        'Baseline CNA cannot be 0 for a normal accommodation cell',
+        'Baseline CNA cannot be 0 for a non-special cell',
         'Cell A-2-101: ',
       )
       page.checkForError(
         'create-cells_baselineCna2',
-        'Baseline CNA cannot be 0 for a normal accommodation cell',
+        'Baseline CNA cannot be 0 for a non-special cell',
         'Cell A-2-102: ',
       )
       page.checkForError(
         'create-cells_baselineCna3',
-        'Baseline CNA cannot be 0 for a normal accommodation cell',
+        'Baseline CNA cannot be 0 for a non-special cell',
         'Cell A-2-103: ',
       )
     })
 
-    it('allows CNA of 0 when not normal accommodation', () => {
-      CreateCellsDetailsPage.goTo('7e570000-0000-1000-8000-000000000002')
-      const detailsPage = Page.verifyOnPage(CreateCellsDetailsPage)
-      detailsPage.submit({
-        cellsToCreate: 4,
-        accommodationType: 'CARE_AND_SEPARATION',
-      })
+    it('allows CNA and working capacity of 0 when special cell', () => {
+      page.setCellType(0).click()
 
-      const cellNumbersPage = Page.verifyOnPage(CreateCellsCellNumbersPage)
-      cellNumbersPage.continueButton().click()
+      const setCellTypePage = Page.verifyOnPage(CreateCellsTypesPage)
+      setCellTypePage.specialAccommodationType().click()
+      setCellTypePage.continueButton().click()
 
-      const doorNumbersPage = Page.verifyOnPage(CreateCellsDoorNumbersPage)
-      doorNumbersPage.continueButton().click()
+      const specialTypePage = Page.verifyOnPage(CreateCellsTypesSpecialPage)
+      specialTypePage.submit({ cellType: 'BIOHAZARD_DIRTY_PROTEST' })
 
       page = Page.verifyOnPage(CreateCellsCapacitiesPage)
       page.submit({
         capacities: [
-          ['0', '1', '2'],
-          ['0', '1', '2'],
-          ['0', '1', '2'],
-          ['0', '1', '2'],
+          ['0', '0', '2'],
+          ['1', '1', '2'],
+          ['1', '1', '2'],
+          ['1', '1', '2'],
         ],
       })
 
-      Page.verifyOnPage(CreateCellsBulkSanitationPage)
+      Page.verifyOnPage(CreateCellsUsedForPage)
     })
 
     it('show the correct error when CNA and working capacity are more than max capacity', () => {

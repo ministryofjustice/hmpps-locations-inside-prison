@@ -58,48 +58,24 @@
   {% set tableRows = [] %}
   {% set cellTypesObject = [] %}
   {% for i in range(0, values['create-cells_cellsToCreate']) -%}
-    {% set cellAccommodationType = values['create-cells_set-cell-type_accommodationType' + i] %}
-    {% set cellTypes = values['create-cells_set-cell-type_normalCellTypes' + i] if cellAccommodationType == 'NORMAL_ACCOMMODATION' else values['create-cells_set-cell-type_specialistCellTypes' + i] %}
-
-    {% set matchedCells = [] %}
-    {% set matchedCell = '' %}
-
-  {% if cellTypes | isArray %}
-     {% for selected in cellTypes %}
-        {% for cell in specialistCellTypesObject %}
-          {% if cell.key == selected %}
-            {% set matchedCells = matchedCells.concat(cell.description) %}
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
-    {% else %}
-     {% for cell in specialistCellTypesObject %}
-       {% if cell.key == cellTypes %}
-         {% set matchedCell = cell.description %}
-       {% endif %}
-     {% endfor %}
-  {% endif %}
+    {% set cellTypes = values['temp-cellTypes' + i] or (values['saved-cellTypes' + i] if not values['temp-cellTypes' + i + '-removed']) %}
+    {% set cellTypesText = formatCellTypes(specialistCellTypesObject, cellTypes) %}
 
    {% if cellTypes %}
-       {% if matchedCells.length %}
-           {% set cellTypesText = matchedCells | join(', ') %}
-       {% else %}
-           {% set cellTypesText = matchedCell %}
-       {% endif %}
        {% set cellTypeColumn =
          {  html:
          '<div data-qa="cell-types-' + i + '" class="change-remove-container">' +
          cellTypesText +
            '<div class="change-remove-actions">' +
-           '<a data-qa="remove-cell-type-' + i + '" class="govuk-!-padding-right-1" href="/create-new/' + locationId + '/create-cells/remove-cell-type/' + i + '">Remove</a>' + '  |  ' +
-           '<a data-qa="change-cell-type-' + i + '" class="govuk-!-padding-left-1" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Change</a>' + '</div>' + '</div>'
+           '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="remove/' + i + '">Remove</button>' + '  |  ' +
+           '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + i + '">Change</button>' + '</div>' + '</div>'
 
          }
        %}
    {% else %}
      {% set cellTypeColumn = {
        html:
-             '<a data-qa="add-cell-type-' + i + '" href="/create-new/' + locationId + '/create-cells/set-cell-type/' + i + '">Add</a>'
+             '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + i + '">Add</button>'
              }
      %}
    {% endif %}

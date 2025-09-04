@@ -1,6 +1,31 @@
 import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
+import LocationFactory from '../../../server/testutils/factories/location'
+
+const residentialSummary = {
+  prisonSummary: {
+    workingCapacity: 8,
+    signedOperationalCapacity: 10,
+    maxCapacity: 9,
+  },
+  subLocationName: 'TestWings',
+  subLocations: [
+    LocationFactory.build({ numberOfCellLocations: 4 }),
+    LocationFactory.build({
+      id: '7e570000-0000-0000-0000-000000000002',
+      pathHierarchy: 'A-1-002',
+      localName: undefined,
+      code: '002',
+      inactiveCells: 1,
+      capacity: { maxCapacity: 3, workingCapacity: 1 },
+      status: 'INACTIVE',
+      numberOfCellLocations: 4,
+    }),
+  ],
+  topLevelLocationType: 'Wings',
+  locationHierarchy: [],
+}
 
 context('View Locations Index', () => {
   context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
@@ -34,7 +59,7 @@ context('View Locations Index', () => {
       cy.task('stubLocationsConstantsLocationType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary')
+      cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
       cy.task('setFeatureFlag', { createAndCertify: true })
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })

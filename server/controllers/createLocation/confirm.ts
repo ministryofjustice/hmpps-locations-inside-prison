@@ -8,8 +8,14 @@ import pluralize from '../../formatters/pluralize'
 import decorateLocation from '../../decorators/location'
 import nonOxfordJoin from '../../formatters/nonOxfordJoin'
 import LocationsApiClient from '../../data/locationsApiClient'
+import unsetTempValues from '../../middleware/unsetTempValues'
 
 export default class ConfirmCreateLocation extends FormInitialStep {
+  override middlewareSetup() {
+    super.middlewareSetup()
+    this.use(unsetTempValues)
+  }
+
   // eslint-disable-next-line no-underscore-dangle
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { services, session, sessionModel } = req
@@ -35,6 +41,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
               {
                 text: 'Change',
                 href: `${res.locals.createRootLink}/create-cells`,
+                classes: 'govuk-link--no-visited-state',
               },
             ],
           },
@@ -47,6 +54,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
               {
                 text: 'Change',
                 href: `${res.locals.createRootLink}/create-cells`,
+                classes: 'govuk-link--no-visited-state',
               },
             ],
           },
@@ -57,13 +65,14 @@ export default class ConfirmCreateLocation extends FormInitialStep {
         res.locals.summaryListRows.push({
           key: { text: 'Used for' },
           value: {
-            text: (await Promise.all(usedFor.map(s => locationsService.getUsedForType(systemToken, s)))).join(', '),
+            html: (await Promise.all(usedFor.map(s => locationsService.getUsedForType(systemToken, s)))).join('<br>'),
           },
           actions: {
             items: [
               {
                 text: 'Change',
                 href: `${res.locals.createRootLink}/create-cells/used-for/edit`,
+                classes: 'govuk-link--no-visited-state',
               },
             ],
           },
@@ -147,11 +156,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
           const withoutSanitation = sessionModel.get<string[]>('create-cells_withoutSanitation')
 
           for (let i = 0; i < cellsToCreate; i += 1) {
-            const cellAccommodationType = sessionModel.get<string>(`create-cells_set-cell-type_accommodationType${i}`)
-            const cellTypes =
-              sessionModel.get<string[] | string>(
-                `create-cells_set-cell-type_${cellAccommodationType === 'NORMAL_ACCOMMODATION' ? 'normal' : 'specialist'}CellTypes${i}`,
-              ) || []
+            const cellTypes = sessionModel.get<string[]>(`saved-cellTypes${i}`) || []
 
             cells.push({
               code: sessionModel.get<string>(`create-cells_cellNumber${i}`).padStart(3, '0'),
@@ -159,7 +164,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
               certifiedNormalAccommodation: Number(sessionModel.get<string>(`create-cells_baselineCna${i}`)),
               maxCapacity: Number(sessionModel.get<string>(`create-cells_maximumCapacity${i}`)),
               workingCapacity: Number(sessionModel.get<string>(`create-cells_workingCapacity${i}`)),
-              specialistCellTypes: typeof cellTypes === 'string' ? [cellTypes] : cellTypes,
+              specialistCellTypes: cellTypes,
               inCellSanitation: bulkSanitation === 'YES' || !withoutSanitation.includes(i.toString()),
             })
           }
@@ -193,23 +198,31 @@ export default class ConfirmCreateLocation extends FormInitialStep {
   }
 
   override async successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { systemToken } = req.session
-    const location = req.sessionModel.get<Location>('newLocation')
+    const { journeyModel, session, sessionModel, services } = req
+    const { systemToken } = session
+    const location = sessionModel.get<Location>('newLocation')
     const decoratedLocation = await decorateLocation({
       location,
       systemToken,
       userToken: '', // not required when limited: true
       manageUsersService: null, // not required when limited: true
-      locationsService: req.services.locationsService,
+      locationsService: services.locationsService,
       limited: true,
     })
+    const cellsToCreate = Number(sessionModel.get<string>('create-cells_cellsToCreate'))
 
-    req.journeyModel.reset()
-    req.sessionModel.reset()
+    journeyModel.reset()
+    sessionModel.reset()
+
+    let content = `You have created ${decoratedLocation.locationType.toLowerCase()} ${decoratedLocation.localName || decoratedLocation.pathHierarchy}`
+    if (cellsToCreate > 0) {
+      content += ` with ${cellsToCreate} cells`
+    }
+    content += '.'
 
     req.flash('success', {
       title: `${decoratedLocation.locationType} created`,
-      content: `You have created ${decoratedLocation.locationType.toLowerCase()} ${decoratedLocation.localName || decoratedLocation.pathHierarchy}.`,
+      content,
     })
 
     res.redirect(`/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`)

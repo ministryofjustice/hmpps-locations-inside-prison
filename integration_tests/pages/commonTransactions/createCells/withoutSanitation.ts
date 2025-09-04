@@ -15,8 +15,10 @@ export default class CreateCellsWithoutSanitationPage extends Page {
   cancelLink = (): PageElement => cy.get('a:contains("Cancel")')
 
   submit = ({ withoutSanitation }: { withoutSanitation: number[] }) => {
+    cy.get('input[name="create-cells_withoutSanitation"]').uncheck()
+
     withoutSanitation.forEach(i => {
-      this.withoutSanitationInput(i).click()
+      this.withoutSanitationInput(i).check()
     })
 
     this.continueButton().click()

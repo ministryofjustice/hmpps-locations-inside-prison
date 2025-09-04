@@ -133,7 +133,7 @@ declare module 'hmpo-form-wizard' {
       baseUrl?: string
       journeyModel: {
         set: (key: string, value: unknown) => void
-        get: (key: string) => unknown
+        get: <T>(key: string) => T
         unset: (key: string) => unknown
         reset: () => unknown
       }
@@ -144,6 +144,7 @@ declare module 'hmpo-form-wizard' {
         get: <T>(key: string) => T
         reset: () => unknown
         unset: (key: string | string[]) => void
+        toJSON: () => object
       }
     }
 
@@ -172,6 +173,9 @@ declare module 'hmpo-form-wizard' {
       _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise<void>
 
       locals(req: Request, res: Express.Response, next: Express.NextFunction): Partial<TypedLocals>
+
+      // eslint-disable-next-line no-underscore-dangle
+      _getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 
       getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 
