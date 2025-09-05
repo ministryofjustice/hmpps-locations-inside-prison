@@ -40,6 +40,7 @@ interface TypedLocals {
     }
   }
   baseUrl?: string
+  bodyText?: string
   bookmarkingEnabled?: boolean
   bookmarks?: BookmarkStoreData[]
   breadcrumbs?: {
