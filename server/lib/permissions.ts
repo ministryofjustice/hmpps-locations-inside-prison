@@ -11,6 +11,7 @@ const manageResidentialLocationsPermissions: string[] = [
   ...viewInternalLocationPermissions,
   'change_cell_capacity',
   'change_local_name',
+  'change_location_code',
   'change_non_residential_type',
   'change_temporary_deactivation_details',
   'change_used_for',

@@ -319,6 +319,25 @@ const stubLocationsLocationsResidentialSummary = (
     },
   })
 
+const stubLocationsLocationsResidentialSummaryByKey = (
+  returnData: Partial<Location> = {
+    key: 'WING1',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/key/[\\w-]+\\?includeChildren',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubLocationsResidentialSummaryForCreateWing = (
   returnData = {
     prisonSummary: {
@@ -823,6 +842,21 @@ const stubUpdateSpecialistCellTypes = () =>
     },
   })
 
+const stubUpdateLocationCode = () =>
+  stubFor({
+    request: {
+      method: 'PATCH',
+      urlPattern: '/locations-api/locations/residential/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubUpdateLocationsConstantsUsedForType = () =>
   stubFor({
     request: {
@@ -1095,6 +1129,7 @@ const allStubs = {
   stubLocationsDeactivateTemporaryOccupied,
   stubLocationsHealthPing,
   stubLocationsLocationsResidentialSummary,
+  stubLocationsLocationsResidentialSummaryByKey,
   stubLocationsLocationsResidentialSummaryForLocation,
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
@@ -1114,6 +1149,7 @@ const allStubs = {
   stubUpdateCapacity,
   stubUpdateLocalName,
   stubUpdateSpecialistCellTypes,
+  stubUpdateLocationCode,
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,

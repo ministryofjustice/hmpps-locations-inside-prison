@@ -141,6 +141,10 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
+    getLocationByKey: this.apiCall<LocationForLocalName, { key: string }>({
+      path: '/locations/key/:key?includeChildren',
+      requestType: 'get',
+    }),
     createWing: this.apiCall<
       Location,
       undefined,
@@ -226,7 +230,7 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['includeHistory'],
       requestType: 'get',
     }),
-    getResidentialHierarchy: this.apiCall<ResidentialHierarchy, { prisonId: string }>({
+    getResidentialHierarchy: this.apiCall<ResidentialHierarchy[], { prisonId: string }>({
       path: '/locations/prison/:prisonId/residential-hierarchy',
       requestType: 'get',
     }),
@@ -264,6 +268,10 @@ export default class LocationsApiClient extends BaseApiClient {
     updateLocalName: this.apiCall<Location, { locationId: string }, { localName?: string; updatedBy?: string }>({
       path: '/locations/:locationId/change-local-name',
       requestType: 'put',
+    }),
+    updateLocationCode: this.apiCall<Location, { locationId: string }, { code: string }>({
+      path: '/locations/residential/:locationId',
+      requestType: 'patch',
     }),
     updateTemporaryDeactivation: this.apiCall<
       Location,

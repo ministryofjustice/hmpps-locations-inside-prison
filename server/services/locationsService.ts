@@ -121,6 +121,10 @@ export default class LocationsService {
     return this.locationsApiClient.locations.getLocationByLocalName(token, { prisonId, localName, parentLocationId })
   }
 
+  async getLocationByKey(token: string, key: string) {
+    return this.locationsApiClient.locations.getLocationByKey(token, { key })
+  }
+
   async getNonResidentialUsageType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getNonResidentialUsageTypes'))[key] || 'Unknown'
   }
@@ -134,7 +138,6 @@ export default class LocationsService {
   }
 
   async getResidentialHierarchy(token: string, prisonId: string): Promise<ResidentialHierarchy[]> {
-    // @ts-expect-error error
     return this.locationsApiClient.locations.getResidentialHierarchy(token, { prisonId })
   }
 
@@ -227,6 +230,10 @@ export default class LocationsService {
 
   async updateLocalName(token: string, locationId: string, localName?: string, updatedBy?: string) {
     return this.locationsApiClient.locations.updateLocalName(token, { locationId }, { localName, updatedBy })
+  }
+
+  async updateLocationCode(token: string, locationId: string, code: string) {
+    return this.locationsApiClient.locations.updateLocationCode(token, { locationId }, { code })
   }
 
   async changeNonResType(

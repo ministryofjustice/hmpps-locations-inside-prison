@@ -23,6 +23,7 @@ import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
 import changeNonResidentialTypeRouter from './changeNonResidentialType'
 import changeUsedForRouter from './changeUsedFor'
+import changeLocationCodeRouter from './changeLocationCode'
 import locationHistoryRouter from './locationHistoryRouter'
 import setLocalNameRouter from './setLocalName'
 import changeLocalNameRouter from './changeLocalName'
@@ -65,6 +66,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/deactivate', deactivateRouter)
   router.use('/location/:locationId/non-residential-conversion', nonResidentialConversionRouter)
   router.use('/location/:locationId/change-used-for', changeUsedForRouter)
+  router.use('/location/:locationId/change-location-code', changeLocationCodeRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
   router.use('/location/:locationId/add-local-name', setLocalNameRouter)
