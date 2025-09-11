@@ -7,6 +7,7 @@ import {
   BulkCapacityUpdate,
   BulkCapacityUpdateChanges,
   CapacitySummary,
+  Change,
 } from '../../../data/types/locationsApi/bulkCapacityChanges'
 import LocationsService from '../../../services/locationsService'
 
@@ -72,29 +73,56 @@ function userResponseMessage(changes: BulkCapacityUpdateChanges): string[] {
       result.push(`${change.key} = ${change.message}`)
     })
   })
+
+  // Sort so that ERROR messages come first
+  result.sort((a, b) => {
+    const aIsError = a.startsWith('ERROR') ? -1 : 1
+    const bIsError = b.startsWith('ERROR') ? -1 : 1
+    return aIsError - bIsError
+  })
+
   return result
 }
 
 export async function processBulkCapacityUpdate(
   systemToken: string,
   locationsService: LocationsService,
-  data: BulkCapacityUpdate,
+  updateData: BulkCapacityUpdate,
 ): Promise<BulkCapacityUpdateChanges> {
   const groupedData: Record<string, BulkCapacityUpdate> = {}
 
   // Group data by the wing e.g. EYI-HB1-1-002 would be HB1
-  for (const key of Object.keys(data)) {
+  for (const key of Object.keys(updateData)) {
     const parts = key.split('-')
     const groupKey = parts[1]
     if (!groupedData[groupKey]) {
       groupedData[groupKey] = {}
     }
-    groupedData[groupKey][key] = data[key]
+    groupedData[groupKey][key] = updateData[key]
   }
 
   // Create promises for each group
-  const chunkPromises: Promise<BulkCapacityUpdateChanges>[] = Object.values(groupedData).map(chunk =>
-    locationsService.updateBulkCapacity(systemToken, chunk),
+  const chunkPromises: Promise<BulkCapacityUpdateChanges>[] = Object.entries(groupedData).map(
+    async ([_groupKey, chunk]) => {
+      try {
+        const result = await locationsService.updateBulkCapacity(systemToken, chunk)
+        return result
+      } catch (error) {
+        const key = Object.keys(chunk)[0]
+        const wing = key.split('-')[1]
+
+        const { userMessage } = error.data
+
+        const change: Change = {
+          key: `ERROR: (complete wing ${wing} not ingested)`,
+          message: `${userMessage}`,
+        }
+        const failedChange = {
+          [key]: [change],
+        }
+        return failedChange
+      }
+    },
   )
 
   const allUpdates = await Promise.all(chunkPromises)
