@@ -6,6 +6,9 @@ generic-service:
 
   ingress:
     host: locations-inside-prison-preprod.hmpps.service.justice.gov.uk
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
 
   env:
     INGRESS_URL: "https://locations-inside-prison-preprod.hmpps.service.justice.gov.uk"
