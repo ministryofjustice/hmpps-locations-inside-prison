@@ -78,10 +78,10 @@ export default {
       url: get('LOCATIONS_API_URL', 'http://localhost:9092', requiredInProduction),
       healthPath: '/health/ping',
       timeout: {
-        response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 60000)),
-        deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 60000)),
+        response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 180000)), // bulk capacity updates can take a long time to complete
+        deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 180000)),
       },
-      agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 60000))),
+      agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 180000))),
     },
     manageUsersApi: {
       url: get('MANAGE_USERS_API_URL', 'http://localhost:9091', requiredInProduction),
