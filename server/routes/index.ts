@@ -30,6 +30,7 @@ import changeLocalNameRouter from './changeLocalName'
 import removeLocalNameRouter from './removeLocalName'
 import createLocationRouter from './createLocation'
 import deleteDraftLocationRouter from './deleteDraftLocation'
+import addToCertificateRouter from './addToCertificate'
 import adminRouter from './adminRouter'
 import changeResiStatusRouter from './admin/resi'
 import changeCertApprovalStatusRouter from './admin/certApproval'
@@ -73,6 +74,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/change-local-name', changeLocalNameRouter)
   router.use('/location/:locationId/remove-local-name', removeLocalNameRouter)
   router.use('/location/:locationId/change-temporary-deactivation-details', changeTemporaryDeactivationDetailsRouter)
+  router.use('/location/:locationId/add-to-certificate', addToCertificateRouter)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
   router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)

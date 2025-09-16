@@ -17,10 +17,54 @@ import { ManagementReportDefinition } from './types/locationsApi/managementRepor
 import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 import { BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
+import { CertificationApprovalRequest } from './types/locationsApi/certificationApprovalRequest'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
     super('LocationsApiClient', redisClient, config.apis.locationsApi, authenticationClient)
+  }
+
+  certification = {
+    location: {
+      requestApproval: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          locationId: string
+          approvalType: string
+        }
+      >({
+        path: '/certification/location/request-approval',
+        requestType: 'put',
+      }),
+    },
+    prison: {
+      signedOpCapChange: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          prisonId: string
+          signedOperationalCapacity: number
+          reasonForChange: string
+        }
+      >({
+        path: '/certification/prison/signed-op-cap-change',
+        requestType: 'put',
+      }),
+    },
+    requestApprovals: {
+      getById: this.apiCall<CertificationApprovalRequest, { id: string }>({
+        path: '/certification/request-approvals/:id',
+        requestType: 'get',
+      }),
+      prison: {
+        getAllForPrisonId: this.apiCall<CertificationApprovalRequest[], { prisonId: string; status?: string }>({
+          path: '/certification/request-approvals/prison/:prisonId',
+          queryParams: ['status'],
+          requestType: 'get',
+        }),
+      },
+    },
   }
 
   constants = {
@@ -232,6 +276,20 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     getResidentialHierarchy: this.apiCall<ResidentialHierarchy[], { prisonId: string }>({
       path: '/locations/prison/:prisonId/residential-hierarchy',
+      requestType: 'get',
+    }),
+    getResidentialHierarchyFromParent: this.apiCall<
+      ResidentialHierarchy[],
+      {
+        prisonId: string
+        parentPathHierarchy: string
+        maxLevel?: string
+        includeVirtualLocations?: string
+        includeInactive?: string
+      }
+    >({
+      path: '/locations/prison/:prisonId/residential-hierarchy/:parentPathHierarchy',
+      queryParams: ['maxLevel', 'includeVirtualLocations', 'includeInactive'],
       requestType: 'get',
     }),
     getResidentialSummary: this.apiCall<

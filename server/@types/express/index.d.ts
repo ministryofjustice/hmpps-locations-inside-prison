@@ -9,6 +9,7 @@ import {
   PrisonerLocation,
   PrisonResidentialSummary,
   PrisonConfiguration,
+  LocationsApiConstant,
 } from '../../data/types/locationsApi'
 import { FeComponentsMeta } from '../../data/feComponentsClient'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
@@ -17,6 +18,7 @@ import { LocationTree } from '../../controllers/reactivate/parent/middleware/pop
 import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
+import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -134,12 +136,29 @@ interface TypedLocals {
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary
+  proposedCertificationApprovalRequests?: Partial<
+    Pick<
+      CertificationApprovalRequest,
+      | 'approvalType'
+      | 'certifiedNormalAccommodationChange'
+      | 'comments'
+      | 'prisonId'
+      | 'locations'
+      | 'reasonForSignedOpChange'
+      | 'maxCapacityChange'
+      | 'signedOperationCapacityChange'
+      | 'workingCapacityChange'
+    >
+  >[]
   recentlyViewedReports?: StoredReportData[]
   referrerRootUrl?: string
   requestedReports?: StoredReportData[]
   routePrefix?: string
+  signedOpCapChangeRequest?: blah
   specialistCellTypes?: string[]
   specialistCellTypesObject?: SpecialistCellTypesObject[]
+  usedForConstants?: LocationsApiConstant[]
+  accommodationTypeConstants?: LocationsApiConstant[]
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string
