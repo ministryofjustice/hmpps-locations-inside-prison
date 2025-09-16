@@ -69,4 +69,6 @@ export declare interface Location {
   numberOfCellLocations: number
   oldWorkingCapacity: number
   wingStructure: LocationType[]
+  cellMark: string
+  inCellSanitation: boolean
 }

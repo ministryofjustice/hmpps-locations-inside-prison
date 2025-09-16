@@ -9,7 +9,7 @@ export default async function getPrisonResidentialSummary(
 ) {
   res.locals.prisonResidentialSummary = (await req.services.locationsService.getResidentialSummary(
     req.session.systemToken,
-    (res.locals.location || res.locals.decoratedLocation).prisonId,
+    (res.locals.location || res.locals.decoratedLocation)?.prisonId || res.locals.prisonId,
   )) as PrisonResidentialSummary
 
   if (next) {

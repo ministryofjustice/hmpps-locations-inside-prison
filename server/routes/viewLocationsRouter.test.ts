@@ -57,9 +57,11 @@ describe('GET /view-and-update-locations/PRISON_ID', () => {
       topLevelLocationType: 'Wings',
       locationHierarchy: [],
       prisonSummary: {
+        prisonName: 'Test (HMP)',
         workingCapacity: 95,
         signedOperationalCapacity: 102,
         maxCapacity: 100,
+        numberOfCellLocations: 73,
       },
       subLocationName: 'TestWings',
       subLocations: [],

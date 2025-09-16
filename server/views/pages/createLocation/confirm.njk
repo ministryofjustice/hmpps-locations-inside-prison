@@ -155,7 +155,7 @@
 
             {% for i in range(0, values['create-cells_cellsToCreate']) -%}
               {% set cellTypes = values['saved-cellTypes' + i] %}
-              {% set cellTypesText = formatCellTypes(specialistCellTypesObject, cellTypes) %}
+              {% set cellTypesText = formatConstants(specialistCellTypesObject, cellTypes) %}
 
               {% set cellRows = (cellRows.push([
                 {

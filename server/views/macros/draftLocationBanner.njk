@@ -26,7 +26,7 @@
       {{ govukButton({
         text: "Add " + (topLevelDraftLocation.locationType | lower) + " to cell certificate",
         preventDoubleClick: true,
-        href: "#",
+        href: "/location/" + topLevelDraftLocation.id + "/add-to-certificate",
         attributes: {
           'data-qa': 'add-to-cell-certificate'
         }

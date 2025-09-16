@@ -43,6 +43,23 @@ export default class LocationsService {
     )
   }
 
+  async createCertificationRequestForLocation(token: string, approvalType: string, locationId: string) {
+    return this.locationsApiClient.certification.location.requestApproval(token, null, { approvalType, locationId })
+  }
+
+  async createCertificationRequestForSignedOpCap(
+    token: string,
+    prisonId: string,
+    signedOperationalCapacity: number,
+    reasonForChange: string,
+  ) {
+    return this.locationsApiClient.certification.prison.signedOpCapChange(token, null, {
+      prisonId,
+      signedOperationalCapacity,
+      reasonForChange,
+    })
+  }
+
   async deactivatePermanent(token: string, locationId: string, reason: string) {
     return this.locationsApiClient.locations.deactivate.permanent(token, { locationId }, { reason })
   }
@@ -83,6 +100,10 @@ export default class LocationsService {
 
   async getArchivedLocations(token: string, prisonId: string) {
     return this.locationsApiClient.locations.prison.getArchivedLocations(token, { prisonId })
+  }
+
+  async getCertificateApprovalRequests(token: string, prisonId: string, status = 'PENDING') {
+    return this.locationsApiClient.certification.requestApprovals.prison.getAllForPrisonId(token, { prisonId, status })
   }
 
   async getConvertedCellType(token: string, key: string) {
@@ -137,7 +158,31 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getResidentialAttributeTypes'))[key] || 'Unknown'
   }
 
-  async getResidentialHierarchy(token: string, prisonId: string): Promise<ResidentialHierarchy[]> {
+  async getResidentialHierarchy(
+    token: string,
+    prisonId: string,
+    {
+      parentPathHierarchy,
+      maxLevel,
+      includeVirtualLocations,
+      includeInactive,
+    }: {
+      parentPathHierarchy?: string
+      maxLevel?: number
+      includeVirtualLocations?: boolean
+      includeInactive?: boolean
+    },
+  ): Promise<ResidentialHierarchy[]> {
+    if (parentPathHierarchy) {
+      return this.locationsApiClient.locations.getResidentialHierarchyFromParent(token, {
+        prisonId,
+        parentPathHierarchy,
+        maxLevel: maxLevel?.toString(),
+        includeVirtualLocations: includeVirtualLocations?.toString(),
+        includeInactive: includeInactive?.toString(),
+      })
+    }
+
     return this.locationsApiClient.locations.getResidentialHierarchy(token, { prisonId })
   }
 

@@ -14,9 +14,11 @@ const existingWingLocation = LocationFactory.build({
 })
 const residentialSummary: PrisonResidentialSummary = {
   prisonSummary: {
+    prisonName: 'TST',
     workingCapacity: 0,
     signedOperationalCapacity: 0,
     maxCapacity: 0,
+    numberOfCellLocations: 0,
   },
   subLocationName: 'Wings',
   subLocations: [existingWingLocation],
