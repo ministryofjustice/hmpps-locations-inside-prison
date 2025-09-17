@@ -39,6 +39,7 @@ describe('setCanAccess', () => {
 
   beforeEach(async () => {
     deepReq.featureFlags = { createAndCertify: true, map2380: false }
+    deepReq.params = { prisonId: 'TST' }
     await setCanAccess(locationsService)(deepReq as Request, deepRes as Response, next)
   })
 
@@ -49,5 +50,31 @@ describe('setCanAccess', () => {
   it('respects permissionOverrides based on prisonConfiguration and feature flags', async () => {
     expect(deepReq.canAccess?.('create_location')).toBe(true)
     expect(deepReq.canAccess?.('change_max_capacity')).toBe(true)
+  })
+
+  it('respects permissionOverrides when prisonId (with INACTIVE certification) in params is different from activeCaseload', async () => {
+    deepReq.params = { prisonId: 'LSI' }
+
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'LSI',
+      resiLocationServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
+    })
+    await setCanAccess(locationsService)(deepReq as Request, deepRes as Response, next)
+    expect(deepReq.canAccess?.('create_location')).toBe(false)
+  })
+
+  it('respects permissionOverrides when prisonId (with ACTIVE certification) in params is different from activeCaseload', async () => {
+    deepReq.params = { prisonId: 'WWI' }
+
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'WWI',
+      resiLocationServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
+    })
+    await setCanAccess(locationsService)(deepReq as Request, deepRes as Response, next)
+    expect(deepReq.canAccess?.('create_location')).toBe(true)
   })
 })

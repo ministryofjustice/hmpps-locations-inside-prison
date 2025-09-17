@@ -1,0 +1,9 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% block submitAction %}
+     {{ govukButton({
+       text: 'Save ' + locationType + ' code',
+       preventDoubleClick: true,
+       type: "submit"
+     }) }}
+ {% endblock %}

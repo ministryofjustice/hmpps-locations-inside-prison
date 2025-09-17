@@ -16,13 +16,55 @@ import { ManagementReportDefinition } from './types/locationsApi/managementRepor
 
 import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
+import { BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
+import { CertificationApprovalRequest } from './types/locationsApi/certificationApprovalRequest'
 
 export default class LocationsApiClient extends BaseApiClient {
-  constructor(
-    protected readonly redisClient: RedisClient,
-    authenticationClient: AuthenticationClient,
-  ) {
+  constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
     super('LocationsApiClient', redisClient, config.apis.locationsApi, authenticationClient)
+  }
+
+  certification = {
+    location: {
+      requestApproval: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          locationId: string
+          approvalType: string
+        }
+      >({
+        path: '/certification/location/request-approval',
+        requestType: 'put',
+      }),
+    },
+    prison: {
+      signedOpCapChange: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          prisonId: string
+          signedOperationalCapacity: number
+          reasonForChange: string
+        }
+      >({
+        path: '/certification/prison/signed-op-cap-change',
+        requestType: 'put',
+      }),
+    },
+    requestApprovals: {
+      getById: this.apiCall<CertificationApprovalRequest, { id: string }>({
+        path: '/certification/request-approvals/:id',
+        requestType: 'get',
+      }),
+      prison: {
+        getAllForPrisonId: this.apiCall<CertificationApprovalRequest[], { prisonId: string; status?: string }>({
+          path: '/certification/request-approvals/prison/:prisonId',
+          queryParams: ['status'],
+          requestType: 'get',
+        }),
+      },
+    },
   }
 
   constants = {
@@ -70,7 +112,14 @@ export default class LocationsApiClient extends BaseApiClient {
       },
     ),
     getSpecialistCellTypes: this.apiCall<
-      { specialistCellTypes: { key: string; description: string; additionalInformation?: string }[] },
+      {
+        specialistCellTypes: {
+          key: string
+          description: string
+          additionalInformation?: string
+          attributes?: { affectsCapacity: boolean }
+        }[]
+      },
       null
     >({
       path: '/constants/specialist-cell-type',
@@ -109,6 +158,24 @@ export default class LocationsApiClient extends BaseApiClient {
         path: '/locations/bulk/reactivate',
         requestType: 'put',
       }),
+      capacityUpdate: this.apiCall<
+        BulkCapacityUpdateChanges,
+        null,
+        {
+          locations: {
+            [id: string]: {
+              maxCapacity: number
+              workingCapacity: number
+              certifiedNormalAccommodation: number
+              cellMark: string
+              inCellSanitation?: boolean
+            }
+          }
+        }
+      >({
+        path: '/locations/bulk/capacity-update',
+        requestType: 'put',
+      }),
     },
     getLocationByLocalName: this.apiCall<
       LocationForLocalName,
@@ -116,6 +183,10 @@ export default class LocationsApiClient extends BaseApiClient {
     >({
       path: '/locations/:prisonId/local-name/:localName',
       queryParams: ['parentLocationId'],
+      requestType: 'get',
+    }),
+    getLocationByKey: this.apiCall<LocationForLocalName, { key: string }>({
+      path: '/locations/key/:key?includeChildren',
       requestType: 'get',
     }),
     createWing: this.apiCall<
@@ -194,13 +265,31 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
+    deleteDraftLocation: this.apiCall<Location, { locationId: string }>({
+      path: '/locations/:locationId',
+      requestType: 'delete',
+    }),
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
       queryParams: ['includeHistory'],
       requestType: 'get',
     }),
-    getResidentialHierarchy: this.apiCall<ResidentialHierarchy, { prisonId: string }>({
+    getResidentialHierarchy: this.apiCall<ResidentialHierarchy[], { prisonId: string }>({
       path: '/locations/prison/:prisonId/residential-hierarchy',
+      requestType: 'get',
+    }),
+    getResidentialHierarchyFromParent: this.apiCall<
+      ResidentialHierarchy[],
+      {
+        prisonId: string
+        parentPathHierarchy: string
+        maxLevel?: string
+        includeVirtualLocations?: string
+        includeInactive?: string
+      }
+    >({
+      path: '/locations/prison/:prisonId/residential-hierarchy/:parentPathHierarchy',
+      queryParams: ['maxLevel', 'includeVirtualLocations', 'includeInactive'],
       requestType: 'get',
     }),
     getResidentialSummary: this.apiCall<
@@ -237,6 +326,10 @@ export default class LocationsApiClient extends BaseApiClient {
     updateLocalName: this.apiCall<Location, { locationId: string }, { localName?: string; updatedBy?: string }>({
       path: '/locations/:locationId/change-local-name',
       requestType: 'put',
+    }),
+    updateLocationCode: this.apiCall<Location, { locationId: string }, { code: string }>({
+      path: '/locations/residential/:locationId',
+      requestType: 'patch',
     }),
     updateTemporaryDeactivation: this.apiCall<
       Location,

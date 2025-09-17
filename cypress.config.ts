@@ -47,6 +47,12 @@ export default defineConfig({
 
           return null
         },
+        log: message => {
+          // eslint-disable-next-line no-console
+          console.log(message)
+
+          return null
+        },
         ...auth.allStubs,
         ...components,
         ...locationsApi.allStubs,

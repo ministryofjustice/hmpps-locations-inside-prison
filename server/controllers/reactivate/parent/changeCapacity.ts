@@ -7,7 +7,7 @@ import populateLocation from '../../../middleware/populateLocation'
 import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateParentChangeCapacity extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.populateCell)
     this.use(this.resetErrors)
@@ -30,7 +30,7 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     next()
   }
 
-  getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
+  override getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
     const { decoratedCell } = res.locals
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
@@ -42,7 +42,7 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     }
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     const { values } = req.form
     const { decoratedCell } = res.locals
     const { accommodationTypes, specialistCellTypes }: Location = decoratedCell.raw
@@ -67,7 +67,7 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     })
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const locals = super.locals(req, res)
     const { decoratedCell, decoratedLocation, values } = res.locals
     const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${decoratedLocation.id}/check-capacity` })
@@ -91,7 +91,7 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedCell } = res.locals
     const maxCapacity = Number(req.form.values.maxCapacity)
     const workingCapacity = Number(req.form.values.workingCapacity)

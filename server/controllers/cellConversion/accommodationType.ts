@@ -5,7 +5,7 @@ import setStepValidity from '../../lib/setStepValidity'
 import { TypedLocals } from '../../@types/express'
 
 export default class CellConversionAccommodationType extends FormInitialStep {
-  async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
     const accommodationTypes = (
       await req.services.locationsService.getAccommodationTypes(req.session.systemToken)
     ).filter(type => type.key !== 'OTHER_NON_RESIDENTIAL')
@@ -18,7 +18,7 @@ export default class CellConversionAccommodationType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { sessionModel } = req
 
     if (req.isEditing) {
@@ -61,7 +61,7 @@ export default class CellConversionAccommodationType extends FormInitialStep {
     return super.locals(req, res)
   }
 
-  saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { accommodationType } = req.form.values
     const { sessionModel } = req
 

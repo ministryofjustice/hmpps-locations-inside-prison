@@ -6,12 +6,8 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class Details extends FormInitialStep {
-  middlewareSetup() {
-    super.middlewareSetup()
-  }
-
   // eslint-disable-next-line no-underscore-dangle
-  async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const formLocationCode = req.form.options.fields.locationCode
     const formCreateCellsNow = req.form.options.fields.createCellsNow
     const locationType = req.sessionModel.get<string>('locationType')
@@ -39,7 +35,7 @@ export default class Details extends FormInitialStep {
     await super._locals(req, res, next)
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const locationType = req.sessionModel.get<string>('locationType')
 
@@ -49,12 +45,12 @@ export default class Details extends FormInitialStep {
     return locals
   }
 
-  async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { locationsService } = req.services
       const { values } = req.form
 
-      const { prisonId, decoratedResidentialSummary } = res.locals
+      const { prisonId, locationId, decoratedResidentialSummary } = res.locals
 
       const sanitizedLocalName = sanitizeString(String(values.localName))
 
@@ -75,8 +71,9 @@ export default class Details extends FormInitialStep {
         if (values.localName) {
           const localNameExists = await locationsService.getLocationByLocalName(
             req.session.systemToken,
-            String(prisonId),
+            prisonId,
             sanitizedLocalName,
+            locationId,
           )
           if (localNameExists) {
             validationErrors.localName = this.formError('localName', 'taken')

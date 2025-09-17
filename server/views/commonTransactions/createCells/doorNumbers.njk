@@ -1,0 +1,40 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block fields %}
+  {% set rows = [] %}
+
+  {% for key, fieldsOptions in fields %}
+    {% set rows = (rows.push(
+      [
+        {
+          classes: 'govuk-table__cell',
+          html: '<label for="' + fieldsOptions.id + '">' + fieldsOptions.text + '</label>'
+        },
+        {
+          html: callAsMacro(fieldsOptions.component)(fieldsOptions)
+        }
+      ]
+    ), rows) %}
+  {% endfor %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-one-half">
+        {{ govukTable({
+          firstCellIsHeader: true,
+          head: [
+            {
+              text: "Cell number"
+            },
+            {
+              text: "Cell door number"
+            }
+          ],
+          rows: rows
+        }) }}
+      </div>
+    </div>
+  </div>
+{% endblock %}

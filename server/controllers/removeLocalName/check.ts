@@ -4,11 +4,7 @@ import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 
 export default class RemoveLocalName extends FormInitialStep {
-  middlewareSetup() {
-    super.middlewareSetup()
-  }
-
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId, localName } = decoratedLocation
 
@@ -29,7 +25,7 @@ export default class RemoveLocalName extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { user, decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -43,7 +39,7 @@ export default class RemoveLocalName extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, prisonId } = res.locals.decoratedLocation
     req.journeyModel.reset()
     req.sessionModel.reset()

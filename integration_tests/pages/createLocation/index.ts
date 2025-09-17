@@ -19,4 +19,30 @@ export default class CreateLocationDetailsPage extends Page {
   backLink = (): PageElement => cy.get('.govuk-back-link')
 
   cancelLink = (): PageElement => cy.get('a:contains("Cancel")')
+
+  submit = ({
+    locationCode,
+    localName,
+    createCellsNow,
+  }: {
+    locationCode?: string
+    localName?: string
+    createCellsNow?: boolean
+  }) => {
+    this.locationCodeInput().clear()
+    if (locationCode) {
+      this.locationCodeInput().type(locationCode)
+    }
+
+    this.localNameTextInput().clear()
+    if (localName) {
+      this.localNameTextInput().type(localName)
+    }
+
+    if (createCellsNow !== undefined) {
+      this.createCellsNowRadio(createCellsNow ? 'YES' : 'NO').click()
+    }
+
+    this.continueButton().click()
+  }
 }

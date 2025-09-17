@@ -1,0 +1,147 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
+
+{% block innerContent %}
+  {{ govukDetails({
+    summaryText: "What the different types of cell capacity mean",
+    html: "<strong>Baseline certified normal accommodation (CNA)</strong><br>" +
+    "The number of people that can live in a cell without it being considered overcrowded.<br><br>" +
+    "<strong>Working capacity</strong><br>" +
+    "The number of people that can currently live in this location based on available beds, furniture and sanitation.<br><br>" +
+    "<strong>Maximum capacity</strong><br>" +
+    "The maximum number of people that could potentially live in this location."
+  }) }}
+
+  {% set autoFillHtml = '<h2 class="govuk-heading-m govuk-!-margin-bottom-5">Apply capacity values to all cells</h2>' %}
+
+  {% for i in [
+    {id: 'CNA', label: 'Baseline certified normal accommodation (CNA)'},
+    {id: 'WC', label: 'Working capacity'},
+    {id: 'MC', label: 'Maximum capacity'}
+  ] %}
+    {% set autoFillHtml = autoFillHtml + govukInput({
+          component: 'govukInput',
+          id: 'autoFill' + i.id,
+          name: 'autoFill' + i.id,
+          classes: 'govuk-input--width-3',
+          rows: 1,
+          autocomplete: 'off',
+          formGroup: {
+            beforeInput: {
+              html: '<label class="govuk-label govuk-input-prefix--plain" for="autoFill' + i.id + '">' + i.label + '</label>'
+            },
+            afterInput: {
+              html: '<a href="#" class="govuk-link govuk-link--no-visited-state govuk-input-suffix--plain" id="apply-autoFill' + i.id + '">Apply to all</a>'
+            }
+          }
+        }) %}
+  {% endfor %}
+
+  {{ mojTicketPanel({
+    attributes: {
+      'data-qa': 'auto-fill-capacities'
+    },
+    items: [
+      {
+        html: autoFillHtml,
+        classes: 'govuk-!-margin-bottom-5'
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block fields %}
+  {% set tableRows = [] %}
+  {% set cellTypesObject = [] %}
+  {% for i in range(0, values['create-cells_cellsToCreate']) -%}
+    {% set cellTypes = values['temp-cellTypes' + i] or (values['saved-cellTypes' + i] if not values['temp-cellTypes' + i + '-removed']) %}
+    {% set cellTypesText = formatConstants(specialistCellTypesObject, cellTypes) %}
+
+   {% if cellTypes %}
+       {% set cellTypeColumn =
+         {  html:
+         '<div data-qa="cell-types-' + i + '" class="change-remove-container">' +
+         cellTypesText +
+           '<div class="change-remove-actions">' +
+           '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="remove/' + i + '">Remove</button>' + '  |  ' +
+           '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + i + '">Change</button>' + '</div>' + '</div>'
+
+         }
+       %}
+   {% else %}
+     {% set cellTypeColumn = {
+       html:
+             '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + i + '">Add</button>'
+             }
+     %}
+   {% endif %}
+
+    {% set tableRows = (tableRows.push([
+      {
+        classes: 'govuk-table__cell',
+        text: locationPathPrefix + '-' + values['create-cells_cellNumber' + i].padStart(3, '0')
+      },
+      {
+        html: callAsMacro(fields['create-cells_baselineCna' + i].component)(fields['create-cells_baselineCna' + i])
+      },
+      {
+        html: callAsMacro(fields['create-cells_workingCapacity' + i].component)(fields['create-cells_workingCapacity' + i])
+      },
+      {
+        html: callAsMacro(fields['create-cells_maximumCapacity' + i].component)(fields['create-cells_maximumCapacity' + i])
+      },
+      cellTypeColumn
+    ]), tableRows) %}
+  {% endfor %}
+
+  {{ govukTable({
+    firstCellIsHeader: true,
+    head: [
+      {
+        text: "Cell number"
+      },
+      {
+        text: "Baseline CNA"
+      },
+      {
+        text: "Working capacity"
+      },
+      {
+        text: "Maximum capacity"
+      },
+      {
+        text: "Cell type (optional)"
+      }
+    ],
+    rows: tableRows
+  }) }}
+{% endblock %}
+
+{#
+[
+      {
+        html: govukInput({
+          validate: ['numeric'],
+          component: 'govukInput',
+          id: 'autoFillCna',
+          name: 'autoFillCna',
+          classes: 'govuk-input--width-3 ',
+          rows: 1,
+          autocomplete: 'off',
+          formGroup: {
+            beforeInput: {
+              html: '<label class="govuk-label govuk-input-prefix--plain" for="autoFillCna">Baseline certified normal accommodation (CNA)</label>'
+            },
+            afterInput: {
+              html: '<a href="#" class="govuk-link govuk-link--no-visited-state govuk-input-suffix--plain" id="auto-fill-apply-cna">Apply to all</a>'
+            }
+          }
+        }),
+        classes: 'govuk-!-margin-bottom-5'
+      }
+    ]
+#}

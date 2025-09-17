@@ -26,7 +26,7 @@ export default class BaseApiClient extends RestClient {
   }: {
     path: string
     queryParams?: string[]
-    requestType: 'get' | 'post' | 'put' | 'delete'
+    requestType: 'get' | 'post' | 'put' | 'delete' | 'patch'
     options?: {
       cacheDuration: number
     }

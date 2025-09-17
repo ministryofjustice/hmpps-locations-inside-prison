@@ -9,12 +9,16 @@ import {
   PrisonerLocation,
   PrisonResidentialSummary,
   PrisonConfiguration,
+  LocationsApiConstant,
 } from '../../data/types/locationsApi'
 import { FeComponentsMeta } from '../../data/feComponentsClient'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
 import config from '../../config'
+import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
+import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
+import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -28,7 +32,7 @@ export declare module 'express-session' {
 
 interface TypedLocals {
   accommodationType?: string
-  actions?: { text: string; href: string }[]
+  actions?: { text: string; href: string; class: string }[]
   archivedLocations?: DecoratedLocation[]
   backLink?: string
   banner?: {
@@ -38,6 +42,7 @@ interface TypedLocals {
     }
   }
   baseUrl?: string
+  bodyText?: string
   bookmarkingEnabled?: boolean
   bookmarks?: BookmarkStoreData[]
   breadcrumbs?: {
@@ -60,6 +65,7 @@ interface TypedLocals {
   cells?: Locations[]
   changeSummary?: string
   continueLink?: string
+  convertedCellTypeDetails?: string
   createButton?: {
     text: string
     href: string
@@ -68,6 +74,8 @@ interface TypedLocals {
   }
   createStructureLink?: string
   createDetailsLink?: string
+  createRootLink?: string
+  createYouCanAddText?: string
   cspNonce?: string
   csrfToken?: string
   currentSignedOperationalCapacity?: number
@@ -113,6 +121,7 @@ interface TypedLocals {
   location?: Location
   locationId?: string
   locationHierarchy?: LocationSummary[]
+  locationPathPrefix?: string
   locationResidentialSummary?: LocationResidentialSummary
   locationTree?: LocationTree[]
   locationType?: string
@@ -127,12 +136,29 @@ interface TypedLocals {
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary
+  proposedCertificationApprovalRequests?: Partial<
+    Pick<
+      CertificationApprovalRequest,
+      | 'approvalType'
+      | 'certifiedNormalAccommodationChange'
+      | 'comments'
+      | 'prisonId'
+      | 'locations'
+      | 'reasonForSignedOpChange'
+      | 'maxCapacityChange'
+      | 'signedOperationCapacityChange'
+      | 'workingCapacityChange'
+    >
+  >[]
   recentlyViewedReports?: StoredReportData[]
   referrerRootUrl?: string
   requestedReports?: StoredReportData[]
   routePrefix?: string
+  signedOpCapChangeRequest?: blah
   specialistCellTypes?: string[]
-
+  specialistCellTypesObject?: SpecialistCellTypesObject[]
+  usedForConstants?: LocationsApiConstant[]
+  accommodationTypeConstants?: LocationsApiConstant[]
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string
@@ -144,6 +170,8 @@ interface TypedLocals {
   values?: FormWizard.Values
   valuesHaveChanged?: boolean
   workingCapacity?: string
+  capacityData?: BulkCapacityUpdate
+  capacitySummary?: CapacitySummary
 }
 
 export declare module 'express' {

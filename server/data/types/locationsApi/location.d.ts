@@ -19,6 +19,12 @@ export declare interface Location {
   certification: {
     certified: boolean
     capacityOfCertifiedCell: number
+    certifiedNormalAccommodation: number
+  }
+  pendingChanges?: {
+    maxCapacity?: number
+    workingCapacity?: number
+    certifiedNormalAccommodation?: number
   }
   attributes: string[]
   usage: {
@@ -63,4 +69,6 @@ export declare interface Location {
   numberOfCellLocations: number
   oldWorkingCapacity: number
   wingStructure: LocationType[]
+  cellMark: string
+  inCellSanitation: boolean
 }

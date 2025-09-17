@@ -1,0 +1,19 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% block fields %}
+  {% for key, fieldsOptions in fields %}
+     {% if fieldsOptions.component and not fieldsOptions.skip %}
+       {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+    {% endif %}
+  {% endfor %}
+{% endblock %}
+
+{% block submitAction %}
+   {{ govukButton({
+     text: "Save cell type",
+     classes: options.buttonClasses,
+     preventDoubleClick: true,
+     type: "submit"
+   }) }}
+{% endblock %}
+

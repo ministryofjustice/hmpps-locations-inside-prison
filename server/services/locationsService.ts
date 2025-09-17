@@ -3,6 +3,7 @@ import LocationsApiClient from '../data/locationsApiClient'
 import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
 import { LocationType, StatusType } from '../data/types/locationsApi'
+import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -42,6 +43,23 @@ export default class LocationsService {
     )
   }
 
+  async createCertificationRequestForLocation(token: string, approvalType: string, locationId: string) {
+    return this.locationsApiClient.certification.location.requestApproval(token, null, { approvalType, locationId })
+  }
+
+  async createCertificationRequestForSignedOpCap(
+    token: string,
+    prisonId: string,
+    signedOperationalCapacity: number,
+    reasonForChange: string,
+  ) {
+    return this.locationsApiClient.certification.prison.signedOpCapChange(token, null, {
+      prisonId,
+      signedOperationalCapacity,
+      reasonForChange,
+    })
+  }
+
   async deactivatePermanent(token: string, locationId: string, reason: string) {
     return this.locationsApiClient.locations.deactivate.permanent(token, { locationId }, { reason })
   }
@@ -68,6 +86,10 @@ export default class LocationsService {
     )
   }
 
+  async deleteDraftLocation(token: string, locationId: string) {
+    return this.locationsApiClient.locations.deleteDraftLocation(token, { locationId })
+  }
+
   async getAccommodationType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getAccommodationTypes'))[key] || 'Unknown'
   }
@@ -78,6 +100,10 @@ export default class LocationsService {
 
   async getArchivedLocations(token: string, prisonId: string) {
     return this.locationsApiClient.locations.prison.getArchivedLocations(token, { prisonId })
+  }
+
+  async getCertificateApprovalRequests(token: string, prisonId: string, status = 'PENDING') {
+    return this.locationsApiClient.certification.requestApprovals.prison.getAllForPrisonId(token, { prisonId, status })
   }
 
   async getConvertedCellType(token: string, key: string) {
@@ -116,6 +142,10 @@ export default class LocationsService {
     return this.locationsApiClient.locations.getLocationByLocalName(token, { prisonId, localName, parentLocationId })
   }
 
+  async getLocationByKey(token: string, key: string) {
+    return this.locationsApiClient.locations.getLocationByKey(token, { key })
+  }
+
   async getNonResidentialUsageType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getNonResidentialUsageTypes'))[key] || 'Unknown'
   }
@@ -128,8 +158,31 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getResidentialAttributeTypes'))[key] || 'Unknown'
   }
 
-  async getResidentialHierarchy(token: string, prisonId: string): Promise<ResidentialHierarchy[]> {
-    // @ts-expect-error error
+  async getResidentialHierarchy(
+    token: string,
+    prisonId: string,
+    {
+      parentPathHierarchy,
+      maxLevel,
+      includeVirtualLocations,
+      includeInactive,
+    }: {
+      parentPathHierarchy?: string
+      maxLevel?: number
+      includeVirtualLocations?: boolean
+      includeInactive?: boolean
+    },
+  ): Promise<ResidentialHierarchy[]> {
+    if (parentPathHierarchy) {
+      return this.locationsApiClient.locations.getResidentialHierarchyFromParent(token, {
+        prisonId,
+        parentPathHierarchy,
+        maxLevel: maxLevel?.toString(),
+        includeVirtualLocations: includeVirtualLocations?.toString(),
+        includeInactive: includeInactive?.toString(),
+      })
+    }
+
     return this.locationsApiClient.locations.getResidentialHierarchy(token, { prisonId })
   }
 
@@ -180,6 +233,10 @@ export default class LocationsService {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
   }
 
+  async updateBulkCapacity(token: string, bulkCapacityUpdate: BulkCapacityUpdate) {
+    return this.locationsApiClient.locations.bulk.capacityUpdate(token, null, { locations: bulkCapacityUpdate })
+  }
+
   async updateSignedOperationalCapacity(
     token: string,
     prisonId: string,
@@ -218,6 +275,10 @@ export default class LocationsService {
 
   async updateLocalName(token: string, locationId: string, localName?: string, updatedBy?: string) {
     return this.locationsApiClient.locations.updateLocalName(token, { locationId }, { localName, updatedBy })
+  }
+
+  async updateLocationCode(token: string, locationId: string, code: string) {
+    return this.locationsApiClient.locations.updateLocationCode(token, { locationId }, { code })
   }
 
   async changeNonResType(

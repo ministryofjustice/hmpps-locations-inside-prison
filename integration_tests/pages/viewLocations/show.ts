@@ -47,6 +47,10 @@ export default class ViewLocationsShowPage extends Page {
 
   convertToCellButton = (): PageElement => cy.get('.govuk-button:contains("Convert to cell")')
 
+  deleteButton = (): PageElement => cy.get('.govuk-button:contains("Delete")')
+
+  deactivateButton = (): PageElement => cy.get('.govuk-button:contains("Deactivate")')
+
   deactivateAction = (): PageElement => cy.get('.moj-button-menu__wrapper a:contains("Deactivate cell")')
 
   summaryCards = {
@@ -75,6 +79,8 @@ export default class ViewLocationsShowPage extends Page {
 
   removeSpecificCellTypeLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Remove")')
 
+  changeLocationCodeLink = (): PageElement => this.locationDetailsRows().eq(0).find('a:contains("Change")')
+
   localNameRow = (): PageElement => cy.get('dt.govuk-summary-list__key').contains('Local Name')
 
   setLocalNameLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Add local name")')
@@ -90,7 +96,9 @@ export default class ViewLocationsShowPage extends Page {
 
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 
-  successBanner = (): PageElement => cy.get('.govuk-notification-banner__heading')
+  successBannerHeading = (): PageElement => cy.get('.govuk-notification-banner__heading')
+
+  successBannerBody = (): PageElement => cy.get('.govuk-notification-banner__content > p.govuk-body')
 
   locationsTableRows = (): PageElement => this.locationsTable().find('tbody tr')
 

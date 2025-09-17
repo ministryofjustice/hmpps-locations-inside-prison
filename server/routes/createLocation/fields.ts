@@ -33,6 +33,7 @@ const fields: FormWizard.Fields = {
     },
     id: 'localName',
     name: 'localName',
+    nameForErrors: 'Local name',
     classes: 'govuk-!-width-one-half local-name-text-input',
     rows: 1,
     label: {
@@ -78,8 +79,8 @@ const fields: FormWizard.Fields = {
       },
     },
     items: [
-      { text: 'Yes', value: 'yes' },
-      { text: "No, I'll create them later", value: 'no' },
+      { text: 'Yes', value: 'YES' },
+      { text: "No, I'll create them later", value: 'NO' },
     ],
     autocomplete: 'off',
   },

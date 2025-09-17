@@ -1,0 +1,38 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% from "../locationStatusTag.njk" import locationStatusTag %}
+
+{% macro cells(locations) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {% set rows = [] %}
+      {% for item in locations %}
+        {% set rows = (rows.push(
+          [
+            { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
+            { html: locationStatusTag(item) },
+            { text: item.pendingChanges.workingCapacity or item.capacity.workingCapacity },
+            { text: item.pendingChanges.maxCapacity or item.capacity.maxCapacity },
+            { html: (item.specialistCellTypes | join('<br>')) or '-' }
+          ]
+        ), rows) %}
+      {% endfor %}
+
+      {{ govukTable({
+        attributes: {
+          "data-qa": "locations-table",
+          "id": "locations-table"
+        },
+        firstCellIsHeader: true,
+        head: [
+          { text: "Location" },
+          { text: "Status" },
+          { text: "Working capacity" },
+          { text: "Maximum capacity" },
+          { text: "Cell type" }
+        ],
+        rows: rows
+      }) }}
+    </div>
+  </div>
+{% endmacro %}

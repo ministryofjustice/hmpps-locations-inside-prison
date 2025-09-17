@@ -8,6 +8,67 @@ import {
 } from '../../server/data/types/locationsApi'
 import LocationFactory from '../../server/testutils/factories/location'
 import TypedStubber from './typedStubber'
+import { CertificationApprovalRequest } from '../../server/data/types/locationsApi/certificationApprovalRequest'
+
+const stubLocationsCertificationPrisonSignedOpCapChange = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/prison/signed-op-cap-change',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+const stubLocationsCertificationLocationRequestApproval = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/location/request-approval',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+const stubLocationsCertificationRequestApprovalsPrison = (approvalRequests: CertificationApprovalRequest[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/certification/request-approvals/prison/TST.*`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: approvalRequests,
+    },
+  })
+
+const stubLocationsCertificationRequestApprovals = (approvalRequest: CertificationApprovalRequest) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/certification/request-approvals/${approvalRequest.id}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: approvalRequest,
+    },
+  })
 
 const stubLocationsConstantsAccommodationType = (
   accommodationTypes = [
@@ -177,15 +238,23 @@ const stubLocationsConstantsSpecialistCellType = (
       key: 'ACCESSIBLE_CELL',
       description: 'Accessible cell',
       additionalInformation: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
+      attributes: { affectsCapacity: false },
+    },
+    {
+      key: 'NORMAL_ACCOMMODATION',
+      description: 'Normal accommodation',
+      attributes: { affectsCapacity: false },
     },
     {
       key: 'BIOHAZARD_DIRTY_PROTEST',
       description: 'Biohazard / dirty protest cell',
       additionalInformation: 'Previously known as a dirty protest cell',
+      attributes: { affectsCapacity: true },
     },
     {
       key: 'CONSTANT_SUPERVISION',
       description: 'Constant Supervision Cell',
+      attributes: { affectsCapacity: false },
     },
   ],
 ) =>
@@ -281,9 +350,11 @@ const stubLocationsConstantsUsedForTypeForPrison = (
 const stubLocationsLocationsResidentialSummary = (
   returnData: PrisonResidentialSummary = {
     prisonSummary: {
+      prisonName: 'Test (HMP)',
       workingCapacity: 8,
       signedOperationalCapacity: 10,
       maxCapacity: 9,
+      numberOfCellLocations: 10,
     },
     subLocationName: 'TestWings',
     subLocations: [
@@ -306,6 +377,25 @@ const stubLocationsLocationsResidentialSummary = (
     request: {
       method: 'GET',
       urlPattern: '/locations-api/locations/residential-summary/\\w+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
+const stubLocationsLocationsResidentialSummaryByKey = (
+  returnData: Partial<Location> = {
+    key: 'WING1',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/locations/key/[\\w-]+\\?includeChildren',
     },
     response: {
       status: 200,
@@ -820,6 +910,21 @@ const stubUpdateSpecialistCellTypes = () =>
     },
   })
 
+const stubUpdateLocationCode = () =>
+  stubFor({
+    request: {
+      method: 'PATCH',
+      urlPattern: '/locations-api/locations/residential/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubUpdateLocationsConstantsUsedForType = () =>
   stubFor({
     request: {
@@ -1052,10 +1157,29 @@ const stubLocationsCreateCells = (location: Location) =>
     },
   })
 
+const stubLocationsDeleteLocation = () =>
+  stubFor({
+    request: {
+      method: 'DELETE',
+      urlPattern: '/locations-api/locations/[\\w-]+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const allStubs = {
   stubLocations,
   stubLocationsBulkReactivate,
   stubLocationsResidentialHierarchy,
+  stubLocationsCertificationPrisonSignedOpCapChange,
+  stubLocationsCertificationLocationRequestApproval,
+  stubLocationsCertificationRequestApprovals,
+  stubLocationsCertificationRequestApprovalsPrison,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -1077,6 +1201,7 @@ const allStubs = {
   stubLocationsDeactivateTemporaryOccupied,
   stubLocationsHealthPing,
   stubLocationsLocationsResidentialSummary,
+  stubLocationsLocationsResidentialSummaryByKey,
   stubLocationsLocationsResidentialSummaryForLocation,
   stubLocationsPrisonArchivedLocations,
   stubLocationsPrisonInactiveCells,
@@ -1096,10 +1221,12 @@ const allStubs = {
   stubUpdateCapacity,
   stubUpdateLocalName,
   stubUpdateSpecialistCellTypes,
+  stubUpdateLocationCode,
   stubUpdateLocationsConstantsUsedForType,
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsUpdateNonResCell,
   stubLocationsResidentialSummaryForCreateWing,
+  stubLocationsDeleteLocation,
 }
 
 const LocationsApiStubber = new TypedStubber<typeof allStubs>(allStubs)

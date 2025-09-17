@@ -1,0 +1,44 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% from "../locationStatusTag.njk" import locationStatusTag %}
+
+{% macro draftCells(locations) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% set rows = [] %}
+      {% for item in locations %}
+        {% set rows = (rows.push(
+          [
+            { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
+            { html: locationStatusTag(item) },
+            { text: item.cellMark },
+            { text: item.pendingChanges.certifiedNormalAccommodation or item.certification.certifiedNormalAccommodation },
+            { text: item.pendingChanges.workingCapacity or item.capacity.workingCapacity },
+            { text: item.pendingChanges.maxCapacity or item.capacity.maxCapacity },
+            { html: (item.specialistCellTypes | join('<br>')) or '-' },
+            { text: 'Yes' if item.inCellSanitation else 'No' }
+          ]
+        ), rows) %}
+      {% endfor %}
+
+      {{ govukTable({
+        attributes: {
+          "data-qa": "locations-table",
+          "id": "locations-table"
+        },
+        firstCellIsHeader: true,
+        head: [
+          { text: "Location" },
+          { text: "Status" },
+          { text: "Door number" },
+          { text: "Baseline CNA" },
+          { text: "Working capacity" },
+          { text: "Maximum capacity" },
+          { text: "Cell type" },
+          { text: "Sanitation" }
+        ],
+        rows: rows
+      }) }}
+    </div>
+  </div>
+{% endmacro %}

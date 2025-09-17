@@ -1,0 +1,13 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% block fields %}
+  <p>You are requesting a change to the cell certificate.</p>
+
+  <p>You may also need to update the establishment's signed operational capacity if this change affects it.</p>
+
+  {{ govukInsetText({
+    html: '<p class="govuk-label govuk-label--m govuk-!-margin-bottom-1">Current signed operational capacity</p><p class="govuk-body-l">' + prisonResidentialSummary.prisonSummary.signedOperationalCapacity + '</p>'
+  }) }}
+
+  {{ super() }}
+{% endblock %}

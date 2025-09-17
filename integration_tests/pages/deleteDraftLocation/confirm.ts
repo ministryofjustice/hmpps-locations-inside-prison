@@ -1,0 +1,16 @@
+import Page, { PageElement } from '../page'
+
+export default class DeleteDraftConfirmPage extends Page {
+  constructor(locationType?: string) {
+    super(`Are you sure you want to delete this ${locationType}?`)
+    this.checkOnPage()
+  }
+
+  static goTo = (locationId?: string) => cy.visit(`/delete-draft/${locationId}/confirm`)
+
+  confirmButton = (locationType?: string): PageElement => cy.get(`button:contains('Delete ${locationType}')`)
+
+  backLink = (): PageElement => cy.get('.govuk-back-link')
+
+  cancelLink = (): PageElement => cy.get('a:contains("Cancel and return to location details")')
+}

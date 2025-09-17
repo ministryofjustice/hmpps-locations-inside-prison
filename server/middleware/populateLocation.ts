@@ -29,7 +29,7 @@ export default function populateLocation({ decorate, id, includeHistory, localNa
       if (!location) {
         location = await req.services.locationsService.getLocation(
           systemToken,
-          id || req.params.locationId,
+          id || req.params.locationId || res.locals.locationId,
           includeHistory,
         )
       }

@@ -4,7 +4,7 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class DeactivateTemporaryOccupied extends FormInitialStep {
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(_req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 

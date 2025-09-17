@@ -5,7 +5,7 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class SetCellType extends FormInitialStep {
-  async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
     const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
 
     req.form.options.fields.specialistCellTypes.items = Object.values(specialistCellTypes).map(
@@ -21,7 +21,7 @@ export default class SetCellType extends FormInitialStep {
     next()
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
@@ -50,7 +50,7 @@ export default class SetCellType extends FormInitialStep {
     }
   }
 
-  async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 
@@ -66,7 +66,7 @@ export default class SetCellType extends FormInitialStep {
     return next()
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
@@ -83,7 +83,7 @@ export default class SetCellType extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, prisonId } = res.locals.decoratedLocation
 
     req.journeyModel.reset()

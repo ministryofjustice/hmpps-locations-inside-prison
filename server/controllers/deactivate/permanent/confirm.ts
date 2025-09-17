@@ -6,7 +6,7 @@ import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentia
 import protectRoute from '../../../middleware/protectRoute'
 
 export default class DeactivatePermanentConfirm extends FormWizard.Controller {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(protectRoute('deactivate:permanent'))
     this.use(getPrisonResidentialSummary)
@@ -21,7 +21,7 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
     return `The establishment’s ${valName} will reduce from ${totalCap} to ${newTotalCap}.`
   }
 
-  locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
     const { maxCapacity: totalMaxCap, workingCapacity: totalWorkingCap } = prisonResidentialSummary.prisonSummary
@@ -46,7 +46,7 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { analyticsService, locationsService } = req.services
 
@@ -73,7 +73,7 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { decoratedLocation } = res.locals
     const { displayName, prisonId } = decoratedLocation
 

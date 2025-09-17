@@ -6,11 +6,7 @@ import FormInitialStep from '../../base/formInitialStep'
 import { StatusType } from '../../../data/types/locationsApi'
 
 export default class CertApprovalStatusChangeConfirm extends FormInitialStep {
-  middlewareSetup() {
-    super.middlewareSetup()
-  }
-
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { prisonConfiguration } = res.locals
     const { prisonId } = prisonConfiguration
@@ -26,7 +22,7 @@ export default class CertApprovalStatusChangeConfirm extends FormInitialStep {
     }
   }
 
-  async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { prisonId } = res.locals.prisonConfiguration
     const { analyticsService, locationsService } = req.services
     const { activation } = req.form.values
@@ -45,7 +41,7 @@ export default class CertApprovalStatusChangeConfirm extends FormInitialStep {
     }
   }
 
-  successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { prisonId } = res.locals.prisonConfiguration
 
     req.journeyModel.reset()

@@ -3,7 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { TypedLocals } from '../../@types/express'
 
 export default class NonResidentialConversionWarning extends FormWizard.Controller {
-  locals(_req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(_req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 

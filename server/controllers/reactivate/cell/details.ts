@@ -7,12 +7,12 @@ import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 import { TypedLocals } from '../../../@types/express'
 
 export default class ReactivateCellDetails extends FormInitialStep {
-  middlewareSetup() {
+  override middlewareSetup() {
     super.middlewareSetup()
     this.use(getReferrerRootUrl)
   }
 
-  getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
+  override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     const { decoratedLocation } = res.locals
     return {
       maxCapacity: decoratedLocation.capacity.maxCapacity,
@@ -20,7 +20,7 @@ export default class ReactivateCellDetails extends FormInitialStep {
     }
   }
 
-  validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+  override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     const { values } = req.form
     const { decoratedLocation } = res.locals
     const { accommodationTypes, specialistCellTypes }: Location = decoratedLocation.raw
@@ -46,7 +46,7 @@ export default class ReactivateCellDetails extends FormInitialStep {
     })
   }
 
-  locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
     const { decoratedLocation, referrerRootUrl } = res.locals
     const { id: locationId } = decoratedLocation

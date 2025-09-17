@@ -1,0 +1,127 @@
+{% extends "../../../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% set title = "Confirm cell certification ingest" %}
+
+{% set rows = [] %}
+
+{% for key, summary in capacitySummary %}
+  {% set rows = (rows.push(
+    [
+      { text: key },
+      { text: summary.maxCapacity },
+      { text: summary.workingCapacity },
+      { text: summary.certifiedNormalAccommodation }
+    ]
+  ), rows) %}
+{% endfor %}
+
+{% set dataRows = [] %}
+
+{% for key, data in capacityData %}
+  {% set dataRows = (dataRows.push(
+    [
+      { text: key },
+      { text: data.maxCapacity },
+      { text: data.workingCapacity },
+      { text: data.certifiedNormalAccommodation },
+      { text: data.cellMark },
+      { text: data.inCellSanitation }
+    ]
+  ), dataRows) %}
+{% endfor %}
+
+{% block heading %}
+  <h1 class="govuk-heading-l">Confirm cell certification ingest</h1>
+{% endblock %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukBackLink({
+          text: "Back",
+          href: backLink
+        }) }}
+
+        {% if errorlist.length %}
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: validationErrors,
+            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+          }) }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  {% set formMethod = options.method | default('post') %}
+  {% set formAction = options.action | default('') %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">Summary</h2>
+        {{ govukTable({
+          attributes: {
+            "data-qa": "summary-table"
+          },
+          head: [
+            { text: "Location", classes: "govuk-!-width-one-quarter" },
+            { text: "Max capacity", classes: "govuk-!-width-one-quarter" },
+            { text: "Working capacity", classes: "govuk-!-width-one-quarter" },
+            { text: "CNA", classes: "govuk-!-width-one-quarter" }
+          ],
+          rows: rows
+        }) }}
+        <h2 class="govuk-heading-m">Full upload details</h2>
+        {{ govukTable({
+          attributes: {
+            "data-qa": "data-table"
+          },
+          head: [
+            { text: "Location", classes: "govuk-!-width-one-sixth" },
+            { text: "Max capacity", classes: "govuk-!-width-one-sixth" },
+            { text: "Working capacity", classes: "govuk-!-width-one-sixth" },
+            { text: "CNA", classes: "govuk-!-width-one-sixth" },
+            { text: "Cell mark", classes: "govuk-!-width-one-sixth" },
+            { text: "In-cell sanitation", classes: "govuk-!-width-one-sixth" }
+          ],
+          rows: dataRows
+        }) }}
+
+        <form method="{{ formMethod }}" action="{{ formAction }}?_csrf={{ csrfToken }}">
+
+          <div class="govuk-button-group">
+            {% block formActions %}
+              {% block submitAction %}
+                {{ govukInsetText({
+                  text: "It can take several minutes to run the ingestion, please wait for a response"
+                }) }}
+                {{ govukButton({
+                  text: "Confirm ingestion",
+                  classes: options.buttonClasses,
+                  preventDoubleClick: true,
+                  type: "submit"
+                }) }}
+              {% endblock %}
+            {% endblock %}
+          </div>
+        </form>
+
+        <p class="govuk-body">
+          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
+            Cancel and return to prison configuration details
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

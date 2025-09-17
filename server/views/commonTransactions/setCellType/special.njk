@@ -1,0 +1,26 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% set workingCapHint %}
+  <p>The CNA and working capacity of the cell should be set to 0.</p>
+{% endset %}
+
+{% block fields %}
+  {% for key, fieldsOptions in fields %}
+     {% if fieldsOptions.component and not fieldsOptions.skip %}
+       {{ callAsMacro(fieldsOptions.component)(fieldsOptions) }}
+    {% endif %}
+  {% endfor %}
+
+  {{ govukInsetText({
+    html: workingCapHint
+  }) }}
+{% endblock %}
+
+{% block submitAction %}
+   {{ govukButton({
+     text: "Save cell type",
+     classes: options.buttonClasses,
+     preventDoubleClick: true,
+     type: "submit"
+   }) }}
+{% endblock %}
