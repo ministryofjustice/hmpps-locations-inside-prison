@@ -24,7 +24,9 @@ export default class PrisonConfigurationIndexPage extends Page {
 
   changeResiLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(0).contains('Change')
 
-  changeCertificationLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(1).contains('Change')
+  changeSegInRollLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(1).contains('Change')
 
-  changePrisonNonHousing = (): PageElement => cy.get('.govuk-summary-list__actions').eq(2).contains('Change')
+  changeCertificationLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(2).contains('Change')
+
+  changePrisonNonHousing = (): PageElement => cy.get('.govuk-summary-list__actions').eq(3).contains('Change')
 }

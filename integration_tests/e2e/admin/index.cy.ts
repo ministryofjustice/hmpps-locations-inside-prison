@@ -4,6 +4,7 @@ import Page from '../../pages/page'
 import PrisonConfigurationIndexPage from '../../pages/admin'
 import ResiStatusConfirmPage from '../../pages/admin/resi/confirm'
 import CertApprovalConfirmPage from '../../pages/admin/certApproval/confirm'
+import SegInRollCountConfirmPage from '../../pages/admin/segInRollCount/confirm'
 
 context('Admin Index', () => {
   context('Without the MANAGE_RES_LOCATIONS_ADMIN role', () => {
@@ -38,6 +39,7 @@ context('Admin Index', () => {
       cy.task('stubPrisonConfiguration')
       cy.task('stubPrisonConfigurationActivateResi')
       cy.task('stubPrisonConfigurationCertApproval')
+      cy.task('stubPrisonConfigurationIncludeSegInRollCount')
       cy.task('stubDisplayHousingCheckboxesDisabled')
       cy.task('stubDisplayHousingCheckboxesPost')
       cy.task('stubGetSplashScreenCondition')
@@ -69,6 +71,23 @@ context('Admin Index', () => {
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Residential location status')
       cy.get('.govuk-notification-banner__content p').contains('You have changed the residential location status.')
+    })
+
+    it('Can enable seg in roll count', () => {
+      const indexPage = Page.verifyOnPage(IndexPage)
+      indexPage.cards.adminster().find('a').click()
+      const prisonConfigurationIndexPage = Page.verifyOnPage(PrisonConfigurationIndexPage)
+      prisonConfigurationIndexPage.checkOnPage()
+      prisonConfigurationIndexPage.changeSegInRollLink().click()
+
+      const segInRollCountIndexPage = Page.verifyOnPage(SegInRollCountConfirmPage)
+      segInRollCountIndexPage.checkOnPage()
+      segInRollCountIndexPage.confirmButton().click()
+
+      Page.verifyOnPage(PrisonConfigurationIndexPage)
+      cy.get('#govuk-notification-banner-title').contains('Success')
+      cy.get('.govuk-notification-banner__content h3').contains('Include seg in roll count')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed the include seg in roll count status.')
     })
 
     it('Can enable certification', () => {

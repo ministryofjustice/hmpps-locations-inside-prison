@@ -100,6 +100,15 @@
           },
           value: {
             text: prisonConfiguration.includeSegregationInRollCount
+          },
+          actions: {
+          items: [
+            {
+              href: '/admin/' + prisonConfiguration.prisonId + '/change-include-seg-in-roll-count',
+              text: "Change",
+              visuallyHiddenText: "resi",
+              classes: "govuk-link--no-visited-state"}
+            ]
           }
         },
         {
