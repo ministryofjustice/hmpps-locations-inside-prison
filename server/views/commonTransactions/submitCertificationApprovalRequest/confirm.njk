@@ -80,7 +80,7 @@
           rows: [[
             { text: request.locations[0].pathHierarchy },
             { text: formatConstants(accommodationTypeConstants, request.locations[0].accommodationTypes) },
-            { text: formatConstants(usedForConstants, request.locations[0].usedFor) }
+            { html: formatConstants(usedForConstants, request.locations[0].usedFor) }
           ]]
         }) }}
 
