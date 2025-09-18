@@ -49,7 +49,7 @@ export default class SegInRollCountStatusChangeConfirm extends FormInitialStep {
 
     req.flash('success', {
       title: 'Include seg in roll count',
-      content: `You have changed the include seg in roll count.`,
+      content: `You have changed the include seg in roll count status.`,
     })
 
     res.redirect(`/admin/${prisonId}`)
