@@ -34,6 +34,7 @@ import addToCertificateRouter from './addToCertificate'
 import adminRouter from './adminRouter'
 import changeResiStatusRouter from './admin/resi'
 import changeCertApprovalStatusRouter from './admin/certApproval'
+import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
 import ingestRouter from './admin/ingest'
 
 export default function routes(services: Services): Router {
@@ -85,6 +86,7 @@ export default function routes(services: Services): Router {
   // admin
   router.use('/admin/:prisonId?', adminRouter(services))
   router.use('/admin/:prisonId/change-resi-status', changeResiStatusRouter)
+  router.use('/admin/:prisonId/change-include-seg-in-roll-count', changeIncludeSegInRollCountStatusRouter)
   router.use('/admin/:prisonId/change-certification-status', changeCertApprovalStatusRouter)
   router.use('/admin/:prisonId/ingest-cert', ingestRouter)
 
