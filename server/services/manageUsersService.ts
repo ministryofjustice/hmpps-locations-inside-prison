@@ -1,4 +1,4 @@
-import ManageUsersApiClient from '../data/manageUsersApiClient'
+import ManageUsersApiClient, { PaginatedUsers, UserAccount } from '../data/manageUsersApiClient'
 import logger from '../../logger'
 
 export default class ManageUsersService {
@@ -19,5 +19,34 @@ export default class ManageUsersService {
 
   async getUserCaseloads(token: string) {
     return this.manageUsersApiClient.users.me.getCaseloads(token)
+  }
+
+  async getAllUsersByCaseload(
+    token: string,
+    caseload: string,
+    accessRoles: string,
+    size = 50,
+  ): Promise<PaginatedUsers> {
+    let allUsers: UserAccount[] = []
+    let page = 0
+    let totalPages = 1
+
+    while (page < totalPages) {
+      // eslint-disable-next-line no-await-in-loop
+      const response: PaginatedUsers = await this.manageUsersApiClient.users.getUsersByCaseload(token, {
+        caseload,
+        accessRoles,
+        page: page.toString(),
+        size: size.toString(),
+      })
+
+      allUsers = allUsers.concat(response.content)
+      totalPages = response.totalPages
+      page += 1
+    }
+    return {
+      content: allUsers,
+      totalPages,
+    }
   }
 }
