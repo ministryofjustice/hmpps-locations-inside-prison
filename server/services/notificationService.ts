@@ -9,7 +9,7 @@ const {
 
 interface EmailClient {
   sendEmail: (
-    templateId: string,
+    templateId: typeof templates[keyof typeof templates],
     emailAddress: string,
     options?: {
       personalisation?: Record<string, string | string[]>

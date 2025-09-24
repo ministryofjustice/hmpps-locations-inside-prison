@@ -5,6 +5,7 @@ import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
 import sendChangeRequestReceivedEmails from '../../notify/emails/changeRequestRecieved'
+import { validateEmails } from '../../utils/validateEmails'
 import { Location } from '../../data/types/locationsApi'
 import { PaginatedUsers } from '../../data/manageUsersApiClient'
 
@@ -123,7 +124,8 @@ export default class Confirm extends FormInitialStep {
       'MANAGE_RES_LOCATIONS_OP_CAP',
     )
 
-    const opCapEmailAddresses: string[] = usersWithOpCapRole.content.map(user => user.email).filter(Boolean)
+    const opCapEmailAddresses = validateEmails(usersWithOpCapRole.content)
+
     await sendChangeRequestReceivedEmails(opCapEmailAddresses, submittedBy, prisonName)
     // Check when sendChangeRequestSubmittedEmails also needs to be sent
     // Same params to be sent (could condense to one function)

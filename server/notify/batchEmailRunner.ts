@@ -1,7 +1,6 @@
 import logger from '../../logger'
 import { EmailResponse } from '../services/notificationService'
 
-// eslint-disable-next-line import/prefer-default-export
 export async function batchSendEmails<T extends { establishment: string }>(
   recipients: string[],
   sendEmail: (recipient: string, args: T) => Promise<EmailResponse>,
@@ -12,19 +11,26 @@ export async function batchSendEmails<T extends { establishment: string }>(
   logger.info(`Starting batch send of ${recipients.length} emails`)
 
   for (const email of recipients) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      await sendEmail(email, args)
-      emailsSent += 1
-    } catch (error) {
-      logger.error(`Error sending email: ${error}`)
-    }
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise(resolve => {
-      setTimeout(resolve, delayMs)
-    })
+    await sendEmailWithDelay(email, sendEmail, args, delayMs)
+    emailsSent += 1
   }
+
   logger.info(
     `Finished batch send of emails for ${args.establishment}. Successfully sent ${emailsSent} of ${recipients.length} emails`,
   )
+}
+
+async function sendEmailWithDelay<T extends { establishment: string }>(
+  email: string,
+  sendEmail: (recipient: string, args: T) => Promise<EmailResponse>,
+  args: T,
+  delayMs: number,
+) {
+  try {
+    await sendEmail(email, args)
+  } catch (error) {
+    logger.error(`Error sending email: ${error}`)
+  }
+
+  await new Promise(resolve => setTimeout(resolve, delayMs))
 }

@@ -32,21 +32,31 @@ export default class ManageUsersService {
     let totalPages = 1
 
     while (page < totalPages) {
-      // eslint-disable-next-line no-await-in-loop
-      const response: PaginatedUsers = await this.manageUsersApiClient.users.getUsersByCaseload(token, {
-        caseload,
-        accessRoles,
-        page: page.toString(),
-        size: size.toString(),
-      })
-
+      const response = await this.getPagedUsersByCaseload(token, caseload, accessRoles, page, size)
       allUsers = allUsers.concat(response.content)
       totalPages = response.totalPages
       page += 1
     }
+
     return {
       content: allUsers,
       totalPages,
     }
   }
+
+  private async getPagedUsersByCaseload(
+    token: string,
+    caseload: string,
+    accessRoles: string,
+    page: number,
+    size: number,
+  ): Promise<PaginatedUsers> {
+    return this.manageUsersApiClient.users.getUsersByCaseload(token, {
+      caseload,
+      accessRoles,
+      page: page.toString(),
+      size: size.toString(),
+    })
+  }
+
 }
