@@ -5,7 +5,7 @@ import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
 import sendChangeRequestReceivedEmails from '../../notify/emails/changeRequestRecieved'
-import { validateEmails } from '../../utils/validateEmails'
+import validateEmails from '../../utils/validateEmails'
 import { Location } from '../../data/types/locationsApi'
 import { PaginatedUsers } from '../../data/manageUsersApiClient'
 

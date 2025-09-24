@@ -1,5 +1,5 @@
 import { notificationServiceFactory } from '../../services/notificationService'
-import { batchSendEmails } from '../batchEmailRunner'
+import batchSendEmails from '../batchEmailRunner'
 
 export default async function sendChangeRequestRejectionEmails(
   recipients: string[],

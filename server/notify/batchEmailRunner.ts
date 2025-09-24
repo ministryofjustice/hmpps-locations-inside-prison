@@ -1,36 +1,47 @@
 import logger from '../../logger'
 import { EmailResponse } from '../services/notificationService'
 
-export async function batchSendEmails<T extends { establishment: string }>(
-  recipients: string[],
-  sendEmail: (recipient: string, args: T) => Promise<EmailResponse>,
-  args: T,
-  delayMs = 10,
-) {
-  let emailsSent = 0
-  logger.info(`Starting batch send of ${recipients.length} emails`)
-
-  for (const email of recipients) {
-    await sendEmailWithDelay(email, sendEmail, args, delayMs)
-    emailsSent += 1
-  }
-
-  logger.info(
-    `Finished batch send of emails for ${args.establishment}. Successfully sent ${emailsSent} of ${recipients.length} emails`,
-  )
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
 }
 
 async function sendEmailWithDelay<T extends { establishment: string }>(
   email: string,
   sendEmail: (recipient: string, args: T) => Promise<EmailResponse>,
   args: T,
-  delayMs: number,
-) {
+): Promise<boolean> {
   try {
     await sendEmail(email, args)
+    return true
   } catch (error) {
     logger.error(`Error sending email: ${error}`)
+    return false
   }
+}
 
-  await new Promise(resolve => setTimeout(resolve, delayMs))
+export default async function batchSendEmails<T extends { establishment: string }>(
+  recipients: string[],
+  sendEmail: (recipient: string, args: T) => Promise<EmailResponse>,
+  args: T,
+  delayMs = 10,
+): Promise<void> {
+  logger.info(`Starting batch send of ${recipients.length} emails`)
+
+  let emailsSent = 0
+
+  await recipients.reduce(async (previousPromise, email) => {
+    await previousPromise
+    const success = await sendEmailWithDelay(email, sendEmail, args)
+    if (success) {
+      emailsSent += 1
+    }
+
+    await delay(delayMs)
+  }, Promise.resolve())
+
+  logger.info(
+    `Finished batch send of emails for ${args.establishment}. Successfully sent ${emailsSent} of ${recipients.length} emails`,
+  )
 }

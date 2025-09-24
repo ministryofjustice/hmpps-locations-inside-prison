@@ -1,4 +1,4 @@
-import { validateEmails } from './validateEmails'
+import validateEmails from './validateEmails'
 import { UserAccount } from '../data/manageUsersApiClient'
 
 describe('getValidEmailAddresses', () => {

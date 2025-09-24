@@ -1,4 +1,4 @@
-import { batchSendEmails } from './batchEmailRunner'
+import batchSendEmails from './batchEmailRunner'
 import logger from '../../logger'
 
 describe('batchSendEmails', () => {
@@ -35,7 +35,7 @@ describe('batchSendEmails', () => {
     await batchSendEmails(recipients, sendEmail, args, 0)
 
     expect(sendEmail).toHaveBeenCalledTimes(recipients.length)
-    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Error sending email:'))
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Error sending email'))
     expect(logger.info).toHaveBeenCalledWith(
       `Finished batch send of emails for MDI. Successfully sent 2 of ${recipients.length} emails`,
     )

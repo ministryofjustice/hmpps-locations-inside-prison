@@ -27,16 +27,15 @@ export default class ManageUsersService {
     accessRoles: string,
     size = 50,
   ): Promise<PaginatedUsers> {
-    let allUsers: UserAccount[] = []
-    let page = 0
-    let totalPages = 1
+    const firstPage: PaginatedUsers = await this.getPagedUsersByCaseload(token, caseload, accessRoles, 0, size)
+    const { totalPages } = firstPage
 
-    while (page < totalPages) {
-      const response = await this.getPagedUsersByCaseload(token, caseload, accessRoles, page, size)
-      allUsers = allUsers.concat(response.content)
-      totalPages = response.totalPages
-      page += 1
-    }
+    const pagedResponses = Array.from({ length: totalPages }, (_, page) =>
+      this.getPagedUsersByCaseload(token, caseload, accessRoles, page, size),
+    )
+
+    const responses: PaginatedUsers[] = await Promise.all(pagedResponses)
+    const allUsers: UserAccount[] = responses.flatMap(response => response.content)
 
     return {
       content: allUsers,
@@ -58,5 +57,4 @@ export default class ManageUsersService {
       size: size.toString(),
     })
   }
-
 }
