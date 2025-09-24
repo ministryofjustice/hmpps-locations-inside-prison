@@ -4,7 +4,9 @@ import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
+import sendChangeRequestReceivedEmails from '../../notify/emails/changeRequestRecieved'
 import { Location } from '../../data/types/locationsApi'
+import { PaginatedUsers } from '../../data/manageUsersApiClient'
 
 async function getAllLocations(req: FormWizard.Request, location: Location) {
   const locations: Location[] = []
@@ -94,7 +96,9 @@ export default class Confirm extends FormInitialStep {
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
-    const { locationsService } = req.services
+    const { locationsService, manageUsersService } = req.services
+    const { prisonName } = res.locals.prisonResidentialSummary.prisonSummary
+    const submittedBy = res.locals.user.username
 
     await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', res.locals.locationId)
 
@@ -112,6 +116,17 @@ export default class Confirm extends FormInitialStep {
         reasonForChange,
       )
     }
+
+    const usersWithOpCapRole: PaginatedUsers = await manageUsersService.getAllUsersByCaseload(
+      req.session.systemToken,
+      res.locals.prisonId,
+      'MANAGE_RES_LOCATIONS_OP_CAP',
+    )
+
+    const opCapEmailAddresses: string[] = usersWithOpCapRole.content.map(user => user.email).filter(Boolean)
+    await sendChangeRequestReceivedEmails(opCapEmailAddresses, submittedBy, prisonName)
+    // Check when sendChangeRequestSubmittedEmails also needs to be sent
+    // Same params to be sent (could condense to one function)
 
     req.journeyModel.reset()
     req.sessionModel.reset()
