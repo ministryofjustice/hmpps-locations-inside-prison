@@ -776,6 +776,28 @@ const stubPrisonConfigurationActivateResi = (
     },
   })
 
+const stubPrisonConfigurationIncludeSegInRollCount = (
+  returnData = {
+    prisonId: 'TST',
+    resiLocationServiceActive: 'ACTIVE',
+    certificationApprovalRequired: 'INACTIVE',
+    includeSegregationInRollCount: 'INACTIVE',
+  },
+) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/prison-configuration/\\w+/include-seg-in-roll-count/ACTIVE',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubPrisonConfigurationDeactivateResi = (
   returnData = {
     prisonId: 'TST',
@@ -1213,6 +1235,7 @@ const allStubs = {
   stubPrisonConfigurationActivateResi,
   stubPrisonConfigurationDeactivateResi,
   stubPrisonConfigurationResiActive,
+  stubPrisonConfigurationIncludeSegInRollCount,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,

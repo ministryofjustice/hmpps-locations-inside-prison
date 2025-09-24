@@ -285,6 +285,14 @@ describe('locationsApiClient', () => {
       { prisonId: 'LEI', status: 'ACTIVE' },
       'put',
     )
+    testCall(
+      'updateSegInRollCount',
+      '/prison-configuration/LEI/include-seg-in-roll-count/ACTIVE',
+      false,
+      () => apiClient.prisonConfiguration.updateIncludeSegInRollCount,
+      { prisonId: 'LEI', status: 'ACTIVE' },
+      'put',
+    )
   })
 
   describe('prisonerLocations', () => {

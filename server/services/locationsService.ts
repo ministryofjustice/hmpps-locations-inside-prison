@@ -312,6 +312,11 @@ export default class LocationsService {
     await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
   }
 
+  async updateIncludeSegInRollCount(token: string, prisonId: string, status: StatusType) {
+    await this.locationsApiClient.prisonConfiguration.updateIncludeSegInRollCount(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
+  }
+
   async createWing(
     token: string,
     prisonId: string,

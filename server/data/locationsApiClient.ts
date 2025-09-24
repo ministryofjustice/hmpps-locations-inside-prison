@@ -397,5 +397,9 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/prison-configuration/:prisonId/certification-approval-required/:status',
       requestType: 'put',
     }),
+    updateIncludeSegInRollCount: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/include-seg-in-roll-count/:status',
+      requestType: 'put',
+    }),
   }
 }
