@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress'
 import superagent from 'superagent'
 import { mapValues } from 'lodash'
+import cypressSplit from 'cypress-split'
 import { resetStubs, stubFor } from './integration_tests/mockApis/wiremock'
 import auth from './integration_tests/mockApis/auth'
 import components from './integration_tests/mockApis/components'
@@ -28,7 +29,7 @@ export default defineConfig({
   },
   taskTimeout: 60000,
   e2e: {
-    setupNodeEvents(on) {
+    setupNodeEvents(on, config) {
       on('task', {
         reset: async () => {
           await resetStubs()
@@ -62,6 +63,8 @@ export default defineConfig({
         ...prisonApi,
         setFeatureFlag,
       })
+      cypressSplit(on, config)
+      return config
     },
     baseUrl: 'http://localhost:3007',
     excludeSpecPattern: '**/!(*.cy).ts',
