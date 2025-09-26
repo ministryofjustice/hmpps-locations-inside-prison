@@ -19,6 +19,8 @@ async function sendEmailWithDelay<T extends { establishment: string }>(
     logger.error(`Error sending email: ${error}`)
     return false
   }
+
+//   add in app insights - seperate ticket as follow up.
 }
 
 export default async function batchSendEmails<T extends { establishment: string }>(

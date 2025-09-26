@@ -1,4 +1,3 @@
-// @ts-expect-error @ts-ignore
 import { NotifyClient } from 'notifications-node-client'
 import config from '../config'
 import logger from '../../logger'
@@ -7,213 +6,118 @@ const {
   email: { enabled, notifyKey, templates },
 } = config
 
-interface EmailClient {
-  sendEmail: (
-    templateId: (typeof templates)[keyof typeof templates],
-    emailAddress: string,
-    options?: {
-      personalisation?: Record<string, string | string[]>
-      reference?: string | null
-      emailReplyToId?: string
-      oneClickUnsubscribeURL?: string
-    },
-  ) => Promise<EmailResponse>
-}
+export default class NotifyService {
 
-export interface EmailResponse {
-  id: string
-  reference?: string
-  content: {
-    subject: string
-    body: string
-    from_email: string
-    one_click_unsubscribe_url?: string
-  }
-  uri: string
-  template: {
-    id: string
-    version: number
-    uri: string
-  }
-}
+  constructor(private readonly emailClient: NotifyClient) {}
 
-export interface WithdrawnChangeEmailArgs {
-  establishment: string
-  location: string
-  changeType: string
-  submittedOn: string
-  submittedBy: string
-  withdrawnBy: string
-  withdrawReason: string
-}
-
-export interface RejectedChangeEmailArgs {
-  establishment: string
-  location: string
-  changeType: string
-  submittedOn: string
-  submittedBy: string
-  rejectionBy: string
-  rejectionReason: string
-}
-
-export interface NotificationService {
-  sendChangeRequestReceivedEmail: (
-    emailAddress: string,
-    submittedBy: string,
-    establishment: string,
-  ) => Promise<EmailResponse>
-  sendChangeRequestSubmittedEmail: (
-    emailAddress: string,
-    submittedBy: string,
-    establishment: string,
-  ) => Promise<EmailResponse>
-  sendRequestApprovalEmail: (emailAddress: string, establishment: string) => Promise<EmailResponse>
-  sendChangeRequestWithdrawnEmail: (emailAddress: string, args: WithdrawnChangeEmailArgs) => Promise<EmailResponse>
-  sendChangeRequestRejectionEmail: (emailAddress: string, args: RejectedChangeEmailArgs) => Promise<EmailResponse>
-}
-
-export const createNotificationService = (emailClient: EmailClient): NotificationService => {
-  const sendChangeRequestReceivedEmail = async (
-    emailAddress: string,
-    submittedBy: string,
-    establishment: string,
-  ): Promise<EmailResponse> => {
-    try {
-      return await emailClient.sendEmail(templates.CHANGE_REQUEST_RECEIVED, emailAddress, {
-        personalisation: {
-          SUBMITTED_BY: submittedBy,
-          ESTABLISHMENT: establishment,
-        },
-      })
-    } catch (error) {
-      logger.error(`Failed to send CHANGE_REQUEST_RECEIVED email for ${establishment}. Error: ${error}`)
-      return null
-    }
+  async notify(notificationDetails: NotificationDetails) {
+    // FIXME needs to be changed to use the batch email
+    // FIXME batch functionality could be added as private functions in the service or maybe in separate util class as now?
+    // return this.emailClient.sendEmail(getTemplateId(notificationDetails.type), notificationDetails.emailAddress[0], {
+    //   personalisation: getPersonalisation(notificationDetails),
+    // })
+    await this.batchSend(notificationDetails)
   }
 
-  const sendChangeRequestSubmittedEmail = async (
-    emailAddress: string,
-    submittedBy: string,
-    establishment: string,
-  ): Promise<EmailResponse> => {
-    try {
-      return await emailClient.sendEmail(templates.CHANGE_REQUEST_SUBMITTED, emailAddress, {
-        personalisation: {
-          SUBMITTED_BY: submittedBy,
-          ESTABLISHMENT: establishment,
-        },
-      })
-    } catch (error) {
-      logger.error(`Failed to send CHANGE_REQUEST_SUBMITTED email for ${establishment}. Error: ${error}`)
-      return null
-    }
-  }
+  private async batchSend(
+    notificationDetails: NotificationDetails,
+    delayMs = 10,
+  ): Promise<void> {
+    const templateId = getTemplateId(notificationDetails.type)
+    logger.info(`Send of ${notificationDetails.emailAddress.length} ${notificationDetails.type} emails`)
 
-  const sendRequestApprovalEmail = async (emailAddress: string, establishment: string): Promise<EmailResponse> => {
-    try {
-      return await emailClient.sendEmail(templates.CHANGE_REQUEST_APPROVED, emailAddress, {
-        personalisation: {
-          ESTABLISHMENT: establishment,
-        },
-      })
-    } catch (error) {
-      logger.error(`Failed to send CHANGE_REQUEST_APPROVED email for ${establishment}. Error: ${error}`)
-      return null
-    }
-  }
+    let emailsSent = 0
 
-  const sendChangeRequestWithdrawnEmail = async (
-    emailAddress: string,
-    {
-      establishment,
-      location,
-      changeType,
-      submittedOn,
-      submittedBy,
-      withdrawnBy,
-      withdrawReason,
-    }: WithdrawnChangeEmailArgs,
-  ): Promise<EmailResponse> => {
-    try {
-      return await emailClient.sendEmail(templates.CHANGE_REQUEST_WITHDRAWN, emailAddress, {
-        personalisation: {
-          ESTABLISHMENT: establishment,
-          LOCATION: location,
-          CHANGE_TYPE: changeType,
-          SUBMITTED_ON: submittedOn,
-          SUBMITTED_BY: submittedBy,
-          WITHDRAWN_BY: withdrawnBy,
-          WITHDRAW_REASON: withdrawReason,
-        },
-      })
-    } catch (error) {
-      logger.error(`Failed to send CHANGE_REQUEST_WITHDRAWN email for ${establishment}. Error: ${error}`)
-      return null
-    }
-  }
-
-  const sendChangeRequestRejectionEmail = async (
-    emailAddress: string,
-    {
-      establishment,
-      location,
-      changeType,
-      submittedOn,
-      submittedBy,
-      rejectionBy,
-      rejectionReason,
-    }: RejectedChangeEmailArgs,
-  ): Promise<EmailResponse> => {
-    try {
-      return await emailClient.sendEmail(templates.CHANGE_REQUEST_REJECTED, emailAddress, {
-        personalisation: {
-          ESTABLISHMENT: establishment,
-          LOCATION: location,
-          CHANGE_TYPE: changeType,
-          SUBMITTED_ON: submittedOn,
-          SUBMITTED_BY: submittedBy,
-          REJECTION_BY: rejectionBy,
-          REJECTION_REASON: rejectionReason,
-        },
-      })
-    } catch (error) {
-      logger.error(`Failed to send CHANGE_REQUEST_REJECTED email for ${establishment}. Error: ${error}`)
-      return null
-    }
-  }
-
-  return {
-    sendChangeRequestReceivedEmail,
-    sendChangeRequestSubmittedEmail,
-    sendRequestApprovalEmail,
-    sendChangeRequestWithdrawnEmail,
-    sendChangeRequestRejectionEmail,
-  }
-}
-
-export const notificationServiceFactory = (): NotificationService => {
-  const stubClient: EmailClient = {
-    sendEmail: async (templateId, emailAddress, options) => {
-      logger.info(`Stubbed sendEmail: ${JSON.stringify({ templateId, emailAddress, options })}`)
-      return {
-        id: 'stubId',
-        reference: options?.reference ?? null,
-        content: {
-          subject: 'Stub subject',
-          body: 'Stub body',
-          from_email: 'stub@example.com',
-        },
-        uri: 'https://stubbed.uri',
-        template: {
-          id: templateId,
-          version: 1,
-          uri: `https://stubbed.uri/${templateId}`,
-        },
+    await notificationDetails.emailAddress.reduce(async (previousPromise, email) => {
+      await previousPromise
+      const success = await this.sendWithDelay(templateId, email, notificationDetails)
+      if (success) {
+        emailsSent += 1
       }
-    },
+
+      await this.delay(delayMs)
+    }, Promise.resolve())
+
+    logger.info(
+      `Finished batch send of emails for ${notificationDetails.establishment}. Successfully sent ${emailsSent} of ${notificationDetails.emailAddress.length} emails`,
+    )
   }
 
-  const notifyClient = enabled === true ? new NotifyClient(notifyKey) : stubClient
-  return createNotificationService(notifyClient)
+  private async sendWithDelay(templateId: string, email: string, notificationDetails: NotificationDetails): Promise<boolean> {
+    try {
+      await this.emailClient.sendEmail(templateId, email, {
+        personalisation: getPersonalisation(notificationDetails),
+      })
+      return true
+    } catch (error) {
+      logger.error(`Error sending email: ${error}`)
+      return false
+    }
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+  }
+}
+
+export type NotificationDetails = {
+  type: NotificationType
+  emailAddress: string[]
+  establishment: string
+  location?: string
+  changeType?: string
+  submittedOn?: string
+  submittedBy?: string
+  who?: string
+  reason?: string
+}
+
+export enum NotificationType {
+  REQUEST_RECEIVED = 'REQUEST_RECEIVED',
+  REQUEST_SUBMITTED = 'REQUEST_SUBMITTED',
+  REQUEST_APPROVED = 'REQUEST_APPROVED',
+  REQUEST_WITHDRAWN = 'REQUEST_WITHDRAWN',
+  REQUEST_REJECTED = 'REQUEST_REJECTED',
+}
+
+const getTemplateId = (type: NotificationType): string => {
+  switch (type) {
+    case NotificationType.REQUEST_RECEIVED:
+      return templates.CHANGE_REQUEST_RECEIVED
+    case NotificationType.REQUEST_SUBMITTED:
+      return templates.CHANGE_REQUEST_SUBMITTED
+    case NotificationType.REQUEST_APPROVED:
+      return templates.CHANGE_REQUEST_APPROVED
+    case NotificationType.REQUEST_WITHDRAWN:
+      return templates.CHANGE_REQUEST_WITHDRAWN
+    case NotificationType.REQUEST_REJECTED:
+      return templates.CHANGE_REQUEST_REJECTED
+    default:
+      throw new Error(`Unsupported notification type: ${type}`)
+  }
+}
+
+const getPersonalisation = (notificationDetails: NotificationDetails): Record<string, string | string[]> => {
+  switch (notificationDetails.type) {
+    // FIXME add in all notifications
+    case NotificationType.REQUEST_RECEIVED:
+      return {
+        SUBMITTED_BY: notificationDetails.submittedBy,
+        ESTABLISHMENT: notificationDetails.establishment,
+      }
+    case NotificationType.REQUEST_REJECTED:
+      return {
+        ESTABLISHMENT: notificationDetails.establishment,
+        LOCATION: notificationDetails.location,
+        CHANGE_TYPE: notificationDetails.changeType,
+        SUBMITTED_ON: notificationDetails.submittedOn,
+        SUBMITTED_BY: notificationDetails.submittedBy,
+        REJECTION_BY: notificationDetails.who,
+        REJECTION_REASON: notificationDetails.reason,
+      }
+    default:
+      throw new Error(`Unsupported notification type: ${notificationDetails.type}`)
+  }
 }
