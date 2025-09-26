@@ -4,7 +4,11 @@ import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
+
+import validateEmails from '../../utils/validateEmails'
 import { Location } from '../../data/types/locationsApi'
+import { PaginatedUsers } from '../../data/manageUsersApiClient'
+import { NotificationDetails, NotificationType } from '../../services/notificationService'
 
 async function getAllLocations(req: FormWizard.Request, location: Location) {
   const locations: Location[] = []
@@ -94,9 +98,11 @@ export default class Confirm extends FormInitialStep {
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
-    const { locationsService } = req.services
+    const { locationsService, manageUsersService, notifyService } = req.services
+    const { prisonName } = res.locals.prisonResidentialSummary.prisonSummary
+    const submittedBy = res.locals.user.username
 
-    await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', res.locals.locationId)
+    // await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', res.locals.locationId)
 
     const proposedSignedOpCapChange = req.sessionModel.get<{
       prisonId: string
@@ -112,6 +118,25 @@ export default class Confirm extends FormInitialStep {
         reasonForChange,
       )
     }
+
+    const usersWithOpCapRole: PaginatedUsers = await manageUsersService.getAllUsersByCaseload(
+      req.session.systemToken,
+      res.locals.prisonId,
+      'MANAGE_RES_LOCATIONS_OP_CAP',
+    )
+
+    const opCapEmailAddresses = validateEmails(usersWithOpCapRole.content)
+
+    const details: NotificationDetails = {
+      // emailAddress: opCapEmailAddresses,
+      emailAddress: ['ashley.gyngell@justice.gov.uk', 'dafydd.houston@justice.gov.uk'],
+      establishment: prisonName,
+      type: NotificationType.REQUEST_RECEIVED,
+      submittedBy,
+    }
+
+    await notifyService.notify(details)
+    // Check when sendChangeRequestSubmittedEmails also needs to be sent
 
     req.journeyModel.reset()
     req.sessionModel.reset()

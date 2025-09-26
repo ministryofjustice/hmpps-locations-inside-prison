@@ -18,8 +18,10 @@ import FeComponentsClient from './feComponentsClient'
 import HmppsAuditClient from './hmppsAuditClient'
 import LocationsApiClient from './locationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
+import { NotifyClient } from 'notifications-node-client'
 import logger from '../../logger'
 import { PrisonApiClient } from './prisonApiClient'
+import NotifyService from '../services/notificationService'
 
 export const dataAccess = () => {
   const hmppsAuthClient = new AuthenticationClient(
@@ -27,6 +29,9 @@ export const dataAccess = () => {
     logger,
     config.redis.enabled ? new RedisTokenStore(redisClient) : new InMemoryTokenStore(),
   )
+  const notifyClient = new NotifyClient(config.email.notifyKey)
+  // Keep stub.
+
 
   return {
     applicationInfo,
@@ -37,6 +42,7 @@ export const dataAccess = () => {
     locationsApiClient: new LocationsApiClient(redisClient, hmppsAuthClient),
     manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
     prisonApiClient: new PrisonApiClient(redisClient, hmppsAuthClient),
+    notifyClient,
     redisClient,
   }
 }

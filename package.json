@@ -111,6 +111,7 @@
     "lodash": "4.17.21",
     "multer": "^2.0.2",
     "nocache": "^4.0.0",
+    "notifications-node-client": "^8.2.1",
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",

@@ -83,6 +83,24 @@ const stubManageUsersMeCaseloads = () =>
     },
   })
 
+const stubManageUsersByCaseload = (page: string = '0') =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/manage-users-api/prisonusers/search?inclusiveRoles=true&status=ACTIVE&caseload=TST&accessRoles=MANAGE_RES_LOCATIONS_OP_CAP&page=${page}&size=50`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        content: [{ username: 'joe1', email: 'joe1@test.com' }],
+        totalPages: 1,
+      },
+    },
+  })
+
 const stubManageHealthPing = () =>
   stubFor({
     request: {
@@ -99,6 +117,7 @@ const allStubs = {
   stubManageUsers,
   stubManageUsersMe,
   stubManageUsersMeCaseloads,
+  stubManageUsersByCaseload,
   stubManageUsersMeRoles,
 }
 

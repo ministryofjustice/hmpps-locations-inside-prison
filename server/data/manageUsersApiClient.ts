@@ -13,6 +13,26 @@ export interface User {
   activeCaseLoadId?: string // Will be removed from User. For now, use 'me/caseloads' endpoint in 'nomis-user-roles-api'
 }
 
+export interface UserAccount {
+  username: string
+  staffId: string
+  firstName: string
+  lastName: string
+  active: boolean
+  status: string
+  locked: boolean
+  expired: boolean
+  activeCaseload: object
+  dpsRoleCount: number
+  email: string
+  staffStatus: string
+}
+
+export interface PaginatedUsers {
+  content: UserAccount[]
+  totalPages: number
+}
+
 export interface Caseload {
   id: string
   name: string
@@ -50,6 +70,13 @@ export default class ManageUsersApiClient extends BaseApiClient {
       path: '/users/:username',
       requestType: 'get',
       options: { cacheDuration: 86_400 },
+    }),
+    getUsersByCaseload: this.apiCall<
+      PaginatedUsers,
+      { caseload: string; accessRoles: string; page: string; size: string }
+    >({
+      path: '/prisonusers/search?inclusiveRoles=true&status=ACTIVE&caseload=:caseload&accessRoles=:accessRoles&page=:page&size=:size',
+      requestType: 'get',
     }),
   }
 }

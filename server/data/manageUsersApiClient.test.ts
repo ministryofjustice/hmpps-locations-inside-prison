@@ -85,5 +85,12 @@ describe('manageUsersApiClient', () => {
     })
 
     testCall('get', '/users/USERNAME', true, () => apiClient.users.get, { username: 'USERNAME' })
+    testCall(
+      'getUsersByCaseload',
+      '/prisonusers/search?inclusiveRoles=true&status=ACTIVE&caseload=CASELOAD&accessRoles=ROLE&size=50&page=1',
+      false,
+      () => apiClient.users.getUsersByCaseload,
+      { caseload: 'CASELOAD', accessRoles: 'ROLE', page: '1', size: '50' },
+    )
   })
 })
