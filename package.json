@@ -155,6 +155,7 @@
     "cypress": "^14.5.2",
     "cypress-axe": "^1.6.0",
     "cypress-multi-reporters": "^2.0.5",
+    "cypress-split": "^1.24.23",
     "dotenv": "^17.2.0",
     "esbuild": "^0.25.8",
     "esbuild-plugin-clean": "^1.0.1",
