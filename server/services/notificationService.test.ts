@@ -1,149 +1,159 @@
-import logger from '../../logger'
-import { createNotificationService, WithdrawnChangeEmailArgs, RejectedChangeEmailArgs } from './notificationService'
+import { NotifyClient } from 'notifications-node-client'
+import NotificationService, { NotificationDetails, NotificationType } from './notificationService'
 import config from '../config'
+import logger from '../../logger'
 
-describe('Notification Service', () => {
-  let emailClient: { sendEmail: jest.Mock }
-  let notificationService: ReturnType<typeof createNotificationService>
+jest.mock('notifications-node-client')
+jest.mock('../../logger', () => ({
+  info: jest.fn(),
+  error: jest.fn(),
+}))
+
+jest.mock('../config', () => {
+  return {
+    email: {
+      enabled: true,
+      devUser: 'dev@example.com',
+      templates: {
+        CHANGE_REQUEST_RECEIVED: 'template-id-received',
+        CHANGE_REQUEST_SUBMITTED: 'template-id-submitted',
+        CHANGE_REQUEST_APPROVED: 'template-id-approved',
+        CHANGE_REQUEST_WITHDRAWN: 'template-id-withdrawn',
+        CHANGE_REQUEST_REJECTED: 'template-id-rejected',
+      },
+    },
+  }
+})
+
+describe('NotificationService', () => {
+  const mockSendEmail = jest.fn()
+
+  const mockNotifyClient = {
+    sendEmail: mockSendEmail,
+  } as unknown as NotifyClient
+
+  const baseNotificationDetails: NotificationDetails = {
+    type: NotificationType.REQUEST_RECEIVED,
+    emailAddress: ['user@example.com'],
+    establishment: 'Test Establishment',
+    submittedBy: 'John Doe',
+  }
 
   beforeEach(() => {
-    emailClient = { sendEmail: jest.fn() }
-    notificationService = createNotificationService(emailClient)
-
-    jest.spyOn(logger, 'error').mockImplementation(() => {})
+    jest.clearAllMocks()
   })
 
-  describe('sendEmail', () => {
-    it('returns the email response from sendEmail', async () => {
-      const mockResponse = {
-        id: 'email-id',
-        content: {
-          subject: 'Subject',
-          body: 'Body',
-          from_email: 'joebloggs@email.com',
-        },
-        uri: 'https://email.uri',
-        template: {
-          id: config.email.templates.CHANGE_REQUEST_RECEIVED,
-          uri: 'https://template.uri',
-        },
-      }
-
-      emailClient.sendEmail.mockResolvedValue(mockResponse)
-
-      const result = await notificationService.sendChangeRequestReceivedEmail('test@email.com', 'Joe', 'MDI')
-
-      expect(result).toEqual(mockResponse)
+  describe('NotificationService (enabled mode)', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+      config.email.enabled = true
     })
 
-    it('returns null if sendEmail fails', async () => {
-      emailClient.sendEmail.mockRejectedValue(new Error('Email service failed'))
+    const baseDetails: Partial<NotificationDetails> = {
+      emailAddress: ['user@example.com'],
+      establishment: 'Test Establishment',
+      submittedBy: 'John Doe',
+      location: 'Test Location',
+      changeType: 'Test Change',
+      submittedOn: '2025-09-26',
+      who: 'Jane Smith',
+      reason: 'Test Reason',
+    }
 
-      const result = await notificationService.sendChangeRequestReceivedEmail('test@email.com', 'Joe', 'MDI')
-
-      expect(result).toBeNull()
-      expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to send CHANGE_REQUEST_RECEIVED email for MDI'),
-      )
-    })
-  })
-
-  describe('sendChangeRequestReceivedEmail', () => {
-    it('calls sendEmail with correct template and personalisation', async () => {
-      await notificationService.sendChangeRequestReceivedEmail('test@email.com', 'Joe', 'MDI')
-      expect(emailClient.sendEmail).toHaveBeenCalledWith(
-        config.email.templates.CHANGE_REQUEST_RECEIVED,
-        'test@email.com',
-        {
-          personalisation: { SUBMITTED_BY: 'Joe', ESTABLISHMENT: 'MDI' },
+    const testCases: { type: NotificationType; expectedPersonalisation: Record<string, string | string[]> }[] = [
+      {
+        type: NotificationType.REQUEST_RECEIVED,
+        expectedPersonalisation: {
+          SUBMITTED_BY: 'John Doe',
+          ESTABLISHMENT: 'Test Establishment',
         },
-      )
-    })
-  })
-
-  describe('sendChangeRequestSubmittedEmail', () => {
-    it('calls sendEmail with correct template and personalisation', async () => {
-      await notificationService.sendChangeRequestSubmittedEmail('test@email.com', 'Joe', 'MDI')
-      expect(emailClient.sendEmail).toHaveBeenCalledWith(
-        config.email.templates.CHANGE_REQUEST_SUBMITTED,
-        'test@email.com',
-        {
-          personalisation: { SUBMITTED_BY: 'Joe', ESTABLISHMENT: 'MDI' },
+      },
+      {
+        type: NotificationType.REQUEST_SUBMITTED,
+        expectedPersonalisation: {
+          SUBMITTED_BY: 'John Doe',
+          ESTABLISHMENT: 'Test Establishment',
         },
-      )
-    })
-  })
-
-  describe('sendRequestApprovalEmail', () => {
-    it('calls sendEmail with correct template and personalisation', async () => {
-      await notificationService.sendRequestApprovalEmail('test@email.com', 'MDI')
-      expect(emailClient.sendEmail).toHaveBeenCalledWith(
-        config.email.templates.CHANGE_REQUEST_APPROVED,
-        'test@email.com',
-        {
-          personalisation: { ESTABLISHMENT: 'MDI' },
+      },
+      {
+        type: NotificationType.REQUEST_APPROVED,
+        expectedPersonalisation: {
+          ESTABLISHMENT: 'Test Establishment',
         },
-      )
-    })
-  })
-
-  describe('sendChangeRequestWithdrawnEmail', () => {
-    it('calls sendEmail with correct template and personalisation', async () => {
-      const args: WithdrawnChangeEmailArgs = {
-        establishment: 'MDI',
-        location: 'WING A',
-        changeType: 'Change 1',
-        submittedOn: '2020-02-02',
-        submittedBy: 'Joe',
-        withdrawnBy: 'Bloggs',
-        withdrawReason: 'Mistake',
-      }
-      await notificationService.sendChangeRequestWithdrawnEmail('test@email.com', args)
-      expect(emailClient.sendEmail).toHaveBeenCalledWith(
-        config.email.templates.CHANGE_REQUEST_WITHDRAWN,
-        'test@email.com',
-        {
-          personalisation: {
-            ESTABLISHMENT: 'MDI',
-            LOCATION: 'WING A',
-            CHANGE_TYPE: 'Change 1',
-            SUBMITTED_ON: '2020-02-02',
-            SUBMITTED_BY: 'Joe',
-            WITHDRAWN_BY: 'Bloggs',
-            WITHDRAW_REASON: 'Mistake',
-          },
+      },
+      {
+        type: NotificationType.REQUEST_WITHDRAWN,
+        expectedPersonalisation: {
+          ESTABLISHMENT: 'Test Establishment',
+          LOCATION: 'Test Location',
+          CHANGE_TYPE: 'Test Change',
+          SUBMITTED_ON: '2025-09-26',
+          SUBMITTED_BY: 'John Doe',
+          WITHDRAWN_BY: 'Jane Smith',
+          WITHDRAW_REASON: 'Test Reason',
         },
-      )
+      },
+      {
+        type: NotificationType.REQUEST_REJECTED,
+        expectedPersonalisation: {
+          ESTABLISHMENT: 'Test Establishment',
+          LOCATION: 'Test Location',
+          CHANGE_TYPE: 'Test Change',
+          SUBMITTED_ON: '2025-09-26',
+          SUBMITTED_BY: 'John Doe',
+          REJECTION_BY: 'Jane Smith',
+          REJECTION_REASON: 'Test Reason',
+        },
+      },
+    ]
+
+    testCases.forEach(({ type, expectedPersonalisation }) => {
+      it(`should send ${type} email to actual recipient when enabled`, async () => {
+        const details: NotificationDetails = {
+          ...baseDetails,
+          type,
+          emailAddress: ['user@example.com'],
+        } as NotificationDetails
+
+        const service = new NotificationService(mockNotifyClient)
+        await service.notify(details)
+
+        expect(mockSendEmail).toHaveBeenCalledWith(config.email.templates[`CHANGE_${type}`], 'user@example.com', {
+          personalisation: expectedPersonalisation,
+        })
+      })
     })
   })
 
-  describe('sendChangeRequestRejectionEmail', () => {
-    it('calls sendEmail with correct template and personalisation', async () => {
-      const args: RejectedChangeEmailArgs = {
-        establishment: 'MDI',
-        location: 'WING A',
-        changeType: 'Change 1',
-        submittedOn: '2020-02-02',
-        submittedBy: 'Joe',
-        rejectionBy: 'Bloggs',
-        rejectionReason: 'Mistake',
-      }
-      await notificationService.sendChangeRequestRejectionEmail('test@email.com', args)
-      expect(emailClient.sendEmail).toHaveBeenCalledWith(
-        config.email.templates.CHANGE_REQUEST_REJECTED,
-        'test@email.com',
-        {
-          personalisation: {
-            ESTABLISHMENT: 'MDI',
-            LOCATION: 'WING A',
-            CHANGE_TYPE: 'Change 1',
-            SUBMITTED_ON: '2020-02-02',
-            SUBMITTED_BY: 'Joe',
-            REJECTION_BY: 'Bloggs',
-            REJECTION_REASON: 'Mistake',
-          },
+  it('should send email to devUser when disabled', async () => {
+    config.email.enabled = false
+
+    const service = new NotificationService(mockNotifyClient)
+    await service.notify(baseNotificationDetails)
+
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      config.email.templates.CHANGE_REQUEST_RECEIVED,
+      config.email.notifyDevUser,
+      {
+        personalisation: {
+          SUBMITTED_BY: 'John Doe',
+          ESTABLISHMENT: 'Test Establishment',
         },
-      )
-    })
+      },
+    )
+  })
+
+  it('should log error if sendEmail fails', async () => {
+    config.email.enabled = true
+    mockSendEmail.mockRejectedValueOnce(new Error('Send failed'))
+
+    const service = new NotificationService(mockNotifyClient)
+    await service.notify(baseNotificationDetails)
+
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Error sending email'))
+    expect(logger.info).toHaveBeenCalledWith('Send of 1 REQUEST_RECEIVED emails')
+    expect(logger.info).toHaveBeenCalledWith(
+      'Finished batch send of emails for Test Establishment. Successfully sent 0 REQUEST_RECEIVED emails',
+    )
   })
 })

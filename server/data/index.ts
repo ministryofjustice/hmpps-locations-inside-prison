@@ -4,6 +4,7 @@
  * In particular, applicationinsights automatically collects bunyan logs
  */
 import { AuthenticationClient, InMemoryTokenStore, RedisTokenStore } from '@ministryofjustice/hmpps-auth-clients'
+import { NotifyClient } from 'notifications-node-client'
 import { initialiseAppInsights, buildAppInsightsClient } from '../utils/azureAppInsights'
 import applicationInfoSupplier from '../applicationInfo'
 
@@ -18,10 +19,8 @@ import FeComponentsClient from './feComponentsClient'
 import HmppsAuditClient from './hmppsAuditClient'
 import LocationsApiClient from './locationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
-import { NotifyClient } from 'notifications-node-client'
 import logger from '../../logger'
 import { PrisonApiClient } from './prisonApiClient'
-import NotifyService from '../services/notificationService'
 
 export const dataAccess = () => {
   const hmppsAuthClient = new AuthenticationClient(
@@ -29,9 +28,7 @@ export const dataAccess = () => {
     logger,
     config.redis.enabled ? new RedisTokenStore(redisClient) : new InMemoryTokenStore(),
   )
-  const notifyClient = new NotifyClient(config.email.notifyKey)
-  // Keep stub.
-
+  const notificationClient = new NotifyClient(config.email.notifyKey)
 
   return {
     applicationInfo,
@@ -42,7 +39,7 @@ export const dataAccess = () => {
     locationsApiClient: new LocationsApiClient(redisClient, hmppsAuthClient),
     manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
     prisonApiClient: new PrisonApiClient(redisClient, hmppsAuthClient),
-    notifyClient,
+    notificationClient,
     redisClient,
   }
 }

@@ -102,7 +102,7 @@ export default class Confirm extends FormInitialStep {
     const { prisonName } = res.locals.prisonResidentialSummary.prisonSummary
     const submittedBy = res.locals.user.username
 
-    // await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', res.locals.locationId)
+    await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', res.locals.locationId)
 
     const proposedSignedOpCapChange = req.sessionModel.get<{
       prisonId: string

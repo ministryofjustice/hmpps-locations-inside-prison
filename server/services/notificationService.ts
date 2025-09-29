@@ -2,27 +2,27 @@ import { NotifyClient } from 'notifications-node-client'
 import config from '../config'
 import logger from '../../logger'
 
-const {
-  email: { enabled, notifyKey, templates },
-} = config
+const { templates } = config.email
+const { notifyDevUser } = config.email
 
-export default class NotifyService {
-
+export default class NotificationService {
   constructor(private readonly emailClient: NotifyClient) {}
 
   async notify(notificationDetails: NotificationDetails) {
-    // FIXME needs to be changed to use the batch email
-    // FIXME batch functionality could be added as private functions in the service or maybe in separate util class as now?
-    // return this.emailClient.sendEmail(getTemplateId(notificationDetails.type), notificationDetails.emailAddress[0], {
-    //   personalisation: getPersonalisation(notificationDetails),
-    // })
-    await this.batchSend(notificationDetails)
+    const { enabled } = config.email
+    if (enabled === 'true' || enabled === true) {
+      await this.batchSend(notificationDetails)
+    } else {
+      logger.info(`NOTIFY_ENABLED is ${config.email.enabled} sending to ${notifyDevUser} instead`)
+      const devUserNotificationDetails: NotificationDetails = {
+        ...notificationDetails,
+        emailAddress: [notifyDevUser],
+      }
+      await this.batchSend(devUserNotificationDetails)
+    }
   }
 
-  private async batchSend(
-    notificationDetails: NotificationDetails,
-    delayMs = 10,
-  ): Promise<void> {
+  private async batchSend(notificationDetails: NotificationDetails, delayMs = 10): Promise<void> {
     const templateId = getTemplateId(notificationDetails.type)
     logger.info(`Send of ${notificationDetails.emailAddress.length} ${notificationDetails.type} emails`)
 
@@ -39,11 +39,15 @@ export default class NotifyService {
     }, Promise.resolve())
 
     logger.info(
-      `Finished batch send of emails for ${notificationDetails.establishment}. Successfully sent ${emailsSent} of ${notificationDetails.emailAddress.length} emails`,
+      `Finished batch send of emails for ${notificationDetails.establishment}. Successfully sent ${emailsSent} ${notificationDetails.type} emails`,
     )
   }
 
-  private async sendWithDelay(templateId: string, email: string, notificationDetails: NotificationDetails): Promise<boolean> {
+  private async sendWithDelay(
+    templateId: string,
+    email: string,
+    notificationDetails: NotificationDetails,
+  ): Promise<boolean> {
     try {
       await this.emailClient.sendEmail(templateId, email, {
         personalisation: getPersonalisation(notificationDetails),
@@ -101,11 +105,29 @@ const getTemplateId = (type: NotificationType): string => {
 
 const getPersonalisation = (notificationDetails: NotificationDetails): Record<string, string | string[]> => {
   switch (notificationDetails.type) {
-    // FIXME add in all notifications
     case NotificationType.REQUEST_RECEIVED:
       return {
         SUBMITTED_BY: notificationDetails.submittedBy,
         ESTABLISHMENT: notificationDetails.establishment,
+      }
+    case NotificationType.REQUEST_SUBMITTED:
+      return {
+        SUBMITTED_BY: notificationDetails.submittedBy,
+        ESTABLISHMENT: notificationDetails.establishment,
+      }
+    case NotificationType.REQUEST_APPROVED:
+      return {
+        ESTABLISHMENT: notificationDetails.establishment,
+      }
+    case NotificationType.REQUEST_WITHDRAWN:
+      return {
+        ESTABLISHMENT: notificationDetails.establishment,
+        LOCATION: notificationDetails.location,
+        CHANGE_TYPE: notificationDetails.changeType,
+        SUBMITTED_ON: notificationDetails.submittedOn,
+        SUBMITTED_BY: notificationDetails.submittedBy,
+        WITHDRAWN_BY: notificationDetails.who,
+        WITHDRAW_REASON: notificationDetails.reason,
       }
     case NotificationType.REQUEST_REJECTED:
       return {
