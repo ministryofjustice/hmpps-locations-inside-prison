@@ -8,6 +8,7 @@ const { notifyDevUser } = config.email
 export default class NotificationService {
   constructor(private readonly emailClient: NotifyClient) {}
 
+  // FIXME this needs to be refactored to remove notifyDevUser (or handle blank. Use notify to limit who local and dev send to??)
   async notify(notificationDetails: NotificationDetails) {
     const { enabled } = config.email
     if (enabled === 'true' || enabled === true) {
