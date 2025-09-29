@@ -1,7 +1,3 @@
-import { RedisClient } from './redisClient'
-import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
-import config from '../config'
-
 export interface EmailResponse {
   id: string
   reference?: string

@@ -1,7 +1,7 @@
 import { defineConfig } from 'cypress'
+import cypressSplit from 'cypress-split'
 import superagent from 'superagent'
 import { mapValues } from 'lodash'
-import cypressSplit from 'cypress-split'
 import { resetStubs, stubFor } from './integration_tests/mockApis/wiremock'
 import auth from './integration_tests/mockApis/auth'
 import components from './integration_tests/mockApis/components'

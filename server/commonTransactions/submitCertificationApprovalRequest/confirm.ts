@@ -128,8 +128,7 @@ export default class Confirm extends FormInitialStep {
     const opCapEmailAddresses = validateEmails(usersWithOpCapRole.content)
 
     const details: NotificationDetails = {
-      // emailAddress: opCapEmailAddresses,
-      emailAddress: ['ashley.gyngell@justice.gov.uk', 'dafydd.houston@justice.gov.uk'],
+      emailAddress: opCapEmailAddresses,
       establishment: prisonName,
       type: NotificationType.REQUEST_RECEIVED,
       submittedBy,
