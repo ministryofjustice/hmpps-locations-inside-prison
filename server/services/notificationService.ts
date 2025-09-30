@@ -3,26 +3,27 @@ import config from '../config'
 import logger from '../../logger'
 
 const { templates } = config.email
-const { notifyDevUser } = config.email
 
 export default class NotificationService {
   constructor(private readonly emailClient: NotifyClient) {}
 
-  // FIXME this needs to be refactored to remove notifyDevUser (or handle blank. Use notify to limit who local and dev send to??)
   async notify(notificationDetails: NotificationDetails) {
     const { enabled } = config.email
     if (enabled === 'true' || enabled === true) {
       await this.batchSend(notificationDetails)
     } else {
-      logger.info(`NOTIFY_ENABLED is ${config.email.enabled} sending to ${notifyDevUser} instead`)
+      const { notifyDevUsers } = config.email
+      logger.info(`NOTIFY_ENABLED is ${config.email.enabled} sending to ${notifyDevUsers} instead`)
+      const emailsOfDevUsers = notifyDevUsers !== undefined ? notifyDevUsers.split(',') : []
       const devUserNotificationDetails: NotificationDetails = {
         ...notificationDetails,
-        emailAddress: [notifyDevUser],
+        emailAddress: emailsOfDevUsers,
       }
       await this.batchSend(devUserNotificationDetails)
     }
   }
 
+  // TODO: This will be updated with appInsights (MAP-2814) to include error response logging.
   private async batchSend(notificationDetails: NotificationDetails, delayMs = 10): Promise<void> {
     const templateId = getTemplateId(notificationDetails.type)
     logger.info(`Send of ${notificationDetails.emailAddress.length} ${notificationDetails.type} emails`)
@@ -55,7 +56,7 @@ export default class NotificationService {
       })
       return true
     } catch (error) {
-      logger.error(`Error sending email: ${error}`)
+      logger.error(`Error sending email: ${error}, error sending email to ${email}`)
       return false
     }
   }

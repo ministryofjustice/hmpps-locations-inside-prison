@@ -127,13 +127,27 @@ describe('NotificationService', () => {
 
   it('should send email to devUser when disabled', async () => {
     config.email.enabled = false
-
+    config.email.notifyDevUsers = 'joe@justice.gov.uk,bloggs@justice.gov.uk'
     const service = new NotificationService(mockNotifyClient)
     await service.notify(baseNotificationDetails)
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(mockSendEmail).toHaveBeenCalledTimes(2)
+
+    expect(mockSendEmail).toHaveBeenNthCalledWith(
+      1,
       config.email.templates.CHANGE_REQUEST_RECEIVED,
-      config.email.notifyDevUser,
+      'joe@justice.gov.uk',
+      {
+        personalisation: {
+          SUBMITTED_BY: 'John Doe',
+          ESTABLISHMENT: 'Test Establishment',
+        },
+      },
+    )
+    expect(mockSendEmail).toHaveBeenNthCalledWith(
+      2,
+      config.email.templates.CHANGE_REQUEST_RECEIVED,
+      'bloggs@justice.gov.uk',
       {
         personalisation: {
           SUBMITTED_BY: 'John Doe',

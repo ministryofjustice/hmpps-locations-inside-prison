@@ -32,7 +32,7 @@ When running in the local or in the dev environment, you will probably want to o
 
 ```
 NOTIFY_ENABLED=false
-NOTIFY_DEV_USER=<myuseremail>@justice.gov.uk
+NOTIFY_DEV_USERS='myuseremail>@justice.gov.uk,myuseremail2>@justice.gov.uk'
 ```
 
 

@@ -1,4 +1,21 @@
 declare module 'notifications-node-client' {
+  interface EmailResponse {
+    id: string
+    reference?: string
+    content: {
+      subject: string
+      body: string
+      from_email: string
+      one_click_unsubscribe_url?: string
+    }
+    uri: string
+    template: {
+      id: string
+      version: number
+      uri: string
+    }
+  }
+
   class NotifyClient {
     constructor(apiKey: string)
 
@@ -11,6 +28,6 @@ declare module 'notifications-node-client' {
         emailReplyToId?: string
         oneClickUnsubscribeURL?: string
       },
-    ): Promise<never>
+    ): Promise<EmailResponse>
   }
 }
