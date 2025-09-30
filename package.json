@@ -119,7 +119,7 @@
     "source-map-support": "^0.5.21",
     "superagent": "^10.2.3",
     "url-value-parser": "^2.2.0",
-    "uuid": "^11.1.0"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
