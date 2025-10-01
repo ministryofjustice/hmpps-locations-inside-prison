@@ -23,6 +23,3 @@ generic-service:
     AUDIT_ENABLED: "false"
     FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
     FLAG_CREATE_AND_CERTIFY: enabled
-    NOTIFY_ENABLED: false
-    NOTIFY_DEV_USERS: "notify_dev_users"
-    NOTIFY_API_KEY: "notify_api_key"
