@@ -185,8 +185,7 @@ context('Reactivate cells', () => {
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
         // wait for js to load
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
+        cy.get('body.jquery-loaded').should('exist')
         page.selectCheckbox(locations[2].id).click({ force: true })
         page.footer().should('exist').should('be.visible')
         page.footerCellCount().contains('1 cell selected')
@@ -201,8 +200,7 @@ context('Reactivate cells', () => {
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
         // wait for js to load
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
+        cy.get('body.jquery-loaded').should('exist')
         page.selectAllCheckbox().click({ force: true })
         page.footer().should('exist').should('be.visible')
         page.footerCellCount().contains('4 cells selected')
@@ -221,8 +219,7 @@ context('Reactivate cells', () => {
         Page.verifyOnPage(ViewLocationsShowPage)
         cy.go('back')
         // wait for js to load
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
+        cy.get('body.jquery-loaded').should('exist')
         Page.verifyOnPage(InactiveCellsIndexPage)
         cy.get('input:checked').should('not.exist')
         cy.get('.sticky-select-action-bar--active').should('not.exist')
@@ -233,8 +230,7 @@ context('Reactivate cells', () => {
       InactiveCellsIndexPage.goTo()
       const page = Page.verifyOnPage(InactiveCellsIndexPage)
       // wait for js to load
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000)
+      cy.get('body.jquery-loaded').should('exist')
       page.selectCheckbox(locations[2].id).click({ force: true })
       page.footerSubmit().click()
 
@@ -249,8 +245,7 @@ context('Reactivate cells', () => {
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
         // wait for js to load
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
+        cy.get('body.jquery-loaded').should('exist')
         page.selectCheckbox(locations[1].id).click({ force: true })
         page.selectCheckbox(locations[2].id).click({ force: true })
         page.footerSubmit().click()
@@ -270,8 +265,7 @@ context('Reactivate cells', () => {
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
         // wait for js to load
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
+        cy.get('body.jquery-loaded').should('exist')
         page.selectCheckbox(locations[1].id).click({ force: true })
         page.selectCheckbox(locations[2].id).click({ force: true })
         page.footerSubmit().click()

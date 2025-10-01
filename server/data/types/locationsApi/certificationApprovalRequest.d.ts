@@ -14,6 +14,7 @@ export declare interface CertificationApprovalRequest {
   workingCapacityChange: number
   maxCapacityChange: number
   signedOperationCapacityChange: number
+  currentSignedOperationCapacity: number
   reasonForSignedOpChange: string
-  locations: Location[]
+  locations: CertificateLocation[]
 }

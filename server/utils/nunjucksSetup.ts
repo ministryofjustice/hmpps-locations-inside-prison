@@ -19,6 +19,7 @@ import logger from '../../logger'
 import locationStatusTagClass from '../formatters/locationStatusTagClass'
 import locationStatusTagLabel from '../formatters/locationStatusTagLabel'
 import formatConstants from '../formatters/formatConstants'
+import formatDateWithTimeAndDay from '../formatters/formatDateWithTimeAndDay'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -111,6 +112,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('formatDate', formatDate)
   njkEnv.addFilter('formatTime', formatTime)
   njkEnv.addFilter('formatDateWithTime', formatDateWithTime)
+  njkEnv.addFilter('formatDateWithTimeAndDay', formatDateWithTimeAndDay)
   njkEnv.addFilter('locationStatusTagClass', locationStatusTagClass)
   njkEnv.addFilter('locationStatusTagLabel', locationStatusTagLabel)
   njkEnv.addFilter('nonOxfordJoin', nonOxfordJoin)

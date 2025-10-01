@@ -185,8 +185,7 @@ context('Reactivate cell (from reactivate cells)', () => {
         InactiveCellsIndexPage.goTo('TST', '7e570000-0000-1000-8000-100000000000')
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
         // wait for js to load
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
+        cy.get('body.jquery-loaded').should('exist')
         page.selectCheckbox(locations[2].id).click({ force: true })
         page.footerSubmit().click()
 

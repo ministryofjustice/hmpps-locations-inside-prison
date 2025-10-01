@@ -177,8 +177,7 @@ context('Reactivate cell (from reactivate cells)', () => {
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
         // wait for js to load
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000)
+        cy.get('body.jquery-loaded').should('exist')
         page.selectCheckbox(locations[2].id).click({ force: true })
         page.footerSubmit().click()
 

@@ -2,7 +2,7 @@ import { rolesToPermissions } from './permissions'
 
 describe('rolesToPermissions', () => {
   it('returns the correct permissions for VIEW_INTERNAL_LOCATION', () => {
-    expect(rolesToPermissions(['VIEW_INTERNAL_LOCATION'])).toEqual([])
+    expect(rolesToPermissions(['VIEW_INTERNAL_LOCATION'])).toEqual(['view_cell_certificate'])
   })
 
   it('returns the correct permissions for MANAGE_RESIDENTIAL_LOCATIONS', () => {
@@ -16,7 +16,9 @@ describe('rolesToPermissions', () => {
       'create_location',
       'deactivate',
       'reactivate',
+      'review_certificate_change_requests',
       'set_cell_type',
+      'view_cell_certificate',
     ])
   })
 
@@ -35,7 +37,9 @@ describe('rolesToPermissions', () => {
       'deactivate',
       'deactivate:permanent',
       'reactivate',
+      'review_certificate_change_requests',
       'set_cell_type',
+      'view_cell_certificate',
     ])
   })
 
@@ -60,7 +64,9 @@ describe('rolesToPermissions', () => {
       'deactivate',
       'deactivate:permanent',
       'reactivate',
+      'review_certificate_change_requests',
       'set_cell_type',
+      'view_cell_certificate',
     ])
   })
 })

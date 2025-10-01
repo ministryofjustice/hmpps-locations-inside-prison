@@ -1,6 +1,7 @@
 import { stubFor } from './wiremock'
 
 import {
+  CellCertificate,
   Location,
   LocationResidentialSummary,
   PrisonerLocation,
@@ -30,6 +31,36 @@ const stubLocationsCertificationLocationRequestApproval = () =>
     request: {
       method: 'PUT',
       urlPattern: '/locations-api/certification/location/request-approval',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+const stubLocationsCertificationLocationApprove = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/location/approve',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+const stubLocationsCertificationLocationReject = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/location/reject',
     },
     response: {
       status: 200,
@@ -270,6 +301,72 @@ const stubLocationsConstantsSpecialistCellType = (
       },
       jsonBody: {
         specialistCellTypes,
+      },
+    },
+  })
+
+const stubLocationsCellCertificates = (certificate: CellCertificate) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/cell-certificates/${certificate.id}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: certificate,
+    },
+  })
+
+const stubLocationsCellCertificatesPrison = (certificates: CellCertificate[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/cell-certificates/prison/TST`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: certificates,
+    },
+  })
+
+const stubLocationsCellCertificatesPrisonCurrent = (certificate: CellCertificate) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/cell-certificates/prison/TST/current`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: certificate,
+    },
+  })
+
+const stubLocationsCellCertificatesPrisonCurrent404 = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/cell-certificates/prison/TST/current`,
+    },
+    response: {
+      status: 404,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        status: 404,
+        userMessage: 'Cell certificate not found',
+        developerMessage: 'blah',
+        errorCode: 101,
+        moreInfo: 'blahblah',
       },
     },
   })
@@ -1199,6 +1296,8 @@ const allStubs = {
   stubLocationsBulkReactivate,
   stubLocationsResidentialHierarchy,
   stubLocationsCertificationPrisonSignedOpCapChange,
+  stubLocationsCertificationLocationApprove,
+  stubLocationsCertificationLocationReject,
   stubLocationsCertificationLocationRequestApproval,
   stubLocationsCertificationRequestApprovals,
   stubLocationsCertificationRequestApprovalsPrison,
@@ -1250,6 +1349,10 @@ const allStubs = {
   stubLocationsUpdateNonResCell,
   stubLocationsResidentialSummaryForCreateWing,
   stubLocationsDeleteLocation,
+  stubLocationsCellCertificates,
+  stubLocationsCellCertificatesPrison,
+  stubLocationsCellCertificatesPrisonCurrent,
+  stubLocationsCellCertificatesPrisonCurrent404,
 }
 
 const LocationsApiStubber = new TypedStubber<typeof allStubs>(allStubs)

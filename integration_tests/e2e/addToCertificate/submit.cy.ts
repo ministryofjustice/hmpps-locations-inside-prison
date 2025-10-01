@@ -7,6 +7,9 @@ import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
 import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
+import testGovukTable from '../../support/testGovukTable'
+import testGovukSummaryList from '../../support/testGovukSummaryList'
+import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
 
 function testRequests(
   page: SubmitCertificationApprovalRequestPage,
@@ -26,24 +29,19 @@ function testRequests(
     page.request('DRAFT').find('h3').should('contain', 'New locations')
   }
 
-  const wingTableCell = (i: number) => page.request('DRAFT').find('[data-qa=wing-table] .govuk-table__cell').eq(i)
-  wingTableCell(0).should('contain', draftRequest.wing.pathHierarchy)
-  wingTableCell(1).should('contain', 'Normal accommodation')
-  wingTableCell(2).should('contain', 'Close Supervision Centre (CSC)')
+  testGovukTable('wing-table', [
+    [draftRequest.wing.pathHierarchy, 'Normal accommodation', 'Close Supervision Centre (CSC)'],
+  ])
 
-  const locationTableRow = (rowIndex: number) =>
-    page.request('DRAFT').find('[data-qa=locations-table] .govuk-table__body .govuk-table__row').eq(rowIndex)
-  const locationCell = (rowIndex: number, cellIndex: number) => locationTableRow(rowIndex).find('th, td').eq(cellIndex)
-  for (let i = 0; i < draftRequest.allLocations.length; i += 1) {
-    const location = draftRequest.allLocations[i]
-    locationCell(i, 0).should('contain', location.pathHierarchy)
-    locationCell(i, 1).should('contain', location.cellMark || '-')
-    locationCell(i, 2).should('contain', location.pendingChanges.certifiedNormalAccommodation)
-    locationCell(i, 3).should('contain', location.pendingChanges.workingCapacity)
-    locationCell(i, 4).should('contain', location.pendingChanges.maxCapacity)
-    locationCell(i, 5).should(
-      'contain',
-      location.specialistCellTypes?.length
+  testGovukTable(
+    'locations-table',
+    draftRequest.allLocations.map(l => [
+      l.pathHierarchy,
+      l.cellMark || '-',
+      l.pendingChanges.certifiedNormalAccommodation.toString(),
+      l.pendingChanges.workingCapacity.toString(),
+      l.pendingChanges.maxCapacity.toString(),
+      l.specialistCellTypes?.length
         ? formatConstants(
             [
               {
@@ -55,32 +53,25 @@ function testRequests(
                 description: 'Biohazard / dirty protest cell',
               },
             ],
-            location.specialistCellTypes,
+            l.specialistCellTypes,
           )
         : '-',
-    )
-    if (location.inCellSanitation === undefined) {
-      locationCell(i, 6).should('contain', '-')
-    } else {
-      locationCell(i, 6).should('contain', location.inCellSanitation ? 'Yes' : 'No')
-    }
-  }
+      { undefined: '-', true: 'Yes', false: 'No' }[`${l.inCellSanitation}`],
+    ]),
+  )
 
   if (requests.length === 1) {
     page.request('SIGNED_OP_CAP').should('not.exist')
   } else {
     const capRequest = requests[1]
 
-    const overviewListRow = (rowIndex: number) =>
-      page.request('SIGNED_OP_CAP').find('[data-qa="overview-list"] .govuk-summary-list__row').eq(rowIndex)
-    overviewListRow(0).find('.govuk-summary-list__value').should('contain', 'TST')
-    overviewListRow(1).find('.govuk-summary-list__value').should('contain', 'Change signed operational capacity')
-    overviewListRow(2).find('.govuk-summary-list__value').should('contain', capRequest.explanation)
+    testGovukSummaryList('overview-list', [
+      ['Location', 'TST'],
+      ['Change type', 'Change signed operational capacity'],
+      ['Explanation', capRequest.explanation],
+    ])
 
-    page
-      .request('SIGNED_OP_CAP')
-      .find('[data-qa="cap-change-table"] .govuk-table__cell')
-      .should('contain', `${capRequest.oldOpCap} → ${capRequest.newOpCap}`)
+    testGovukTable('cap-change-table', [['TST', `${capRequest.oldOpCap} → ${capRequest.newOpCap}`]])
   }
 }
 
@@ -118,8 +109,7 @@ context('Add To Certificate - Submit Certification Approval Request', () => {
 
       it('submits when the checkbox is checked', () => {
         page.submit({ confirm: true })
-        // TODO: change this when certification approval requests page is added
-        Page.verifyOnPage(ViewLocationsShowPage)
+        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
 
         cy.get('#govuk-notification-banner-title').contains('Success')
         cy.get('.govuk-notification-banner__content h3').contains('Change requests sent')
@@ -159,8 +149,7 @@ context('Add To Certificate - Submit Certification Approval Request', () => {
 
       it('submits when the checkbox is checked', () => {
         page.submit({ confirm: true })
-        // TODO: change this when certification approval requests page is added
-        Page.verifyOnPage(ViewLocationsShowPage)
+        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
 
         cy.get('#govuk-notification-banner-title').contains('Success')
         cy.get('.govuk-notification-banner__content h3').contains('Change request sent')
