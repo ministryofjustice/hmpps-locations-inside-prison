@@ -12,6 +12,8 @@ export default function testGovukSummaryList(dataQaTag: string, rows: [string | 
           : (summaryListRow[cellIndex] as string[])
 
       cellContents.forEach(cellContent => {
+        // NB: Removing this log statement causes the tests to fail, must be quantum computing related
+        cy.task('log', `${rowIndex}/${cellIndex} ${cellContent}`)
         cells[cellIndex].should('contain', cellContent)
       })
     }
