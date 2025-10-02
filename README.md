@@ -25,6 +25,17 @@ fnm use
 
 Additional tools are required to manage deployment: `kubectl` and `helm`.
 
+### Notifications
+
+As part of the location approval process, email notifications are sent to users.
+When running in the local or in the dev environment, you will probably want to override this functionality which can be achieved by the adding the following examples
+
+```
+NOTIFY_ENABLED=false
+NOTIFY_DEV_USERS='myuseremail>@justice.gov.uk,myuseremail2>@justice.gov.uk'
+```
+
+
 ### Using services in `dev` environment
 
 This is the easiest way to run and develop on your machine: by hooking into services that already exist

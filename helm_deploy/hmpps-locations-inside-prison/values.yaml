@@ -34,6 +34,7 @@ generic-service:
     AUDIT_SQS_REGION: 'eu-west-2'
     AUDIT_SERVICE_NAME: 'UNASSIGNED' # Your audit service name
     LOAD_DPR_ON_STARTUP: "true"
+    NOTIFY_ENABLED: 'false'
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -60,6 +61,8 @@ generic-service:
       GOOGLE_ANALYTICS_MEASUREMENT_API_SECRET: 'GOOGLE_ANALYTICS_MEASUREMENT_API_SECRET?'
       GOOGLE_ANALYTICS_MEASUREMENT_ID: 'GOOGLE_ANALYTICS_MEASUREMENT_ID?'
       GOOGLE_TAG_MANAGER_CONTAINER_ID: "GOOGLE_TAG_MANAGER_CONTAINER_ID?"
+      NOTIFY_API_KEY: NOTIFY_API_KEY
+      NOTIFY_DEV_USERS: NOTIFY_DEV_USERS
     elasticache-redis:
       REDIS_HOST: 'primary_endpoint_address'
       REDIS_AUTH_TOKEN: 'auth_token'
