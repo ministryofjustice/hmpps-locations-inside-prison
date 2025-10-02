@@ -6,7 +6,6 @@ import capFirst from '../../../../formatters/capFirst'
 import displayName from '../../../../formatters/displayName'
 
 export default class Review extends FormInitialStep {
-  // eslint-disable-next-line no-underscore-dangle
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { locationsService, manageUsersService } = req.services
     const { systemToken } = req.session
@@ -29,7 +28,6 @@ export default class Review extends FormInitialStep {
 
     res.locals.cancelText = 'Cancel'
 
-    // eslint-disable-next-line no-underscore-dangle
     await super._locals(req, res, next)
   }
 }

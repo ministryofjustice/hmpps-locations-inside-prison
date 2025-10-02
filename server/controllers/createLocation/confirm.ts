@@ -16,7 +16,6 @@ export default class ConfirmCreateLocation extends FormInitialStep {
     this.use(unsetTempValues)
   }
 
-  // eslint-disable-next-line no-underscore-dangle
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { services, session, sessionModel } = req
     const createCellsNow = sessionModel.get<string>('createCellsNow')
@@ -82,7 +81,6 @@ export default class ConfirmCreateLocation extends FormInitialStep {
       res.locals.specialistCellTypesObject = await locationsService.getSpecialistCellTypes(systemToken)
     }
 
-    // eslint-disable-next-line no-underscore-dangle
     await super._locals(req, res, next)
   }
 

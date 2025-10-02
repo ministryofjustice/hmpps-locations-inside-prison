@@ -24,4 +24,12 @@ config.push({
   },
 })
 
+config.push({
+  name: 'underscore-dangle',
+  files: [`**/*.ts`],
+  rules: {
+    'no-underscore-dangle': 0,
+  },
+})
+
 export default config
