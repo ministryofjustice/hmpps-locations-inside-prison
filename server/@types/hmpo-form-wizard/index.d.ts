@@ -169,12 +169,10 @@ declare module 'hmpo-form-wizard' {
 
       validateFields(req: FormWizard.Request, res: Express.Response, callback: (errors: FormWizard.Errors) => void)
 
-      // eslint-disable-next-line no-underscore-dangle
       _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise<void>
 
       locals(req: Request, res: Express.Response, next: Express.NextFunction): Partial<TypedLocals>
 
-      // eslint-disable-next-line no-underscore-dangle
       _getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 
       getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
@@ -195,13 +193,10 @@ declare module 'hmpo-form-wizard' {
 
       getBackLink(req: Request, res: Express.Response): string | undefined
 
-      // eslint-disable-next-line no-underscore-dangle
       _process(req: Request, res: Express.Response, next: Express.NextFunction)
 
-      // eslint-disable-next-line no-underscore-dangle
       _getErrors(req: Request, res: Express.Response, next: Express.NextFunction)
 
-      // eslint-disable-next-line no-underscore-dangle
       _resetErrors(req: Request, res: Express.Response, next: Express.NextFunction)
 
       getNextStep(req: FormWizard.Request, res: Response): string
@@ -220,7 +215,6 @@ declare module 'hmpo-form-wizard' {
 
       resolvePath(base: string, url: string, forceRelative: boolean): string
 
-      // eslint-disable-next-line no-underscore-dangle
       _backlinksGetHistoryStep(req: FormWizard.Request, res: Response): string
     }
 

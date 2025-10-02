@@ -5,7 +5,6 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class Details extends FormInitialStep {
-  // eslint-disable-next-line no-underscore-dangle
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedResidentialSummary, locationHierarchy } = res.locals
 
@@ -25,7 +24,6 @@ export default class Details extends FormInitialStep {
     const locationType = decoratedResidentialSummary.location?.locationType.toLowerCase()
     formLocationCode.label.text = `${capFirst(locationType)} code`
 
-    // eslint-disable-next-line no-underscore-dangle
     await super._locals(req, res, next)
   }
 

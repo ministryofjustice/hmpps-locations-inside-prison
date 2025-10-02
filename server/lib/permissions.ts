@@ -1,6 +1,6 @@
 import { uniq } from 'lodash'
 
-const viewInternalLocationPermissions: string[] = []
+const viewInternalLocationPermissions: string[] = ['view_cell_certificate']
 
 const reportingLocationInformationPermissions: string[] = [
   ...viewInternalLocationPermissions,
@@ -19,6 +19,8 @@ const manageResidentialLocationsPermissions: string[] = [
   'reactivate',
   'set_cell_type',
   'create_location',
+  // TODO: change this to new "Certificate reviewer" role, when created
+  'review_certificate_change_requests',
 ]
 
 const manageResLocationsOpCapPermissions: string[] = [

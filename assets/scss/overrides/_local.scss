@@ -62,6 +62,10 @@ h1 .govuk-caption-l {
   width: 100%;
 }
 
+.govuk-\!-width-one-eighth {
+  width: 100%;
+}
+
 @media (min-width: 40.0625em) {
   .govuk-\!-width-one-sixth {
     width: 16.666%;
@@ -69,6 +73,10 @@ h1 .govuk-caption-l {
 
   .govuk-\!-width-four-sixths {
     width: 66.666%;
+  }
+
+  .govuk-\!-width-one-eighth {
+    width: 12.5%;
   }
 }
 
@@ -247,4 +255,38 @@ button.govuk-link {
   color: #1d70b8;
   cursor: pointer;
   font-size: 1.1875rem;
+}
+
+a[data-collapsible-table-handle] {
+  position: relative;
+  padding-left: 16px;
+}
+
+[data-collapsible-table-group] {
+  padding-left: 32px;
+}
+
+a[data-collapsible-table-handle]::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0);
+  -webkit-clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  border-width: 7px 0 7px 12.124px;
+  border-left-color: inherit
+}
+
+a[data-collapsible-table-handle][data-expanded=true]::before {
+  -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%);
+  clip-path: polygon(0% 0%, 50% 100%, 100% 0%);
+  border-width: 12.124px 7px 0 7px;
+  border-top-color: inherit
 }

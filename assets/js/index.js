@@ -4,6 +4,7 @@ import * as mojFrontend from '@ministryofjustice/frontend'
 import card from './card'
 import multiSelect from './multiSelect'
 import localNameInputSubmit from './localNameInputSubmit'
+import collapsibleTable from './collapsibleTable'
 import updateStructurePreview from './structurePreview'
 import structureAddRemoveLevel from './structureAddRemoveLevel'
 import autoFillNumbering from './autoFillNumbering'
@@ -14,9 +15,14 @@ mojFrontend.initAll()
 card()
 multiSelect()
 localNameInputSubmit()
+collapsibleTable()
 updateStructurePreview()
 structureAddRemoveLevel()
 autoFillNumbering('apply-cell-numbering', 'startCreateCellNumber', 'create-cells_cellNumber', n => n + 1)
 autoFillNumbering('apply-autoFillCNA', 'autoFillCNA', 'create-cells_baselineCna', n => n)
 autoFillNumbering('apply-autoFillWC', 'autoFillWC', 'create-cells_workingCapacity', n => n)
 autoFillNumbering('apply-autoFillMC', 'autoFillMC', 'create-cells_maximumCapacity', n => n)
+
+$(() => {
+  $('body').addClass('jquery-loaded')
+})

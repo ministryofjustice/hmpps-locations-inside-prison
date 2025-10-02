@@ -36,6 +36,7 @@ import changeResiStatusRouter from './admin/resi'
 import changeCertApprovalStatusRouter from './admin/certApproval'
 import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
 import ingestRouter from './admin/ingest'
+import cellCertificateRouter from './cellCertificate'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -79,6 +80,8 @@ export default function routes(services: Services): Router {
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
   router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
+
+  router.use('/:prisonId?/cell-certificate', cellCertificateRouter)
 
   // Digital Prison Reporting
   dprRouter(router, services)
