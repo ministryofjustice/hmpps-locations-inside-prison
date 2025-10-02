@@ -45,6 +45,7 @@ export default defineConfig({
               },
             },
           })
+          await superagent.get(`http://localhost:3007/reset-feature-flags`)
 
           return null
         },
