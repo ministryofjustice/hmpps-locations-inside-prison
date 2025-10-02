@@ -19,6 +19,16 @@ export default function setUpFeatureFlags(): Router {
       })
       res.sendStatus(200)
     })
+
+    router.get('/reset-feature-flags', (_req, res) => {
+      Object.keys(flags).forEach((key: keyof typeof flags) => delete flags[key])
+
+      Object.entries(config.featureFlags).forEach(([key, val]: [keyof typeof flags, boolean]) => {
+        flags[key] = val
+      })
+
+      res.sendStatus(200)
+    })
   }
 
   return router

@@ -10,7 +10,6 @@ export default class AnalyticsService {
     const event: GoogleAnalyticsEvent = { name: `res_locations_${name}`, params }
 
     try {
-      // eslint-disable-next-line no-underscore-dangle
       const gaClientId = req.cookies?._ga?.match(/.*\.(\d+\.\d+)$/)[1]
       return await this.googleAnalyticsClient.sendEvents(gaClientId, [event])
     } catch (error) {

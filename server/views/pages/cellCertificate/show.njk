@@ -1,0 +1,20 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "../../macros/cellCertificate.njk" import cellCertificate %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <p data-qa="last-approval">Approved by {{ userMap[certificate.approvedBy] }} on {{ certificate.approvedDate | formatDateWithTimeAndDay }}.</p>
+
+    {{ cellCertificate(certificate, accommodationTypeConstants, usedForConstants, specialistCellTypesObject) }}
+  </div>
+{% endblock %}

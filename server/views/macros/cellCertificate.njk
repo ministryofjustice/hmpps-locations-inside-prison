@@ -1,0 +1,150 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% from "./collapsibleTable.njk" import collapsibleTable %}
+{% from "./miniSummary.njk" import miniSummary %}
+
+{% macro recurseLocationTable(rows, location, specialistCellTypesObject) %}
+  {% if location.inCellSanitation != undefined %}
+    {% set rows = (rows.push([
+      {
+        classes: 'govuk-table__cell',
+        text: location.pathHierarchy
+      },
+      {
+        text: location.cellMark or '-'
+      },
+      {
+        text: location.certifiedNormalAccommodation or '-'
+      },
+      {
+        text: location.workingCapacity or '-'
+      },
+      {
+        text: location.maxCapacity or '-'
+      },
+      {
+        html: formatConstants(specialistCellTypesObject, location.specialistCellTypes) or '-'
+      },
+      {
+        text: 'Yes' if location.inCellSanitation == true else ('No' if location.inCellSanitation == false else '-')
+      }
+    ]), rows) %}
+  {% endif %}
+
+  {% for subLocation in location.subLocations %}
+    {{ recurseLocationTable(rows, subLocation, specialistCellTypesObject) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro cellCertificate(certificate, accommodationTypeConstants, usedForConstants, specialistCellTypesObject) %}
+  {% set wingUsageRows = [] %}
+  {% set cellRowGroups = [] %}
+  {% for location in certificate.locations %}
+    {% set wingUsageRows = (wingUsageRows.push([
+      {
+        text: location.pathHierarchy
+      },
+      {
+        html: formatConstants(accommodationTypeConstants, location.accommodationTypes)
+      },
+      {
+        html: formatConstants(usedForConstants, location.usedFor)
+      }
+    ]), wingUsageRows) %}
+
+    {% set cellRows = [] %}
+    {{ recurseLocationTable(cellRows, location, specialistCellTypesObject) }}
+
+    {% set cellRowGroups = (cellRowGroups.push({
+      parentRow: [
+        { text: location.localName or (location.pathHierarchy + '-wing') },
+        { text: '-' },
+        { text: location.certifiedNormalAccommodation },
+        { text: location.workingCapacity },
+        { text: location.maxCapacity },
+        { text: '-' },
+        { text: '-' }
+      ],
+      rows: cellRows
+    }), cellRowGroups) %}
+  {% endfor %}
+
+  <div class="govuk-grid-row govuk-!-margin-top-7">
+    <div class="govuk-grid-column-three-quarters">
+      <h3 class="govuk-heading-m govuk-!-margin-bottom-1">Signed operational capacity</h3>
+      <p class="govuk-body-l govuk-!-font-size-36 govuk-!-margin-top-3" data-qa="signed-op-cap">
+        {{ certificate.signedOperationCapacity }}</p>
+
+      <h3 class="govuk-heading-m">Total cell capacities</h3>
+      <div class="govuk-grid-row hmpps-miniSummaryWrapper govuk-!-margin-bottom-8" data-qa="mini-summary-list-macro">
+        <div class="govuk-grid-column-one-third" data-qa="cna-card">
+          {{ miniSummary({bottomLabel: 'Baseline CNA', bottomClass: 'big', bottomContentLine1: certificate.totalCertifiedNormalAccommodation}) }}
+        </div>
+        <div class="govuk-grid-column-one-third" data-qa="working-cap-card">
+          {{ miniSummary({bottomLabel: 'Certified working capacity', bottomClass: 'big', bottomContentLine1: certificate.totalWorkingCapacity}) }}
+        </div>
+        <div class="govuk-grid-column-one-third" data-qa="max-cap-card">
+          {{ miniSummary({bottomLabel: 'Maximum capacity', bottomClass: 'big', bottomContentLine1: certificate.totalMaxCapacity}) }}
+        </div>
+      </div>
+
+      <h3 class="govuk-heading-m">Wing usage</h3>
+      {{ govukTable({
+        firstCellIsHeader: true,
+        head: [
+          {
+            text: "Location"
+          },
+          {
+            text: "Accommmodation type"
+          },
+          {
+            text: "Used for"
+          }
+        ],
+        rows: wingUsageRows,
+        attributes: { "data-qa": "wing-usage-table" }
+      }) }}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row govuk-!-margin-top-7">
+    <div class="govuk-grid-column-full">
+      <h3 class="govuk-heading-m">Cell schedule</h3>
+      {{ collapsibleTable({
+        head: [
+          {
+            text: "",
+            classes: 'govuk-!-width-one-eighth'
+          },
+          {
+            text: "Door number",
+            classes: 'govuk-!-width-one-eighth'
+          },
+          {
+            text: "Baseline CNA",
+            classes: 'govuk-!-width-one-eighth'
+          },
+          {
+            text: "Certified working capacity",
+            classes: 'govuk-!-width-one-eighth'
+          },
+          {
+            text: "Maximum capacity",
+            classes: 'govuk-!-width-one-eighth'
+          },
+          {
+            text: "Cell type",
+            classes: 'govuk-!-width-one-quarter'
+          },
+          {
+            text: "Sanitation",
+            classes: 'govuk-!-width-one-eighth'
+          }
+        ],
+        rowGroups: cellRowGroups,
+        attributes: { "data-qa": "cell-schedule-table" }
+      }) }}
+    </div>
+  </div>
+{% endmacro %}

@@ -4,16 +4,32 @@ import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
-
 import validateEmails from '../../utils/validateEmails'
 import { Location } from '../../data/types/locationsApi'
+import { CertificateLocation } from '../../data/types/locationsApi/certificateLocation'
 import { PaginatedUsers } from '../../data/manageUsersApiClient'
 import { NotificationDetails, NotificationType } from '../../services/notificationService'
 
-async function getAllLocations(req: FormWizard.Request, location: Location) {
-  const locations: Location[] = []
-
-  locations.push(location)
+async function locationToCertificationLocation(
+  req: FormWizard.Request,
+  location: Location,
+): Promise<CertificateLocation> {
+  const certificationLocation: CertificateLocation = {
+    id: location.id,
+    locationCode: location.code,
+    pathHierarchy: location.pathHierarchy,
+    level: location.level,
+    certifiedNormalAccommodation: location.pendingChanges.certifiedNormalAccommodation,
+    workingCapacity: location.pendingChanges.workingCapacity,
+    maxCapacity: location.pendingChanges.maxCapacity,
+    locationType: location.locationType,
+    subLocations: [],
+    inCellSanitation: location.inCellSanitation,
+    cellMark: location.cellMark,
+    specialistCellTypes: location.specialistCellTypes,
+    accommodationTypes: location.accommodationTypes,
+    usedFor: location.usedFor,
+  }
 
   if (!location.leafLevel) {
     const locationSummary = await req.services.locationsService.getResidentialSummary(
@@ -21,16 +37,13 @@ async function getAllLocations(req: FormWizard.Request, location: Location) {
       location.prisonId,
       location.id,
     )
-    locations.push(
-      ...(
-        await Promise.all(
-          locationSummary.subLocations.map((subLocation: Location) => getAllLocations(req, subLocation)),
-        )
-      ).flat(),
+
+    certificationLocation.subLocations = await Promise.all(
+      locationSummary.subLocations.map((subLocation: Location) => locationToCertificationLocation(req, subLocation)),
     )
   }
 
-  return locations
+  return certificationLocation
 }
 
 export default class Confirm extends FormInitialStep {
@@ -76,13 +89,14 @@ export default class Confirm extends FormInitialStep {
 
     proposedCertificationApprovalRequests.push({
       approvalType: 'DRAFT',
-      locations: await getAllLocations(req, res.locals.location),
+      locations: [await locationToCertificationLocation(req, locals.location)],
     })
 
     if (proposedSignedOpCapChange) {
       proposedCertificationApprovalRequests.push({
         approvalType: 'SIGNED_OP_CAP',
         prisonId: proposedSignedOpCapChange.prisonId,
+        currentSignedOperationCapacity: locals.prisonResidentialSummary.prisonSummary.signedOperationalCapacity,
         signedOperationCapacityChange:
           proposedSignedOpCapChange.signedOperationalCapacity -
           locals.prisonResidentialSummary.prisonSummary.signedOperationalCapacity,
@@ -145,6 +159,6 @@ export default class Confirm extends FormInitialStep {
       content: `You have submitted ${proposedSignedOpCapChange ? '2 requests' : 'a request'} to update the cell certificate.`,
     })
 
-    res.redirect(`/view-and-update-locations/${res.locals.prisonId}/${res.locals.locationId}`)
+    res.redirect(`/${res.locals.prisonId}/cell-certificate/change-requests`)
   }
 }
