@@ -36,12 +36,12 @@ context('Delete draft location', () => {
   })
 
   beforeEach(() => {
+    cy.task('reset')
     cy.task('setFeatureFlag', { createAndCertify: true })
   })
 
   context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
-      cy.task('reset')
       cy.task('stubSignIn')
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
@@ -69,7 +69,6 @@ context('Delete draft location', () => {
 
   context('With the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
-      cy.task('reset')
       cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')

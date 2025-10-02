@@ -18,6 +18,12 @@ async function setFeatureFlag(flags: Record<string, boolean>): Promise<null> {
   return null
 }
 
+async function resetFeatureFlags(): Promise<null> {
+  await superagent.get(`http://localhost:3007/reset-feature-flags`)
+
+  return null
+}
+
 export default defineConfig({
   chromeWebSecurity: false,
   fixturesFolder: 'integration_tests/fixtures',
@@ -45,7 +51,7 @@ export default defineConfig({
               },
             },
           })
-          await superagent.get(`http://localhost:3007/reset-feature-flags`)
+          await resetFeatureFlags()
 
           return null
         },

@@ -21,12 +21,12 @@ context('Deactivate permanent', () => {
   })
 
   beforeEach(() => {
+    cy.task('reset')
     cy.task('setFeatureFlag', { permanentDeactivation: true })
   })
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      cy.task('reset')
       cy.task('stubSignIn')
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
@@ -61,7 +61,6 @@ context('Deactivate permanent', () => {
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      cy.task('reset')
       cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
