@@ -223,6 +223,7 @@ describe('Confirm create location (LANDING)', () => {
       localName: 'North Landing',
       locationCode: 'NL',
       locationId: 'parentId',
+      'create-cells_accommodationType': 'NORMAL_ACCOMMODATION',
     }
 
     locationsService = {
