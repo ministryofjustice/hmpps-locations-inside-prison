@@ -28,6 +28,13 @@ export default class LocationsService {
     })
   }
 
+  async withdrawCertificationRequest(token: string, requestId: string, comments: string) {
+    return this.locationsApiClient.certification.location.withdraw(token, null, {
+      approvalRequestReference: requestId,
+      comments,
+    })
+  }
+
   async convertCellToNonResCell(
     token: string,
     locationId: string,

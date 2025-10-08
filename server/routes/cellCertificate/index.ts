@@ -2,6 +2,7 @@ import express from 'express'
 import changeRequestsIndex from '../../controllers/cellCertificate/changeRequests'
 import changeRequestsShow from '../../controllers/cellCertificate/changeRequests/show'
 import changeRequestsReview from './changeRequests/review'
+import changeRequestsWithdraw from './changeRequests/withdraw'
 import history from '../../controllers/cellCertificate/history'
 import populatePrisonAndLocationId from '../../middleware/populatePrisonAndLocationId'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
@@ -25,6 +26,12 @@ router.use(
   populateConstants,
   populateApprovalRequest,
   changeRequestsReview,
+)
+router.use(
+  '/change-requests/:approvalRequestId/withdraw',
+  populateConstants,
+  populateApprovalRequest,
+  changeRequestsWithdraw,
 )
 router.use('/change-requests/:approvalRequestId', populateConstants, populateApprovalRequest, changeRequestsShow)
 router.use('/change-requests', addBreadcrumb({ title: '', href: '/' }), changeRequestsIndex)
