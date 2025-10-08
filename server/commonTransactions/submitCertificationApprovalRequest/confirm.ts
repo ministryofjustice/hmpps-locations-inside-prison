@@ -9,6 +9,7 @@ import { Location } from '../../data/types/locationsApi'
 import { CertificateLocation } from '../../data/types/locationsApi/certificateLocation'
 import { PaginatedUsers } from '../../data/manageUsersApiClient'
 import { NotificationDetails, NotificationType } from '../../services/notificationService'
+import config from '../../config'
 
 async function locationToCertificationLocation(
   req: FormWizard.Request,
@@ -111,20 +112,25 @@ export default class Confirm extends FormInitialStep {
   }
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { ingressUrl } = config
     const { systemToken } = req.session
     const { locationsService, manageUsersService, notifyService } = req.services
     const { prisonName } = res.locals.prisonResidentialSummary.prisonSummary
+    const { prisonId } = res.locals.location
     const submittedBy = res.locals.user.username
 
-    await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', res.locals.locationId)
+    const certificationApprovalRequest = await locationsService.createCertificationRequestForLocation(
+      systemToken,
+      'DRAFT',
+      res.locals.locationId,
+    )
 
     const proposedSignedOpCapChange = req.sessionModel.get<{
-      prisonId: string
       signedOperationalCapacity: number
       reasonForChange: string
     }>('proposedSignedOpCapChange')
     if (proposedSignedOpCapChange) {
-      const { prisonId, signedOperationalCapacity, reasonForChange } = proposedSignedOpCapChange
+      const { signedOperationalCapacity, reasonForChange } = proposedSignedOpCapChange
       await locationsService.createCertificationRequestForSignedOpCap(
         systemToken,
         prisonId,
@@ -140,10 +146,12 @@ export default class Confirm extends FormInitialStep {
     )
 
     const opCapEmailAddresses = validateEmails(usersWithOpCapRole.content)
+    const reviewUrl = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}/review`
 
     const details: NotificationDetails = {
       emailAddress: opCapEmailAddresses,
       establishment: prisonName,
+      url: reviewUrl,
       type: NotificationType.REQUEST_RECEIVED,
       submittedBy,
     }
