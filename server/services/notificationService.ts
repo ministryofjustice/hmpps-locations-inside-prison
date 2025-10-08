@@ -72,6 +72,7 @@ export type NotificationDetails = {
   type: NotificationType
   emailAddress: string[]
   establishment: string
+  url?: string
   location?: string
   changeType?: string
   submittedOn?: string
@@ -111,6 +112,7 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
       return {
         SUBMITTED_BY: notificationDetails.submittedBy,
         ESTABLISHMENT: notificationDetails.establishment,
+        URL: notificationDetails.url,
       }
     case NotificationType.REQUEST_SUBMITTED:
       return {
