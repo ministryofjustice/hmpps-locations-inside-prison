@@ -19,6 +19,8 @@ const fields: FormWizard.Fields = {
       text: 'This will help the authorising director understand why the request has been withdrawn.',
     },
     autocomplete: 'off',
+    // Don't strip newlines
+    'ignore-defaults': true,
   },
 }
 

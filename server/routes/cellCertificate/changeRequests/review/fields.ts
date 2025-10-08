@@ -62,6 +62,8 @@ const fields: FormWizard.Fields = {
       text: 'This will help the person who submitted the request understand why it has been rejected.',
     },
     autocomplete: 'off',
+    // Don't strip newlines
+    'ignore-defaults': true,
   },
 }
 
