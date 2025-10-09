@@ -1,0 +1,17 @@
+{% extends "../../../../partials/formStep.njk" %}
+
+{% from '../../../../macros/certificationApprovalRequestSummary.njk' import certificationApprovalRequestSummary %}
+
+{% block fields %}
+  <p>
+    You are withdrawing this request. The proposed change will not happen unless a new request is submitted.
+  </p>
+
+  {{ certificationApprovalRequestSummary(approvalRequest, userMap, false, false) }}
+
+  {{ super() }}
+
+  {{ govukInsetText({
+    text: "The authorising director will be notified of the withdrawal."
+  }) }}
+{% endblock %}

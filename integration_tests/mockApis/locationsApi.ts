@@ -71,6 +71,21 @@ const stubLocationsCertificationLocationReject = () =>
     },
   })
 
+const stubLocationsCertificationLocationWithdraw = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/location/withdraw',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubLocationsCertificationRequestApprovalsPrison = (approvalRequests: CertificationApprovalRequest[]) =>
   stubFor({
     request: {
@@ -1298,6 +1313,7 @@ const allStubs = {
   stubLocationsCertificationPrisonSignedOpCapChange,
   stubLocationsCertificationLocationApprove,
   stubLocationsCertificationLocationReject,
+  stubLocationsCertificationLocationWithdraw,
   stubLocationsCertificationLocationRequestApproval,
   stubLocationsCertificationRequestApprovals,
   stubLocationsCertificationRequestApprovalsPrison,

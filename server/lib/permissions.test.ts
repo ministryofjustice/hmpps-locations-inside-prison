@@ -7,6 +7,8 @@ describe('rolesToPermissions', () => {
 
   it('returns the correct permissions for MANAGE_RESIDENTIAL_LOCATIONS', () => {
     expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS']).sort()).toEqual([
+      'certificate_change_request_create',
+      'certificate_change_request_withdraw',
       'change_cell_capacity',
       'change_local_name',
       'change_location_code',
@@ -16,7 +18,6 @@ describe('rolesToPermissions', () => {
       'create_location',
       'deactivate',
       'reactivate',
-      'review_certificate_change_requests',
       'set_cell_type',
       'view_cell_certificate',
     ])
@@ -24,6 +25,9 @@ describe('rolesToPermissions', () => {
 
   it('returns the correct permissions for MANAGE_RES_LOCATIONS_OP_CAP', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP']).sort()).toEqual([
+      'certificate_change_request_create',
+      'certificate_change_request_review',
+      'certificate_change_request_withdraw',
       'change_cell_capacity',
       'change_local_name',
       'change_location_code',
@@ -37,7 +41,6 @@ describe('rolesToPermissions', () => {
       'deactivate',
       'deactivate:permanent',
       'reactivate',
-      'review_certificate_change_requests',
       'set_cell_type',
       'view_cell_certificate',
     ])
@@ -51,6 +54,9 @@ describe('rolesToPermissions', () => {
         'MANAGE_RES_LOCATIONS_OP_CAP',
       ]).sort(),
     ).toEqual([
+      'certificate_change_request_create',
+      'certificate_change_request_review',
+      'certificate_change_request_withdraw',
       'change_cell_capacity',
       'change_local_name',
       'change_location_code',
@@ -64,7 +70,6 @@ describe('rolesToPermissions', () => {
       'deactivate',
       'deactivate:permanent',
       'reactivate',
-      'review_certificate_change_requests',
       'set_cell_type',
       'view_cell_certificate',
     ])
