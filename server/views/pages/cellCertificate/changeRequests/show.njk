@@ -30,7 +30,7 @@
           request if you need to make changes.
         </p>
 
-        {{ certificationApprovalRequestSummary(approvalRequest, userMap, true, true) }}
+        {{ certificationApprovalRequestSummary(approvalRequest, userMap, canAccess('certificate_change_request_withdraw'), true) }}
       </div>
     </div>
 
