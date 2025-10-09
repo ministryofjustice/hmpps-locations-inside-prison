@@ -3,9 +3,7 @@ import { NextFunction, Response } from 'express'
 import BaseController from './baseController'
 
 export default class Details extends BaseController {
-  // eslint-disable-next-line no-underscore-dangle
   override _process(req: FormWizard.Request, res: Response, next: NextFunction) {
-    // eslint-disable-next-line no-underscore-dangle
     super._process(
       {
         ...req,

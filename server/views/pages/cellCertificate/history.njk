@@ -1,0 +1,72 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    {{ govukBackLink({
+      text: "Back",
+      href: backLink
+    }) }}
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
+      <div class="govuk-grid-column-two-thirds">
+        <p>
+          A history of changes to the establishment's cell certificate. You can view versions of the cell certificate as
+          it was when a change was made.
+        </p>
+      </div>
+    </div>
+
+    {% if certificates | length == 0 %}
+      {{ govukInsetText({
+        text: "There are no changes to the establishment's cell certificate currently.",
+        classes: 'govuk-!-margin-top-0'
+      }) }}
+    {% else %}
+      {% set rows = [] %}
+
+      {% for certificate in certificates %}
+        {% set request = certificate.approvedRequest %}
+
+        {% set rows = (rows.push(
+          [
+            {
+              text: (request.locationKey.replace(prisonId + '-', '') if request.locationKey) or request.prisonId
+            },
+            {
+              text: formatConstants(approvalTypeConstants, request.approvalType)
+            },
+            {
+              text: request.approvedOrRejectedDate | formatDate
+            },
+            {
+              text: userMap[request.approvedOrRejectedBy]
+            },
+            {
+              html: '<a class="govuk-link" href="change-requests/' + request.id + '">View details</a> | <a class="govuk-link" href="' + ('current' if certificate.current else certificate.id) + '">View certificate</a>'
+            }
+          ]
+        ), rows) %}
+      {% endfor %}
+
+      {{ govukTable({
+        firstCellIsHeader: true,
+        head: [
+          { text: "Location"},
+          { text: "Change type"},
+          { text: "Approved on"},
+          { text: "Approved by"},
+          { text: "Actions"}
+        ],
+        rows: rows,
+        attributes: { "data-qa": "change-requests-history-table" }
+      }) }}
+    {% endif %}
+  </div>
+{% endblock %}

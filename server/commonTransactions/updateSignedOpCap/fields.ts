@@ -58,12 +58,14 @@ const fields: FormWizard.Fields = {
     label: {
       text: 'Explain why you need to update the signed operational capacity',
       classes: 'govuk-label--m',
-      for: 'newSignedOpCap',
+      for: 'explanation',
     },
     hint: {
       text: 'This will help the authorising director understand the need for the change to capacity.',
     },
     autocomplete: 'off',
+    // Don't strip newlines
+    'ignore-defaults': true,
   },
 }
 

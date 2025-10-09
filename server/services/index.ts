@@ -6,6 +6,7 @@ import AuthService from './authService'
 import ManageUsersService from './manageUsersService'
 import AnalyticsService from './analyticsService'
 import PrisonService from './prisonService'
+import NotificationService from './notificationService'
 
 export const services = () => {
   const {
@@ -17,8 +18,9 @@ export const services = () => {
     locationsApiClient,
     manageUsersApiClient,
     prisonApiClient,
+    notificationClient,
   } = dataAccess()
-
+  const notificationService = new NotificationService(notificationClient)
   const analyticsService = new AnalyticsService(googleAnalyticsClient)
   const auditService = new AuditService(hmppsAuditClient)
   const authService = new AuthService(hmppsAuthClient)
@@ -28,6 +30,7 @@ export const services = () => {
   const prisonService = new PrisonService(prisonApiClient)
 
   return {
+    notifyService: notificationService,
     analyticsService,
     applicationInfo,
     auditService,

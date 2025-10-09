@@ -1,0 +1,101 @@
+{% extends "../../../partials/layout.njk" %}
+
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/sub-navigation/macro.njk" import mojSubNavigation %}
+
+{% block beforeContent %}
+  {{ super() }}
+
+  {% if banner.success %}
+    {% set html %}
+      <h3 class="govuk-notification-banner__heading">
+        {{ banner.success.title }}
+      </h3>
+      <p class="govuk-body">
+        {{ banner.success.content }}
+      </p>
+    {% endset %}
+
+    <div class="govuk-width-container">
+      <div class="govuk-grid-row govuk-!-margin-bottom-0">
+        <div class="govuk-grid-column-two-thirds">
+          {{ govukNotificationBanner({
+            html: html,
+            type: "success",
+            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+          }) }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block heading %}
+  {{ super() }}
+
+  {{ mojSubNavigation({
+    label: "Sub navigation",
+    items: [{
+      text: "Current cell certificate",
+      href: "/" + prisonId + "/cell-certificate/current"
+    }, {
+      text: "Change requests (" + approvalRequests | length + ")",
+      href: "/" + prisonId + "/cell-certificate/change-requests",
+      active: true
+    }]
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <h2 class="govuk-heading-m">Change requests ({{ approvalRequests | length }})</h2>
+
+    {% if approvalRequests | length == 0 %}
+      <p>There are no change requests currently.</p>
+    {% else %}
+      {% if canAccess('certificate_change_request_review') %}
+        <p>Review proposed changes to the cell certificate submitted by the establishment.</p>
+      {% else %}
+        <p>Changes sent to the establishment's authorising director to review.</p>
+      {% endif %}
+
+      {% set rows = [] %}
+
+      {% for request in approvalRequests %}
+        {% set rows = (rows.push(
+          [
+            {
+              text: (request.locationKey.replace(prisonId + '-', '') if request.locationKey) or request.prisonId
+            },
+            {
+              text: formatConstants(approvalTypeConstants, request.approvalType)
+            },
+            {
+              text: request.requestedDate | formatDate
+            },
+            {
+              text: userMap[request.requestedBy]
+            },
+            {
+              html: ('<a class="govuk-link" href="change-requests/' + request.id + '/review">Review</a>') if canAccess('certificate_change_request_review') else ('<a class="govuk-link" href="change-requests/' + request.id + '">View details</a>')
+            }
+          ]
+        ), rows) %}
+      {% endfor %}
+
+      {{ govukTable({
+        firstCellIsHeader: true,
+        head: [
+          { text: "Location" },
+          { text: "Change type" },
+          { text: "Submitted on" },
+          { text: "Submitted by" },
+          { text: "Actions" }
+        ],
+        rows: rows,
+        attributes: { "data-qa": "change-requests-table" }
+      }) }}
+    {% endif %}
+  </div>
+{% endblock %}

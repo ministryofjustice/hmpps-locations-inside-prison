@@ -1,0 +1,39 @@
+{% extends "../../../partials/layout.njk" %}
+
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/sub-navigation/macro.njk" import mojSubNavigation %}
+
+{% from '../../../macros/certificationApprovalRequest.njk' import certificationApprovalRequest %}
+{% from '../../../macros/certificationApprovalRequestSummary.njk' import certificationApprovalRequestSummary %}
+
+{% block beforeContent %}
+  <div class="govuk-width-container">
+    {{ govukBackLink({
+      text: "Back to change requests" if approvalRequest.status == 'PENDING' else 'Back',
+      href: backLink
+    }) }}
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p>
+          This request is being reviewed by the establishment’s authorising director. If approved, the cell certificate
+          will be updated with this change.
+        </p>
+
+        <p>
+          You are unable to make changes to this location while the request is being reviewed. You can withdraw the
+          request if you need to make changes.
+        </p>
+
+        {{ certificationApprovalRequestSummary(approvalRequest, userMap, canAccess('certificate_change_request_withdraw'), true) }}
+      </div>
+    </div>
+
+    {{ certificationApprovalRequest(approvalRequest, false, 0, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, false) }}
+  </div>
+{% endblock %}

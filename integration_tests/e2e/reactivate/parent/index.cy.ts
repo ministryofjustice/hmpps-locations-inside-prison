@@ -148,13 +148,13 @@ context('Reactivate parent', () => {
 
   context.skip('when the map2380 feature flag is disabled', () => {
     beforeEach(() => {
+      cy.task('reset')
       cy.task('setFeatureFlag', { map2380: false })
     })
 
     context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
       beforeEach(() => {
         createLocations()
-        cy.task('reset')
         cy.task('stubSignIn')
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')
@@ -188,7 +188,6 @@ context('Reactivate parent', () => {
 
       beforeEach(() => {
         createLocations()
-        cy.task('reset')
         cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')
@@ -921,7 +920,6 @@ context('Reactivate parent', () => {
     context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
       beforeEach(() => {
         createLocations()
-        cy.task('reset')
         cy.task('stubSignIn')
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')
@@ -954,7 +952,6 @@ context('Reactivate parent', () => {
 
       beforeEach(() => {
         createLocations()
-        cy.task('reset')
         cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')
@@ -1587,7 +1584,6 @@ context('Reactivate parent', () => {
 
       beforeEach(() => {
         createLocations()
-        cy.task('reset')
         cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')

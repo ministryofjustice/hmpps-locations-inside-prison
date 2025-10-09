@@ -18,14 +18,54 @@ import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 import { BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
 import { CertificationApprovalRequest } from './types/locationsApi/certificationApprovalRequest'
+import { CellCertificate } from './types/locationsApi/cellCertificate'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
     super('LocationsApiClient', redisClient, config.apis.locationsApi, authenticationClient)
   }
 
+  cellCertificates = {
+    getById: this.apiCall<CellCertificate, { id: string }>({
+      path: '/cell-certificates/:id',
+      requestType: 'get',
+    }),
+    prison: {
+      getAllForPrisonId: this.apiCall<CellCertificate[], { prisonId: string }>({
+        path: '/cell-certificates/prison/:prisonId',
+        requestType: 'get',
+      }),
+      getCurrentForPrisonId: this.apiCall<CellCertificate, { prisonId: string }>({
+        path: '/cell-certificates/prison/:prisonId/current',
+        requestType: 'get',
+      }),
+    },
+  }
+
   certification = {
     location: {
+      approve: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          approvalRequestReference: string
+          comments?: string
+        }
+      >({
+        path: '/certification/location/approve',
+        requestType: 'put',
+      }),
+      reject: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          approvalRequestReference: string
+          comments: string
+        }
+      >({
+        path: '/certification/location/reject',
+        requestType: 'put',
+      }),
       requestApproval: this.apiCall<
         CertificationApprovalRequest,
         null,
@@ -35,6 +75,17 @@ export default class LocationsApiClient extends BaseApiClient {
         }
       >({
         path: '/certification/location/request-approval',
+        requestType: 'put',
+      }),
+      withdraw: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          approvalRequestReference: string
+          comments: string
+        }
+      >({
+        path: '/certification/location/withdraw',
         requestType: 'put',
       }),
     },

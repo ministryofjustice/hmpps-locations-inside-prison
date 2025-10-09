@@ -25,6 +25,7 @@ context('Change cell capacity', () => {
 
   context('when the map2380 feature flag is disabled', () => {
     beforeEach(() => {
+      cy.task('reset')
       cy.task('setFeatureFlag', { map2380: false })
     })
 
@@ -87,7 +88,6 @@ context('Change cell capacity', () => {
       ]
 
       beforeEach(() => {
-        cy.task('reset')
         cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'] })
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')
@@ -302,6 +302,7 @@ context('Change cell capacity', () => {
 
   context('when the map2380 feature flag is enabled', () => {
     beforeEach(() => {
+      cy.task('reset')
       cy.task('setFeatureFlag', { map2380: true })
     })
 
@@ -364,7 +365,6 @@ context('Change cell capacity', () => {
       ]
 
       beforeEach(() => {
-        cy.task('reset')
         cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')
@@ -664,7 +664,6 @@ context('Change cell capacity', () => {
       ]
 
       beforeEach(() => {
-        cy.task('reset')
         cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
         cy.task('stubManageUsers')
         cy.task('stubManageUsersMe')

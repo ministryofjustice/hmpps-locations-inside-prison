@@ -6,7 +6,6 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class Details extends FormInitialStep {
-  // eslint-disable-next-line no-underscore-dangle
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const formLocationCode = req.form.options.fields.locationCode
     const formCreateCellsNow = req.form.options.fields.createCellsNow
@@ -31,7 +30,6 @@ export default class Details extends FormInitialStep {
       text: `The letter or number used to identify the location, for example ${locationExample}.`,
     }
 
-    // eslint-disable-next-line no-underscore-dangle
     await super._locals(req, res, next)
   }
 

@@ -9,7 +9,7 @@ import populatePrisonAndLocationId from '../../middleware/populatePrisonAndLocat
 const router = express.Router({ mergeParams: true })
 
 router.use(
-  protectRoute('create_location'),
+  protectRoute('certificate_change_request_create'),
   populatePrisonAndLocationId,
   populateDecoratedResidentialSummary,
   wizard(steps, fields, {

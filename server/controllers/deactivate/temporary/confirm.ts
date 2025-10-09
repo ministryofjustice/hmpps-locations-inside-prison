@@ -23,7 +23,6 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  // eslint-disable-next-line no-underscore-dangle
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
     const { locationsService } = req.services
@@ -40,7 +39,6 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
       res.locals.deactivationReason += ` - ${deactivationReasonDescription}`
     }
 
-    // eslint-disable-next-line no-underscore-dangle
     await super._locals(req, res, next)
   }
 
