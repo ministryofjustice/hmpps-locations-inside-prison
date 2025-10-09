@@ -38,27 +38,30 @@ export default class Capacities extends BaseController {
 
       const validationErrors: FormWizard.Errors = {}
 
-      for (let i = 0; i < cellsToCreate; i += 1) {
-        let cellTypes = sessionModel.get<string[]>(`temp-cellTypes${i}`)
-        if (!cellTypes && !sessionModel.get<boolean>(`temp-cellTypes${i}-removed`)) {
-          cellTypes = sessionModel.get<string[]>(`saved-cellTypes${i}`)
-        }
-        if (!cellTypes) {
-          cellTypes = []
-        }
+      // CARE_AND_SEPARATION and HEALTHCARE_INPATIENTS landings allow 0 cna/working cap, so skip this loop for those
+      if (sessionModel.get<string>('create-cells_accommodationType') === 'NORMAL_ACCOMMODATION') {
+        for (let i = 0; i < cellsToCreate; i += 1) {
+          let cellTypes = sessionModel.get<string[]>(`temp-cellTypes${i}`)
+          if (!cellTypes && !sessionModel.get<boolean>(`temp-cellTypes${i}-removed`)) {
+            cellTypes = sessionModel.get<string[]>(`saved-cellTypes${i}`)
+          }
+          if (!cellTypes) {
+            cellTypes = []
+          }
 
-        const workingCapacityKey = `create-cells_workingCapacity${i}`
-        const baselineCnaKey = `create-cells_baselineCna${i}`
-        const isSpecialistCellType = cellTypes.some(
-          type => specialistCellTypesObject.find(sct => sct.key === type)?.attributes?.affectsCapacity,
-        )
+          const workingCapacityKey = `create-cells_workingCapacity${i}`
+          const baselineCnaKey = `create-cells_baselineCna${i}`
+          const isSpecialistCellType = cellTypes.some(
+            type => specialistCellTypesObject.find(sct => sct.key === type)?.attributes?.affectsCapacity,
+          )
 
-        if (!errors[workingCapacityKey] && values[workingCapacityKey] === '0' && !isSpecialistCellType) {
-          validationErrors[workingCapacityKey] = this.formError(workingCapacityKey, 'greaterThan')
-        }
+          if (!errors[workingCapacityKey] && values[workingCapacityKey] === '0' && !isSpecialistCellType) {
+            validationErrors[workingCapacityKey] = this.formError(workingCapacityKey, 'greaterThan')
+          }
 
-        if (!errors[baselineCnaKey] && values[baselineCnaKey] === '0' && !isSpecialistCellType) {
-          validationErrors[baselineCnaKey] = this.formError(baselineCnaKey, 'greaterThan')
+          if (!errors[baselineCnaKey] && values[baselineCnaKey] === '0' && !isSpecialistCellType) {
+            validationErrors[baselineCnaKey] = this.formError(baselineCnaKey, 'greaterThan')
+          }
         }
       }
 

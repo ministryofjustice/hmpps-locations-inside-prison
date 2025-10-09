@@ -177,7 +177,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
             locationType: locationType as 'LANDING' | 'SPUR',
           },
           cellsUsedFor: [],
-          accommodationType: 'NORMAL_ACCOMMODATION',
+          accommodationType: sessionModel.get<string>('create-cells_accommodationType'),
           cells,
         })
         req.sessionModel.set('newLocation', response)
