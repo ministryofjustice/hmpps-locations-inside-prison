@@ -223,7 +223,23 @@ describe('Confirm create location (LANDING)', () => {
       localName: 'North Landing',
       locationCode: 'NL',
       locationId: 'parentId',
+      createCellsNow: 'YES',
+      'create-cells_cellsToCreate': 2,
+      'create-cells_bulkSanitation': false,
+      'create-cells_withoutSanitation': ['0'],
+      'create-cells_cellNumber0': '1',
+      'create-cells_doorNumber0': '1',
+      'create-cells_baselineCna0': '1',
+      'create-cells_workingCapacity0': '2',
+      'create-cells_maximumCapacity0': '3',
+      'saved-cellTypes0': ['BIOHAZARD_DIRTY_PROTEST'],
+      'create-cells_cellNumber1': '2',
+      'create-cells_doorNumber1': '2',
+      'create-cells_baselineCna1': '1',
+      'create-cells_workingCapacity1': '2',
+      'create-cells_maximumCapacity1': '3',
       'create-cells_accommodationType': 'NORMAL_ACCOMMODATION',
+      'create-cells_usedFor': ['CLOSE_SUPERVISION_CENTRE'],
     }
 
     locationsService = {
@@ -294,6 +310,11 @@ describe('Confirm create location (LANDING)', () => {
         values: {
           locationType: 'LANDING',
         },
+        decoratedResidentialSummary: {
+          location: {
+            pathHierarchy: 'A-1',
+          },
+        },
       },
       redirect: jest.fn(),
     }
@@ -320,8 +341,27 @@ describe('Confirm create location (LANDING)', () => {
 
       expect(locationsService.createCells).toHaveBeenCalledWith('token', {
         accommodationType: 'NORMAL_ACCOMMODATION',
-        cells: [],
-        cellsUsedFor: [],
+        cells: [
+          {
+            cellMark: '1',
+            certifiedNormalAccommodation: 1,
+            code: '001',
+            inCellSanitation: false,
+            maxCapacity: 3,
+            specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+            workingCapacity: 2,
+          },
+          {
+            cellMark: '2',
+            certifiedNormalAccommodation: 1,
+            code: '002',
+            inCellSanitation: true,
+            maxCapacity: 3,
+            specialistCellTypes: [],
+            workingCapacity: 2,
+          },
+        ],
+        cellsUsedFor: ['CLOSE_SUPERVISION_CENTRE'],
         newLevelAboveCells: {
           levelCode: 'NL',
           levelLocalName: 'North Landing',
@@ -365,8 +405,8 @@ describe('Confirm create location (LANDING)', () => {
       await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        title: 'resolved.LANDING created',
-        content: 'You have created resolved.landing WW-NL.',
+        title: 'Locations created',
+        content: 'You have created resolved.landing WW-NL with 2 cells.',
       })
 
       expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/TST/${newLocation.id}`)
@@ -378,8 +418,8 @@ describe('Confirm create location (LANDING)', () => {
       await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        title: 'resolved.LANDING created',
-        content: 'You have created resolved.landing North Landing.',
+        title: 'Locations created',
+        content: 'You have created resolved.landing North Landing with 2 cells.',
       })
     })
   })
