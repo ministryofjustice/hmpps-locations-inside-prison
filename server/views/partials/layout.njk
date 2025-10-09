@@ -130,12 +130,16 @@
 
   <main class="govuk-main-wrapper" id="main-content" role="main">
     <div class="govuk-width-container">
-      {% block heading %}
-        {% if titleCaption %}
-          <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
-        {% endif %}
-        <h1 class="govuk-heading-l">{{ title }}</h1>
-      {% endblock %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          {% block heading %}
+            {% if titleCaption %}
+              <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
+            {% endif %}
+            <h1 class="govuk-heading-l">{{ title }}</h1>
+          {% endblock %}
+        </div>
+      </div>
     </div>
 
     {% block content %}{% endblock %}
