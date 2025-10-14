@@ -25,13 +25,23 @@ context('Delete draft location', () => {
     localName: 'activeW',
   })
 
+  const draftCell = LocationFactory.build({
+    id: '7e570000-0000-1000-8000-000000000004',
+    pathHierarchy: 'B-draftCell',
+    parentId: '7e570000-0000-1000-8000-000000000003',
+    locationType: 'CELL',
+    status: 'DRAFT',
+    active: false,
+    localName: 'draftCell',
+  })
+
   beforeEach(() => {
+    cy.task('reset')
     cy.task('setFeatureFlag', { createAndCertify: true })
   })
 
   context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
-      cy.task('reset')
       cy.task('stubSignIn')
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
@@ -59,7 +69,6 @@ context('Delete draft location', () => {
 
   context('With the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
-      cy.task('reset')
       cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
@@ -77,8 +86,12 @@ context('Delete draft location', () => {
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
         parentLocation: activeWing,
       })
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        parentLocation: draftCell,
+      })
       cy.task('stubLocations', activeWing)
       cy.task('stubLocations', draftWing)
+      cy.task('stubLocations', draftCell)
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
@@ -99,13 +112,13 @@ context('Delete draft location', () => {
         viewLocationsShowPage.deleteButton().should('exist')
       })
 
-      it('shows the success banner after deleting a DRAFT location ', () => {
+      it('shows the success banner after deleting a DRAFT wing ', () => {
         ViewLocationsShowPage.goTo(draftWing.prisonId, draftWing.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.deleteButton().click()
         DeleteDraftConfirmPage.goTo(draftWing.id)
-        const deleteDraftConfirmPage = Page.verifyOnPage(DeleteDraftConfirmPage)
-        deleteDraftConfirmPage.confirmButton().click()
+        const deleteDraftConfirmPage = new DeleteDraftConfirmPage('wing')
+        deleteDraftConfirmPage.confirmButton('wing').click()
 
         cy.task('stubLocationsLocationsResidentialSummary')
         ViewLocationsShowPage.goTo(draftWing.prisonId)
@@ -117,7 +130,17 @@ context('Delete draft location', () => {
     })
 
     context('Delete draft CELL', () => {
-      //   Complete these once the cell journey has been built
+      it('shows the success banner after deleting a DRAFT cell ', () => {
+        ViewLocationsShowPage.goTo(draftCell.prisonId, draftCell.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.deleteButton().click()
+        DeleteDraftConfirmPage.goTo(draftCell.id)
+        const deleteDraftConfirmPage = new DeleteDraftConfirmPage('cell')
+        deleteDraftConfirmPage.confirmButton('cell').click()
+        cy.get('#govuk-notification-banner-title').contains('Success')
+        cy.get('.govuk-notification-banner__content h3').contains('Cell deleted')
+        cy.get('.govuk-notification-banner__content p').contains('You have deleted draftCell')
+      })
     })
   })
 })

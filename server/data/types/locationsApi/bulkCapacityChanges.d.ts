@@ -23,7 +23,7 @@ export type BulkCapacityUpdateChanges = {
 type Change = {
   key: string
   message: string
-  type: string
-  previousValue: number
-  newValue: number
+  type?: string
+  previousValue?: number
+  newValue?: number
 }

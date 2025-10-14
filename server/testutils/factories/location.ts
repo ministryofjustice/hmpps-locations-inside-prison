@@ -21,6 +21,7 @@ const LocationFactory = Factory.define<Location>(() => {
     certification: {
       certified: true,
       capacityOfCertifiedCell: 1,
+      certifiedNormalAccommodation: 1,
     },
     attributes: ['ANTI_BARRICADE_DOOR'],
     usage: [
@@ -68,6 +69,8 @@ const LocationFactory = Factory.define<Location>(() => {
     numberOfCellLocations: 0,
     oldWorkingCapacity: 0,
     wingStructure: [],
+    cellMark: undefined,
+    inCellSanitation: false,
   }
 })
 

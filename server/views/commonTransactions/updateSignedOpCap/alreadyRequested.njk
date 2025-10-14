@@ -1,0 +1,16 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% block fields %}
+  <p>A request to change the signed operational capacity is currently being reviewed.</p>
+
+  <p>
+    If you want to set a different operational capacity, you will need to withdraw the existing request and then submit
+    a new request with the updated capacity.
+  </p>
+
+  {{ govukInsetText({
+    html: '<p class="govuk-label govuk-label--m govuk-!-margin-bottom-1">Proposed signed operational capacity</p><p class="govuk-body-l">' + (prisonResidentialSummary.prisonSummary.signedOperationalCapacity + signedOpCapChangeRequest.signedOperationCapacityChange) + '</p>'
+  }) }}
+
+  {{ super() }}
+{% endblock %}

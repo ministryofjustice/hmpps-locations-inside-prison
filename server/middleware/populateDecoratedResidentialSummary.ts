@@ -10,6 +10,10 @@ function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
+function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
+  return location.status === 'DRAFT' && req.canAccess('change_location_code')
+}
+
 function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
   return (location.active || location.status === 'DRAFT') && req.canAccess('change_local_name')
 }
@@ -19,7 +23,7 @@ function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
 }
 
 function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
-  return location.active && req.canAccess('change_used_for')
+  return (location.active || location.status === 'DRAFT') && req.canAccess('change_used_for')
 }
 
 function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow {
@@ -102,6 +106,28 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
   return row
 }
 
+function locationCodeRow(location: DecoratedLocation, req: Request): SummaryListRow {
+  const { pathHierarchy } = location
+  const changeLocationCodeUrl = `/location/${location.id}/change-location-code`
+  const row: SummaryListRow = {
+    key: { text: 'Location' },
+    value: {
+      html: pathHierarchy || '-',
+    },
+  }
+  if (showChangeLocationCodeLink(location, req)) {
+    row.actions = {
+      items: [
+        {
+          href: changeLocationCodeUrl,
+          text: 'Change',
+        },
+      ],
+    }
+  }
+  return row
+}
+
 function showChangeNonResLink(location: DecoratedLocation, req: Request) {
   return !location.isResidential && req.canAccess('change_non_residential_type')
 }
@@ -127,7 +153,13 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
 }
 
 function getLocationDetails(location: DecoratedLocation, req: Request) {
-  const details: SummaryListRow[] = [{ key: { text: 'Location' }, value: { text: location.pathHierarchy } }]
+  const details: SummaryListRow[] = []
+
+  if (location.status === 'DRAFT') {
+    details.push(locationCodeRow(location, req))
+  } else {
+    details.push({ key: { text: 'Location' }, value: { text: location.pathHierarchy } })
+  }
 
   if (!location.leafLevel) {
     details.push(localNameRow(location, req))
@@ -235,13 +267,28 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         }
 
         const { numberOfCellLocations } = residentialSummary.location
-        const { workingCapacity, maxCapacity } = residentialSummary.location.capacity
-        const { capacityOfCertifiedCell } = residentialSummary.location.certification
+        let { workingCapacity, maxCapacity } = residentialSummary.location.capacity
+        let { certifiedNormalAccommodation: cna } = residentialSummary.location.certification
+
+        const { pendingChanges } = residentialSummary.location
+
+        if (pendingChanges?.certifiedNormalAccommodation !== undefined) {
+          cna = pendingChanges.certifiedNormalAccommodation
+        }
+
+        if (pendingChanges?.maxCapacity !== undefined) {
+          maxCapacity = pendingChanges.maxCapacity
+        }
+
+        if (pendingChanges?.workingCapacity !== undefined) {
+          workingCapacity = pendingChanges.workingCapacity
+        }
+
         if (residentialSummary.location.status === 'DRAFT') {
           residentialSummary.summaryCards.push({
             title: 'CNA',
             type: 'cna',
-            text: numberOfCellLocations ? capacityOfCertifiedCell.toString() : '-',
+            text: numberOfCellLocations ? `${cna}` : '-',
           })
         }
 

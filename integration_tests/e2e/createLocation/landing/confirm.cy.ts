@@ -2,7 +2,7 @@ import Page from '../../../pages/page'
 import CreateLocationDetailsPage from '../../../pages/createLocation/index'
 import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import LocationFactory from '../../../../server/testutils/factories/location'
-import CreateLocationpage from '../../../pages/createLocation/confirm'
+import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
 import setupStubs, { existingWingLocation } from './setupStubs'
@@ -42,7 +42,7 @@ context('Create Landing Confirm', () => {
     ],
     wingStructure: [],
   }
-  let page: CreateLocationpage
+  let page: CreateLocationConfirmPage
 
   context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
@@ -73,7 +73,7 @@ context('Create Landing Confirm', () => {
       page.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBanner().contains('Landing created')
+      viewLocationsShowPage.successBannerHeading().contains('Landing created')
       viewLocationsShowPage.draftBanner().should('exist')
       viewLocationsShowPage.summaryCards.cnaText().contains('-')
       viewLocationsShowPage.summaryCards.workingCapacityText().contains('-')

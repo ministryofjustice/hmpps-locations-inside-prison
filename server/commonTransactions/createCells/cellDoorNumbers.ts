@@ -3,11 +3,13 @@ import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import capFirst from '../../formatters/capFirst'
 import getCellPath from './getCellPath'
+import unsetTempValues from '../../middleware/unsetTempValues'
 
 export default class CellDoorNumbers extends BaseController {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.setupDynamicFields)
+    this.use(unsetTempValues)
   }
 
   setupDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {

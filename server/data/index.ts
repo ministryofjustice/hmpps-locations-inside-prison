@@ -4,6 +4,7 @@
  * In particular, applicationinsights automatically collects bunyan logs
  */
 import { AuthenticationClient, InMemoryTokenStore, RedisTokenStore } from '@ministryofjustice/hmpps-auth-clients'
+import { NotifyClient } from 'notifications-node-client'
 import { initialiseAppInsights, buildAppInsightsClient } from '../utils/azureAppInsights'
 import applicationInfoSupplier from '../applicationInfo'
 
@@ -27,6 +28,7 @@ export const dataAccess = () => {
     logger,
     config.redis.enabled ? new RedisTokenStore(redisClient) : new InMemoryTokenStore(),
   )
+  const notificationClient = new NotifyClient(config.email.notifyKey)
 
   return {
     applicationInfo,
@@ -37,6 +39,7 @@ export const dataAccess = () => {
     locationsApiClient: new LocationsApiClient(redisClient, hmppsAuthClient),
     manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
     prisonApiClient: new PrisonApiClient(redisClient, hmppsAuthClient),
+    notificationClient,
     redisClient,
   }
 }

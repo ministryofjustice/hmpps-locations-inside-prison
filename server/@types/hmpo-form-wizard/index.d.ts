@@ -133,7 +133,7 @@ declare module 'hmpo-form-wizard' {
       baseUrl?: string
       journeyModel: {
         set: (key: string, value: unknown) => void
-        get: (key: string) => unknown
+        get: <T>(key: string) => T
         unset: (key: string) => unknown
         reset: () => unknown
       }
@@ -144,6 +144,7 @@ declare module 'hmpo-form-wizard' {
         get: <T>(key: string) => T
         reset: () => unknown
         unset: (key: string | string[]) => void
+        toJSON: () => object
       }
     }
 
@@ -168,10 +169,11 @@ declare module 'hmpo-form-wizard' {
 
       validateFields(req: FormWizard.Request, res: Express.Response, callback: (errors: FormWizard.Errors) => void)
 
-      // eslint-disable-next-line no-underscore-dangle
       _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise<void>
 
       locals(req: Request, res: Express.Response, next: Express.NextFunction): Partial<TypedLocals>
+
+      _getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 
       getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 
@@ -191,13 +193,10 @@ declare module 'hmpo-form-wizard' {
 
       getBackLink(req: Request, res: Express.Response): string | undefined
 
-      // eslint-disable-next-line no-underscore-dangle
       _process(req: Request, res: Express.Response, next: Express.NextFunction)
 
-      // eslint-disable-next-line no-underscore-dangle
       _getErrors(req: Request, res: Express.Response, next: Express.NextFunction)
 
-      // eslint-disable-next-line no-underscore-dangle
       _resetErrors(req: Request, res: Express.Response, next: Express.NextFunction)
 
       getNextStep(req: FormWizard.Request, res: Response): string
@@ -216,7 +215,6 @@ declare module 'hmpo-form-wizard' {
 
       resolvePath(base: string, url: string, forceRelative: boolean): string
 
-      // eslint-disable-next-line no-underscore-dangle
       _backlinksGetHistoryStep(req: FormWizard.Request, res: Response): string
     }
 
@@ -332,6 +330,7 @@ declare module 'hmpo-form-wizard' {
         }
       }
       autocomplete?: string
+      'ignore-defaults'?: boolean
       labelClasses?: string
       formGroupClasses?: string
       characterCountMax?: number
@@ -355,7 +354,13 @@ declare module 'hmpo-form-wizard' {
     namespace Step {
       type NextStepCondition = (req: Request, res: Response) => boolean
       type Op = (fieldValue, req, res, con) => boolean
-      type FieldValueCondition = { field: string; op?: string | Op; value: string | string[]; next: NextStep }
+      type FieldValueCondition = {
+        field: string
+        op?: string | Op
+        value: string | string[]
+        next: NextStep
+        continueOnEdit?: boolean
+      }
       type CallbackCondition = { fn: NextStepCondition; next: string }
 
       type NextStep = FieldValueCondition | CallbackCondition | string | NextStep[]
@@ -365,7 +370,9 @@ declare module 'hmpo-form-wizard' {
       pageTitle?: string
       reset?: boolean
       skip?: boolean
+      continueOnEdit?: boolean
       editable?: boolean
+      editBackStep?: string
       resetJourney?: boolean
       checkJourney?: boolean
       entryPoint?: boolean

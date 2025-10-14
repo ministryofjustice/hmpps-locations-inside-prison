@@ -7,15 +7,9 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-
-{% block heading %}
-  {% if titleCaption %}
-    <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
-  {% endif %}
-  <h1 class="govuk-heading-l">{{ title }}</h1>
-{% endblock %}
 
 {% block beforeContent %}
   <div class="govuk-width-container">
@@ -94,7 +88,7 @@
             {% block formActions %}
               {% block submitAction %}
                 {{ govukButton({
-                  text: "Continue",
+                  text: buttonText or "Continue",
                   classes: options.buttonClasses,
                   preventDoubleClick: true,
                   type: "submit"
@@ -106,7 +100,11 @@
 
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel and return to location details
+            {% if cancelText %}
+              {{ cancelText }}
+            {% else %}
+              Cancel and return to location details
+            {% endif %}
           </a>
         </p>
       </div>

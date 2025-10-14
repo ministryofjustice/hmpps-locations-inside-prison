@@ -17,10 +17,105 @@ import { ManagementReportDefinition } from './types/locationsApi/managementRepor
 import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 import { BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
+import { CertificationApprovalRequest } from './types/locationsApi/certificationApprovalRequest'
+import { CellCertificate } from './types/locationsApi/cellCertificate'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
     super('LocationsApiClient', redisClient, config.apis.locationsApi, authenticationClient)
+  }
+
+  cellCertificates = {
+    getById: this.apiCall<CellCertificate, { id: string }>({
+      path: '/cell-certificates/:id',
+      requestType: 'get',
+    }),
+    prison: {
+      getAllForPrisonId: this.apiCall<CellCertificate[], { prisonId: string }>({
+        path: '/cell-certificates/prison/:prisonId',
+        requestType: 'get',
+      }),
+      getCurrentForPrisonId: this.apiCall<CellCertificate, { prisonId: string }>({
+        path: '/cell-certificates/prison/:prisonId/current',
+        requestType: 'get',
+      }),
+    },
+  }
+
+  certification = {
+    location: {
+      approve: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          approvalRequestReference: string
+          comments?: string
+        }
+      >({
+        path: '/certification/location/approve',
+        requestType: 'put',
+      }),
+      reject: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          approvalRequestReference: string
+          comments: string
+        }
+      >({
+        path: '/certification/location/reject',
+        requestType: 'put',
+      }),
+      requestApproval: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          locationId: string
+          approvalType: string
+        }
+      >({
+        path: '/certification/location/request-approval',
+        requestType: 'put',
+      }),
+      withdraw: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          approvalRequestReference: string
+          comments: string
+        }
+      >({
+        path: '/certification/location/withdraw',
+        requestType: 'put',
+      }),
+    },
+    prison: {
+      signedOpCapChange: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          prisonId: string
+          signedOperationalCapacity: number
+          reasonForChange: string
+        }
+      >({
+        path: '/certification/prison/signed-op-cap-change',
+        requestType: 'put',
+      }),
+    },
+    requestApprovals: {
+      getById: this.apiCall<CertificationApprovalRequest, { id: string }>({
+        path: '/certification/request-approvals/:id',
+        requestType: 'get',
+      }),
+      prison: {
+        getAllForPrisonId: this.apiCall<CertificationApprovalRequest[], { prisonId: string; status?: string }>({
+          path: '/certification/request-approvals/prison/:prisonId',
+          queryParams: ['status'],
+          requestType: 'get',
+        }),
+      },
+    },
   }
 
   constants = {
@@ -141,6 +236,10 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
+    getLocationByKey: this.apiCall<LocationForLocalName, { key: string }>({
+      path: '/locations/key/:key?includeChildren',
+      requestType: 'get',
+    }),
     createWing: this.apiCall<
       Location,
       undefined,
@@ -226,8 +325,22 @@ export default class LocationsApiClient extends BaseApiClient {
       queryParams: ['includeHistory'],
       requestType: 'get',
     }),
-    getResidentialHierarchy: this.apiCall<ResidentialHierarchy, { prisonId: string }>({
+    getResidentialHierarchy: this.apiCall<ResidentialHierarchy[], { prisonId: string }>({
       path: '/locations/prison/:prisonId/residential-hierarchy',
+      requestType: 'get',
+    }),
+    getResidentialHierarchyFromParent: this.apiCall<
+      ResidentialHierarchy[],
+      {
+        prisonId: string
+        parentPathHierarchy: string
+        maxLevel?: string
+        includeVirtualLocations?: string
+        includeInactive?: string
+      }
+    >({
+      path: '/locations/prison/:prisonId/residential-hierarchy/:parentPathHierarchy',
+      queryParams: ['maxLevel', 'includeVirtualLocations', 'includeInactive'],
       requestType: 'get',
     }),
     getResidentialSummary: this.apiCall<
@@ -264,6 +377,10 @@ export default class LocationsApiClient extends BaseApiClient {
     updateLocalName: this.apiCall<Location, { locationId: string }, { localName?: string; updatedBy?: string }>({
       path: '/locations/:locationId/change-local-name',
       requestType: 'put',
+    }),
+    updateLocationCode: this.apiCall<Location, { locationId: string }, { code: string }>({
+      path: '/locations/residential/:locationId',
+      requestType: 'patch',
     }),
     updateTemporaryDeactivation: this.apiCall<
       Location,
@@ -329,6 +446,10 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     updateCertificationApproval: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
       path: '/prison-configuration/:prisonId/certification-approval-required/:status',
+      requestType: 'put',
+    }),
+    updateIncludeSegInRollCount: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/include-seg-in-roll-count/:status',
       requestType: 'put',
     }),
   }

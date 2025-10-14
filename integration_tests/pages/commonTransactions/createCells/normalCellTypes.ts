@@ -6,7 +6,7 @@ export default class CreateCellsTypesNormalPage extends Page {
   }
 
   cellTypeCheckboxes = (value: string): PageElement => {
-    return cy.get(`input[name="create-cells_set-cell-type_normalCellTypes0"][type="checkbox"][value="${value}"]`)
+    return cy.get(`input[name^="create-cells_set-cell-type_normalCellTypes"][type="checkbox"][value="${value}"]`)
   }
 
   saveButton = (): PageElement => cy.get('button:contains("Save cell type")')

@@ -6,9 +6,11 @@ import LocationFactory from './location'
 const PrisonResidentialSummaryFactory = Factory.define<PrisonResidentialSummary>(() => {
   return {
     prisonSummary: {
+      prisonName: 'Test (HMP)',
       workingCapacity: 100,
       signedOperationalCapacity: 140,
       maxCapacity: 200,
+      numberOfCellLocations: 73,
     },
     topLevelLocationType: 'Wings',
     subLocationName: 'Wings',

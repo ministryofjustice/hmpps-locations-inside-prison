@@ -321,9 +321,10 @@ context('Cell conversion', () => {
           .cellTypeCheckboxHints()
           .eq(0)
           .contains('Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant')
-        setCellTypePage.cellTypeCheckboxLabels().eq(1).contains('Biohazard / dirty protest cell')
+        setCellTypePage.cellTypeCheckboxLabels().eq(1).contains('Normal accommodation')
+        setCellTypePage.cellTypeCheckboxLabels().eq(2).contains('Biohazard / dirty protest cell')
         setCellTypePage.cellTypeCheckboxHints().eq(1).contains('Previously known as a dirty protest cell')
-        setCellTypePage.cellTypeCheckboxLabels().eq(2).contains('Constant Supervision Cell')
+        setCellTypePage.cellTypeCheckboxLabels().eq(3).contains('Constant Supervision Cell')
       })
 
       it('has an inset text warning about working capacity', () => {

@@ -132,9 +132,7 @@ context('View Locations Show', () => {
       if (location.status === 'DRAFT') {
         viewLocationsShowPage.draftBanner().should('exist')
 
-        viewLocationsShowPage
-          .draftBannerCertifyButton()
-          .should(`${location.numberOfCellLocations === 0 ? 'not.' : ''}exist`)
+        viewLocationsShowPage.draftBannerCertifyButton().should('not.exist')
       } else {
         viewLocationsShowPage.draftBanner().should('not.exist')
       }

@@ -79,6 +79,8 @@ export default class ViewLocationsShowPage extends Page {
 
   removeSpecificCellTypeLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Remove")')
 
+  changeLocationCodeLink = (): PageElement => this.locationDetailsRows().eq(0).find('a:contains("Change")')
+
   localNameRow = (): PageElement => cy.get('dt.govuk-summary-list__key').contains('Local Name')
 
   setLocalNameLink = (): PageElement => this.locationDetailsRows().eq(1).find('a:contains("Add local name")')
@@ -94,7 +96,9 @@ export default class ViewLocationsShowPage extends Page {
 
   locationsTable = (): PageElement => cy.get('[data-qa=locations-table]')
 
-  successBanner = (): PageElement => cy.get('.govuk-notification-banner__heading')
+  successBannerHeading = (): PageElement => cy.get('.govuk-notification-banner__heading')
+
+  successBannerBody = (): PageElement => cy.get('.govuk-notification-banner__content > p.govuk-body')
 
   locationsTableRows = (): PageElement => this.locationsTable().find('tbody tr')
 

@@ -62,7 +62,8 @@ context('Create landing - Create cells - Types', () => {
         })
 
         const capacitiesPage = Page.verifyOnPage(CreateCellsCapacitiesPage)
-        capacitiesPage.cellTypes(0).should('contain.text', 'Accessible cell, Constant Supervision Cell')
+        capacitiesPage.cellTypes(0).should('contain.text', 'Accessible cell')
+        capacitiesPage.cellTypes(0).should('contain.text', 'Constant Supervision Cell')
         capacitiesPage.removeCellType(0).should('exist')
         capacitiesPage.setCellType(0).should('exist')
       })
@@ -76,7 +77,7 @@ context('Create landing - Create cells - Types', () => {
         const capacitiesPage = Page.verifyOnPage(CreateCellsCapacitiesPage)
         capacitiesPage.removeCellType(0).click()
         capacitiesPage.cellTypes(0).should('not.exist')
-        capacitiesPage.addCellType(0).should('exist')
+        capacitiesPage.setCellType(0).should('exist')
       })
 
       it('has a back link to the previous step', () => {

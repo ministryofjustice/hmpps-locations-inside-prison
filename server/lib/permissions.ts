@@ -1,6 +1,6 @@
 import { uniq } from 'lodash'
 
-const viewInternalLocationPermissions: string[] = []
+const viewInternalLocationPermissions: string[] = ['view_cell_certificate']
 
 const reportingLocationInformationPermissions: string[] = [
   ...viewInternalLocationPermissions,
@@ -11,6 +11,7 @@ const manageResidentialLocationsPermissions: string[] = [
   ...viewInternalLocationPermissions,
   'change_cell_capacity',
   'change_local_name',
+  'change_location_code',
   'change_non_residential_type',
   'change_temporary_deactivation_details',
   'change_used_for',
@@ -18,6 +19,9 @@ const manageResidentialLocationsPermissions: string[] = [
   'reactivate',
   'set_cell_type',
   'create_location',
+  // TODO: change this to new "Certificate administrator" role, when created
+  'certificate_change_request_create',
+  'certificate_change_request_withdraw',
 ]
 
 const manageResLocationsOpCapPermissions: string[] = [
@@ -26,6 +30,8 @@ const manageResLocationsOpCapPermissions: string[] = [
   'change_signed_operational_capacity',
   'convert_non_residential',
   'deactivate:permanent',
+  // TODO: change this to new "Certificate reviewer" role, when created
+  'certificate_change_request_review',
 ]
 
 const administerResLocationsPermissions: string[] = [...manageResLocationsOpCapPermissions, 'administer_residential']

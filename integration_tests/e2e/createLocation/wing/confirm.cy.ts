@@ -64,13 +64,15 @@ context('Create Wing Confirm', () => {
       page.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBanner().contains('Wing created')
+      viewLocationsShowPage.successBannerHeading().contains('Wing created')
       viewLocationsShowPage.draftBanner().should('exist')
       viewLocationsShowPage.summaryCards.cnaText().contains('-')
       viewLocationsShowPage.summaryCards.workingCapacityText().contains('-')
       viewLocationsShowPage.summaryCards.maximumCapacityText().contains('-')
       viewLocationsShowPage.locationDetailsRows().eq(0).contains('B')
       viewLocationsShowPage.locationDetailsRows().eq(1).contains('testW')
+      viewLocationsShowPage.changeLocalNameLink().should('exist')
+      viewLocationsShowPage.changeCellUsedForLink().should('exist')
     })
 
     it('has a back link to the enter details page', () => {

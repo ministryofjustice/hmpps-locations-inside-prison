@@ -88,7 +88,6 @@ describe('Create location (WING)', () => {
       locationsService.getSpecialistCellType = jest.fn().mockResolvedValue('resolvedSpecialistCellType')
       locationsService.getUsedForType = jest.fn().mockResolvedValue('resolvedUsedForType')
 
-      // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toMatchObject({
         fields: {
@@ -307,7 +306,6 @@ describe('Create location (LANDING)', () => {
       locationsService.getSpecialistCellType = jest.fn().mockResolvedValue('resolvedSpecialistCellType')
       locationsService.getUsedForType = jest.fn().mockResolvedValue('resolvedUsedForType')
 
-      // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toMatchObject({
         fields: {

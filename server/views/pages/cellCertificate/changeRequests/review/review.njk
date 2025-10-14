@@ -1,0 +1,22 @@
+{% extends "../../../../partials/formStep.njk" %}
+
+{% from '../../../../macros/certificationApprovalRequest.njk' import certificationApprovalRequest %}
+{% from '../../../../macros/certificationApprovalRequestSummary.njk' import certificationApprovalRequestSummary %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p>
+          Review the proposed change to the establishment's cell certificate. If approved, the cell certificate will be updated with this change.
+        </p>
+
+        {{ certificationApprovalRequestSummary(approvalRequest, userMap, false, false) }}
+      </div>
+    </div>
+
+    {{ certificationApprovalRequest(approvalRequest, false, 0, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, false) }}
+  </div>
+
+  {{ super() }}
+{% endblock %}

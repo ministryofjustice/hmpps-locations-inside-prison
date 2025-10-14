@@ -23,16 +23,20 @@ import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
 import changeNonResidentialTypeRouter from './changeNonResidentialType'
 import changeUsedForRouter from './changeUsedFor'
+import changeLocationCodeRouter from './changeLocationCode'
 import locationHistoryRouter from './locationHistoryRouter'
 import setLocalNameRouter from './setLocalName'
 import changeLocalNameRouter from './changeLocalName'
 import removeLocalNameRouter from './removeLocalName'
 import createLocationRouter from './createLocation'
 import deleteDraftLocationRouter from './deleteDraftLocation'
+import addToCertificateRouter from './addToCertificate'
 import adminRouter from './adminRouter'
 import changeResiStatusRouter from './admin/resi'
 import changeCertApprovalStatusRouter from './admin/certApproval'
+import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
 import ingestRouter from './admin/ingest'
+import cellCertificateRouter from './cellCertificate'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -65,15 +69,19 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/deactivate', deactivateRouter)
   router.use('/location/:locationId/non-residential-conversion', nonResidentialConversionRouter)
   router.use('/location/:locationId/change-used-for', changeUsedForRouter)
+  router.use('/location/:locationId/change-location-code', changeLocationCodeRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
   router.use('/location/:locationId/add-local-name', setLocalNameRouter)
   router.use('/location/:locationId/change-local-name', changeLocalNameRouter)
   router.use('/location/:locationId/remove-local-name', removeLocalNameRouter)
   router.use('/location/:locationId/change-temporary-deactivation-details', changeTemporaryDeactivationDetailsRouter)
+  router.use('/location/:locationId/add-to-certificate', addToCertificateRouter)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
   router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
+
+  router.use('/:prisonId?/cell-certificate', cellCertificateRouter)
 
   // Digital Prison Reporting
   dprRouter(router, services)
@@ -81,6 +89,7 @@ export default function routes(services: Services): Router {
   // admin
   router.use('/admin/:prisonId?', adminRouter(services))
   router.use('/admin/:prisonId/change-resi-status', changeResiStatusRouter)
+  router.use('/admin/:prisonId/change-include-seg-in-roll-count', changeIncludeSegInRollCountStatusRouter)
   router.use('/admin/:prisonId/change-certification-status', changeCertApprovalStatusRouter)
   router.use('/admin/:prisonId/ingest-cert', ingestRouter)
 

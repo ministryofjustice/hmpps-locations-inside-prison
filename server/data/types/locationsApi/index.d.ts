@@ -1,3 +1,5 @@
+export * from './cellCertificate'
+export * from './constant'
 export * from './location'
 export * from './locationResidentialSummary'
 export * from './locationStatus'

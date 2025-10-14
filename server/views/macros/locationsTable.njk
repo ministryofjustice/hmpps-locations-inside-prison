@@ -1,74 +1,33 @@
-{% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% from "./locationStatusTag.njk" import locationStatusTag %}
+{% from "./locationTables/cells.njk" import cells %}
+{% from "./locationTables/draftCells.njk" import draftCells %}
+{% from "./locationTables/draftOther.njk" import draftOther %}
+{% from "./locationTables/other.njk" import other %}
 
-{% macro locationsTable (createButton, locationType, locations) %}
+{% macro locationsTable(createButton, decoratedResidentialSummary) %}
+  {% set locationType = decoratedResidentialSummary.subLocationName %}
+  {% set locations = decoratedResidentialSummary.subLocations %}
 
-<h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
 
   {% if createButton %}
     {{ govukButton(createButton) }}
   {% endif %}
 
   {% if locations | length %}
-    {% set rows = [] %}
-    {% set leafLevel = locations[0].leafLevel %}
-
-    {% if leafLevel %}
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
-    {% endif %}
-
-    {% for item in locations %}
-      {% set column5Html %}
-        {% if item.status == 'NON_RESIDENTIAL' %}
-          {{ item.convertedCellType if not item.otherConvertedCellType else item.convertedCellType + ' - ' + item.otherConvertedCellType }}
-        {% else %}
-          {% if leafLevel %}
-            {{ item.specialistCellTypes | join('<br>') | safe }}
-          {% elif item.inactiveCells > 0 %}
-            <a href="/inactive-cells/{{ item.prisonId }}/{{ item.id }}">{{ item.inactiveCells }}</a>
-          {% else %}
-            0
-          {% endif %}
-        {% endif %}
-      {% endset %}
-
-      {% set rows = (rows.push(
-        [
-          { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
-          { html: locationStatusTag(item) },
-          { text: 'None' if item.status == 'NON_RESIDENTIAL' else (item.capacity.workingCapacity if item.capacity.workingCapacity >= 0 else '-') },
-          { text: 'None' if item.status == 'NON_RESIDENTIAL' else (item.capacity.maxCapacity if item.capacity.maxCapacity >= 0 else '-') },
-          { html: column5Html },
-          { html: item.accommodationTypes | join('<br>') } if not leafLevel,
-          { html: item.usedFor | join('<br>') } if not leafLevel
-        ]
-      ), rows) %}
-    {% endfor %}
-
-    {{ govukTable({
-      attributes: {
-        "data-qa": "locations-table",
-        "id": "locations-table"
-      },
-      firstCellIsHeader: true,
-      head: [
-        { text: "Location" },
-        { text: "Status" },
-        { text: "Working capacity" },
-        { text: "Maximum capacity" },
-        { text: "Inactive cells" if not leafLevel else "Cell type" },
-        { text: "Accommodation type" } if not leafLevel,
-        { text: "Used for"  if not leafLevel}
-      ],
-      rows: rows
-    }) }}
-
-    {% if leafLevel %}
-        </div>
-      </div>
+    {% if locationType == 'Cells' %}
+      {% if decoratedResidentialSummary.location.status == 'DRAFT' %}
+        {{ draftCells(locations) }}
+      {% else %}
+        {{ cells(locations) }}
+      {% endif %}
+    {% else %}
+      {% if decoratedResidentialSummary.location.status == 'DRAFT' %}
+        {{ draftOther(locations) }}
+      {% else %}
+        {{ other(locations) }}
+      {% endif %}
     {% endif %}
   {% else %}
     <p>

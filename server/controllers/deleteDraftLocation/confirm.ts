@@ -9,10 +9,14 @@ export default class ConfirmDeleteDraftLocation extends FormInitialStep {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals
     const locationType = decoratedResidentialSummary.location.locationType.toLowerCase()
+    const isCell = decoratedResidentialSummary.location.locationType === 'Cell'
+    const subLocationsClause = isCell ? '' : ' and any locations that are part of it'
+    const bodyText = `The ${locationType}${subLocationsClause} will be deleted and cannot be restored.`
 
     return {
       ...locals,
       locationType,
+      bodyText,
       titleCaption: capFirst(decoratedResidentialSummary.location.displayName),
       title: `Are you sure you want to delete this ${locationType}?`,
     }

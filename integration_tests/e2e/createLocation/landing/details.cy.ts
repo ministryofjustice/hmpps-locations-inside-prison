@@ -114,7 +114,7 @@ context('Create Landing Details', () => {
       LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(residentialSummaryWithoutCellChild)
       page = goToCreateLocationDetailsPage('7e570000-0000-1000-8000-000000000002', false)
 
-      page.createCellsNowRadio('no').should('not.exist')
+      page.createCellsNowRadio('NO').should('not.exist')
     })
 
     it('has a back link to the manage location page', () => {
