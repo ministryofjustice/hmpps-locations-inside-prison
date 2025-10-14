@@ -28,11 +28,9 @@ Additional tools are required to manage deployment: `kubectl` and `helm`.
 ### Notifications
 
 As part of the location approval process, email notifications are sent to users.
-When running in the local or in the dev environment, you will probably want to override this functionality which can be achieved by the adding the following examples
-
+When running locally or in the dev environment, emails will only be sent to team members who have the appropriate roles and are listed (Team members) on the GovUK Notify dashboard.
 ```
-NOTIFY_ENABLED=false
-NOTIFY_DEV_USERS='myuseremail>@justice.gov.uk,myuseremail2>@justice.gov.uk'
+NOTIFY_API_KEY=<example-dev-key>
 ```
 
 
