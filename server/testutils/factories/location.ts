@@ -69,6 +69,8 @@ const LocationFactory = Factory.define<Location>(() => {
     numberOfCellLocations: 0,
     oldWorkingCapacity: 0,
     wingStructure: [],
+    cellMark: undefined,
+    inCellSanitation: false,
   }
 })
 

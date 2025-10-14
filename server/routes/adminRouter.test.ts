@@ -77,7 +77,7 @@ describe('GET /admin/PRISON_ID', () => {
         // check links
         expect(res.text).toContain('/admin/TST/change-resi-status')
         expect(res.text).toContain('/admin/TST/change-certification-status')
-
+        expect(res.text).toContain('/admin/TST/change-include-seg-in-roll-count')
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
           correlationId: expect.any(String),

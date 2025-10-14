@@ -59,7 +59,7 @@
   {% set cellTypesObject = [] %}
   {% for i in range(0, values['create-cells_cellsToCreate']) -%}
     {% set cellTypes = values['temp-cellTypes' + i] or (values['saved-cellTypes' + i] if not values['temp-cellTypes' + i + '-removed']) %}
-    {% set cellTypesText = formatCellTypes(specialistCellTypesObject, cellTypes) %}
+    {% set cellTypesText = formatConstants(specialistCellTypesObject, cellTypes) %}
 
    {% if cellTypes %}
        {% set cellTypeColumn =

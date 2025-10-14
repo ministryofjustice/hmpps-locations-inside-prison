@@ -49,6 +49,18 @@ export default {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
+  email: {
+    notifyKey: get('NOTIFY_API_KEY', 'invalid-token', requiredInProduction),
+    enabled: get('NOTIFY_ENABLED', false),
+    notifyDevUsers: get('NOTIFY_DEV_USERS', ''),
+    templates: {
+      CHANGE_REQUEST_RECEIVED: '39bf63fe-0b13-46d6-9cb7-e36e959f182c',
+      CHANGE_REQUEST_WITHDRAWN: '6369cc40-bdc9-4150-9181-3f19385f67e6',
+      CHANGE_REQUEST_APPROVED: '0bbf14e3-435a-4bae-91cd-cd0efe4e5d36',
+      CHANGE_REQUEST_REJECTED: '9aacb69a-f1af-454f-964d-9006398a1b76',
+      CHANGE_REQUEST_SUBMITTED: '55fd714f-a553-4aeb-aa16-314c8ca9ee46',
+    },
+  },
   apis: {
     frontendComponents: {
       url: get('COMPONENT_API_URL', 'http://localhost:8082', requiredInProduction),
@@ -78,10 +90,10 @@ export default {
       url: get('LOCATIONS_API_URL', 'http://localhost:9092', requiredInProduction),
       healthPath: '/health/ping',
       timeout: {
-        response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 60000)),
-        deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 60000)),
+        response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 180000)), // bulk capacity updates can take a long time to complete
+        deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 180000)),
       },
-      agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 60000))),
+      agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 180000))),
     },
     manageUsersApi: {
       url: get('MANAGE_USERS_API_URL', 'http://localhost:9091', requiredInProduction),

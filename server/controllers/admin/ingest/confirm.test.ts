@@ -267,5 +267,40 @@ describe('Ingest the cell cert data', () => {
 
       expect(result).toEqual(expectedMerged)
     })
+
+    it('should handle a not found location', async () => {
+      const input: BulkCapacityUpdate = {
+        'EYI-HB1-1-001': expectedChunks.HB1['EYI-HB1-1-001'],
+        'EYI-HB1-1-002': expectedChunks.HB1['EYI-HB1-1-002'],
+      }
+
+      const errorObj = {
+        data: {
+          status: 404,
+          userMessage: 'Location not found: There is no location found for ID = EYI-HB1-1-001',
+          developerMessage: 'There is no location found for ID = EYI-HB1-1-001',
+          errorCode: 101,
+        },
+        message: 'Not Found',
+      }
+
+      locationsService.updateBulkCapacity = mockUpdateBulkCapacity.mockRejectedValueOnce(errorObj)
+
+      const result = await processBulkCapacityUpdate('token', locationsService, input)
+
+      expect(mockUpdateBulkCapacity).toHaveBeenCalledTimes(1)
+      expect(mockUpdateBulkCapacity).toHaveBeenCalledWith('token', expectedChunks.HB1)
+
+      const expectedWithError = {
+        'EYI-HB1-1-001': [
+          {
+            key: 'ERROR: (complete wing HB1 not ingested)',
+            message: 'Location not found: There is no location found for ID = EYI-HB1-1-001',
+          },
+        ],
+      }
+
+      expect(result).toEqual(expectedWithError)
+    })
   })
 })

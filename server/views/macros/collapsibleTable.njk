@@ -1,0 +1,42 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro collapsibleTable(data) %}
+  {% set rows = [] %}
+
+  {% set rowGroupIndex = 0 %}
+  {% for rowGroup in data.rowGroups %}
+    {% set cells = [] %}
+    {% for cell in rowGroup.parentRow %}
+      {% if cells.length == 0 %}
+        {% set cells = (cells.push(
+          {html: "<a href='#' class='govuk-link--no-visited-state moj-hidden' data-collapsible-table-handle=" + rowGroupIndex + ">" + cell.text + "</a><span class='moj-js-hidden'>" + cell.text + "</span>"}
+        ), cells) %}
+      {% else %}
+        {% set cells = (cells.push(cell), cells) %}
+      {% endif %}
+    {% endfor %}
+    {% set rows = (rows.push(cells), rows) %}
+
+    {% for row in rowGroup.rows %}
+      {% set cells = [] %}
+      {% for cell in row %}
+        {% if cells.length == 0 %}
+          {% set cells = (cells.push(
+            {text: cell.text, html: cell.html, attributes: ({'data-collapsible-table-group': rowGroupIndex})}
+          ), cells) %}
+        {% else %}
+          {% set cells = (cells.push(cell), cells) %}
+        {% endif %}
+      {% endfor %}
+      {% set rows = (rows.push(cells), rows) %}
+    {% endfor %}
+
+    {% set rowGroupIndex = rowGroupIndex + 1 %}
+  {% endfor %}
+
+  {{ govukTable({
+    head: data.head,
+    rows: rows,
+    attributes: data.attributes
+  }) }}
+{% endmacro %}

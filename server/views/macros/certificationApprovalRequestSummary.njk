@@ -1,0 +1,80 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro certificationApprovalRequestSummary(request, userMap, showWithdraw, showStatus) %}
+  {% if request.approvalType == 'SIGNED_OP_CAP' %}
+    {% set changeType = 'Change signed operational capacity' %}
+  {% elseif request.approvalType == 'DRAFT' %}
+    {% set changeType = 'Add new locations to certificate' %}
+  {% elseif request.approvalType == 'DEACTIVATION' %}
+  {% elseif request.approvalType == 'REACTIVATION' %}
+  {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
+  {% endif %}
+
+  {% if request.status == 'PENDING' %}
+    {% set statusText = 'Awaiting approval' %}
+  {% elseif request.status == 'APPROVED' %}
+    {% set statusText = 'Approved' %}
+  {% elseif request.status == 'REJECTED' %}
+    {% set statusText = 'Rejected' %}
+  {% elseif request.status == 'WITHDRAWN' %}
+    {% set statusText = 'Withdrawn' %}
+  {% endif %}
+
+  {{ govukSummaryList({
+    attributes: {
+      'data-qa': 'overview-list'
+    },
+    rows:[
+      {
+        key: { text: 'Location' },
+        value: { text: (request.locationKey.replace(request.prisonId + '-', '') if request.locationKey) or request.prisonId }
+      },
+      {
+        key: { text: 'Change type' },
+        value: { text: changeType }
+      },
+      {
+        key: { text: 'Explanation' },
+        value: { text: request.reasonForSignedOpChange }
+      } if request.approvalType == 'SIGNED_OP_CAP',
+      {
+        key: { text: 'Submitted on' },
+        value: { text: request.requestedDate | formatDateWithTime }
+      } if request.status,
+      {
+        key: { text: 'Submitted by' },
+        value: { text: userMap[request.requestedBy] }
+      } if request.status,
+      {
+        key: { text: 'Approved on' },
+        value: { text: request.approvedOrRejectedDate | formatDate }
+      } if request.status == 'APPROVED',
+      {
+        key: { text: 'Approved by' },
+        value: { text: userMap[request.approvedOrRejectedBy] }
+      } if request.status == 'APPROVED',
+      {
+        key: { text: 'Rejected on' },
+        value: { text: request.approvedOrRejectedDate | formatDate }
+      } if request.status == 'REJECTED',
+      {
+        key: { text: 'Rejected by' },
+        value: { text: userMap[request.approvedOrRejectedBy] }
+      } if request.status == 'REJECTED',
+      {
+        key: { text: 'Status' },
+        value: { text: statusText }
+      } if request.status and showStatus
+    ]
+  }) }}
+
+  {% if showWithdraw and request.status == 'PENDING' %}
+    {{ govukButton({
+      text: "Withdraw request",
+      classes: "govuk-button--secondary",
+      preventDoubleClick: true,
+      href: "/" + request.prisonId + "/cell-certificate/change-requests/" + request.id + "/withdraw"
+    }) }}
+  {% endif %}
+{% endmacro %}

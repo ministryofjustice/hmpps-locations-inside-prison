@@ -116,7 +116,6 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
       ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
 
       const callback = jest.fn()
-      // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(deepRes.locals.deactivationReason).toEqual('Translated reason - Description text')
@@ -132,7 +131,6 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
       )
 
       const callback = jest.fn()
-      // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(deepRes.locals.deactivationReason).toEqual('Other translated reason - Other description text')
@@ -146,7 +144,6 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
       ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
 
       const callback = jest.fn()
-      // eslint-disable-next-line no-underscore-dangle
       await controller._locals(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(deepRes.locals.deactivationReason).toEqual('Translated reason')

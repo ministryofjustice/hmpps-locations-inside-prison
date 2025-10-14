@@ -1,4 +1,5 @@
 import { defineConfig } from 'cypress'
+import cypressSplit from 'cypress-split'
 import superagent from 'superagent'
 import { mapValues } from 'lodash'
 import { resetStubs, stubFor } from './integration_tests/mockApis/wiremock'
@@ -17,6 +18,12 @@ async function setFeatureFlag(flags: Record<string, boolean>): Promise<null> {
   return null
 }
 
+async function resetFeatureFlags(): Promise<null> {
+  await superagent.get(`http://localhost:3007/reset-feature-flags`)
+
+  return null
+}
+
 export default defineConfig({
   chromeWebSecurity: false,
   fixturesFolder: 'integration_tests/fixtures',
@@ -28,7 +35,7 @@ export default defineConfig({
   },
   taskTimeout: 60000,
   e2e: {
-    setupNodeEvents(on) {
+    setupNodeEvents(on, config) {
       on('task', {
         reset: async () => {
           await resetStubs()
@@ -44,6 +51,13 @@ export default defineConfig({
               },
             },
           })
+          await resetFeatureFlags()
+
+          return null
+        },
+        log: message => {
+          // eslint-disable-next-line no-console
+          console.log(message)
 
           return null
         },
@@ -56,6 +70,8 @@ export default defineConfig({
         ...prisonApi,
         setFeatureFlag,
       })
+      cypressSplit(on, config)
+      return config
     },
     baseUrl: 'http://localhost:3007',
     excludeSpecPattern: '**/!(*.cy).ts',

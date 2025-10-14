@@ -1,9 +1,9 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { LocationResidentialSummary } from '../../../../data/types/locationsApi'
 
 export default async function getLocationResidentialSummary(
-  req: FormWizard.Request,
+  req: FormWizard.Request | Request,
   res: Response,
   next: NextFunction | null,
 ) {

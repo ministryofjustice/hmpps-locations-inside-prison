@@ -3,12 +3,14 @@ import { BookmarkStoreData } from '@ministryofjustice/hmpps-digital-prison-repor
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import { Services } from '../../services'
 import {
+  CellCertificate,
   Location,
   LocationSummary,
   LocationResidentialSummary,
   PrisonerLocation,
   PrisonResidentialSummary,
   PrisonConfiguration,
+  LocationsApiConstant,
 } from '../../data/types/locationsApi'
 import { FeComponentsMeta } from '../../data/feComponentsClient'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
@@ -17,6 +19,7 @@ import { LocationTree } from '../../controllers/reactivate/parent/middleware/pop
 import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
+import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -31,6 +34,8 @@ export declare module 'express-session' {
 interface TypedLocals {
   accommodationType?: string
   actions?: { text: string; href: string; class: string }[]
+  approvalRequest?: CertificationApprovalRequest
+  approvalRequests?: CertificationApprovalRequest[]
   archivedLocations?: DecoratedLocation[]
   backLink?: string
   banner?: {
@@ -50,6 +55,7 @@ interface TypedLocals {
   buttonText?: string
   canAccess?: (permission: string) => boolean
   cancelLink?: string
+  cancelText?: string
   cards?: {
     clickable: boolean
     heading: string
@@ -134,12 +140,33 @@ interface TypedLocals {
   prisonId?: string
   prisonerLocation?: PrisonerLocation
   prisonResidentialSummary?: PrisonResidentialSummary
+  proposedCertificationApprovalRequests?: Partial<
+    Pick<
+      CertificationApprovalRequest,
+      | 'approvalType'
+      | 'certifiedNormalAccommodationChange'
+      | 'comments'
+      | 'prisonId'
+      | 'locations'
+      | 'reasonForSignedOpChange'
+      | 'maxCapacityChange'
+      | 'signedOperationCapacityChange'
+      | 'workingCapacityChange'
+      | 'currentSignedOperationCapacity'
+    >
+  >[]
   recentlyViewedReports?: StoredReportData[]
   referrerRootUrl?: string
   requestedReports?: StoredReportData[]
   routePrefix?: string
+  signedOpCapChangeRequest?: blah
   specialistCellTypes?: string[]
   specialistCellTypesObject?: SpecialistCellTypesObject[]
+  usedForConstants?: LocationsApiConstant[]
+  accommodationTypeConstants?: LocationsApiConstant[]
+  approvalTypeConstants?: LocationsApiConstant[]
+  certificate?: CellCertificate
+  certificates?: CellCertificate[]
   summaryListRows?: SummaryListRow[]
   title?: string
   titleCaption?: string
@@ -147,6 +174,7 @@ interface TypedLocals {
   topLevelLocationType?: string
   usedForTypes?: string[]
   user?: HmppsUser
+  userMap?: { [username: string]: string }
   validationErrors?: { text: string; href: string }[]
   values?: FormWizard.Values
   valuesHaveChanged?: boolean

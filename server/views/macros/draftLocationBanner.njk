@@ -22,11 +22,11 @@
       {% endif %}
     </p>
 
-    {% if topLevelDraftLocation.numberOfCellLocations > 0 %}
+    {% if topLevelDraftLocation.numberOfCellLocations > 0 and canAccess('certificate_change_request_create') %}
       {{ govukButton({
         text: "Add " + (topLevelDraftLocation.locationType | lower) + " to cell certificate",
         preventDoubleClick: true,
-        href: "#",
+        href: "/location/" + topLevelDraftLocation.id + "/add-to-certificate",
         attributes: {
           'data-qa': 'add-to-cell-certificate'
         }

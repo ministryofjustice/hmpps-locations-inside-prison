@@ -14,6 +14,27 @@ export default class LocationsService {
     )
   }
 
+  async approveCertificationRequest(token: string, requestId: string) {
+    return this.locationsApiClient.certification.location.approve(token, null, {
+      approvalRequestReference: requestId,
+      comments: 'Legal disclaimer confirmed',
+    })
+  }
+
+  async rejectCertificationRequest(token: string, requestId: string, comments: string) {
+    return this.locationsApiClient.certification.location.reject(token, null, {
+      approvalRequestReference: requestId,
+      comments,
+    })
+  }
+
+  async withdrawCertificationRequest(token: string, requestId: string, comments: string) {
+    return this.locationsApiClient.certification.location.withdraw(token, null, {
+      approvalRequestReference: requestId,
+      comments,
+    })
+  }
+
   async convertCellToNonResCell(
     token: string,
     locationId: string,
@@ -41,6 +62,23 @@ export default class LocationsService {
       { locationId },
       { accommodationType, specialistCellTypes, maxCapacity, workingCapacity, usedForTypes },
     )
+  }
+
+  async createCertificationRequestForLocation(token: string, approvalType: string, locationId: string) {
+    return this.locationsApiClient.certification.location.requestApproval(token, null, { approvalType, locationId })
+  }
+
+  async createCertificationRequestForSignedOpCap(
+    token: string,
+    prisonId: string,
+    signedOperationalCapacity: number,
+    reasonForChange: string,
+  ) {
+    return this.locationsApiClient.certification.prison.signedOpCapChange(token, null, {
+      prisonId,
+      signedOperationalCapacity,
+      reasonForChange,
+    })
   }
 
   async deactivatePermanent(token: string, locationId: string, reason: string) {
@@ -81,8 +119,36 @@ export default class LocationsService {
     return (await this.locationsApiClient.constants.getAccommodationTypes(token)).accommodationTypes
   }
 
+  async getApprovalTypes(_token: string) {
+    // TODO: replace with api call when available
+    return [
+      { key: 'DRAFT', description: 'Add new locations' },
+      { key: 'SIGNED_OP_CAP', description: 'Change signed operational capacity' },
+    ]
+  }
+
   async getArchivedLocations(token: string, prisonId: string) {
     return this.locationsApiClient.locations.prison.getArchivedLocations(token, { prisonId })
+  }
+
+  async getCellCertificates(token: string, prisonId: string) {
+    return this.locationsApiClient.cellCertificates.prison.getAllForPrisonId(token, { prisonId })
+  }
+
+  async getCertificateApprovalRequest(token: string, id: string) {
+    return this.locationsApiClient.certification.requestApprovals.getById(token, { id })
+  }
+
+  async getCertificateApprovalRequests(token: string, prisonId: string, status = 'PENDING') {
+    return this.locationsApiClient.certification.requestApprovals.prison.getAllForPrisonId(token, { prisonId, status })
+  }
+
+  async getCurrentCellCertificate(token: string, prisonId: string) {
+    return this.locationsApiClient.cellCertificates.prison.getCurrentForPrisonId(token, { prisonId })
+  }
+
+  async getCellCertificate(token: string, id: string) {
+    return this.locationsApiClient.cellCertificates.getById(token, { id })
   }
 
   async getConvertedCellType(token: string, key: string) {
@@ -137,7 +203,31 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getResidentialAttributeTypes'))[key] || 'Unknown'
   }
 
-  async getResidentialHierarchy(token: string, prisonId: string): Promise<ResidentialHierarchy[]> {
+  async getResidentialHierarchy(
+    token: string,
+    prisonId: string,
+    {
+      parentPathHierarchy,
+      maxLevel,
+      includeVirtualLocations,
+      includeInactive,
+    }: {
+      parentPathHierarchy?: string
+      maxLevel?: number
+      includeVirtualLocations?: boolean
+      includeInactive?: boolean
+    },
+  ): Promise<ResidentialHierarchy[]> {
+    if (parentPathHierarchy) {
+      return this.locationsApiClient.locations.getResidentialHierarchyFromParent(token, {
+        prisonId,
+        parentPathHierarchy,
+        maxLevel: maxLevel?.toString(),
+        includeVirtualLocations: includeVirtualLocations?.toString(),
+        includeInactive: includeInactive?.toString(),
+      })
+    }
+
     return this.locationsApiClient.locations.getResidentialHierarchy(token, { prisonId })
   }
 
@@ -264,6 +354,11 @@ export default class LocationsService {
 
   async updateCertificationApproval(token: string, prisonId: string, status: StatusType) {
     await this.locationsApiClient.prisonConfiguration.updateCertificationApproval(token, { prisonId, status })
+    await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
+  }
+
+  async updateIncludeSegInRollCount(token: string, prisonId: string, status: StatusType) {
+    await this.locationsApiClient.prisonConfiguration.updateIncludeSegInRollCount(token, { prisonId, status })
     await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
   }
 

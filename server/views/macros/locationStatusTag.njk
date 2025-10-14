@@ -8,4 +8,14 @@
       "data-qa": "status-tag"
     }
   }) }}
+
+  {% if location.status.startsWith('LOCKED_') %}
+    {{ govukTag({
+      text: 'Change requested',
+      classes: 'govuk-tag--purple',
+      attributes: {
+        "data-qa": "locked-tag"
+      }
+    }) }}
+  {% endif %}
 {% endmacro %}

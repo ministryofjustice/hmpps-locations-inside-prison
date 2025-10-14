@@ -1,0 +1,17 @@
+{% extends "../../../../partials/formStep.njk" %}
+
+{% from '../../../../macros/certificationApprovalRequestSummary.njk' import certificationApprovalRequestSummary %}
+
+{% block fields %}
+  <p>
+    You are rejecting this request. The prison will have to submit a new change request.
+  </p>
+
+  {{ certificationApprovalRequestSummary(approvalRequest, userMap, false, false) }}
+
+  {{ super() }}
+
+  {{ govukInsetText({
+    text: "The person who submitted the request will be notified of the rejection"
+  }) }}
+{% endblock %}
