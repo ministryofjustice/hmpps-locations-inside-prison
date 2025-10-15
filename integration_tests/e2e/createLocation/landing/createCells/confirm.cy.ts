@@ -96,7 +96,7 @@ context('Create Landing - Create cells - Confirm', () => {
       page.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBannerHeading().contains('Landing created')
+      viewLocationsShowPage.successBannerHeading().contains('Locations created')
       viewLocationsShowPage.successBannerBody().contains('You have created landing testL with 4 cells.')
       viewLocationsShowPage.draftBanner().should('exist')
       viewLocationsShowPage.summaryCards.cnaText().contains('4')

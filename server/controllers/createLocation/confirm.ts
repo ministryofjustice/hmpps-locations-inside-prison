@@ -176,8 +176,8 @@ export default class ConfirmCreateLocation extends FormInitialStep {
             levelLocalName: localName,
             locationType: locationType as 'LANDING' | 'SPUR',
           },
-          cellsUsedFor: [],
-          accommodationType: 'NORMAL_ACCOMMODATION',
+          cellsUsedFor: sessionModel.get<string[]>('create-cells_usedFor'),
+          accommodationType: sessionModel.get<string>('create-cells_accommodationType'),
           cells,
         })
         req.sessionModel.set('newLocation', response)
@@ -207,19 +207,20 @@ export default class ConfirmCreateLocation extends FormInitialStep {
       locationsService: services.locationsService,
       limited: true,
     })
+    const createCellsNow = sessionModel.get<string>('createCellsNow')
     const cellsToCreate = Number(sessionModel.get<string>('create-cells_cellsToCreate'))
 
     journeyModel.reset()
     sessionModel.reset()
 
     let content = `You have created ${decoratedLocation.locationType.toLowerCase()} ${decoratedLocation.localName || decoratedLocation.pathHierarchy}`
-    if (cellsToCreate > 0) {
+    if (createCellsNow === 'YES') {
       content += ` with ${cellsToCreate} cells`
     }
     content += '.'
 
     req.flash('success', {
-      title: `${decoratedLocation.locationType} created`,
+      title: `${createCellsNow === 'YES' ? 'Locations' : decoratedLocation.locationType} created`,
       content,
     })
 

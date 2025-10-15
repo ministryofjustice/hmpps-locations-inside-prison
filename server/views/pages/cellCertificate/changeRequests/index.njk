@@ -54,7 +54,7 @@
     {% if approvalRequests | length == 0 %}
       <p>There are no change requests currently.</p>
     {% else %}
-      {% if canAccess('review_certificate_change_requests') %}
+      {% if canAccess('certificate_change_request_review') %}
         <p>Review proposed changes to the cell certificate submitted by the establishment.</p>
       {% else %}
         <p>Changes sent to the establishment's authorising director to review.</p>
@@ -78,7 +78,7 @@
               text: userMap[request.requestedBy]
             },
             {
-              html: ('<a class="govuk-link" href="change-requests/' + request.id + '/review">Review</a>') if canAccess('review_certificate_change_requests') else ('<a class="govuk-link" href="change-requests/' + request.id + '">View details</a>')
+              html: ('<a class="govuk-link" href="change-requests/' + request.id + '/review">Review</a>') if canAccess('certificate_change_request_review') else ('<a class="govuk-link" href="change-requests/' + request.id + '">View details</a>')
             }
           ]
         ), rows) %}

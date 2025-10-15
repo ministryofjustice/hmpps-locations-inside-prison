@@ -330,6 +330,7 @@ declare module 'hmpo-form-wizard' {
         }
       }
       autocomplete?: string
+      'ignore-defaults'?: boolean
       labelClasses?: string
       formGroupClasses?: string
       characterCountMax?: number

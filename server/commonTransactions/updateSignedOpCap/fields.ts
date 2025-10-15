@@ -64,6 +64,8 @@ const fields: FormWizard.Fields = {
       text: 'This will help the authorising director understand the need for the change to capacity.',
     },
     autocomplete: 'off',
+    // Don't strip newlines
+    'ignore-defaults': true,
   },
 }
 

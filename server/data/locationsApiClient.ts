@@ -77,6 +77,17 @@ export default class LocationsApiClient extends BaseApiClient {
         path: '/certification/location/request-approval',
         requestType: 'put',
       }),
+      withdraw: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          approvalRequestReference: string
+          comments: string
+        }
+      >({
+        path: '/certification/location/withdraw',
+        requestType: 'put',
+      }),
     },
     prison: {
       signedOpCapChange: this.apiCall<
