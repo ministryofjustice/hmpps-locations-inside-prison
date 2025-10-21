@@ -8,7 +8,7 @@ export default class CreateLocationInit extends FormInitialStep {
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location, subLocationName } = res.locals.decoratedResidentialSummary
 
-    if (location?.status === 'LOCKED_DRAFT') {
+    if (location?.pendingApprovalRequestId) {
       res.redirect(`/view-and-update-locations/${location.prisonId}`)
       return
     }

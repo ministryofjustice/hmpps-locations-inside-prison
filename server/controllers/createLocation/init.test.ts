@@ -38,6 +38,7 @@ describe('CreateLocationInit', () => {
       deepRes.locals.decoratedResidentialSummary.location = {
         status: 'LOCKED_DRAFT',
         prisonId: 'TST',
+        pendingApprovalRequestId: 'REQUEST-ID-0000-1000',
       }
 
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
