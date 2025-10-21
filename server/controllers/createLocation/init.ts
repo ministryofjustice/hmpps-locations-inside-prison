@@ -6,10 +6,16 @@ import { LocationType } from '../../data/types/locationsApi'
 
 export default class CreateLocationInit extends FormInitialStep {
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { decoratedResidentialSummary } = res.locals
-    const locationType = singularizeString(decoratedResidentialSummary.subLocationName).toUpperCase() as LocationType
+    const { location, subLocationName } = res.locals.decoratedResidentialSummary
+
+    if (location?.status === 'LOCKED_DRAFT') {
+      res.redirect(`/view-and-update-locations/${location.prisonId}`)
+      return
+    }
+
+    const locationType = singularizeString(subLocationName).toUpperCase() as LocationType
     req.sessionModel.set('locationType', locationType)
-    req.sessionModel.set('locationId', decoratedResidentialSummary.location?.id)
+    req.sessionModel.set('locationId', location?.id)
 
     super.successHandler(req, res, next)
   }

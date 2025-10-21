@@ -34,6 +34,17 @@ describe('CreateLocationInit', () => {
   })
 
   describe('successHandler', () => {
+    it('redirects if location status is LOCKED_DRAFT', () => {
+      deepRes.locals.decoratedResidentialSummary.location = {
+        status: 'LOCKED_DRAFT',
+        prisonId: 'TST',
+      }
+
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST')
+    })
+
     it('sets values on the sessionModel', () => {
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
