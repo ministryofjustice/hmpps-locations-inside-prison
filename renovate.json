@@ -44,5 +44,5 @@
     "stabilityDays": 0
   },
   "rebaseWhen": "conflicted",
-  "enabled": false
+  "enabled": true
 }
