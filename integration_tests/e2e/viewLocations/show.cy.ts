@@ -142,7 +142,7 @@ context('View Locations Show', () => {
         viewLocationsShowPage
           .draftBannerCertifyLinkButton()
           .should('exist')
-          .should('have.attr', 'href', `/cell-certificate/change-requests/${location.pendingApprovalRequestId}`)
+          .should('have.attr', 'href', `/TST/cell-certificate/change-requests/${location.pendingApprovalRequestId}`)
           .contains('View request details')
       } else {
         viewLocationsShowPage.draftBanner().should('not.exist')
