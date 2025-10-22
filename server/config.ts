@@ -51,8 +51,6 @@ export default {
   },
   email: {
     notifyKey: get('NOTIFY_API_KEY', 'invalid-token', requiredInProduction),
-    enabled: get('NOTIFY_ENABLED', false),
-    notifyDevUsers: get('NOTIFY_DEV_USERS', ''),
     templates: {
       CHANGE_REQUEST_RECEIVED: '39bf63fe-0b13-46d6-9cb7-e36e959f182c',
       CHANGE_REQUEST_WITHDRAWN: '6369cc40-bdc9-4150-9181-3f19385f67e6',
