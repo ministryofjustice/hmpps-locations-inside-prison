@@ -1,24 +1,41 @@
 {% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% macro draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) %}
   {% set topLevelDraftLocation = topLevelDraftLocationSummary.parentLocation %}
   {% set location = decoratedResidentialSummary.location %}
+  {% set pendingApproval = location.pendingApprovalRequestId %}
   {% set locationName = location.displayName | capFirst %}
   {% set locationType = location.locationType | lower %}
 
   {% set bannerHtml %}
-    <h3 class="govuk-heading-m">{{ locationName }} in draft</h3>
+    {% if pendingApproval %}
+      <h3 class="govuk-heading-m">Cell certificate change requested for this location{{ govukTag({
+          text: 'Change requested',
+          classes: "govuk-tag--purple govuk-\!-float-right",
+          attributes: {
+            "data-qa": "change-requested"
+          }
+        }) }}</h3>
+    {% else %}
+      <h3 class="govuk-heading-m">{{ locationName }} in draft</h3>
+    {% endif %}
+
     <p>
-      {% if location.id != topLevelDraftLocation.id %}
+      {% if pendingApproval %}
+        A change to this location on the cell certificate has been requested. You are unable to make any  changes to this location until the request has been reviewed by the authorising director.
+      {% elseif location.id != topLevelDraftLocation.id %}
         This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
       {% endif %}
 
+      {% if not pendingApproval %}
       {% if topLevelDraftLocation.numberOfCellLocations == 0 %}
         You can add the {{ topLevelDraftLocation.locationType | lower }} to the cell certificate once cells have been created.
         You can activate the {{ locationType }} once it is on the cell certificate.
       {% else %}
         The {{ topLevelDraftLocation.locationType | lower }} must be added to the cell certificate before cells in the {{ topLevelDraftLocation.locationType | lower }} can be activated and used.
+      {% endif %}
       {% endif %}
     </p>
 
@@ -29,6 +46,16 @@
         href: "/location/" + topLevelDraftLocation.id + "/add-to-certificate",
         attributes: {
           'data-qa': 'add-to-cell-certificate'
+        }
+      }) }}
+    {% endif %}
+    {% if pendingApproval %}
+      {{ govukButton({
+        text: "View request details",
+        preventDoubleClick: true,
+        href: "/" + location.prisonId + "/cell-certificate/change-requests/" + location.pendingApprovalRequestId,
+        attributes: {
+          'data-qa': 'view-request-details'
         }
       }) }}
     {% endif %}

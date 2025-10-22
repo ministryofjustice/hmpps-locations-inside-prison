@@ -28,11 +28,9 @@ Additional tools are required to manage deployment: `kubectl` and `helm`.
 ### Notifications
 
 As part of the location approval process, email notifications are sent to users.
-When running in the local or in the dev environment, you will probably want to override this functionality which can be achieved by the adding the following examples
-
+When running locally or in the dev environment, emails will only be sent to team members who have the appropriate roles and are listed (Team members) on the GovUK Notify dashboard.
 ```
-NOTIFY_ENABLED=false
-NOTIFY_DEV_USERS='myuseremail>@justice.gov.uk,myuseremail2>@justice.gov.uk'
+NOTIFY_API_KEY=<example-dev-key>
 ```
 
 
@@ -58,13 +56,28 @@ npm run start:dev
 docker compose -f docker-compose.yml --profile include-frontend up --build
 ```
 
+#### Roles
+
+| Role Name                                            | System Role Code               | Description                                                                                                                                                                    |
+|------------------------------------------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Administration of residential location configuration | MANAGE_RES_LOCATIONS_ADMIN     | Allows central admin and support to control features and roll out of the residential location service.                                                                         |
+| Cell status manager                                  | MANAGE_RESIDENTIAL_LOCATIONS   | Previously allowed users to carry out most transactions in the service. Now restricted: users can no longer adjust cell capacity or convert cells to non-res (and vice versa). |
+| Certificate administrator                            | MANAGE_RES_LOCATIONS_OP_CAP    | View and approve cell certificates, request changes to residential attributes. Previously included archiving locations and changing signed operational capacity.               |
+| Certificate reviewer                                 | RESI__CERT_REVIEWER            | Role for PGD and Ops Managers to review certificate change requests and decide on approval or rejection.                                                                       |
+| Certificate viewer                                   | RESI__CERT_VIEWER              | View-only role for certificate management, allowing capacity management team to view cell certificates and change requests across all establishments.                          |
+| View location information                            | VIEW_INTERNAL_LOCATION         | Provides read-only access to users with an establishment in their caseload, reducing the need for role administration.                                                         |
+| View residential location reports                    | REPORTING_LOCATION_INFORMATION | Allows access to reports                                                                                                                                                       |
+
 #### Dev logins
-| username          | password       | roles                                                                                         |
-|-------------------|----------------|-----------------------------------------------------------------------------------------------|
-| LOCATION_RO       | password123456 | VIEW_INTERNAL_LOCATION                                                                        |
-| LOCATION_CAP      | password123456 | MANAGE_RES_LOCATIONS_OP_CAP                                                                   |
-| LOCATION_MAINTAIN | password123456 | MANAGE_RESIDENTIAL_LOCATIONS                                                                  |
-| LOCATION_ADMIN    | password123456 | MANAGE_RES_LOCATIONS_OP_CAP<br/>REPORTING_LOCATION_INFORMATION<br/>MANAGE_RES_LOCATIONS_ADMIN |
+
+| username               | password       | roles                                                                                         |
+|------------------------|----------------|-----------------------------------------------------------------------------------------------|
+| LOCATION_RO            | password123456 | VIEW_INTERNAL_LOCATION                                                                        |
+| LOCATION_CAP           | password123456 | MANAGE_RES_LOCATIONS_OP_CAP                                                                   |
+| LOCATION_MAINTAIN      | password123456 | MANAGE_RESIDENTIAL_LOCATIONS                                                                  |
+| LOCATION_CERT_REVIEWER | password123456 | RESI__CERT_REVIEWER                                                                           |
+| LOCATION_CERT_VIEWER   | password123456 | RESI__CERT_VIEWER                                                                             |
+| LOCATION_ADMIN         | password123456 | MANAGE_RES_LOCATIONS_OP_CAP<br/>REPORTING_LOCATION_INFORMATION<br/>MANAGE_RES_LOCATIONS_ADMIN |
 
 
 ### Updating dependencies

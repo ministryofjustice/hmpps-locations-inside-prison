@@ -54,7 +54,7 @@
       <div class="govuk-grid-column-three-quarters">
         {% if decoratedResidentialSummary.location.status == 'INACTIVE' %}
           {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess) }}
-        {% elseif decoratedResidentialSummary.location.status == 'DRAFT' %}
+        {% elseif decoratedResidentialSummary.location.status in ['DRAFT', 'LOCKED_DRAFT'] %}
           {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
         {% endif %}
 

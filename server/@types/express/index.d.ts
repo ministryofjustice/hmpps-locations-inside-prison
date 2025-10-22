@@ -1,5 +1,6 @@
 import { StoredReportData } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/types/UserReports'
 import { BookmarkStoreData } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/types/Bookmark'
+import { DprUser } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/types/DprUser'
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import { Services } from '../../services'
 import {
@@ -104,6 +105,7 @@ interface TypedLocals {
   definitionsPath?: string
   dpdPathFromConfig?: string
   dpdPathFromQuery?: string
+  dprUser?: DprUser
   downloadingEnabled?: boolean
   errorlist?: FormWizard.Controller.Error[]
   errorMessage?: string
@@ -138,6 +140,7 @@ interface TypedLocals {
   pathSuffix?: string
   prisonConfiguration?: PrisonConfiguration
   prisonNonHousingDisabled?: boolean
+  nestedBaseUrl?: string
   nomisScreenBlocked?: boolean
   prisonId?: string
   prisonerLocation?: PrisonerLocation

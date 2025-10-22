@@ -46,7 +46,6 @@ describe('NotificationService', () => {
   describe('NotificationService (enabled mode)', () => {
     beforeEach(() => {
       jest.clearAllMocks()
-      config.email.enabled = true
     })
 
     const baseDetails: Partial<NotificationDetails> = {
@@ -108,7 +107,7 @@ describe('NotificationService', () => {
     ]
 
     testCases.forEach(({ type, expectedPersonalisation }) => {
-      it(`should send ${type} email to actual recipient when enabled`, async () => {
+      it(`should send ${type} email to actual recipient`, async () => {
         const details: NotificationDetails = {
           ...baseDetails,
           type,
@@ -125,49 +124,21 @@ describe('NotificationService', () => {
     })
   })
 
-  it('should send email to devUser when disabled', async () => {
-    config.email.enabled = false
-    config.email.notifyDevUsers = 'joe@justice.gov.uk,bloggs@justice.gov.uk'
-    const service = new NotificationService(mockNotifyClient)
-    await service.notify(baseNotificationDetails)
-
-    expect(mockSendEmail).toHaveBeenCalledTimes(2)
-
-    expect(mockSendEmail).toHaveBeenNthCalledWith(
-      1,
-      config.email.templates.CHANGE_REQUEST_RECEIVED,
-      'joe@justice.gov.uk',
-      {
-        personalisation: {
-          SUBMITTED_BY: 'John Doe',
-          ESTABLISHMENT: 'Test Establishment',
-        },
-      },
-    )
-    expect(mockSendEmail).toHaveBeenNthCalledWith(
-      2,
-      config.email.templates.CHANGE_REQUEST_RECEIVED,
-      'bloggs@justice.gov.uk',
-      {
-        personalisation: {
-          SUBMITTED_BY: 'John Doe',
-          ESTABLISHMENT: 'Test Establishment',
-        },
-      },
-    )
-  })
-
   it('should log error if sendEmail fails', async () => {
-    config.email.enabled = true
     mockSendEmail.mockRejectedValueOnce(new Error('Send failed'))
 
     const service = new NotificationService(mockNotifyClient)
     await service.notify(baseNotificationDetails)
 
-    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Error sending email'))
-    expect(logger.info).toHaveBeenCalledWith('Send of 1 REQUEST_RECEIVED emails')
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Email failed to send'))
     expect(logger.info).toHaveBeenCalledWith(
-      'Finished batch send of emails for Test Establishment. Successfully sent 0 REQUEST_RECEIVED emails',
+      'Starting batch send for Test Establishment. Sending 1 REQUEST_RECEIVED emails to GovUK Notify.',
+    )
+    expect(logger.info).toHaveBeenCalledWith(
+      'Finished batch send for Test Establishment. Sent 0/1 REQUEST_RECEIVED emails to GovUK Notify.',
+    )
+    expect(logger.info).toHaveBeenCalledWith(
+      'Failed to send 1 REQUEST_RECEIVED emails for Test Establishment. Check GovUK Notify dashboard for details.',
     )
   })
 })

@@ -4,7 +4,6 @@ import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
-import validateEmails from '../../utils/validateEmails'
 import { Location } from '../../data/types/locationsApi'
 import { CertificateLocation } from '../../data/types/locationsApi/certificateLocation'
 import { PaginatedUsers } from '../../data/manageUsersApiClient'
@@ -145,7 +144,7 @@ export default class Confirm extends FormInitialStep {
       'MANAGE_RES_LOCATIONS_OP_CAP',
     )
 
-    const opCapEmailAddresses = validateEmails(usersWithOpCapRole.content)
+    const opCapEmailAddresses = usersWithOpCapRole.content.map(user => user.email)
     const reviewUrl = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}/review`
 
     const details: NotificationDetails = {

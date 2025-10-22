@@ -8,41 +8,40 @@ export default class NotificationService {
   constructor(private readonly emailClient: NotifyClient) {}
 
   async notify(notificationDetails: NotificationDetails) {
-    const { enabled } = config.email
-    if (enabled === 'true' || enabled === true) {
-      await this.batchSend(notificationDetails)
-    } else {
-      const { notifyDevUsers } = config.email
-      logger.info(`NOTIFY_ENABLED is ${config.email.enabled} sending to ${notifyDevUsers} instead`)
-      const emailsOfDevUsers = notifyDevUsers !== undefined ? notifyDevUsers.split(',') : []
-      const devUserNotificationDetails: NotificationDetails = {
-        ...notificationDetails,
-        emailAddress: emailsOfDevUsers,
-      }
-      await this.batchSend(devUserNotificationDetails)
-    }
+    await this.batchSend(notificationDetails)
   }
 
-  // TODO: This will be updated with appInsights (MAP-2814) to include error response logging.
   private async batchSend(notificationDetails: NotificationDetails, delayMs = 10): Promise<void> {
     const templateId = getTemplateId(notificationDetails.type)
-    logger.info(`Send of ${notificationDetails.emailAddress.length} ${notificationDetails.type} emails`)
+    const totalEmails = notificationDetails.emailAddress.length
+    logger.info(
+      `Starting batch send for ${notificationDetails.establishment}. Sending ${totalEmails} ${notificationDetails.type} emails to GovUK Notify.`,
+    )
 
     let emailsSent = 0
+    const emailsFailed: string[] = []
 
     await notificationDetails.emailAddress.reduce(async (previousPromise, email) => {
       await previousPromise
       const success = await this.sendWithDelay(templateId, email, notificationDetails)
       if (success) {
         emailsSent += 1
+      } else {
+        emailsFailed.push(email)
       }
 
       await this.delay(delayMs)
     }, Promise.resolve())
 
     logger.info(
-      `Finished batch send of emails for ${notificationDetails.establishment}. Successfully sent ${emailsSent} ${notificationDetails.type} emails`,
+      `Finished batch send for ${notificationDetails.establishment}. Sent ${emailsSent}/${totalEmails} ${notificationDetails.type} emails to GovUK Notify.`,
     )
+
+    if (emailsFailed.length > 0) {
+      logger.info(
+        `Failed to send ${emailsFailed.length} ${notificationDetails.type} emails for ${notificationDetails.establishment}. Check GovUK Notify dashboard for details.`,
+      )
+    }
   }
 
   private async sendWithDelay(
@@ -56,7 +55,7 @@ export default class NotificationService {
       })
       return true
     } catch (error) {
-      logger.error(`Error sending email: ${error}, error sending email to ${email}`)
+      logger.error(`Email failed to send to GovUk Notify for ${notificationDetails.establishment}. ${error}`)
       return false
     }
   }
