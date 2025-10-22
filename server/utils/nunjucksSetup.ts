@@ -2,7 +2,7 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
-import setUpNunjucksFilters from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/setUpNunjucksFilters'
+import { setUpNunjucksFilters } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/setUpNunjucksFilters'
 
 import fs from 'fs'
 import { get, isFunction } from 'lodash'
