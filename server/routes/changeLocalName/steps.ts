@@ -11,6 +11,7 @@ const steps = {
   '/details': {
     fields: ['localName'],
     controller: Details,
+    layout: '../../partials/formStep',
   },
 }
 

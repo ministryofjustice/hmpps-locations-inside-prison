@@ -112,6 +112,8 @@ describe('DeactivateTemporaryDetails', () => {
         backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields,
+        title: 'Deactivation details',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#deactivationReasonOther',
@@ -129,6 +131,8 @@ describe('DeactivateTemporaryDetails', () => {
         backLink: '/last/step',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields,
+        title: 'Deactivation details',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })

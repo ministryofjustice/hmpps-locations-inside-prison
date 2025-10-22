@@ -1,7 +1,6 @@
 {% extends "../../partials/layout.njk" %}
 
 {% from "govuk/components/tag/macro.njk" import govukTag %}
-{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
 
@@ -11,74 +10,42 @@
 {% from "../../macros/locationsTable.njk" import locationsTable %}
 {% from "../../macros/locationStatusTag.njk" import locationStatusTag %}
 {% from "../../macros/miniSummary.njk" import miniSummary %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set locationType = decoratedResidentialSummary.location.locationType %}
 {% set locationName = decoratedResidentialSummary.location.localName or decoratedResidentialSummary.location.pathHierarchy %}
 {% set title = (decoratedResidentialSummary.location.displayName | capFirst) + ' - ' + title %}
 
-{% block beforeContent %}
-  {{ super() }}
-
-  {% if banner.success %}
-    {% set html %}
-      <h3 class="govuk-notification-banner__heading">
-        {{ banner.success.title }}
-      </h3>
-      <p class="govuk-body">
-        {{ banner.success.content }}
-      </p>
-    {% endset %}
-
-    <div class="govuk-width-container">
-      <div class="govuk-grid-row govuk-!-margin-bottom-0">
-        <div class="govuk-grid-column-three-quarters">
-          {{ govukNotificationBanner({
-            html: html,
-            type: "success",
-            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
-          }) }}
-        </div>
-      </div>
-    </div>
-  {% endif %}
-{% endblock %}
-
 {% block heading %}
-  <div class="govuk-grid-row govuk-!-margin-bottom-0">
-    <div class="govuk-grid-column-three-quarters">
-      <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
-      <h1 class="govuk-heading-l">
-        {{ locationName }}
-        {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certification and decoratedResidentialSummary.location.certification.certified %}
-          {{ govukTag({
-            text: 'Certified',
-            classes: "govuk-tag--hollow",
-            attributes: {
-              "data-qa": "certified-tag"
-            }
-          }) }}
-        {% endif %}
-        {{ locationStatusTag(decoratedResidentialSummary.location) }}
+  <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
+  <h1 class="govuk-heading-l">
+    {{ locationName }}
+    {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certification and decoratedResidentialSummary.location.certification.certified %}
+      {{ govukTag({
+        text: 'Certified',
+        classes: "govuk-tag--hollow",
+        attributes: {
+          "data-qa": "certified-tag"
+        }
+      }) }}
+    {% endif %}
+    {{ locationStatusTag(decoratedResidentialSummary.location) }}
 
-        {% if actions | length %}
-          <div class="govuk-!-float-right">
-            {% if actions | length > 1 %}
-              {{ mojButtonMenu({
-                button: { text: "Actions" },
-                alignMenu: "right",
-                items: actions
-              }) }}
-            {% else %}
-              <a href="{{actions[0].href}}"
-                role="button"
-                class="govuk-button {{actions[0].class}} }}">{{ actions[0].text }}</a>
-            {% endif %}
-          </div>
+    {% if actions | length %}
+      <div class="govuk-!-float-right">
+        {% if actions | length > 1 %}
+          {{ mojButtonMenu({
+            button: { text: "Actions" },
+            alignMenu: "right",
+            items: actions
+          }) }}
+        {% else %}
+          <a href="{{actions[0].href}}"
+            role="button"
+            class="govuk-button {{actions[0].class}} }}">{{ actions[0].text }}</a>
         {% endif %}
-      </h1>
-    </div>
-  </div>
+      </div>
+    {% endif %}
+  </h1>
 {% endblock %}
 
 {% block content %}

@@ -14,6 +14,7 @@ const steps = {
     fields: ['workingCapacity', 'maxCapacity'],
     next: 'confirm',
     controller: ReactivateCellDetails,
+    layout: '../../partials/formStep',
   },
   '/confirm': {
     fields: ['confirm'],

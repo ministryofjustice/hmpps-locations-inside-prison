@@ -2,15 +2,15 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
+import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class RemoveLocalName extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId, localName } = decoratedLocation
+    const { id: locationId, prisonId } = decoratedLocation
 
     const locals = super.locals(req, res)
-
-    const pageTitleText = 'Are you sure you want to remove the local name?'
 
     const backLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
@@ -19,9 +19,10 @@ export default class RemoveLocalName extends FormInitialStep {
     return {
       ...locals,
       backLink,
-      localName,
-      pageTitleText,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'Are you sure you want to remove the local name?',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Remove name',
     }
   }
 

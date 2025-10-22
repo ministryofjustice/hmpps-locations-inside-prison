@@ -1,124 +1,34 @@
-{% extends "../../partials/layout.njk" %}
+{% extends "../../partials/formStep.njk" %}
 
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set title = "Confirm cell capacity" %}
+{% block fields %}
+  <p class="govuk-body">
+    You are removing the cell’s specific cell type and updating the capacity.
+  </p>
 
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ govukBackLink({
-      text: "Back",
-      href: backLink
-    }) }}
+  {{ govukSummaryList({
+    card: {
+      title: { text: "Capacity" },
+      actions: { items: [ { href: backLink, text: "Change" } ] }
+    },
+    rows: [
+      {
+        key: { text: "Working capacity" },
+        value: { text: values.workingCapacity }
+      },
+      {
+        key: { text: "Maximum capacity" },
+        value: { text: values.maxCapacity }
+      }
+    ]
+  }) }}
 
-    {% if errorlist.length %}
-      {{ govukErrorSummary({
-        titleText: "There is a problem",
-        errorList: errorlist
-      }) }}
-    {% endif %}
+  <div class="govuk-!-padding-bottom-2 change-summary">
+    <h2 class="govuk-heading-m">Change to establishment capacity</h2>
+
+    <p>{{ changeSummary | safe }}</p>
   </div>
 
-{% endblock %}
-
-{% block heading %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
-        <h1 class="govuk-heading-l">Confirm cell type removal and capacity changes</h1>
-      </div>
-    </div>
-  </div>
-{% endblock %}
-
-{% block content %}
-
-  {% set formMethod = options.method | default('post') %}
-  {% set formAction = options.action | default('') %}
-  {% set formEnctype = options.enctype | default('') %}
-
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <p class="govuk-body">
-          You are removing the cell’s specific cell type and updating the capacity.
-        </p>
-
-        {{ govukSummaryList({
-          card: {
-            title: {
-              text: "Capacity"
-            },
-            actions: {
-              items: [
-                {
-                  href: backLink,
-                  text: "Change"
-                }
-              ]
-            }
-          },
-          rows: [
-            {
-              key: {
-                text: "Working capacity"
-              },
-              value: {
-                html: values.workingCapacity
-              }
-            },
-            {
-              key: {
-                text: "Maximum capacity"
-              },
-              value: {
-                html: values.maxCapacity
-              }
-            }
-          ]
-        }) }}
-
-        <div class="govuk-!-padding-bottom-2 change-summary">
-          <h2 class="govuk-heading-m">Change to establishment capacity</h2>
-
-          <p>{{ changeSummary | safe }}</p>
-        </div>
-
-        <form method="{{ formMethod }}" action="{{ formAction }}"
-        {% if formEnctype %}
-          enctype="{{ formEnctype }}"
-        {% endif %}
-        >
-
-          {% if formMethod == 'post' %}
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% endif %}
-
-          <div class="govuk-button-group">
-            {% block formActions %}
-              {% block submitAction %}
-                {{ govukButton({
-                  text: "Update cell",
-                  preventDoubleClick: true,
-                  type: "submit"
-                }) }}
-              {% endblock %}
-            {% endblock %}
-          </div>
-        </form>
-
-        <p class="govuk-body">
-          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel and return to location details
-          </a>
-        </p>
-      </div>
-    </div>
-  </div>
+  {{ super() }}
 {% endblock %}

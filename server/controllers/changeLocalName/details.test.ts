@@ -86,6 +86,7 @@ describe('Change Local Name', () => {
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        buttonText: 'Save name',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           localName: {
@@ -114,6 +115,10 @@ describe('Change Local Name', () => {
             value: 'Local name',
           },
         },
+        insetText:
+          'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
+        title: 'Change local name',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })

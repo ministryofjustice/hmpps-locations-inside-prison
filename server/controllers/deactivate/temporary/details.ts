@@ -3,6 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
 import { TypedLocals } from '../../../@types/express'
 import populateDeactivationReasonItems from '../../../middleware/populateDeactivationReasonItems'
+import capFirst from '../../../formatters/capFirst'
 
 export default class DeactivateTemporaryDetails extends FormInitialStep {
   override middlewareSetup() {
@@ -19,7 +20,7 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
 
-    const { id: locationId, prisonId } = res.locals.decoratedLocation
+    const { id: locationId, prisonId, displayName } = res.locals.decoratedLocation
 
     const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
@@ -27,6 +28,8 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
       ...locals,
       backLink: res.locals.backLink || cancelLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'Deactivation details',
+      titleCaption: capFirst(displayName),
     }
   }
 }

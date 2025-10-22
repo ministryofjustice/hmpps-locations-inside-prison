@@ -4,6 +4,7 @@ import { compact } from 'lodash'
 import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class NonResidentialConversionConfirm extends FormWizard.Controller {
   override middlewareSetup() {
@@ -40,6 +41,9 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
       convertedCellTypeDetails,
+      title: 'Confirm conversion to non-residential room',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Confirm conversion',
     }
   }
 

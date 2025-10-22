@@ -1,44 +1,16 @@
 {% extends "../../partials/layout.njk" %}
 
 {% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% from "../../macros/locationsTable.njk" import locationsTable %}
 {% from "../../macros/miniSummary.njk" import miniSummary %}
-
-{% block beforeContent %}
-  {{ super() }}
-
-  {% if banner.success %}
-    {% set html %}
-      <h3 class="govuk-notification-banner__heading">
-        {{ banner.success.title }}
-      </h3>
-      <p class="govuk-body">
-        {{ banner.success.content }}
-      </p>
-    {% endset %}
-
-    <div class="govuk-width-container">
-      <div class="govuk-grid-row govuk-!-margin-bottom-0">
-        <div class="govuk-grid-column-two-thirds">
-          {{ govukNotificationBanner({
-            html: html,
-            type: "success",
-            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
-          }) }}
-        </div>
-      </div>
-    </div>
-  {% endif %}
-{% endblock %}
 
 {% block content %}
   <div class="govuk-width-container">
     <h2 class="govuk-heading-m">Overall establishment capacity</h2>
 
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-three-quarters">
+      <div class="govuk-grid-column-{{ minLayout }}">
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full" data-qa="overview-mini-summary-group-b">
             <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="mini-summary-list-macro">

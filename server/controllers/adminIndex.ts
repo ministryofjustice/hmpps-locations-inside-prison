@@ -14,5 +14,6 @@ export default async (req: Request, res: Response) => {
   }
   return res.render('pages/admin/index', {
     banner,
+    title: 'Prison configuration',
   })
 }

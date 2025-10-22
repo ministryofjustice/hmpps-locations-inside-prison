@@ -196,7 +196,7 @@ context('Reactivate cell (from reactivate cells)', () => {
         reactivateCellDetailsPage.backLink().click()
 
         Page.verifyOnPage(InactiveCellsIndexPage)
-        cy.title().should('eq', 'Inactive Parent - Inactive cells - Manage locations - Residential locations')
+        cy.title().should('eq', 'Inactive Parent - Inactive cells - Residential locations')
       })
 
       it('has the correct main heading and a caption showing the cell description', () => {
@@ -208,7 +208,7 @@ context('Reactivate cell (from reactivate cells)', () => {
         reactivateCellDetailsPage.cancelLink().click()
 
         Page.verifyOnPage(InactiveCellsIndexPage)
-        cy.title().should('eq', 'Inactive Parent - Inactive cells - Manage locations - Residential locations')
+        cy.title().should('eq', 'Inactive Parent - Inactive cells - Residential locations')
       })
 
       describe('confirm cell capacity', () => {
@@ -228,14 +228,14 @@ context('Reactivate cell (from reactivate cells)', () => {
           reactivateCellConfirmPage.cancelLink().click()
 
           Page.verifyOnPage(InactiveCellsIndexPage)
-          cy.title().should('eq', 'Inactive Parent - Inactive cells - Manage locations - Residential locations')
+          cy.title().should('eq', 'Inactive Parent - Inactive cells - Residential locations')
         })
 
         it('redirects back to the referring page and shows the success banner when the change is complete', () => {
           reactivateCellConfirmPage.confirmButton().click()
 
           Page.verifyOnPage(InactiveCellsIndexPage)
-          cy.title().should('eq', 'Inactive Parent - Inactive cells - Manage locations - Residential locations')
+          cy.title().should('eq', 'Inactive Parent - Inactive cells - Residential locations')
 
           cy.get('#govuk-notification-banner-title').contains('Success')
           cy.get('.govuk-notification-banner__content h3').contains('Cell activated')

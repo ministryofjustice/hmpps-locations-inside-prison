@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import removeLocalName from '../../controllers/removeLocalName/check'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
@@ -9,8 +10,8 @@ const steps = {
     next: 'details',
   },
   '/details': {
-    fields: ['check'],
     controller: removeLocalName,
+    buttonClasses: 'govuk-button--warning',
   },
 }
 

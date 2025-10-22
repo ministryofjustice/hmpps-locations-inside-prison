@@ -6,6 +6,7 @@ import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { SummaryListRow } from '../../@types/govuk'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class CellConversionConfirm extends FormInitialStep {
   override middlewareSetup() {
@@ -113,6 +114,9 @@ export default class CellConversionConfirm extends FormInitialStep {
     return {
       changeSummary,
       summaryListRows,
+      title: 'Confirm conversion to cell',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Confirm conversion',
     }
   }
 

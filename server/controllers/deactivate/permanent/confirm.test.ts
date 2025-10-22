@@ -87,13 +87,16 @@ describe('DeactivatePermanentConfirm', () => {
     it('formats the change summary correctly', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual({
+        buttonText: 'Confirm deactivation',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeSummary: `You are archiving 1 cell.
 <br/><br/>
 The establishment’s working capacity will reduce from 20 to 19.
 <br/><br/>
 The establishment’s maximum capacity will reduce from 30 to 28.`,
-        permanentDeactivationReason: 'wing has vanished',
+        deactivationReason: 'wing has vanished',
+        title: 'You are permanently deactivating this location',
+        titleCaption: 'Cell A-1-001',
       })
     })
 
@@ -102,11 +105,14 @@ The establishment’s maximum capacity will reduce from 30 to 28.`,
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
+        buttonText: 'Confirm deactivation',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeSummary: `You are archiving 1 cell.
 <br/><br/>
 The establishment’s maximum capacity will reduce from 30 to 28.`,
-        permanentDeactivationReason: 'wing has vanished',
+        deactivationReason: 'wing has vanished',
+        title: 'You are permanently deactivating this location',
+        titleCaption: 'Cell A-1-001',
       })
     })
 
@@ -119,13 +125,16 @@ The establishment’s maximum capacity will reduce from 30 to 28.`,
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
+        buttonText: 'Confirm deactivation',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeSummary: `You are archiving 10 cells.
 <br/><br/>
 The establishment’s working capacity will reduce from 20 to 10.
 <br/><br/>
 The establishment’s maximum capacity will reduce from 30 to 15.`,
-        permanentDeactivationReason: 'wing has vanished',
+        deactivationReason: 'wing has vanished',
+        title: 'You are permanently deactivating this location',
+        titleCaption: 'Cell A-1-001',
       })
     })
   })

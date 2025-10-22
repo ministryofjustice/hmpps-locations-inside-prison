@@ -8,7 +8,11 @@ export default class NonResidentialConversionWarning extends FormWizard.Controll
     const { id: locationId, prisonId } = decoratedLocation
 
     return {
+      cancelClasses: 'govuk-link--inverse',
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'You are about to convert this cell to a non-residential room',
+      buttonText: 'Continue conversion to non-residential room',
+      minLayout: 'three-quarters',
     }
   }
 }

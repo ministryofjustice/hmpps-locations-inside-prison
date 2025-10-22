@@ -3,6 +3,7 @@ import { NextFunction, Response } from 'express'
 import { isEqual, sortBy } from 'lodash'
 import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class SetCellType extends FormInitialStep {
   override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
@@ -26,9 +27,7 @@ export default class SetCellType extends FormInitialStep {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 
-    const pageTitleText = decoratedLocation.specialistCellTypes.length
-      ? 'Change specific cell type'
-      : 'Set specific cell type'
+    const title = decoratedLocation.specialistCellTypes.length ? 'Change specific cell type' : 'Set specific cell type'
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
 
@@ -46,7 +45,9 @@ export default class SetCellType extends FormInitialStep {
       backLink: cancelLink,
       cancelLink,
       fields,
-      pageTitleText,
+      title,
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Save cell type',
     }
   }
 

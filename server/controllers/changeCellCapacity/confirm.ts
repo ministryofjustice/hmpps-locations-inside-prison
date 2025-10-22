@@ -3,6 +3,8 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import backUrl from '../../utils/backUrl'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
+import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class ConfirmCellCapacity extends FormWizard.Controller {
   override middlewareSetup() {
@@ -24,7 +26,7 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  override locals(req: FormWizard.Request, res: Response): object {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation, values } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
@@ -61,6 +63,9 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
       backLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
+      title: `Confirm ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: `Update ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
     }
   }
 

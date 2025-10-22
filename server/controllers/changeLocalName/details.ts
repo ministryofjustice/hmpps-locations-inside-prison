@@ -4,6 +4,7 @@ import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class Details extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
@@ -22,6 +23,11 @@ export default class Details extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'Change local name',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      insetText:
+        'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
+      buttonText: 'Save name',
     }
   }
 

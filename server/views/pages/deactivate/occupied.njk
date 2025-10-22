@@ -1,23 +1,5 @@
 {% extends "../../partials/layout.njk" %}
 
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
-{% set title = "You can't deactivate this location as it is currently occupied" %}
-
-{% block heading %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
-      <h1 class="govuk-heading-l">{{ title }}</h1>
-    </div>
-  </div>
-{% endblock %}
-
 {% block beforeContent %}
 {% endblock %}
 

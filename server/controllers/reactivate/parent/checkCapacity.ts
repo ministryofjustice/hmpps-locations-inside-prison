@@ -4,6 +4,8 @@ import FormInitialStep from '../../base/formInitialStep'
 import { Location } from '../../../data/types/locationsApi'
 import populateLocationTree from './middleware/populateLocationTree'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
+import { TypedLocals } from '../../../@types/express'
+import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateParentCheckCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -28,7 +30,7 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
     next()
   }
 
-  override locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
     const isSelect = !!req.sessionModel.get('selectLocations')
     const backLink = isSelect
@@ -57,6 +59,10 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
       ...super.locals(req, res),
       backLink,
       cancelLink: backLink,
+      cancelText: 'Cancel',
+      title: 'Check capacity of cells',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      minLayout: 'one-half',
     }
   }
 

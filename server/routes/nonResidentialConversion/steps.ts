@@ -50,11 +50,13 @@ const steps: FormWizard.Steps = {
   '/warning': {
     controller: NonResidentialConversionWarning,
     next: 'details',
+    buttonClasses: 'govuk-button--secondary',
   },
   '/details': {
     fields: ['convertedCellType', 'otherConvertedCellType'],
     controller: NonResidentialConversionDetails,
     next: 'confirm',
+    template: '../../partials/formStep',
   },
   '/confirm': {
     controller: NonResidentialConversionConfirm,

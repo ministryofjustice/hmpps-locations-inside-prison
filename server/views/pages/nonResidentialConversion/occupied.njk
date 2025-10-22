@@ -1,30 +1,13 @@
 {% extends "../../partials/layout.njk" %}
 
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/panel/macro.njk" import govukPanel %}
-
-{% set title = "You are about to convert this cell to a non-residential room" %}
-
-{% block heading %}
-  <div class="govuk-grid-row govuk-!-margin-bottom-0">
-    <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
-      <h1 class="govuk-heading-l">You can’t convert this location as it is currently occupied</h1>
-    </div>
-  </div>
-{% endblock %}
-
 {% block content %}
-  {% set formMethod = options.method | default('post') %}
-  {% set formAction = options.action | default('') %}
-  {% set formEnctype = options.enctype | default('') %}
-
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-grid-column-{{ minLayout }}">
         <p class="govuk-body">
           You need to move everyone out of this location before you can convert it to a non-residential room.
         </p>
+
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
             Return to location details

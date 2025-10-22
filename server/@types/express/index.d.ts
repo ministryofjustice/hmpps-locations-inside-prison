@@ -38,6 +38,7 @@ interface TypedLocals {
   approvalRequests?: CertificationApprovalRequest[]
   archivedLocations?: DecoratedLocation[]
   backLink?: string
+  backLinkText?: string
   banner?: {
     success?: {
       title: string
@@ -54,6 +55,7 @@ interface TypedLocals {
   }[]
   buttonText?: string
   canAccess?: (permission: string) => boolean
+  cancelClasses?: string
   cancelLink?: string
   cancelText?: string
   cards?: {
@@ -130,9 +132,9 @@ interface TypedLocals {
   locationTree?: LocationTree[]
   locationType?: string
   maxCapacity?: string
+  minLayout?: string
   certAction?: string
   options?: FormWizard.Request['form']['options']
-  pageTitleText?: string
   pathSuffix?: string
   prisonConfiguration?: PrisonConfiguration
   prisonNonHousingDisabled?: boolean

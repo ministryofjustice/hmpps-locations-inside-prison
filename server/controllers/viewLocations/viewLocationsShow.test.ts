@@ -48,6 +48,7 @@ describe('view locations show', () => {
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
+      minLayout: 'three-quarters',
       title: 'Manage locations',
     })
   })
@@ -65,6 +66,7 @@ describe('view locations show', () => {
       banner: {
         success,
       },
+      minLayout: 'three-quarters',
       title: 'Manage locations',
     })
   })
@@ -245,6 +247,7 @@ describe('view locations show', () => {
       ])
       expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
         banner: undefined,
+        minLayout: 'three-quarters',
         title: 'Manage locations',
       })
     })
@@ -260,6 +263,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -280,6 +284,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -300,6 +305,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -320,6 +326,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -345,6 +352,7 @@ describe('view locations show', () => {
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
               banner: undefined,
               createButton: undefined,
+              minLayout: 'three-quarters',
               title: 'Manage locations',
             })
           })
@@ -365,6 +373,7 @@ describe('view locations show', () => {
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
+            minLayout: 'three-quarters',
             title: 'Manage locations',
           })
         })
@@ -378,6 +387,7 @@ describe('view locations show', () => {
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
+            minLayout: 'three-quarters',
             title: 'Manage locations',
           })
         })
@@ -396,6 +406,7 @@ describe('view locations show', () => {
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
               banner: undefined,
               createButton: undefined,
+              minLayout: 'three-quarters',
               title: 'Manage locations',
             })
           })
@@ -420,6 +431,7 @@ describe('view locations show', () => {
                 href: '/create-new/7e570000-0000-0000-0000-000000000001',
                 text: 'Create new landing',
               },
+              minLayout: 'three-quarters',
               title: 'Manage locations',
             })
           })

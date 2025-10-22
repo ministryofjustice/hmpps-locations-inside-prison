@@ -4,6 +4,7 @@ import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import populateDeactivationReasonItems from '../../middleware/populateDeactivationReasonItems'
+import capFirst from '../../formatters/capFirst'
 
 export default class ChangeTemporaryDeactivationDetails extends FormInitialStep {
   override middlewareSetup() {
@@ -39,7 +40,8 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
   override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
     const locals = super.locals(req, res)
 
-    const { id: locationId, prisonId } = res.locals.decoratedLocation
+    const { decoratedLocation } = res.locals
+    const { id: locationId, prisonId } = decoratedLocation
 
     const backLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
@@ -49,6 +51,9 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
       ...locals,
       backLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'Deactivation details',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Update deactivation details',
     }
   }
 

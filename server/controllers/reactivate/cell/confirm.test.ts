@@ -126,8 +126,10 @@ describe('ReactivateCellConfirm', () => {
 
         expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
           backLink: `/reactivate/cell/${deepRes.locals.decoratedLocation.id}/details`,
+          buttonText: 'Confirm activation',
           cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
           changeSummary: `The establishment's total working capacity will increase from 20 to 23.\n<br/><br/>\nThe establishment's total maximum capacity will increase from 30 to 32.`,
+          title: 'You are about to reactivate cell A-1-001',
         })
       })
     })
@@ -148,8 +150,10 @@ describe('ReactivateCellConfirm', () => {
 
         expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
           backLink: `/reactivate/cell/${deepRes.locals.decoratedLocation.id}/details`,
+          buttonText: 'Confirm activation',
           cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
           changeSummary: `The establishment's total working capacity will increase from 20 to 23.`,
+          title: 'You are about to reactivate cell A-1-001',
         })
       })
     })

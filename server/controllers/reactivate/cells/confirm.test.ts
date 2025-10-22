@@ -142,9 +142,11 @@ describe('ReactivateCellsConfirm', () => {
 
     it('sets the correct locals', async () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        backLink: `/reactivate/cells/check-capacity`,
+        buttonText: 'Confirm activation',
         cancelLink: `/inactive-cells/${sessionModelValues.referrerPrisonId}/${sessionModelValues.referrerLocationId}`,
-        changeSummary: `The establishment’s total working capacity will increase from 20 to 23.`,
+        cancelText: 'Cancel',
+        changeSummary: 'The establishment’s total working capacity will increase from 20 to 23.',
+        title: 'You are about to reactivate 2 cells',
       })
     })
   })

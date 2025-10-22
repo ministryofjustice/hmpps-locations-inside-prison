@@ -114,6 +114,12 @@ export default class ConfirmCreateLocation extends FormInitialStep {
       locals.locationPathPrefix = [pathHierarchy, newLocationCode].filter(s => s).join('-')
     }
 
+    locals.title = `Check and confirm the ${
+      values.createCellsNow === 'YES' ? 'location' : locationType.toLowerCase()
+    } details`
+    locals.titleCaption = `Create new ${values.createCellsNow === 'YES' ? 'locations' : locationType.toLowerCase()}`
+    locals.buttonText = `Create ${values.createCellsNow === 'YES' ? 'locations' : locationType.toLowerCase()}`
+
     return locals
   }
 

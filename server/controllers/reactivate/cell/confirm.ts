@@ -6,6 +6,7 @@ import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 import { isValidUUID } from '../../../utils/isValidUUID'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
+import { TypedLocals } from '../../../@types/express'
 
 export default class ReactivateCellConfirm extends FormWizard.Controller {
   override middlewareSetup() {
@@ -27,7 +28,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  override locals(req: FormWizard.Request, res: Response): object {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation, prisonResidentialSummary, referrerRootUrl, values } = res.locals
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
@@ -62,6 +63,8 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
       backLink,
       cancelLink: referrerRootUrl,
       changeSummary,
+      title: `You are about to reactivate ${decoratedLocation.displayName}`,
+      buttonText: 'Confirm activation',
     }
   }
 
