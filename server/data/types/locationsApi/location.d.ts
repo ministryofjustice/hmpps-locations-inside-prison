@@ -47,6 +47,7 @@ export declare interface Location {
   deactivatedBy: string
   proposedReactivationDate?: string
   topLevelId: string
+  pendingApprovalRequestId?: string
   parentId: string
   parentLocation: string
   inactiveCells: number

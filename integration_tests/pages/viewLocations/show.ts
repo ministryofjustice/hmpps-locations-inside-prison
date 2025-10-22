@@ -27,6 +27,8 @@ export default class ViewLocationsShowPage extends Page {
 
   draftBannerCertifyButton = (): PageElement => this.draftBanner().get('[data-qa=add-to-cell-certificate]')
 
+  draftBannerCertifyLinkButton = (): PageElement => this.draftBanner().get('[data-qa=view-request-details]')
+
   inactiveBanner = (): PageElement => cy.get('[data-qa=inactive-location-banner]')
 
   inactiveBannerRows = (): PageElement => this.inactiveBanner().find('.govuk-summary-list__row')

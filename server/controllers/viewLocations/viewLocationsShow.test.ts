@@ -386,10 +386,15 @@ describe('view locations show', () => {
       describe('when req.featureFlags.createAndCertify is true', () => {
         beforeEach(() => {
           deepReq.featureFlags.createAndCertify = true
+          deepReq.canAccess = (permission: string) => permission === 'create_location'
         })
 
-        describe('when canAccess("create_location") is false', () => {
-          it('renders the page without the create button', () => {
+        describe('when location has a pending approval request', () => {
+          beforeEach(() => {
+            deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId = 'REQUEST-ID-0000-1000-8'
+          })
+
+          it('does not render the create button', () => {
             controller(deepReq as Request, deepRes as Response)
 
             expect(deepRes.locals.actions).toEqual(undefined)
@@ -401,12 +406,12 @@ describe('view locations show', () => {
           })
         })
 
-        describe('when canAccess("create_location") is true', () => {
+        describe('when location does not have a pending approval request', () => {
           beforeEach(() => {
-            deepReq.canAccess = (permission: string) => permission === 'create_location'
+            delete deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId
           })
 
-          it('renders the page with the create button', () => {
+          it('renders the create button', () => {
             controller(deepReq as Request, deepRes as Response)
 
             expect(deepRes.locals.actions).toEqual(undefined)
