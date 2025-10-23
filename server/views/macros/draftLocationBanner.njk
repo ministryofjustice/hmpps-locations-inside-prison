@@ -8,6 +8,7 @@
   {% set isLockedDraft = location.pendingApprovalRequestId or location.status == 'LOCKED_DRAFT' %}
   {% set locationName = location.displayName | capFirst %}
   {% set locationType = location.locationType | lower %}
+  {% set panelColour = isLockedDraft and 'purple' or 'orange' %}
 
   {% set bannerHtml %}
     {% if isLockedDraft %}
@@ -67,7 +68,7 @@
     },
     items: [{
       html: bannerHtml,
-      classes: 'moj-ticket-panel__content--orange govuk-!-margin-bottom-7'
+      classes: 'moj-ticket-panel__content--' + panelColour + ' ' + 'govuk-!-margin-bottom-7'
     }]
   }) }}
 {% endmacro %}
