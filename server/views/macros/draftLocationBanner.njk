@@ -5,12 +5,12 @@
 {% macro draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) %}
   {% set topLevelDraftLocation = topLevelDraftLocationSummary.parentLocation %}
   {% set location = decoratedResidentialSummary.location %}
-  {% set pendingApproval = location.pendingApprovalRequestId %}
+  {% set isLockedDraft = location.pendingApprovalRequestId or location.status == 'LOCKED_DRAFT' %}
   {% set locationName = location.displayName | capFirst %}
   {% set locationType = location.locationType | lower %}
 
   {% set bannerHtml %}
-    {% if pendingApproval %}
+    {% if isLockedDraft %}
       <h3 class="govuk-heading-m">Cell certificate change requested for this location{{ govukTag({
           text: 'Change requested',
           classes: "govuk-tag--purple govuk-\!-float-right",
@@ -23,19 +23,19 @@
     {% endif %}
 
     <p>
-      {% if pendingApproval %}
+      {% if isLockedDraft %}
         A change to this location on the cell certificate has been requested. You are unable to make any  changes to this location until the request has been reviewed by the authorising director.
       {% elseif location.id != topLevelDraftLocation.id %}
         This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
       {% endif %}
 
-      {% if not pendingApproval %}
-      {% if topLevelDraftLocation.numberOfCellLocations == 0 %}
-        You can add the {{ topLevelDraftLocation.locationType | lower }} to the cell certificate once cells have been created.
-        You can activate the {{ locationType }} once it is on the cell certificate.
-      {% else %}
-        The {{ topLevelDraftLocation.locationType | lower }} must be added to the cell certificate before cells in the {{ topLevelDraftLocation.locationType | lower }} can be activated and used.
-      {% endif %}
+      {% if not isLockedDraft %}
+        {% if topLevelDraftLocation.numberOfCellLocations == 0 %}
+          You can add the {{ topLevelDraftLocation.locationType | lower }} to the cell certificate once cells have been created.
+          You can activate the {{ locationType }} once it is on the cell certificate.
+        {% else %}
+          The {{ topLevelDraftLocation.locationType | lower }} must be added to the cell certificate before cells in the {{ topLevelDraftLocation.locationType | lower }} can be activated and used.
+        {% endif %}
       {% endif %}
     </p>
 
@@ -49,11 +49,11 @@
         }
       }) }}
     {% endif %}
-    {% if pendingApproval %}
+    {% if isLockedDraft %}
       {{ govukButton({
         text: "View request details",
         preventDoubleClick: true,
-        href: "/" + location.prisonId + "/cell-certificate/change-requests/" + location.pendingApprovalRequestId,
+        href: "/" + location.prisonId + "/cell-certificate/change-requests/" + (location.pendingApprovalRequestId or ''),
         attributes: {
           'data-qa': 'view-request-details'
         }
