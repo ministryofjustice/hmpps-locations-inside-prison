@@ -16,7 +16,7 @@ function permanentDeactivationForbidden(req: FormWizard.Request, res: Response) 
   return !req.canAccess('deactivate:permanent')
 }
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
@@ -32,6 +32,7 @@ const steps = {
     fields: ['deactivationType'],
     next: [{ field: 'deactivationType', value: 'temporary', next: 'temporary/details' }, 'permanent/warning'],
     controller: DeactivateType,
+    template: '../../partials/formStep',
   },
   '/temporary': {
     entryPoint: true,
@@ -44,6 +45,7 @@ const steps = {
     fields: ['deactivationReason', 'estimatedReactivationDate', 'planetFmReference'],
     next: 'temporary/confirm',
     controller: DeactivateTemporaryDetails,
+    template: '../../partials/formStep',
   },
   '/temporary/confirm': {
     fields: ['confirm'],
@@ -64,6 +66,7 @@ const steps = {
     fields: ['permanentDeactivationReason'],
     next: 'permanent/confirm',
     controller: DeactivatePermanentDetails,
+    template: '../../partials/formStep',
   },
   '/permanent/confirm': {
     fields: ['confirm'],

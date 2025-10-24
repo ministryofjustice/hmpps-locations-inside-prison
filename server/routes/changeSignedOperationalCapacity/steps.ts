@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import ChangeSignedOperationalCapacity from '../../controllers/changeSignedOperationalCapacity'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,

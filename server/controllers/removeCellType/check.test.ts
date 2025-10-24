@@ -62,11 +62,11 @@ describe('CheckRemoveCellType', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         cellTypesLabel: 'Cell type:',
         cellTypesText: 'Accessible cell',
         fields,
-        pageTitleText: 'Are you sure you want to remove the specific cell type?',
+        title: 'Are you sure you want to remove the specific cell type?',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             text: 'Select yes if you want to remove the specific cell type',
@@ -81,11 +81,11 @@ describe('CheckRemoveCellType', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         cellTypesLabel: 'Cell types:',
         cellTypesText: 'Dry cell, Escape list cell',
         fields,
-        pageTitleText: 'Are you sure you want to remove all of the specific cell types?',
+        title: 'Are you sure you want to remove all of the specific cell types?',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             text: 'Select yes if you want to remove the specific cell types',

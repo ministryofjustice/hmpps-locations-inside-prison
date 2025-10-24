@@ -4,6 +4,7 @@ import { isEqual, sortBy } from 'lodash'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class ChangeUsedForDetails extends FormInitialStep {
   override middlewareSetup() {
@@ -45,6 +46,9 @@ export default class ChangeUsedForDetails extends FormInitialStep {
       leafLevel,
       backLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'Change what the location is used for',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Save used for',
     }
   }
 

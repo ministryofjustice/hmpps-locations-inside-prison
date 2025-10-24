@@ -1,22 +1,11 @@
 {% extends "partials/layout.njk" %}
 
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-
-{% set title = "Management reporting" %}
-
-{% block pageTitle %}{{ 'Management reporting - ' + applicationName }}{% endblock %}
-
-{% block heading %}
-  <h1 class="govuk-heading-l">{{ title }}</h1>
-{% endblock %}
-
 {% set reportShown = false %}
 
 {% block content %}
-
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-grid-column-{{ minLayout }}">
         {% for definition in definitions %}
           {% if definition.authorised %}
             {% set reportShown = true %}
@@ -38,5 +27,4 @@
       </div>
     </div>
   </div>
-
 {% endblock %}

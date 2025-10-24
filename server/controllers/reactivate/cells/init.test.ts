@@ -25,14 +25,14 @@ describe('ReactivateCellsInit', () => {
     }
   })
 
-  describe('render', () => {
+  describe('successHandler', () => {
     describe('when multiple locations are selected', () => {
       beforeEach(() => {
         deepReq.query.selectedLocations = ['l1', 'l2', 'l3']
       })
 
       it('sets values on the sessionModel', async () => {
-        await controller.render(deepReq as FormWizard.Request, deepRes as Response, next)
+        await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepReq.sessionModel.set).toHaveBeenCalledWith('referrerLocationId', deepReq.query.locationId)
         expect(deepReq.sessionModel.set).toHaveBeenCalledWith('referrerPrisonId', deepReq.query.prisonId)
@@ -46,7 +46,7 @@ describe('ReactivateCellsInit', () => {
       })
 
       it('it redirects to single cell reactivation', async () => {
-        await controller.render(deepReq as FormWizard.Request, deepRes as Response, next)
+        await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.redirect).toHaveBeenCalledWith(
           `/reactivate/cell/${deepReq.query.selectedLocations}?ref=inactive-cells&refPrisonId=TST&refLocationId=l0`,
@@ -56,7 +56,7 @@ describe('ReactivateCellsInit', () => {
 
     describe('when no locations are selected', () => {
       it('it redirects to the inactive-cells screen', async () => {
-        await controller.render(deepReq as FormWizard.Request, deepRes as Response, next)
+        await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.redirect).toHaveBeenCalledWith(
           `/inactive-cells/${deepReq.query.prisonId}/${deepReq.query.locationId}`,

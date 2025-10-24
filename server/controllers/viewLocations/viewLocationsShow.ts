@@ -6,6 +6,7 @@ import addAction from '../../middleware/addAction'
 export default async (req: Request, res: Response) => {
   const locals: TypedLocals = {
     title: 'Manage locations',
+    minLayout: 'three-quarters',
   }
 
   const { decoratedResidentialSummary: summary } = res.locals

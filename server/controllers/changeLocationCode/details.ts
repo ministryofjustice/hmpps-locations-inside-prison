@@ -45,6 +45,7 @@ export default class Details extends FormInitialStep {
       locationType,
       titleCaption: capFirst(decoratedResidentialSummary.location?.displayName),
       title: `Change ${locationType} code`,
+      buttonText: `Save ${locationType} code`,
     }
   }
 

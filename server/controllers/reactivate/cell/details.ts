@@ -5,6 +5,7 @@ import FormInitialStep from '../../base/formInitialStep'
 import { Location } from '../../../data/types/locationsApi'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 import { TypedLocals } from '../../../@types/express'
+import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateCellDetails extends FormInitialStep {
   override middlewareSetup() {
@@ -60,6 +61,10 @@ export default class ReactivateCellDetails extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: referrerRootUrl,
+      title: `Check ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      titleCaption: capFirst(decoratedLocation.displayName),
+      insetText:
+        'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
     }
   }
 }

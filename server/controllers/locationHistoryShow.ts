@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { Location } from '../data/types/locationsApi'
 import { Services } from '../services'
 import renderMacro from '../utils/renderMacro'
+import capFirst from '../formatters/capFirst'
 
 function formatValue(attribute: string, values: string[]) {
   if (values?.length) {
@@ -62,5 +63,8 @@ export default ({ manageUsersService }: Services) =>
     return res.render('pages/locationHistory/show', {
       backLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       tableRows,
+      title: 'Location history',
+      titleCaption: `${capFirst(location.locationType.toLowerCase())} ${location.localName || location.pathHierarchy}`,
+      minLayout: 'three-quarters',
     })
   }

@@ -1,21 +1,22 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import backUrl from '../../utils/backUrl'
 import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
+import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
+import FormInitialStep from '../base/formInitialStep'
 
-export default class ConfirmRemoveCellType extends FormWizard.Controller {
+export default class ConfirmRemoveCellType extends FormInitialStep {
   override middlewareSetup() {
+    this.use(populateLocation({ decorate: true }))
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
-    this.use(populateLocation({ decorate: true }))
   }
 
-  override locals(req: FormWizard.Request, res: Response): object {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
@@ -39,12 +40,11 @@ export default class ConfirmRemoveCellType extends FormWizard.Controller {
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/remove-cell-type/review` })
-
     return {
-      backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
+      title: 'Confirm cell type removal and capacity changes',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Update cell',
     }
   }
 

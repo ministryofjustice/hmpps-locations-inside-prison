@@ -2,6 +2,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class CellConversionSetCellType extends FormInitialStep {
   override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
@@ -39,6 +40,8 @@ export default class CellConversionSetCellType extends FormInitialStep {
       ...locals,
       buttonText: 'Continue',
       fields,
+      title: 'Convert to cell',
+      titleCaption: capFirst(res.locals.decoratedLocation.displayName),
     }
   }
 }

@@ -1,10 +1,15 @@
 {% extends "./partials/layout.njk" %}
 
+{% set title = 'Authorisation Error' %}
+
 {% block content %}
-  <h1 class="govuk-heading-l">
-    Authorisation Error
-  </h1>
-  <p>
-    You are not authorised to use this application.
-  </p>
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p>
+          You are not authorised to use this application.
+        </p>
+      </div>
+    </div>
+  </div>
 {% endblock %}

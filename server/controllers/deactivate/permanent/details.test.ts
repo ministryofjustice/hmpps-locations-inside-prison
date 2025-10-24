@@ -73,6 +73,8 @@ describe('DeactivatePermanentDetails', () => {
       expect(result).toEqual({
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields,
+        title: 'Permanent deactivation details',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#permanentDeactivationReason',

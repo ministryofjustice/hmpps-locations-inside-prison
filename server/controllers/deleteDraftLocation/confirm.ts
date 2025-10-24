@@ -19,6 +19,7 @@ export default class ConfirmDeleteDraftLocation extends FormInitialStep {
       bodyText,
       titleCaption: capFirst(decoratedResidentialSummary.location.displayName),
       title: `Are you sure you want to delete this ${locationType}?`,
+      buttonText: `Delete ${locationType}`,
     }
   }
 

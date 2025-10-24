@@ -129,6 +129,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: `/view-and-update-locations/TST/${locationId}`,
+        buttonText: 'Save',
         cancelLink: `/view-and-update-locations/TST/${locationId}`,
         fields: {
           convertedCellType: {
@@ -179,6 +180,8 @@ describe('ChangeNonResidentialTypeDetails', () => {
             value: '',
           },
         },
+        title: 'Change non-residential room type',
+        titleCaption: 'A-1-001',
         validationErrors: [],
       })
     })
