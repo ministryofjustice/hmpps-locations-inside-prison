@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import backUrl from '../../../utils/backUrl'
 import { Location, PrisonResidentialSummary } from '../../../data/types/locationsApi'
 import populateCells from './populateCells'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
+import { TypedLocals } from '../../../@types/express'
 
 export default class ReactivateCellsConfirm extends FormWizard.Controller {
   override middlewareSetup() {
@@ -37,11 +37,10 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     `.replace(/^\s*|\s*$/gm, '')
   }
 
-  override locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { cells, prisonResidentialSummary } = res.locals
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const backLink = backUrl(req, { fallbackUrl: '/reactivate/cells/check-capacity' })
     const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
     const { maxCapacity, workingCapacity } = prisonResidentialSummary.prisonSummary
     let newMaxCapacity = maxCapacity
@@ -68,9 +67,11 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     return {
-      backLink,
       cancelLink,
+      cancelText: 'Cancel',
       changeSummary,
+      title: `You are about to reactivate ${cells.length} cells`,
+      buttonText: 'Confirm activation',
     }
   }
 

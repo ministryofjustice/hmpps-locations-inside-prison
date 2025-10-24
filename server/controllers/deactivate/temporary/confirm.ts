@@ -3,6 +3,8 @@ import FormWizard from 'hmpo-form-wizard'
 import backUrl from '../../../utils/backUrl'
 import getCellCount from '../../../middleware/getCellCount'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
+import { TypedLocals } from '../../../@types/express'
+import capFirst from '../../../formatters/capFirst'
 
 export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   override middlewareSetup() {
@@ -42,7 +44,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     await super._locals(req, res, next)
   }
 
-  override locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
     const { workingCapacity } = decoratedLocation.capacity
     const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/deactivate/temporary/details` })
@@ -56,6 +58,9 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
       backLink,
       cancelLink: `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`,
       changeSummary,
+      title: 'Check your answers before deactivating this location',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Confirm deactivation',
     }
   }
 

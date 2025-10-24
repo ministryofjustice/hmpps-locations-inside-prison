@@ -10,8 +10,10 @@ function mustReviewCapacity(req: FormWizard.Request, res: Response) {
   return active && capacity?.workingCapacity === 0 && accommodationTypes.includes('NORMAL_ACCOMMODATION')
 }
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
+    backLink: (_req, res) =>
+      `/view-and-update-locations/${[res.locals.decoratedLocation.prisonId, res.locals.decoratedLocation.id].filter(i => i).join('/')}`,
     entryPoint: true,
     reset: true,
     resetJourney: true,
@@ -26,6 +28,7 @@ const steps = {
   },
   '/remove': {
     controller: RemoveCellType,
+    buttonClasses: 'govuk-button--warning',
   },
   '/check': {
     fields: ['areYouSure'],

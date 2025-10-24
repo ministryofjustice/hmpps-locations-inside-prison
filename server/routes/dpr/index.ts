@@ -54,7 +54,7 @@ export function dprRouter(router: Router, services: Services): Router {
     addBreadcrumb({ title: 'Management reporting', href: '/management-reporting' }),
     async (req, res) => {
       const definitions = await populateRoutes(services.locationsService, req.session.systemToken, router)
-      res.render('pages/managementReporting/index.njk', { definitions })
+      res.render('pages/managementReporting/index.njk', { definitions, title: 'Management reporting' })
     },
   )
 

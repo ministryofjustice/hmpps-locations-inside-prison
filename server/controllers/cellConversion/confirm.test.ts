@@ -125,6 +125,7 @@ describe('CellConversionConfirm', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
+        buttonText: 'Confirm conversion',
         changeSummary:
           'This will increase the establishment’s working capacity from 20 to 21.\n<br/><br/>\nThis will increase the establishment’s maximum capacity from 30 to 32.',
         summaryListRows: [
@@ -194,6 +195,8 @@ describe('CellConversionConfirm', () => {
             },
           },
         ],
+        title: 'Confirm conversion to cell',
+        titleCaption: 'Executive washroom',
       })
     })
 

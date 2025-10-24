@@ -68,11 +68,11 @@ describe('RemoveCellType', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         buttonText: 'Remove cell type',
         cellTypesLabel: 'Cell type:',
         cellTypesText: 'Accessible cell',
-        pageTitleText: 'Are you sure you want to remove the specific cell type?',
+        title: 'Are you sure you want to remove the specific cell type?',
+        titleCaption: 'Cell A-1-001',
       })
     })
 
@@ -81,11 +81,11 @@ describe('RemoveCellType', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         buttonText: 'Remove cell types',
         cellTypesLabel: 'Cell types:',
         cellTypesText: 'Dry cell, Escape list cell',
-        pageTitleText: 'Are you sure you want to remove all of the specific cell types?',
+        title: 'Are you sure you want to remove all of the specific cell types?',
+        titleCaption: 'Cell A-1-001',
       })
     })
   })

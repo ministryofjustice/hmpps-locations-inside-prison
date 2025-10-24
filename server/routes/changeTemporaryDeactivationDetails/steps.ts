@@ -11,6 +11,7 @@ const steps = {
   '/details': {
     fields: ['deactivationReason', 'estimatedReactivationDate', 'planetFmReference'],
     controller: ChangeTemporaryDeactivationDetails,
+    template: '../../partials/formStep',
   },
 }
 

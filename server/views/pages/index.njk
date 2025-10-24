@@ -3,6 +3,9 @@
 {% from "../macros/card.njk" import card %}
 
 {% set title = applicationName %}
+{% if sandbox %}
+  {% set title = title + ' (practice version)' %}
+{% endif %}
 {% set feedbackBannerBackground = 'feedbackBannerBackground'%}
 
 {% block topBannerContent %}
@@ -25,10 +28,6 @@
       </div>
     </div>
   </div>
-{% endblock %}
-
-{% block heading %}
-  <h1 class="govuk-heading-l">{{ title }}{{ " (practice version)" if sandbox }}</h1>
 {% endblock %}
 
 {% block content %}

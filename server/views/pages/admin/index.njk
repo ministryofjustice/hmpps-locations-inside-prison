@@ -1,8 +1,6 @@
 {% extends "../../partials/layout.njk" %}
-{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set title = 'Prison configuration' %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set rows = [] %}
 {% set rows = (rows.push(
@@ -29,42 +27,6 @@
     Not-Blocked
   {% endif %}
 {% endset %}
-
-{% block beforeContent %}
-  {{ super() }}
-
-  {% if banner.success %}
-    {% set html %}
-      <h3 class="govuk-notification-banner__heading">
-        {{ banner.success.title }}
-      </h3>
-      <p class="govuk-body">
-       {% if banner.success.content is string %}
-         {{ banner.success.content }}
-       {% else %}
-        {# will be an array of data #}
-        <ul>
-          {% for line in banner.success.content %}
-            <li>{{ line }}</li>
-          {% endfor %}
-        </ul>
-       {% endif %}
-      </p>
-    {% endset %}
-
-    <div class="govuk-width-container">
-      <div class="govuk-grid-row govuk-!-margin-bottom-0">
-        <div class="govuk-grid-column-two-thirds">
-          {{ govukNotificationBanner({
-            html: html,
-            type: "success",
-            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
-          }) }}
-        </div>
-      </div>
-    </div>
-  {% endif %}
-{% endblock %}
 
 {% set resiHtml %}
   <span class="hmpps-inactive-location-banner">

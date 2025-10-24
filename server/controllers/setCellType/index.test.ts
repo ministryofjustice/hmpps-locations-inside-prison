@@ -140,9 +140,11 @@ describe('SetCellType', () => {
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        buttonText: 'Save cell type',
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         fields,
-        pageTitleText: 'Change specific cell type',
+        title: 'Change specific cell type',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#specialistCellTypes',
@@ -184,6 +186,7 @@ describe('SetCellType', () => {
 
       expect(result).toEqual({
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        buttonText: 'Save cell type',
         cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
         fields: {
           specialistCellTypes: {
@@ -221,7 +224,8 @@ describe('SetCellType', () => {
             errorMessage: { text: 'Select a cell type', href: '#specialistCellTypes' },
           },
         },
-        pageTitleText: 'Change specific cell type',
+        title: 'Change specific cell type',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })

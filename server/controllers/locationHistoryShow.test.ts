@@ -46,6 +46,7 @@ describe('view locations show', () => {
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/locationHistory/show', {
       backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+      minLayout: 'three-quarters',
       tableRows: [
         [
           { text: 'Location Type' },
@@ -55,6 +56,8 @@ describe('view locations show', () => {
           { text: '05/07/2021' },
         ],
       ],
+      title: 'Location history',
+      titleCaption: 'Cell A-1-001',
     })
   })
 
@@ -68,9 +71,12 @@ describe('view locations show', () => {
 
       expect(deepRes.render).toHaveBeenCalledWith('pages/locationHistory/show', {
         backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        minLayout: 'three-quarters',
         tableRows: [
           [{ text: 'Location Type' }, { text: 'CELL' }, { text: 'WING' }, { text: 'Unknown' }, { text: '05/07/2021' }],
         ],
+        title: 'Location history',
+        titleCaption: 'Cell A-1-001',
       })
     })
   })

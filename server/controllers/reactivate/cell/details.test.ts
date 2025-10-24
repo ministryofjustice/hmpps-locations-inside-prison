@@ -194,6 +194,10 @@ describe('ReactivateCellDetails', () => {
         backLink: '/referrer-url',
         cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
         fields,
+        insetText:
+          'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
+        title: 'Check cell capacity',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#workingCapacity',

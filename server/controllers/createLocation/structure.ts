@@ -31,6 +31,9 @@ export default class Structure extends FormInitialStep {
 
     locals.level4 = values['level-4'] ? pluralize(String(values['level-4'])) : ''
 
+    locals.title = `Set ${locals.locationType.toLowerCase()} structure`
+    locals.titleCaption = `Create new ${locals.locationType.toLowerCase()}`
+
     return locals
   }
 
