@@ -2,8 +2,8 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
 import populateLocation from '../../../middleware/populateLocation'
-import backUrl from '../../../utils/backUrl'
 import { Location } from '../../../data/types/locationsApi'
+import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateCellsChangeCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -60,15 +60,19 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
 
   override locals(req: FormWizard.Request, res: Response) {
     const locals = super.locals(req, res)
+    const { location } = res.locals
     const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const backLink = backUrl(req, { fallbackUrl: '/reactivate/cells/check-capacity' })
     const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
 
     return {
       ...locals,
-      backLink,
       cancelLink,
+      cancelText: 'cancel',
+      title: 'Change cell capacity',
+      titleCaption: `${capFirst(location.locationType.toLowerCase())} ${location.localName || location.pathHierarchy}`,
+      insetText:
+        'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
     }
   }
 

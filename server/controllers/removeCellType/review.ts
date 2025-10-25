@@ -3,12 +3,14 @@ import { Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 import populateLocation from '../../middleware/populateLocation'
+import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class ReviewCellCapacity extends FormInitialStep {
   override middlewareSetup() {
+    this.use(populateLocation({ decorate: true }))
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
-    this.use(populateLocation({ decorate: true }))
   }
 
   override getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
@@ -38,13 +40,13 @@ export default class ReviewCellCapacity extends FormInitialStep {
     })
   }
 
-  override locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
 
     return {
       ...super.locals(req, res),
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'Review cell capacity',
+      titleCaption: capFirst(decoratedLocation.displayName),
     }
   }
 }

@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import ChangeNonResidentialTypeDetails from '../../controllers/changeNonResidentialType/details'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
@@ -11,6 +12,7 @@ const steps = {
   '/details': {
     fields: ['convertedCellType', 'otherConvertedCellType'],
     controller: ChangeNonResidentialTypeDetails,
+    template: '../../partials/formStep',
   },
 }
 

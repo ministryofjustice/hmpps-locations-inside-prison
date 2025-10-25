@@ -5,6 +5,7 @@ import { singularizeString } from '../../utils/utils'
 export default async (req: Request, res: Response) => {
   const locals: TypedLocals = {
     title: 'Manage locations',
+    minLayout: 'three-quarters',
   }
 
   const success = req.flash('success')

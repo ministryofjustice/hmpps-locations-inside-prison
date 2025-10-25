@@ -1,21 +1,22 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import populateLocation from '../../middleware/populateLocation'
+import capFirst from '../../formatters/capFirst'
+import FormInitialStep from '../base/formInitialStep'
 
-export default class RemoveCellType extends FormWizard.Controller {
+export default class RemoveCellType extends FormInitialStep {
   override middlewareSetup() {
-    super.middlewareSetup()
-    // decorate the location now that the steps config has been processed
     this.use(populateLocation({ decorate: true }))
+    super.middlewareSetup()
   }
 
-  override locals(_req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId, specialistCellTypes } = decoratedLocation
+    const { specialistCellTypes } = decoratedLocation
 
     const multipleTypes = specialistCellTypes.length > 1
 
-    const pageTitleText = multipleTypes
+    const title = multipleTypes
       ? 'Are you sure you want to remove all of the specific cell types?'
       : 'Are you sure you want to remove the specific cell type?'
 
@@ -26,11 +27,12 @@ export default class RemoveCellType extends FormWizard.Controller {
     const cellTypesText = specialistCellTypes.join(', ')
 
     return {
-      backLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      ...super.locals(req, res),
       buttonText,
       cellTypesLabel,
       cellTypesText,
-      pageTitleText,
+      title,
+      titleCaption: capFirst(decoratedLocation.displayName),
     }
   }
 

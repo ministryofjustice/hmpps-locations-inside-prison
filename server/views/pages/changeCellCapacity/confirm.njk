@@ -1,124 +1,40 @@
-{% extends "../../partials/layout.njk" %}
+{% extends "../../partials/formStep.njk" %}
 
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set title = "Confirm " + ('cell' if canAccess('change_max_capacity') else 'working') + " capacity" %}
-
-{% block heading %}
-  <span class="govuk-caption-m" data-qa="cell-name">{{ decoratedLocation.displayName | capFirst }}</span>
-  <h1 class="govuk-heading-l">{{ title }}</h1>
-{% endblock %}
-
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ govukBackLink({
-      text: "Back",
-      href: backLink
-    }) }}
-
-    {% if errorlist.length %}
-      {{ govukErrorSummary({
-        titleText: "There is a problem",
-        errorList: errorlist
-      }) }}
-    {% endif %}
-  </div>
-
-{% endblock %}
-
-{% block content %}
-
-  {% set formMethod = options.method | default('post') %}
-  {% set formAction = options.action | default('') %}
-  {% set formEnctype = options.enctype | default('') %}
-
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-
-        {{ govukSummaryList({
-          card: {
-            title: {
-              text: "Capacity"
-            },
-            actions: {
-              items: [
-                {
-                  href: backLink,
-                  text: "Change"
-                }
-              ] if canAccess('change_max_capacity')
-            }
-          },
-          rows: [
+{% block fields %}
+  {{ govukSummaryList({
+    card: {
+      title: {
+        text: "Capacity"
+      },
+      actions: {
+        items: [ { href: backLink, text: "Change" } ] if canAccess('change_max_capacity')
+      }
+    },
+    rows: [
+      {
+        key: { text: "Working capacity" },
+        value: { text: values.workingCapacity },
+        actions: {
+          items: [
             {
-              key: {
-                text: "Working capacity"
-              },
-              value: {
-                html: values.workingCapacity
-              },
-              actions: {
-                items: [
-                  {
-                    href: backLink,
-                    text: "Change"
-                  }
-                ] if not canAccess('change_max_capacity')
-              }
-            },
-            {
-              key: {
-                text: "Maximum capacity"
-              },
-              value: {
-                html: values.maxCapacity
-              }
+              href: backLink,
+              text: "Change"
             }
-          ]
-        }) }}
+          ] if not canAccess('change_max_capacity')
+        }
+      },
+      {
+        key: { text: "Maximum capacity" },
+        value: { text: values.maxCapacity }
+      }
+    ]
+  }) }}
 
-        <div class="govuk-!-padding-bottom-2 change-summary">
-          <h2 class="govuk-heading-m">Change to {{ 'cell’s' if canAccess('change_max_capacity') else 'working' }} capacity</h2>
+  <div class="govuk-!-padding-bottom-2 change-summary">
+    <h2 class="govuk-heading-m">Change to {{ 'cell’s' if canAccess('change_max_capacity') else 'working' }} capacity</h2>
 
-          <p>{{ changeSummary | safe }}</p>
-        </div>
-
-        <form method="{{ formMethod }}" action="{{ formAction }}"
-        {% if formEnctype %}
-          enctype="{{ formEnctype }}"
-        {% endif %}
-        >
-
-          {% if formMethod == 'post' %}
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% endif %}
-
-          <div class="govuk-button-group">
-            {% block formActions %}
-              {% block submitAction %}
-                {{ govukButton({
-                  text: "Update " + ('cell' if canAccess('change_max_capacity') else 'working') + " capacity",
-                  classes: options.buttonClasses,
-                  preventDoubleClick: true,
-                  type: "submit"
-                }) }}
-              {% endblock %}
-            {% endblock %}
-          </div>
-        </form>
-
-        <p class="govuk-body">
-          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel and return to location details
-          </a>
-        </p>
-      </div>
-    </div>
+    <p>{{ changeSummary | safe }}</p>
   </div>
 {% endblock %}

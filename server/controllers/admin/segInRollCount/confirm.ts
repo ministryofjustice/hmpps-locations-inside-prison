@@ -19,6 +19,9 @@ export default class SegInRollCountStatusChangeConfirm extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: backLink,
+      title: 'Update include seg in roll count status',
+      buttonText: `${prisonConfiguration.includeSegregationInRollCount === 'INACTIVE' ? 'Activate' : 'Inactivate'} include seg in roll count`,
+      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

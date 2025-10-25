@@ -20,6 +20,9 @@ export default class ResiStatusChangeConfirm extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: backLink,
+      title: 'Update residential location status',
+      buttonText: `${prisonConfiguration.resiLocationServiceActive === 'INACTIVE' ? 'Activate' : 'Inactivate'} residential location`,
+      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

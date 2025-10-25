@@ -1,0 +1,41 @@
+{% extends "../../../partials/formStep.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block fields %}
+  {% set rows = [] %}
+  {% for cell in cells %}
+    {% set workingCapacity = (cell.oldWorkingCapacity or 0) | string %}
+    {% set maxCapacity = (cell.capacity.maxCapacity or 0) | string %}
+    {% if values.capacityChanges and values.capacityChanges[cell.id] %}
+      {% if values.capacityChanges[cell.id].workingCapacity %}
+        {% set workingCapacity = values.capacityChanges[cell.id].workingCapacity %}
+      {% endif %}
+      {% if values.capacityChanges[cell.id].maxCapacity %}
+        {% set maxCapacity = values.capacityChanges[cell.id].maxCapacity %}
+      {% endif %}
+    {% endif %}
+
+    {% set rows = (rows.push(
+      [
+        { text: cell.pathHierarchy },
+        { html: workingCapacity },
+        { html: maxCapacity },
+        { html: '<a href="/reactivate/cells/change-capacity/' + cell.id  + '" id="' + cell.id + '">Change</a>' }
+      ]
+    ), rows) %}
+  {% endfor %}
+
+  {{ govukTable({
+    attributes: {
+      "data-qa": "locations-table"
+    },
+    head: [
+      { text: "Location" },
+      { text: "Working capacity" },
+      { text: "Maximum capacity" },
+      { text: "Action" }
+    ],
+    rows: rows
+  }) }}
+{% endblock %}

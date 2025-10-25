@@ -12,6 +12,7 @@ export default async (req: Request, res: Response) => {
   const { approvalRequest, user, prisonId } = res.locals
   const locals: TypedLocals = {
     backLink: `/${res.locals.prisonId}/cell-certificate/change-requests`,
+    backLinkText: `Back${approvalRequest.status === 'PENDING' ? ' to change requests' : ''}`,
   }
 
   locals.accommodationTypeConstants = await locationsService.getAccommodationTypes(systemToken)
