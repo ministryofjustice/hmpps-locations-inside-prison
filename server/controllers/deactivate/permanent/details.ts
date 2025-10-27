@@ -11,7 +11,7 @@ export default class DeactivatePermanentDetails extends FormInitialStep {
     this.use(protectRoute('deactivate:permanent'))
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
 
     const { id: locationId, prisonId, displayName } = res.locals.decoratedLocation

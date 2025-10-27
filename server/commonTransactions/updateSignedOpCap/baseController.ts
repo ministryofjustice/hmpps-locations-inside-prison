@@ -23,7 +23,7 @@ export default class BaseController extends FormInitialStep {
     this.use(getSignedOpCapChangeRequest)
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
 

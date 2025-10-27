@@ -7,7 +7,7 @@ import { StatusType } from '../../../data/types/locationsApi'
 import { ServiceCode } from '../../../data/types/locationsApi/serviceCode'
 
 export default class ResiStatusChangeConfirm extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonConfiguration } = res.locals
     const { prisonId } = prisonConfiguration

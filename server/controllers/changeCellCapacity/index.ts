@@ -67,7 +67,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     return next()
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedLocation, values } = res.locals
     const { capacity, displayName, id: locationId, prisonId } = decoratedLocation

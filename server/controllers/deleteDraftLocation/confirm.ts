@@ -5,7 +5,7 @@ import FormInitialStep from '../base/formInitialStep'
 import capFirst from '../../formatters/capFirst'
 
 export default class ConfirmDeleteDraftLocation extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals
     const locationType = decoratedResidentialSummary.location.locationType.toLowerCase()

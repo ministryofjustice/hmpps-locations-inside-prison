@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import ChangeUsedFor from '../../controllers/changeUsedFor/details'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,

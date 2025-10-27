@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import CertApprovalStatusChangeConfirm from '../../../controllers/admin/certification/confirm'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
