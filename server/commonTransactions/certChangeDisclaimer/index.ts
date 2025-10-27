@@ -24,7 +24,7 @@ class ExtendedTransaction extends CommonTransaction {
     modifiedSteps[`${this.pathPrefix}/`] = {
       ...modifiedSteps[`${this.pathPrefix}/`],
       controller: class extends FormInitialStep {
-        override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+        override locals(req: FormWizard.Request, res: Response): TypedLocals {
           const locals = super.locals(req, res)
 
           if (title) {

@@ -37,7 +37,7 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     super.validateFields(req, res, callback)
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
 
     const { decoratedLocation } = res.locals

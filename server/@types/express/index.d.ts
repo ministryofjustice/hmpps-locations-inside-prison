@@ -32,34 +32,34 @@ export declare module 'express-session' {
   }
 }
 
-interface TypedLocals {
-  accommodationType?: string
-  actions?: { text: string; href: string; class: string }[]
-  approvalRequest?: CertificationApprovalRequest
-  approvalRequests?: CertificationApprovalRequest[]
-  archivedLocations?: DecoratedLocation[]
-  backLink?: string
-  backLinkText?: string
-  banner?: {
+interface AllLocals {
+  accommodationType: string
+  actions: { text: string; href: string; class: string }[]
+  approvalRequest: CertificationApprovalRequest
+  approvalRequests: CertificationApprovalRequest[]
+  archivedLocations: DecoratedLocation[]
+  backLink: string
+  backLinkText: string
+  banner: {
     success?: {
       title: string
       content: string
     }
   }
-  baseUrl?: string
-  bodyText?: string
-  bookmarkingEnabled?: boolean
-  bookmarks?: BookmarkStoreData[]
-  breadcrumbs?: {
+  baseUrl: string
+  bodyText: string
+  bookmarkingEnabled: boolean
+  bookmarks: BookmarkStoreData[]
+  breadcrumbs: {
     title: string
     href: string
   }[]
-  buttonText?: string
-  canAccess?: (permission: string) => boolean
-  cancelClasses?: string
-  cancelLink?: string
-  cancelText?: string
-  cards?: {
+  buttonText: string
+  canAccess: (permission: string) => boolean
+  cancelClasses: string
+  cancelLink: string
+  cancelText: string
+  cards: {
     clickable: boolean
     heading: string
     href: string
@@ -67,32 +67,32 @@ interface TypedLocals {
     'data-qa': string
     visible: boolean
   }[]
-  cell?: Location
-  cellCount?: number
-  cells?: Locations[]
-  changeSummary?: string
-  continueLink?: string
-  convertedCellTypeDetails?: string
-  createButton?: {
+  cell: Location
+  cellCount: number
+  cells: Location[]
+  changeSummary: string
+  continueLink: string
+  convertedCellTypeDetails: string
+  createButton: {
     text: string
     href: string
     classes: string
     attributes: { [attr: string]: string }
   }
-  createStructureLink?: string
-  createDetailsLink?: string
-  createRootLink?: string
-  createYouCanAddText?: string
-  cspNonce?: string
-  csrfToken?: string
-  currentSignedOperationalCapacity?: number
-  deactivationReason?: string
-  decoratedCell?: DecoratedLocation
-  decoratedCells?: DecoratedLocation[]
-  decoratedLocation?: DecoratedLocation
-  decoratedLocationTree?: DecoratedLocationTree[]
-  decoratedLocationStructure?: string
-  decoratedResidentialSummary?: {
+  createStructureLink: string
+  createDetailsLink: string
+  createRootLink: string
+  createYouCanAddText: string
+  cspNonce: string
+  csrfToken: string
+  currentSignedOperationalCapacity: number
+  deactivationReason: string
+  decoratedCell: DecoratedLocation
+  decoratedCells: DecoratedLocation[]
+  decoratedLocation: DecoratedLocation
+  decoratedLocationTree: DecoratedLocationTree[]
+  decoratedLocationStructure: string
+  decoratedResidentialSummary: {
     location?: DecoratedLocation
     locationDetails?: SummaryListRow[]
     locationHistory?: boolean // TODO: change this type when location history tab is implemented
@@ -101,51 +101,51 @@ interface TypedLocals {
     summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string; linkAriaLabel?: string }[]
     wingStructure?: string[]
   }
-  definitions?: string[]
-  definitionsPath?: string
-  dpdPathFromConfig?: string
-  dpdPathFromQuery?: string
-  dprUser?: DprUser
-  downloadingEnabled?: boolean
-  errorlist?: FormWizard.Controller.Error[]
-  errorMessage?: string
-  errorStack?: string
-  feComponents?: {
+  definitions: string[]
+  definitionsPath: string
+  dpdPathFromConfig: string
+  dpdPathFromQuery: string
+  dprUser: DprUser
+  downloadingEnabled: boolean
+  errorlist: FormWizard.Controller.Error[]
+  errorMessage: string
+  errorStack: string
+  feComponents: {
     header?: string
     footer?: string
     cssIncludes?: string[]
     jsIncludes?: string[]
     meta?: FeComponentsMeta
   }
-  fields?: FormWizard.Fields
-  inactiveCells?: DecoratedLocation[]
-  inactiveParentLocations?: DecoratedLocation[]
-  insetText?: string
-  lastUpdate?: { time: string; date: string; updatedBy: string }
-  leafLevel?: boolean
-  level2?: string
-  level3?: string
-  level4?: string
-  location?: Location
-  locationId?: string
-  locationHierarchy?: LocationSummary[]
-  locationPathPrefix?: string
-  locationResidentialSummary?: LocationResidentialSummary
-  locationTree?: LocationTree[]
-  locationType?: string
-  maxCapacity?: string
-  minLayout?: string
-  certAction?: string
-  options?: FormWizard.Request['form']['options']
-  pathSuffix?: string
-  prisonConfiguration?: PrisonConfiguration
-  prisonNonHousingDisabled?: boolean
-  nestedBaseUrl?: string
-  nomisScreenBlocked?: boolean
-  prisonId?: string
-  prisonerLocation?: PrisonerLocation
-  prisonResidentialSummary?: PrisonResidentialSummary
-  proposedCertificationApprovalRequests?: Partial<
+  fields: FormWizard.Fields
+  inactiveCells: DecoratedLocation[]
+  inactiveParentLocations: DecoratedLocation[]
+  insetText: string
+  lastUpdate: { time: string; date: string; updatedBy: string }
+  leafLevel: boolean
+  level2: string
+  level3: string
+  level4: string
+  location: Location
+  locationId: string
+  locationHierarchy: LocationSummary[]
+  locationPathPrefix: string
+  locationResidentialSummary: LocationResidentialSummary
+  locationTree: LocationTree[]
+  locationType: string
+  maxCapacity: string
+  minLayout: string
+  certAction: string
+  options: FormWizard.Request['form']['options']
+  pathSuffix: string
+  prisonConfiguration: PrisonConfiguration
+  prisonNonHousingDisabled: boolean
+  nestedBaseUrl: string
+  nomisScreenBlocked: boolean
+  prisonId: string
+  prisonerLocation: PrisonerLocation
+  prisonResidentialSummary: PrisonResidentialSummary
+  proposedCertificationApprovalRequests: Partial<
     Pick<
       CertificationApprovalRequest,
       | 'approvalType'
@@ -160,33 +160,35 @@ interface TypedLocals {
       | 'currentSignedOperationCapacity'
     >
   >[]
-  recentlyViewedReports?: StoredReportData[]
-  referrerRootUrl?: string
-  requestedReports?: StoredReportData[]
-  routePrefix?: string
-  signedOpCapChangeRequest?: blah
-  specialistCellTypes?: string[]
-  specialistCellTypesObject?: SpecialistCellTypesObject[]
-  usedForConstants?: LocationsApiConstant[]
-  accommodationTypeConstants?: LocationsApiConstant[]
-  approvalTypeConstants?: LocationsApiConstant[]
-  certificate?: CellCertificate
-  certificates?: CellCertificate[]
-  summaryListRows?: SummaryListRow[]
-  title?: string
-  titleCaption?: string
-  topLevelDraftLocationSummary?: LocationResidentialSummary
-  topLevelLocationType?: string
-  usedForTypes?: string[]
-  user?: HmppsUser
-  userMap?: { [username: string]: string }
-  validationErrors?: { text: string; href: string }[]
-  values?: FormWizard.Values
-  valuesHaveChanged?: boolean
-  workingCapacity?: string
-  capacityData?: BulkCapacityUpdate
-  capacitySummary?: CapacitySummary
+  recentlyViewedReports: StoredReportData[]
+  referrerRootUrl: string
+  requestedReports: StoredReportData[]
+  routePrefix: string
+  signedOpCapChangeRequest: CertificationApprovalRequest
+  specialistCellTypes: string[]
+  specialistCellTypesObject: SpecialistCellTypesObject[]
+  usedForConstants: LocationsApiConstant[]
+  accommodationTypeConstants: LocationsApiConstant[]
+  approvalTypeConstants: LocationsApiConstant[]
+  certificate: CellCertificate
+  certificates: CellCertificate[]
+  summaryListRows: SummaryListRow[]
+  title: string
+  titleCaption: string
+  topLevelDraftLocationSummary: LocationResidentialSummary
+  topLevelLocationType: string
+  usedForTypes: string[]
+  user: HmppsUser
+  userMap: { [username: string]: string }
+  validationErrors: { text: string; href: string }[]
+  values: FormWizard.Values
+  valuesHaveChanged: boolean
+  workingCapacity: string
+  capacityData: BulkCapacityUpdate
+  capacitySummary: CapacitySummary
 }
+
+type TypedLocals = Partial<AllLocals>
 
 export declare module 'express' {
   interface Response {

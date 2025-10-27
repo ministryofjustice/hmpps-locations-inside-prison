@@ -167,7 +167,7 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   override locals(_req: FormWizard.Request, res: Response) {
-    const locals: Partial<TypedLocals> = {}
+    const locals: TypedLocals = {}
     const { options, values } = res.locals
 
     if (options?.fields) {
