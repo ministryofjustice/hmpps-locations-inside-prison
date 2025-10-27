@@ -68,7 +68,7 @@ export default class Confirm extends FormInitialStep {
     next()
   }
 
-  override locals(_req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(_req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(_req, res)
 
     locals.buttonText = 'Submit for approval'

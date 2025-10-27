@@ -17,7 +17,7 @@ export default class CellConversionUsedFor extends FormInitialStep {
     next()
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const usedForTypes = req.form.values.usedForTypes || req.sessionModel.get<string[]>('usedForTypes')
     const fields = { ...(locals.fields as FormWizard.Fields) }

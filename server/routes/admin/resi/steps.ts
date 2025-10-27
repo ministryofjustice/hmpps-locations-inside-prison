@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import ResiStatusChangeConfirm from '../../../controllers/admin/resi/confirm'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,

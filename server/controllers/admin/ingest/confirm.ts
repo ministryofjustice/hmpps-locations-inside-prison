@@ -12,7 +12,7 @@ import {
 import LocationsService from '../../../services/locationsService'
 
 export default class IngestConfirm extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals.prisonConfiguration
 

@@ -7,7 +7,7 @@ const steps: FormWizard.Steps = {
   '/': {
     skip: true,
     controller: BaseController,
-    next: [{ fn: (_req, res) => res.locals.signedOpCapChangeRequest, next: 'already-requested' }, 'is-update-needed'],
+    next: [{ fn: (_req, res) => !!res.locals.signedOpCapChangeRequest, next: 'already-requested' }, 'is-update-needed'],
   },
   '/already-requested': {
     pageTitle: 'A change to the signed operational capacity has already been requested',

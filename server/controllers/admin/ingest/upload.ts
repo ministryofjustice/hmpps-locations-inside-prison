@@ -7,7 +7,7 @@ import FormInitialStep from '../../base/formInitialStep'
 import { BulkCapacityUpdate, CapacitySummary } from '../../../data/types/locationsApi/bulkCapacityChanges'
 
 export default class IngestUpload extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals.prisonConfiguration
 

@@ -1,7 +1,8 @@
+import FormWizard from 'hmpo-form-wizard'
 import ChangeCellCapacity from '../../controllers/changeCellCapacity'
 import ConfirmCellCapacity from '../../controllers/changeCellCapacity/confirm'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
