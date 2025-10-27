@@ -12,7 +12,7 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
     this.use(getPrisonResidentialSummary)
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const convertedCellType = req.sessionModel.get('convertedCellType') as { text: string; value: string }
     let convertedCellTypeDetails = convertedCellType?.text
     const otherConvertedCellType = req.sessionModel.get('otherConvertedCellType') as string

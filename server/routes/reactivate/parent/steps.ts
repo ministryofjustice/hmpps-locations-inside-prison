@@ -8,7 +8,7 @@ const isSelect = (req: FormWizard.Request) => {
   return !!req.query.select
 }
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,

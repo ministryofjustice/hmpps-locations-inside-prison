@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import SetCellType from '../../controllers/setCellType'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,

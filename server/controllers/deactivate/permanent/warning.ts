@@ -10,7 +10,7 @@ export default class DeactivatePermanentWarning extends FormInitialStep {
     this.use(protectRoute('deactivate:permanent'))
   }
 
-  override locals(_req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(_req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 

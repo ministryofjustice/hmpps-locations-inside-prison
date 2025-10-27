@@ -6,7 +6,7 @@ import FormInitialStep from '../../base/formInitialStep'
 import { StatusType } from '../../../data/types/locationsApi'
 
 export default class SegInRollCountStatusChangeConfirm extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonConfiguration } = res.locals
     const { prisonId } = prisonConfiguration
