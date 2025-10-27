@@ -88,7 +88,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     return next()
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals
 

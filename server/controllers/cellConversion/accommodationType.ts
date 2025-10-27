@@ -19,7 +19,7 @@ export default class CellConversionAccommodationType extends FormInitialStep {
     next()
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { sessionModel } = req
 
     if (req.isEditing) {

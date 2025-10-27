@@ -4,7 +4,7 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class NonResidentialConversionOccupied extends FormWizard.Controller {
-  override locals(_req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(_req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
 

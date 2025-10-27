@@ -68,7 +68,7 @@ export default class CellConversionConfirm extends FormInitialStep {
     }
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { sessionModel } = req
     const {
       accommodationType,

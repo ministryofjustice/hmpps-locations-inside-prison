@@ -84,7 +84,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
     await super._locals(req, res, next)
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonId, locationId, values } = res.locals
     const { locationType, structureLevels } = values

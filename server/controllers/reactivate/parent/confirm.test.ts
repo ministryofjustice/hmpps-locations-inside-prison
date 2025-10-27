@@ -104,7 +104,7 @@ describe('ReactivateParentConfirm', () => {
         cancelLink: `/inactive-cells/${sessionModelValues.referrerPrisonId}/${sessionModelValues.referrerLocationId}`,
         cancelText: 'Cancel',
         changeSummary: `The establishment’s total working capacity will increase from 20 to 22.`,
-        title: 'You are about to reactivate 1 cells',
+        title: 'You are about to reactivate 1 cell',
       })
     })
   })

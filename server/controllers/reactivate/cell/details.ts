@@ -47,7 +47,7 @@ export default class ReactivateCellDetails extends FormInitialStep {
     })
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedLocation, referrerRootUrl } = res.locals
     const { id: locationId } = decoratedLocation
