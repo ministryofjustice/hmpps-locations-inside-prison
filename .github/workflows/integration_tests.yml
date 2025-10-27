@@ -63,7 +63,7 @@ jobs:
           node-version-file: ${{ inputs.node_version_file }}
 
       - name: download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: npm_build_artifacts
 
@@ -92,7 +92,7 @@ jobs:
           sleep 5
 
       - name: Run split Cypress tests 🧪
-        uses: cypress-io/github-action@v6.10.2
+        uses: cypress-io/github-action@v6.10.3
         with:
           browser: chrome
         env:
@@ -102,7 +102,7 @@ jobs:
           SPLIT_FILE: 'timings.json'
 
       - name: Upload any screenshots due to failure
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: Upload screenshots
@@ -118,7 +118,7 @@ jobs:
 
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: npm_integration_test_artifacts
           path: |
