@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../base/formInitialStep'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
+import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateParentSelect extends FormInitialStep {
   override middlewareSetup() {
@@ -34,7 +35,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response) {
-    const { decoratedLocation } = res.locals
+    const { decoratedLocation, locationResidentialSummary } = res.locals
     const backLink = `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
 
     const { form } = req
@@ -52,6 +53,10 @@ export default class ReactivateParentSelect extends FormInitialStep {
       ...super.locals(req, res),
       backLink,
       cancelLink: backLink,
+      cancelText: 'Cancel',
+      title: `Activate individual ${locationResidentialSummary.subLocationName.toLowerCase()}`,
+      titleCaption: capFirst(decoratedLocation.displayName),
+      minLayout: 'one-half',
     }
   }
 

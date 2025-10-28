@@ -7,7 +7,7 @@ import { StatusType } from '../../../data/types/locationsApi'
 import { ServiceCode } from '../../../data/types/locationsApi/serviceCode'
 
 export default class ResiStatusChangeConfirm extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonConfiguration } = res.locals
     const { prisonId } = prisonConfiguration
@@ -20,6 +20,9 @@ export default class ResiStatusChangeConfirm extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: backLink,
+      title: 'Update residential location status',
+      buttonText: `${prisonConfiguration.resiLocationServiceActive === 'INACTIVE' ? 'Activate' : 'Inactivate'} residential location`,
+      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

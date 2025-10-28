@@ -85,6 +85,7 @@ describe('RemoveLocalName', () => {
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        buttonText: 'Remove name',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           localName: {
@@ -113,8 +114,8 @@ describe('RemoveLocalName', () => {
             value: null,
           },
         },
-        localName: 'Wing A',
-        pageTitleText: 'Are you sure you want to remove the local name?',
+        title: 'Are you sure you want to remove the local name?',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })

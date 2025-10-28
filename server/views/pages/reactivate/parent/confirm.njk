@@ -1,93 +1,30 @@
-{% extends "../../../partials/layout.njk" %}
+{% extends "../../../partials/formStep.njk" %}
 
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% set title = "You are about to reactivate " + (cells | length) + " cells" %}
-
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    {{ govukBackLink({
-      text: "Back",
-      href: backLink
-    }) }}
-
-    {% if errorlist.length %}
-      {{ govukErrorSummary({
-        titleText: "There is a problem",
-        errorList: errorlist
+{% block fields %}
+  <div class="govuk-!-padding-bottom-2 change-summary">
+    <h2 class="govuk-heading-m">Change to establishment capacity</h2>
+    {% set topLevelLocationNames = [] %}
+    {% for topLevelLocationData in locationTree %}
+      {% if not topLevelLocationData.location.leafLevel %}
+        {% set topLevelLocationNames = (topLevelLocationNames.push(topLevelLocationData.location.localName or topLevelLocationData.location.pathHierarchy), topLevelLocationNames) %}
+      {% endif %}
+    {% endfor %}
+    {% if topLevelLocationNames | length %}
+      {{ govukWarningText({
+        text: "Every cell in " + (topLevelLocationNames | nonOxfordJoin) + " will be activated.",
+        iconFallbackText: "Warning"
       }) }}
     {% endif %}
-  </div>
 
-{% endblock %}
+    <p data-qa="change-summary">{{ changeSummary | safe }}</p>
 
-{% block content %}
-
-  {% set formMethod = options.method | default('post') %}
-  {% set formAction = options.action | default('') %}
-  {% set formEnctype = options.enctype | default('') %}
-
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-!-padding-bottom-2 change-summary">
-          <h2 class="govuk-heading-m">Change to establishment capacity</h2>
-          {% set topLevelLocationNames = [] %}
-          {% for topLevelLocationData in locationTree %}
-            {% if not topLevelLocationData.location.leafLevel %}
-              {% set topLevelLocationNames = (topLevelLocationNames.push(topLevelLocationData.location.localName or topLevelLocationData.location.pathHierarchy), topLevelLocationNames) %}
-            {% endif %}
-          {% endfor %}
-          {% if topLevelLocationNames | length %}
-            {{ govukWarningText({
-              text: "Every cell in " + (topLevelLocationNames | nonOxfordJoin) + " will be activated.",
-              iconFallbackText: "Warning"
-            }) }}
-          {% endif %}
-
-          <p data-qa="change-summary">{{ changeSummary | safe }}</p>
-
-          {% for parentLocation in inactiveParentLocations | sort(attribute='pathHierarchy') %}
-            <p data-qa="inactive-parent-{{ parentLocation.id }}">
-              The status of {{ parentLocation.displayName }} will change to active because it will contain active
-              locations.
-            </p>
-          {% endfor %}
-        </div>
-
-        <form method="{{ formMethod }}" action="{{ formAction }}"
-            {% if formEnctype %}
-              enctype="{{ formEnctype }}"
-            {% endif %}
-        >
-
-          {% if formMethod == 'post' %}
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% endif %}
-
-          <div class="govuk-button-group">
-            {% block formActions %}
-              {% block submitAction %}
-                {{ govukButton({
-                  text: "Confirm activation",
-                  classes: options.buttonClasses,
-                  preventDoubleClick: true,
-                  type: "submit"
-                }) }}
-              {% endblock %}
-            {% endblock %}
-          </div>
-        </form>
-
-        <p class="govuk-body">
-          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel
-          </a>
-        </p>
-      </div>
-    </div>
-  </div>
+    {% for parentLocation in inactiveParentLocations | sort(attribute='pathHierarchy') %}
+      <p data-qa="inactive-parent-{{ parentLocation.id }}">
+        The status of {{ parentLocation.displayName }} will change to active because it will contain active
+        locations.
+      </p>
+    {% endfor %}
+</div>
 {% endblock %}

@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import Details from '../../controllers/changeLocalName/details'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
@@ -11,6 +12,7 @@ const steps = {
   '/details': {
     fields: ['localName'],
     controller: Details,
+    template: '../../partials/formStep',
   },
 }
 

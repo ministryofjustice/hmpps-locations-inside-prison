@@ -6,7 +6,7 @@ import FormInitialStep from '../../base/formInitialStep'
 import { StatusType } from '../../../data/types/locationsApi'
 
 export default class CertApprovalStatusChangeConfirm extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonConfiguration } = res.locals
     const { prisonId } = prisonConfiguration
@@ -19,6 +19,9 @@ export default class CertApprovalStatusChangeConfirm extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: backLink,
+      title: 'Update certification approval status',
+      buttonText: `${prisonConfiguration.certificationApprovalRequired === 'INACTIVE' ? 'Activate' : 'Inactivate'} certification approval`,
+      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

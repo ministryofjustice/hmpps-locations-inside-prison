@@ -112,8 +112,9 @@ describe('ReviewCellCapacity', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        cancelLink: '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields,
+        title: 'Review cell capacity',
+        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#workingCapacity',

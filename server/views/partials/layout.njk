@@ -1,15 +1,17 @@
 {% extends "govuk/template.njk" %}
 
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% from "../macros/breadcrumb.njk" import breadcrumb %}
 {% from "../macros/feedbackBanner.njk" import feedbackBanner %}
 
-{% set pageTitle = title if title === applicationName else title + ' - ' + applicationName %}
 {% set mainClasses = "app-container govuk-body" %}
+{% set minLayout = minLayout or 'two-thirds' %}
+{% set pageTitle = title if title === applicationName else title + ' - ' + applicationName %}
+{% block pageTitle %}{{ pageTitle | default(applicationName) }}{% endblock %}
 
 {% block head %}
-
   {% block pageStylesheets %}
     <link href="{{ '/assets/css/index.css' | assetMap }}" rel="stylesheet"/>
   {% endblock %}
@@ -64,8 +66,6 @@
     {% endfor %}
   {% endif %}
 {% endblock %}
-
-{% block pageTitle %}{{ pageTitle | default(applicationName) }}{% endblock %}
 
 {% block header %}
   {% if feComponents.header %}
@@ -124,17 +124,65 @@
 
   {% block beforeContent %}
     <div class="govuk-width-container">
-      {{ breadcrumb('', breadcrumbs, false) }}
+      <div class="govuk-grid-row govuk-!-margin-bottom-0">
+        <div class="govuk-grid-column-{{ minLayout }}">
+          {% if backLink %}
+            {{ govukBackLink({
+              text: backLinkText or "Back",
+              href: backLink
+            }) }}
+          {% else %}
+            {{ breadcrumb('', breadcrumbs, false) }}
+          {% endif %}
+
+          {% if errorlist.length %}
+            {{ govukErrorSummary({
+              titleText: "There is a problem",
+              errorList: validationErrors,
+              classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+            }) }}
+          {% endif %}
+        </div>
+      </div>
     </div>
+
+    {% if banner.success %}
+      {% set html %}
+        <h3 class="govuk-notification-banner__heading">
+          {{ banner.success.title }}
+        </h3>
+        <p class="govuk-body">
+          {{ banner.success.content }}
+        </p>
+      {% endset %}
+
+      <div class="govuk-width-container">
+        <div class="govuk-grid-row govuk-!-margin-bottom-0">
+          <div class="govuk-grid-column-{{ minLayout }}">
+            {{ govukNotificationBanner({
+              html: html,
+              type: "success",
+              classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+            }) }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
   {% endblock %}
 
   <main class="govuk-main-wrapper" id="main-content" role="main">
     <div class="govuk-width-container">
-      {% block heading %}
-        {% if titleCaption %}
-          <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
-        {% endif %}
-        <h1 class="govuk-heading-l">{{ title }}</h1>
+      {% block outerHeading %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-{{ minLayout }}">
+            {% block heading %}
+              {% if titleCaption %}
+                <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
+              {% endif %}
+              <h1 class="govuk-heading-l">{{ title }}</h1>
+            {% endblock %}
+          </div>
+        </div>
       {% endblock %}
     </div>
 

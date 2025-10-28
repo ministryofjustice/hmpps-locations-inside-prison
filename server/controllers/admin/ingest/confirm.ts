@@ -12,7 +12,7 @@ import {
 import LocationsService from '../../../services/locationsService'
 
 export default class IngestConfirm extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals.prisonConfiguration
 
@@ -29,6 +29,9 @@ export default class IngestConfirm extends FormInitialStep {
       cancelLink: backLink,
       capacityData,
       capacitySummary,
+      title: 'Confirm cell certification ingest',
+      buttonText: 'Confirm ingestion',
+      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

@@ -88,6 +88,7 @@ declare module 'hmpo-form-wizard' {
       name?: string
       hint?: Hint
       checked?: boolean
+      autocomplete?: string
     }
     export type Errors = Record<string, FormWizard.Controller.Error>
     export type Values = Record<string, string | string[] | number | boolean>
@@ -171,7 +172,7 @@ declare module 'hmpo-form-wizard' {
 
       _locals(req: Request, res: Express.Response, next: Express.NextFunction): Promise<void>
 
-      locals(req: Request, res: Express.Response, next: Express.NextFunction): Partial<TypedLocals>
+      locals(req: Request, res: Express.Response, next: Express.NextFunction): TypedLocals
 
       _getValues(req: Request, res: Express.Response, next: (err: Error, values?: FormWizard.Values) => void): Promise
 
@@ -367,6 +368,9 @@ declare module 'hmpo-form-wizard' {
     }
 
     interface Step {
+      buttonClasses?: string
+      method?: string
+      enctype?: string
       pageTitle?: string
       reset?: boolean
       skip?: boolean

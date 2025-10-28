@@ -84,7 +84,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
     await super._locals(req, res, next)
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonId, locationId, values } = res.locals
     const { locationType, structureLevels } = values
@@ -113,6 +113,12 @@ export default class ConfirmCreateLocation extends FormInitialStep {
       const newLocationCode = req.sessionModel.get<string>(`locationCode`)
       locals.locationPathPrefix = [pathHierarchy, newLocationCode].filter(s => s).join('-')
     }
+
+    locals.title = `Check and confirm the ${
+      values.createCellsNow === 'YES' ? 'location' : locationType.toLowerCase()
+    } details`
+    locals.titleCaption = `Create new ${values.createCellsNow === 'YES' ? 'locations' : locationType.toLowerCase()}`
+    locals.buttonText = `Create ${values.createCellsNow === 'YES' ? 'locations' : locationType.toLowerCase()}`
 
     return locals
   }

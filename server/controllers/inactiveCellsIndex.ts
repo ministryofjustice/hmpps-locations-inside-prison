@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import capFirst from '../formatters/capFirst'
 
 export default async (req: Request, res: Response) => {
   const banner: {
@@ -13,7 +14,11 @@ export default async (req: Request, res: Response) => {
     ;[banner.success] = success
   }
 
+  const displayName = res.locals.decoratedResidentialSummary?.location?.displayName
+
   return res.render('pages/inactiveCells/index', {
     banner,
+    title: 'Inactive cells',
+    titleCaption: displayName ? capFirst(displayName) : undefined,
   })
 }

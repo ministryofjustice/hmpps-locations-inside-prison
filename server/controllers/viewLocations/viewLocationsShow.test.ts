@@ -48,6 +48,7 @@ describe('view locations show', () => {
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
+      minLayout: 'three-quarters',
       title: 'Manage locations',
     })
   })
@@ -65,6 +66,7 @@ describe('view locations show', () => {
       banner: {
         success,
       },
+      minLayout: 'three-quarters',
       title: 'Manage locations',
     })
   })
@@ -245,6 +247,7 @@ describe('view locations show', () => {
       ])
       expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
         banner: undefined,
+        minLayout: 'three-quarters',
         title: 'Manage locations',
       })
     })
@@ -260,6 +263,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -280,6 +284,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -300,6 +305,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -320,6 +326,7 @@ describe('view locations show', () => {
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
+          minLayout: 'three-quarters',
           title: 'Manage locations',
         })
       })
@@ -345,6 +352,7 @@ describe('view locations show', () => {
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
               banner: undefined,
               createButton: undefined,
+              minLayout: 'three-quarters',
               title: 'Manage locations',
             })
           })
@@ -365,6 +373,7 @@ describe('view locations show', () => {
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
+            minLayout: 'three-quarters',
             title: 'Manage locations',
           })
         })
@@ -378,6 +387,7 @@ describe('view locations show', () => {
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
+            minLayout: 'three-quarters',
             title: 'Manage locations',
           })
         })
@@ -386,27 +396,33 @@ describe('view locations show', () => {
       describe('when req.featureFlags.createAndCertify is true', () => {
         beforeEach(() => {
           deepReq.featureFlags.createAndCertify = true
+          deepReq.canAccess = (permission: string) => permission === 'create_location'
         })
 
-        describe('when canAccess("create_location") is false', () => {
-          it('renders the page without the create button', () => {
+        describe('when location has a pending approval request', () => {
+          beforeEach(() => {
+            deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId = 'REQUEST-ID-0000-1000-8'
+          })
+
+          it('does not render the create button', () => {
             controller(deepReq as Request, deepRes as Response)
 
             expect(deepRes.locals.actions).toEqual(undefined)
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
               banner: undefined,
               createButton: undefined,
+              minLayout: 'three-quarters',
               title: 'Manage locations',
             })
           })
         })
 
-        describe('when canAccess("create_location") is true', () => {
+        describe('when location does not have a pending approval request', () => {
           beforeEach(() => {
-            deepReq.canAccess = (permission: string) => permission === 'create_location'
+            delete deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId
           })
 
-          it('renders the page with the create button', () => {
+          it('renders the create button', () => {
             controller(deepReq as Request, deepRes as Response)
 
             expect(deepRes.locals.actions).toEqual(undefined)
@@ -420,6 +436,7 @@ describe('view locations show', () => {
                 href: '/create-new/7e570000-0000-0000-0000-000000000001',
                 text: 'Create new landing',
               },
+              minLayout: 'three-quarters',
               title: 'Manage locations',
             })
           })

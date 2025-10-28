@@ -71,7 +71,10 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
     return {
       backLink,
       cancelLink,
+      cancelText: 'Cancel',
       changeSummary,
+      title: `You are about to reactivate ${cells.length} cell${cells.length > 1 ? 's' : ''}`,
+      buttonText: 'Confirm activation',
     }
   }
 

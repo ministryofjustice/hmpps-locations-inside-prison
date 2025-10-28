@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import SegInRollCountStatusChangeConfirm from '../../../controllers/admin/segInRollCount/confirm'
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,

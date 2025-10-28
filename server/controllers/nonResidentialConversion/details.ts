@@ -2,6 +2,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class NonResidentialConversionDetails extends FormInitialStep {
   override middlewareSetup() {
@@ -21,7 +22,7 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     next()
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
 
     const { decoratedLocation } = res.locals
@@ -30,6 +31,8 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     return {
       ...locals,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      title: 'Convert to non-residential room',
+      titleCaption: capFirst(decoratedLocation.displayName),
     }
   }
 

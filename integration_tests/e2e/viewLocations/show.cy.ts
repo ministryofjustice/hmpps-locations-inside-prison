@@ -91,12 +91,15 @@ context('View Locations Show', () => {
       viewLocationsShowPage
         .certifiedTag()
         .should(`${location.leafLevel && location.certification.certified ? '' : 'not.'}exist`)
-      viewLocationsShowPage.statusTag().contains(
-        location.status
-          .replace(/_/, '-')
-          .toLowerCase()
-          .replace(/^\w/, a => a.toUpperCase()),
-      )
+      const statusTag =
+        location.status === 'DRAFT' || location.status === 'LOCKED_DRAFT'
+          ? 'Draft'
+          : location.status
+              .replace(/_/, '-')
+              .toLowerCase()
+              .replace(/^\w/, a => a.toUpperCase())
+
+      viewLocationsShowPage.statusTag().contains(statusTag)
 
       validateBreadcrumbs(viewLocationsShowPage, locationHierarchy)
 
@@ -133,6 +136,14 @@ context('View Locations Show', () => {
         viewLocationsShowPage.draftBanner().should('exist')
 
         viewLocationsShowPage.draftBannerCertifyButton().should('not.exist')
+      } else if (location.status === 'LOCKED_DRAFT') {
+        viewLocationsShowPage.draftBanner().should('exist')
+
+        viewLocationsShowPage
+          .draftBannerCertifyLinkButton()
+          .should('exist')
+          .should('have.attr', 'href', `/TST/cell-certificate/change-requests/${location.pendingApprovalRequestId}`)
+          .contains('View request details')
       } else {
         viewLocationsShowPage.draftBanner().should('not.exist')
       }
@@ -428,6 +439,25 @@ context('View Locations Show', () => {
           it('Correctly presents the API data', () => {
             testShow({ location, locationHierarchy })
           })
+        })
+      })
+
+      context('When the location is Locked Draft', () => {
+        beforeEach(() => {
+          location = LocationFactory.build({
+            ...locationDetails,
+            status: 'LOCKED_DRAFT',
+            pendingApprovalRequestId: 'REQUEST-ID-0000-1000',
+          })
+
+          cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+            parentLocation: location,
+            locationHierarchy,
+          })
+        })
+
+        it('Correctly presents the API data', () => {
+          testShow({ location, locationHierarchy })
         })
       })
     })
@@ -728,4 +758,5 @@ context('View Locations Show', () => {
       })
     })
   })
+  //   TODO: Add tests for different roles (buttons/banners displayed) and for when locations are locked (draft requested) / unlocked
 })

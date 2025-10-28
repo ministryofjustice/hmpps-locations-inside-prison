@@ -8,7 +8,7 @@ const isSelect = (req: FormWizard.Request) => {
   return !!req.query.select
 }
 
-const steps = {
+const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
@@ -20,11 +20,11 @@ const steps = {
     controller: ReactivateParentSelect,
     fields: ['selectLocations'],
     next: 'check-capacity',
+    template: '../../../partials/formStep',
   },
   '/check-capacity': {
     controller: ReactivateParentCheckCapacity,
     next: 'confirm',
-    template: 'checkCapacity',
   },
   '/change-capacity/:cellId': {
     checkJourney: false,

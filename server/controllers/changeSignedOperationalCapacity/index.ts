@@ -88,7 +88,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     return next()
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { prisonId } = res.locals
 
@@ -100,6 +100,11 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: backLink,
+      title: 'Change signed operational capacity',
+      insetText:
+        'Signed operational capacity is the number of people the prison governor has approved that the establishment can currently safely hold.',
+      buttonText: 'Update signed operational capacity',
+      cancelText: 'Cancel',
     }
   }
 

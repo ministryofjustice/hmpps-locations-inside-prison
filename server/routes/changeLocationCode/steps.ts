@@ -14,6 +14,7 @@ const steps: FormWizard.Steps = {
   '/details': {
     fields: ['locationCode'],
     controller: Details,
+    template: '../../partials/formStep',
   },
 }
 

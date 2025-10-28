@@ -1,114 +1,33 @@
-{% extends "../../../partials/layout.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% extends "../../../partials/formStep.njk" %}
+
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
-{% set title = "Change residential location status" %}
-
-{% block heading %}
-  <h1 class="govuk-heading-l">Update certification approval status</h1>
-{% endblock %}
-
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
-        {{ govukBackLink({
-          text: "Back",
-          href: backLink
-        }) }}
-
-        {% if errorlist.length %}
-          {{ govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: validationErrors,
-            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
-          }) }}
-        {% endif %}
-      </div>
-    </div>
-  </div>
-{% endblock %}
-
 {% set certApprovalHtml %}
   <span class="hmpps-inactive-location-banner">
-      {{ govukSummaryList({rows:[
-        {
-          key: {
-            text: 'Prison'
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: { text: 'Prison' },
+            value: { text: prisonConfiguration.prisonId }
           },
-          value: {
-            text: prisonConfiguration.prisonId
+          {
+            key: { text: 'Certification approval required' },
+            value: { text: prisonConfiguration.certificationApprovalRequired }
           }
-        },
-        {
-          key: {
-            text: 'Certification approval required'
-          },
-          value: {
-            text: prisonConfiguration.certificationApprovalRequired
-          }
-        }
-      ],
-        classes: 'hmpps-inactive-location-banner-summary-list' }) }}
+        ],
+        classes: 'hmpps-inactive-location-banner-summary-list'
+      }) }}
   </span>
 {% endset %}
 
-{% block content %}
-  {% set formMethod = options.method | default('post') %}
-  {% set formAction = options.action | default('') %}
+{% block fields %}
+  {{ govukNotificationBanner({
+    html: certApprovalHtml,
+    classes: 'govuk-notification-banner__headerless'
+  }) }}
 
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
-        <form method="{{ formMethod }}" action="{{ formAction }}">
-          {% if formMethod == 'post' %}
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% endif %}
+  <input type="hidden" name="activation" value="{{ 'IN' if prisonConfiguration.certificationApprovalRequired == 'ACTIVE' }}ACTIVE">
 
-          {{ govukNotificationBanner({
-            html: certApprovalHtml,
-            classes: 'govuk-notification-banner__headerless',
-            attributes: {
-              'data-qa': 'inactive-location-banner'
-            }
-          }) }}
-
-          <div class="govuk-button-group">
-            {% block formActions %}
-              {% block submitAction %}
-                {% if prisonConfiguration.certificationApprovalRequired == 'INACTIVE' %}
-                  <input type="hidden" name="activation" value="{{ 'ACTIVE' }}">
-                  {{ govukButton({
-                    text: "Activate certification approval",
-                    classes: options.buttonClasses,
-                    preventDoubleClick: true,
-                    type: "submit"
-                  }) }}
-                {% else %}
-                  <input type="hidden" name="activation" value="{{ 'INACTIVE' }}">
-                  {{ govukButton({
-                    text: "Inactivate certification approval",
-                    classes: options.buttonClasses,
-                    preventDoubleClick: true,
-                    type: "submit"
-                  }) }}
-                {% endif %}
-
-              {% endblock %}
-            {% endblock %}
-          </div>
-        </form>
-
-        <p class="govuk-body">
-          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel and return to prison configuration details
-          </a>
-        </p>
-      </div>
-    </div>
-  </div>
+  {{ super() }}
 {% endblock %}

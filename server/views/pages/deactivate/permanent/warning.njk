@@ -8,71 +8,58 @@
 {% block heading %}
 {% endblock %}
 
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
-        {{ govukBackLink({
-          text: "Back",
-          href: backLink
-        }) }}
-      </div>
+{% set formMethod = options.method | default('post') %}
+{% set formAction = options.action | default('') %}
+{% set formEnctype = options.enctype | default('') %}
+
+{% set panelTitle %}
+  <div class="govuk-grid-row govuk-!-margin-bottom-8">
+    <div class="govuk-grid-column-three-quarters">
+      <h1 class="govuk-panel__title">
+        You are about to permanently deactivate this location. This needs to be authorised by a governor.
+      </h1>
     </div>
   </div>
-{% endblock %}
+{% endset %}
+
+{% set panelBody %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <p class="govuk-body govuk-body-l govuk-!-margin-bottom-8">
+        You cannot restore permanently deactivated locations.
+      </p>
+
+      <form method="{{ formMethod }}" action="{{ formAction }}"
+        {% if formEnctype %}
+          enctype="{{ formEnctype }}"
+        {% endif %}
+      >
+
+        {% if formMethod == 'post' %}
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {% endif %}
+
+        <div class="govuk-button-group govuk-!-margin-bottom-4">
+          {{ govukButton({
+            text: "Continue with permanent deactivation",
+            preventDoubleClick: true,
+            type: "submit",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+      </form>
+
+      <p class="govuk-body govuk-!-margin-bottom-0">
+        <a href="{{ cancelLink }}" class="govuk-link govuk-link--inverse">
+          Cancel and return to location details
+        </a>
+      </p>
+    </div>
+  </div>
+{% endset %}
 
 {% block content %}
-  {% set formMethod = options.method | default('post') %}
-  {% set formAction = options.action | default('') %}
-  {% set formEnctype = options.enctype | default('') %}
-
   <div class="govuk-width-container">
-    {% set panelTitle %}
-      <div class="govuk-grid-row govuk-!-margin-bottom-8">
-        <div class="govuk-grid-column-three-quarters">
-          <h1 class="govuk-panel__title">
-            You are about to permanently deactivate this location. This needs to be authorised by a governor.
-          </h1>
-        </div>
-      </div>
-    {% endset %}
-
-    {% set panelBody %}
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
-          <p class="govuk-body govuk-body-l govuk-!-margin-bottom-8">
-            You cannot restore permanently deactivated locations.
-          </p>
-
-          <form method="{{ formMethod }}" action="{{ formAction }}"
-          {% if formEnctype %}
-            enctype="{{ formEnctype }}"
-          {% endif %}
-          >
-
-            {% if formMethod == 'post' %}
-              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-            {% endif %}
-
-            <div class="govuk-button-group govuk-!-margin-bottom-4">
-              {{ govukButton({
-                text: "Continue with permanent deactivation",
-                preventDoubleClick: true,
-                type: "submit",
-                classes: "govuk-button--secondary"
-              }) }}
-            </div>
-          </form>
-
-          <p class="govuk-body govuk-!-margin-bottom-0">
-            <a href="{{ cancelLink }}" class="govuk-link govuk-link--inverse">
-              Cancel and return to location details
-            </a>
-          </p>
-        </div>
-      </div>
-    {% endset %}
-
     {{ govukPanel({
       titleHtml: panelTitle,
       html: panelBody,

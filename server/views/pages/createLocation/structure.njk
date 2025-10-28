@@ -1,185 +1,119 @@
-{% extends "../../partials/layout.njk" %}
+{% extends "../../partials/formStep.njk" %}
 
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
-{% set title = "Set " + locationType | lower + " structure" %}
+{% block fields %}
+  <p class="govuk-body">
+    The wing will be set up with these levels. You can change them if this wing is built differently.
+  </p>
+  <p class="govuk-body">
+    You will add locations to each level later.
+  </p>
 
-{% block beforeContent %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row govuk-!-margin-bottom-0">
-      <div class="govuk-grid-column-two-thirds">
-        {{ govukBackLink({
-          text: "Back",
-          href: backLink
-        }) }}
-        {% if errorlist.length %}
-          {{ govukErrorSummary({
-            titleText: "There is a problem",
-            errorList: validationErrors,
-            classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
-          }) }}
-        {% endif %}
-      </div>
-    </div>
-  </div>
-{% endblock %}
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Level 1 type</h2>
+  <p class="govuk-body">{{ locationType | lower | capFirst }}</p>
 
-{% block heading %}
-  <div class="govuk-grid-row govuk-!-margin-bottom-0">
-    <div class="govuk-grid-column-two-thirds">
-      <span class="govuk-caption-m" data-qa="cell-name">
-        Create new {{ locationType | lower }}
-      </span>
-      <h1 class="govuk-heading-l">
-        Set {{ locationType | lower }} structure
-      </h1>
-    </div>
-  </div>
-{% endblock %}
-
-{% block content %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-
-        <form method="post" action="{{ options.action }}">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-
-          <p class="govuk-body">
-            The wing will be set up with these levels. You can change them if this wing is built differently.
-          </p>
-          <p class="govuk-body">
-            You will add locations to each level later.
-          </p>
-
-          <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Level 1 type</h2>
-          <p class="govuk-body">{{ locationType | lower | capFirst }}</p>
-
-          <div id="levelType" class="{% if errors.levelType %}govuk-form-group--error{% endif %}">
-            {% if errors.levelType %}
-              <span class="govuk-error-message">
+  <div id="levelType" class="{% if errors.levelType %}govuk-form-group--error{% endif %}">
+    {% if errors.levelType %}
+      <span class="govuk-error-message">
                 {{ validationErrors[0].text }}
               </span>
-            {% endif %}
+    {% endif %}
 
-            <div class="level-wrapper" id="level-2-wrapper">
-              <div class="level-header">
-                <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Level 2 type</h2>
-              </div>
-              {{ govukSelect({
-                id: "level-2",
-                name: "level-2",
-                label: {
-                  text: "Level 2 type",
-                  classes: "govuk-visually-hidden",
-                  for: "level-2"
-                },
-                value: level2,
-                items: [
-                  { value: "Spurs", text: "Spurs" },
-                  { value: "Landings", text: "Landings" },
-                  { value: "Cells", text: "Cells" }
-                ]
-              }) }}
-            </div>
-
-            <div class="level-wrapper{% if not level3 %} hidden{% endif %}" id="level-3-wrapper">
-              <div class="level-header">
-                <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Level 3 type</h2>
-                <p class="govuk-body govuk-!-margin-bottom-2">
-                  <a href="#" class="govuk-link remove-level">Remove level</a>
-                </p>
-              </div>
-              {{ govukSelect({
-                id: "level-3",
-                name: "level-3",
-                value: level3,
-                label: {
-                  text: "Level 3 type",
-                  classes: "govuk-visually-hidden",
-                  for: "level-3"
-                },
-                items: [
-                  { value: "Spurs", text: "Spurs" },
-                  { value: "Landings", text: "Landings" },
-                  { value: "Cells", text: "Cells" }
-                ]
-              }) }}
-            </div>
-
-            <div class="level-wrapper{% if not level4 %} hidden{% endif %}" id="level-4-wrapper">
-              <div class="level-header">
-                <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Level 4 type</h2>
-                <p class="govuk-body govuk-!-margin-bottom-2">
-                  <a href="#" class="govuk-link remove-level">Remove level</a>
-                </p>
-              </div>
-              {{ govukSelect({
-                id: "level-4",
-                name: "level-4",
-                label: {
-                  text: "Level 4 type",
-                  classes: "govuk-visually-hidden",
-                  for: "level-4"
-                },
-                value: level4,
-                items: [
-                  { value: "Spurs", text: "Spurs" },
-                  { value: "Landings", text: "Landings" },
-                  { value: "Cells", text: "Cells" }
-                ]
-              }) }}
-            </div>
-          </div>
-
-          <button
-            type="button"
-            class="govuk-button govuk-button--secondary govuk-!-margin-bottom-7"
-            data-module="govuk-button"
-            id="addLevel"
-          >
-            Add level
-          </button>
-
-          <h3 class="govuk-heading-m">Structure preview</h3>
-
-          <div class="govuk-inset-text">
-            <div class="structurePreview" id="structurePreview">
-              <div class="structureLevel" id="level1"><p>{{ locationType | lower | capFirst }}</p></div>
-              <div class="structureLevel" id="level2"><p></p></div>
-              <div class="structureLevel" id="level3"><p></p></div>
-              <div class="structureLevel" id="level4"><p></p></div>
-
-              <div class="line-vertical" id="line-v1"></div>
-              <div class="line-horizontal" id="line-h1"></div>
-              <div class="line-vertical" id="line-v2"></div>
-              <div class="line-horizontal" id="line-h2"></div>
-              <div class="line-vertical" id="line-v3"></div>
-              <div class="line-horizontal" id="line-h3"></div>
-            </div>
-          </div>
-
-          <div class="govuk-button-group">
-            {{ govukButton({
-              text: "Continue",
-              classes: options.buttonClasses,
-              preventDoubleClick: true,
-              type: "submit"
-            }) }}
-          </div>
-        </form>
-
-        <p class="govuk-body">
-          <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">
-            Cancel and return to location details
-          </a>
-        </p>
-
+    <div class="level-wrapper" id="level-2-wrapper">
+      <div class="level-header">
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Level 2 type</h2>
       </div>
+      {{ govukSelect({
+        id: "level-2",
+        name: "level-2",
+        label: {
+          text: "Level 2 type",
+          classes: "govuk-visually-hidden",
+          for: "level-2"
+        },
+        value: level2,
+        items: [
+          { value: "Spurs", text: "Spurs" },
+          { value: "Landings", text: "Landings" },
+          { value: "Cells", text: "Cells" }
+        ]
+      }) }}
+    </div>
+
+    <div class="level-wrapper{{ ' hidden' if not level3 }}" id="level-3-wrapper">
+      <div class="level-header">
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Level 3 type</h2>
+        <p class="govuk-body govuk-!-margin-bottom-2">
+          <a href="#" class="govuk-link remove-level">Remove level</a>
+        </p>
+      </div>
+      {{ govukSelect({
+        id: "level-3",
+        name: "level-3",
+        value: level3,
+        label: {
+          text: "Level 3 type",
+          classes: "govuk-visually-hidden",
+          for: "level-3"
+        },
+        items: [
+          { value: "Spurs", text: "Spurs" },
+          { value: "Landings", text: "Landings" },
+          { value: "Cells", text: "Cells" }
+        ]
+      }) }}
+    </div>
+
+    <div class="level-wrapper{% if not level4 %} hidden{% endif %}" id="level-4-wrapper">
+      <div class="level-header">
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Level 4 type</h2>
+        <p class="govuk-body govuk-!-margin-bottom-2">
+          <a href="#" class="govuk-link remove-level">Remove level</a>
+        </p>
+      </div>
+      {{ govukSelect({
+        id: "level-4",
+        name: "level-4",
+        label: {
+          text: "Level 4 type",
+          classes: "govuk-visually-hidden",
+          for: "level-4"
+        },
+        value: level4,
+        items: [
+          { value: "Spurs", text: "Spurs" },
+          { value: "Landings", text: "Landings" },
+          { value: "Cells", text: "Cells" }
+        ]
+      }) }}
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="govuk-button govuk-button--secondary govuk-!-margin-bottom-7"
+    data-module="govuk-button"
+    id="addLevel"
+  >
+    Add level
+  </button>
+
+  <h3 class="govuk-heading-m">Structure preview</h3>
+
+  <div class="govuk-inset-text">
+    <div class="structurePreview" id="structurePreview">
+      <div class="structureLevel" id="level1"><p>{{ locationType | lower | capFirst }}</p></div>
+      <div class="structureLevel" id="level2"><p></p></div>
+      <div class="structureLevel" id="level3"><p></p></div>
+      <div class="structureLevel" id="level4"><p></p></div>
+
+      <div class="line-vertical" id="line-v1"></div>
+      <div class="line-horizontal" id="line-h1"></div>
+      <div class="line-vertical" id="line-v2"></div>
+      <div class="line-horizontal" id="line-h2"></div>
+      <div class="line-vertical" id="line-v3"></div>
+      <div class="line-horizontal" id="line-h3"></div>
     </div>
   </div>
 {% endblock %}

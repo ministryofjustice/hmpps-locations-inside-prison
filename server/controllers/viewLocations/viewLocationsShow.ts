@@ -6,11 +6,13 @@ import addAction from '../../middleware/addAction'
 export default async (req: Request, res: Response) => {
   const locals: TypedLocals = {
     title: 'Manage locations',
+    minLayout: 'three-quarters',
   }
 
   const { decoratedResidentialSummary: summary } = res.locals
   const { location } = summary
   const { active, isResidential, leafLevel } = location
+  const pendingApproval = location.pendingApprovalRequestId
 
   const success = req.flash('success')
   if (success?.length) {
@@ -18,8 +20,7 @@ export default async (req: Request, res: Response) => {
       success: success[0],
     }
   }
-
-  if (req.featureFlags.createAndCertify && req.canAccess('create_location')) {
+  if (!pendingApproval && req.featureFlags.createAndCertify && req.canAccess('create_location')) {
     if (!leafLevel && summary.subLocationName !== 'Cells') {
       const singularizedLocationType = singularizeString(summary.subLocationName).toLowerCase()
 

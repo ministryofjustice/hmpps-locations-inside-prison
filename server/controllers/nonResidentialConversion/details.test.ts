@@ -3,9 +3,9 @@ import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import NonResidentialConversionDetails from './details'
 import LocationsService from '../../services/locationsService'
-import LocationFactory from '../../testutils/factories/location'
 import fields from '../../routes/nonResidentialConversion/fields'
 import maxLength from '../../validators/maxLength'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 
 describe('NonResidentialConversionDetails', () => {
   const controller = new NonResidentialConversionDetails({ route: '/' })
@@ -44,7 +44,7 @@ describe('NonResidentialConversionDetails', () => {
     deepRes = {
       locals: {
         errorlist: [],
-        decoratedLocation: LocationFactory.build({
+        decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           localName: 'A-1-001',
           capacity: {
@@ -158,6 +158,8 @@ describe('NonResidentialConversionDetails', () => {
             value: 'pet therapy room',
           },
         },
+        title: 'Convert to non-residential room',
+        titleCaption: 'A-1-001',
         validationErrors: [],
       })
     })

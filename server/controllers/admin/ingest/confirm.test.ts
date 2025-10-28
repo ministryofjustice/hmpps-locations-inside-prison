@@ -62,7 +62,12 @@ describe('Ingest the cell cert data', () => {
       deepRes.locals.prisonConfiguration.prisonId = 'TST'
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         backLink: '/admin/TST',
+        buttonText: 'Confirm ingestion',
         cancelLink: '/admin/TST',
+        cancelText: 'Cancel and return to prison configuration details',
+        capacityData: undefined,
+        capacitySummary: undefined,
+        title: 'Confirm cell certification ingest',
       })
     })
   })

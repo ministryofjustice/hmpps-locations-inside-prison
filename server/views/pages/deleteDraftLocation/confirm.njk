@@ -2,15 +2,6 @@
 
 {% block heading %}
   {{ super() }}
+
   <p class="govuk-body">{{ bodyText }}</p>
 {% endblock %}
-
- {% block submitAction %}
-     {{ govukButton({
-       text: 'Delete ' + locationType,
-       classes: "govuk-button--warning",
-       preventDoubleClick: true,
-       type: "submit"
-     }) }}
- {% endblock %}
-

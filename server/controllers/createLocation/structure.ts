@@ -5,7 +5,7 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 
 export default class Structure extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { values } = req.form
 
@@ -30,6 +30,9 @@ export default class Structure extends FormInitialStep {
     }
 
     locals.level4 = values['level-4'] ? pluralize(String(values['level-4'])) : ''
+
+    locals.title = `Set ${locals.locationType.toLowerCase()} structure`
+    locals.titleCaption = `Create new ${locals.locationType.toLowerCase()}`
 
     return locals
   }

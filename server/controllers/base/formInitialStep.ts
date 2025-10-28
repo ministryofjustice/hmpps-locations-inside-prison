@@ -167,7 +167,7 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   override locals(_req: FormWizard.Request, res: Response) {
-    const locals: Partial<TypedLocals> = {}
+    const locals: TypedLocals = {}
     const { options, values } = res.locals
 
     if (options?.fields) {
@@ -222,6 +222,7 @@ export default class FormInitialStep extends FormWizard.Controller {
             id: `${field.id}-day`,
             name: `${field.id}-day`,
             value: day || '',
+            autocomplete: 'off',
           },
           {
             classes: `govuk-input--width-2 ${error && ['*', 'Month'].filter(s => errorFields.includes(s)).length ? 'govuk-input--error' : ''}`,
@@ -229,6 +230,7 @@ export default class FormInitialStep extends FormWizard.Controller {
             id: `${field.id}-month`,
             name: `${field.id}-month`,
             value: month || '',
+            autocomplete: 'off',
           },
           {
             classes: `govuk-input--width-4 ${error && ['*', 'Year'].filter(s => errorFields.includes(s)).length ? 'govuk-input--error' : ''}`,
@@ -236,6 +238,7 @@ export default class FormInitialStep extends FormWizard.Controller {
             id: `${field.id}-year`,
             name: `${field.id}-year`,
             value: year || '',
+            autocomplete: 'off',
           },
         ]
       })

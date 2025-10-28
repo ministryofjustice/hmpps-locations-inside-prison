@@ -4,6 +4,8 @@ import { compact } from 'lodash'
 import getCellCount from '../../../middleware/getCellCount'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 import protectRoute from '../../../middleware/protectRoute'
+import { TypedLocals } from '../../../@types/express'
+import capFirst from '../../../formatters/capFirst'
 
 export default class DeactivatePermanentConfirm extends FormWizard.Controller {
   override middlewareSetup() {
@@ -21,7 +23,7 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
     return `The establishment’s ${valName} will reduce from ${totalCap} to ${newTotalCap}.`
   }
 
-  override locals(req: FormWizard.Request, res: Response) {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
     const { maxCapacity: totalMaxCap, workingCapacity: totalWorkingCap } = prisonResidentialSummary.prisonSummary
@@ -37,12 +39,15 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
       ${changeSummaries.join('\n<br/><br/>\n')}
     `.replace(/^\s*|\s*$/gm, '')
 
-    const permanentDeactivationReason = req.sessionModel.get<string>('permanentDeactivationReason')
+    const deactivationReason = req.sessionModel.get<string>('permanentDeactivationReason')
 
     return {
       cancelLink: `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`,
       changeSummary,
-      permanentDeactivationReason,
+      deactivationReason,
+      title: 'You are permanently deactivating this location',
+      titleCaption: capFirst(decoratedLocation.displayName),
+      buttonText: 'Confirm deactivation',
     }
   }
 

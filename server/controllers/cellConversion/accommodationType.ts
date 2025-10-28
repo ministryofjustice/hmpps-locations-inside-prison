@@ -3,6 +3,7 @@ import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import setStepValidity from '../../lib/setStepValidity'
 import { TypedLocals } from '../../@types/express'
+import capFirst from '../../formatters/capFirst'
 
 export default class CellConversionAccommodationType extends FormInitialStep {
   override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
@@ -18,7 +19,7 @@ export default class CellConversionAccommodationType extends FormInitialStep {
     next()
   }
 
-  override locals(req: FormWizard.Request, res: Response): Partial<TypedLocals> {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { sessionModel } = req
 
     if (req.isEditing) {
@@ -58,7 +59,11 @@ export default class CellConversionAccommodationType extends FormInitialStep {
       }
     }
 
-    return super.locals(req, res)
+    return {
+      ...super.locals(req, res),
+      title: 'Convert to cell',
+      titleCaption: capFirst(res.locals.decoratedLocation.displayName),
+    }
   }
 
   override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {

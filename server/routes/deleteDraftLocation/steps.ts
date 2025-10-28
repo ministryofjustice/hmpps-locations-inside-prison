@@ -13,6 +13,7 @@ const steps: FormWizard.Steps = {
   },
   '/confirm': {
     controller: ConfirmDeleteDraftLocation,
+    buttonClasses: 'govuk-button--warning',
   },
 }
 
