@@ -46,7 +46,7 @@ generic-service:
         ctl:ruleRemoveById=949110, \
         nolog, \
         pass"
-      SecDefaultAction "phase:4,pass,log,tag:github_team=hmpps-incident-reporting"
+      SecDefaultAction "phase:4,pass,log,tag:github_team=move-a-prisoner"
       SecRuleUpdateActionById 959100 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
 
   livenessProbe:
