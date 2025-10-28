@@ -38,7 +38,7 @@ generic-service:
       SecRuleUpdateTargetById 920450 "!REQUEST_HEADERS_NAMES:/accept-charset/"
       SecRuleUpdateTargetById 933150 "!REQUEST_COOKIES:/jwtSession/"
       SecAction "id:900200,phase:1,nolog,pass,t:none,setvar:tx.allowed_methods=GET HEAD PATCH POST OPTIONS PUT DELETE"
-      SecDefaultAction "phase:2,pass,log,tag:github_team=hmpps-incident-reporting"
+      SecDefaultAction "phase:2,pass,log,tag:github_team=move-a-prisoner"
       SecRule REQUEST_METHOD "POST" \
         "id:10000, \
         phase:2, \
