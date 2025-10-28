@@ -6,6 +6,7 @@ generic-service:
 
   ingress:
     host: locations-inside-prison-dev.hmpps.service.justice.gov.uk
+    modsecurity_audit_enabled: true
     annotations:
       nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
