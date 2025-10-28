@@ -16,6 +16,38 @@ generic-service:
     enabled: true
     host: app-hostname.local # override per environment
     tlsSecretName: locations-inside-prison-cert
+    modsecurity_enabled: true  # enable OWASP core rules then handle false positives by removing or tweaking rules to not block specific args or cookies
+    modsecurity_audit_enabled: false
+    modsecurity_snippet: |
+      SecRuleEngine On
+      {{ if .Values.ingress.modsecurity_audit_enabled -}}
+      SecAuditEngine RelevantOnly
+      SecAuditLog /var/log/nginx/error.log
+      SecAuditLogType Serial
+      {{ end -}}
+      SecRuleRemoveById 920320
+      SecRuleRemoveById 920300
+      SecRuleRemoveById 920440
+      SecRuleRemoveById 942110
+      SecRuleRemoveById 913101
+      SecRuleUpdateTargetById 931130 "!ARGS:/redirect_uri/"
+      SecRuleUpdateTargetById 942440 "!REQUEST_COOKIES:/jwtSession/"
+      SecRuleUpdateTargetById 942450 "!REQUEST_COOKIES:/jwtSession/"
+      SecRuleUpdateTargetById 930120 "!REQUEST_COOKIES:/jwtSession/"
+      SecRuleUpdateTargetById 942210 "!REQUEST_COOKIES:/jwtSession/"
+      SecRuleUpdateTargetById 920450 "!REQUEST_HEADERS_NAMES:/accept-charset/"
+      SecRuleUpdateTargetById 933150 "!REQUEST_COOKIES:/jwtSession/"
+      SecAction "id:900200,phase:1,nolog,pass,t:none,setvar:tx.allowed_methods=GET HEAD PATCH POST OPTIONS PUT DELETE"
+      SecDefaultAction "phase:2,pass,log,tag:github_team=hmpps-incident-reporting"
+      SecRule REQUEST_METHOD "POST" \
+        "id:10000, \
+        phase:2, \
+        t:none, \
+        ctl:ruleRemoveById=949110, \
+        nolog, \
+        pass"
+      SecDefaultAction "phase:4,pass,log,tag:github_team=hmpps-incident-reporting"
+      SecRuleUpdateActionById 959100 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
 
   livenessProbe:
     httpGet:
