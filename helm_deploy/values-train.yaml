@@ -15,8 +15,7 @@ generic-service:
     COMMON_COMPONENTS_ENABLED: false
     COMPONENT_API_URL: "http://not-used"
     DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
-    SERVICE_LOCATIONS_LANDING_URL: "https://locations-inside-prison-dev.hmpps.service.justice.gov.uk"
-    SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-dev.hmpps.service.justice.gov.uk"
+    SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-preprod.hmpps.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-train.hmpps.service.justice.gov.uk"
     PRISON_API_URL: "http://localhost:8090"
     ENVIRONMENT_NAME: Training

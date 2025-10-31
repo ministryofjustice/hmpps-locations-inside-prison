@@ -127,7 +127,6 @@ export default {
   },
   services: {
     dps: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
-    locationsLanding: get('SERVICE_LOCATIONS_LANDING_URL', 'http://localhost:3000', requiredInProduction),
     nonResidentialLocations: get(
       'SERVICE_NON_RESIDENTIAL_LOCATIONS_URL',
       'http://localhost:3000',
