@@ -1,8 +1,8 @@
 {% extends "../partials/layout.njk" %}
 
-{% from "../macros/card.njk" import card %}
+{% from "../macros/cardBlock.njk" import cardBlock %}
 
-{% set title = applicationName %}
+{% set title = applicationName if not nonResiCards else 'Locations' %}
 {% if sandbox %}
   {% set title = title + ' (practice version)' %}
 {% endif %}
@@ -31,15 +31,9 @@
 {% endblock %}
 
 {% block content %}
-  <div class="body-tiles">
-    <div class="govuk-width-container">
-      <div class="card-group govuk-grid-row">
-        {% for cardDetails in cards -%}
-          <div class="govuk-grid-column-one-third card-group__item">
-            {{ card(cardDetails) }}
-          </div>
-        {%- endfor %}
-      </div>
-    </div>
-  </div>
+ {% set resiTitle = 'Residential locations' if nonResiCards %}
+  {{ cardBlock(resiTitle, resiCards) }}
+  {% if nonResiCards %}
+    {{ cardBlock('Non-residential locations', nonResiCards) }}
+  {% endif %}
 {% endblock %}

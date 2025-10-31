@@ -32,6 +32,15 @@ export declare module 'express-session' {
   }
 }
 
+interface card {
+  clickable: boolean
+  heading: string
+  href: string
+  description: string
+  'data-qa': string
+  visible: boolean
+}
+
 interface AllLocals {
   accommodationType: string
   actions: { text: string; href: string; class: string }[]
@@ -59,14 +68,8 @@ interface AllLocals {
   cancelClasses: string
   cancelLink: string
   cancelText: string
-  cards: {
-    clickable: boolean
-    heading: string
-    href: string
-    description: string
-    'data-qa': string
-    visible: boolean
-  }[]
+  resiCards: card[]
+  nonResiCards: card[]
   cell: Location
   cellCount: number
   cells: Location[]

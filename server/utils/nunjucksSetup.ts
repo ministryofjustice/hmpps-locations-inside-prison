@@ -36,7 +36,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   app.locals.environmentName = config.environmentName
   app.locals.environmentNameColour = ENV_TAG_COLOURS[config.environmentName] || ''
   app.locals.sandbox = config.sandbox
-  app.locals.dpsUrl = config.dpsUrl
+  app.locals.dpsUrl = config.services.dps
   app.locals.productionUrl = config.productionUrl
 
   // Cachebusting version string
