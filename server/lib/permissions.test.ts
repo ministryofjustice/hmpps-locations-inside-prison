@@ -8,6 +8,8 @@ describe('rolesToPermissions', () => {
   it('returns the correct permissions for MANAGE_RESIDENTIAL_LOCATIONS', () => {
     expect(rolesToPermissions(['MANAGE_RESIDENTIAL_LOCATIONS']).sort()).toEqual([
       'change_temporary_deactivation_details',
+      'deactivate',
+      'reactivate',
     ])
   })
 

@@ -1,16 +1,14 @@
 import { uniq } from 'lodash'
 
-const cellStatusManagerPermissions: string[] = ['change_temporary_deactivation_details']
+const cellStatusManagerPermissions: string[] = ['change_temporary_deactivation_details', 'reactivate', 'deactivate']
 
 const certificateAdministratorPermissions: string[] = [
+  ...cellStatusManagerPermissions,
   'change_cell_capacity',
   'change_local_name',
   'change_location_code',
   'change_non_residential_type',
-  'change_temporary_deactivation_details',
   'change_used_for',
-  'deactivate',
-  'reactivate',
   'set_cell_type',
   'create_location',
   'certificate_change_request_create',

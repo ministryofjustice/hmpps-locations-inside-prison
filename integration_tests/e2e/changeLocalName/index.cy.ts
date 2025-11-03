@@ -23,7 +23,7 @@ context('Change local name', () => {
     localName: '1-1-001',
   }
 
-  const setupStubs = (roles = ['VIEW_INTERNAL_LOCATION']) => {
+  const setupStubs = (roles = []) => {
     cy.task('reset')
     cy.task('stubSignIn', { roles })
     cy.task('stubManageUsers')
