@@ -1,14 +1,8 @@
 import { uniq } from 'lodash'
 
-const viewInternalLocationPermissions: string[] = ['view_cell_certificate']
+const cellStatusManagerPermissions: string[] = ['change_temporary_deactivation_details']
 
-const reportingLocationInformationPermissions: string[] = [
-  ...viewInternalLocationPermissions,
-  'reporting_location_information',
-]
-
-const manageResidentialLocationsPermissions: string[] = [
-  ...viewInternalLocationPermissions,
+const certificateAdministratorPermissions: string[] = [
   'change_cell_capacity',
   'change_local_name',
   'change_location_code',
@@ -19,27 +13,34 @@ const manageResidentialLocationsPermissions: string[] = [
   'reactivate',
   'set_cell_type',
   'create_location',
-  // TODO: change this to new "Certificate administrator" role, when created
   'certificate_change_request_create',
   'certificate_change_request_withdraw',
-]
-
-const manageResLocationsOpCapPermissions: string[] = [
-  ...manageResidentialLocationsPermissions,
   'change_max_capacity',
   'change_signed_operational_capacity',
   'convert_non_residential',
   'deactivate:permanent',
-  // TODO: change this to new "Certificate reviewer" role, when created
+]
+
+const certificateReviewerPermissions: string[] = [
+  'change_signed_operational_capacity',
   'certificate_change_request_review',
 ]
 
-const administerResLocationsPermissions: string[] = [...manageResLocationsOpCapPermissions, 'administer_residential']
+const certificateViewerPermissions: string[] = ['certificate_view_management']
+
+const reportingLocationInformationPermissions: string[] = ['reporting_location_information']
+
+const administerResLocationsPermissions: string[] = [
+  ...certificateAdministratorPermissions,
+  ...reportingLocationInformationPermissions,
+  'administer_residential',
+]
 
 const permissionsByRole: { [key: string]: string[] } = {
-  VIEW_INTERNAL_LOCATION: viewInternalLocationPermissions,
-  MANAGE_RESIDENTIAL_LOCATIONS: manageResidentialLocationsPermissions,
-  MANAGE_RES_LOCATIONS_OP_CAP: manageResLocationsOpCapPermissions,
+  MANAGE_RESIDENTIAL_LOCATIONS: cellStatusManagerPermissions,
+  MANAGE_RES_LOCATIONS_OP_CAP: certificateAdministratorPermissions,
+  RESI__CERT_REVIEWER: certificateReviewerPermissions,
+  RESI__CERT_VIEWER: certificateViewerPermissions,
   REPORTING_LOCATION_INFORMATION: reportingLocationInformationPermissions,
   MANAGE_RES_LOCATIONS_ADMIN: administerResLocationsPermissions,
 }

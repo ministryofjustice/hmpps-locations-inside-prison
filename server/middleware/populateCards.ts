@@ -41,7 +41,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible: req.canAccess('view_cell_certificate'),
+        visible: true,
         heading: 'Cell certificate',
         href: '/cell-certificate/current',
         description: 'View the current certificate and requested changes.',

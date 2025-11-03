@@ -92,7 +92,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use((req, res, next) => {
-    req.featureFlags = { map2380: false, createAndCertify: true, permanentDeactivation: false }
+    req.featureFlags = { createAndCertify: true, permanentDeactivation: false }
     next()
   })
   app.use(setCanAccess(services.locationsService))
