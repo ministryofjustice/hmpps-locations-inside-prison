@@ -40,7 +40,7 @@ context('Set local name', () => {
     cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
-  context('Without MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('Without MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => setupStubs())
 
     it('does not show change/set links on the show location page', () => {
@@ -52,9 +52,9 @@ context('Set local name', () => {
     })
   })
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       cy.signIn()
     })
 

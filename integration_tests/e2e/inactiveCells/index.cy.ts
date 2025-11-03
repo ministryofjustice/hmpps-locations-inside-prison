@@ -4,6 +4,7 @@ import Page, { PageElement } from '../../pages/page'
 import InactiveCellsIndexPage from '../../pages/inactiveCells'
 import LocationFactory from '../../../server/testutils/factories/location'
 import formatDate from '../../../server/formatters/formatDate'
+import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
 function testInactiveCellsTable(
   inactiveCellsIndexPage: InactiveCellsIndexPage,
@@ -27,7 +28,7 @@ function testInactiveCellsTable(
 }
 
 context('Inactive Cells Index', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
@@ -44,7 +45,7 @@ context('Inactive Cells Index', () => {
     })
   })
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  context('With location in caseload', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')

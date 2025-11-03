@@ -11,9 +11,9 @@ import CreateCellsTypesSpecialPage from '../../../../pages/commonTransactions/cr
 context('Create landing - Create cells - Capacities', () => {
   let page: CreateCellsCapacitiesPage
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       page = goToCreateCellsCapacitiesPage()
     })
 

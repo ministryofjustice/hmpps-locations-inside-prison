@@ -7,9 +7,9 @@ import CellCertificateFactory from '../../../server/testutils/factories/cellCert
 import CertificationApprovalRequestFactory from '../../../server/testutils/factories/certificationApprovalRequest'
 
 context('Cell Certificate - History', () => {
-  context('With VIEW_INTERNAL_LOCATION role', () => {
+  context('With default access', () => {
     beforeEach(() => {
-      setupStubs(['VIEW_INTERNAL_LOCATION'])
+      setupStubs([])
       cy.signIn()
     })
 

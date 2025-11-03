@@ -21,7 +21,7 @@ describe('setCanAccess', () => {
     deepRes = {
       locals: {
         user: {
-          userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'],
+          userRoles: ['MANAGE_RES_LOCATIONS_OP_CAP'],
           activeCaseload: { id: 'TST' },
         },
       },
@@ -38,7 +38,7 @@ describe('setCanAccess', () => {
   })
 
   beforeEach(async () => {
-    deepReq.featureFlags = { createAndCertify: true, map2380: false }
+    deepReq.featureFlags = { createAndCertify: true }
     deepReq.params = { prisonId: 'TST' }
     await setCanAccess(locationsService)(deepReq as Request, deepRes as Response, next)
   })
