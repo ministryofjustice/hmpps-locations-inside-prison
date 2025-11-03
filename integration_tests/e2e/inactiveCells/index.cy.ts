@@ -4,7 +4,6 @@ import Page, { PageElement } from '../../pages/page'
 import InactiveCellsIndexPage from '../../pages/inactiveCells'
 import LocationFactory from '../../../server/testutils/factories/location'
 import formatDate from '../../../server/formatters/formatDate'
-import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
 function testInactiveCellsTable(
   inactiveCellsIndexPage: InactiveCellsIndexPage,
