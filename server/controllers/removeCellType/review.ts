@@ -24,12 +24,6 @@ export default class ReviewCellCapacity extends FormInitialStep {
 
       const validationErrors: FormWizard.Errors = {}
 
-      if (!errors.workingCapacity) {
-        if (Number(values?.workingCapacity) < occupants.length) {
-          validationErrors.workingCapacity = this.formError('workingCapacity', 'isNoLessThanOccupancy')
-        }
-      }
-
       if (!errors.maxCapacity) {
         if (Number(values?.maxCapacity) < occupants.length) {
           validationErrors.maxCapacity = this.formError('maxCapacity', 'isNoLessThanOccupancy')

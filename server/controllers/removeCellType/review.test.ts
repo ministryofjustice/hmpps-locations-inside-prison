@@ -75,11 +75,6 @@ describe('ReviewCellCapacity', () => {
       controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({
-        workingCapacity: {
-          args: {},
-          key: 'workingCapacity',
-          type: 'isNoLessThanOccupancy',
-        },
         maxCapacity: {
           args: {},
           key: 'maxCapacity',
