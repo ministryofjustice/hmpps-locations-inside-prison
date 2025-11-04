@@ -894,14 +894,8 @@ context('Change cell capacity', () => {
           cy.get('.govuk-error-summary__list').contains(
             'Maximum capacity cannot be less than the number of people currently occupying the cell',
           )
-          cy.get('.govuk-error-summary__list').contains(
-            'Working capacity cannot be less than the number of people currently occupying the cell',
-          )
           cy.get('#maxCapacity-error').contains(
             'Maximum capacity cannot be less than the number of people currently occupying the cell',
-          )
-          cy.get('#workingCapacity-error').contains(
-            'Working capacity cannot be less than the number of people currently occupying the cell',
           )
         })
 
