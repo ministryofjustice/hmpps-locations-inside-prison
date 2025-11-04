@@ -43,6 +43,10 @@ export default function createErrorHandler(production: boolean) {
       return res.render('pages/errors/404')
     }
 
+    if (res.locals.errorMessage === 'Caseload is not accessible by this user.') {
+      return res.render('pages/errors/page')
+    }
+
     if (res.locals.errorMessage === 'Missing prereq for this step') {
       // @ts-expect-error not typing locals for error cases
       res.locals.journeyModel = req.journeyModel

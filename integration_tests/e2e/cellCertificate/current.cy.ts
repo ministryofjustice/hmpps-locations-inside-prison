@@ -8,9 +8,9 @@ import testGovukTable from '../../support/testGovukTable'
 context('Cell Certificate - Current', () => {
   let page: CellCertificateCurrentPage
 
-  context('With VIEW_INTERNAL_LOCATION role', () => {
+  context('With default access', () => {
     beforeEach(() => {
-      setupStubs(['VIEW_INTERNAL_LOCATION'])
+      setupStubs([])
       cy.signIn()
     })
 

@@ -12,9 +12,7 @@ interface UserToken {
 
 const createToken = (userToken: UserToken) => {
   // authorities in the session are always prefixed by ROLE.
-  const authorities =
-    (userToken.roles || ['VIEW_INTERNAL_LOCATION']).map(role => (role.startsWith('ROLE_') ? role : `ROLE_${role}`)) ||
-    []
+  const authorities = (userToken.roles || []).map(role => (role.startsWith('ROLE_') ? role : `ROLE_${role}`)) || []
   const payload = {
     name: userToken.name || 'john smith',
     user_name: 'USER1',

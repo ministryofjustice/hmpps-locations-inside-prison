@@ -29,7 +29,7 @@ const residentialSummary = {
 }
 
 context('View Locations Index', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
@@ -46,7 +46,7 @@ context('View Locations Index', () => {
     })
   })
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  context('With the default role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')

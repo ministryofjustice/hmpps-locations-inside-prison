@@ -7,9 +7,9 @@ import LocationsApiStubber from '../../../mockApis/locationsApi'
 import CertificationApprovalRequestFactory from '../../../../server/testutils/factories/certificationApprovalRequest'
 
 context('Cell Certificate - Change Requests - Show', () => {
-  context('With VIEW_INTERNAL_LOCATION role', () => {
+  context('With default access', () => {
     beforeEach(() => {
-      setupStubs(['VIEW_INTERNAL_LOCATION'])
+      setupStubs([])
       cy.signIn()
     })
 

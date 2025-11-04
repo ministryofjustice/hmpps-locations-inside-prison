@@ -5,7 +5,7 @@ import NonResidentialRoomPage from '../../pages/nonResidentialRoom'
 import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoom/setNonResidentialChangeType'
 
 context('Change non-residential rooms', () => {
-  context('When user does not have the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('When user does not have the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
@@ -17,7 +17,7 @@ context('Change non-residential rooms', () => {
     })
   })
 
-  context('When user does have the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('When user does have the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     const location = LocationFactory.build({
       isResidential: false,
       leafLevel: true,
@@ -58,7 +58,7 @@ context('Change non-residential rooms', () => {
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
       cy.task('stubLocationsUpdateNonResCell')
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
 
       cy.signIn()
