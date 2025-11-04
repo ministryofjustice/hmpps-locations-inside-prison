@@ -260,6 +260,7 @@ button.govuk-link {
 a[data-collapsible-table-handle] {
   position: relative;
   padding-left: 16px;
+  display: block;
 }
 
 [data-collapsible-table-group] {
