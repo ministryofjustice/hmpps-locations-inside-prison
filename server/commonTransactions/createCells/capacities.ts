@@ -15,7 +15,7 @@ export default class Capacities extends BaseController {
   }
 
   override validateFields(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { cellTypeAction } = req.body
+    const { backLink, cellTypeAction } = req.body
     if (cellTypeAction) {
       const [action, cellId] = cellTypeAction.split('/')
 
@@ -24,6 +24,13 @@ export default class Capacities extends BaseController {
       res.redirect(
         `/create-new/${res.locals.locationId}/create-cells/${action}-cell-type/${cellId}${req.isEditing ? '/edit' : ''}`,
       )
+      return
+    }
+
+    if (backLink) {
+      req.sessionModel.set('temp-capacitiesValues', req.body)
+
+      res.redirect(backLink)
       return
     }
 

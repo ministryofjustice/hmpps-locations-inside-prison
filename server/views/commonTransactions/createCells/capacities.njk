@@ -5,6 +5,12 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
 
+{% block backButton %}
+  <button class="govuk-back-link" type="submit" form="form-wizard-form" name="backLink" value="{{ backLink }}">
+    Back
+  </button>
+{% endblock %}
+
 {% block innerContent %}
   {{ govukDetails({
     summaryText: "What the different types of cell capacity mean",
