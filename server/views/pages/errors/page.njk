@@ -1,0 +1,21 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set title = "Authorisation Error" %}
+
+{% block pageTitle %}{{ applicationName }} - Error{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p>
+          You are not authorised to access this page.
+        </p>
+
+        <p>
+          <a href="/">Return to Residential locations</a>
+        </p>
+        </div>
+    </div>
+  </div>
+{% endblock %}

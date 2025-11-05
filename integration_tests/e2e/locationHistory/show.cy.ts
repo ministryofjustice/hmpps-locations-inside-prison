@@ -4,7 +4,7 @@ import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
 context('show location history', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
@@ -16,7 +16,36 @@ context('show location history', () => {
     })
   })
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  // TODO: DO WE WANT TO TEST THIS SCENARIO IN INT-E2E?
+  // context('Without location in caseload', () => {
+  //   const location = LocationFactory.build({ prisonId: 'MDI', locationType: 'CELL', localName: '1-1-002' })
+  //
+  //   beforeEach(() => {
+  //     cy.task('reset')
+  //     cy.task('stubSignIn')
+  //     cy.task('stubManageUsers')
+  //     cy.task('stubManageUsersMe')
+  //     cy.task('stubManageUsersMeCaseloads')
+  //     cy.task('stubLocationsConstantsAccommodationType')
+  //     cy.task('stubLocationsConstantsConvertedCellType')
+  //     cy.task('stubLocationsConstantsDeactivatedReason')
+  //     cy.task('stubLocationsConstantsLocationType')
+  //     cy.task('stubLocationsConstantsSpecialistCellType')
+  //     cy.task('stubLocationsConstantsUsedForType')
+  //     cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+  //     cy.task('stubLocations', location)
+  //     cy.task('stubGetPrisonConfiguration', { prisonId: 'MDI', certificationActive: 'ACTIVE' })
+  //     cy.signIn()
+  //   })
+  //
+  //   it('Denies access if prison is not in caseload', () => {
+  //     cy.visit('view-and-update-locations/MDI/7e570000-0000-0000-0000-000000000001', { failOnStatusCode: false })
+  //     Page.verifyOnPage(ViewLocationsShowPage)
+  //     cy.get('h2').contains('Caseload is not accessible by this user.')
+  //   })
+  // })
+
+  context('With location in caseload', () => {
     const location = LocationFactory.build({ locationType: 'CELL', localName: '1-1-001' })
 
     beforeEach(() => {

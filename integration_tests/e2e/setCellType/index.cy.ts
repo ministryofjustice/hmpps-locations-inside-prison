@@ -5,7 +5,7 @@ import SetCellTypePage from '../../pages/setCellType'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
 context('Set cell type', () => {
-  context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       const location = LocationFactory.build({
         accommodationTypes: ['NORMAL_ACCOMMODATION'],
@@ -18,7 +18,7 @@ context('Set cell type', () => {
         specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
       })
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
@@ -47,10 +47,10 @@ context('Set cell type', () => {
     })
   })
 
-  context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'] })
+      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')

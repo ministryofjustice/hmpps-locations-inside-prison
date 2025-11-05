@@ -6,9 +6,9 @@ import testGovukTable from '../../../support/testGovukTable'
 context('Cell Certificate - Change Requests - Index', () => {
   let page: CellCertificateChangeRequestsIndexPage
 
-  context('With VIEW_INTERNAL_LOCATION role', () => {
+  context('With default access', () => {
     beforeEach(() => {
-      setupStubs(['VIEW_INTERNAL_LOCATION'])
+      setupStubs([])
       cy.signIn()
 
       CellCertificateChangeRequestsIndexPage.goTo()
@@ -25,9 +25,9 @@ context('Cell Certificate - Change Requests - Index', () => {
     })
   })
 
-  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+  context('With RESI__CERT_REVIEWER role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
+      setupStubs(['RESI__CERT_REVIEWER'])
       cy.signIn()
 
       CellCertificateChangeRequestsIndexPage.goTo()

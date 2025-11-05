@@ -23,7 +23,7 @@ context('Set cell type', () => {
     usedFor: ['STANDARD_ACCOMMODATION', 'TEST_TYPE'],
   })
 
-  const setupStubs = (roles = ['VIEW_INTERNAL_LOCATION']) => {
+  const setupStubs = (roles = []) => {
     cy.task('reset')
     cy.task('stubSignIn', { roles })
     cy.task('stubManageUsers')
@@ -40,9 +40,9 @@ context('Set cell type', () => {
     cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
-  context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['VIEW_INTERNAL_LOCATION'])
+      setupStubs([])
     })
 
     it('does not show the change/set links on the show location page', () => {
@@ -54,9 +54,9 @@ context('Set cell type', () => {
     })
   })
 
-  context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       cy.signIn()
     })
 

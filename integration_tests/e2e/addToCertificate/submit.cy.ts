@@ -78,9 +78,9 @@ function testRequests(
 context('Add To Certificate - Submit Certification Approval Request', () => {
   let page: SubmitCertificationApprovalRequestPage
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
     })
 
     context('When also updating signed op cap', () => {

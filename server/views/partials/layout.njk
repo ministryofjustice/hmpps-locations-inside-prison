@@ -127,10 +127,12 @@
       <div class="govuk-grid-row govuk-!-margin-bottom-0">
         <div class="govuk-grid-column-{{ minLayout }}">
           {% if backLink %}
-            {{ govukBackLink({
-              text: backLinkText or "Back",
-              href: backLink
-            }) }}
+            {% block backButton %}
+              {{ govukBackLink({
+                text: backLinkText or "Back",
+                href: backLink
+              }) }}
+            {% endblock %}
           {% else %}
             {{ breadcrumb('', breadcrumbs, false) }}
           {% endif %}

@@ -10,9 +10,9 @@ import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertifica
 import CellCertificateChangeRequestsRejectPage from '../../../pages/cellCertificate/changeRequests/review/reject'
 
 context('Cell Certificate - Change Requests - Review', () => {
-  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+  context('With RESI__CERT_REVIEWER role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
+      setupStubs(['RESI__CERT_REVIEWER'])
       cy.signIn()
     })
 
