@@ -1,11 +1,12 @@
 import asyncMiddleware from './asyncMiddleware'
 import setCanAccess from './setCanAccess'
 import LocationsService from '../services/locationsService'
+import config from '../config'
 
 export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
     setCanAccess(locationsService)
-    res.locals.cards = [
+    res.locals.resiCards = [
       req.featureFlags.createAndCertify
         ? {
             clickable: true,
@@ -41,7 +42,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible: req.canAccess('view_cell_certificate'),
+        visible: true,
         heading: 'Cell certificate',
         href: '/cell-certificate/current',
         description: 'View the current certificate and requested changes.',
@@ -64,6 +65,19 @@ export default function populateCards(locationsService: LocationsService) {
         'data-qa': 'admin-card',
       },
     ]
+
+    res.locals.nonResiCards = req.featureFlags.nonResi
+      ? [
+          {
+            clickable: true,
+            visible: true, // req.canAccess('view_non_residential'),
+            heading: 'Edit non-residential locations',
+            href: config.services.nonResidentialLocations,
+            description: 'Add, change or archive non-residential locations.',
+            'data-qa': 'non-resi-card',
+          },
+        ]
+      : null
 
     next()
   })

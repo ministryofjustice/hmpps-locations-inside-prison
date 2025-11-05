@@ -21,7 +21,7 @@ const prisonResidentialSummary: PrisonResidentialSummary = {
   locationHierarchy: [],
 }
 
-export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) {
+export default function setupStubs(roles = ['MANAGE_RES_LOCATIONS_OP_CAP']) {
   cy.task('reset')
   cy.task('setFeatureFlag', { createAndCertify: true })
   AuthStubber.stub.stubSignIn({ roles })

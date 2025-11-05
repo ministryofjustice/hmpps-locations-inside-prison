@@ -15,9 +15,9 @@ context('Create landing - Create cells - Types', () => {
   let normalTypesPage: CreateCellsTypesNormalPage
   let specialTypesPage: CreateCellsTypesSpecialPage
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
     })
 
     context('Select type page', () => {

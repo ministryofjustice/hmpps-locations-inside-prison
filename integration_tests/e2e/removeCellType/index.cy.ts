@@ -8,7 +8,7 @@ import ReviewCellCapacityPage from '../../pages/removeCellType/review'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
 context('Remove cell type', () => {
-  context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       const location = LocationFactory.build({
         accommodationTypes: ['NORMAL_ACCOMMODATION'],
@@ -21,7 +21,7 @@ context('Remove cell type', () => {
         specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
       })
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
@@ -49,7 +49,7 @@ context('Remove cell type', () => {
     })
   })
 
-  context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     const prisonerLocations = [
       {
         cellLocation: '1-1-001',
@@ -98,7 +98,7 @@ context('Remove cell type', () => {
 
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'] })
+      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
@@ -558,14 +558,8 @@ context('Remove cell type', () => {
             cy.get('.govuk-error-summary__list').contains(
               'Maximum capacity cannot be less than the number of people currently occupying the cell',
             )
-            cy.get('.govuk-error-summary__list').contains(
-              'Working capacity cannot be less than the number of people currently occupying the cell',
-            )
             cy.get('#maxCapacity-error').contains(
               'Maximum capacity cannot be less than the number of people currently occupying the cell',
-            )
-            cy.get('#workingCapacity-error').contains(
-              'Working capacity cannot be less than the number of people currently occupying the cell',
             )
           })
         })

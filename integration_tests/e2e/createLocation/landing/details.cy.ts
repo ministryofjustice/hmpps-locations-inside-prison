@@ -35,9 +35,9 @@ const residentialSummaryWithoutCellChild: LocationResidentialSummary = {
 context('Create Landing Details', () => {
   let page: CreateLocationDetailsPage
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       page = goToCreateLocationDetailsPage('7e570000-0000-1000-8000-000000000002')
     })
 

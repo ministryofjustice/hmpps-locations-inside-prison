@@ -84,7 +84,25 @@ describe('ChangeCellCapacity', () => {
       })
     })
 
-    it('does not allow max or working capacity lower than current occupancy', () => {
+    it('does allow working capacity lower than current occupancy', () => {
+      deepRes.locals.prisonerLocation.prisoners = [
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+      ]
+      const callback = jest.fn()
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).not.toHaveBeenCalledWith({
+        workingCapacity: {
+          args: {},
+          key: 'workingCapacity',
+          type: 'isNoLessThanOccupancy',
+        },
+      })
+    })
+
+    it('does not allow max capacity lower than current occupancy', () => {
       deepRes.locals.prisonerLocation.prisoners = [
         PrisonerFactory.build(),
         PrisonerFactory.build(),
@@ -94,11 +112,6 @@ describe('ChangeCellCapacity', () => {
       controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({
-        workingCapacity: {
-          args: {},
-          key: 'workingCapacity',
-          type: 'isNoLessThanOccupancy',
-        },
         maxCapacity: {
           args: {},
           key: 'maxCapacity',

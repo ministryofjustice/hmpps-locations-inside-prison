@@ -83,11 +83,11 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.914.0",
-    "@ministryofjustice/frontend": "^6.0.0",
-    "@ministryofjustice/hmpps-auth-clients": "^0.0.3",
+    "@ministryofjustice/frontend": "^7.1.0",
+    "@ministryofjustice/hmpps-auth-clients": "^1.0.0",
     "@ministryofjustice/hmpps-digital-prison-reporting-frontend": "^4.14.2",
     "@ministryofjustice/hmpps-monitoring": "^0.0.2",
-    "@ministryofjustice/hmpps-rest-client": "^0.0.3",
+    "@ministryofjustice/hmpps-rest-client": "^1.0.0",
     "applicationinsights": "^2.9.8",
     "axe-core": "^4.11.0",
     "body-parser": "^2.2.0",
@@ -125,7 +125,7 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.4",
-    "@ministryofjustice/eslint-config-hmpps": "^0.0.5",
+    "@ministryofjustice/eslint-config-hmpps": "^1.0.0",
     "@tsconfig/node22": "^22.0.2",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",

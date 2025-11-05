@@ -7,7 +7,6 @@ import cookieParser from 'cookie-parser'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import { appInsightsMiddleware } from './utils/azureAppInsights'
-import authorisationMiddleware from './middleware/authorisationMiddleware'
 
 import addBreadcrumb from './middleware/addBreadcrumb'
 import getFrontendComponents from './middleware/getFeComponents'
@@ -46,15 +45,6 @@ export default function createApp(services: Services): express.Application {
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpFeatureFlags())
   app.use(setUpAuthentication())
-  app.use(
-    authorisationMiddleware([
-      'REPORTING_LOCATION_INFORMATION',
-      'MANAGE_RES_LOCATIONS_OP_CAP',
-      'MANAGE_RESIDENTIAL_LOCATIONS',
-      'VIEW_INTERNAL_LOCATION',
-      'MANAGE_RES_LOCATIONS_ADMIN',
-    ]),
-  )
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
