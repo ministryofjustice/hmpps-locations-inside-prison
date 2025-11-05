@@ -206,6 +206,18 @@ $sticky-footer-vertical-spacing: govuk-spacing(2);
   margin-top: 10px;
 }
 
+.govuk-tag__wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 6px;
+  row-gap: 10px;
+  margin: -2px 0px;
+}
+.govuk-tag {
+  vertical-align: top;
+}
+
+
 // location structure preview
 
 .structurePreview {
