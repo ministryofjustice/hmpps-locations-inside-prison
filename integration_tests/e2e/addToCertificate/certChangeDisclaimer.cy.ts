@@ -10,10 +10,10 @@ import UpdateSignedOpCapAlreadyRequestedPage from '../../pages/commonTransaction
 context('Add To Certificate - Cert Change Disclaimer', () => {
   let page: CertChangeDisclaimerPage
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     context('when there is already a proposed op cap change', () => {
       beforeEach(() => {
-        setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'], { proposedOpCap: true })
+        setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'], { proposedOpCap: true })
         page = goToCertChangeDisclaimer('7e570000-0000-1000-8000-000000000200')
       })
 
@@ -25,7 +25,7 @@ context('Add To Certificate - Cert Change Disclaimer', () => {
 
     context('when there is not already a proposed op cap change', () => {
       beforeEach(() => {
-        setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+        setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
         page = goToCertChangeDisclaimer('7e570000-0000-1000-8000-000000000200')
       })
 

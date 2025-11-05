@@ -6,7 +6,7 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import formatDate from '../../../server/formatters/formatDate'
 
 context('View Locations Show', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
@@ -55,7 +55,7 @@ context('View Locations Show', () => {
     })
   }
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  context('With the default role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
@@ -644,14 +644,25 @@ context('View Locations Show', () => {
         })
 
         describe('Actions button', () => {
-          context('when the map2380 feature flag is disabled', () => {
-            beforeEach(() => {
-              cy.task('setFeatureFlag', { map2380: false })
-            })
-
+          context('when the user has MANAGE_RESIDENTIAL_LOCATIONS role', () => {
             before(() => {
               cy.task('stubSignIn', {
-                roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
+                roles: ['MANAGE_RESIDENTIAL_LOCATIONS'],
+              })
+              cy.signIn()
+            })
+
+            it('does not show the actions menu', () => {
+              ViewLocationsShowPage.goTo(location.prisonId, location.id)
+              Page.verifyOnPage(ViewLocationsShowPage)
+              cy.get('.moj-button-menu').should('not.exist')
+            })
+          })
+
+          context('when the user has MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+            before(() => {
+              cy.task('stubSignIn', {
+                roles: ['MANAGE_RES_LOCATIONS_OP_CAP'],
               })
               cy.signIn()
             })
@@ -660,42 +671,6 @@ context('View Locations Show', () => {
               ViewLocationsShowPage.goTo(location.prisonId, location.id)
               Page.verifyOnPage(ViewLocationsShowPage)
               cy.get('.moj-button-menu').should('exist')
-            })
-          })
-
-          context('when the map2380 feature flag is enabled', () => {
-            beforeEach(() => {
-              cy.task('setFeatureFlag', { map2380: true })
-            })
-
-            context('when the user has MANAGE_RESIDENTIAL_LOCATIONS role', () => {
-              before(() => {
-                cy.task('stubSignIn', {
-                  roles: ['MANAGE_RESIDENTIAL_LOCATIONS'],
-                })
-                cy.signIn()
-              })
-
-              it('does not show the actions menu', () => {
-                ViewLocationsShowPage.goTo(location.prisonId, location.id)
-                Page.verifyOnPage(ViewLocationsShowPage)
-                cy.get('.moj-button-menu').should('not.exist')
-              })
-            })
-
-            context('when the user has MANAGE_RES_LOCATIONS_OP_CAP role', () => {
-              before(() => {
-                cy.task('stubSignIn', {
-                  roles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'MANAGE_RES_LOCATIONS_OP_CAP'],
-                })
-                cy.signIn()
-              })
-
-              it('shows the actions menu', () => {
-                ViewLocationsShowPage.goTo(location.prisonId, location.id)
-                Page.verifyOnPage(ViewLocationsShowPage)
-                cy.get('.moj-button-menu').should('exist')
-              })
             })
           })
         })
