@@ -33,9 +33,9 @@ context('Create Wing Confirm', () => {
     ],
   }
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
     })
 
     it('shows the correct information and successfully creates draft wing', () => {

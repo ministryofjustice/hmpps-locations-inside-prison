@@ -379,7 +379,7 @@ context('Deactivate permanent', () => {
         cy.get('.change-summary p').contains(/The establishment’s maximum capacity will reduce from 10 to 8.$/)
       })
 
-      context('With the VIEW_INTERNAL_LOCATION role', () => {
+      context('after permanent deactivation with the MANAGE_RES_LOCATIONS_ROLE role', () => {
         let locations: ReturnType<typeof LocationFactory.build>[]
         beforeEach(() => {
           locations = [

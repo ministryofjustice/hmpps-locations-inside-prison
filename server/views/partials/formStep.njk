@@ -30,7 +30,7 @@
         {% block innerContent %}
         {% endblock %}
 
-        <form method="{{ formMethod }}" action="{{ formAction }}"
+        <form method="{{ formMethod }}" action="{{ formAction }}" id="form-wizard-form"
           {% if formEnctype %}
             enctype="{{ formEnctype }}"
           {% endif %}
