@@ -8,9 +8,9 @@ import CellCertificateShowPage from '../../pages/cellCertificate/show'
 context('Cell Certificate - Show', () => {
   let page: CellCertificateShowPage
 
-  context('With VIEW_INTERNAL_LOCATION role', () => {
+  context('With default access', () => {
     beforeEach(() => {
-      setupStubs(['VIEW_INTERNAL_LOCATION'])
+      setupStubs([])
       cy.signIn()
     })
 

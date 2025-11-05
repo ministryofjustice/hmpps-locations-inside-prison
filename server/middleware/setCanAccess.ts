@@ -6,7 +6,8 @@ const rolePriority = [
   'MANAGE_RES_LOCATIONS_ADMIN',
   'MANAGE_RES_LOCATIONS_OP_CAP',
   'MANAGE_RESIDENTIAL_LOCATIONS',
-  'VIEW_INTERNAL_LOCATION',
+  'RESI_CERT_REVIEWER',
+  'RESI_CERT_VIEWER',
 ]
 
 export default function setCanAccess(locationService: LocationsService) {
@@ -21,13 +22,6 @@ export default function setCanAccess(locationService: LocationsService) {
 
     if (!req.featureFlags?.permanentDeactivation) {
       permissionOverrides['deactivate:permanent'] = false
-    }
-
-    if (!req.featureFlags?.map2380) {
-      permissionOverrides.change_max_capacity = true
-      permissionOverrides.convert_non_residential = {
-        MANAGE_RESIDENTIAL_LOCATIONS: true,
-      }
     }
 
     if (!req.featureFlags?.createAndCertify) {

@@ -4,7 +4,7 @@ import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeLocalNamePage from '../../pages/changeLocalName'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 
-context('change local name', () => {
+context('Change local name', () => {
   const locationAsWing = LocationFactory.build({
     accommodationTypes: ['NORMAL_ACCOMMODATION'],
     capacity: { maxCapacity: 2, workingCapacity: 1 },
@@ -23,7 +23,7 @@ context('change local name', () => {
     localName: '1-1-001',
   }
 
-  const setupStubs = (roles = ['VIEW_INTERNAL_LOCATION']) => {
+  const setupStubs = (roles = []) => {
     cy.task('reset')
     cy.task('stubSignIn', { roles })
     cy.task('stubManageUsers')
@@ -40,9 +40,9 @@ context('change local name', () => {
     cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
-  describe('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  describe('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['VIEW_INTERNAL_LOCATION'])
+      setupStubs([])
     })
 
     it('does not show the change/set links on the show location page', () => {
@@ -54,9 +54,9 @@ context('change local name', () => {
     })
   })
 
-  describe('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  describe('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       cy.signIn()
     })
 

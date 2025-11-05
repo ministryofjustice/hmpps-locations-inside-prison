@@ -7,10 +7,10 @@ import formatDate from '../../../server/formatters/formatDate'
 import ArchivedLocationsIndexPage from '../../pages/archivedLocations'
 
 context('Archived Locations Index', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
+      cy.task('stubSignIn')
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -24,7 +24,7 @@ context('Archived Locations Index', () => {
     })
   })
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  context('With location in caseload', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')

@@ -23,7 +23,7 @@ context('Remove Local Name', () => {
     localName: '1-1-001',
   }
 
-  const setupStubs = (roles = ['VIEW_INTERNAL_LOCATION']) => {
+  const setupStubs = (roles = []) => {
     cy.task('reset')
     cy.task('stubSignIn', { roles })
     cy.task('stubManageUsers')
@@ -40,7 +40,7 @@ context('Remove Local Name', () => {
     cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
-  context('Without MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('Without MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => setupStubs())
 
     it('does not show change/remove links on the location page', () => {
@@ -52,9 +52,9 @@ context('Remove Local Name', () => {
     })
   })
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       cy.signIn()
     })
 

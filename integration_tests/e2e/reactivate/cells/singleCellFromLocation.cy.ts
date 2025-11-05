@@ -118,7 +118,7 @@ context('Reactivate cell (from reactivate cells)', () => {
     })
   }
 
-  context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       createLocations()
       cy.task('reset')
@@ -150,11 +150,11 @@ context('Reactivate cell (from reactivate cells)', () => {
     })
   })
 
-  context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       createLocations()
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')

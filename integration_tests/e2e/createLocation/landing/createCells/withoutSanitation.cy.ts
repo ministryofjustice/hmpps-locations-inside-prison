@@ -9,9 +9,9 @@ import CreateCellsBulkSanitationPage from '../../../../pages/commonTransactions/
 context('Create landing - Create cells - Without sanitation', () => {
   let page: CreateCellsWithoutSanitationPage
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       page = goToCreateCellsWithoutSanitationPage()
     })
 
