@@ -40,14 +40,16 @@ export default function populateCards(locationsService: LocationsService) {
         description: 'View locations that have been permanently deactivated as residential locations.',
         'data-qa': 'archived-locations-card',
       },
-      {
-        clickable: true,
-        visible: true,
-        heading: 'Cell certificate',
-        href: '/cell-certificate/current',
-        description: 'View the current certificate and requested changes.',
-        'data-qa': 'cell-certificate-card',
-      },
+      req.featureFlags.createAndCertify
+        ? {
+            clickable: true,
+            visible: true,
+            heading: 'Cell certificate',
+            href: '/cell-certificate/current',
+            description: 'View the current certificate and requested changes.',
+            'data-qa': 'cell-certificate-card',
+          }
+        : null,
       {
         clickable: true,
         visible: req.canAccess('reporting_location_information'),
