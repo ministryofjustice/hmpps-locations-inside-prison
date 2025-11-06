@@ -4,10 +4,7 @@
 {% from "moj/components/sub-navigation/macro.njk" import mojSubNavigation %}
 
 {% block heading %}
-  {% if titleCaption %}
-    <span class="govuk-caption-l" data-qa="title-caption">{{ titleCaption }}</span>
-  {% endif %}
-  <h1 class="govuk-heading-xl">{{ title }}</h1>
+  {{ super() }}
 
   {{ mojSubNavigation({
     label: "Sub navigation",
@@ -24,7 +21,7 @@
 
 {% block content %}
   <div class="govuk-width-container">
-    <h2 class="govuk-heading-l">Change requests ({{ approvalRequests | length }})</h2>
+    <h2 class="govuk-heading-m">Change requests ({{ approvalRequests | length }})</h2>
 
     {% if approvalRequests | length == 0 %}
       <p>There are no change requests currently.</p>
