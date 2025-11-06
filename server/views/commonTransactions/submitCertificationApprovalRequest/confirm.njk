@@ -4,15 +4,15 @@
 
 {% block content %}
   <div class="govuk-width-container">
-    <div class="govuk-grid-row">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-two-thirds">
         <p>
           This request will be reviewed by the establishment's authorising director. If approved, the cell certificate
           will be updated with this change.
         </p>
-
-        <p>You will be unable to make changes to these locations while the request is being reviewed.</p>
-
+        <p>
+          You will be unable to make changes to these locations while the request is being reviewed.
+        </p>
         {{ govukInsetText({
           text: "New locations will change status from draft to inactive if approved."
         }) }}
