@@ -37,21 +37,25 @@ import changeCertApprovalStatusRouter from './admin/certApproval'
 import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
 import ingestRouter from './admin/ingest'
 import cellCertificateRouter from './cellCertificate'
+import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
+import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
 
 export default function routes(services: Services): Router {
   const router = Router()
 
   router.use(addBreadcrumb({ title: 'Residential locations', href: '/' }))
+  router.use(addServicesToRequest(services))
+  router.use(populatePrisonAndLocationId)
+
   router.get(
     '/',
+    populatePrisonConfiguration(),
     populateCards(services.locationsService),
     logPageView(services.auditService, Page.INDEX),
     asyncMiddleware(async (req, res) => {
       res.render('pages/index')
     }),
   )
-
-  router.use(addServicesToRequest(services))
 
   router.use('/archived-locations/:prisonId?', archivedLocationsRouter(services))
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))

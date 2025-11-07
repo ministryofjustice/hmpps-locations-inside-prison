@@ -2,6 +2,7 @@ import asyncMiddleware from './asyncMiddleware'
 import setCanAccess from './setCanAccess'
 import LocationsService from '../services/locationsService'
 import config from '../config'
+import populatePrisonConfiguration from './populatePrisonConfiguration'
 
 export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
@@ -68,18 +69,19 @@ export default function populateCards(locationsService: LocationsService) {
       },
     ]
 
-    res.locals.nonResiCards = req.featureFlags.nonResi
-      ? [
-          {
-            clickable: true,
-            visible: true, // req.canAccess('view_non_residential'),
-            heading: 'Edit non-residential locations',
-            href: config.services.nonResidentialLocations,
-            description: 'Add, change or archive non-residential locations.',
-            'data-qa': 'non-resi-card',
-          },
-        ]
-      : null
+    res.locals.nonResiCards =
+      req.featureFlags.nonResi && res.locals.prisonConfiguration?.nonResiServiceActive === 'ACTIVE'
+        ? [
+            {
+              clickable: true,
+              visible: true,
+              heading: 'Edit non-residential locations',
+              href: config.services.nonResidentialLocations,
+              description: 'Add, change or archive non-residential locations.',
+              'data-qa': 'non-resi-card',
+            },
+          ]
+        : null
 
     next()
   })

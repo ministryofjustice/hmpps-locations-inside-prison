@@ -1,0 +1,32 @@
+{% extends "../../../partials/formStep.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% set resiHtml %}
+  <span class="hmpps-inactive-location-banner">
+      {{ govukSummaryList({
+        rows:[
+          {
+            key: { text: 'Prison' },
+            value: { text: prisonConfiguration.prisonId }
+          },
+          {
+            key: { text: 'Residential location' },
+            value: { text: prisonConfiguration.nonResiServiceActive }
+          }
+        ],
+        classes: 'hmpps-inactive-location-banner-summary-list' }) }}
+  </span>
+{% endset %}
+
+{% block fields %}
+  {{ govukNotificationBanner({
+    html: resiHtml,
+    classes: 'govuk-notification-banner__headerless'
+  }) }}
+
+  <input type="hidden" name="activation" value="{{ 'IN' if prisonConfiguration.nonResiServiceActive == 'ACTIVE' }}ACTIVE">
+
+  {{ super() }}
+{% endblock %}
