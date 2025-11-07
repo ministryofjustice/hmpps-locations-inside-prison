@@ -32,6 +32,7 @@ describe('setCanAccess', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'ACTIVE',
     })
@@ -58,6 +59,7 @@ describe('setCanAccess', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'LSI',
       resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
@@ -71,6 +73,7 @@ describe('setCanAccess', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'WWI',
       resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'ACTIVE',
     })
