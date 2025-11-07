@@ -3,6 +3,7 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import PrisonConfigurationIndexPage from '../../pages/admin'
 import ResiStatusConfirmPage from '../../pages/admin/resi/confirm'
+import NonResiStatusConfirmPage from '../../pages/admin/nonResi/confirm'
 import CertApprovalConfirmPage from '../../pages/admin/certApproval/confirm'
 import SegInRollCountConfirmPage from '../../pages/admin/segInRollCount/confirm'
 
@@ -38,6 +39,7 @@ context('Admin Index', () => {
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubPrisonConfiguration')
       cy.task('stubPrisonConfigurationActivateResi')
+      cy.task('stubPrisonConfigurationActivateNonResi')
       cy.task('stubPrisonConfigurationCertApproval')
       cy.task('stubPrisonConfigurationIncludeSegInRollCount')
       cy.task('stubDisplayHousingCheckboxesDisabled')
@@ -71,6 +73,24 @@ context('Admin Index', () => {
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Residential location status')
       cy.get('.govuk-notification-banner__content p').contains('You have changed the residential location status.')
+    })
+
+    it('Can enable non-resi locations', () => {
+      const indexPage = Page.verifyOnPage(IndexPage)
+      indexPage.cards.adminster().find('a').click()
+      const prisonConfigurationIndexPage = Page.verifyOnPage(PrisonConfigurationIndexPage)
+      prisonConfigurationIndexPage.checkOnPage()
+      cy.get('.govuk-summary-list__value').eq(1).contains('INACTIVE')
+      prisonConfigurationIndexPage.changeResiLink().click()
+
+      const nonResiStatusIndexPage = Page.verifyOnPage(NonResiStatusConfirmPage)
+      nonResiStatusIndexPage.checkOnPage()
+      nonResiStatusIndexPage.confirmButton('Activate').click()
+
+      Page.verifyOnPage(PrisonConfigurationIndexPage)
+      cy.get('#govuk-notification-banner-title').contains('Success')
+      cy.get('.govuk-notification-banner__content h3').contains('Non-residential locations status')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed the non-residential locations status.')
     })
 
     it('Can enable seg in roll count', () => {
