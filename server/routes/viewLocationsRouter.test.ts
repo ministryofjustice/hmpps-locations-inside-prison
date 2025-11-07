@@ -28,6 +28,7 @@ beforeEach(() => {
   locationsService.getPrisonConfiguration.mockResolvedValue({
     prisonId: 'TST',
     resiLocationServiceActive: 'INACTIVE',
+    nonResiServiceActive: 'INACTIVE',
     includeSegregationInRollCount: 'INACTIVE',
     certificationApprovalRequired: 'INACTIVE',
   })
