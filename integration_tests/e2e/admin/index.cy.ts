@@ -80,8 +80,8 @@ context('Admin Index', () => {
       indexPage.cards.adminster().find('a').click()
       const prisonConfigurationIndexPage = Page.verifyOnPage(PrisonConfigurationIndexPage)
       prisonConfigurationIndexPage.checkOnPage()
-      cy.get('.govuk-summary-list__value').eq(1).contains('INACTIVE')
-      prisonConfigurationIndexPage.changeResiLink().click()
+      cy.get('.govuk-summary-list__value').eq(2).contains('INACTIVE')
+      prisonConfigurationIndexPage.changeNonResiLink().click()
 
       const nonResiStatusIndexPage = Page.verifyOnPage(NonResiStatusConfirmPage)
       nonResiStatusIndexPage.checkOnPage()
