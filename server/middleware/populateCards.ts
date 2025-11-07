@@ -2,7 +2,6 @@ import asyncMiddleware from './asyncMiddleware'
 import setCanAccess from './setCanAccess'
 import LocationsService from '../services/locationsService'
 import config from '../config'
-import populatePrisonConfiguration from './populatePrisonConfiguration'
 
 export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
