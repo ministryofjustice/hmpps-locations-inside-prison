@@ -72,7 +72,6 @@ context('Change draft location code', () => {
     },
   ]
 
-
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
