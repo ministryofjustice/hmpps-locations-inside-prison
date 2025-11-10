@@ -22,7 +22,7 @@ const steps: FormWizard.Steps = {
     controller: Details,
     template: '../../partials/formStep',
     next: [
-      { field: 'createCellsNow', value: 'YES', next: 'create-cells' },
+      { field: 'createCellsNow', value: 'YES', next: 'create-cells/details' },
       {
         fn: (req, _res) => !req.sessionModel.get<string>('locationId'),
         next: 'structure',

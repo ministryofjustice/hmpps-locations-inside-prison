@@ -7,6 +7,7 @@ import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
 import setupStubs, { existingWingLocation } from './setupStubs'
 import goToCreateLocationConfirmPage from './goToCreateLocationConfirmPage'
+import CreateCellsDetailsPage from '../../../pages/commonTransactions/createCells/details'
 
 context('Create Landing Confirm', () => {
   const newLandingLocation = LocationFactory.build({
@@ -91,6 +92,15 @@ context('Create Landing Confirm', () => {
       page.cancelLink().click()
 
       Page.verifyOnPage(ViewLocationsIndexPage)
+    })
+
+    it('walks through the transaction when create cells is changed to yes', () => {
+      page.editDetailsLink().click()
+
+      const detailsPage = Page.verifyOnPage(CreateLocationDetailsPage)
+      detailsPage.submit({ locationCode: 'test', createCellsNow: true })
+
+      Page.verifyOnPage(CreateCellsDetailsPage)
     })
   })
 })
