@@ -101,6 +101,7 @@ context('Index', () => {
       indexPage.cards.manageLocations().contains('Manage locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
+      indexPage.cards.cellCertificate().contains('Cell certificate')
     })
   })
 })

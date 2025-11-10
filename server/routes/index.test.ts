@@ -61,7 +61,7 @@ describe('GET /', () => {
     })
   })
 
-  it('should render index page with "Manage locations" and "Cell certificate" when certificationApprovalRequired is ACTIVE', async () => {
+  it('should render index page with "Manage locations" when certificationApprovalRequired is ACTIVE', async () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
