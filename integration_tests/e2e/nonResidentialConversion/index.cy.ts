@@ -68,7 +68,7 @@ context('Non-residential conversion', () => {
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
       cy.task('stubLocationsConvertCellToNonResCell')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 

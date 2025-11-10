@@ -67,7 +67,7 @@ context('View Locations Index', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.manageLocations().find('a').click()
+      indexPage.cards.viewLocations().find('a').click()
       const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsIndexPage)
 
       viewLocationsIndexPage.capacity.working().contains('8')
