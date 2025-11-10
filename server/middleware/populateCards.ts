@@ -40,7 +40,7 @@ export default function populateCards(locationsService: LocationsService) {
         description: 'View locations that have been permanently deactivated as residential locations.',
         'data-qa': 'archived-locations-card',
       },
-      req.canAccess('create_location')
+      req.canAccess('certificate_view_management')
         ? {
             clickable: true,
             visible: true,

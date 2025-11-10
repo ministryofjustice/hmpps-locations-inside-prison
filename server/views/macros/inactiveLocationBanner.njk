@@ -10,6 +10,12 @@
   {% if location.deactivationReasonDescription %}
     {% set deactivatedReason = deactivatedReason + " - " + location.deactivationReasonDescription %}
   {% endif %}
+  {% set changeRef = '#' %}
+  {% set changeText = '' %}
+  {% if canAccess('deactivate') %}
+    {% set changeRef = '/location/' + location.id + '/change-temporary-deactivation-details' %}
+    {% set changeText = 'Change' %}
+  {% endif %}
 
   {% set inactiveHtml %}
     <span class="hmpps-inactive-location-banner">
@@ -28,8 +34,8 @@
           actions: {
             items: [
               {
-                href: '/location/' + location.id + '/change-temporary-deactivation-details',
-                text: "Change",
+                href: changeRef,
+                text: changeText,
                 visuallyHiddenText: "reason",
                 classes: "govuk-link--no-visited-state"}
             ]
@@ -45,8 +51,8 @@
           actions: {
             items: [
               {
-                href: '/location/' + location.id + '/change-temporary-deactivation-details',
-                text: "Change",
+                href: changeRef,
+                text: changeText,
                 visuallyHiddenText: "estimatedReactivationDate",
                 classes: "govuk-link--no-visited-state"}
             ]
@@ -62,8 +68,8 @@
           actions: {
             items: [
               {
-                href: '/location/' + location.id + '/change-temporary-deactivation-details',
-                text: "Change",
+                href: changeRef,
+                text: changeText,
                 visuallyHiddenText: "planetFMReferenceNumber",
                 classes: "govuk-link--no-visited-state"
               }

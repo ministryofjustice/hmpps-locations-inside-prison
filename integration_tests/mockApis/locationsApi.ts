@@ -1283,7 +1283,7 @@ const stubGetPrisonConfiguration = ({
       },
       jsonBody: {
         prisonId,
-        resiLocationServiceActive: 'INACTIVE',
+        resiLocationServiceActive: 'ACTIVE',
         includeSegregationInRollCount: 'INACTIVE',
         certificationApprovalRequired: certificationActive,
       },

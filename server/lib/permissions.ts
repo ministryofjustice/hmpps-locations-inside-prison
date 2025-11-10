@@ -19,12 +19,13 @@ const certificateAdministratorPermissions: string[] = [
   'deactivate:permanent',
 ]
 
+const certificateViewerPermissions: string[] = ['certificate_view_management']
+
 const certificateReviewerPermissions: string[] = [
+  ...certificateViewerPermissions,
   'change_signed_operational_capacity',
   'certificate_change_request_review',
 ]
-
-const certificateViewerPermissions: string[] = ['certificate_view_management']
 
 const reportingLocationInformationPermissions: string[] = ['reporting_location_information']
 
