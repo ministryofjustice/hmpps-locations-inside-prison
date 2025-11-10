@@ -72,9 +72,6 @@ context('Change draft location code', () => {
     },
   ]
 
-  beforeEach(() => {
-    cy.task('setFeatureFlag', { createAndCertify: true })
-  })
 
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
@@ -94,7 +91,7 @@ context('Change draft location code', () => {
         parentLocation: draftWing,
       })
       cy.task('stubLocations', draftWing)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

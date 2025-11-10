@@ -27,7 +27,6 @@ context('Index', () => {
   context('With the default role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('setFeatureFlag', { createAndCertify: false })
       AuthStubber.stub.stubSignIn()
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
@@ -58,7 +57,6 @@ context('Index', () => {
   context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('setFeatureFlag', { createAndCertify: false })
       AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
@@ -86,10 +84,9 @@ context('Index', () => {
     })
   })
 
-  context('With createAndCertify featureFlag and MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('setFeatureFlag', { createAndCertify: true })
       AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()

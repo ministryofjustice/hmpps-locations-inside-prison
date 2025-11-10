@@ -23,7 +23,6 @@ const prisonResidentialSummary: PrisonResidentialSummary = {
 
 export default function setupStubs(roles = ['MANAGE_RES_LOCATIONS_OP_CAP']) {
   cy.task('reset')
-  cy.task('setFeatureFlag', { createAndCertify: true })
   AuthStubber.stub.stubSignIn({ roles })
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
   LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()

@@ -20,7 +20,7 @@ export default async (req: Request, res: Response) => {
       success: success[0],
     }
   }
-  if (!pendingApproval && req.featureFlags.createAndCertify && req.canAccess('create_location')) {
+  if (!pendingApproval && req.canAccess('create_location')) {
     if (!leafLevel && summary.subLocationName !== 'Cells') {
       const singularizedLocationType = singularizeString(summary.subLocationName).toLowerCase()
 

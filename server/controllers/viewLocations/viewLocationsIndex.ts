@@ -15,7 +15,7 @@ export default async (req: Request, res: Response) => {
     }
   }
 
-  if (req.featureFlags.createAndCertify && req.canAccess('create_location')) {
+  if (req.canAccess('create_location')) {
     const { decoratedResidentialSummary: summary } = res.locals
     const singularizedLocationType = singularizeString(String(summary.subLocationName)).toLowerCase()
 

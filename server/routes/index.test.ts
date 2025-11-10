@@ -51,7 +51,7 @@ describe('GET /', () => {
     const res = await request(app).get('/')
 
     expect(res.text).toContain('govuk-breadcrumbs')
-    expect(res.text).toContain('Manage locations')
+    expect(res.text).toContain('View and update locations')
     expect(res.text).toContain('View all inactive cells')
     expect(res.text).toContain('Archived locations')
 

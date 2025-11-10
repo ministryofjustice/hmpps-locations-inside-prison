@@ -7,7 +7,7 @@ export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
     setCanAccess(locationsService)
     res.locals.resiCards = [
-      req.featureFlags.createAndCertify
+      req.canAccess('create_location')
         ? {
             clickable: true,
             visible: true,
@@ -40,7 +40,7 @@ export default function populateCards(locationsService: LocationsService) {
         description: 'View locations that have been permanently deactivated as residential locations.',
         'data-qa': 'archived-locations-card',
       },
-      req.featureFlags.createAndCertify
+      req.canAccess('create_location')
         ? {
             clickable: true,
             visible: true,

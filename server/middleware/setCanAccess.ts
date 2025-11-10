@@ -20,14 +20,6 @@ export default function setCanAccess(locationService: LocationsService) {
     // A map of permission overrides, false = always disabled, true = always enabled
     const permissionOverrides: { [permission: string]: boolean | { [role: string]: boolean } } = {}
 
-    if (!req.featureFlags?.permanentDeactivation) {
-      permissionOverrides['deactivate:permanent'] = false
-    }
-
-    if (!req.featureFlags?.createAndCertify) {
-      permissionOverrides.create_location = false
-    }
-
     if (prisonIdFromParams !== undefined) {
       const prisonConfiguration = await locationService.getPrisonConfiguration(systemToken, prisonIdFromParams)
       if (prisonConfiguration.certificationApprovalRequired === 'INACTIVE') {
