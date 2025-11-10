@@ -15,7 +15,7 @@ export default function setCanAccess(locationService: LocationsService) {
     const { userRoles } = res.locals.user
     const { systemToken } = req.session
     const permissions = rolesToPermissions(userRoles)
-    const prisonIdFromParams = res.locals.user.activeCaseload.id
+    const prisonIdFromParams = req.params.prisonId || res.locals.user.activeCaseload.id
 
     // A map of permission overrides, false = always disabled, true = always enabled
     const permissionOverrides: { [permission: string]: boolean | { [role: string]: boolean } } = {}
