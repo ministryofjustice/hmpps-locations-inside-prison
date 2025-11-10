@@ -12,13 +12,13 @@
 
   {% set bannerHtml %}
     {% if isLockedDraft %}
-      <h3 class="govuk-heading-m">Cell certificate change requested for this location{{ govukTag({
-          text: 'Change requested',
-          classes: "govuk-tag--purple govuk-\!-float-right",
-          attributes: {
-            "data-qa": "change-requested"
-          }
-        }) }}</h3>
+      <div class="moj-ticket-panel__wrapper"><h3 class="govuk-heading-m govuk-!-margin-bottom-0 govuk-!-margin-right-2">Cell certificate change requested for this location</h3>{{ govukTag({
+      text: 'Change requested',
+      classes: "govuk-tag--purple govuk-\!-float-right",
+      attributes: {
+        "data-qa": "change-requested"
+      }
+    }) }}</div>
     {% else %}
       <h3 class="govuk-heading-m">{{ locationName }} in draft</h3>
     {% endif %}

@@ -50,14 +50,13 @@ context('Create Landing - Create cells - Confirm', () => {
   }
   let page: CreateLocationConfirmPage
 
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       page = goToCreateCellsConfirmPage()
     })
 
     it('shows the correct information and successfully creates draft landing', () => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
       LocationsApiStubber.stub.stubLocationsCreateCells(newLandingLocation)
       LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(createdLocationResidentialSummary)
       LocationsApiStubber.stub.stubLocations(newLandingLocation)

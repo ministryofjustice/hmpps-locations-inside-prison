@@ -6,10 +6,10 @@ import LocationsApiStubber from '../mockApis/locationsApi'
 import ManageUsersApiStubber from '../mockApis/manageUsersApi'
 
 context('Index', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
-      AuthStubber.stub.stubSignIn({ roles: [] })
+      AuthStubber.stub.stubSignIn()
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
@@ -24,7 +24,7 @@ context('Index', () => {
     })
   })
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  context('With the default role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('setFeatureFlag', { createAndCertify: false })
@@ -40,6 +40,7 @@ context('Index', () => {
 
       indexPage.cards.viewLocations().contains('View and update locations')
       indexPage.cards.manageLocations().should('not.exist')
+      indexPage.cards.cellCertificate().should('not.exist')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
     })
@@ -54,11 +55,11 @@ context('Index', () => {
     })
   })
 
-  context('With the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('setFeatureFlag', { createAndCertify: false })
-      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
@@ -70,6 +71,7 @@ context('Index', () => {
 
       indexPage.cards.viewLocations().contains('View and update locations')
       indexPage.cards.manageLocations().should('not.exist')
+      indexPage.cards.cellCertificate().should('not.exist')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
     })
@@ -84,11 +86,11 @@ context('Index', () => {
     })
   })
 
-  context('With createAndCertify featureFlag and MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With createAndCertify featureFlag and MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('setFeatureFlag', { createAndCertify: true })
-      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
@@ -102,6 +104,7 @@ context('Index', () => {
       indexPage.cards.manageLocations().contains('Manage locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
+      indexPage.cards.cellCertificate().contains('Cell certificate')
     })
   })
 })

@@ -16,7 +16,7 @@ context('Cell conversion', () => {
     localName: '1-1-001',
   })
 
-  context('without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
@@ -32,7 +32,7 @@ context('Cell conversion', () => {
       cy.task('stubLocationsConstantsUsedForTypeForPrison')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubLocations', location)
-      cy.task('setFeatureFlag', { map2380: false, createAndCertify: false })
+      cy.task('setFeatureFlag', { createAndCertify: false })
       // TODO: write tests for createAndCertify?
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
@@ -50,10 +50,10 @@ context('Cell conversion', () => {
     })
   })
 
-  context('with the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
@@ -69,7 +69,6 @@ context('Cell conversion', () => {
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
       cy.task('stubLocationsConvertToCell')
-      cy.task('setFeatureFlag', { map2380: false })
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })

@@ -6,9 +6,9 @@ import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertifica
 import CellCertificateChangeRequestsWithdrawPage from '../../../pages/cellCertificate/changeRequests/withdraw'
 
 context('Cell Certificate - Change Requests - Withdraw', () => {
-  context('With MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      setupStubs(['MANAGE_RESIDENTIAL_LOCATIONS'])
+      setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
       cy.signIn()
     })
 

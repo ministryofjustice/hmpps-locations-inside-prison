@@ -34,7 +34,7 @@
               text: formatConstants(approvalTypeConstants, request.approvalType)
             },
             {
-              text: request.approvedOrRejectedDate | formatDate
+              text: request.approvedOrRejectedDate | formatDateWithTime
             },
             {
               text: userMap[request.approvedOrRejectedBy]

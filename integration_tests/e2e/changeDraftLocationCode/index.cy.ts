@@ -76,7 +76,7 @@ context('Change draft location code', () => {
     cy.task('setFeatureFlag', { createAndCertify: true })
   })
 
-  context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn')
@@ -105,10 +105,10 @@ context('Change draft location code', () => {
     })
   })
 
-  context('With the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+  context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
