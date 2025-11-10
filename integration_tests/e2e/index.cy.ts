@@ -24,7 +24,7 @@ context('Index', () => {
     })
   })
 
-  context('With the default role', () => {
+  context('With the default role but certification inactive', () => {
     beforeEach(() => {
       cy.task('reset')
       AuthStubber.stub.stubSignIn()
@@ -54,24 +54,24 @@ context('Index', () => {
     })
   })
 
-  context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+  context('With the default role but certification active', () => {
     beforeEach(() => {
       cy.task('reset')
-      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
     })
 
     it('Displays the tiles', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.viewLocations().contains('View and update locations')
-      indexPage.cards.manageLocations().should('not.exist')
-      indexPage.cards.cellCertificate().should('not.exist')
+      indexPage.cards.viewLocations().should('not.exist')
+      indexPage.cards.manageLocations().contains('Manage locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
+      indexPage.cards.cellCertificate().should('not.exist')
     })
 
     it('has a feedback banner', () => {
