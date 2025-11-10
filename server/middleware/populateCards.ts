@@ -4,10 +4,15 @@ import LocationsService from '../services/locationsService'
 import config from '../config'
 
 export default function populateCards(locationsService: LocationsService) {
-  return asyncMiddleware((req, res, next) => {
+  return asyncMiddleware(async (req, res, next) => {
     setCanAccess(locationsService)
+    const { systemToken } = req.session
+    const { id: prisonId } = res.locals.user.activeCaseload
+    const prisonConfiguration = await locationsService.getPrisonConfiguration(systemToken, prisonId)
+    const certificationEnabled = prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
+
     res.locals.resiCards = [
-      req.featureFlags.createAndCertify
+      certificationEnabled
         ? {
             clickable: true,
             visible: true,
@@ -40,7 +45,7 @@ export default function populateCards(locationsService: LocationsService) {
         description: 'View locations that have been permanently deactivated as residential locations.',
         'data-qa': 'archived-locations-card',
       },
-      req.featureFlags.createAndCertify
+      certificationEnabled
         ? {
             clickable: true,
             visible: true,
