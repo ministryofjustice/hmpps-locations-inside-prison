@@ -92,7 +92,7 @@ jobs:
           sleep 5
 
       - name: Run split Cypress tests 🧪
-        uses: cypress-io/github-action@v6.10.3
+        uses: cypress-io/github-action@v6.10.4
         with:
           browser: chrome
         env:

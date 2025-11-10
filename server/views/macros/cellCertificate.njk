@@ -42,7 +42,7 @@
   {% for location in certificate.locations %}
     {% set wingUsageRows = (wingUsageRows.push([
       {
-        text: location.pathHierarchy
+        text: location.localName or (location.pathHierarchy + '-wing')
       },
       {
         html: formatConstants(accommodationTypeConstants, location.accommodationTypes)
