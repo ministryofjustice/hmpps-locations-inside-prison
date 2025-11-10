@@ -13,20 +13,24 @@ export default class PrisonConfigurationIndexPage extends Page {
     cy.get('.govuk-summary-list__key').eq(0).contains('Prison')
     cy.get('.govuk-summary-list__value').eq(0).contains('TST')
     cy.get('.govuk-summary-list__key').eq(1).contains('Residential location')
-    cy.get('.govuk-summary-list__key').eq(2).contains('Include seg in roll count')
+    cy.get('.govuk-summary-list__key').eq(2).contains('Non-residential locations')
     cy.get('.govuk-summary-list__value').eq(2).contains('INACTIVE')
-    cy.get('.govuk-summary-list__key').eq(3).contains('Certification approval required')
+    cy.get('.govuk-summary-list__key').eq(3).contains('Include seg in roll count')
     cy.get('.govuk-summary-list__value').eq(3).contains('INACTIVE')
-    cy.get('.govuk-summary-list__key').eq(4).contains('Prison non housing checkboxes')
-    cy.get('.govuk-summary-list__key').eq(5).contains('OIMMHOLO screen blocked')
-    cy.get('.govuk-summary-list__value').eq(5).contains('Not-Blocked')
+    cy.get('.govuk-summary-list__key').eq(4).contains('Certification approval required')
+    cy.get('.govuk-summary-list__value').eq(4).contains('INACTIVE')
+    cy.get('.govuk-summary-list__key').eq(5).contains('Prison non housing checkboxes')
+    cy.get('.govuk-summary-list__key').eq(6).contains('OIMMHOLO screen blocked')
+    cy.get('.govuk-summary-list__value').eq(6).contains('Not-Blocked')
   }
 
   changeResiLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(0).contains('Change')
 
-  changeSegInRollLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(1).contains('Change')
+  changeNonResiLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(1).contains('Change')
 
-  changeCertificationLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(2).contains('Change')
+  changeSegInRollLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(2).contains('Change')
 
-  changePrisonNonHousing = (): PageElement => cy.get('.govuk-summary-list__actions').eq(3).contains('Change')
+  changeCertificationLink = (): PageElement => cy.get('.govuk-summary-list__actions').eq(3).contains('Change')
+
+  changePrisonNonHousing = (): PageElement => cy.get('.govuk-summary-list__actions').eq(4).contains('Change')
 }

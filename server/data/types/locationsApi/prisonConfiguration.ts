@@ -1,6 +1,7 @@
 export declare interface PrisonConfiguration {
   prisonId: string
   resiLocationServiceActive: string
+  nonResiServiceActive: string
   includeSegregationInRollCount: string
   certificationApprovalRequired: string
 }

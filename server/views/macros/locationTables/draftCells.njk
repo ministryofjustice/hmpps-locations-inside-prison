@@ -10,7 +10,7 @@
         {% set rows = (rows.push(
           [
             { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
-            { html: locationStatusTag(item) },
+            { html: "<p class='govuk-tag__wrapper'>" + locationStatusTag(item) + "</p>" },
             { text: item.cellMark },
             { text: item.pendingChanges.certifiedNormalAccommodation or item.certification.certifiedNormalAccommodation },
             { text: item.pendingChanges.workingCapacity or item.capacity.workingCapacity },

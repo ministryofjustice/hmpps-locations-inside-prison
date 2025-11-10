@@ -21,7 +21,7 @@
       text: location.maxCapacity or '-'
     },
     {
-      html: formatConstants(specialistCellTypesObject, location.specialistCellTypes) or '-'
+      html: (formatConstants(specialistCellTypesObject, location.specialistCellTypes) or '-') if location.locationType == 'CELL' else '-'
     },
     {
       text: 'Yes' if location.inCellSanitation == true else ('No' if location.inCellSanitation == false else '-')
@@ -43,7 +43,7 @@
   {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
   {% endif %}
 
-  <div class="govuk-grid-row" data-qa="approval-request-{{ request.approvalType }}">
+  <div class="govuk-grid-row govuk-!-margin-bottom-0" data-qa="approval-request-{{ request.approvalType }}">
     <div class="govuk-grid-column-two-thirds">
       {% if multiple %}
         <h2 class="govuk-heading-m">Change {{ index + 1 }} - {{ changeType }}</h2>
@@ -99,11 +99,10 @@
             { text: "Used for" }
           ],
           rows: [[
-            { text: request.locations[0].pathHierarchy },
+            { text: request.locations[0].pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
             { html: formatConstants(accommodationTypeConstants, request.locations[0].accommodationTypes) },
             { html: formatConstants(usedForConstants, request.locations[0].usedFor) }
-          ]],
-          firstCellIsHeader: true
+          ]]
         }) }}
 
         {% if not multiple %}
