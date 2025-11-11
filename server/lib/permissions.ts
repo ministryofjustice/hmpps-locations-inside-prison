@@ -2,8 +2,11 @@ import { uniq } from 'lodash'
 
 const cellStatusManagerPermissions: string[] = ['change_temporary_deactivation_details', 'reactivate', 'deactivate']
 
+const certificateViewerPermissions: string[] = ['certificate_view_management']
+
 const certificateAdministratorPermissions: string[] = [
   ...cellStatusManagerPermissions,
+  ...certificateViewerPermissions,
   'change_cell_capacity',
   'change_local_name',
   'change_location_code',
@@ -20,16 +23,14 @@ const certificateAdministratorPermissions: string[] = [
 ]
 
 const certificateReviewerPermissions: string[] = [
+  ...certificateViewerPermissions,
   'change_signed_operational_capacity',
   'certificate_change_request_review',
 ]
 
-const certificateViewerPermissions: string[] = ['certificate_view_management']
-
 const reportingLocationInformationPermissions: string[] = ['reporting_location_information']
 
 const administerResLocationsPermissions: string[] = [
-  ...certificateAdministratorPermissions,
   ...reportingLocationInformationPermissions,
   'administer_residential',
 ]

@@ -1,7 +1,5 @@
 # Runs the services needed for integration testing
 # or the subset of services needed by the application if it is connected to `dev` HMPPS APIs
-version: "3.9"
-
 services:
 
   redis:

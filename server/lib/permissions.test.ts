@@ -13,6 +13,7 @@ describe('rolesToPermissions', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP']).sort()).toEqual([
       'certificate_change_request_create',
       'certificate_change_request_withdraw',
+      'certificate_view_management',
       'change_cell_capacity',
       'change_local_name',
       'change_location_code',

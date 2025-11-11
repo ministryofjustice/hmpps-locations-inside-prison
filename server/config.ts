@@ -148,8 +148,6 @@ export default {
   feedbackFormUrl: get('FEEDBACK_FORM_URL', ''),
   loadReportDefinitionsOnStartup: get('LOAD_DPR_ON_STARTUP', 'false') === 'true',
   featureFlags: {
-    permanentDeactivation: get('FLAG_MVP2_PERMANENT_DEACTIVATION', 'disabled') === 'enabled',
-    createAndCertify: get('FLAG_CREATE_AND_CERTIFY', 'disabled') === 'enabled',
     nonResi: get('FLAG_NON_RESI', 'disabled') === 'enabled',
   },
 }

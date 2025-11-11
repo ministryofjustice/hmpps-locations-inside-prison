@@ -39,7 +39,6 @@ describe('setCanAccess', () => {
   })
 
   beforeEach(async () => {
-    deepReq.featureFlags = { createAndCertify: true }
     deepReq.params = { prisonId: 'TST' }
     await setCanAccess(locationsService)(deepReq as Request, deepRes as Response, next)
   })

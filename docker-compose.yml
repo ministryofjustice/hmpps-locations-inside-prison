@@ -206,8 +206,6 @@ services:
       - PRISON_API_URL=http://localhost:8091
       - NO_HTTPS=true
       - LOAD_DPR_ON_STARTUP=true
-      - FLAG_MVP2_PERMANENT_DEACTIVATION=enabled
-      - FLAG_CREATE_AND_CERTIFY=enabled
 
 networks:
   hmpps:
