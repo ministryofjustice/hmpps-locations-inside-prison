@@ -66,6 +66,7 @@ generic-service:
     AUDIT_SQS_REGION: 'eu-west-2'
     AUDIT_SERVICE_NAME: 'UNASSIGNED' # Your audit service name
     LOAD_DPR_ON_STARTUP: "true"
+    FLAG_NON_RESI: disabled
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

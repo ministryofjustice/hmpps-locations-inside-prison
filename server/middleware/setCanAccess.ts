@@ -15,18 +15,10 @@ export default function setCanAccess(locationService: LocationsService) {
     const { userRoles } = res.locals.user
     const { systemToken } = req.session
     const permissions = rolesToPermissions(userRoles)
-    const prisonIdFromParams = req.params.prisonId
+    const prisonIdFromParams = req.params.prisonId || res.locals.user.activeCaseload.id
 
     // A map of permission overrides, false = always disabled, true = always enabled
     const permissionOverrides: { [permission: string]: boolean | { [role: string]: boolean } } = {}
-
-    if (!req.featureFlags?.permanentDeactivation) {
-      permissionOverrides['deactivate:permanent'] = false
-    }
-
-    if (!req.featureFlags?.createAndCertify) {
-      permissionOverrides.create_location = false
-    }
 
     if (prisonIdFromParams !== undefined) {
       const prisonConfiguration = await locationService.getPrisonConfiguration(systemToken, prisonIdFromParams)
