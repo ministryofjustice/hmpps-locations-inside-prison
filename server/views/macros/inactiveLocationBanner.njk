@@ -28,8 +28,8 @@
           actions: {
             items: [
               {
-                href: changeRef,
-                text: changeText,
+                href: '/location/' + location.id + '/change-temporary-deactivation-details',
+                text: "Change",
                 visuallyHiddenText: "reason",
                 classes: "govuk-link--no-visited-state"} if canAccess('deactivate')
             ]
@@ -45,8 +45,8 @@
           actions: {
             items: [
               {
-                href: changeRef,
-                text: changeText,
+                href: '/location/' + location.id + '/change-temporary-deactivation-details',
+                text: "Change",
                 visuallyHiddenText: "estimatedReactivationDate",
                 classes: "govuk-link--no-visited-state"} if canAccess('deactivate')
             ]
@@ -62,8 +62,8 @@
           actions: {
             items: [
               {
-                href: changeRef,
-                text: changeText,
+                href: '/location/' + location.id + '/change-temporary-deactivation-details',
+                text: "Change",
                 visuallyHiddenText: "planetFMReferenceNumber",
                 classes: "govuk-link--no-visited-state"
               } if canAccess('deactivate')
