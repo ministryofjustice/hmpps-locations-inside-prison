@@ -39,7 +39,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
             items: [
               {
                 text: 'Change',
-                href: `${res.locals.createRootLink}/create-cells`,
+                href: `${res.locals.createRootLink}/create-cells/details/edit`,
                 classes: 'govuk-link--no-visited-state',
               },
             ],
@@ -52,7 +52,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
             items: [
               {
                 text: 'Change',
-                href: `${res.locals.createRootLink}/create-cells`,
+                href: `${res.locals.createRootLink}/create-cells/details/edit`,
                 classes: 'govuk-link--no-visited-state',
               },
             ],
@@ -91,7 +91,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
 
     locals.locationType = req.sessionModel.get<LocationType>('locationType')
 
-    locals.createDetailsLink = `/create-new/${locationId || prisonId}/details`
+    locals.createDetailsLink = `/create-new/${locationId || prisonId}/details/edit`
 
     if (structureLevels?.length) {
       const fullStructure = [locationType, ...structureLevels]

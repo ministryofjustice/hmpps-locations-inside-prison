@@ -7,6 +7,7 @@ import setupStubs from './setupStubs'
 import goToCreateLocationDetailsPage from '../goToCreateLocationDetailsPage'
 import LocationFactory from '../../../../server/testutils/factories/location'
 import { LocationResidentialSummary } from '../../../../server/data/types/locationsApi'
+import CreateLocationConfirmPage from '../../../pages/createLocation/confirm'
 
 const residentialSummaryWithoutCellChild: LocationResidentialSummary = {
   parentLocation: LocationFactory.build({
@@ -127,6 +128,10 @@ context('Create Landing Details', () => {
       Page.verifyOnPage(ViewLocationsShowPage)
     })
 
+    it('navigates to confirm page when validation passes', () => {
+      page.submit({ locationCode: 'new1', createCellsNow: false })
+      Page.verifyOnPage(CreateLocationConfirmPage)
+    })
     // TODO: write tests for transition to next step
     // TODO: write tests for create cells field
   })
