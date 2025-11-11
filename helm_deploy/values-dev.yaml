@@ -23,8 +23,6 @@ generic-service:
     PRISON_API_URL: "https://prison-api-dev.prison.service.justice.gov.uk"
     ENVIRONMENT_NAME: DEV
     AUDIT_ENABLED: "false"
-    FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
-    FLAG_CREATE_AND_CERTIFY: enabled
     FLAG_NON_RESI: enabled
 
 generic-prometheus-alerts:

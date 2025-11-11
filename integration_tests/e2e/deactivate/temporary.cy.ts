@@ -20,7 +20,6 @@ context('Deactivate temporary', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.task('setFeatureFlag', { permanentDeactivation: true })
   })
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -166,31 +165,6 @@ context('Deactivate temporary', () => {
       deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
       deactivateTypePage.backLink().click()
       Page.verifyOnPage(ViewLocationsShowPage)
-    })
-
-    context('when the permanentDeactivation feature flag is disabled', () => {
-      beforeEach(() => {
-        cy.task('setFeatureFlag', { permanentDeactivation: false })
-      })
-
-      it('goes straight to temp deactivation when clicking the actions dropdown', () => {
-        ViewLocationsShowPage.goTo(location.prisonId, location.id)
-        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-        viewLocationsShowPage.actionsMenu().click()
-        viewLocationsShowPage.deactivateAction().click()
-
-        Page.verifyOnPage(DeactivateTemporaryDetailsPage)
-      })
-
-      it('goes straight back to the view location page when clicking back', () => {
-        ViewLocationsShowPage.goTo(location.prisonId, location.id)
-        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-        viewLocationsShowPage.actionsMenu().click()
-        viewLocationsShowPage.deactivateAction().click()
-        const deactivateTemporaryPage = Page.verifyOnPage(DeactivateTemporaryDetailsPage)
-        deactivateTemporaryPage.backLink().click()
-        Page.verifyOnPage(ViewLocationsShowPage)
-      })
     })
 
     describe('details page', () => {

@@ -30,7 +30,6 @@ const residentialSummary: LocationResidentialSummary = {
 
 export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) {
   cy.task('reset')
-  cy.task('setFeatureFlag', { createAndCertify: true })
   AuthStubber.stub.stubSignIn({ roles })
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
   LocationsApiStubber.stub.stubLocations(existingLandingLocation)
