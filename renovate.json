@@ -2,7 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>ministryofjustice/hmpps-renovate-config:node"],
   "prBodyTemplate": "{{{table}}}{{{notes}}}{{{warnings}}}{{{controls}}}",
-  "schedule": ["before 7am every weekday"],
   "packageRules": [
     {
       "matchManagers": ["npm"],
@@ -45,5 +44,6 @@
     "stabilityDays": 0
   },
   "rebaseWhen": "conflicted",
+  "schedule": ["before 7am every weekday", "after 1am every weekday"],
   "enabled": true
 }
