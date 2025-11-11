@@ -85,7 +85,7 @@ describe('GET /', () => {
     expect(res.text).toContain('Manage locations')
     expect(res.text).toContain('View all inactive cells')
     expect(res.text).toContain('Archived locations')
-    expect(res.text).not.toContain('Cell certificate')
+    expect(res.text).toContain('Cell certificate')
     expect(res.text).not.toContain('View and update locations')
 
     expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
