@@ -157,7 +157,6 @@ const otherNewLocationsRequest = CertificationApprovalRequestFactory.build({
 
 export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS'], options?: { proposedOpCap?: boolean }) {
   cy.task('reset')
-  cy.task('setFeatureFlag', { createAndCertify: true })
   AuthStubber.stub.stubSignIn({ roles })
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
   LocationsApiStubber.stub.stubLocations(otherDraftWing)

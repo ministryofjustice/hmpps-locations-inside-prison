@@ -52,6 +52,7 @@ describe('error handler', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'ACTIVE',
     })

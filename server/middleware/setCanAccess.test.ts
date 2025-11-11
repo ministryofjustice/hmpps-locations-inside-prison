@@ -32,13 +32,13 @@ describe('setCanAccess', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'ACTIVE',
     })
   })
 
   beforeEach(async () => {
-    deepReq.featureFlags = { createAndCertify: true }
     deepReq.params = { prisonId: 'TST' }
     await setCanAccess(locationsService)(deepReq as Request, deepRes as Response, next)
   })
@@ -58,6 +58,7 @@ describe('setCanAccess', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'LSI',
       resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
@@ -71,6 +72,7 @@ describe('setCanAccess', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'WWI',
       resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'ACTIVE',
     })

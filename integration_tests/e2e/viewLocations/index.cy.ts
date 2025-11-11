@@ -61,7 +61,6 @@ context('View Locations Index', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
-      cy.task('setFeatureFlag', { createAndCertify: true })
     })
 
     it('Correctly presents the API data', () => {

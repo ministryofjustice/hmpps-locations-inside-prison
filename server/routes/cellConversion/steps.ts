@@ -21,7 +21,7 @@ const steps: FormWizard.Steps = {
     skip: true,
     next: [
       {
-        fn: (req, _res) => req.featureFlags.createAndCertify,
+        fn: (req, _res) => req.canAccess('create_location'),
         next: 'cert-change-disclaimer',
       },
       'accommodation-type',

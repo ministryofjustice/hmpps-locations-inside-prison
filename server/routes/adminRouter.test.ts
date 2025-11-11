@@ -43,6 +43,7 @@ describe('GET /admin', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'ACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
@@ -57,6 +58,7 @@ describe('GET /admin/PRISON_ID', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'ACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
@@ -90,6 +92,7 @@ describe('GET /admin/PRISON_ID', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'ACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
@@ -127,6 +130,7 @@ describe('GET /admin/PRISON_ID', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'ACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
@@ -169,6 +173,7 @@ describe('GET /admin/PRISON_ID', () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'ACTIVE',
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })

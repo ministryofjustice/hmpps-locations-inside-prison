@@ -2,7 +2,6 @@ import Page from '../../../../../pages/page'
 import setupStubs from '../../setupStubs'
 import goToCreateCellsConfirmPage from '../goToCreateCellsConfirmPage'
 import CreateLocationConfirmPage from '../../../../../pages/createLocation/confirm'
-import CreateCellsDetailsPage from '../../../../../pages/commonTransactions/createCells/details'
 import CreateLocationDetailsPage from '../../../../../pages/createLocation'
 
 context('Create Landing - Create cells - Edit - Details', () => {
@@ -14,13 +13,32 @@ context('Create Landing - Create cells - Edit - Details', () => {
       page = goToCreateCellsConfirmPage()
     })
 
-    it('Walks back through the whole transaction', () => {
-      page.editDetailsLink().click()
+    context('When createCellsNow changes', () => {
+      it('Goes back to confirm', () => {
+        page.editDetailsLink().click()
 
-      const detailsPage = Page.verifyOnPage(CreateLocationDetailsPage)
-      detailsPage.submit({ locationCode: 'test', createCellsNow: true })
+        let detailsPage = Page.verifyOnPage(CreateLocationDetailsPage)
+        detailsPage.submit({ locationCode: 'test', createCellsNow: false })
 
-      Page.verifyOnPage(CreateCellsDetailsPage)
+        Page.verifyOnPage(CreateLocationConfirmPage)
+        page.editDetailsLink().click()
+
+        detailsPage = Page.verifyOnPage(CreateLocationDetailsPage)
+        detailsPage.submit({ locationCode: 'test', createCellsNow: true })
+
+        Page.verifyOnPage(CreateLocationConfirmPage)
+      })
+    })
+
+    context('When no values change', () => {
+      it('Goes back to confirm', () => {
+        page.editDetailsLink().click()
+
+        const detailsPage = Page.verifyOnPage(CreateLocationDetailsPage)
+        detailsPage.submit({ locationCode: 'test', createCellsNow: true })
+
+        Page.verifyOnPage(CreateLocationConfirmPage)
+      })
     })
   })
 })

@@ -10,6 +10,7 @@ import modifyFieldName from '../../helpers/field/modifyFieldName'
 import WithoutSanitation from './withoutSanitation'
 import UsedFor from './usedFor'
 import RemoveCellType from './removeCellType'
+import Details from './details'
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/set-cell-type/:cellId') {
@@ -132,11 +133,11 @@ const setCellTypeSteps = Object.fromEntries(
 )
 
 const steps: FormWizard.Steps = {
-  '/': {
+  '/details': {
     editable: true,
     pageTitle: 'Enter cell details',
     fields: ['cellsToCreate', 'accommodationType'],
-    controller: BaseController,
+    controller: Details,
     next: 'cell-numbers',
   },
   '/cell-numbers': {

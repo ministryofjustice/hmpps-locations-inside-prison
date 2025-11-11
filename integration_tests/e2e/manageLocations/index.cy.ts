@@ -30,7 +30,6 @@ const residentialSummary = {
 context('View Locations Index', () => {
   context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
-      cy.task('setFeatureFlag', { createAndCertify: true })
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
     })
@@ -60,7 +59,6 @@ context('View Locations Index', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
-      cy.task('setFeatureFlag', { createAndCertify: true })
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
