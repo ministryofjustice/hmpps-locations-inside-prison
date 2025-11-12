@@ -43,99 +43,97 @@
   {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
   {% endif %}
 
-  <div class="govuk-grid-row govuk-!-margin-bottom-0" data-qa="approval-request-{{ request.approvalType }}">
-    <div class="govuk-grid-column-two-thirds">
-      {% if multiple %}
-        <h2 class="govuk-heading-m">Change {{ index + 1 }} - {{ changeType }}</h2>
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row govuk-!-margin-bottom-0" data-qa="approval-request-{{ request.approvalType }}">
+      <div class="govuk-grid-column-two-thirds">
+        {% if multiple %}
+          <h2 class="govuk-heading-m">Change {{ index + 1 }} - {{ changeType }}</h2>
+        {% endif %}
+      </div>
+
+      {% if request.approvalType == 'SIGNED_OP_CAP' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request) }}
+          {% endif %}
+
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'cap-change-table'
+            },
+            head: [
+              { text: "Location", classes: "govuk-!-width-one-third" },
+              { text: "Signed operational capacity", classes: "govuk-!-width-two-thirds" }
+            ],
+            rows: [[
+              { text: request.prisonId },
+              { text: request.currentSignedOperationCapacity + " → " + (request.currentSignedOperationCapacity + request.signedOperationCapacityChange) }
+            ]]
+          }) }}
+        </div>
+      {% elseif request.approvalType == 'DRAFT' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+            <h3 class="govuk-heading-s">New wing usage</h3>
+          {% endif %}
+
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'wing-table'
+            },
+            head: [
+              { classes: 'govuk-table__cell', text: "Location" },
+              { text: "Accommodation type" },
+              { text: "Used for" }
+            ],
+            rows: [[
+              { text: request.locations[0].pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
+              { html: formatConstants(accommodationTypeConstants, request.locations[0].accommodationTypes) },
+              { html: formatConstants(usedForConstants, request.locations[0].usedFor) }
+            ]]
+          }) }}
+
+          {% if not multiple %}
+            <h3 class="govuk-heading-s">New locations</h3>
+          {% endif %}
+        </div>
+
+        {% set locationTableRows = [] %}
+        {% for location in request.locations %}
+          {{ recurseLocationTable(locationTableRows, location, specialistCellTypesObject) }}
+        {% endfor %}
+
+        <div class="govuk-grid-column-full">
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'locations-table'
+            },
+            head: [
+              { text: "Location code" },
+              { text: "Door number" },
+              { text: "Baseline CNA" },
+              { text: "Certified working capacity" },
+              { text: "Maximum capacity" },
+              { text: "Cell type" },
+              { text: "Sanitation" }
+            ],
+            rows: locationTableRows,
+            firstCellIsHeader: true
+          }) }}
+        </div>
+      {% elseif request.approvalType == 'DEACTIVATION' %}
+      {% elseif request.approvalType == 'REACTIVATION' %}
+      {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
       {% endif %}
     </div>
-
-    {% if request.approvalType == 'SIGNED_OP_CAP' %}
-      <div class="govuk-grid-column-two-thirds">
-        {% if includeChangeSummary %}
-          {{ certificationApprovalRequestSummary(request) }}
-        {% endif %}
-
-        {% if multiple %}
-          <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
-        {% else %}
-          <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
-        {% endif %}
-
-        {{ govukTable({
-          attributes: {
-            'data-qa': 'cap-change-table'
-          },
-          head: [
-            { text: "Location", classes: "govuk-!-width-one-third" },
-            { text: "Signed operational capacity", classes: "govuk-!-width-two-thirds" }
-          ],
-          rows: [[
-            { text: request.prisonId },
-            { text: request.currentSignedOperationCapacity + " → " + (request.currentSignedOperationCapacity + request.signedOperationCapacityChange) }
-          ]]
-        }) }}
-      </div>
-    {% elseif request.approvalType == 'DRAFT' %}
-      <div class="govuk-grid-column-two-thirds">
-        {% if multiple %}
-          <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
-        {% else %}
-          <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
-
-          <h3 class="govuk-heading-s">New wing usage</h3>
-        {% endif %}
-
-        {{ govukTable({
-          attributes: {
-            'data-qa': 'wing-table'
-          },
-          head: [
-            {
-              classes: 'govuk-table__cell',
-              text: "Location"
-            },
-            { text: "Accommodation type" },
-            { text: "Used for" }
-          ],
-          rows: [[
-            { text: request.locations[0].pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
-            { html: formatConstants(accommodationTypeConstants, request.locations[0].accommodationTypes) },
-            { html: formatConstants(usedForConstants, request.locations[0].usedFor) }
-          ]]
-        }) }}
-
-        {% if not multiple %}
-          <h3 class="govuk-heading-s">New locations</h3>
-        {% endif %}
-      </div>
-
-      {% set locationTableRows = [] %}
-      {% for location in request.locations %}
-        {{ recurseLocationTable(locationTableRows, location, specialistCellTypesObject) }}
-      {% endfor %}
-
-      <div class="govuk-grid-column-full">
-        {{ govukTable({
-          attributes: {
-            'data-qa': 'locations-table'
-          },
-          head: [
-            { text: "Location code" },
-            { text: "Door number" },
-            { text: "Baseline CNA" },
-            { text: "Certified working capacity" },
-            { text: "Maximum capacity" },
-            { text: "Cell type" },
-            { text: "Sanitation" }
-          ],
-          rows: locationTableRows,
-          firstCellIsHeader: true
-        }) }}
-      </div>
-    {% elseif request.approvalType == 'DEACTIVATION' %}
-    {% elseif request.approvalType == 'REACTIVATION' %}
-    {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
-    {% endif %}
   </div>
 {% endmacro %}
