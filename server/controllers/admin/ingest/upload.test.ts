@@ -77,17 +77,34 @@ describe('Upload file csv', () => {
       expect(callback).toHaveBeenCalledWith(expect.objectContaining({ file: expectedError }))
     })
 
-    it('validation failure for an incorrectly formatted file', async () => {
+    it('validation failure for an incorrectly formatted cna value in the file', async () => {
       deepReq.file = {
-        path: 'uploads/testdata/bad-format.csv',
+        path: 'uploads/testdata/empty-cna.csv',
       } as unknown as Express.Multer.File
-
-      const expectedError = controller.formError('file', 'parseFailure')
 
       const callback = jest.fn()
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ file: expectedError }))
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: controller.formError('file', 'ingest', 'The CNA value is not numeric for cell LGI-S-0-032'),
+        }),
+      )
+    })
+
+    it('validation failure for an incorrectly formatted max cap value in the file', async () => {
+      deepReq.file = {
+        path: 'uploads/testdata/empty-max-cap.csv',
+      } as unknown as Express.Multer.File
+
+      const callback = jest.fn()
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: controller.formError('file', 'ingest', 'The Max Cap value is not numeric for cell LGI-S-0-032'),
+        }),
+      )
     })
 
     it('validation failure as prison does not match', async () => {
