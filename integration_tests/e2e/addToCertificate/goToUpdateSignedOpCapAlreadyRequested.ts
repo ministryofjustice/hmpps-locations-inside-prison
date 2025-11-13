@@ -1,10 +1,9 @@
 import Page from '../../pages/page'
-import goToCertChangeDisclaimer from './goToCertChangeDisclaimer'
 import UpdateSignedOpCapAlreadyRequestedPage from '../../pages/commonTransactions/updateSignedOpCap/alreadyRequested'
+import goToUpdateSignedOpCapIsUpdateNeeded from './goToUpdateSignedOpCapIsUpdateNeeded'
 
 const goToUpdateSignedOpCapAlreadyRequested = (locationId: string) => {
-  goToCertChangeDisclaimer(locationId).submit()
-
+  goToUpdateSignedOpCapIsUpdateNeeded(locationId).submit({ updateNeeded: true })
   return Page.verifyOnPage(UpdateSignedOpCapAlreadyRequestedPage)
 }
 

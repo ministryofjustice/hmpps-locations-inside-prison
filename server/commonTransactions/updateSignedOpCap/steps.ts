@@ -7,20 +7,28 @@ const steps: FormWizard.Steps = {
   '/': {
     skip: true,
     controller: BaseController,
-    next: [{ fn: (_req, res) => !!res.locals.signedOpCapChangeRequest, next: 'already-requested' }, 'is-update-needed'],
-  },
-  '/already-requested': {
-    pageTitle: 'A change to the signed operational capacity has already been requested',
-    template: '../../commonTransactions/updateSignedOpCap/alreadyRequested',
-    controller: BaseController,
-    next: '$END_OF_TRANSACTION$',
+    next: ['is-update-needed'],
   },
   '/is-update-needed': {
     pageTitle: "Check the establishment's signed operational capacity",
     fields: ['isUpdateNeeded'],
     template: '../../commonTransactions/updateSignedOpCap/isUpdateNeeded',
     controller: IsUpdateNeeded,
-    next: [{ field: 'isUpdateNeeded', op: '==', value: 'YES', next: 'details' }, '$END_OF_TRANSACTION$'],
+    next: [
+      {
+        field: 'isUpdateNeeded',
+        op: '==',
+        value: 'YES',
+        next: [{ fn: (_req, res) => !!res.locals.signedOpCapChangeRequest, next: 'already-requested' }, 'details'],
+      },
+      '$END_OF_TRANSACTION$',
+    ],
+  },
+  '/already-requested': {
+    pageTitle: 'A change to the signed operational capacity has already been requested',
+    template: '../../commonTransactions/updateSignedOpCap/alreadyRequested',
+    controller: BaseController,
+    next: '$END_OF_TRANSACTION$',
   },
   '/details': {
     pageTitle: 'Update the signed operational capacity',
