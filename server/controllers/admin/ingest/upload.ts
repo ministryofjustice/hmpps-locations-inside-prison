@@ -46,8 +46,10 @@ export default class IngestUpload extends FormInitialStep {
           if (invalidDataForPrison(prisonId, capacityData)) {
             validationErrors.file = this.formError('file', 'invalidPrison')
           }
-        } catch {
-          validationErrors.file = this.formError('file', 'parseFailure')
+        } catch (error) {
+          validationErrors.file = error.message.includes('numeric')
+            ? this.formError('file', 'ingest', error.message)
+            : this.formError('file', 'parseFailure')
         }
       }
       callback({ ...errors, ...validationErrors })
@@ -102,8 +104,8 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
         ? inCellSanitation.toLowerCase() === 'true'
         : undefined
 
-      assertIsValidNumber(maxCapacity)
-      assertIsValidNumber(certifiedNormalAccommodation)
+      assertIsValidNumber(maxCapacity, 'Max Cap', cellNumber)
+      assertIsValidNumber(certifiedNormalAccommodation, 'CNA', cellNumber)
 
       return [
         cellNumber,
@@ -119,9 +121,9 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
   )
 }
 
-function assertIsValidNumber(value: string) {
+function assertIsValidNumber(value: string, type: string, cellNumber: string) {
   if (value === undefined || value.trim() === '' || Number.isNaN(Number(value))) {
-    throw new Error('Value must be a defined numeric string')
+    throw new Error(`The ${type} value is not numeric for cell ${cellNumber}`)
   }
 }
 
