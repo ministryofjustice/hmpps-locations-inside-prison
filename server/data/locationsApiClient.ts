@@ -444,6 +444,10 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/prison-configuration/:prisonId/resi-service/:status',
       requestType: 'put',
     }),
+    updateNonResiStatus: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
+      path: '/prison-configuration/:prisonId/non-resi-service/:status',
+      requestType: 'put',
+    }),
     updateCertificationApproval: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
       path: '/prison-configuration/:prisonId/certification-approval-required/:status',
       requestType: 'put',

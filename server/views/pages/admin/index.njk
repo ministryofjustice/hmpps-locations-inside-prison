@@ -7,6 +7,7 @@
   [
     { text: prisonConfiguration.prisonId },
     { text: prisonConfiguration.resiLocationServiceActive },
+    { text: prisonConfiguration.nonResiServiceActive },
     { text: prisonConfiguration.includeSegregationInRollCount },
     { text: prisonConfiguration.certificationApprovalRequired }
   ]
@@ -52,6 +53,23 @@
                 href: '/admin/' + prisonConfiguration.prisonId + '/change-resi-status',
                 text: "Change",
                 visuallyHiddenText: "resi",
+                classes: "govuk-link--no-visited-state"}
+            ]
+          }
+        },
+        {
+          key: {
+            text: 'Non-residential locations'
+          },
+          value: {
+            text: prisonConfiguration.nonResiServiceActive
+          },
+          actions: {
+            items: [
+              {
+                href: '/admin/' + prisonConfiguration.prisonId + '/change-non-resi-status',
+                text: "Change",
+                visuallyHiddenText: "non-resi",
                 classes: "govuk-link--no-visited-state"}
             ]
           }

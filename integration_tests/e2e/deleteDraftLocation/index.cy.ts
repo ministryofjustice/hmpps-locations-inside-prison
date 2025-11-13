@@ -37,7 +37,6 @@ context('Delete draft location', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.task('setFeatureFlag', { createAndCertify: true })
   })
 
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -56,7 +55,7 @@ context('Delete draft location', () => {
         parentLocation: draftWing,
       })
       cy.task('stubLocations', draftWing)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

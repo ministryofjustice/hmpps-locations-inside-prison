@@ -19,8 +19,6 @@ generic-service:
     LOCATIONS_API_URL: "https://locations-inside-prison-api.hmpps.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api.prison.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
-    FLAG_MVP2_PERMANENT_DEACTIVATION: enabled
-    FLAG_CREATE_AND_CERTIFY: disabled
     FLAG_NON_RESI: disabled
 
 generic-prometheus-alerts:

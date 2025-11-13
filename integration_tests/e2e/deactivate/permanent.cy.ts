@@ -22,7 +22,6 @@ context('Deactivate permanent', () => {
 
   beforeEach(() => {
     cy.task('reset')
-    cy.task('setFeatureFlag', { permanentDeactivation: true })
   })
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -214,26 +213,6 @@ context('Deactivate permanent', () => {
       Page.verifyOnPage(ViewLocationsShowPage)
       cy.get('.govuk-button:contains("Deactivate permanently")').click()
       Page.verifyOnPage(DeactivatePermanentWarningPage)
-    })
-
-    context('when the permanentDeactivation feature flag is disabled and the location is temp inactive', () => {
-      beforeEach(() => {
-        cy.task('setFeatureFlag', { permanentDeactivation: false })
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-          parentLocation: { ...location, status: 'INACTIVE' },
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
-        })
-      })
-
-      it('has no direct link from a temporarily deactivated location page', () => {
-        ViewLocationsShowPage.goTo(location.prisonId, location.id)
-        Page.verifyOnPage(ViewLocationsShowPage)
-        cy.get('.govuk-button:contains("Deactivate permanently")').should('not.exist')
-      })
     })
 
     describe('warning page', () => {

@@ -53,7 +53,7 @@ const controller = (services: Services) => {
   router.use(populatePrisonAndLocationId)
   router.use(redirectToAddPrisonId)
   router.use(validateCaseload())
-  // set can access here to avoid create_location actions showing for prisons without createAndCertify enabled.
+  // set can access here
   router.use(setCanAccess(services.locationsService))
 
   router.get(

@@ -14,13 +14,26 @@ context('Create Landing - Create cells - Edit - Cell details', () => {
       page = goToCreateCellsConfirmPage()
     })
 
-    it('Walks back through the whole transaction', () => {
-      page.editCellDetailsLink().click()
+    context('When any value changes', () => {
+      it('Walks back through the whole transaction', () => {
+        page.editCellDetailsLink().click()
 
-      const cellDetailsPage = Page.verifyOnPage(CreateCellsDetailsPage)
-      cellDetailsPage.submit({ cellsToCreate: 4 })
+        const cellDetailsPage = Page.verifyOnPage(CreateCellsDetailsPage)
+        cellDetailsPage.submit({ cellsToCreate: 3, accommodationType: 'NORMAL_ACCOMMODATION' })
 
-      Page.verifyOnPage(CreateCellsCellNumbersPage)
+        Page.verifyOnPage(CreateCellsCellNumbersPage)
+      })
+    })
+
+    context('When no values change', () => {
+      it('Goes back to confirm', () => {
+        page.editCellDetailsLink().click()
+
+        const cellDetailsPage = Page.verifyOnPage(CreateCellsDetailsPage)
+        cellDetailsPage.submit({ cellsToCreate: 4, accommodationType: 'NORMAL_ACCOMMODATION' })
+
+        Page.verifyOnPage(CreateLocationConfirmPage)
+      })
     })
   })
 })

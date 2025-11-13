@@ -335,37 +335,11 @@ describe('view locations show', () => {
 
   describe('createButton', () => {
     describe('when the location is leafLevel', () => {
-      describe('when req.featureFlags.createAndCertify is true', () => {
+      describe('when canAccess("create_location") is true', () => {
         beforeEach(() => {
-          deepReq.featureFlags.createAndCertify = true
+          deepReq.canAccess = (permission: string) => permission === 'create_location'
         })
 
-        describe('when canAccess("create_location") is true', () => {
-          beforeEach(() => {
-            deepReq.canAccess = (permission: string) => permission === 'create_location'
-          })
-
-          it('renders the page without the create button', () => {
-            controller(deepReq as Request, deepRes as Response)
-
-            expect(deepRes.locals.actions).toEqual(undefined)
-            expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-              banner: undefined,
-              createButton: undefined,
-              minLayout: 'three-quarters',
-              title: 'Manage locations',
-            })
-          })
-        })
-      })
-    })
-
-    describe('when the location is not leafLevel', () => {
-      beforeEach(() => {
-        deepRes.locals.decoratedResidentialSummary.location.leafLevel = false
-      })
-
-      describe('when req.featureFlags.createAndCertify is not set', () => {
         it('renders the page without the create button', () => {
           controller(deepReq as Request, deepRes as Response)
 
@@ -377,6 +351,12 @@ describe('view locations show', () => {
             title: 'Manage locations',
           })
         })
+      })
+    })
+
+    describe('when the location is not leafLevel', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedResidentialSummary.location.leafLevel = false
       })
 
       describe('when canAccess("create_location") is false', () => {
@@ -393,9 +373,8 @@ describe('view locations show', () => {
         })
       })
 
-      describe('when req.featureFlags.createAndCertify is true', () => {
+      describe('when create_location is true', () => {
         beforeEach(() => {
-          deepReq.featureFlags.createAndCertify = true
           deepReq.canAccess = (permission: string) => permission === 'create_location'
         })
 

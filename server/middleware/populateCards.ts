@@ -6,8 +6,9 @@ import config from '../config'
 export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
     setCanAccess(locationsService)
+    const certificationEnabled = res.locals.prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
     res.locals.resiCards = [
-      req.featureFlags.createAndCertify
+      certificationEnabled
         ? {
             clickable: true,
             visible: true,
@@ -40,7 +41,7 @@ export default function populateCards(locationsService: LocationsService) {
         description: 'View locations that have been permanently deactivated as residential locations.',
         'data-qa': 'archived-locations-card',
       },
-      req.featureFlags.createAndCertify
+      certificationEnabled
         ? {
             clickable: true,
             visible: true,
@@ -68,18 +69,19 @@ export default function populateCards(locationsService: LocationsService) {
       },
     ]
 
-    res.locals.nonResiCards = req.featureFlags.nonResi
-      ? [
-          {
-            clickable: true,
-            visible: true, // req.canAccess('view_non_residential'),
-            heading: 'Edit non-residential locations',
-            href: config.services.nonResidentialLocations,
-            description: 'Add, change or archive non-residential locations.',
-            'data-qa': 'non-resi-card',
-          },
-        ]
-      : null
+    res.locals.nonResiCards =
+      req.featureFlags.nonResi && res.locals.prisonConfiguration?.nonResiServiceActive === 'ACTIVE'
+        ? [
+            {
+              clickable: true,
+              visible: true,
+              heading: 'Edit non-residential locations',
+              href: config.services.nonResidentialLocations,
+              description: 'Add, change or archive non-residential locations.',
+              'data-qa': 'non-resi-card',
+            },
+          ]
+        : null
 
     next()
   })
