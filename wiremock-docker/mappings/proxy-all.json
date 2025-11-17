@@ -1,0 +1,10 @@
+{
+  "request": {
+    "_comment": "This mapping is for training env only and proxies manage-users-api requests. Only the getUsersByCaseload response is mocked in prisonusers-search.json.",
+    "method": "GET",
+    "urlPattern": "/users/.*"
+  },
+  "response": {
+    "proxyBaseUrl": "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
+  }
+}
