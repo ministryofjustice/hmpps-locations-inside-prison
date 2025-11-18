@@ -1,7 +1,7 @@
 import setupStubs from './setupStubs'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
+import IsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
 import UpdateSignedOpCapAlreadyRequestedPage from '../../pages/commonTransactions/updateSignedOpCap/alreadyRequested'
 import goToUpdateSignedOpCapAlreadyRequested from './goToUpdateSignedOpCapAlreadyRequested'
 import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
@@ -22,7 +22,7 @@ context('Add To Certificate - Update Signed Operational Capacity - Already Reque
 
     it('has a back link to cert change disclaimer', () => {
       page.backLink().click()
-      Page.verifyOnPage(CertChangeDisclaimerPage)
+      Page.verifyOnPage(IsUpdateNeededPage)
     })
 
     it('has a cancel link to the view location show page', () => {

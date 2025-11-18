@@ -5,6 +5,10 @@
 {% from "../../macros/cellCertificate.njk" import cellCertificate %}
 
 {% block heading %}
+  {% if titleCaption %}
+    <span class="govuk-caption-l" data-qa="title-caption">{{ titleCaption }}</span>
+  {% endif %}
+  <h1 class="govuk-heading-xl">{{ title }}</h1>
 
   {{ mojSubNavigation({
     label: "Sub navigation",
