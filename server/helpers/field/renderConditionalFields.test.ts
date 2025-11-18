@@ -72,7 +72,7 @@ describe('Field helpers', () => {
           })
 
           it('should call component service for each item', () => {
-            expect(feComponentsService.getComponent).toBeCalledTimes(2)
+            expect(feComponentsService.getComponent).toHaveBeenCalledTimes(2)
           })
 
           it('should call component service with correct args', () => {
@@ -130,7 +130,7 @@ describe('Field helpers', () => {
           })
 
           it('should not call component service for each item', () => {
-            expect(feComponentsService.getComponent).toBeCalledTimes(0)
+            expect(feComponentsService.getComponent).toHaveBeenCalledTimes(0)
           })
 
           it('should render original item', () => {
@@ -169,7 +169,7 @@ describe('Field helpers', () => {
         })
 
         it('should not call component service for each item', () => {
-          expect(feComponentsService.getComponent).toBeCalledTimes(0)
+          expect(feComponentsService.getComponent).toHaveBeenCalledTimes(0)
         })
 
         it('should render conditional content', () => {
@@ -228,7 +228,7 @@ describe('Field helpers', () => {
         })
 
         it('should call component service for each item', () => {
-          expect(feComponentsService.getComponent).toBeCalledTimes(2)
+          expect(feComponentsService.getComponent).toHaveBeenCalledTimes(2)
         })
 
         it('should call component service with correct args', () => {
