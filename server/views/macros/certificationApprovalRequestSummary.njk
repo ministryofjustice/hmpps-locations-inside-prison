@@ -48,7 +48,7 @@
       } if request.status,
       {
         key: { text: 'Approved on' },
-        value: { text: request.approvedOrRejectedDate | formatDate }
+        value: { text: request.approvedOrRejectedDate | formatDateWithTime }
       } if request.status == 'APPROVED',
       {
         key: { text: 'Approved by' },
@@ -56,7 +56,7 @@
       } if request.status == 'APPROVED',
       {
         key: { text: 'Rejected on' },
-        value: { text: request.approvedOrRejectedDate | formatDate }
+        value: { text: request.approvedOrRejectedDate | formatDateWithTime }
       } if request.status == 'REJECTED',
       {
         key: { text: 'Rejected by' },

@@ -1,0 +1,9 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/users/.*"
+  },
+  "response": {
+    "proxyBaseUrl": "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
+  }
+}
