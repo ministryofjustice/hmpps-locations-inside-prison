@@ -25,7 +25,7 @@ generic-service:
   extraContainers:
     - name: wiremock
       image: "ghcr.io/ministryofjustice/hmpps-wiremock:latest"
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       ports:
         - name: http
           containerPort: 8090
