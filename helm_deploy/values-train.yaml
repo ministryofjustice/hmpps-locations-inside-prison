@@ -28,5 +28,24 @@ generic-service:
       imagePullPolicy: IfNotPresent
       ports:
         - name: http
-          containerPort: 8091
+          containerPort: 8090
           protocol: TCP
+      env:
+        - name: WIREMOCK_REPOS
+          value: |
+            [
+              {
+                "repoUrl": "https://github.com/ministryofjustice/hmpps-locations-inside-prison",
+                "branch": "main",
+                "path": "wiremock"
+              }
+            ]
+      livenessProbe:
+        httpGet:
+          path: /__admin/mappings
+          port: 8090
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 5
+
