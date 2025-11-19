@@ -117,6 +117,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${unCapFirst(fieldName)}`,
       taken: `A location with this ${unCapFirst(fieldName)} already exists`,
+      ingest: `${error.args?.ingest}`,
     }
 
     const errorMessage =

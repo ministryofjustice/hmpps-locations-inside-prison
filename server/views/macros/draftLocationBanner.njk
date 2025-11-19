@@ -25,7 +25,7 @@
 
     <p>
       {% if isLockedDraft %}
-        A change to this location on the cell certificate has been requested. You are unable to make any  changes to this location until the request has been reviewed by the authorising director.
+        A change to this location on the cell certificate has been requested. You are unable to make any changes to this location until the request has been reviewed by the authorising director.
       {% elseif location.id != topLevelDraftLocation.id %}
         This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
       {% endif %}

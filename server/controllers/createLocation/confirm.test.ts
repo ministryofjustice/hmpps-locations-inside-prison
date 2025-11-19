@@ -111,7 +111,7 @@ describe('Confirm create location (WING)', () => {
           createYouCanAddText: 'Landings and Cells',
           decoratedLocationStructure: 'Wing → Landings → Cells',
           createStructureLink: '/create-new/TST/structure',
-          createDetailsLink: '/create-new/TST/details',
+          createDetailsLink: '/create-new/TST/details/edit',
         }),
       )
     })
@@ -329,7 +329,7 @@ describe('Confirm create location (LANDING)', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual(
         expect.objectContaining({
-          createDetailsLink: '/create-new/7e570000-0000-1000-8000-000000000001/details',
+          createDetailsLink: '/create-new/7e570000-0000-1000-8000-000000000001/details/edit',
         }),
       )
     })

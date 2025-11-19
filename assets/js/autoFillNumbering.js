@@ -5,8 +5,9 @@
  * @param {(previousNumber: number) => number} fillFunction a function which returns the number to fill with,
  *   previousNumber is the last number that was filled, so to increment each input by 1, you would do something
  *   like (n) => n + 1
+ * @param {(num: number) => string} [inputFormatter] a function that formats the number to be placed in the input
  */
-module.exports = (applyButtonId, inputId, inputsToFillId, fillFunction) => {
+module.exports = (applyButtonId, inputId, inputsToFillId, fillFunction, inputFormatter) => {
   $(`#${applyButtonId}`).on('click', function (e) {
     e.preventDefault()
     const $input = $(`#${inputId}`)
@@ -85,7 +86,7 @@ module.exports = (applyButtonId, inputId, inputsToFillId, fillFunction) => {
 
     let previousNumber = numberToStartFrom
     $(`input[id^="${inputsToFillId}"]`).each(function () {
-      $(this).val(previousNumber)
+      $(this).val(inputFormatter ? inputFormatter(previousNumber) : previousNumber)
       previousNumber = fillFunction(previousNumber)
     })
 

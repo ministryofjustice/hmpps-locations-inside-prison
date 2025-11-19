@@ -34,11 +34,11 @@ export default class CreateLocationConfirmPage extends Page {
 
   editCapacitiesLink = (): PageElement => cy.get('a[href$="/capacities/edit"]').first()
 
-  editCellDetailsLink = (): PageElement => cy.get('a[href$="/create-cells"]').first()
+  editCellDetailsLink = (): PageElement => cy.get('a[href$="/create-cells/details/edit"]').first()
 
   editCellNumbersLink = (): PageElement => cy.get('a[href$="/cell-numbers/edit"]')
 
-  editDetailsLink = (): PageElement => cy.get('a[href$="/details"]')
+  editDetailsLink = (): PageElement => cy.get('a[href$="/details/edit"]').first()
 
   editDoorNumbersLink = (): PageElement => cy.get('a[href$="/door-numbers/edit"]')
 
