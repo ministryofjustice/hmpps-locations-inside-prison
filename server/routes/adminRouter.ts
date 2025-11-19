@@ -11,6 +11,7 @@ import getServicePrisonsNonHousingDisplay, {
 } from '../middleware/getServicePrisonsNonHousingDisplay'
 import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
 import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
+import protectRoute from '../middleware/protectRoute'
 
 const router = express.Router({ mergeParams: true })
 
@@ -21,6 +22,7 @@ const controller = (services: Services) => {
 
   router.get(
     '/',
+    protectRoute('administer_residential'),
     addBreadcrumb({ title: '', href: '/' }),
     populatePrisonConfiguration(),
     getServicePrisonsNonHousingDisplay(),
