@@ -29,6 +29,7 @@ import setLocalNameRouter from './setLocalName'
 import changeLocalNameRouter from './changeLocalName'
 import removeLocalNameRouter from './removeLocalName'
 import createLocationRouter from './createLocation'
+import createCellsRouter from './createCells'
 import deleteDraftLocationRouter from './deleteDraftLocation'
 import addToCertificateRouter from './addToCertificate'
 import adminRouter from './adminRouter'
@@ -61,6 +62,7 @@ export default function routes(services: Services): Router {
   router.use('/archived-locations/:prisonId?', archivedLocationsRouter(services))
   router.use('/inactive-cells/:prisonId?', inactiveCellsRouter(services))
   router.use('/create-new/:prisonOrLocationId', createLocationRouter)
+  router.use('/create-cells/:locationId', createCellsRouter)
   router.use('/delete-draft/:prisonOrLocationId', deleteDraftLocationRouter)
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))

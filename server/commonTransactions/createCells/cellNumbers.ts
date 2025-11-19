@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import capFirst from '../../formatters/capFirst'
+import getCellPath from './getCellPath'
 
 export default class CellDoorNumbers extends BaseController {
   override middlewareSetup() {
@@ -11,8 +12,7 @@ export default class CellDoorNumbers extends BaseController {
 
   setupDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { options } = req.form
-    const { decoratedResidentialSummary } = res.locals
-    const locationName = `${decoratedResidentialSummary.location.pathHierarchy} - ${req.sessionModel.get<string>('locationCode')} - `
+    const locationName = `${getCellPath(req, res)}-`
     const cellsToCreate = req.sessionModel.get<number>('create-cells_cellsToCreate')
     const errors: { [key: string]: FormWizard.Controller.Error } = req.sessionModel.get('errors') || {}
     const errorValues: { [key: string]: FormWizard.Controller.Error } = req.sessionModel.get('errorValues') || {}

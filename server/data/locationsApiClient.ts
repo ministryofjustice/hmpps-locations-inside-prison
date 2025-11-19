@@ -254,7 +254,7 @@ export default class LocationsApiClient extends BaseApiClient {
       {
         prisonId: string
         parentLocation: string
-        newLevelAboveCells: {
+        newLevelAboveCells?: {
           levelCode: string
           levelLocalName?: string
           locationType: 'LANDING' | 'SPUR'
