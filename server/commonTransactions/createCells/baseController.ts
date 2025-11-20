@@ -7,10 +7,11 @@ export default class BaseController extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals
-    const localName = req.sessionModel.get<string>('localName')
     const locationName =
-      localName ||
-      `${decoratedResidentialSummary.location.pathHierarchy}-${req.sessionModel.get<string>('locationCode')}`
+      req.sessionModel.get<string>('localName') ||
+      [decoratedResidentialSummary.location.pathHierarchy, req.sessionModel.get<string>('locationCode')]
+        .filter(s => s)
+        .join('-')
     locals.locationType = req.sessionModel.get<string>('locationType')
     locals.titleCaption = `Create cells on ${locals.locationType.toLowerCase()} ${locationName}`
 

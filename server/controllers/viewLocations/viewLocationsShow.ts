@@ -33,13 +33,15 @@ export default async (req: Request, res: Response) => {
         },
       }
     } else if (summary.subLocationName === 'Cells') {
-      locals.createButton = {
-        text: 'Create new cells',
-        href: `/create-cells/${location.id}`,
-        classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
-        attributes: {
-          'data-qa': 'create-button',
-        },
+      if (summary.subLocations.length === 0) {
+        locals.createButton = {
+          text: 'Create new cells',
+          href: `/create-cells/${location.id}`,
+          classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
+          attributes: {
+            'data-qa': 'create-button',
+          },
+        }
       }
     }
   }

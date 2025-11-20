@@ -1,0 +1,74 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% block fields %}
+  {{ govukSummaryList({
+    card: {
+      title: {
+        text: "Cell details"
+      }
+    },
+    rows: summaryListRows,
+    attributes: {
+      'data-qa': 'cell-details-summary'
+    }
+  }) }}
+
+
+  {% set cellRows = [] %}
+
+  {% for i in range(0, values['create-cells_cellsToCreate']) -%}
+    {% set cellTypes = values['saved-cellTypes' + i] %}
+    {% set cellTypesText = formatConstants(specialistCellTypesObject, cellTypes) %}
+
+    {% set cellRows = (cellRows.push([
+      {
+        text: locationPathPrefix + '-' + values['create-cells_cellNumber' + i].padStart(3, '0')
+      },
+      {
+        text: values['create-cells_doorNumber' + i]
+      },
+      {
+        text: values['create-cells_baselineCna' + i]
+      },
+      {
+        text: values['create-cells_workingCapacity' + i]
+      },
+      {
+        text: values['create-cells_maximumCapacity' + i]
+      },
+      {
+        html: cellTypesText
+      },
+      {
+        text: 'Yes' if (values['create-cells_bulkSanitation'] == 'YES' or not values['create-cells_withoutSanitation'].includes(i.toString())) else 'No'
+      }
+    ]), cellRows) %}
+  {% endfor %}
+
+  {{ govukTable({
+    caption: "Cell information",
+    captionClasses: "govuk-table__caption--m",
+    attributes: {
+      "data-qa": "cell-information-table"
+    },
+    head: [
+      { html: "Cell number<br><a href='" + createRootLink + "/create-cells/cell-numbers/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
+      { html: "Cell door number<br><a href='" + createRootLink + "/create-cells/door-numbers/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
+      { html: "Baseline CNA<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
+      { html: "Working capacity<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
+      { html: "Maximum capacity<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
+      { html: "Cell type<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
+      { html: "Sanitation<br><a href='" + createRootLink + "/create-cells/bulk-sanitation/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" }
+    ],
+    rows: cellRows
+  }) }}
+
+  {{ govukWarningText({
+    text: "The cells will be in draft until they are added to the cell certificate.",
+    iconFallbackText: "Warning"
+  }) }}
+{% endblock %}
