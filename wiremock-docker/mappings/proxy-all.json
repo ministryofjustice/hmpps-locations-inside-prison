@@ -1,9 +1,17 @@
 {
   "request": {
     "method": "GET",
-    "urlPattern": "/users/.*"
+    "urlPattern": "/users/.*",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .+"
+      }
+    }
   },
   "response": {
-    "proxyBaseUrl": "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
+    "proxyBaseUrl": "https://manage-users-api-preprod.hmpps.service.justice.gov.uk",
+    "headers": {
+      "Authorization": "{{ request.headers.Authorization }}"
+    }
   }
 }
