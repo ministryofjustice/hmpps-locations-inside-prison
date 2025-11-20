@@ -51,7 +51,7 @@ jobs:
       timings-7: ${{ steps.timings.outputs.t7 }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - uses: ministryofjustice/hmpps-assess-risks-and-needs-github-actions/.github/actions/cypress/create_timings_file@v1
         with:
