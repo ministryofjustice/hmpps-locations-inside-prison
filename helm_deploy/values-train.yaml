@@ -21,12 +21,3 @@ generic-service:
     ENVIRONMENT_NAME: Training
     AUDIT_ENABLED: "false"
     PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
-
-  extraContainers:
-    - name: wiremock
-      image: "ghcr.io/ministryofjustice/hmpps-wiremock:latest"
-      imagePullPolicy: IfNotPresent
-      ports:
-        - name: http
-          containerPort: 8091
-          protocol: TCP
