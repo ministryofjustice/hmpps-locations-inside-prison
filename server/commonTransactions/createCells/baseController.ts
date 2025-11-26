@@ -13,7 +13,7 @@ export default class BaseController extends FormInitialStep {
         .filter(s => s)
         .join('-')
     locals.locationType = req.sessionModel.get<string>('locationType')
-    locals.titleCaption = `Create cells on ${locals.locationType.toLowerCase()} ${locationName}`
+    locals.titleCaption = `${req.form.options.name === 'edit-cells' ? 'Edit' : 'Create'} cells on ${locals.locationType.toLowerCase()} ${locationName}`
 
     return locals
   }

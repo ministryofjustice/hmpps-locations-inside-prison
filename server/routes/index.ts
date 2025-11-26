@@ -31,6 +31,7 @@ import removeLocalNameRouter from './removeLocalName'
 import createLocationRouter from './createLocation'
 import createCellsRouter from './createCells'
 import deleteDraftLocationRouter from './deleteDraftLocation'
+import editCellsRouter from './editCells'
 import addToCertificateRouter from './addToCertificate'
 import adminRouter from './adminRouter'
 import changeResiStatusRouter from './admin/resi'
@@ -64,6 +65,7 @@ export default function routes(services: Services): Router {
   router.use('/create-new/:prisonOrLocationId', createLocationRouter)
   router.use('/create-cells/:locationId', createCellsRouter)
   router.use('/delete-draft/:prisonOrLocationId', deleteDraftLocationRouter)
+  router.use('/edit-cells/:locationId', editCellsRouter)
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
 

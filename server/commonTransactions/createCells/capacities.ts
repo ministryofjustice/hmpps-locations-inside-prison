@@ -21,15 +21,17 @@ export default class Capacities extends BaseController {
 
       req.sessionModel.set('temp-capacitiesValues', req.body)
 
+      let prefix = 'create-cells'
       if (req.form.options.name === 'create-location') {
-        res.redirect(
-          `/create-new/${res.locals.locationId}/create-cells/${action}-cell-type/${cellId}${req.isEditing ? '/edit' : ''}`,
-        )
-      } else {
-        res.redirect(
-          `/create-cells/${res.locals.locationId}/create-cells/${action}-cell-type/${cellId}${req.isEditing ? '/edit' : ''}`,
-        )
+        prefix = 'create-new'
+      } else if (req.form.options.name === 'edit-cells') {
+        prefix = 'edit-cells'
       }
+
+      res.redirect(
+        `/${prefix}/${res.locals.locationId}/create-cells/${action}-cell-type/${cellId}${req.isEditing ? '/edit' : ''}`,
+      )
+
       return
     }
 

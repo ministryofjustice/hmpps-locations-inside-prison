@@ -320,6 +320,29 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId',
       requestType: 'delete',
     }),
+    editCells: this.apiCall<
+      Location,
+      undefined,
+      {
+        prisonId: string
+        parentLocation: string
+        cellsUsedFor: string[]
+        accommodationType: string
+        cells: {
+          id?: string
+          code: string
+          cellMark: string
+          certifiedNormalAccommodation: number
+          maxCapacity: number
+          workingCapacity: number
+          specialistCellTypes: string[]
+          inCellSanitation: boolean
+        }[]
+      }
+    >({
+      path: '/locations/edit-cells',
+      requestType: 'put',
+    }),
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
       queryParams: ['includeHistory'],
