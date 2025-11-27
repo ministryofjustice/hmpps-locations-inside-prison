@@ -1320,6 +1320,21 @@ const stubLocationsCreateCells = (location: Location) =>
     },
   })
 
+const stubLocationsEditCells = (location: Location) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/edit-cells',
+    },
+    response: {
+      status: 201,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location,
+    },
+  })
+
 const stubLocationsDeleteLocation = () =>
   stubFor({
     request: {
@@ -1365,6 +1380,7 @@ const allStubs = {
   stubLocationsDeactivatePermanentOccupied,
   stubLocationsDeactivateTemporary,
   stubLocationsDeactivateTemporaryOccupied,
+  stubLocationsEditCells,
   stubLocationsHealthPing,
   stubLocationsLocationsResidentialSummary,
   stubLocationsLocationsResidentialSummaryByKey,
