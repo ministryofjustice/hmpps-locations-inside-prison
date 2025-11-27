@@ -51,10 +51,14 @@
       }) }}
     {% endif %}
     {% if isLockedDraft %}
+      {% set viewRequestUrl = "/" + location.prisonId + "/cell-certificate/change-requests/" + (location.pendingApprovalRequestId or '') %}
+      {% if canAccess('certificate_change_request_review') %}
+        {% set viewRequestUrl = viewRequestUrl + '/review' %}
+      {% endif %}
       {{ govukButton({
         text: "View request details",
         preventDoubleClick: true,
-        href: "/" + location.prisonId + "/cell-certificate/change-requests/" + (location.pendingApprovalRequestId or ''),
+        href: viewRequestUrl,
         attributes: {
           'data-qa': 'view-request-details'
         }
