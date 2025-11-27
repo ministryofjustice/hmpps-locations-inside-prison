@@ -31,13 +31,24 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
   manage-users-api:
-    image: wiremock/wiremock:latest
-    container_name: manage-users-wiremock
+    image: ghcr.io/ministryofjustice/hmpps-manage-users-api:latest
+    container_name: manage-users-api
+    networks:
+      - hmpps
+    depends_on:
+      - nomis-user-roles-api
+      - hmpps-auth
     ports:
-      - "8093:8080"
-    volumes:
-      - $PWD/wiremock-docker:/home/wiremock
-    command: --verbose --global-response-templating --port=8080
+      - "8082:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev,local-docker
+      - HMPPS_AUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth
+      - HMPPS_AUTH_EXTERNAL_ENDPOINT_URL=http://localhost:8080/auth
+      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
+      - AUTHORIZATION_SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:8080/auth/oauth/token
 
   locations-inside-prison-api:
     image: ghcr.io/ministryofjustice/hmpps-locations-inside-prison-api:latest
