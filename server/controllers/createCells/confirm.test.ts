@@ -18,8 +18,8 @@ describe('Confirm create cells', () => {
 
   beforeEach(() => {
     sessionModelData = {
-      'create-cells_cellsToCreate': 2,
-      'create-cells_bulkSanitation': false,
+      'create-cells_cellsToCreate': '2',
+      'create-cells_bulkSanitation': 'NO',
       'create-cells_withoutSanitation': ['0'],
       'create-cells_cellNumber0': '1',
       'create-cells_doorNumber0': '1',

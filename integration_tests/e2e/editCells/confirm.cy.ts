@@ -77,8 +77,8 @@ context('Create Landing - Create cells - Confirm', () => {
       page.createButton().click()
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBannerHeading().contains('Cell details updated')
-      viewLocationsShowPage.successBannerBody().contains('You have updated cell details for A-2.')
+      viewLocationsShowPage.successBannerHeading().contains('Cells updated')
+      viewLocationsShowPage.successBannerBody().contains('You have updated cells on A-2.')
     })
 
     it('has a back link to the view location show page', () => {
