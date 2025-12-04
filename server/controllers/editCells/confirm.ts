@@ -5,27 +5,19 @@ import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
 import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
 
-function changesMade(
-  req: FormWizard.Request,
-  res: Response,
-  cells: Parameters<LocationsApiClient['locations']['editCells']>[2]['cells'],
+function changesMadeToCells(
+  existingCells: DecoratedLocation[],
+  newCells: Parameters<LocationsApiClient['locations']['editCells']>[2]['cells'],
 ) {
-  const { location, subLocations } = res.locals.decoratedResidentialSummary
-  const { sessionModel } = req
-  const newUsedFor = sessionModel.get<string[]>('create-cells_usedFor')
-  if (
-    sessionModel.get<string>('create-cells_accommodationType') !== location.raw.accommodationTypes[0] ||
-    cells.length !== subLocations.length ||
-    newUsedFor.length !== location.raw.usedFor.length ||
-    uniq([...newUsedFor, ...location.raw.usedFor]).length !== newUsedFor.length
-  ) {
+  if (existingCells.length !== newCells.length) {
     return true
   }
 
-  for (let i = 0; i < cells.length; i += 1) {
-    const oldCell = subLocations[i]
-    const newCell = cells[i]
+  for (let i = 0; i < newCells.length; i += 1) {
+    const oldCell = existingCells[i]
+    const newCell = newCells[i]
 
     if (
       oldCell.code !== newCell.code ||
@@ -43,6 +35,23 @@ function changesMade(
   }
 
   return false
+}
+
+function changesMade(
+  req: FormWizard.Request,
+  res: Response,
+  cells: Parameters<LocationsApiClient['locations']['editCells']>[2]['cells'],
+) {
+  const { location, subLocations } = res.locals.decoratedResidentialSummary
+  const { sessionModel } = req
+  const newUsedFor = sessionModel.get<string[]>('create-cells_usedFor')
+
+  return (
+    sessionModel.get<string>('create-cells_accommodationType') !== location.raw.accommodationTypes[0] ||
+    newUsedFor.length !== location.raw.usedFor.length ||
+    uniq([...newUsedFor, ...location.raw.usedFor]).length !== newUsedFor.length ||
+    changesMadeToCells(subLocations, cells)
+  )
 }
 
 export default class EditCellsConfirm extends FormInitialStep {
