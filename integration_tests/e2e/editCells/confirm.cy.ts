@@ -6,6 +6,7 @@ import setupStubs, { existingWingLocation } from './setupStubs'
 import goToEditCellsConfirmPage from './goToEditCellsConfirmPage'
 import checkCellInformation from './checkCellInformation'
 import EditCellsConfirmPage from '../../pages/editCells/confirm'
+import CreateCellsDoorNumbersPage from '../../pages/commonTransactions/createCells/doorNumbers'
 
 context('Create Landing - Create cells - Confirm', () => {
   const newLandingLocation = LocationFactory.build({
@@ -55,30 +56,67 @@ context('Create Landing - Create cells - Confirm', () => {
       page = goToEditCellsConfirmPage()
     })
 
-    it('shows the correct information and successfully creates draft landing', () => {
-      LocationsApiStubber.stub.stubLocationsEditCells(newLandingLocation)
-      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(createdLocationResidentialSummary)
-      LocationsApiStubber.stub.stubLocations(newLandingLocation)
+    context('when no changes are made', () => {
+      it('shows the correct information and redirects back to view location', () => {
+        LocationsApiStubber.stub.stubLocationsEditCells(newLandingLocation)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(createdLocationResidentialSummary)
+        LocationsApiStubber.stub.stubLocations(newLandingLocation)
 
-      page.cellDetailsKey(0).contains('Number of cells')
-      page.cellDetailsValue(0).contains('2')
+        page.cellDetailsKey(0).contains('Number of cells')
+        page.cellDetailsValue(0).contains('2')
 
-      page.cellDetailsKey(1).contains('Accommodation type')
-      page.cellDetailsValue(1).contains('Normal accommodation')
+        page.cellDetailsKey(1).contains('Accommodation type')
+        page.cellDetailsValue(1).contains('Normal accommodation')
 
-      page.cellDetailsKey(2).contains('Used for')
-      page.cellDetailsValue(2).contains('Close Supervision Centre (CSC)')
+        page.cellDetailsKey(2).contains('Used for')
+        page.cellDetailsValue(2).contains('Close Supervision Centre (CSC)')
 
-      checkCellInformation(page, [
-        ['A-2-001', '1', '1', '2', '3', 'Biohazard / dirty protest cell', 'No'],
-        ['A-2-002', '2', '2', '3', '4', '-', 'Yes'],
-      ])
+        checkCellInformation(page, [
+          ['A-2-001', '1', '1', '2', '3', 'Biohazard / dirty protest cell', 'No'],
+          ['A-2-002', '2', '2', '3', '4', '-', 'Yes'],
+        ])
 
-      page.createButton().click()
+        page.createButton().click()
 
-      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.successBannerHeading().contains('Cells updated')
-      viewLocationsShowPage.successBannerBody().contains('You have updated cells on A-2.')
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.successBannerHeading().should('not.exist')
+      })
+    })
+
+    context('when changes are made', () => {
+      beforeEach(() => {
+        page.editDoorNumbersLink().click()
+        const doorNumbersPage = Page.verifyOnPage(CreateCellsDoorNumbersPage)
+        doorNumbersPage.submit({ doorNumbers: ['A2-01', 'A2-02'] })
+
+        page = Page.verifyOnPage(EditCellsConfirmPage)
+      })
+
+      it('shows the correct information and shows a success banner on submit', () => {
+        LocationsApiStubber.stub.stubLocationsEditCells(newLandingLocation)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(createdLocationResidentialSummary)
+        LocationsApiStubber.stub.stubLocations(newLandingLocation)
+
+        page.cellDetailsKey(0).contains('Number of cells')
+        page.cellDetailsValue(0).contains('2')
+
+        page.cellDetailsKey(1).contains('Accommodation type')
+        page.cellDetailsValue(1).contains('Normal accommodation')
+
+        page.cellDetailsKey(2).contains('Used for')
+        page.cellDetailsValue(2).contains('Close Supervision Centre (CSC)')
+
+        checkCellInformation(page, [
+          ['A-2-001', 'A2-01', '1', '2', '3', 'Biohazard / dirty protest cell', 'No'],
+          ['A-2-002', 'A2-02', '2', '3', '4', '-', 'Yes'],
+        ])
+
+        page.createButton().click()
+
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.successBannerHeading().contains('Cells updated')
+        viewLocationsShowPage.successBannerBody().contains('You have updated cells on A-2.')
+      })
     })
 
     it('has a back link to the view location show page', () => {
