@@ -385,4 +385,8 @@ export default class LocationsService {
   async createCells(token: string, data: Parameters<LocationsApiClient['locations']['createCells']>[2]) {
     return this.locationsApiClient.locations.createCells(token, undefined, data)
   }
+
+  async editCells(token: string, data: Parameters<LocationsApiClient['locations']['editCells']>[2]) {
+    return this.locationsApiClient.locations.editCells(token, undefined, data)
+  }
 }

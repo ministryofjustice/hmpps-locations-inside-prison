@@ -45,28 +45,6 @@ export const user: HmppsUser = {
   ],
 }
 
-export const manageUser: HmppsUser = {
-  uuid: 'xxxx-xxxx-xxxx-xxxx',
-  name: 'FIRST LAST',
-  userId: 'id',
-  token: 'token',
-  username: 'user1',
-  displayName: 'First Last',
-  authSource: 'nomis',
-  staffId: 1234,
-  userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'],
-  activeCaseload: {
-    id: 'TST',
-    name: 'Test (HMP)',
-  },
-  caseloads: [
-    {
-      id: 'TST',
-      name: 'Test (HMP)',
-    },
-  ],
-}
-
 export const flashProvider = jest.fn()
 
 function appSetup(services: Services, production: boolean, userSupplier: () => HmppsUser): Express {
