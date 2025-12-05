@@ -12,10 +12,11 @@
     "strict": false,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false, // FIXME work around to a dpr package 'any' issue'
     "noImplicitOverride": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./server/@types", "./node_modules/@types"]
+    "typeRoots": ["./server/@types", "./node_modules/@types"],
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules",
@@ -26,5 +27,5 @@
     "esbuild",
     "eslint.config.mjs"
   ],
-  "include": ["**/*.js", "**/*.ts"]
+  "include": ["server/**/*.ts"]
 }
