@@ -44,7 +44,7 @@ export default async (req: Request, res: Response) => {
         }
       } else if (location.status === 'DRAFT' && !summary.subLocations.find(l => l.status !== 'DRAFT')) {
         locals.createButton = {
-          text: 'Edit cell details',
+          text: 'Edit cells',
           href: `/edit-cells/${location.id}`,
           classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
           attributes: {
