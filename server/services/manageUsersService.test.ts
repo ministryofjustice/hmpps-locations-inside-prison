@@ -93,7 +93,7 @@ describe('Manage users service', () => {
         return Promise.resolve({ content: [], totalPages: 2 })
       })
 
-      const result = await service.getAllUsersByCaseload('token', 'CASELOAD', 'ROLE')
+      const result = await service.getAllUsersByCaseload('token', 'CASELOAD', ['ROLE'])
 
       expect(apiClient.users.getUsersByCaseload).toHaveBeenCalledWith('token', {
         caseload: 'CASELOAD',
