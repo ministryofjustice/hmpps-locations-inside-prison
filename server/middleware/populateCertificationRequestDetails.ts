@@ -30,13 +30,13 @@ export default async function populateCertificationRequestDetails(
     }
     res.locals.notificationDetails = {
       requestedBy: requestedByName,
+      prisonName: prisonResidentialSummary.prisonSummary.prisonName,
     }
   }
 
   // set notification details
   res.locals.notificationDetails = {
     ...res.locals.notificationDetails,
-    prisonName: prisonResidentialSummary.prisonSummary.prisonName,
     requestedDate: approvalRequest.requestedDate,
     locationKey: approvalRequest.locationKey,
     locationName: approvalRequest.locationKey ? approvalRequest.locationKey.replace(`${prisonId}-`, '') : prisonId,
