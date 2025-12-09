@@ -1,0 +1,4 @@
+title = "HMPPS Gitleaks configuration"
+[extend]
+path = "./node_modules/@ministryofjustice/hmpps-precommit-hooks/config.toml"
+
