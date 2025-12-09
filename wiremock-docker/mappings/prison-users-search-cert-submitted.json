@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/prisonusers/search",
+    "queryParameters": {
+      "accessRoles": {
+        "matches": "^(?=.*MANAGE_RES_LOCATIONS_OP_CAP)(?=.*RESI__CERT_VIEWER).*$"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "prison-users-cert-submitted.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
