@@ -5,7 +5,7 @@ export declare interface NotificationDetails {
   locationKey?: string
   locationName?: string
   prisonId?: string
-  prisonName?: string
+  prisonName: string
   requestedBy?: string
   requestedDate?: string
   usedForConstants?: LocationsApiConstant[]
