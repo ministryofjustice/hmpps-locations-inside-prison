@@ -62,6 +62,9 @@ jobs:
         with:
           node-version-file: ${{ inputs.node_version_file }}
 
+      - name: Upgrade npm
+        run: npm install -g npm@^11.2.0
+
       - name: download artifacts
         uses: actions/download-artifact@v6
         with:
