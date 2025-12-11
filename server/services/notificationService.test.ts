@@ -34,7 +34,7 @@ describe('NotificationService', () => {
 
   const baseNotificationDetails: NotificationDetails = {
     type: NotificationType.REQUEST_RECEIVED,
-    emailAddress: ['user@example.com'],
+    emailAddresses: ['user@example.com'],
     establishment: 'Test Establishment',
     submittedBy: 'John Doe',
   }
@@ -49,7 +49,7 @@ describe('NotificationService', () => {
     })
 
     const baseDetails: Partial<NotificationDetails> = {
-      emailAddress: ['user@example.com'],
+      emailAddresses: ['user@example.com'],
       establishment: 'Test Establishment',
       submittedBy: 'John Doe',
       location: 'Test Location',
