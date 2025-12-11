@@ -4,7 +4,7 @@
     "urlPath": "/prisonusers/search",
     "queryParameters": {
       "accessRoles": {
-        "matches": "^(?=.*RESI__CERT_REVIEWER).*$"
+        "matches": "RESI__CERT_REVIEWER"
       }
     }
   },

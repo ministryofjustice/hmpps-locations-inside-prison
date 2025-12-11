@@ -4,7 +4,7 @@
     "urlPath": "/prisonusers/search",
     "queryParameters": {
       "accessRoles": {
-        "matches": "^(?=.*MANAGE_RES_LOCATIONS_OP_CAP)(?=.*RESI__CERT_VIEWER).*$"
+        "matches": "MANAGE_RES_LOCATIONS_OP_CAP,RESI__CERT_VIEWER"
       }
     }
   },
