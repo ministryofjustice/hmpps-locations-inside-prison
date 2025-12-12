@@ -1,9 +1,58 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { uniq } from 'lodash'
 import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
 import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
+
+function changesMadeToCells(
+  existingCells: DecoratedLocation[],
+  newCells: Parameters<LocationsApiClient['locations']['editCells']>[2]['cells'],
+) {
+  if (existingCells.length !== newCells.length) {
+    return true
+  }
+
+  for (let i = 0; i < newCells.length; i += 1) {
+    const oldCell = existingCells[i]
+    const newCell = newCells[i]
+
+    if (
+      oldCell.code !== newCell.code ||
+      oldCell.cellMark !== newCell.cellMark ||
+      oldCell.pendingChanges.certifiedNormalAccommodation !== newCell.certifiedNormalAccommodation ||
+      oldCell.pendingChanges.workingCapacity !== newCell.workingCapacity ||
+      oldCell.pendingChanges.maxCapacity !== newCell.maxCapacity ||
+      oldCell.inCellSanitation !== newCell.inCellSanitation ||
+      oldCell.raw.specialistCellTypes.length !== newCell.specialistCellTypes.length ||
+      uniq([...oldCell.raw.specialistCellTypes, ...newCell.specialistCellTypes]).length !==
+        newCell.specialistCellTypes.length
+    ) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function changesMade(
+  req: FormWizard.Request,
+  res: Response,
+  cells: Parameters<LocationsApiClient['locations']['editCells']>[2]['cells'],
+) {
+  const { location, subLocations } = res.locals.decoratedResidentialSummary
+  const { sessionModel } = req
+  const newUsedFor = sessionModel.get<string[]>('create-cells_usedFor')
+
+  return (
+    sessionModel.get<string>('create-cells_accommodationType') !== location.raw.accommodationTypes[0] ||
+    newUsedFor.length !== location.raw.usedFor.length ||
+    uniq([...newUsedFor, ...location.raw.usedFor]).length !== newUsedFor.length ||
+    changesMadeToCells(subLocations, cells)
+  )
+}
 
 export default class EditCellsConfirm extends FormInitialStep {
   override middlewareSetup() {
@@ -82,9 +131,9 @@ export default class EditCellsConfirm extends FormInitialStep {
     const { localName, locationType, pathHierarchy, id, prisonId } = res.locals.decoratedResidentialSummary.location
     locals.locationPathPrefix = pathHierarchy
 
-    locals.title = 'Edit cell details'
+    locals.title = 'Edit cells'
     locals.titleCaption = `${locationType} ${localName || pathHierarchy}`
-    locals.buttonText = 'Update cell details'
+    locals.buttonText = 'Update cells'
     locals.cancelText = 'Cancel'
     locals.backLink = `/view-and-update-locations/${[prisonId, id].join('/')}`
 
@@ -123,6 +172,11 @@ export default class EditCellsConfirm extends FormInitialStep {
       cells.push(cell)
     }
 
+    if (!changesMade(req, res, cells)) {
+      res.redirect(res.locals.cancelLink)
+      return
+    }
+
     try {
       await locationsService.editCells(req.session.systemToken, {
         prisonId,
@@ -152,8 +206,8 @@ export default class EditCellsConfirm extends FormInitialStep {
     sessionModel.reset()
 
     req.flash('success', {
-      title: `Cell details updated`,
-      content: `You have updated cell details for ${location.localName || location.pathHierarchy}.`,
+      title: `Cells updated`,
+      content: `You have updated cells on ${location.localName || location.pathHierarchy}.`,
     })
 
     res.redirect(`/view-and-update-locations/${location.prisonId}/${location.id}`)
