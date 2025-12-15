@@ -13,15 +13,15 @@ export default class NotificationService {
 
   private async batchSend(notificationDetails: NotificationDetails, delayMs = 10): Promise<void> {
     const templateId = getTemplateId(notificationDetails.type)
-    const totalEmails = notificationDetails.emailAddress.length
+    const validEmails = notificationDetails.emailAddresses.filter(email => !!email)
     logger.info(
-      `Starting batch send for ${notificationDetails.establishment}. Sending ${totalEmails} ${notificationDetails.type} emails to GovUK Notify.`,
+      `Starting batch send for ${notificationDetails.establishment}. Sending ${validEmails.length} ${notificationDetails.type} emails to GovUK Notify.`,
     )
 
     let emailsSent = 0
     const emailsFailed: string[] = []
 
-    await notificationDetails.emailAddress.reduce(async (previousPromise, email) => {
+    await validEmails.reduce(async (previousPromise, email) => {
       await previousPromise
       const success = await this.sendWithDelay(templateId, email, notificationDetails)
       if (success) {
@@ -34,7 +34,7 @@ export default class NotificationService {
     }, Promise.resolve())
 
     logger.info(
-      `Finished batch send for ${notificationDetails.establishment}. Sent ${emailsSent}/${totalEmails} ${notificationDetails.type} emails to GovUK Notify.`,
+      `Finished batch send for ${notificationDetails.establishment}. Sent ${emailsSent}/${validEmails.length} ${notificationDetails.type} emails to GovUK Notify.`,
     )
 
     if (emailsFailed.length > 0) {
@@ -69,7 +69,7 @@ export default class NotificationService {
 
 export type NotificationDetails = {
   type: NotificationType
-  emailAddress: string[]
+  emailAddresses: string[]
   establishment: string
   url?: string
   location?: string
@@ -117,6 +117,7 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
       return {
         SUBMITTED_BY: notificationDetails.submittedBy,
         ESTABLISHMENT: notificationDetails.establishment,
+        URL: notificationDetails.url,
       }
     case NotificationType.REQUEST_APPROVED:
       return {
@@ -145,4 +146,10 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
     default:
       throw new Error(`Unsupported notification type: ${notificationDetails.type}`)
   }
+}
+
+export const notificationGroups = {
+  requestReceivedUsers: ['RESI__CERT_REVIEWER'],
+  requestSubmittedUsers: ['MANAGE_RES_LOCATIONS_OP_CAP', 'RESI__CERT_VIEWER'],
+  allCertUsers: ['MANAGE_RES_LOCATIONS_OP_CAP', 'RESI__CERT_REVIEWER', 'RESI__CERT_VIEWER'],
 }

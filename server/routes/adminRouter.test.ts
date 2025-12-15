@@ -20,6 +20,11 @@ const prisonService = new PrisonService(null) as jest.Mocked<PrisonService>
 
 let app: Express
 
+const adminUser = {
+  ...user,
+  userRoles: ['MANAGE_RES_LOCATIONS_ADMIN'],
+}
+
 beforeEach(() => {
   app = appWithAllRoutes({
     services: {
@@ -28,7 +33,7 @@ beforeEach(() => {
       locationsService,
       prisonService,
     },
-    userSupplier: () => user,
+    userSupplier: () => adminUser,
   })
   authService.getSystemClientToken.mockResolvedValue('token')
 })
