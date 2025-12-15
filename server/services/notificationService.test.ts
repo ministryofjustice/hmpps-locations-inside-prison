@@ -55,8 +55,10 @@ describe('NotificationService', () => {
       location: 'Test Location',
       changeType: 'Test Change',
       submittedOn: '2025-09-26',
-      who: 'Jane Smith',
-      reason: 'Test Reason',
+      withdrawnBy: 'Jack Withdrawer',
+      withdrawReason: 'Test Reason',
+      rejectedBy: 'John Rejecter',
+      rejectionReason: 'Test Reason',
     }
 
     const testCases: { type: NotificationType; expectedPersonalisation: Record<string, string | string[]> }[] = [
@@ -88,7 +90,7 @@ describe('NotificationService', () => {
           CHANGE_TYPE: 'Test Change',
           SUBMITTED_ON: '2025-09-26',
           SUBMITTED_BY: 'John Doe',
-          WITHDRAWN_BY: 'Jane Smith',
+          WITHDRAWN_BY: 'Jack Withdrawer',
           WITHDRAW_REASON: 'Test Reason',
         },
       },
@@ -100,7 +102,7 @@ describe('NotificationService', () => {
           CHANGE_TYPE: 'Test Change',
           SUBMITTED_ON: '2025-09-26',
           SUBMITTED_BY: 'John Doe',
-          REJECTION_BY: 'Jane Smith',
+          REJECTED_BY: 'John Rejecter',
           REJECTION_REASON: 'Test Reason',
         },
       },

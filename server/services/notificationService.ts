@@ -76,8 +76,10 @@ export type NotificationDetails = {
   changeType?: string
   submittedOn?: string
   submittedBy?: string
-  who?: string
-  reason?: string
+  withdrawnBy?: string
+  withdrawReason?: string
+  rejectedBy?: string
+  rejectionReason?: string
 }
 
 export enum NotificationType {
@@ -122,6 +124,7 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
     case NotificationType.REQUEST_APPROVED:
       return {
         ESTABLISHMENT: notificationDetails.establishment,
+        URL: notificationDetails.url,
       }
     case NotificationType.REQUEST_WITHDRAWN:
       return {
@@ -130,8 +133,8 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
         CHANGE_TYPE: notificationDetails.changeType,
         SUBMITTED_ON: notificationDetails.submittedOn,
         SUBMITTED_BY: notificationDetails.submittedBy,
-        WITHDRAWN_BY: notificationDetails.who,
-        WITHDRAW_REASON: notificationDetails.reason,
+        WITHDRAWN_BY: notificationDetails.withdrawnBy,
+        WITHDRAW_REASON: notificationDetails.withdrawReason,
       }
     case NotificationType.REQUEST_REJECTED:
       return {
@@ -140,8 +143,8 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
         CHANGE_TYPE: notificationDetails.changeType,
         SUBMITTED_ON: notificationDetails.submittedOn,
         SUBMITTED_BY: notificationDetails.submittedBy,
-        REJECTION_BY: notificationDetails.who,
-        REJECTION_REASON: notificationDetails.reason,
+        REJECTED_BY: notificationDetails.rejectedBy,
+        REJECTION_REASON: notificationDetails.rejectionReason,
       }
     default:
       throw new Error(`Unsupported notification type: ${notificationDetails.type}`)
