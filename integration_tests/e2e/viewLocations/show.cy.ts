@@ -55,21 +55,23 @@ context('View Locations Show', () => {
     })
   }
 
+  function setUpCommonStubs(roles: string[] = []) {
+    cy.task('reset')
+    cy.task('stubSignIn', { roles })
+    cy.task('stubManageUsers')
+    cy.task('stubManageUsersMe')
+    cy.task('stubManageUsersMeCaseloads')
+    cy.task('stubLocationsConstantsAccommodationType')
+    cy.task('stubLocationsConstantsConvertedCellType')
+    cy.task('stubLocationsConstantsDeactivatedReason')
+    cy.task('stubLocationsConstantsLocationType')
+    cy.task('stubLocationsConstantsSpecialistCellType')
+    cy.task('stubLocationsConstantsUsedForType')
+    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
+  }
+
   context('With the default role', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: true })
-    })
+    beforeEach(() => setUpCommonStubs())
 
     function testShow({
       location,
@@ -719,6 +721,121 @@ context('View Locations Show', () => {
           location = LocationFactory.build({
             ...locationDetails,
             status: 'NON_RESIDENTIAL',
+          })
+
+          cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+            parentLocation: location,
+            locationHierarchy,
+          })
+        })
+
+        it('Correctly presents the API data', () => {
+          testShow({ location, locationHierarchy })
+        })
+      })
+    })
+  })
+
+  context('With the RESI__CERT_REVIEWER role', () => {
+    beforeEach(() => setUpCommonStubs(['RESI__CERT_REVIEWER']))
+
+    function testShow({
+      location,
+      locationHierarchy,
+    }: {
+      location: Location
+      locationHierarchy: LocationSummary[]
+      subLocations?: Location[]
+    }) {
+      cy.signIn()
+
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      cy.get('h1').contains(location.localName || location.pathHierarchy)
+      viewLocationsShowPage
+        .locationType()
+        .contains(location.locationType.toLowerCase().replace(/^\w/, a => a.toUpperCase()))
+      viewLocationsShowPage
+        .certifiedTag()
+        .should(`${location.leafLevel && location.certification.certified ? '' : 'not.'}exist`)
+      const statusTag =
+        location.status === 'DRAFT' || location.status === 'LOCKED_DRAFT'
+          ? 'Draft'
+          : location.status
+              .replace(/_/, '-')
+              .toLowerCase()
+              .replace(/^\w/, a => a.toUpperCase())
+
+      viewLocationsShowPage.statusTag().contains(statusTag)
+
+      validateBreadcrumbs(viewLocationsShowPage, locationHierarchy)
+
+      if (location.status === 'LOCKED_DRAFT') {
+        viewLocationsShowPage.draftBanner().should('exist')
+
+        viewLocationsShowPage
+          .draftBannerCertifyLinkButton()
+          .should('exist')
+          .should(
+            'have.attr',
+            'href',
+            `/TST/cell-certificate/change-requests/${location.pendingApprovalRequestId}/review`,
+          )
+          .contains('View request details')
+      }
+    }
+
+    let location: Location
+
+    context('When the location is a Wing', () => {
+      const locationDetails: Partial<Location> = {
+        localName: null,
+        id: 'b8813f47-4497-4c88-9dee-a8d7ae54ba60',
+        prisonId: 'TST',
+        code: 'A',
+        pathHierarchy: 'A',
+        locationType: 'WING',
+        permanentlyInactive: false,
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
+        specialistCellTypes: [],
+        usedFor: [],
+        status: 'ACTIVE',
+        convertedCellType: 'OFFICE',
+        active: true,
+        deactivatedByParent: false,
+        deactivatedReason: 'TEST1',
+        proposedReactivationDate: '2024-04-28',
+        planetFmReference: 'PFM/1234',
+        topLevelId: '7995694d-d12b-4571-a9bb-4de01e1fe910',
+        level: 1,
+        leafLevel: false,
+        parentId: '1a5ef7cc-2fb4-4df0-8688-f946e6db2f85',
+        inactiveCells: 0,
+        lastModifiedBy: 'LOCATION_RO',
+        lastModifiedDate: new Date().toISOString(),
+        key: 'TST-A',
+        sortName: 'A',
+        isResidential: true,
+        capacity: { maxCapacity: 100, workingCapacity: 94 },
+        numberOfCellLocations: 4,
+      }
+      const locationHierarchy = [
+        {
+          id: 'id1',
+          prisonId: 'TST',
+          code: '1',
+          type: 'WING',
+          pathHierarchy: '1',
+          level: 1,
+        },
+      ]
+
+      context('When the location is Locked Draft', () => {
+        beforeEach(() => {
+          location = LocationFactory.build({
+            ...locationDetails,
+            status: 'LOCKED_DRAFT',
+            pendingApprovalRequestId: 'REQUEST-ID-0000-1000',
           })
 
           cy.task('stubLocationsLocationsResidentialSummaryForLocation', {

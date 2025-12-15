@@ -36,6 +36,7 @@ export default function setupStubs(roles = ['MANAGE_RES_LOCATIONS_OP_CAP']) {
   ManageUsersApiStubber.stub.stubManageUsers()
   ManageUsersApiStubber.stub.stubManageUsersMe()
   ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+  ManageUsersApiStubber.stub.stubManageUsersByCaseload()
 
   const approvalRequests: CertificationApprovalRequest[] = []
 

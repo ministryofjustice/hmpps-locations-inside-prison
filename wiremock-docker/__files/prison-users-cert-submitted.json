@@ -1,0 +1,7 @@
+{
+  "content": [
+    { "username": "CERTIFICATE_ADMINISTRATOR_TEST_USER", "email": "certificate_administrator@test.com" },
+    { "username": "CERTIFICATE_VIEWER_TEST_USER", "email": "certificate_viewer@test.com" }
+  ],
+  "totalPages": 1
+}

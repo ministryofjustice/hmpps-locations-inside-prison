@@ -254,7 +254,7 @@ export default class LocationsApiClient extends BaseApiClient {
       {
         prisonId: string
         parentLocation: string
-        newLevelAboveCells: {
+        newLevelAboveCells?: {
           levelCode: string
           levelLocalName?: string
           locationType: 'LANDING' | 'SPUR'
@@ -319,6 +319,29 @@ export default class LocationsApiClient extends BaseApiClient {
     deleteDraftLocation: this.apiCall<Location, { locationId: string }>({
       path: '/locations/:locationId',
       requestType: 'delete',
+    }),
+    editCells: this.apiCall<
+      Location,
+      undefined,
+      {
+        prisonId: string
+        parentLocation: string
+        cellsUsedFor: string[]
+        accommodationType: string
+        cells: {
+          id?: string
+          code: string
+          cellMark: string
+          certifiedNormalAccommodation: number
+          maxCapacity: number
+          workingCapacity: number
+          specialistCellTypes: string[]
+          inCellSanitation: boolean
+        }[]
+      }
+    >({
+      path: '/locations/edit-cells',
+      requestType: 'put',
     }),
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',

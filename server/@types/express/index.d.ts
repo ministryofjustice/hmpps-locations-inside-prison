@@ -21,6 +21,7 @@ import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
 import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
+import { NotificationDetails } from '../../data/types/locationsApi/notificationDetails'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -73,6 +74,7 @@ interface AllLocals {
   cell: Location
   cellCount: number
   cells: Location[]
+  notificationDetails: NotificationDetails
   changeSummary: string
   continueLink: string
   convertedCellTypeDetails: string
@@ -167,6 +169,7 @@ interface AllLocals {
   referrerRootUrl: string
   requestedReports: StoredReportData[]
   routePrefix: string
+  saveDefaultsEnabled: boolean
   signedOpCapChangeRequest: CertificationApprovalRequest
   specialistCellTypes: string[]
   specialistCellTypesObject: SpecialistCellTypesObject[]

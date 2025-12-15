@@ -35,7 +35,7 @@ describe('Details', () => {
         set: (key: string, value: any) => {
           sessionModelData[key] = value
         },
-        unset: (key: string) => delete sessionModelData[key],
+        unset: jest.fn((key: string) => delete sessionModelData[key]),
         reset: () => {
           sessionModelData = {}
         },
@@ -71,7 +71,35 @@ describe('Details', () => {
   })
 
   describe('saveValues', () => {
+    describe('when not editing', () => {
+      beforeEach(() => {
+        deepReq.isEditing = false
+      })
+
+      describe('when accommodationType is not NORMAL_ACCOMMODATION', () => {
+        it('unsets usedFor', () => {
+          deepReq.body = {
+            blah_cellsToCreate: '3',
+            blah_accommodationType: 'ANYTHING_ELSE',
+          }
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, () => {})
+          expect(deepReq.sessionModel.unset).toHaveBeenCalledWith('blah_usedFor')
+        })
+      })
+    })
+
     describe('when editing', () => {
+      describe('when accommodationType is not NORMAL_ACCOMMODATION', () => {
+        it('unsets usedFor', () => {
+          deepReq.body = {
+            blah_cellsToCreate: '3',
+            blah_accommodationType: 'ANYTHING_ELSE',
+          }
+          controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, () => {})
+          expect(deepReq.sessionModel.unset).toHaveBeenCalledWith('blah_usedFor')
+        })
+      })
+
       it('sets editing to false if any value is changed', () => {
         deepReq.body = {
           blah_cellsToCreate: '3',

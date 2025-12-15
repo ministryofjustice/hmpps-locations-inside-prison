@@ -31,7 +31,7 @@ jobs:
     needs: get-timings
     services:
       redis:
-        image: redis:8.2
+        image: redis:8.4
         ports:
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
@@ -51,7 +51,7 @@ jobs:
       timings-7: ${{ steps.timings.outputs.t7 }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - uses: ministryofjustice/hmpps-assess-risks-and-needs-github-actions/.github/actions/cypress/create_timings_file@v1
         with:
@@ -61,6 +61,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version-file: ${{ inputs.node_version_file }}
+
+      - name: Upgrade npm
+        run: npm install -g npm@^11.2.0
 
       - name: download artifacts
         uses: actions/download-artifact@v6
