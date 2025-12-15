@@ -8,6 +8,7 @@ export default configureAllowedScripts({
     'node_modules/dtrace-provider@0.8.8': 'ALLOW',
     // ESBuild is written in GoLang - this is needed to download prebuilt binaries for the specific platform
     'node_modules/esbuild@0.27.1': 'ALLOW',
+    'node_modules/tsx/node_modules/esbuild@0.25.12': 'ALLOW',
     // Needed by jest for running tests in watch mode
     'node_modules/fsevents@2.3.3': 'ALLOW',
     // Needed by esbuild for watching files during development
