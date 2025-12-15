@@ -169,6 +169,7 @@ interface AllLocals {
   referrerRootUrl: string
   requestedReports: StoredReportData[]
   routePrefix: string
+  saveDefaultsEnabled: boolean
   signedOpCapChangeRequest: CertificationApprovalRequest
   specialistCellTypes: string[]
   specialistCellTypesObject: SpecialistCellTypesObject[]
