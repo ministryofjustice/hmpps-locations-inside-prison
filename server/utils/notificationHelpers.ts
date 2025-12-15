@@ -25,8 +25,10 @@ export async function sendNotification(
   changeType?: string,
   submittedOn?: string,
   submittedBy?: string,
-  who?: string,
-  reason?: string,
+  withdrawnBy?: string,
+  withdrawReason?: string,
+  rejectedBy?: string,
+  rejectionReason?: string,
 ) {
   const details: NotificationDetails = {
     type,
@@ -37,8 +39,10 @@ export async function sendNotification(
     changeType,
     submittedOn,
     submittedBy,
-    who,
-    reason,
+    withdrawnBy,
+    withdrawReason,
+    rejectedBy,
+    rejectionReason,
   }
   await notifyService.notify(details)
 }
