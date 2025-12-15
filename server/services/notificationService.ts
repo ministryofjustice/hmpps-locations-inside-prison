@@ -117,6 +117,7 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
       return {
         SUBMITTED_BY: notificationDetails.submittedBy,
         ESTABLISHMENT: notificationDetails.establishment,
+        URL: notificationDetails.url,
       }
     case NotificationType.REQUEST_APPROVED:
       return {
