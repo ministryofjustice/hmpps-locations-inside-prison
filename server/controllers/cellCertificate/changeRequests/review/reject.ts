@@ -50,6 +50,8 @@ export default class Reject extends FormInitialStep {
       changeType,
       formatDateWithTime(requestedDate),
       requestedBy,
+      undefined,
+      undefined,
       res.locals.user.name,
       explanation as string,
     )

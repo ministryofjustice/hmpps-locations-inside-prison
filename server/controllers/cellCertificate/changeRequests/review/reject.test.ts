@@ -99,6 +99,8 @@ describe('Reject', () => {
         'Add new locations to certificate',
         '1 January 2025 at 10:30',
         'John Submitter',
+        undefined,
+        undefined,
         'Joe Reviewer',
         'Nope, sorry',
       )
