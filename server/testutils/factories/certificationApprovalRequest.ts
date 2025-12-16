@@ -21,6 +21,7 @@ const CertificationApprovalRequestFactory = Factory.define<CertificationApproval
     maxCapacityChange: 3,
     signedOperationCapacityChange: 4,
     currentSignedOperationCapacity: 5,
+    certificateId: 'some-certificate-uuid',
     reasonForSignedOpChange: 'Needed to change it',
     locations: [
       CertificateLocationFactory.build({

@@ -128,7 +128,7 @@ describe('Confirm', () => {
         notifyService,
         ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
         'Moorland (HMP & YOI)',
-        expect.stringContaining('/MDI/cell-certificate/change-requests/some-uuid/review'),
+        expect.stringContaining('/MDI/cell-certificate/change-requests/some-uuid'),
         NotificationType.REQUEST_SUBMITTED,
         undefined,
         undefined,

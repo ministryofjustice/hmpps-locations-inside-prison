@@ -12,6 +12,8 @@ import redirectToPrependPrisonId from '../../middleware/redirectToPrependPrisonI
 import populateApprovalRequest from '../../middleware/populateApprovalRequest'
 import populateConstants from '../../middleware/populateConstants'
 import addBreadcrumb from '../../middleware/addBreadcrumb'
+import redirectNonPendingRequest from '../../middleware/redirectNonPendingRequest'
+import redirectCurrentCertificate from '../../middleware/redirectCurrentCertificate'
 
 const router = express.Router({ mergeParams: true })
 
@@ -23,18 +25,20 @@ router.use('/current', addBreadcrumb({ title: '', href: '/' }), populateConstant
 router.use('/history', history)
 router.use(
   '/change-requests/:approvalRequestId/review',
+  redirectNonPendingRequest,
   populateConstants,
   populateApprovalRequest,
   changeRequestsReview,
 )
 router.use(
   '/change-requests/:approvalRequestId/withdraw',
+  redirectNonPendingRequest,
   populateConstants,
   populateApprovalRequest,
   changeRequestsWithdraw,
 )
 router.use('/change-requests/:approvalRequestId', populateConstants, populateApprovalRequest, changeRequestsShow)
 router.use('/change-requests', addBreadcrumb({ title: '', href: '/' }), changeRequestsIndex)
-router.use('/:certificateId', populateConstants, certificateShow)
+router.use('/:certificateId', redirectCurrentCertificate, populateConstants, certificateShow)
 
 export default router
