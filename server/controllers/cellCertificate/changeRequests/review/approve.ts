@@ -38,9 +38,9 @@ export default class Approve extends FormInitialStep {
     const { systemToken } = req.session
     const { locationsService, manageUsersService, notifyService } = req.services
     const { approvalRequest, notificationDetails, prisonId } = res.locals
-    const url = `${ingressUrl}/${prisonId}/cell-certificate/${approvalRequest.id}`
 
-    await locationsService.approveCertificationRequest(systemToken, approvalRequest.id)
+    const certification = await locationsService.approveCertificationRequest(systemToken, approvalRequest.id)
+    const url = `${ingressUrl}/${prisonId}/cell-certificate/${certification.certificateId}`
 
     // Send notifications to all cert roles
     const emailAddresses = await getUserEmails(
