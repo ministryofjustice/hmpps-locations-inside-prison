@@ -4,10 +4,11 @@ import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
+import canEditCna from '../utils/canEditCna'
 
 function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
-  const { active, capacity, leafLevel } = location
-  return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
+  const { active, capacity, leafLevel, status } = location
+  return (active || status === 'DRAFT') && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
 function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
@@ -256,6 +257,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
 
       if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
         const changeLink: { linkHref?: string; linkLabel?: string } = {}
+        const cnaLink: typeof changeLink & { linkAriaLabel?: string } = {}
         const workingCapLink: { linkAriaLabel?: string } = {}
         const maxCapLink: { linkAriaLabel?: string } = {}
 
@@ -264,6 +266,16 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           changeLink.linkLabel = 'Change'
           workingCapLink.linkAriaLabel = 'Change working capacity'
           maxCapLink.linkAriaLabel = 'Change maximum capacity'
+
+          if (
+            canEditCna(
+              await locationsService.getPrisonConfiguration(systemToken, prisonId),
+              residentialSummary.location,
+            )
+          ) {
+            Object.assign(cnaLink, changeLink)
+            cnaLink.linkAriaLabel = 'Change CNA'
+          }
         }
 
         const { numberOfCellLocations } = residentialSummary.location
@@ -284,11 +296,12 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           workingCapacity = pendingChanges.workingCapacity
         }
 
-        if (residentialSummary.location.status === 'DRAFT') {
+        if (residentialSummary.location.status.includes('DRAFT')) {
           residentialSummary.summaryCards.push({
             title: 'CNA',
             type: 'cna',
             text: numberOfCellLocations ? `${cna}` : '-',
+            ...cnaLink,
           })
         }
 
@@ -309,7 +322,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           },
         )
 
-        if (residentialSummary.location.status !== 'DRAFT' && !residentialSummary.location.leafLevel) {
+        if (!residentialSummary.location.status.includes('DRAFT') && !residentialSummary.location.leafLevel) {
           residentialSummary.summaryCards.push({
             title: 'Inactive cells',
             type: 'inactive-cells',

@@ -16,7 +16,6 @@ const certificateAdministratorPermissions: string[] = [
   'create_location',
   'certificate_change_request_create',
   'certificate_change_request_withdraw',
-  'change_max_capacity',
   'change_signed_operational_capacity',
   'convert_non_residential',
   'deactivate:permanent',

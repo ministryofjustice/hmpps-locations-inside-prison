@@ -54,12 +54,10 @@ export default class ConfirmRemoveCellType extends FormInitialStep {
       const { locationsService } = req.services
 
       const token = req.session.systemToken
-      await locationsService.updateCapacity(
-        token,
-        decoratedLocation.id,
-        Number(req.sessionModel.get('maxCapacity')),
-        Number(req.sessionModel.get('workingCapacity')),
-      )
+      await locationsService.updateCapacity(token, decoratedLocation.id, {
+        maxCapacity: Number(req.sessionModel.get('maxCapacity')),
+        workingCapacity: Number(req.sessionModel.get('workingCapacity')),
+      })
 
       await locationsService.updateSpecialistCellTypes(token, decoratedLocation.id, [])
 

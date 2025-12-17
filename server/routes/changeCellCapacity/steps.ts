@@ -1,6 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
 import ChangeCellCapacity from '../../controllers/changeCellCapacity'
 import ConfirmCellCapacity from '../../controllers/changeCellCapacity/confirm'
+import canEditCna from '../../utils/canEditCna'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -10,15 +11,24 @@ const steps: FormWizard.Steps = {
     skip: true,
     next: 'change',
   },
-  '/confirm': {
-    fields: ['confirm'],
-    controller: ConfirmCellCapacity,
-  },
   '/change': {
-    fields: ['workingCapacity', 'maxCapacity'],
-    next: 'confirm',
+    fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
+    next: [
+      {
+        fn: (_req, res) => canEditCna(res.locals.prisonConfiguration, res.locals.decoratedLocation),
+        next: 'confirm-skip',
+      },
+      'confirm',
+    ],
     controller: ChangeCellCapacity,
     template: '../../partials/formStep',
+  },
+  '/confirm': {
+    controller: ConfirmCellCapacity,
+  },
+  '/confirm-skip': {
+    controller: ConfirmCellCapacity,
+    skip: true,
   },
 }
 

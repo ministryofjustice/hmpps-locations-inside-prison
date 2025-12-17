@@ -5,6 +5,7 @@ import FormInitialStep from '../base/formInitialStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
+import canEditCna from '../../utils/canEditCna'
 
 export default class ChangeCellCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -13,7 +14,15 @@ export default class ChangeCellCapacity extends FormInitialStep {
   }
 
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
-    return res.locals.decoratedLocation.capacity
+    const { capacity, certification, pendingChanges } = res.locals.decoratedLocation
+    let values = { ...capacity, baselineCna: certification?.certifiedNormalAccommodation }
+
+    if (pendingChanges) {
+      const { workingCapacity, maxCapacity, certifiedNormalAccommodation } = pendingChanges
+      values = { ...values, ...{ workingCapacity, maxCapacity, baselineCna: certifiedNormalAccommodation } }
+    }
+
+    return values
   }
 
   override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
@@ -24,11 +33,17 @@ export default class ChangeCellCapacity extends FormInitialStep {
 
     const validationErrors: FormWizard.Errors = {}
 
-    if (!req.canAccess('change_max_capacity')) {
-      values.maxCapacity = decoratedLocation.capacity.maxCapacity.toString()
-    }
-
     super.validateFields(req, res, errors => {
+      if (!errors.baselineCna && canEditCna(res.locals.prisonConfiguration, res.locals.decoratedLocation)) {
+        if (
+          values?.baselineCna === '0' &&
+          accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
+          !specialistCellTypes.length
+        ) {
+          validationErrors.baselineCna = this.formError('baselineCna', 'nonZeroForNormalCell')
+        }
+      }
+
       if (!errors.workingCapacity) {
         if (
           values?.workingCapacity === '0' &&
@@ -50,13 +65,14 @@ export default class ChangeCellCapacity extends FormInitialStep {
   }
 
   override validate(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { decoratedLocation } = res.locals
+    const { decoratedLocation, prisonConfiguration } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
-    const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap } = req.form.values
-    const { maxCapacity, workingCapacity } = decoratedLocation.capacity
+    const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap, baselineCna: newBaselineCna } = req.form.values
+    const { maxCapacity, workingCapacity, baselineCna } = this.getInitialValues(req, res)
 
     if (
-      (!req.canAccess('change_max_capacity') || Number(newMaxCap) === maxCapacity) &&
+      (!canEditCna(prisonConfiguration, decoratedLocation) || Number(newBaselineCna) === baselineCna) &&
+      Number(newMaxCap) === maxCapacity &&
       Number(newWorkingCap) === workingCapacity
     ) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
@@ -66,30 +82,28 @@ export default class ChangeCellCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-    const { decoratedLocation, values } = res.locals
-    const { capacity, displayName, id: locationId, prisonId } = decoratedLocation
+    const { decoratedLocation, prisonConfiguration } = res.locals
+    const { displayName, id: locationId, prisonId } = decoratedLocation
+    const showCna = canEditCna(prisonConfiguration, decoratedLocation)
 
     const cancelLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
       nextStepUrl: `/location/${locationId}/change-cell-capacity/confirm`,
     })
 
-    const { maxCapacity } = capacity
-
-    if (!req.canAccess('change_max_capacity')) {
-      req.sessionModel.set('maxCapacity', maxCapacity)
-      values.maxCapacity = maxCapacity
-    }
-
-    return {
-      ...locals,
+    const locals = {
+      ...super.locals(req, res),
       backLink: cancelLink,
       cancelLink,
-      title: `Change ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
-      insetText:
-        'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
+      title: `Change cell capacity`,
+      insetText: `Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a ${showCna ? 'baseline certified normal accommodation and ' : ''}working capacity of 0.`,
       titleCaption: capFirst(displayName),
     }
+
+    if (showCna) {
+      locals.buttonText = 'Save cell capacity'
+    }
+
+    return locals
   }
 }

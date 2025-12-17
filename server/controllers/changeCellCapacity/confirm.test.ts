@@ -18,7 +18,7 @@ describe('ConfirmCellCapacity', () => {
 
   beforeEach(() => {
     permissions = {}
-    sessionModel = { maxCapacity: '3', workingCapacity: '1' }
+    sessionModel = { maxCapacity: '3', workingCapacity: '1', baselineCna: '2' }
     deepReq = {
       canAccess: (permission: string) => permissions[permission],
       form: {
@@ -56,6 +56,9 @@ describe('ConfirmCellCapacity', () => {
           },
           prisonId: 'TST',
         }),
+        prisonConfiguration: {
+          certificationApprovalRequired: 'ACTIVE',
+        },
         prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
@@ -74,71 +77,54 @@ describe('ConfirmCellCapacity', () => {
   })
 
   describe('locals', () => {
-    describe('when the user has permission to change_max_capacity', () => {
-      beforeEach(() => {
-        permissions.change_max_capacity = true
-      })
-
-      it('formats the change summary correctly', () => {
-        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-        expect(result).toEqual({
-          backLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/change',
-          buttonText: 'Update cell capacity',
-          cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-          changeSummary: `You are decreasing the cell’s working capacity by 1.
+    it('formats the change summary correctly', () => {
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect(result).toEqual({
+        backLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/change',
+        buttonText: 'Update cell capacity',
+        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        changeSummary: `You are decreasing the cell’s working capacity by 1.
 <br/><br/>
 This will decrease the establishment’s working capacity from 20 to 19.
 <br/><br/>
 You are increasing the cell’s maximum capacity by 1.
 <br/><br/>
 This will increase the establishment’s maximum capacity from 30 to 31.`,
-          title: 'Confirm cell capacity',
-          titleCaption: 'Cell A-1-001',
-        })
-      })
-    })
-
-    describe('when the user does not have permission to change_max_capacity', () => {
-      beforeEach(() => {
-        permissions.change_max_capacity = false
-      })
-
-      it('strips the max capacity from the change summary', () => {
-        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-        expect(result).toEqual({
-          backLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/change',
-          buttonText: 'Update working capacity',
-          cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-          changeSummary: `You are decreasing the cell’s working capacity by 1.
-<br/><br/>
-This will decrease the establishment’s working capacity from 20 to 19.`,
-          title: 'Confirm working capacity',
-          titleCaption: 'Cell A-1-001',
-        })
+        title: 'Confirm cell capacity',
+        titleCaption: 'Cell A-1-001',
       })
     })
   })
 
   describe('saveValues', () => {
-    describe('when the user has permission to change_max_capacity', () => {
+    describe('when !canEditCna', () => {
       beforeEach(() => {
-        permissions.change_max_capacity = true
+        deepRes.locals.decoratedLocation.status = 'ACTIVE'
       })
-      it('calls locationsService', async () => {
+
+      it('calls locationsService without CNA change', async () => {
         await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(locationsService.updateCapacity).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, 3, 1)
+        expect(locationsService.updateCapacity).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, {
+          maxCapacity: 3,
+          workingCapacity: 1,
+        })
       })
     })
 
-    describe('when the user does not have permission to change_max_capacity', () => {
+    describe('when canEditCna', () => {
       beforeEach(() => {
-        permissions.change_max_capacity = false
+        deepRes.locals.decoratedLocation.status = 'DRAFT'
       })
-      it('calls locationsService without the max capacity change', async () => {
+
+      it('calls locationsService with CNA', async () => {
         await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(locationsService.updateCapacity).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, 2, 1)
+        expect(locationsService.updateCapacity).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, {
+          maxCapacity: 3,
+          workingCapacity: 1,
+          certifiedNormalAccommodation: 2,
+        })
       })
     })
 

@@ -62,6 +62,7 @@ export default class ViewLocationsShowPage extends Page {
       cy.get('[data-qa=working-capacity-card]').find('[data-qa=bottom-content-line-1]'),
     maximumCapacityText: (): PageElement =>
       cy.get('[data-qa=maximum-capacity-card]').find('[data-qa=bottom-content-line-1]'),
+    cnaChangeLink: (): PageElement => cy.get('[data-qa=cna-card]').find('.hmpps-mini-card__link a'),
     workingCapacityChangeLink: (): PageElement =>
       cy.get('[data-qa=working-capacity-card]').find('.hmpps-mini-card__link a'),
     maximumCapacityChangeLink: (): PageElement =>

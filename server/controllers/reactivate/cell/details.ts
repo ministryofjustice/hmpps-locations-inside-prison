@@ -28,10 +28,6 @@ export default class ReactivateCellDetails extends FormInitialStep {
 
     const validationErrors: FormWizard.Errors = {}
 
-    if (!req.canAccess('change_max_capacity')) {
-      values.maxCapacity = decoratedLocation.capacity.maxCapacity.toString()
-    }
-
     super.validateFields(req, res, errors => {
       if (!errors.workingCapacity) {
         if (
@@ -61,7 +57,7 @@ export default class ReactivateCellDetails extends FormInitialStep {
       ...locals,
       backLink,
       cancelLink: referrerRootUrl,
-      title: `Check ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      title: `Check cell capacity`,
       titleCaption: capFirst(decoratedLocation.displayName),
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',

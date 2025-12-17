@@ -92,7 +92,7 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
       expect(locationsApiCalls).toEqual([
         {
           methodName: 'updateCapacity',
-          args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', 3, 1],
+          args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', { maxCapacity: 3, workingCapacity: 1 }],
         },
         {
           methodName: 'updateSpecialistCellTypes',

@@ -385,7 +385,11 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'get',
       }),
     },
-    updateCapacity: this.apiCall<Location, { locationId: string }, { maxCapacity?: number; workingCapacity?: number }>({
+    updateCapacity: this.apiCall<
+      Location,
+      { locationId: string },
+      { maxCapacity?: number; workingCapacity?: number; certifiedNormalAccommodation?: number }
+    >({
       path: '/locations/:locationId/capacity',
       requestType: 'put',
     }),

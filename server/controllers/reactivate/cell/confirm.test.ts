@@ -20,9 +20,7 @@ describe('ReactivateCellConfirm', () => {
   let sessionModel: { [key: string]: any }
 
   beforeEach(() => {
-    permissions = {
-      change_max_capacity: true,
-    }
+    permissions = {}
     sessionModel = {
       maxCapacity: 3,
       workingCapacity: 3,
@@ -110,51 +108,21 @@ describe('ReactivateCellConfirm', () => {
       }
     })
 
-    describe('when the user has permission to change_max_capacity', () => {
-      beforeEach(() => {
-        permissions.change_max_capacity = true
-      })
+    it('sets the correct locals', async () => {
+      getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      it('sets the correct locals', async () => {
-        getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
+      deepReq.form.values = {
+        deactivationReason: 'REASON',
+        deactivationReasonDescription: 'Description text',
+      }
+      ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
 
-        deepReq.form.values = {
-          deactivationReason: 'REASON',
-          deactivationReasonDescription: 'Description text',
-        }
-        ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
-
-        expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-          backLink: `/reactivate/cell/${deepRes.locals.decoratedLocation.id}/details`,
-          buttonText: 'Confirm activation',
-          cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
-          changeSummary: `The establishment's total working capacity will increase from 20 to 23.\n<br/><br/>\nThe establishment's total maximum capacity will increase from 30 to 32.`,
-          title: 'You are about to reactivate cell A-1-001',
-        })
-      })
-    })
-
-    describe('when the user does not have permission to change_max_capacity', () => {
-      beforeEach(() => {
-        permissions.change_max_capacity = false
-      })
-
-      it('sets the correct locals by stripping max capacity changes', async () => {
-        getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
-
-        deepReq.form.values = {
-          deactivationReason: 'REASON',
-          deactivationReasonDescription: 'Description text',
-        }
-        ;(deepReq.services.locationsService.getDeactivatedReason as jest.Mock).mockResolvedValue('Translated reason')
-
-        expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-          backLink: `/reactivate/cell/${deepRes.locals.decoratedLocation.id}/details`,
-          buttonText: 'Confirm activation',
-          cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
-          changeSummary: `The establishment's total working capacity will increase from 20 to 23.`,
-          title: 'You are about to reactivate cell A-1-001',
-        })
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
+        backLink: `/reactivate/cell/${deepRes.locals.decoratedLocation.id}/details`,
+        buttonText: 'Confirm activation',
+        cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
+        changeSummary: `The establishment's total working capacity will increase from 20 to 23.\n<br/><br/>\nThe establishment's total maximum capacity will increase from 30 to 32.`,
+        title: 'You are about to reactivate cell A-1-001',
       })
     })
   })
@@ -180,21 +148,6 @@ describe('ReactivateCellConfirm', () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalled()
-    })
-
-    describe('when the user does not have permission to change_max_capacity', () => {
-      beforeEach(() => {
-        permissions.change_max_capacity = false
-      })
-
-      it('strips out any change to max capacity', async () => {
-        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-        expect(locationsService.reactivateCell).toHaveBeenCalledWith('token', deepRes.locals.decoratedLocation.id, {
-          maxCapacity: deepRes.locals.decoratedLocation.capacity.maxCapacity,
-          workingCapacity: 3,
-        })
-      })
     })
   })
 

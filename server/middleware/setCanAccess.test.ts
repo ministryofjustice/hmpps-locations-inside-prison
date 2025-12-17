@@ -49,7 +49,6 @@ describe('setCanAccess', () => {
 
   it('respects permissionOverrides based on prisonConfiguration and feature flags', async () => {
     expect(deepReq.canAccess?.('create_location')).toBe(true)
-    expect(deepReq.canAccess?.('change_max_capacity')).toBe(true)
   })
 
   it('respects permissionOverrides when prisonId (with INACTIVE certification) in params is different from activeCaseload', async () => {

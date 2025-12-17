@@ -154,7 +154,7 @@ context('View Locations Show', () => {
         viewLocationsShowPage.summaryCards.all().should('have.length', 0)
       } else {
         viewLocationsShowPage.summaryCards.all().should('have.length', location.leafLevel ? 2 : 3)
-        if (location.status === 'DRAFT') {
+        if (location.status.includes('DRAFT')) {
           viewLocationsShowPage.summaryCards
             .cnaText()
             .contains(`${location.numberOfCellLocations > 0 ? location.certification.capacityOfCertifiedCell : '-'}`)
