@@ -6,9 +6,9 @@ import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSu
 import populateLocation from '../../middleware/populateLocation'
 import { Location } from '../../data/types/locationsApi'
 import { CertificateLocation } from '../../data/types/locationsApi/certificateLocation'
-import { PaginatedUsers } from '../../data/manageUsersApiClient'
-import { NotificationDetails, NotificationType } from '../../services/notificationService'
+import { NotificationType, notificationGroups } from '../../services/notificationService'
 import config from '../../config'
+import { getUserEmails, sendNotification } from '../../utils/notificationHelpers'
 
 async function locationToCertificationLocation(
   req: FormWizard.Request,
@@ -116,13 +116,14 @@ export default class Confirm extends FormInitialStep {
     const { locationsService, manageUsersService, notifyService } = req.services
     const { prisonName } = res.locals.prisonResidentialSummary.prisonSummary
     const { prisonId } = res.locals.location
-    const submittedBy = res.locals.user.username
+    const submittedBy = res.locals.user.name
 
     const certificationApprovalRequest = await locationsService.createCertificationRequestForLocation(
       systemToken,
       'DRAFT',
       res.locals.locationId,
     )
+    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}`
 
     const proposedSignedOpCapChange = req.sessionModel.get<{
       signedOperationalCapacity: number
@@ -138,25 +139,32 @@ export default class Confirm extends FormInitialStep {
       )
     }
 
-    const usersWithOpCapRole: PaginatedUsers = await manageUsersService.getAllUsersByCaseload(
-      req.session.systemToken,
-      res.locals.prisonId,
-      'MANAGE_RES_LOCATIONS_OP_CAP',
+    // Send notifications to both sets of relevant cert roles
+    const [requestReceivedAddresses, requestSubmittedEmails] = await Promise.all([
+      getUserEmails(manageUsersService, systemToken, res.locals.prisonId, notificationGroups.requestReceivedUsers),
+      getUserEmails(manageUsersService, systemToken, res.locals.prisonId, notificationGroups.requestSubmittedUsers),
+    ])
+
+    const notifications = [
+      { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },
+      { emailAddresses: requestSubmittedEmails, type: NotificationType.REQUEST_SUBMITTED, url },
+    ]
+
+    await Promise.all(
+      notifications.map(({ emailAddresses, type, url: notificationUrl }) =>
+        sendNotification(
+          notifyService,
+          emailAddresses,
+          prisonName,
+          notificationUrl,
+          type,
+          undefined,
+          undefined,
+          undefined,
+          submittedBy,
+        ),
+      ),
     )
-
-    const opCapEmailAddresses = usersWithOpCapRole.content.map(user => user.email)
-    const reviewUrl = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}/review`
-
-    const details: NotificationDetails = {
-      emailAddress: opCapEmailAddresses,
-      establishment: prisonName,
-      url: reviewUrl,
-      type: NotificationType.REQUEST_RECEIVED,
-      submittedBy,
-    }
-
-    await notifyService.notify(details)
-    // Check when sendChangeRequestSubmittedEmails also needs to be sent
 
     req.journeyModel.reset()
     req.sessionModel.reset()

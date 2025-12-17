@@ -3,8 +3,17 @@ import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../../base/formInitialStep'
 import capFirst from '../../../../formatters/capFirst'
 import displayName from '../../../../formatters/displayName'
+import { getUserEmails, sendNotification } from '../../../../utils/notificationHelpers'
+import { NotificationType, notificationGroups } from '../../../../services/notificationService'
+import config from '../../../../config'
+import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 
 export default class Approve extends FormInitialStep {
+  override middlewareSetup() {
+    super.middlewareSetup()
+    this.use(populateCertificationRequestDetails)
+  }
+
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { locationsService } = req.services
     const { systemToken } = req.session
@@ -25,9 +34,29 @@ export default class Approve extends FormInitialStep {
   }
 
   override async saveValues(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { locationsService } = req.services
+    const { ingressUrl } = config
+    const { systemToken } = req.session
+    const { locationsService, manageUsersService, notifyService } = req.services
+    const { approvalRequest, notificationDetails, prisonId } = res.locals
 
-    await locationsService.approveCertificationRequest(req.session.systemToken, res.locals.approvalRequest.id)
+    const certification = await locationsService.approveCertificationRequest(systemToken, approvalRequest.id)
+    const url = `${ingressUrl}/${prisonId}/cell-certificate/${certification.certificateId}`
+
+    // Send notifications to all cert roles
+    const emailAddresses = await getUserEmails(
+      manageUsersService,
+      systemToken,
+      prisonId,
+      notificationGroups.allCertUsers,
+    )
+
+    await sendNotification(
+      notifyService,
+      emailAddresses,
+      notificationDetails.prisonName,
+      url,
+      NotificationType.REQUEST_APPROVED,
+    )
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -37,6 +66,6 @@ export default class Approve extends FormInitialStep {
       content: `The establishment has been notified that the change request has been approved.`,
     })
 
-    res.redirect(`/${res.locals.prisonId}/cell-certificate/change-requests`)
+    res.redirect(`/${prisonId}/cell-certificate/change-requests`)
   }
 }

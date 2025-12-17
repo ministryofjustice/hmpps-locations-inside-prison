@@ -1,30 +1,19 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../../base/formInitialStep'
-import capFirst from '../../../../formatters/capFirst'
-import displayName from '../../../../formatters/displayName'
+import { getUserEmails, sendNotification } from '../../../../utils/notificationHelpers'
+import { NotificationType, notificationGroups } from '../../../../services/notificationService'
+import formatDateWithTime from '../../../../formatters/formatDateWithTime'
+import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 
 export default class Reject extends FormInitialStep {
+  override middlewareSetup() {
+    super.middlewareSetup()
+    this.use(populateCertificationRequestDetails)
+  }
+
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { locationsService, manageUsersService } = req.services
-    const { systemToken } = req.session
-    const { approvalRequest, user } = res.locals
-
-    if (approvalRequest.locationId) {
-      const location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
-      res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
-    } else {
-      res.locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
-    }
-
     res.locals.buttonText = 'Reject request'
-
-    res.locals.userMap = {
-      [approvalRequest.requestedBy]:
-        (await manageUsersService.getUser(user.token, approvalRequest.requestedBy))?.name ||
-        approvalRequest.requestedBy,
-    }
-
     res.locals.cancelText = 'Cancel'
 
     await super._locals(req, res, next)
@@ -32,11 +21,38 @@ export default class Reject extends FormInitialStep {
 
   override async saveValues(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { explanation } = req.form.values
-    const { locationsService } = req.services
+    const { locationsService, notifyService, manageUsersService } = req.services
+    const { systemToken } = req.session
+    const { prisonId, notificationDetails } = res.locals
+    const { prisonName, requestedBy, locationName, changeType, requestedDate } = notificationDetails
 
     await locationsService.rejectCertificationRequest(
       req.session.systemToken,
       res.locals.approvalRequest.id,
+      explanation as string,
+    )
+
+    // Send notifications to all cert roles
+    const emailAddresses = await getUserEmails(
+      manageUsersService,
+      systemToken,
+      prisonId,
+      notificationGroups.allCertUsers,
+    )
+
+    await sendNotification(
+      notifyService,
+      emailAddresses,
+      prisonName,
+      undefined,
+      NotificationType.REQUEST_REJECTED,
+      locationName,
+      changeType,
+      formatDateWithTime(requestedDate),
+      requestedBy,
+      undefined,
+      undefined,
+      res.locals.user.name,
       explanation as string,
     )
 

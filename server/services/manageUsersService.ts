@@ -24,7 +24,7 @@ export default class ManageUsersService {
   async getAllUsersByCaseload(
     token: string,
     caseload: string,
-    accessRoles: string,
+    accessRoles: string[],
     size = 50,
   ): Promise<PaginatedUsers> {
     const firstPage: PaginatedUsers = await this.getPagedUsersByCaseload(token, caseload, accessRoles, 0, size)
@@ -46,13 +46,13 @@ export default class ManageUsersService {
   private async getPagedUsersByCaseload(
     token: string,
     caseload: string,
-    accessRoles: string,
+    accessRoles: string[],
     page: number,
     size: number,
   ): Promise<PaginatedUsers> {
     return this.manageUsersApiClient.users.getUsersByCaseload(token, {
       caseload,
-      accessRoles,
+      accessRoles: accessRoles.join(','),
       page: page.toString(),
       size: size.toString(),
     })

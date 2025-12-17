@@ -1,6 +1,8 @@
 import hmppsConfig from '@ministryofjustice/eslint-config-hmpps'
 
-const config = hmppsConfig()
+const config = hmppsConfig({
+  extraPathsAllowingDevDependencies: ['.allowed-scripts.mjs'],
+})
 
 config.push({
   name: 'jquery',
