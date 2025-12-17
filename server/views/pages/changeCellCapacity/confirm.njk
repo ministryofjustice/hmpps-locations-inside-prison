@@ -9,21 +9,17 @@
         text: "Capacity"
       },
       actions: {
-        items: [ { href: backLink, text: "Change" } ] if canAccess('change_max_capacity')
+        items: [ { href: backLink, text: "Change" } ]
       }
     },
     rows: [
       {
+        key: { text: "Baseline certified normal accommodation (CNA)" },
+        value: { text: values.baselineCna }
+      } if values.baselineCna != '',
+      {
         key: { text: "Working capacity" },
-        value: { text: values.workingCapacity },
-        actions: {
-          items: [
-            {
-              href: backLink,
-              text: "Change"
-            }
-          ] if not canAccess('change_max_capacity')
-        }
+        value: { text: values.workingCapacity }
       },
       {
         key: { text: "Maximum capacity" },
@@ -33,7 +29,7 @@
   }) }}
 
   <div class="govuk-!-padding-bottom-2 change-summary">
-    <h2 class="govuk-heading-m">Change to {{ 'cell’s' if canAccess('change_max_capacity') else 'working' }} capacity</h2>
+    <h2 class="govuk-heading-m">Change to cell's capacity</h2>
 
     <p>{{ changeSummary | safe }}</p>
   </div>

@@ -5,6 +5,8 @@ import backUrl from '../../utils/backUrl'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
+import canEditCna from '../../utils/canEditCna'
+import LocationsService from '../../services/locationsService'
 
 export default class ConfirmCellCapacity extends FormWizard.Controller {
   override middlewareSetup() {
@@ -27,14 +29,9 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const { decoratedLocation, values } = res.locals
+    const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
-
-    if (!req.canAccess('change_max_capacity')) {
-      req.sessionModel.set('maxCapacity', maxCapacity)
-      values.maxCapacity = maxCapacity
-    }
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
     const newMaxCap = Number(req.sessionModel.get('maxCapacity'))
@@ -63,27 +60,25 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
       backLink,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
-      title: `Confirm ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      title: `Confirm cell capacity`,
       titleCaption: capFirst(decoratedLocation.displayName),
-      buttonText: `Update ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      buttonText: `Update cell capacity`,
     }
   }
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { decoratedLocation } = res.locals
+      const { decoratedLocation, prisonConfiguration } = res.locals
       const { locationsService } = req.services
 
-      if (!req.canAccess('change_max_capacity')) {
-        req.sessionModel.set('maxCapacity', decoratedLocation.capacity.maxCapacity)
+      const capacities: Parameters<LocationsService['updateCapacity']>[2] = {
+        maxCapacity: Number(req.sessionModel.get('maxCapacity')),
+        workingCapacity: Number(req.sessionModel.get('workingCapacity')),
       }
-
-      await locationsService.updateCapacity(
-        req.session.systemToken,
-        decoratedLocation.id,
-        Number(req.sessionModel.get('maxCapacity')),
-        Number(req.sessionModel.get('workingCapacity')),
-      )
+      if (canEditCna(prisonConfiguration, decoratedLocation)) {
+        capacities.certifiedNormalAccommodation = Number(req.sessionModel.get('baselineCna'))
+      }
+      await locationsService.updateCapacity(req.session.systemToken, decoratedLocation.id, capacities)
 
       req.services.analyticsService.sendEvent(req, 'change_cell_capacity', { prison_id: decoratedLocation.prisonId })
 
