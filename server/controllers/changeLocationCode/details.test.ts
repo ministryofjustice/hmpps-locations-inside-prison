@@ -175,6 +175,16 @@ describe('Change Location Code', () => {
       )
     })
 
+    it('pads a single digit location code to 3 digits', async () => {
+      deepReq.form.values.locationCode = '1'
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(locationsService.updateLocationCode).toHaveBeenLastCalledWith(
+        'token',
+        'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        '001',
+      )
+    })
+
     it('sends an analytics event', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'change_location_code', {
