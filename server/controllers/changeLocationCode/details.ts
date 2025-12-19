@@ -89,7 +89,7 @@ export default class Details extends FormInitialStep {
       const { systemToken } = req.session
       const { locationId, prisonId } = res.locals
       const { locationsService } = req.services
-      const code = req.form.values.locationCode as string
+      const code = (req.form.values.locationCode as string).padStart(3, '0')
 
       await locationsService.updateLocationCode(systemToken, locationId, code)
 
