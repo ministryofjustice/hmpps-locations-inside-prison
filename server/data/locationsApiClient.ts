@@ -405,7 +405,7 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/change-local-name',
       requestType: 'put',
     }),
-    updateLocationCode: this.apiCall<Location, { locationId: string }, { code: string }>({
+    patchLocation: this.apiCall<Location, { locationId: string }, { code?: string; cellMark?: string }>({
       path: '/locations/residential/:locationId',
       requestType: 'patch',
     }),

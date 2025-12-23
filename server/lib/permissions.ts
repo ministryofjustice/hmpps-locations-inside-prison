@@ -8,6 +8,7 @@ const certificateAdministratorPermissions: string[] = [
   ...cellStatusManagerPermissions,
   ...certificateViewerPermissions,
   'change_cell_capacity',
+  'change_door_number',
   'change_local_name',
   'change_location_code',
   'change_non_residential_type',

@@ -1073,7 +1073,7 @@ const stubUpdateSpecialistCellTypes = () =>
     },
   })
 
-const stubUpdateLocationCode = () =>
+const stubPatchLocation = () =>
   stubFor({
     request: {
       method: 'PATCH',
@@ -1351,9 +1351,13 @@ const stubLocationsDeleteLocation = () =>
   })
 
 const allStubs = {
+  stubGetPrisonConfiguration,
   stubLocations,
   stubLocationsBulkReactivate,
-  stubLocationsResidentialHierarchy,
+  stubLocationsCellCertificates,
+  stubLocationsCellCertificatesPrison,
+  stubLocationsCellCertificatesPrisonCurrent,
+  stubLocationsCellCertificatesPrisonCurrent404,
   stubLocationsCertificationPrisonSignedOpCapChange,
   stubLocationsCertificationLocationApprove,
   stubLocationsCertificationLocationReject,
@@ -1361,6 +1365,7 @@ const allStubs = {
   stubLocationsCertificationLocationRequestApproval,
   stubLocationsCertificationRequestApprovals,
   stubLocationsCertificationRequestApprovalsPrison,
+  stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsConstantsAccommodationType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
@@ -1380,6 +1385,7 @@ const allStubs = {
   stubLocationsDeactivatePermanentOccupied,
   stubLocationsDeactivateTemporary,
   stubLocationsDeactivateTemporaryOccupied,
+  stubLocationsDeleteLocation,
   stubLocationsEditCells,
   stubLocationsHealthPing,
   stubLocationsLocationsResidentialSummary,
@@ -1389,14 +1395,17 @@ const allStubs = {
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
   stubLocationsPrisonLocalName,
-  stubGetPrisonConfiguration,
+  stubLocationsResidentialHierarchy,
+  stubLocationsResidentialSummaryForCreateWing,
+  stubLocationsUpdateNonResCell,
+  stubPatchLocation,
   stubPrisonConfiguration,
-  stubPrisonConfigurationCertApproval,
-  stubPrisonConfigurationActivateResi,
-  stubPrisonConfigurationDeactivateResi,
   stubPrisonConfigurationActivateNonResi,
-  stubPrisonConfigurationResiActive,
+  stubPrisonConfigurationActivateResi,
+  stubPrisonConfigurationCertApproval,
+  stubPrisonConfigurationDeactivateResi,
   stubPrisonConfigurationIncludeSegInRollCount,
+  stubPrisonConfigurationResiActive,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
   stubSignedOperationalCapacityGet,
@@ -1405,16 +1414,7 @@ const allStubs = {
   stubUpdateCapacity,
   stubUpdateLocalName,
   stubUpdateSpecialistCellTypes,
-  stubUpdateLocationCode,
   stubUpdateLocationsConstantsUsedForType,
-  stubLocationsChangeTemporaryDeactivationDetails,
-  stubLocationsUpdateNonResCell,
-  stubLocationsResidentialSummaryForCreateWing,
-  stubLocationsDeleteLocation,
-  stubLocationsCellCertificates,
-  stubLocationsCellCertificatesPrison,
-  stubLocationsCellCertificatesPrisonCurrent,
-  stubLocationsCellCertificatesPrisonCurrent404,
 }
 
 const LocationsApiStubber = new TypedStubber<typeof allStubs>(allStubs)
