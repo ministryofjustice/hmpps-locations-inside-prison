@@ -4,7 +4,7 @@ import { DeepPartial } from 'fishery'
 import Details from './details'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
-import fields from '../../routes/createLocation/fields'
+import fields from '../../routes/changeLocationCode/fields'
 
 describe('Change Location Code', () => {
   const controller = new Details({ route: '/' })
@@ -163,16 +163,14 @@ describe('Change Location Code', () => {
     beforeEach(() => {
       deepReq.form.values.locationCode = 'WING4'
       deepRes.locals.decoratedResidentialSummary.location.code = 'WING3'
-      locationsService.updateLocationCode = jest.fn().mockResolvedValue(true)
+      locationsService.patchLocation = jest.fn().mockResolvedValue(true)
     })
 
     it('calls locations API with correct arguments', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-      expect(locationsService.updateLocationCode).toHaveBeenCalledWith(
-        'token',
-        'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-        'WING4',
-      )
+      expect(locationsService.patchLocation).toHaveBeenCalledWith('token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', {
+        code: 'WING4',
+      })
     })
 
     it('pads a single digit location code to 3 digits', async () => {
@@ -200,7 +198,7 @@ describe('Change Location Code', () => {
 
     it('calls next with an error if API call fails', async () => {
       const error = new Error('API error')
-      ;(locationsService.updateLocationCode as jest.Mock).mockRejectedValue(error)
+      ;(locationsService.patchLocation as jest.Mock).mockRejectedValue(error)
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalledWith(error)
     })

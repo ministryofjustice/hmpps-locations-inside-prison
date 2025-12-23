@@ -15,6 +15,10 @@ function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
   return location.status === 'DRAFT' && req.canAccess('change_location_code')
 }
 
+function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
+  return location.status === 'DRAFT' && req.canAccess('change_door_number')
+}
+
 function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
   return (location.active || location.status === 'DRAFT') && req.canAccess('change_local_name')
 }
@@ -129,6 +133,26 @@ function locationCodeRow(location: DecoratedLocation, req: Request): SummaryList
   return row
 }
 
+function doorNumberRow(location: DecoratedLocation, req: Request): SummaryListRow {
+  const row: SummaryListRow = {
+    key: { text: 'Door number' },
+    value: {
+      html: location.cellMark || '-',
+    },
+  }
+  if (showChangeDoorNumberLink(location, req)) {
+    row.actions = {
+      items: [
+        {
+          href: `/location/${location.id}/change-door-number`,
+          text: 'Change',
+        },
+      ],
+    }
+  }
+  return row
+}
+
 function showChangeNonResLink(location: DecoratedLocation, req: Request) {
   return !location.isResidential && req.canAccess('change_non_residential_type')
 }
@@ -156,10 +180,10 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
 function getLocationDetails(location: DecoratedLocation, req: Request) {
   const details: SummaryListRow[] = []
 
-  if (location.status === 'DRAFT') {
-    details.push(locationCodeRow(location, req))
-  } else {
-    details.push({ key: { text: 'Location' }, value: { text: location.pathHierarchy } })
+  details.push(locationCodeRow(location, req))
+
+  if (location.raw.locationType === 'CELL') {
+    details.push(doorNumberRow(location, req))
   }
 
   if (!location.leafLevel) {
@@ -169,7 +193,7 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
   if (location.status === 'NON_RESIDENTIAL') {
     details.push(nonResCellTypeRow(location, req))
   } else {
-    if (location.locationType === 'Cell') {
+    if (location.raw.locationType === 'CELL') {
       details.push(cellTypesRow(location, req))
     }
 

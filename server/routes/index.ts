@@ -23,6 +23,7 @@ import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
 import changeNonResidentialTypeRouter from './changeNonResidentialType'
 import changeUsedForRouter from './changeUsedFor'
+import changeDoorNumberRouter from './changeDoorNumber'
 import changeLocationCodeRouter from './changeLocationCode'
 import locationHistoryRouter from './locationHistoryRouter'
 import setLocalNameRouter from './setLocalName'
@@ -73,22 +74,23 @@ export default function routes(services: Services): Router {
 
   router.use('/reactivate', reactivateRouter)
 
+  router.use('/location/:locationId/add-local-name', setLocalNameRouter)
+  router.use('/location/:locationId/add-to-certificate', addToCertificateRouter)
   router.use('/location/:locationId/cell-conversion', cellConversionRouter)
   router.use('/location/:locationId/change-cell-capacity', changeCellCapacityRouter)
+  router.use('/location/:locationId/change-door-number', changeDoorNumberRouter)
+  router.use('/location/:locationId/change-local-name', changeLocalNameRouter)
+  router.use('/location/:locationId/change-location-code', changeLocationCodeRouter)
+  router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
+  router.use('/location/:locationId/change-temporary-deactivation-details', changeTemporaryDeactivationDetailsRouter)
+  router.use('/location/:locationId/change-used-for', changeUsedForRouter)
   router.use('/location/:locationId/deactivate', deactivateRouter)
   router.use('/location/:locationId/non-residential-conversion', nonResidentialConversionRouter)
-  router.use('/location/:locationId/change-used-for', changeUsedForRouter)
-  router.use('/location/:locationId/change-location-code', changeLocationCodeRouter)
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
-  router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
-  router.use('/location/:locationId/add-local-name', setLocalNameRouter)
-  router.use('/location/:locationId/change-local-name', changeLocalNameRouter)
   router.use('/location/:locationId/remove-local-name', removeLocalNameRouter)
-  router.use('/location/:locationId/change-temporary-deactivation-details', changeTemporaryDeactivationDetailsRouter)
-  router.use('/location/:locationId/add-to-certificate', addToCertificateRouter)
+  router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
-  router.use('/location/:locationId/change-non-residential-type', changeNonResidentialTypeRouter)
 
   router.use('/:prisonId?/cell-certificate', cellCertificateRouter)
 

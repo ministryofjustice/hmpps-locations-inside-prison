@@ -115,7 +115,7 @@ context('Change draft location code', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsDeleteLocation')
-      cy.task('stubUpdateLocationCode')
+      cy.task('stubPatchLocation')
       cy.task('stubLocationsLocationsResidentialSummary')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
         parentLocation: draftWing,
