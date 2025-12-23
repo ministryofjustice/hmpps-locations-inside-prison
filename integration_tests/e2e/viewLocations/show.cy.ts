@@ -192,6 +192,22 @@ context('View Locations Show', () => {
         .contains(location.pathHierarchy)
       detailsRows += 1
 
+      if (location.locationType === 'CELL') {
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__key')
+          .contains('Door number')
+
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__value')
+          .contains(location.cellMark || '-')
+
+        detailsRows += 1
+      }
+
       if (!location.leafLevel) {
         viewLocationsShowPage
           .locationDetailsRows()
