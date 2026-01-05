@@ -155,7 +155,7 @@ context('Reactivate cell', () => {
           )
         })
 
-        it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+        it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
@@ -164,11 +164,11 @@ context('Reactivate cell', () => {
 
           reactivateCellDetailsPage.checkForError(
             'workingCapacity',
-            'Working capacity cannot be 0 for a non-specialist cell',
+            'Working capacity cannot be 0 for a normal accommodation cell',
           )
         })
 
-        it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+        it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
@@ -374,7 +374,7 @@ context('Reactivate cell', () => {
           cy.get('#workingCapacity-error').contains('Working capacity cannot be more than the maximum capacity')
         })
 
-        it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+        it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
@@ -383,8 +383,8 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.continueButton().click()
 
           cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
-          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
+          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a normal accommodation cell')
+          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a normal accommodation cell')
         })
 
         it('shows the correct validation error when missing max capacity', () => {

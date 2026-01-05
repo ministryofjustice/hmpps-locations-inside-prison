@@ -23,7 +23,7 @@ const fields = {
       lessThanOrEqualTo(99),
       lessThanOrEqualTo({ field: 'maxCapacity' }),
     ],
-    errorMessages: { greaterThan: 'Working capacity cannot be 0 for a non-specialist cell' },
+    errorMessages: { greaterThan: 'Working capacity cannot be 0 for a normal accommodation cell' },
   },
   maxCapacity: {
     ...capacityFields.maxCapacity,

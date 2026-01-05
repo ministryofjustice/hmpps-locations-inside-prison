@@ -197,7 +197,7 @@ context('Change cell capacity', () => {
           cy.get('#workingCapacity-error').contains('Working capacity cannot be more than the maximum capacity')
         })
 
-        it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+        it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
           ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
           const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
 
@@ -206,8 +206,8 @@ context('Change cell capacity', () => {
           changeCellCapacityPage.continueButton().click()
 
           cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
-          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
+          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a normal accommodation cell')
+          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a normal accommodation cell')
         })
 
         it('shows the correct validation error when missing max capacity', () => {
@@ -399,6 +399,32 @@ context('Change cell capacity', () => {
           changeCellCapacityPage.checkForError(
             'baselineCna',
             'Baseline certified normal accommodation (CNA) cannot be more than 99',
+          )
+        })
+
+        it('shows the correct validation error when cna > max capacity', () => {
+          ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
+          const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
+
+          changeCellCapacityPage.cnaInput().clear().type('6')
+          changeCellCapacityPage.saveButton().click()
+
+          changeCellCapacityPage.checkForError(
+            'baselineCna',
+            'Baseline certified normal accommodation (CNA) cannot be more than the maximum capacity',
+          )
+        })
+
+        it('shows the correct validation error when cna is zero for normal accommodation cell', () => {
+          ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
+          const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
+
+          changeCellCapacityPage.cnaInput().clear().type('0')
+          changeCellCapacityPage.saveButton().click()
+
+          changeCellCapacityPage.checkForError(
+            'baselineCna',
+            'Baseline certified normal accommodation (CNA) cannot be 0 for a normal accommodation cell',
           )
         })
 

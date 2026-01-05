@@ -113,7 +113,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       maxLength: `${fieldName} must be ${error.args?.maxLength} characters or less`,
       minLength: `${fieldName} must be at least ${error.args?.minLength} characters`,
       numericString: `${fieldName} must only include numbers`,
-      nonZeroForNormalCell: `${fieldName} cannot be 0 for a non-specialist cell`,
+      nonZeroForNormalCell: `${fieldName} cannot be 0 for a normal accommodation cell`,
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${unCapFirst(fieldName)}`,
       taken: `A location with this ${unCapFirst(fieldName)} already exists`,

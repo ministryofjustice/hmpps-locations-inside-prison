@@ -17,7 +17,7 @@ context('Create landing - Create cells - Capacities', () => {
       page = goToCreateCellsCapacitiesPage()
     })
 
-    it('shows the correct error when CNA is 0 for non-special cell', () => {
+    it('shows the correct error when CNA is 0 for normal accommodation cell', () => {
       page.submit({
         capacities: [
           ['0', '1', '2'],
@@ -29,22 +29,22 @@ context('Create landing - Create cells - Capacities', () => {
 
       page.checkForError(
         'create-cells_baselineCna0',
-        'Baseline CNA cannot be 0 for a non-special cell',
+        'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-100: ',
       )
       page.checkForError(
         'create-cells_baselineCna1',
-        'Baseline CNA cannot be 0 for a non-special cell',
+        'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-101: ',
       )
       page.checkForError(
         'create-cells_baselineCna2',
-        'Baseline CNA cannot be 0 for a non-special cell',
+        'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-102: ',
       )
       page.checkForError(
         'create-cells_baselineCna3',
-        'Baseline CNA cannot be 0 for a non-special cell',
+        'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-103: ',
       )
     })

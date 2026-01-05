@@ -73,7 +73,7 @@ describe('ChangeCellCapacity', () => {
   })
 
   describe('validateFields', () => {
-    it('does not allow zero working capacity for non-specialist cells', () => {
+    it('does not allow zero working capacity for normal accommodation cells', () => {
       deepReq.form.values = { maxCapacity: '2', workingCapacity: '0' }
       const callback = jest.fn()
       controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)

@@ -76,7 +76,7 @@ const fields: FormWizard.Fields = {
   baselineCna: {
     validate: ['required', 'numeric', lessThanOrEqualTo(99)],
     errorMessages: {
-      greaterThan: 'Baseline CNA cannot be 0 for a non-special cell',
+      nonZeroForNormalCell: 'Baseline CNA cannot be 0 for a normal accommodation cell',
     },
     component: 'govukInput',
     id: 'baselineCna',
@@ -97,7 +97,7 @@ const fields: FormWizard.Fields = {
   workingCapacity: {
     validate: ['required', 'numeric', lessThanOrEqualTo(99)],
     errorMessages: {
-      greaterThan: 'Working capacity cannot be 0 for a non-special cell',
+      nonZeroForNormalCell: 'Working capacity cannot be 0 for a normal accommodation cell',
     },
     component: 'govukInput',
     id: 'workingCapacity',
