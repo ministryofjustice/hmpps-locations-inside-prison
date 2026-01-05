@@ -71,11 +71,11 @@ export default class Capacities extends BaseController {
           )
 
           if (!errors[workingCapacityKey] && values[workingCapacityKey] === '0' && !isSpecialistCellType) {
-            validationErrors[workingCapacityKey] = this.formError(workingCapacityKey, 'greaterThan')
+            validationErrors[workingCapacityKey] = this.formError(workingCapacityKey, 'nonZeroForNormalCell')
           }
 
           if (!errors[baselineCnaKey] && values[baselineCnaKey] === '0' && !isSpecialistCellType) {
-            validationErrors[baselineCnaKey] = this.formError(baselineCnaKey, 'greaterThan')
+            validationErrors[baselineCnaKey] = this.formError(baselineCnaKey, 'nonZeroForNormalCell')
           }
         }
       }

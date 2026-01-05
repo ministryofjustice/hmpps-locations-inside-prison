@@ -76,7 +76,7 @@ describe('ReactivateCellDetails', () => {
   })
 
   describe('validateFields', () => {
-    it('does not allow zero working capacity for non-specialist cells', () => {
+    it('does not allow zero working capacity for normal accommodation cells', () => {
       deepReq.form.values = { maxCapacity: '2', workingCapacity: '0' }
       deepRes.locals.decoratedLocation.raw.accommodationTypes = ['NORMAL_ACCOMMODATION']
       deepRes.locals.decoratedLocation.raw.specialistCellTypes = []

@@ -7,9 +7,9 @@ const fields: FormWizard.Fields = {
   baselineCna: {
     remove: (_req, res) => !canEditCna(res.locals.prisonConfiguration, res.locals.decoratedLocation),
     hideWhenRemoved: true,
-    validate: ['required', 'numeric', lessThanOrEqualTo(99)],
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'maxCapacity' })],
     errorMessages: {
-      greaterThan: 'Baseline certified normal accommodation (CNA) cannot be 0 for a non-special cell',
+      nonZeroForNormalCell: 'Baseline certified normal accommodation (CNA) cannot be 0 for a normal accommodation cell',
     },
     component: 'govukInput',
     id: 'baselineCna',

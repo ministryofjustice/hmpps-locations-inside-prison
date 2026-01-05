@@ -450,7 +450,7 @@ context('Remove cell type', () => {
             cy.get('#workingCapacity-error').contains('Working capacity cannot be more than the maximum capacity')
           })
 
-          it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+          it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
             const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 
             reviewCellCapacityPage.maxCapacityInput().clear().type('3')
@@ -458,8 +458,10 @@ context('Remove cell type', () => {
             reviewCellCapacityPage.continueButton().click()
 
             cy.get('.govuk-error-summary__title').contains('There is a problem')
-            cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
-            cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
+            cy.get('.govuk-error-summary__list').contains(
+              'Working capacity cannot be 0 for a normal accommodation cell',
+            )
+            cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a normal accommodation cell')
           })
 
           it('shows the correct validation error when missing max capacity', () => {

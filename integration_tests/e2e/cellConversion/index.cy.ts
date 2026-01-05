@@ -539,8 +539,8 @@ context('Cell conversion', () => {
           changeCellCapacityPage.continueButton().click()
 
           cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
-          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
+          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a normal accommodation cell')
+          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a normal accommodation cell')
         })
       })
     })
