@@ -4,7 +4,7 @@ export default class ChangeLocationCodePage extends Page {
   locationType: string
 
   constructor(locationType = 'location') {
-    super(`Change ${locationType} code`)
+    super(`Change ${locationType} ${locationType === 'cell' ? 'number' : 'code'}`)
     this.locationType = locationType
     this.checkOnPage()
   }
@@ -15,7 +15,8 @@ export default class ChangeLocationCodePage extends Page {
 
   locationCodeInput = (): PageElement => cy.get('#locationCode')
 
-  confirmButton = (): PageElement => cy.get(`button:contains('Save ${this.locationType} code')`)
+  confirmButton = (): PageElement =>
+    cy.get(`button:contains('Save ${this.locationType} ${this.locationType === 'cell' ? 'number' : 'code'}')`)
 
   backLink = (): PageElement => cy.get('.govuk-back-link')
 

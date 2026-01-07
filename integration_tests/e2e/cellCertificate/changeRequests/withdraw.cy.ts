@@ -25,7 +25,7 @@ context('Cell Certificate - Change Requests - Withdraw', () => {
 
       it('Displays an error when no explanation is entered', () => {
         withdrawPage.submit({})
-        withdrawPage.checkForError('explanation', 'Explain why you are withdrawing this request')
+        Page.checkForError('explanation', 'Explain why you are withdrawing this request')
       })
 
       it('Redirects to change requests and displays a banner', () => {

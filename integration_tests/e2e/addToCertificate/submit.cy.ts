@@ -101,7 +101,7 @@ context('Add To Certificate - Submit Certification Approval Request', () => {
       it('displays the correct validation error when the checkbox is not checked', () => {
         page.submit({})
 
-        page.checkForError(
+        Page.checkForError(
           'submit-certification-approval-request_cellsMeetStandards',
           'Confirm that the cells meet the certification standards',
         )
@@ -141,7 +141,7 @@ context('Add To Certificate - Submit Certification Approval Request', () => {
       it('displays the correct validation error when the checkbox is not checked', () => {
         page.submit({})
 
-        page.checkForError(
+        Page.checkForError(
           'submit-certification-approval-request_cellsMeetStandards',
           'Confirm that the cells meet the certification standards',
         )

@@ -25,7 +25,7 @@ context('Create landing - Create cells - Types', () => {
         typesPage = goToCreateCellsTypesPage()
         typesPage.continueButton().click()
 
-        typesPage.checkForError(
+        Page.checkForError(
           'create-cells_set-cell-type_accommodationType0',
           'Select if it is a normal or special cell type',
         )
@@ -51,7 +51,7 @@ context('Create landing - Create cells - Types', () => {
         normalTypesPage = goToCreateCellsTypesNormalPage()
         normalTypesPage.saveButton().click()
 
-        normalTypesPage.checkForError('create-cells_set-cell-type_normalCellTypes0', 'Select a cell type')
+        Page.checkForError('create-cells_set-cell-type_normalCellTypes0', 'Select a cell type')
       })
 
       it('correctly saves multiple normal types and shows them on the capacity page', () => {
@@ -100,7 +100,7 @@ context('Create landing - Create cells - Types', () => {
         specialTypesPage = goToCreateCellsTypesSpecialPage()
         specialTypesPage.saveButton().click()
 
-        specialTypesPage.checkForError('create-cells_set-cell-type_specialistCellTypes0', 'Select a cell type')
+        Page.checkForError('create-cells_set-cell-type_specialistCellTypes0', 'Select a cell type')
       })
 
       it('correctly saves the special type and shows it on the capacity page', () => {

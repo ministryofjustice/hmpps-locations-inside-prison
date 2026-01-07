@@ -386,7 +386,7 @@ context('Change cell capacity', () => {
           changeCellCapacityPage.cnaInput().clear()
           changeCellCapacityPage.saveButton().click()
 
-          changeCellCapacityPage.checkForError('baselineCna', 'Enter a baseline certified normal accommodation (CNA)')
+          Page.checkForError('baselineCna', 'Enter a baseline certified normal accommodation (CNA)')
         })
 
         it('shows the correct validation error when cna > 99', () => {
@@ -396,10 +396,7 @@ context('Change cell capacity', () => {
           changeCellCapacityPage.cnaInput().clear().type('100')
           changeCellCapacityPage.saveButton().click()
 
-          changeCellCapacityPage.checkForError(
-            'baselineCna',
-            'Baseline certified normal accommodation (CNA) cannot be more than 99',
-          )
+          Page.checkForError('baselineCna', 'Baseline certified normal accommodation (CNA) cannot be more than 99')
         })
 
         it('shows the correct validation error when cna > max capacity', () => {
@@ -435,10 +432,7 @@ context('Change cell capacity', () => {
           changeCellCapacityPage.cnaInput().clear().type('abc')
           changeCellCapacityPage.saveButton().click()
 
-          changeCellCapacityPage.checkForError(
-            'baselineCna',
-            'Baseline certified normal accommodation (CNA) must be a number',
-          )
+          Page.checkForError('baselineCna', 'Baseline certified normal accommodation (CNA) must be a number')
         })
 
         it('redirects back to the view locations page when there is no change', () => {
