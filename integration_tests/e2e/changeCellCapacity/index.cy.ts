@@ -406,7 +406,7 @@ context('Change cell capacity', () => {
           changeCellCapacityPage.cnaInput().clear().type('6')
           changeCellCapacityPage.saveButton().click()
 
-          changeCellCapacityPage.checkForError(
+          Page.checkForError(
             'baselineCna',
             'Baseline certified normal accommodation (CNA) cannot be more than the maximum capacity',
           )
@@ -419,7 +419,7 @@ context('Change cell capacity', () => {
           changeCellCapacityPage.cnaInput().clear().type('0')
           changeCellCapacityPage.saveButton().click()
 
-          changeCellCapacityPage.checkForError(
+          Page.checkForError(
             'baselineCna',
             'Baseline certified normal accommodation (CNA) cannot be 0 for a normal accommodation cell',
           )
