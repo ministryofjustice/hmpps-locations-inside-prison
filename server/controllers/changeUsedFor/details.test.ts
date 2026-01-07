@@ -160,24 +160,31 @@ describe('ChangeUsedForDetails', () => {
           text: 'Remand',
         },
       ]
-      controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 
-    it('calls locationsService', () => {
+    it.each([
+      { status: 'DRAFT' as const, description: 'draft' },
+      { status: 'ACTIVE' as const, description: 'active' },
+    ])('saves values on a $description cell', async ({ status }) => {
+      deepRes.locals.decoratedLocation = buildDecoratedLocation({
+        id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        localName: 'A-1-001',
+        capacity: {
+          maxCapacity: 2,
+          workingCapacity: 1,
+        },
+        prisonId: 'TST',
+        status,
+      })
+
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
       expect(locationsService.updateUsedForTypes).toHaveBeenCalledWith(
         'token',
         deepRes.locals.decoratedLocation.id,
         deepReq.form.values.usedFor,
       )
-    })
-
-    it('sends an analytics event', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
       expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'change_used_for', { prison_id: 'TST' })
-    })
-
-    it('calls next', () => {
       expect(next).toHaveBeenCalled()
     })
   })

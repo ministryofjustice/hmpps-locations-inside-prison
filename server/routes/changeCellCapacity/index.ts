@@ -4,12 +4,14 @@ import steps from './steps'
 import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
+import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 
 const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('change_cell_capacity'),
   populateLocation({ decorate: true }),
+  populatePrisonConfiguration(),
   wizard(steps, fields, {
     name: 'change-cell-capacity',
     templatePath: 'pages/changeCellCapacity',

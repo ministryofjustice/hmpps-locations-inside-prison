@@ -166,7 +166,10 @@ describe('Locations service', () => {
 
   describe('updateCapacity', () => {
     it('calls the correct client function', async () => {
-      await locationsService.updateCapacity('token', '481fc587-60f8-402b-804d-64462babddcc', 1, 3)
+      await locationsService.updateCapacity('token', '481fc587-60f8-402b-804d-64462babddcc', {
+        maxCapacity: 1,
+        workingCapacity: 3,
+      })
 
       expect(locationsApiClient.locations.updateCapacity).toHaveBeenCalledWith(
         'token',

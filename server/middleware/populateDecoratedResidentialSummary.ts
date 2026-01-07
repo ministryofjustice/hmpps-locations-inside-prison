@@ -4,14 +4,19 @@ import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
+import canEditCna from '../utils/canEditCna'
 
 function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
-  const { active, capacity, leafLevel } = location
-  return active && capacity && leafLevel && req.canAccess('change_cell_capacity')
+  const { active, capacity, leafLevel, status } = location
+  return (active || status === 'DRAFT') && capacity && leafLevel && req.canAccess('change_cell_capacity')
 }
 
 function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
   return location.status === 'DRAFT' && req.canAccess('change_location_code')
+}
+
+function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
+  return location.status === 'DRAFT' && req.canAccess('change_door_number')
 }
 
 function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
@@ -128,6 +133,26 @@ function locationCodeRow(location: DecoratedLocation, req: Request): SummaryList
   return row
 }
 
+function doorNumberRow(location: DecoratedLocation, req: Request): SummaryListRow {
+  const row: SummaryListRow = {
+    key: { text: 'Door number' },
+    value: {
+      html: location.cellMark || '-',
+    },
+  }
+  if (showChangeDoorNumberLink(location, req)) {
+    row.actions = {
+      items: [
+        {
+          href: `/location/${location.id}/change-door-number`,
+          text: 'Change',
+        },
+      ],
+    }
+  }
+  return row
+}
+
 function showChangeNonResLink(location: DecoratedLocation, req: Request) {
   return !location.isResidential && req.canAccess('change_non_residential_type')
 }
@@ -155,10 +180,10 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
 function getLocationDetails(location: DecoratedLocation, req: Request) {
   const details: SummaryListRow[] = []
 
-  if (location.status === 'DRAFT') {
-    details.push(locationCodeRow(location, req))
-  } else {
-    details.push({ key: { text: 'Location' }, value: { text: location.pathHierarchy } })
+  details.push(locationCodeRow(location, req))
+
+  if (location.raw.locationType === 'CELL') {
+    details.push(doorNumberRow(location, req))
   }
 
   if (!location.leafLevel) {
@@ -168,7 +193,7 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
   if (location.status === 'NON_RESIDENTIAL') {
     details.push(nonResCellTypeRow(location, req))
   } else {
-    if (location.locationType === 'Cell') {
+    if (location.raw.locationType === 'CELL') {
       details.push(cellTypesRow(location, req))
     }
 
@@ -256,6 +281,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
 
       if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
         const changeLink: { linkHref?: string; linkLabel?: string } = {}
+        const cnaLink: typeof changeLink & { linkAriaLabel?: string } = {}
         const workingCapLink: { linkAriaLabel?: string } = {}
         const maxCapLink: { linkAriaLabel?: string } = {}
 
@@ -264,6 +290,16 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           changeLink.linkLabel = 'Change'
           workingCapLink.linkAriaLabel = 'Change working capacity'
           maxCapLink.linkAriaLabel = 'Change maximum capacity'
+
+          if (
+            canEditCna(
+              await locationsService.getPrisonConfiguration(systemToken, prisonId),
+              residentialSummary.location,
+            )
+          ) {
+            Object.assign(cnaLink, changeLink)
+            cnaLink.linkAriaLabel = 'Change CNA'
+          }
         }
 
         const { numberOfCellLocations } = residentialSummary.location
@@ -284,11 +320,12 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           workingCapacity = pendingChanges.workingCapacity
         }
 
-        if (residentialSummary.location.status === 'DRAFT') {
+        if (residentialSummary.location.status.includes('DRAFT')) {
           residentialSummary.summaryCards.push({
             title: 'CNA',
             type: 'cna',
             text: numberOfCellLocations ? `${cna}` : '-',
+            ...cnaLink,
           })
         }
 
@@ -309,7 +346,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           },
         )
 
-        if (residentialSummary.location.status !== 'DRAFT' && !residentialSummary.location.leafLevel) {
+        if (!residentialSummary.location.status.includes('DRAFT') && !residentialSummary.location.leafLevel) {
           residentialSummary.summaryCards.push({
             title: 'Inactive cells',
             type: 'inactive-cells',

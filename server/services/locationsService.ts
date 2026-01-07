@@ -274,8 +274,12 @@ export default class LocationsService {
     return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations })
   }
 
-  async updateCapacity(token: string, locationId: string, maxCapacity?: number, workingCapacity?: number) {
-    return this.locationsApiClient.locations.updateCapacity(token, { locationId }, { maxCapacity, workingCapacity })
+  async updateCapacity(
+    token: string,
+    locationId: string,
+    capacities: { maxCapacity?: number; workingCapacity?: number; certifiedNormalAccommodation?: number },
+  ) {
+    return this.locationsApiClient.locations.updateCapacity(token, { locationId }, capacities)
   }
 
   async updateBulkCapacity(token: string, bulkCapacityUpdate: BulkCapacityUpdate) {
@@ -322,8 +326,12 @@ export default class LocationsService {
     return this.locationsApiClient.locations.updateLocalName(token, { locationId }, { localName, updatedBy })
   }
 
-  async updateLocationCode(token: string, locationId: string, code: string) {
-    return this.locationsApiClient.locations.updateLocationCode(token, { locationId }, { code })
+  async patchLocation(
+    token: string,
+    locationId: string,
+    data: Parameters<LocationsApiClient['locations']['patchLocation']>[2],
+  ) {
+    return this.locationsApiClient.locations.patchLocation(token, { locationId }, data)
   }
 
   async changeNonResType(

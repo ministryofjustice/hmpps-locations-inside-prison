@@ -20,7 +20,9 @@ describe('Approve', () => {
   const notifyService = new NotificationService(null) as jest.Mocked<NotificationService>
 
   beforeEach(() => {
-    locationsService.approveCertificationRequest = jest.fn().mockResolvedValue(undefined)
+    locationsService.approveCertificationRequest = jest
+      .fn()
+      .mockResolvedValue({ certificateId: 'some-certificate-uuid' })
 
     deepReq = {
       session: {
@@ -43,7 +45,7 @@ describe('Approve', () => {
       locals: {
         approvalRequest: {
           id: 'some-uuid',
-          locationId: 'some-location-id',
+          locationId: 'some-location-uuid',
         },
         notificationDetails: {
           prisonName: 'Moorland (HMP & YOI)',
@@ -82,7 +84,7 @@ describe('Approve', () => {
         notifyService,
         ['certificate_administrator@test.com', 'certificate_reviewer@test.com', 'certificate_viewer@test.com'],
         'Moorland (HMP & YOI)',
-        'http://localhost:3000/MDI/cell-certificate/some-uuid',
+        'http://localhost:3000/MDI/cell-certificate/some-certificate-uuid',
         NotificationType.REQUEST_APPROVED,
       )
     })

@@ -29,13 +29,8 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const { decoratedLocation, prisonResidentialSummary, referrerRootUrl, values } = res.locals
+    const { decoratedLocation, prisonResidentialSummary, referrerRootUrl } = res.locals
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
-
-    if (!req.canAccess('change_max_capacity')) {
-      req.sessionModel.set('maxCapacity', maxCapacity)
-      values.maxCapacity = maxCapacity
-    }
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
     const newMaxCap = Number(req.sessionModel.get('maxCapacity'))
@@ -72,10 +67,6 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     try {
       const { decoratedLocation } = res.locals
       const { locationsService } = req.services
-
-      if (!req.canAccess('change_max_capacity')) {
-        req.sessionModel.set('maxCapacity', decoratedLocation.capacity.maxCapacity)
-      }
 
       const workingCapacity = Number(req.sessionModel.get('workingCapacity'))
       const maxCapacity = Number(req.sessionModel.get('maxCapacity'))

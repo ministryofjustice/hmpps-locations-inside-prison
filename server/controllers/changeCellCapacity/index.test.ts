@@ -13,7 +13,7 @@ describe('ChangeCellCapacity', () => {
   let permissions: { [permission: string]: boolean }
 
   beforeEach(() => {
-    permissions = { change_max_capacity: true }
+    permissions = {}
     deepReq = {
       canAccess: (permission: string) => permissions[permission],
       form: {
@@ -60,6 +60,9 @@ describe('ChangeCellCapacity', () => {
             workingCapacity: 20,
           },
         },
+        prisonConfiguration: {
+          certificationApprovalRequired: 'ACTIVE',
+        },
         values: {
           maxCapacity: '2',
           workingCapacity: '1',
@@ -70,7 +73,7 @@ describe('ChangeCellCapacity', () => {
   })
 
   describe('validateFields', () => {
-    it('does not allow zero working capacity for non-specialist cells', () => {
+    it('does not allow zero working capacity for normal accommodation cells', () => {
       deepReq.form.values = { maxCapacity: '2', workingCapacity: '0' }
       const callback = jest.fn()
       controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
@@ -146,22 +149,6 @@ describe('ChangeCellCapacity', () => {
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
       expect(deepRes.redirect).not.toHaveBeenCalled()
-    })
-
-    describe('when the user does not have permission to change_max_capacity', () => {
-      beforeEach(() => {
-        permissions.change_max_capacity = false
-      })
-
-      it('redirects to the show location page when the only change is max capacity', () => {
-        deepReq.form.values = { maxCapacity: '9', workingCapacity: '2' }
-        deepRes.redirect = jest.fn()
-        controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
-
-        expect(deepRes.redirect).toHaveBeenCalledWith(
-          '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-        )
-      })
     })
   })
 

@@ -1,7 +1,7 @@
 services:
 
   hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
+    image: ghcr.io/ministryofjustice/hmpps-auth:latest
     networks:
       - hmpps
     container_name: hmpps-auth
@@ -124,7 +124,7 @@ services:
       - ./wiremock:/home/wiremock
 
   redis:
-    image: 'redis:8.0'
+    image: 'redis:8.4'
     networks:
       - hmpps
     container_name: redis

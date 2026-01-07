@@ -53,8 +53,7 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
       const changes = capacityChanges[cell.id] || {}
       const originalCellMaxCapacity = cell.capacity.maxCapacity
       const originalCellWorkingCapacity = cell.oldWorkingCapacity
-      const newCellMaxCapacity =
-        'maxCapacity' in changes && req.canAccess('change_max_capacity') ? changes.maxCapacity : originalCellMaxCapacity
+      const newCellMaxCapacity = 'maxCapacity' in changes ? changes.maxCapacity : originalCellMaxCapacity
       const newCellWorkingCapacity =
         'workingCapacity' in changes ? changes.workingCapacity : originalCellWorkingCapacity
       newMaxCapacity += newCellMaxCapacity - originalCellMaxCapacity
@@ -89,10 +88,6 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
           const changes = capacityChanges[cell.id]
           if (!changes) {
             return null
-          }
-
-          if (!req.canAccess('change_max_capacity')) {
-            delete changes.maxCapacity
           }
 
           const newCapacity = {

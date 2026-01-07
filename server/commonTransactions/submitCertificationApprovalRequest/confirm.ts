@@ -123,7 +123,7 @@ export default class Confirm extends FormInitialStep {
       'DRAFT',
       res.locals.locationId,
     )
-    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}/review`
+    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}`
 
     const proposedSignedOpCapChange = req.sessionModel.get<{
       signedOperationalCapacity: number
@@ -146,17 +146,17 @@ export default class Confirm extends FormInitialStep {
     ])
 
     const notifications = [
-      { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED },
-      { emailAddresses: requestSubmittedEmails, type: NotificationType.REQUEST_SUBMITTED },
+      { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },
+      { emailAddresses: requestSubmittedEmails, type: NotificationType.REQUEST_SUBMITTED, url },
     ]
 
     await Promise.all(
-      notifications.map(({ emailAddresses, type }) =>
+      notifications.map(({ emailAddresses, type, url: notificationUrl }) =>
         sendNotification(
           notifyService,
           emailAddresses,
           prisonName,
-          url,
+          notificationUrl,
           type,
           undefined,
           undefined,

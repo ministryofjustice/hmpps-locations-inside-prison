@@ -48,10 +48,6 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     const { accommodationTypes, specialistCellTypes }: Location = decoratedCell.raw
     const validationErrors: FormWizard.Errors = {}
 
-    if (!req.canAccess('change_max_capacity')) {
-      values.maxCapacity = decoratedCell.capacity.maxCapacity.toString()
-    }
-
     super.validateFields(req, res, errors => {
       if (!errors.workingCapacity) {
         if (
@@ -69,22 +65,15 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
 
   override locals(req: FormWizard.Request, res: Response) {
     const locals = super.locals(req, res)
-    const { decoratedCell, decoratedLocation, values } = res.locals
+    const { decoratedCell, decoratedLocation } = res.locals
     const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${decoratedLocation.id}/check-capacity` })
     const cancelLink = `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
-
-    const { maxCapacity } = decoratedCell.capacity
-
-    if (!req.canAccess('change_max_capacity')) {
-      req.sessionModel.set('maxCapacity', maxCapacity)
-      values.maxCapacity = maxCapacity
-    }
 
     return {
       ...locals,
       backLink,
       cancelLink,
-      title: `Change ${req.canAccess('change_max_capacity') ? 'cell' : 'working'} capacity`,
+      title: `Change cell capacity`,
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
       titleCaption: capFirst(decoratedCell.displayName),
@@ -99,7 +88,7 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
     const capacityChanges: { [id: string]: Partial<Location['capacity']> } = (req.sessionModel.get('capacityChanges') ||
       {}) as typeof capacityChanges
     const cellChanges: Partial<Location['capacity']> = {}
-    if (maxCapacity !== decoratedCell.capacity?.maxCapacity && req.canAccess('change_max_capacity')) {
+    if (maxCapacity !== decoratedCell.capacity?.maxCapacity) {
       cellChanges.maxCapacity = maxCapacity
     }
     if (workingCapacity !== decoratedCell.capacity?.workingCapacity) {

@@ -385,7 +385,11 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'get',
       }),
     },
-    updateCapacity: this.apiCall<Location, { locationId: string }, { maxCapacity?: number; workingCapacity?: number }>({
+    updateCapacity: this.apiCall<
+      Location,
+      { locationId: string },
+      { maxCapacity?: number; workingCapacity?: number; certifiedNormalAccommodation?: number }
+    >({
       path: '/locations/:locationId/capacity',
       requestType: 'put',
     }),
@@ -401,7 +405,7 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/change-local-name',
       requestType: 'put',
     }),
-    updateLocationCode: this.apiCall<Location, { locationId: string }, { code: string }>({
+    patchLocation: this.apiCall<Location, { locationId: string }, { code?: string; cellMark?: string }>({
       path: '/locations/residential/:locationId',
       requestType: 'patch',
     }),

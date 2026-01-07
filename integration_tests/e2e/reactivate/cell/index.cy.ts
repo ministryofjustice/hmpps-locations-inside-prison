@@ -93,7 +93,7 @@ context('Reactivate cell', () => {
       it('has the correct main heading and a caption showing the cell description', () => {
         ReactivateCellDetailsPage.goTo(location.id)
 
-        cy.get('h1').contains('Check working capacity')
+        cy.get('h1').contains('Check cell capacity')
         cy.get('.govuk-caption-m').contains('Cell A-1-001')
       })
 
@@ -105,47 +105,41 @@ context('Reactivate cell', () => {
         Page.verifyOnPage(ViewLocationsShowPage)
       })
 
-      it('does not have a max capacity input', () => {
-        ReactivateCellDetailsPage.goTo(location.id)
-        const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
-        reactivateCellDetailsPage.maxCapacityInput().should('not.exist')
-      })
-
       describe('validations', () => {
-        it('shows the correct validation error when missing working capacity', () => {
+        it('shows the correct validation error when missing values', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
           reactivateCellDetailsPage.workingCapacityInput().clear()
+          reactivateCellDetailsPage.maxCapacityInput().clear()
           reactivateCellDetailsPage.continueButton().click()
 
-          cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Enter a working capacity')
-          cy.get('#workingCapacity-error').contains('Enter a working capacity')
+          reactivateCellDetailsPage.checkForError('workingCapacity', 'Enter a working capacity')
+          reactivateCellDetailsPage.checkForError('maxCapacity', 'Enter a maximum capacity')
         })
 
-        it('shows the correct validation error when working capacity > 99', () => {
+        it('shows the correct validation error when working/max capacity > 99', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
           reactivateCellDetailsPage.workingCapacityInput().clear().type('100')
+          reactivateCellDetailsPage.maxCapacityInput().clear().type('100')
           reactivateCellDetailsPage.continueButton().click()
 
-          cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be more than 99')
-          cy.get('#workingCapacity-error').contains('Working capacity cannot be more than 99')
+          reactivateCellDetailsPage.checkForError('workingCapacity', 'Working capacity cannot be more than 99')
+          reactivateCellDetailsPage.checkForError('maxCapacity', 'Maximum capacity cannot be more than 99')
         })
 
-        it('shows the correct validation error when working capacity is not a number', () => {
+        it('shows the correct validation error when working/max capacity is not a number', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
           reactivateCellDetailsPage.workingCapacityInput().clear().type('hello')
+          reactivateCellDetailsPage.maxCapacityInput().clear().type('hello')
           reactivateCellDetailsPage.continueButton().click()
 
-          cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity must be a number')
-          cy.get('#workingCapacity-error').contains('Working capacity must be a number')
+          reactivateCellDetailsPage.checkForError('workingCapacity', 'Working capacity must be a number')
+          reactivateCellDetailsPage.checkForError('maxCapacity', 'Maximum capacity must be a number')
         })
 
         it('shows the correct validation error when working capacity is greater than max capacity', () => {
@@ -155,21 +149,33 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.workingCapacityInput().clear().type('8')
           reactivateCellDetailsPage.continueButton().click()
 
-          cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be more than the maximum capacity')
-          cy.get('#workingCapacity-error').contains('Working capacity cannot be more than the maximum capacity')
+          reactivateCellDetailsPage.checkForError(
+            'workingCapacity',
+            'Working capacity cannot be more than the maximum capacity',
+          )
         })
 
-        it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+        it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
           reactivateCellDetailsPage.workingCapacityInput().clear().type('0')
           reactivateCellDetailsPage.continueButton().click()
 
-          cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
-          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
+          reactivateCellDetailsPage.checkForError(
+            'workingCapacity',
+            'Working capacity cannot be 0 for a normal accommodation cell',
+          )
+        })
+
+        it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
+          ReactivateCellDetailsPage.goTo(location.id)
+          const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
+
+          reactivateCellDetailsPage.maxCapacityInput().clear().type('0')
+          reactivateCellDetailsPage.continueButton().click()
+
+          reactivateCellDetailsPage.checkForError('maxCapacity', 'Maximum capacity cannot be 0')
         })
       })
 
@@ -250,12 +256,6 @@ context('Reactivate cell', () => {
           reactivateCellConfirmPage.cancelLink().click()
 
           Page.verifyOnPage(ViewLocationsShowPage)
-        })
-
-        it('does not have a max capacity input', () => {
-          ReactivateCellDetailsPage.goTo(location.id)
-          const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
-          reactivateCellDetailsPage.maxCapacityInput().should('not.exist')
         })
 
         it('shows the success banner when the change is complete', () => {
@@ -374,7 +374,7 @@ context('Reactivate cell', () => {
           cy.get('#workingCapacity-error').contains('Working capacity cannot be more than the maximum capacity')
         })
 
-        it('shows the correct validation error when working capacity is zero for non-specialist cell', () => {
+        it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
           ReactivateCellDetailsPage.goTo(location.id)
           const reactivateCellDetailsPage = Page.verifyOnPage(ReactivateCellDetailsPage)
 
@@ -383,8 +383,8 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.continueButton().click()
 
           cy.get('.govuk-error-summary__title').contains('There is a problem')
-          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a non-specialist cell')
-          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a non-specialist cell')
+          cy.get('.govuk-error-summary__list').contains('Working capacity cannot be 0 for a normal accommodation cell')
+          cy.get('#workingCapacity-error').contains('Working capacity cannot be 0 for a normal accommodation cell')
         })
 
         it('shows the correct validation error when missing max capacity', () => {

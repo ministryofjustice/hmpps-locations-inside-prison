@@ -1,8 +1,29 @@
 import FormWizard from 'hmpo-form-wizard'
 import greaterThan from '../../validators/greaterThan'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
+import canEditCna from '../../utils/canEditCna'
 
 const fields: FormWizard.Fields = {
+  baselineCna: {
+    remove: (_req, res) => !canEditCna(res.locals.prisonConfiguration, res.locals.decoratedLocation),
+    hideWhenRemoved: true,
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'maxCapacity' })],
+    errorMessages: {
+      nonZeroForNormalCell: 'Baseline certified normal accommodation (CNA) cannot be 0 for a normal accommodation cell',
+    },
+    component: 'govukInput',
+    id: 'baselineCna',
+    name: 'baselineCna',
+    label: {
+      text: 'Baseline certified normal accommodation (CNA)',
+      classes: 'govuk-label--s',
+    },
+    classes: 'govuk-input--width-2',
+    hint: {
+      text: 'The number of people that can live in this location without it being considered overcrowded.',
+    },
+    autocomplete: 'off',
+  },
   workingCapacity: {
     component: 'govukInput',
     validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'maxCapacity' })],
@@ -19,7 +40,6 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
   },
   maxCapacity: {
-    remove: (req, _res) => !req.canAccess('change_max_capacity'),
     component: 'govukInput',
     validate: ['required', 'numeric', greaterThan(0), lessThanOrEqualTo(99)],
     errorMessages: { greaterThan: 'Maximum capacity cannot be 0' },

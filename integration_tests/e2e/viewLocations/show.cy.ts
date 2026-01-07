@@ -154,7 +154,7 @@ context('View Locations Show', () => {
         viewLocationsShowPage.summaryCards.all().should('have.length', 0)
       } else {
         viewLocationsShowPage.summaryCards.all().should('have.length', location.leafLevel ? 2 : 3)
-        if (location.status === 'DRAFT') {
+        if (location.status.includes('DRAFT')) {
           viewLocationsShowPage.summaryCards
             .cnaText()
             .contains(`${location.numberOfCellLocations > 0 ? location.certification.capacityOfCertifiedCell : '-'}`)
@@ -191,6 +191,22 @@ context('View Locations Show', () => {
         .find('.govuk-summary-list__value')
         .contains(location.pathHierarchy)
       detailsRows += 1
+
+      if (location.locationType === 'CELL') {
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__key')
+          .contains('Door number')
+
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__value')
+          .contains(location.cellMark || '-')
+
+        detailsRows += 1
+      }
 
       if (!location.leafLevel) {
         viewLocationsShowPage
