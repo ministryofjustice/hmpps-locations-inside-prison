@@ -45,6 +45,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
       ...locals,
       leafLevel,
       backLink,
+      removeHeadingSpacing: true,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       title: 'Change what the location is used for',
       titleCaption: capFirst(decoratedLocation.displayName),

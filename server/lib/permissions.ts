@@ -12,14 +12,15 @@ const certificateAdministratorPermissions: string[] = [
   'change_local_name',
   'change_location_code',
   'change_non_residential_type',
+  'change_sanitation',
+  'change_signed_operational_capacity',
   'change_used_for',
-  'set_cell_type',
-  'create_location',
   'certificate_change_request_create',
   'certificate_change_request_withdraw',
-  'change_signed_operational_capacity',
   'convert_non_residential',
+  'create_location',
   'deactivate:permanent',
+  'set_cell_type',
 ]
 
 const certificateReviewerPermissions: string[] = [...certificateViewerPermissions, 'certificate_change_request_review']

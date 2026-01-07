@@ -112,6 +112,7 @@ describe('ChangeUsedForDetails', () => {
       controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
+        removeHeadingSpacing: true,
         backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         buttonText: 'Save used for',
         cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',

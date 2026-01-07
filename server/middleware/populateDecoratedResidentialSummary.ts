@@ -19,6 +19,10 @@ function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
   return location.status === 'DRAFT' && req.canAccess('change_door_number')
 }
 
+function showSanitationChangeLink(location: DecoratedLocation, req: Request) {
+  return location.status === 'DRAFT' && req.canAccess('change_sanitation')
+}
+
 function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
   return (location.active || location.status === 'DRAFT') && req.canAccess('change_local_name')
 }
@@ -153,6 +157,26 @@ function doorNumberRow(location: DecoratedLocation, req: Request): SummaryListRo
   return row
 }
 
+function sanitationRow(location: DecoratedLocation, req: Request): SummaryListRow {
+  const row: SummaryListRow = {
+    key: { text: 'Sanitation' },
+    value: {
+      html: location.inCellSanitation ? 'Yes' : 'No',
+    },
+  }
+  if (showSanitationChangeLink(location, req)) {
+    row.actions = {
+      items: [
+        {
+          href: `/location/${location.id}/change-sanitation`,
+          text: 'Change',
+        },
+      ],
+    }
+  }
+  return row
+}
+
 function showChangeNonResLink(location: DecoratedLocation, req: Request) {
   return !location.isResidential && req.canAccess('change_non_residential_type')
 }
@@ -203,6 +227,10 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
     })
 
     details.push(usedForRow(location, req))
+
+    if (location.raw.locationType === 'CELL') {
+      details.push(sanitationRow(location, req))
+    }
   }
 
   details.push({

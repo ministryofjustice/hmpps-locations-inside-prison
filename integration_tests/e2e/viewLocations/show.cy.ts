@@ -271,6 +271,22 @@ context('View Locations Show', () => {
           .find('.govuk-summary-list__value')
           .contains(location.usedFor.length ? 'Close Supervision Centre (CSC)' : '-')
         detailsRows += 1
+
+        if (location.locationType === 'CELL') {
+          viewLocationsShowPage
+            .locationDetailsRows()
+            .eq(detailsRows)
+            .find('.govuk-summary-list__key')
+            .contains('Sanitation')
+
+          viewLocationsShowPage
+            .locationDetailsRows()
+            .eq(detailsRows)
+            .find('.govuk-summary-list__value')
+            .contains(location.inCellSanitation ? 'Yes' : 'No')
+
+          detailsRows += 1
+        }
       } else {
         viewLocationsShowPage
           .locationDetailsRows()
