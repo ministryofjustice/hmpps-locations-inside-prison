@@ -7,7 +7,7 @@ import capFirst from '../../formatters/capFirst'
 export default class Details extends FormInitialStep {
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     return {
-      doorNumber: res.locals.decoratedResidentialSummary.location.cellMark,
+      inCellSanitation: res.locals.decoratedResidentialSummary.location.inCellSanitation ? 'YES' : 'NO',
     }
   }
 
@@ -19,7 +19,7 @@ export default class Details extends FormInitialStep {
       ...locals,
       removeHeadingSpacing: true,
       titleCaption: `Cell ${capFirst(decoratedResidentialSummary.location.pathHierarchy)}`,
-      buttonText: 'Save door number',
+      buttonText: 'Save sanitation',
       cancelText: 'Cancel',
     }
   }
@@ -27,30 +27,13 @@ export default class Details extends FormInitialStep {
   override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { values } = req.form
-      const { systemToken } = req.session
       const { decoratedResidentialSummary, prisonId, locationId } = res.locals
-      const { locationsService } = req.services
       const validationErrors: FormWizard.Errors = {}
 
-      if (values.doorNumber === decoratedResidentialSummary.location.cellMark) {
+      if (values.inCellSanitation === (decoratedResidentialSummary.location.inCellSanitation ? 'YES' : 'NO')) {
         return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
       }
 
-      try {
-        if (!validationErrors.doorNumber) {
-          const parentSummary = await locationsService.getResidentialSummary(
-            systemToken,
-            prisonId,
-            decoratedResidentialSummary.location.parentId,
-          )
-
-          if (parentSummary.subLocations.find(l => l.cellMark === values.doorNumber)) {
-            validationErrors.doorNumber = this.formError('doorNumber', 'taken')
-          }
-        }
-      } catch {
-        // handled below
-      }
       return callback({ ...errors, ...validationErrors })
     })
   }
@@ -60,11 +43,11 @@ export default class Details extends FormInitialStep {
       const { systemToken } = req.session
       const { locationId, prisonId } = res.locals
       const { locationsService } = req.services
-      const cellMark = req.form.values.doorNumber as string
+      const inCellSanitation = req.form.values.inCellSanitation as string
 
-      await locationsService.patchLocation(systemToken, locationId, { cellMark })
+      await locationsService.patchLocation(systemToken, locationId, { inCellSanitation: inCellSanitation === 'YES' })
 
-      req.services.analyticsService.sendEvent(req, 'change_door_number', {
+      req.services.analyticsService.sendEvent(req, 'change_sanitation', {
         prison_id: prisonId,
         location_id: locationId,
       })
@@ -81,8 +64,8 @@ export default class Details extends FormInitialStep {
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('success', {
-      title: 'Cell door number changed',
-      content: `You have changed the door number for cell ${pathHierarchy}.`,
+      title: 'Sanitation changed',
+      content: `You have changed sanitation for ${pathHierarchy}.`,
     })
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
   }

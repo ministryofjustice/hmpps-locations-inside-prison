@@ -55,6 +55,7 @@ export default class Details extends FormInitialStep {
     return {
       ...locals,
       locationType,
+      removeHeadingSpacing: true,
       titleCaption: capFirst(decoratedResidentialSummary.location?.displayName),
     }
   }

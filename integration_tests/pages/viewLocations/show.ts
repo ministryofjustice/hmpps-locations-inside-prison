@@ -87,6 +87,9 @@ export default class ViewLocationsShowPage extends Page {
   changeDoorNumberLink = (): PageElement =>
     this.locationDetails().find('.govuk-summary-list__row:contains("Door number")').find('a:contains("Change")')
 
+  changeSanitationLink = (): PageElement =>
+    this.locationDetails().find('.govuk-summary-list__row:contains("Sanitation")').find('a:contains("Change")')
+
   changeLocationCodeLink = (): PageElement =>
     this.locationDetails().find('.govuk-summary-list__row:contains("Location")').find('a:contains("Change")')
 
