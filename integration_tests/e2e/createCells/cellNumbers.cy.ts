@@ -20,9 +20,9 @@ context('Create landing - Create cells - Cell numbers', () => {
         cellNumbers: ['0', '0', '0', '3'],
       })
 
-      page.checkForError('create-cells_cellNumber0', 'Cell 1 and cell 2 have the same cell number')
-      page.checkForError('create-cells_cellNumber1', 'Cell 1 and cell 2 have the same cell number')
-      page.checkForError('create-cells_cellNumber2', 'Cell 1 and cell 3 have the same cell number')
+      Page.checkForError('create-cells_cellNumber0', 'Cell 1 and cell 2 have the same cell number')
+      Page.checkForError('create-cells_cellNumber1', 'Cell 1 and cell 2 have the same cell number')
+      Page.checkForError('create-cells_cellNumber2', 'Cell 1 and cell 3 have the same cell number')
     })
 
     it('shows the correct error when a cell number is not present', () => {
@@ -30,19 +30,19 @@ context('Create landing - Create cells - Cell numbers', () => {
         cellNumbers: ['', '', '2', '3'],
       })
 
-      page.checkForError('create-cells_cellNumber0', 'Enter a cell number for cell 1')
-      page.checkForError('create-cells_cellNumber1', 'Enter a cell number for cell 2')
+      Page.checkForError('create-cells_cellNumber0', 'Enter a cell number for cell 1')
+      Page.checkForError('create-cells_cellNumber1', 'Enter a cell number for cell 2')
     })
 
     it('shows the correct error when start numbering value is not a number', () => {
       page.startCreateCellInput().type('x')
       page.applyLink().click()
-      page.checkForError('startCreateCellNumber', 'Enter a valid number')
+      Page.checkForError('startCreateCellNumber', 'Enter a valid number')
     })
 
     it('shows the correct error when start numbering value is empty', () => {
       page.applyLink().click()
-      page.checkForError('startCreateCellNumber', 'Enter a number')
+      Page.checkForError('startCreateCellNumber', 'Enter a number')
     })
 
     it('navigates to the next step with js populated numbers', () => {

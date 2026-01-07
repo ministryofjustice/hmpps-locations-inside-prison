@@ -1073,7 +1073,7 @@ const stubUpdateSpecialistCellTypes = () =>
     },
   })
 
-const stubPatchLocation = () =>
+const stubPatchLocation = (location: Partial<Location> = {}) =>
   stubFor({
     request: {
       method: 'PATCH',
@@ -1084,7 +1084,7 @@ const stubPatchLocation = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: {},
+      jsonBody: location,
     },
   })
 

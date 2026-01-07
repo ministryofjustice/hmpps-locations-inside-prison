@@ -18,7 +18,7 @@ context('Create landing - Create cells - Used for', () => {
     it('shows the correct error when no types are picked', () => {
       page.submit({ usedFor: [] })
 
-      page.checkForError('create-cells_usedFor', 'Select what the location is used for')
+      Page.checkForError('create-cells_usedFor', 'Select what the location is used for')
     })
 
     it('navigates to the next step when validation passes', () => {

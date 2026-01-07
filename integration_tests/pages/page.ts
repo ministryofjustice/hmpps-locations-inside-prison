@@ -51,7 +51,7 @@ export default abstract class Page {
     cy.task('logAccessibilityViolationsTable', violationData)
   }
 
-  checkForError(fieldName: string | null, errorText: string, summaryPrefix?: string) {
+  static checkForError(fieldName: string | null, errorText: string, summaryPrefix?: string) {
     const summaryText = summaryPrefix ? summaryPrefix + errorText : errorText
 
     cy.get('.govuk-error-summary__title').contains('There is a problem')
@@ -60,5 +60,11 @@ export default abstract class Page {
     if (fieldName) {
       cy.get(`#${fieldName}-error`).contains(errorText)
     }
+  }
+
+  static checkForSuccessBanner(h3: string, p: string) {
+    cy.get('#govuk-notification-banner-title').contains('Success')
+    cy.get('.govuk-notification-banner__content h3').contains(h3)
+    cy.get('.govuk-notification-banner__content p').contains(p)
   }
 }

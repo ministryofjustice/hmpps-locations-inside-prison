@@ -19,7 +19,7 @@ context('Add To Certificate - Update Signed Operational Capacity - Is Update Nee
     it('displays the correct validation error when no option is selected', () => {
       page.submit({})
 
-      page.checkForError('update-signed-op-cap_isUpdateNeeded', 'Select if you need to update the operational capacity')
+      Page.checkForError('update-signed-op-cap_isUpdateNeeded', 'Select if you need to update the operational capacity')
     })
 
     it('continues to details when yes is selected', () => {

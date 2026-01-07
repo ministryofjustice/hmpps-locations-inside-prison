@@ -20,9 +20,9 @@ context('Create landing - Create cells - Door numbers', () => {
         doorNumbers: ['0', '0', '0', '3'],
       })
 
-      page.checkForError('create-cells_doorNumber0', 'Cell A-2-100 and cell A-2-101 have the same cell door number')
-      page.checkForError('create-cells_doorNumber1', 'Cell A-2-100 and cell A-2-101 have the same cell door number')
-      page.checkForError('create-cells_doorNumber2', 'Cell A-2-100 and cell A-2-102 have the same cell door number')
+      Page.checkForError('create-cells_doorNumber0', 'Cell A-2-100 and cell A-2-101 have the same cell door number')
+      Page.checkForError('create-cells_doorNumber1', 'Cell A-2-100 and cell A-2-101 have the same cell door number')
+      Page.checkForError('create-cells_doorNumber2', 'Cell A-2-100 and cell A-2-102 have the same cell door number')
     })
 
     it('shows the correct error when a door number is not present', () => {
@@ -30,8 +30,8 @@ context('Create landing - Create cells - Door numbers', () => {
         doorNumbers: ['', '', '2', '3'],
       })
 
-      page.checkForError('create-cells_doorNumber0', 'Enter a cell door number for A-2-100')
-      page.checkForError('create-cells_doorNumber1', 'Enter a cell door number for A-2-101')
+      Page.checkForError('create-cells_doorNumber0', 'Enter a cell door number for A-2-100')
+      Page.checkForError('create-cells_doorNumber1', 'Enter a cell door number for A-2-101')
     })
 
     it('navigates to the next step when validation passes', () => {

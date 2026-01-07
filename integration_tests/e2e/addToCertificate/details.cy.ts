@@ -18,8 +18,8 @@ context('Add To Certificate - Update Signed Operational Capacity - Details', () 
     it('displays the correct validation errors when no values are entered', () => {
       page.submit({})
 
-      page.checkForError('update-signed-op-cap_newSignedOpCap', 'Enter a new signed operational capacity')
-      page.checkForError(
+      Page.checkForError('update-signed-op-cap_newSignedOpCap', 'Enter a new signed operational capacity')
+      Page.checkForError(
         'update-signed-op-cap_explanation',
         'Explain why you need to update the signed operational capacity',
       )
@@ -28,7 +28,7 @@ context('Add To Certificate - Update Signed Operational Capacity - Details', () 
     it('displays the correct validation error when new op cap is higher than prison max cap', () => {
       page.submit({ opCap: 281, explanation: 'Dave told me to do it' })
 
-      page.checkForError(
+      Page.checkForError(
         'update-signed-op-cap_newSignedOpCap',
         "New signed operational capacity cannot be more than the establishment's maximum capacity",
       )

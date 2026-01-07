@@ -5,6 +5,8 @@ import Details from './details'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import fields from '../../routes/changeLocationCode/fields'
+import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import LocationFactory from '../../testutils/factories/location'
 
 describe('Change Location Code', () => {
   const controller = new Details({ route: '/' })
@@ -15,17 +17,17 @@ describe('Change Location Code', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   const decoratedResidentialSummaryMock: DeepPartial<any> = {
-    location: {
+    location: buildDecoratedLocation({
       id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
       prisonId: 'TST',
       locationType: 'WING',
-      displayName: 'A-Wing',
+      localName: 'A-Wing',
       status: 'INACTIVE',
       active: false,
       code: 'A',
       key: 'WINGA',
       level: 1,
-    },
+    }),
   }
 
   beforeEach(() => {
@@ -101,8 +103,7 @@ describe('Change Location Code', () => {
   describe('validateFields', () => {
     it('redirects if the location code has not changed', async () => {
       deepReq.form.values.locationCode = decoratedResidentialSummaryMock.location.code
-      const callback = jest.fn()
-      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
       expect(deepRes.redirect).toHaveBeenCalledWith(
         '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
       )
@@ -163,7 +164,12 @@ describe('Change Location Code', () => {
     beforeEach(() => {
       deepReq.form.values.locationCode = 'WING4'
       deepRes.locals.decoratedResidentialSummary.location.code = 'WING3'
-      locationsService.patchLocation = jest.fn().mockResolvedValue(true)
+      locationsService.patchLocation = jest.fn().mockResolvedValue(
+        LocationFactory.build({
+          ...deepRes.locals.decoratedResidentialSummary.location.raw,
+          code: 'WING4',
+        }),
+      )
     })
 
     it('calls locations API with correct arguments', async () => {
@@ -173,11 +179,41 @@ describe('Change Location Code', () => {
       })
     })
 
-    it('pads a single digit location code to 3 digits', async () => {
-      deepReq.form.values.locationCode = '1'
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-      expect(locationsService.patchLocation).toHaveBeenLastCalledWith('token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', {
-        code: '001',
+    describe('when location is a cell', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedResidentialSummary = {
+          ...deepRes.locals.decoratedResidentialSummary,
+          location: buildDecoratedLocation({
+            ...deepRes.locals.decoratedResidentialSummary.location.raw,
+            locationType: 'CELL',
+          }),
+        }
+      })
+
+      it('pads a single digit location code to 3 digits', async () => {
+        deepReq.form.values.locationCode = '1'
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        expect(locationsService.patchLocation).toHaveBeenLastCalledWith(
+          'token',
+          'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+          {
+            code: '001',
+          },
+        )
+      })
+    })
+
+    describe('when location is not a cell', () => {
+      it('does not pad a single digit location code to 3 digits', async () => {
+        deepReq.form.values.locationCode = '1'
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        expect(locationsService.patchLocation).toHaveBeenLastCalledWith(
+          'token',
+          'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+          {
+            code: '1',
+          },
+        )
       })
     })
 
@@ -203,31 +239,83 @@ describe('Change Location Code', () => {
   })
 
   describe('successHandler', () => {
-    beforeEach(() => {
-      deepReq.form.values.locationCode = 'WING5'
-      deepRes.locals.decoratedResidentialSummary.location.locationType = 'Wing'
-      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
-    })
+    describe('when location is a cell', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedResidentialSummary = {
+          ...deepRes.locals.decoratedResidentialSummary,
+          location: buildDecoratedLocation({
+            ...deepRes.locals.decoratedResidentialSummary.location.raw,
+            locationType: 'CELL',
+            pathHierarchy: 'A-1-001',
+          }),
+        }
 
-    it('resets the journey model', () => {
-      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
-    })
+        deepReq.form.values.locationCode = '003'
+        deepRes.locals.decoratedResidentialSummary.location.locationType = 'Wing'
+        deepReq.sessionModel.get = jest.fn().mockReturnValue(
+          LocationFactory.build({
+            ...deepRes.locals.decoratedResidentialSummary.location.raw,
+            pathHierarchy: 'A-1-003',
+          }),
+        )
+        controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+      })
 
-    it('resets the session model', () => {
-      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
-    })
+      it('resets the journey model', () => {
+        expect(deepReq.journeyModel.reset).toHaveBeenCalled()
+      })
 
-    it('sets the flash correctly', () => {
-      expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        title: 'Wing code changed',
-        content: 'You have changed the wing code for WING5.',
+      it('resets the session model', () => {
+        expect(deepReq.sessionModel.reset).toHaveBeenCalled()
+      })
+
+      it('sets the flash correctly', () => {
+        expect(deepReq.flash).toHaveBeenCalledWith('success', {
+          title: 'Cell number changed',
+          content: 'You have changed the cell number for A-1-003.',
+        })
+      })
+
+      it('redirects to the view location page', () => {
+        expect(deepRes.redirect).toHaveBeenCalledWith(
+          '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        )
       })
     })
 
-    it('redirects to the view location page', () => {
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+    describe('when location is not a cell', () => {
+      beforeEach(() => {
+        deepReq.form.values.locationCode = 'WING5'
+        deepRes.locals.decoratedResidentialSummary.location.locationType = 'Wing'
+        deepReq.sessionModel.get = jest.fn().mockReturnValue(
+          LocationFactory.build({
+            ...deepRes.locals.decoratedResidentialSummary.location.raw,
+            pathHierarchy: 'WING5',
+          }),
+        )
+        controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+      })
+
+      it('resets the journey model', () => {
+        expect(deepReq.journeyModel.reset).toHaveBeenCalled()
+      })
+
+      it('resets the session model', () => {
+        expect(deepReq.sessionModel.reset).toHaveBeenCalled()
+      })
+
+      it('sets the flash correctly', () => {
+        expect(deepReq.flash).toHaveBeenCalledWith('success', {
+          title: 'Wing code changed',
+          content: 'You have changed the wing code for WING5.',
+        })
+      })
+
+      it('redirects to the view location page', () => {
+        expect(deepRes.redirect).toHaveBeenCalledWith(
+          '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        )
+      })
     })
   })
 })

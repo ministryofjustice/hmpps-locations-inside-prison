@@ -20,7 +20,7 @@ context('Create landing - Create cells - Details', () => {
         accommodationType: 'NORMAL_ACCOMMODATION',
       })
 
-      page.checkForError('create-cells_cellsToCreate', 'Enter how many cells you want to create')
+      Page.checkForError('create-cells_cellsToCreate', 'Enter how many cells you want to create')
     })
 
     it('shows the correct validation error when create cells has non numeric input', () => {
@@ -29,7 +29,7 @@ context('Create landing - Create cells - Details', () => {
         accommodationType: 'NORMAL_ACCOMMODATION',
       })
 
-      page.checkForError('create-cells_cellsToCreate', 'Enter the number of cells you want to create')
+      Page.checkForError('create-cells_cellsToCreate', 'Enter the number of cells you want to create')
     })
 
     it('shows the correct validation error when create cells input is over 999', () => {
@@ -38,7 +38,7 @@ context('Create landing - Create cells - Details', () => {
         accommodationType: 'NORMAL_ACCOMMODATION',
       })
 
-      page.checkForError('create-cells_cellsToCreate', 'You can create a maximum of 999 cells at once')
+      Page.checkForError('create-cells_cellsToCreate', 'You can create a maximum of 999 cells at once')
     })
 
     it('shows the correct validation error when no accommodation type is selected', () => {
@@ -46,7 +46,7 @@ context('Create landing - Create cells - Details', () => {
         cellsToCreate: 1000,
       })
 
-      page.checkForError('create-cells_accommodationType', 'Select an accommodation type')
+      Page.checkForError('create-cells_accommodationType', 'Select an accommodation type')
     })
 
     it('navigates to the next step when validation passes', () => {

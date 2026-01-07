@@ -19,13 +19,13 @@ context('Create Wing Details', () => {
         locationCode: '!@£$',
       })
 
-      page.checkForError('locationCode', 'Wing code can only include numbers or letters')
+      Page.checkForError('locationCode', 'Wing code can only include numbers or letters')
     })
 
     it('shows the correct validation error for location code when submitting nothing', () => {
       page.submit({})
 
-      page.checkForError('locationCode', 'Enter a wing code')
+      Page.checkForError('locationCode', 'Enter a wing code')
     })
 
     it('shows the correct validation error for location code when submitting more than 5 characters', () => {
@@ -33,7 +33,7 @@ context('Create Wing Details', () => {
         locationCode: 'thisistoolong',
       })
 
-      page.checkForError('locationCode', 'Wing code must be 5 characters or less')
+      Page.checkForError('locationCode', 'Wing code must be 5 characters or less')
     })
 
     it('shows the correct validation error when submitting a code that already exists', () => {
@@ -41,7 +41,7 @@ context('Create Wing Details', () => {
         locationCode: 'A',
       })
 
-      page.checkForError('locationCode', 'A location with this wing code already exists')
+      Page.checkForError('locationCode', 'A location with this wing code already exists')
     })
 
     it('shows the correct validation error when submitting a localName that already exists', () => {
@@ -52,7 +52,7 @@ context('Create Wing Details', () => {
         localName: 'exists',
       })
 
-      page.checkForError('localName', 'A location with this name already exists')
+      Page.checkForError('localName', 'A location with this name already exists')
     })
 
     it('has a back link to the manage location page', () => {

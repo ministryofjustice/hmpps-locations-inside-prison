@@ -59,7 +59,7 @@ context('Cell Certificate - Change Requests - Review', () => {
 
       it('Displays an error when no option is checked', () => {
         reviewPage.submit({})
-        reviewPage.checkForError('approveOrReject', 'Select if you want to approve or reject this change')
+        Page.checkForError('approveOrReject', 'Select if you want to approve or reject this change')
       })
 
       context('When approving', () => {
@@ -73,7 +73,7 @@ context('Cell Certificate - Change Requests - Review', () => {
 
         it('Displays an error when the legal disclaimer is not checked', () => {
           approvePage.submit({})
-          reviewPage.checkForError('cellsMeetStandards', 'Confirm that the cells meet the certification standards')
+          Page.checkForError('cellsMeetStandards', 'Confirm that the cells meet the certification standards')
         })
 
         it('Redirects to change requests and displays a banner', () => {
@@ -99,7 +99,7 @@ context('Cell Certificate - Change Requests - Review', () => {
 
         it('Displays an error when no explanation is entered', () => {
           rejectPage.submit({})
-          reviewPage.checkForError('explanation', 'Explain why you are rejecting this request')
+          Page.checkForError('explanation', 'Explain why you are rejecting this request')
         })
 
         it('Redirects to change requests and displays a banner', () => {
