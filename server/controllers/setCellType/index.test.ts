@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import SetCellType from '.'
-import fields from '../../routes/setCellType/fields'
+import fields from '../../routes/setCellTypeOld/fields'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
@@ -44,7 +44,8 @@ describe('SetCellType', () => {
           fields,
         },
         values: {
-          specialistCellTypes: ['CAT_A'],
+          'set-cell-type_accommodationType': 'NORMAL_ACCOMMODATION',
+          'set-cell-type_normalCellTypes': ['N1', 'N2'],
         },
       },
       journeyModel: {
@@ -97,160 +98,35 @@ describe('SetCellType', () => {
     analyticsService.sendEvent = jest.fn()
   })
 
-  describe('configure', () => {
-    it('adds the options to the field', async () => {
-      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
-      expect(deepReq.form.options.fields.specialistCellTypes.items).toEqual([
-        {
-          hint: {
-            text: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
-          },
-          text: 'Accessible cell',
-          value: 'ACCESSIBLE_CELL',
-        },
-        {
-          hint: {
-            text: 'Previously known as a dirty protest cell',
-          },
-          text: 'Biohazard / dirty protest cell',
-          value: 'BIOHAZARD_DIRTY_PROTEST',
-        },
-        {
-          text: 'Constant Supervision Cell',
-          value: 'CONSTANT_SUPERVISION',
-          hint: {
-            text: undefined,
-          },
-        },
-      ])
-    })
-  })
-
-  describe('locals', () => {
-    it('returns the expected locals when there are errors', () => {
-      deepRes.locals.errorlist = [
-        {
-          key: 'specialistCellTypes',
-          type: 'required',
-          url: '/',
-          args: {},
-        },
-      ]
-      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-
-      expect(result).toEqual({
-        backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-        buttonText: 'Save cell type',
-        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-        fields,
-        title: 'Change specific cell type',
-        titleCaption: 'Cell A-1-001',
-        validationErrors: [
-          {
-            href: '#specialistCellTypes',
-            text: 'Select a cell type',
-          },
-        ],
-      })
-    })
-
-    it('returns the expected locals when there are existing cell types', () => {
-      const checkboxFields = {
-        specialistCellTypes: {
-          items: [
-            {
-              hint: {
-                text: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
-              },
-              text: 'Accessible cell',
-              value: 'ACCESSIBLE_CELL',
-            },
-            {
-              hint: {
-                text: 'Previously known as a dirty protest cell',
-              },
-              text: 'Biohazard / dirty protest cell',
-              value: 'BIOHAZARD_DIRTY_PROTEST',
-            },
-            {
-              text: 'Constant Supervision Cell',
-              value: 'CONSTANT_SUPERVISION',
-            },
-          ],
-        },
-      }
-      deepReq.form.values = {}
-      deepRes.locals.fields = checkboxFields
-
-      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-
-      expect(result).toEqual({
-        backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-        buttonText: 'Save cell type',
-        cancelLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-        fields: {
-          specialistCellTypes: {
-            component: 'govukCheckboxes',
-            multiple: true,
-            validate: ['required'],
-            errorMessages: { required: 'Select a cell type' },
-            id: 'specialistCellTypes',
-            name: 'specialistCellTypes',
-            label: { text: 'Set specific cell type' },
-            hint: { text: 'Select all that apply.' },
-            items: [
-              {
-                text: 'Accessible cell',
-                value: 'ACCESSIBLE_CELL',
-                hint: {
-                  text: 'Also known as wheelchair accessible or Disability and Discrimination Act (DDA) compliant',
-                },
-                checked: false,
-              },
-              {
-                text: 'Biohazard / dirty protest cell',
-                value: 'BIOHAZARD_DIRTY_PROTEST',
-                hint: { text: 'Previously known as a dirty protest cell' },
-                checked: true,
-              },
-              {
-                text: 'Constant Supervision Cell',
-                value: 'CONSTANT_SUPERVISION',
-                hint: { text: undefined },
-                checked: false,
-              },
-            ],
-            value: ['CAT_A'],
-            errorMessage: { text: 'Select a cell type', href: '#specialistCellTypes' },
-          },
-        },
-        title: 'Change specific cell type',
-        titleCaption: 'Cell A-1-001',
-        validationErrors: [],
-      })
-    })
-  })
-
-  describe('validate', () => {
-    it('cancels and redirects to the show location page when there are no changes', () => {
-      deepReq.form.values = { specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'] }
-      deepRes.redirect = jest.fn()
-      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
-
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-      )
-    })
-  })
-
   describe('saveValues', () => {
-    it('saves the values via the locations API', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-      expect(locationsService.updateSpecialistCellTypes).toHaveBeenCalledWith(
-        'token',
-        '7e570000-0000-0000-0000-000000000001',
-        ['CAT_A'],
-      )
+    describe('when normal cell types are chosen', () => {
+      it('saves the correct types via the locations API', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        expect(locationsService.updateSpecialistCellTypes).toHaveBeenCalledWith(
+          'token',
+          '7e570000-0000-0000-0000-000000000001',
+          ['N1', 'N2'],
+        )
+      })
+    })
+
+    describe('when a special cell type is chosen', () => {
+      beforeEach(() => {
+        deepReq.form.values = {
+          'set-cell-type_accommodationType': 'SPECIAL_ACCOMMODATION',
+          'set-cell-type_normalCellTypes': ['N1', 'N2'],
+          'set-cell-type_specialistCellTypes': 'S',
+        }
+      })
+
+      it('saves the correct types via the locations API', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        expect(locationsService.updateSpecialistCellTypes).toHaveBeenCalledWith(
+          'token',
+          '7e570000-0000-0000-0000-000000000001',
+          ['S'],
+        )
+      })
     })
 
     it('sends an analytics event when setting cell type', async () => {
@@ -259,14 +135,6 @@ describe('SetCellType', () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'set_cell_type', { prison_id: 'TST' })
-    })
-
-    it('sends an analytics event when changing cell type', async () => {
-      deepRes.locals.decoratedLocation.specialistCellTypes = ['EXISTING_TYPE']
-
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(analyticsService.sendEvent).toHaveBeenCalledWith(deepReq, 'change_cell_type', { prison_id: 'TST' })
     })
   })
 
@@ -285,7 +153,7 @@ describe('SetCellType', () => {
 
     it('sets the flash correctly', () => {
       expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        content: 'You have set a specific cell type for this location.',
+        content: 'You have set a cell type for A-1-001.',
         title: 'Cell type set',
       })
     })

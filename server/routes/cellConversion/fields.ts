@@ -1,4 +1,4 @@
-import setCellTypeFields from '../setCellType/fields'
+import setCellTypeFields from '../setCellTypeOld/fields'
 import capacityFields from '../changeCellCapacity/fields'
 
 const fields = {

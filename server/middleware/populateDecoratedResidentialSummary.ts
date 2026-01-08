@@ -28,7 +28,7 @@ function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
 }
 
 function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
-  return location.active && req.canAccess('set_cell_type')
+  return (location.active || location.status === 'DRAFT') && req.canAccess('set_cell_type')
 }
 
 function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
@@ -78,16 +78,12 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
             href: removeCellTypeUrl,
             text: 'Remove',
           },
-          {
-            href: setCellTypeUrl,
-            text: 'Change',
-          },
         ],
       }
     }
   } else if (showEditCellTypeLinks(location, req)) {
     row.value = {
-      html: `<a href="${setCellTypeUrl}" class="govuk-link">Set specific cell type</a>`,
+      html: `<a href="${setCellTypeUrl}" class="govuk-link">Set cell type</a>`,
     }
   }
   return row
