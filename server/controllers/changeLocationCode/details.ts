@@ -6,6 +6,12 @@ import capFirst from '../../formatters/capFirst'
 import { Location } from '../../data/types/locationsApi'
 
 export default class Details extends FormInitialStep {
+  override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
+    return {
+      locationCode: res.locals.decoratedResidentialSummary.location.code,
+    }
+  }
+
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedResidentialSummary, locationHierarchy } = res.locals
 
@@ -34,8 +40,6 @@ export default class Details extends FormInitialStep {
     const formLocationCode = req.form.options.fields?.locationCode
 
     const locationType = decoratedResidentialSummary.location?.locationType.toLowerCase()
-
-    formLocationCode.value = (req.form.values.locationCode as string) || decoratedResidentialSummary.location?.code
 
     if (locationType === 'cell') {
       formLocationCode.hint = {

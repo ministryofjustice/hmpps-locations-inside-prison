@@ -84,7 +84,6 @@ describe('Change Location Code', () => {
       expect((deepReq.form.options.fields.locationCode.hint as { text: string }).text).toBe(
         'The letter or number used to identify the location, for example Wing A.',
       )
-      expect(deepReq.form.options.fields.locationCode.value).toBe('A')
     })
 
     it('returns the correct locals for a non-top-level location', () => {
