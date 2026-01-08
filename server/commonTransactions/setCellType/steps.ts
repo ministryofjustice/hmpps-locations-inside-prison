@@ -1,30 +1,29 @@
 import FormWizard from 'hmpo-form-wizard'
 import SetCellType from './setCellType'
 import FormInitialStep from '../../controllers/base/formInitialStep'
+import BaseController from './baseController'
 
 const steps: FormWizard.Steps = {
-  '/:cellId': {
+  '/init': {
     entryPoint: true,
     skip: true,
     controller: FormInitialStep,
-    next: ':cellId/type',
+    next: 'type',
   },
-  '/:cellId/type': {
+  '/type': {
     pageTitle: 'Is it a normal or special cell type?',
     fields: ['accommodationType'],
-    next: [
-      { field: 'accommodationType', op: '==', value: 'NORMAL_ACCOMMODATION', next: ':cellId/normal' },
-      ':cellId/special',
-    ],
+    controller: BaseController,
+    next: [{ field: 'accommodationType', op: '==', value: 'NORMAL_ACCOMMODATION', next: 'normal' }, 'special'],
   },
-  '/:cellId/normal': {
+  '/normal': {
     pageTitle: 'Select normal cell type',
     template: '../../commonTransactions/setCellType/normal',
     fields: ['normalCellTypes'],
     controller: SetCellType,
     next: '$END_OF_TRANSACTION$',
   },
-  '/:cellId/special': {
+  '/special': {
     pageTitle: 'Select special cell type',
     template: '../../commonTransactions/setCellType/special',
     fields: ['specialistCellTypes'],

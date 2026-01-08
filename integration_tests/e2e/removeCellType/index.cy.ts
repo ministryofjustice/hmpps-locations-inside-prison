@@ -39,7 +39,7 @@ context('Remove cell type', () => {
       cy.signIn()
       ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-      viewLocationsShowPage.removeSpecificCellTypeLink().should('not.exist')
+      viewLocationsShowPage.removeCellTypeLink().should('not.exist')
     })
 
     it('redirects user to sign in page if accessed directly', () => {
@@ -132,7 +132,7 @@ context('Remove cell type', () => {
       ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
 
-      viewLocationsShowPage.removeSpecificCellTypeLink().should('not.exist')
+      viewLocationsShowPage.removeCellTypeLink().should('not.exist')
     })
 
     context('when the working capacity is >= 1', () => {
@@ -155,7 +155,7 @@ context('Remove cell type', () => {
       it('can be accessed by clicking the remove link on the show location page', () => {
         ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-        viewLocationsShowPage.removeSpecificCellTypeLink().click()
+        viewLocationsShowPage.removeCellTypeLink().click()
 
         Page.verifyOnPage(RemoveCellTypePage)
       })
@@ -263,7 +263,7 @@ context('Remove cell type', () => {
           cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
           ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
           const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-          viewLocationsShowPage.removeSpecificCellTypeLink().click()
+          viewLocationsShowPage.removeCellTypeLink().click()
 
           Page.verifyOnPage(CheckRemoveCellTypePage)
         })
