@@ -17,8 +17,8 @@ export default class RemoveCellType extends FormInitialStep {
     const multipleTypes = specialistCellTypes.length > 1
 
     const title = multipleTypes
-      ? 'Are you sure you want to remove all of the specific cell types?'
-      : 'Are you sure you want to remove the specific cell type?'
+      ? 'Are you sure you want to remove all of the cell types?'
+      : 'Are you sure you want to remove the cell type?'
 
     const buttonText = multipleTypes ? 'Remove cell types' : 'Remove cell type'
 
@@ -59,7 +59,7 @@ export default class RemoveCellType extends FormInitialStep {
 
     req.flash('success', {
       title: 'Cell type removed',
-      content: 'You have removed the specific cell type for this location.',
+      content: 'You have removed the cell type for this location.',
     })
 
     res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)

@@ -49,6 +49,7 @@ export declare interface Location {
   topLevelId: string
   pendingApprovalRequestId?: string
   parentId: string
+  topLevelApprovalLocationId?: string
   parentLocation: string
   inactiveCells: number
   childLocations: string[]

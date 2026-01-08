@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class CheckRemoveCellType extends Page {
   constructor() {
-    super(/Are you sure you want to remove (the specific cell type|all of the specific cell types)\?/)
+    super(/Are you sure you want to remove (all of )?the cell types?\?/)
   }
 
   static goTo = (locationId: string) => cy.visit(`/location/${locationId}/remove-cell-type`)

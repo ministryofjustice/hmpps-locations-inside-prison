@@ -7,6 +7,8 @@ import populateLocation from '../../middleware/populateLocation'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 import FormInitialStep from '../base/formInitialStep'
+import LocationsService from '../../services/locationsService'
+import canEditCna from '../../utils/canEditCna'
 
 export default class ConfirmRemoveCellType extends FormInitialStep {
   override middlewareSetup() {
@@ -50,18 +52,23 @@ export default class ConfirmRemoveCellType extends FormInitialStep {
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const { decoratedLocation } = res.locals
+      const { location, prisonConfiguration } = res.locals
       const { locationsService } = req.services
 
       const token = req.session.systemToken
-      await locationsService.updateCapacity(token, decoratedLocation.id, {
+
+      const capacities: Parameters<LocationsService['updateCapacity']>[2] = {
         maxCapacity: Number(req.sessionModel.get('maxCapacity')),
         workingCapacity: Number(req.sessionModel.get('workingCapacity')),
-      })
+      }
+      if (canEditCna(prisonConfiguration, location)) {
+        capacities.certifiedNormalAccommodation = Number(req.sessionModel.get('baselineCna'))
+      }
+      await locationsService.updateCapacity(token, location.id, capacities)
 
-      await locationsService.updateSpecialistCellTypes(token, decoratedLocation.id, [])
+      await locationsService.updateSpecialistCellTypes(token, location.id, [])
 
-      req.services.analyticsService.sendEvent(req, 'remove_cell_type', { prison_id: decoratedLocation.prisonId })
+      req.services.analyticsService.sendEvent(req, 'remove_cell_type', { prison_id: location.prisonId })
 
       next()
     } catch (error) {
@@ -70,7 +77,7 @@ export default class ConfirmRemoveCellType extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.decoratedLocation
+    const { id: locationId, prisonId } = res.locals.location
 
     req.journeyModel.reset()
     req.sessionModel.reset()

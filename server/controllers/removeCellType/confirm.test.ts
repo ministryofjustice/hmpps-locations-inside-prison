@@ -5,6 +5,7 @@ import ConfirmRemoveCellType from './confirm'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import LocationFactory from '../../testutils/factories/location'
 
 describe('ConfirmRemoveCellType', () => {
   const controller = new ConfirmRemoveCellType({ route: '/' })
@@ -30,7 +31,7 @@ describe('ConfirmRemoveCellType', () => {
       },
       sessionModel: {
         get: jest.fn(
-          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
+          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1', baselineCna: '2' })[fieldName],
         ) as FormWizard.Request['sessionModel']['get'],
         reset: jest.fn(),
       },
@@ -45,6 +46,17 @@ describe('ConfirmRemoveCellType', () => {
           },
           prisonId: 'TST',
         }),
+        location: LocationFactory.build({
+          id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+          capacity: {
+            maxCapacity: 2,
+            workingCapacity: 2,
+          },
+          prisonId: 'TST',
+        }),
+        prisonConfiguration: {
+          certificationApprovalRequired: 'ACTIVE',
+        },
         prisonResidentialSummary: {
           prisonSummary: {
             maxCapacity: 30,
@@ -78,27 +90,70 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
   })
 
   describe('saveValues', () => {
-    it('updates the capacity and then the cell types via the locations API', async () => {
-      const locationsApiCalls: any[] = []
-      const methodNames = ['updateCapacity', 'updateSpecialistCellTypes'] as const
-      methodNames.forEach(methodName => {
-        locationsService[methodName] = jest
-          .fn()
-          .mockImplementation((...args): any => locationsApiCalls.push({ methodName, args }))
+    describe('when !canEditCna', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedLocation.status = 'ACTIVE'
       })
 
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      it('updates the capacity without cna and then the cell types via the locations API', async () => {
+        const locationsApiCalls: any[] = []
+        const methodNames = ['updateCapacity', 'updateSpecialistCellTypes'] as const
+        methodNames.forEach(methodName => {
+          locationsService[methodName] = jest
+            .fn()
+            .mockImplementation((...args): any => locationsApiCalls.push({ methodName, args }))
+        })
 
-      expect(locationsApiCalls).toEqual([
-        {
-          methodName: 'updateCapacity',
-          args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', { maxCapacity: 3, workingCapacity: 1 }],
-        },
-        {
-          methodName: 'updateSpecialistCellTypes',
-          args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', []],
-        },
-      ])
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(locationsApiCalls).toEqual([
+          {
+            methodName: 'updateCapacity',
+            args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', { maxCapacity: 3, workingCapacity: 1 }],
+          },
+          {
+            methodName: 'updateSpecialistCellTypes',
+            args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', []],
+          },
+        ])
+      })
+    })
+
+    describe('when canEditCna', () => {
+      beforeEach(() => {
+        deepRes.locals.location.status = 'DRAFT'
+      })
+
+      it('updates the capacity with cna and then the cell types via the locations API', async () => {
+        const locationsApiCalls: any[] = []
+        const methodNames = ['updateCapacity', 'updateSpecialistCellTypes'] as const
+        methodNames.forEach(methodName => {
+          locationsService[methodName] = jest
+            .fn()
+            .mockImplementation((...args): any => locationsApiCalls.push({ methodName, args }))
+        })
+
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(locationsApiCalls).toEqual([
+          {
+            methodName: 'updateCapacity',
+            args: [
+              'token',
+              'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+              {
+                maxCapacity: 3,
+                workingCapacity: 1,
+                certifiedNormalAccommodation: 2,
+              },
+            ],
+          },
+          {
+            methodName: 'updateSpecialistCellTypes',
+            args: ['token', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2', []],
+          },
+        ])
+      })
     })
 
     it('sends an analytics event when successful', async () => {

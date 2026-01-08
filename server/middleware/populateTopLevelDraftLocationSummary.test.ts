@@ -29,6 +29,7 @@ const locations: { [id: string]: Location } = {
   draftChild3: LocationFactory.build({
     id: 'draftChild3',
     parentId: 'draftChild2',
+    topLevelApprovalLocationId: 'topLevelDraftLocation',
     status: 'DRAFT',
   }),
 }

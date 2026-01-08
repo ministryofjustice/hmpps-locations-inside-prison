@@ -8,11 +8,8 @@ const getTopLevelDraftLocation = async (
   systemToken: string,
   location: Location,
 ) => {
-  if (location.parentId) {
-    const drilledLocation = await locationsService.getLocation(systemToken, location.parentId, false)
-    if (drilledLocation.status === 'DRAFT') {
-      return getTopLevelDraftLocation(locationsService, systemToken, drilledLocation)
-    }
+  if (location.topLevelApprovalLocationId) {
+    return locationsService.getLocation(systemToken, location.topLevelApprovalLocationId, false)
   }
 
   return location

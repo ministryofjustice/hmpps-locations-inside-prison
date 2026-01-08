@@ -17,15 +17,14 @@ export default class CheckRemoveCellType extends FormInitialStep {
     const multipleTypes = specialistCellTypes.length > 1
 
     if (multipleTypes) {
-      res.locals.options.fields.areYouSure.errorMessages.required =
-        'Select yes if you want to remove the specific cell types'
+      res.locals.options.fields.areYouSure.errorMessages.required = 'Select yes if you want to remove the cell types'
     }
 
     const locals = super.locals(req, res)
 
     const title = multipleTypes
-      ? 'Are you sure you want to remove all of the specific cell types?'
-      : 'Are you sure you want to remove the specific cell type?'
+      ? 'Are you sure you want to remove all of the cell types?'
+      : 'Are you sure you want to remove the cell type?'
 
     const cellTypesLabel = multipleTypes ? 'Cell types:' : 'Cell type:'
 

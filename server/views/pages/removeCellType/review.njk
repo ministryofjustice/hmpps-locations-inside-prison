@@ -4,12 +4,12 @@
 
 {% block fields %}
   {{ govukWarningText({
-    text: "The cell’s working capacity must be more than 0.",
+    text: "The cell’s " + ("CNA and " if not fields['baselineCna'].removed else "") + "working capacity must be more than 0.",
     iconFallbackText: "Warning"
   }) }}
 
   {{ govukInsetText({
-    text: "Cells used as normal accommodation that don’t have a specific cell type must have a working capacity of at least 1.",
+    text: "Cells used as normal accommodation that are not a special cell type must have a " + ("CNA and " if not fields['baselineCna'].removed else "") + "working capacity of at least 1.",
     classes: "govuk-!-margin-top-0"
   }) }}
 

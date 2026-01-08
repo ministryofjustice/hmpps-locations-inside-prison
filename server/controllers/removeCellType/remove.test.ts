@@ -71,7 +71,7 @@ describe('RemoveCellType', () => {
         buttonText: 'Remove cell type',
         cellTypesLabel: 'Cell type:',
         cellTypesText: 'Accessible cell',
-        title: 'Are you sure you want to remove the specific cell type?',
+        title: 'Are you sure you want to remove the cell type?',
         titleCaption: 'Cell A-1-001',
       })
     })
@@ -84,7 +84,7 @@ describe('RemoveCellType', () => {
         buttonText: 'Remove cell types',
         cellTypesLabel: 'Cell types:',
         cellTypesText: 'Dry cell, Escape list cell',
-        title: 'Are you sure you want to remove all of the specific cell types?',
+        title: 'Are you sure you want to remove all of the cell types?',
         titleCaption: 'Cell A-1-001',
       })
     })
@@ -134,7 +134,7 @@ describe('RemoveCellType', () => {
 
     it('sets the flash correctly', () => {
       expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        content: 'You have removed the specific cell type for this location.',
+        content: 'You have removed the cell type for this location.',
         title: 'Cell type removed',
       })
     })
