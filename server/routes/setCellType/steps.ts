@@ -5,6 +5,8 @@ import SetCellTypeController from '../../controllers/setCellType'
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
+    backLink: (_req, res) =>
+      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
     reset: true,
     resetJourney: true,
     skip: true,
