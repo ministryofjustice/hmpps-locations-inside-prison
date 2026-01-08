@@ -46,6 +46,9 @@ describe('ReviewCellCapacity', () => {
         options: {
           fields,
         },
+        prisonConfiguration: {
+          certificationApprovalRequired: 'ACTIVE',
+        },
         prisonerLocation: {
           prisoners: [],
         },

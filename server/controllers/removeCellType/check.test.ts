@@ -65,11 +65,11 @@ describe('CheckRemoveCellType', () => {
         cellTypesLabel: 'Cell type:',
         cellTypesText: 'Accessible cell',
         fields,
-        title: 'Are you sure you want to remove the specific cell type?',
+        title: 'Are you sure you want to remove the cell type?',
         titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
-            text: 'Select yes if you want to remove the specific cell type',
+            text: 'Select yes if you want to remove the cell type',
             href: '#areYouSure',
           },
         ],
@@ -84,11 +84,11 @@ describe('CheckRemoveCellType', () => {
         cellTypesLabel: 'Cell types:',
         cellTypesText: 'Dry cell, Escape list cell',
         fields,
-        title: 'Are you sure you want to remove all of the specific cell types?',
+        title: 'Are you sure you want to remove all of the cell types?',
         titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
-            text: 'Select yes if you want to remove the specific cell types',
+            text: 'Select yes if you want to remove the cell types',
             href: '#areYouSure',
           },
         ],
