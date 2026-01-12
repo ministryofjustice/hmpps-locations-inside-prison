@@ -4,10 +4,27 @@ import RemoveCellType from '../../controllers/removeCellType/remove'
 import CheckRemoveCellType from '../../controllers/removeCellType/check'
 import ReviewCellCapacity from '../../controllers/removeCellType/review'
 import ConfirmRemoveCellType from '../../controllers/removeCellType/confirm'
+import canEditCna from '../../utils/canEditCna'
 
-function mustReviewCapacity(req: FormWizard.Request, res: Response) {
-  const { accommodationTypes, active, capacity } = res.locals.location
-  return active && capacity?.workingCapacity === 0 && accommodationTypes.includes('NORMAL_ACCOMMODATION')
+function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
+  const { accommodationTypes, active, capacity, certification, status, pendingChanges } = res.locals.location
+
+  let { workingCapacity } = capacity
+  let { certifiedNormalAccommodation: cna } = certification
+
+  if (pendingChanges?.certifiedNormalAccommodation !== undefined) {
+    cna = pendingChanges.certifiedNormalAccommodation
+  }
+
+  if (pendingChanges?.workingCapacity !== undefined) {
+    workingCapacity = pendingChanges.workingCapacity
+  }
+
+  return (
+    (active || status === 'DRAFT') &&
+    (workingCapacity === 0 || cna === 0) &&
+    accommodationTypes.includes('NORMAL_ACCOMMODATION')
+  )
 }
 
 const steps: FormWizard.Steps = {
@@ -36,12 +53,22 @@ const steps: FormWizard.Steps = {
     next: 'review',
   },
   '/review': {
-    fields: ['workingCapacity', 'maxCapacity'],
+    fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
     controller: ReviewCellCapacity,
-    next: 'confirm',
+    next: [
+      {
+        fn: (_req, res) => canEditCna(res.locals.prisonConfiguration, res.locals.decoratedLocation),
+        next: 'confirm-skip',
+      },
+      'confirm',
+    ],
   },
   '/confirm': {
     controller: ConfirmRemoveCellType,
+  },
+  '/confirm-skip': {
+    controller: ConfirmRemoveCellType,
+    skip: true,
   },
 }
 

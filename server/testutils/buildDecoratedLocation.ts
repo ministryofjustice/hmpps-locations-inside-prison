@@ -1,8 +1,9 @@
+import { DeepPartialObject } from 'fishery'
 import { Location } from '../data/types/locationsApi'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
 import LocationFactory from './factories/location'
 
-const buildDecoratedLocation = (params?: Partial<Location>): DecoratedLocation => {
+const buildDecoratedLocation = (params?: DeepPartialObject<Location>): DecoratedLocation => {
   const location = LocationFactory.build(params)
 
   const locationType = location.locationType.toLowerCase().replace(/^\w/, a => a.toUpperCase())

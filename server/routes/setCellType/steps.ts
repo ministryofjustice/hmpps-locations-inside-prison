@@ -1,17 +1,21 @@
 import FormWizard from 'hmpo-form-wizard'
-import SetCellType from '../../controllers/setCellType'
+import SetCellType from '../../commonTransactions/setCellType'
+import SetCellTypeController from '../../controllers/setCellType'
 
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
+    backLink: (_req, res) =>
+      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
     reset: true,
     resetJourney: true,
     skip: true,
-    next: 'change',
+    next: 'set-cell-type/init',
   },
-  '/change': {
-    fields: ['specialistCellTypes'],
-    controller: SetCellType,
+  ...SetCellType.getSteps({ next: 'save' }),
+  '/save': {
+    controller: SetCellTypeController,
+    skip: true,
   },
 }
 

@@ -178,6 +178,7 @@ interface AllLocals {
   approvalTypeConstants: LocationsApiConstant[]
   certificate: CellCertificate
   certificates: CellCertificate[]
+  removeHeadingSpacing: boolean
   summaryListRows: SummaryListRow[]
   title: string
   titleCaption: string

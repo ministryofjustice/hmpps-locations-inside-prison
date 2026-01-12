@@ -27,22 +27,22 @@ context('Create landing - Create cells - Capacities', () => {
         ],
       })
 
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna0',
         'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-100: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna1',
         'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-101: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna2',
         'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-102: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna3',
         'Baseline CNA cannot be 0 for a normal accommodation cell',
         'Cell A-2-103: ',
@@ -82,43 +82,43 @@ context('Create landing - Create cells - Capacities', () => {
         ],
       })
 
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna0',
         'Baseline CNA cannot be more than the maximum capacity',
         'Cell A-2-100: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna1',
         'Baseline CNA cannot be more than the maximum capacity',
         'Cell A-2-101: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna2',
         'Baseline CNA cannot be more than the maximum capacity',
         'Cell A-2-102: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_baselineCna3',
         'Baseline CNA cannot be more than the maximum capacity',
         'Cell A-2-103: ',
       )
 
-      page.checkForError(
+      Page.checkForError(
         'create-cells_workingCapacity0',
         'Working capacity cannot be more than the maximum capacity',
         'Cell A-2-100: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_workingCapacity1',
         'Working capacity cannot be more than the maximum capacity',
         'Cell A-2-101: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_workingCapacity2',
         'Working capacity cannot be more than the maximum capacity',
         'Cell A-2-102: ',
       )
-      page.checkForError(
+      Page.checkForError(
         'create-cells_workingCapacity3',
         'Working capacity cannot be more than the maximum capacity',
         'Cell A-2-103: ',
@@ -135,20 +135,20 @@ context('Create landing - Create cells - Capacities', () => {
         ],
       })
 
-      page.checkForError('create-cells_baselineCna0', 'Baseline CNA cannot be more than 99', 'Cell A-2-100: ')
-      page.checkForError('create-cells_baselineCna1', 'Baseline CNA cannot be more than 99', 'Cell A-2-101: ')
-      page.checkForError('create-cells_baselineCna2', 'Baseline CNA cannot be more than 99', 'Cell A-2-102: ')
-      page.checkForError('create-cells_baselineCna3', 'Baseline CNA cannot be more than 99', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_baselineCna0', 'Baseline CNA cannot be more than 99', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_baselineCna1', 'Baseline CNA cannot be more than 99', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_baselineCna2', 'Baseline CNA cannot be more than 99', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_baselineCna3', 'Baseline CNA cannot be more than 99', 'Cell A-2-103: ')
 
-      page.checkForError('create-cells_workingCapacity0', 'Working capacity cannot be more than 99', 'Cell A-2-100: ')
-      page.checkForError('create-cells_workingCapacity1', 'Working capacity cannot be more than 99', 'Cell A-2-101: ')
-      page.checkForError('create-cells_workingCapacity2', 'Working capacity cannot be more than 99', 'Cell A-2-102: ')
-      page.checkForError('create-cells_workingCapacity3', 'Working capacity cannot be more than 99', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_workingCapacity0', 'Working capacity cannot be more than 99', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_workingCapacity1', 'Working capacity cannot be more than 99', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_workingCapacity2', 'Working capacity cannot be more than 99', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_workingCapacity3', 'Working capacity cannot be more than 99', 'Cell A-2-103: ')
 
-      page.checkForError('create-cells_maximumCapacity0', 'Maximum capacity cannot be more than 99', 'Cell A-2-100: ')
-      page.checkForError('create-cells_maximumCapacity1', 'Maximum capacity cannot be more than 99', 'Cell A-2-101: ')
-      page.checkForError('create-cells_maximumCapacity2', 'Maximum capacity cannot be more than 99', 'Cell A-2-102: ')
-      page.checkForError('create-cells_maximumCapacity3', 'Maximum capacity cannot be more than 99', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_maximumCapacity0', 'Maximum capacity cannot be more than 99', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_maximumCapacity1', 'Maximum capacity cannot be more than 99', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_maximumCapacity2', 'Maximum capacity cannot be more than 99', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_maximumCapacity3', 'Maximum capacity cannot be more than 99', 'Cell A-2-103: ')
     })
 
     it('shows the correct error when capacities are empty', () => {
@@ -161,20 +161,20 @@ context('Create landing - Create cells - Capacities', () => {
         ],
       })
 
-      page.checkForError('create-cells_baselineCna0', 'Enter a baseline CNA', 'Cell A-2-100: ')
-      page.checkForError('create-cells_baselineCna1', 'Enter a baseline CNA', 'Cell A-2-101: ')
-      page.checkForError('create-cells_baselineCna2', 'Enter a baseline CNA', 'Cell A-2-102: ')
-      page.checkForError('create-cells_baselineCna3', 'Enter a baseline CNA', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_baselineCna0', 'Enter a baseline CNA', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_baselineCna1', 'Enter a baseline CNA', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_baselineCna2', 'Enter a baseline CNA', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_baselineCna3', 'Enter a baseline CNA', 'Cell A-2-103: ')
 
-      page.checkForError('create-cells_workingCapacity0', 'Enter a working capacity', 'Cell A-2-100: ')
-      page.checkForError('create-cells_workingCapacity1', 'Enter a working capacity', 'Cell A-2-101: ')
-      page.checkForError('create-cells_workingCapacity2', 'Enter a working capacity', 'Cell A-2-102: ')
-      page.checkForError('create-cells_workingCapacity3', 'Enter a working capacity', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_workingCapacity0', 'Enter a working capacity', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_workingCapacity1', 'Enter a working capacity', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_workingCapacity2', 'Enter a working capacity', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_workingCapacity3', 'Enter a working capacity', 'Cell A-2-103: ')
 
-      page.checkForError('create-cells_maximumCapacity0', 'Enter a maximum capacity', 'Cell A-2-100: ')
-      page.checkForError('create-cells_maximumCapacity1', 'Enter a maximum capacity', 'Cell A-2-101: ')
-      page.checkForError('create-cells_maximumCapacity2', 'Enter a maximum capacity', 'Cell A-2-102: ')
-      page.checkForError('create-cells_maximumCapacity3', 'Enter a maximum capacity', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_maximumCapacity0', 'Enter a maximum capacity', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_maximumCapacity1', 'Enter a maximum capacity', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_maximumCapacity2', 'Enter a maximum capacity', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_maximumCapacity3', 'Enter a maximum capacity', 'Cell A-2-103: ')
     })
 
     it('show the correct error when capacities have non-numeric characters', () => {
@@ -187,20 +187,20 @@ context('Create landing - Create cells - Capacities', () => {
         ],
       })
 
-      page.checkForError('create-cells_baselineCna0', 'Baseline CNA must be a number', 'Cell A-2-100: ')
-      page.checkForError('create-cells_baselineCna1', 'Baseline CNA must be a number', 'Cell A-2-101: ')
-      page.checkForError('create-cells_baselineCna2', 'Baseline CNA must be a number', 'Cell A-2-102: ')
-      page.checkForError('create-cells_baselineCna3', 'Baseline CNA must be a number', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_baselineCna0', 'Baseline CNA must be a number', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_baselineCna1', 'Baseline CNA must be a number', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_baselineCna2', 'Baseline CNA must be a number', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_baselineCna3', 'Baseline CNA must be a number', 'Cell A-2-103: ')
 
-      page.checkForError('create-cells_workingCapacity0', 'Working capacity must be a number', 'Cell A-2-100: ')
-      page.checkForError('create-cells_workingCapacity1', 'Working capacity must be a number', 'Cell A-2-101: ')
-      page.checkForError('create-cells_workingCapacity2', 'Working capacity must be a number', 'Cell A-2-102: ')
-      page.checkForError('create-cells_workingCapacity3', 'Working capacity must be a number', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_workingCapacity0', 'Working capacity must be a number', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_workingCapacity1', 'Working capacity must be a number', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_workingCapacity2', 'Working capacity must be a number', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_workingCapacity3', 'Working capacity must be a number', 'Cell A-2-103: ')
 
-      page.checkForError('create-cells_maximumCapacity0', 'Maximum capacity must be a number', 'Cell A-2-100: ')
-      page.checkForError('create-cells_maximumCapacity1', 'Maximum capacity must be a number', 'Cell A-2-101: ')
-      page.checkForError('create-cells_maximumCapacity2', 'Maximum capacity must be a number', 'Cell A-2-102: ')
-      page.checkForError('create-cells_maximumCapacity3', 'Maximum capacity must be a number', 'Cell A-2-103: ')
+      Page.checkForError('create-cells_maximumCapacity0', 'Maximum capacity must be a number', 'Cell A-2-100: ')
+      Page.checkForError('create-cells_maximumCapacity1', 'Maximum capacity must be a number', 'Cell A-2-101: ')
+      Page.checkForError('create-cells_maximumCapacity2', 'Maximum capacity must be a number', 'Cell A-2-102: ')
+      Page.checkForError('create-cells_maximumCapacity3', 'Maximum capacity must be a number', 'Cell A-2-103: ')
     })
 
     it('navigates to the next step when validation passes', () => {

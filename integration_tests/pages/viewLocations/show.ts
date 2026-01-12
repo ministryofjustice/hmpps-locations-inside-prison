@@ -76,16 +76,16 @@ export default class ViewLocationsShowPage extends Page {
 
   locationDetailsRows = (): PageElement => this.locationDetails().find('.govuk-summary-list__row')
 
-  setSpecificCellTypeLink = (): PageElement => this.locationDetails().find('a:contains("Set specific cell type")')
+  setCellTypeLink = (): PageElement => this.locationDetails().find('a:contains("Set cell type")')
 
-  changeSpecificCellTypeLink = (): PageElement =>
-    this.locationDetails().find('.govuk-summary-list__row:contains("Cell type")').find('a:contains("Change")')
-
-  removeSpecificCellTypeLink = (): PageElement =>
+  removeCellTypeLink = (): PageElement =>
     this.locationDetails().find('.govuk-summary-list__row:contains("Cell type")').find('a:contains("Remove")')
 
   changeDoorNumberLink = (): PageElement =>
     this.locationDetails().find('.govuk-summary-list__row:contains("Door number")').find('a:contains("Change")')
+
+  changeSanitationLink = (): PageElement =>
+    this.locationDetails().find('.govuk-summary-list__row:contains("Sanitation")').find('a:contains("Change")')
 
   changeLocationCodeLink = (): PageElement =>
     this.locationDetails().find('.govuk-summary-list__row:contains("Location")').find('a:contains("Change")')

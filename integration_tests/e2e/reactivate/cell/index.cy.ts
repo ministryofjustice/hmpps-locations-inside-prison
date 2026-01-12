@@ -114,8 +114,8 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.maxCapacityInput().clear()
           reactivateCellDetailsPage.continueButton().click()
 
-          reactivateCellDetailsPage.checkForError('workingCapacity', 'Enter a working capacity')
-          reactivateCellDetailsPage.checkForError('maxCapacity', 'Enter a maximum capacity')
+          Page.checkForError('workingCapacity', 'Enter a working capacity')
+          Page.checkForError('maxCapacity', 'Enter a maximum capacity')
         })
 
         it('shows the correct validation error when working/max capacity > 99', () => {
@@ -126,8 +126,8 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.maxCapacityInput().clear().type('100')
           reactivateCellDetailsPage.continueButton().click()
 
-          reactivateCellDetailsPage.checkForError('workingCapacity', 'Working capacity cannot be more than 99')
-          reactivateCellDetailsPage.checkForError('maxCapacity', 'Maximum capacity cannot be more than 99')
+          Page.checkForError('workingCapacity', 'Working capacity cannot be more than 99')
+          Page.checkForError('maxCapacity', 'Maximum capacity cannot be more than 99')
         })
 
         it('shows the correct validation error when working/max capacity is not a number', () => {
@@ -138,8 +138,8 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.maxCapacityInput().clear().type('hello')
           reactivateCellDetailsPage.continueButton().click()
 
-          reactivateCellDetailsPage.checkForError('workingCapacity', 'Working capacity must be a number')
-          reactivateCellDetailsPage.checkForError('maxCapacity', 'Maximum capacity must be a number')
+          Page.checkForError('workingCapacity', 'Working capacity must be a number')
+          Page.checkForError('maxCapacity', 'Maximum capacity must be a number')
         })
 
         it('shows the correct validation error when working capacity is greater than max capacity', () => {
@@ -149,10 +149,7 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.workingCapacityInput().clear().type('8')
           reactivateCellDetailsPage.continueButton().click()
 
-          reactivateCellDetailsPage.checkForError(
-            'workingCapacity',
-            'Working capacity cannot be more than the maximum capacity',
-          )
+          Page.checkForError('workingCapacity', 'Working capacity cannot be more than the maximum capacity')
         })
 
         it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
@@ -162,10 +159,7 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.workingCapacityInput().clear().type('0')
           reactivateCellDetailsPage.continueButton().click()
 
-          reactivateCellDetailsPage.checkForError(
-            'workingCapacity',
-            'Working capacity cannot be 0 for a normal accommodation cell',
-          )
+          Page.checkForError('workingCapacity', 'Working capacity cannot be 0 for a normal accommodation cell')
         })
 
         it('shows the correct validation error when working capacity is zero for normal accommodation cell', () => {
@@ -175,7 +169,7 @@ context('Reactivate cell', () => {
           reactivateCellDetailsPage.maxCapacityInput().clear().type('0')
           reactivateCellDetailsPage.continueButton().click()
 
-          reactivateCellDetailsPage.checkForError('maxCapacity', 'Maximum capacity cannot be 0')
+          Page.checkForError('maxCapacity', 'Maximum capacity cannot be 0')
         })
       })
 

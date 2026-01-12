@@ -72,6 +72,7 @@ describe('Change door number', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
+        removeHeadingSpacing: true,
         buttonText: 'Save door number',
         cancelText: 'Cancel',
         titleCaption: 'Cell A-1-001',

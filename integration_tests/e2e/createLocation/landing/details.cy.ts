@@ -48,7 +48,7 @@ context('Create Landing Details', () => {
         createCellsNow: false,
       })
 
-      page.checkForError('locationCode', 'Landing code can only include numbers or letters')
+      Page.checkForError('locationCode', 'Landing code can only include numbers or letters')
     })
 
     it('shows the correct validation error for location code when submitting nothing', () => {
@@ -56,7 +56,7 @@ context('Create Landing Details', () => {
         createCellsNow: false,
       })
 
-      page.checkForError('locationCode', 'Enter a landing code')
+      Page.checkForError('locationCode', 'Enter a landing code')
     })
 
     it('shows the correct validation error for location code when submitting more than 5 characters', () => {
@@ -65,7 +65,7 @@ context('Create Landing Details', () => {
         createCellsNow: false,
       })
 
-      page.checkForError('locationCode', 'Landing code must be 5 characters or less')
+      Page.checkForError('locationCode', 'Landing code must be 5 characters or less')
     })
 
     it('shows the correct validation error when submitting a code that already exists', () => {
@@ -74,7 +74,7 @@ context('Create Landing Details', () => {
         createCellsNow: false,
       })
 
-      page.checkForError('locationCode', 'A location with this landing code already exists')
+      Page.checkForError('locationCode', 'A location with this landing code already exists')
     })
 
     it('shows the correct validation error when submitting a local name that already exists', () => {
@@ -89,7 +89,7 @@ context('Create Landing Details', () => {
         createCellsNow: false,
       })
 
-      page.checkForError('localName', 'A location with this name already exists')
+      Page.checkForError('localName', 'A location with this name already exists')
     })
 
     it('shows the correct validation error for local name when submitting more than 30 characters', () => {
@@ -99,7 +99,7 @@ context('Create Landing Details', () => {
         createCellsNow: false,
       })
 
-      page.checkForError('localName', 'Local name must be 30 characters or less')
+      Page.checkForError('localName', 'Local name must be 30 characters or less')
     })
 
     it('shows the correct validation error when create cells has no selected value', () => {
@@ -107,7 +107,7 @@ context('Create Landing Details', () => {
         locationCode: 'new1',
       })
 
-      page.checkForError('createCellsNow', 'Select yes if you want to create cells now')
+      Page.checkForError('createCellsNow', 'Select yes if you want to create cells now')
     })
 
     it('does not show create cells for non-cell child type', () => {

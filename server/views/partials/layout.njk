@@ -175,13 +175,13 @@
   <main class="govuk-main-wrapper" id="main-content" role="main">
     <div class="govuk-width-container">
       {% block outerHeading %}
-        <div class="govuk-grid-row">
+        <div class="govuk-grid-row{{ ' govuk-!-margin-bottom-2' if removeHeadingSpacing }}">
           <div class="govuk-grid-column-{{ minLayout }}">
             {% block heading %}
               {% if titleCaption %}
                 <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
               {% endif %}
-              <h1 class="govuk-heading-l">{{ title }}</h1>
+              <h1 class="govuk-heading-l{{ ' govuk-!-margin-bottom-0' if removeHeadingSpacing }}">{{ title }}</h1>
             {% endblock %}
           </div>
         </div>

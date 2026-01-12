@@ -19,7 +19,7 @@ context('Create  Structure', () => {
         levels: ['Cells', 'Cells'],
       })
 
-      page.checkForError(null, 'You cannot have two of the same level type')
+      Page.checkForError(null, 'You cannot have two of the same level type')
     })
 
     it('shows the correct validation error if cells is not the last structure item', () => {
@@ -27,7 +27,7 @@ context('Create  Structure', () => {
         levels: ['Landings', 'Spurs'],
       })
 
-      page.checkForError(null, 'The level 3 type must be cells')
+      Page.checkForError(null, 'The level 3 type must be cells')
     })
 
     it('shows the correct default values for select options and preview updates', () => {

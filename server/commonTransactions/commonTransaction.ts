@@ -29,7 +29,7 @@ function convertNext(
 
     return {
       ...next,
-      field: `${strippedPrefix}_${next.field}`,
+      field: `${strippedPrefix.replace(/:\w+\//g, '')}_${next.field}`,
       next: convertNext(next.next, strippedPrefix, endNext),
     }
   }
@@ -85,22 +85,23 @@ export default class CommonTransaction {
     )
   }
 
-  getSteps({ next }: { next: FormWizard.Step['next'] }) {
+  getSteps({ next, prefix }: { next: FormWizard.Step['next']; prefix?: string }) {
     const keys = Object.keys(this.steps)
     const lastStepKey = keys[keys.length - 1]
-    const strippedPrefix = this.pathPrefix.replace(/^\//, '')
+    const extraPrefix = prefix ? `/${prefix}` : ''
+    const strippedPrefix = (extraPrefix + this.pathPrefix).replace(/^\//, '')
 
     return {
       ...Object.fromEntries(
         Object.entries(this.steps).map(([k, step]) => {
           if (!step.next) {
-            return [k, step]
+            return [`${extraPrefix}${k}`, step]
           }
 
-          return [k, { ...step, next: convertNext(step.next, strippedPrefix, next) }]
+          return [`${extraPrefix}${k}`, { ...step, next: convertNext(step.next, strippedPrefix, next) }]
         }),
       ),
-      [lastStepKey]: { ...this.steps[lastStepKey], next },
+      [`${extraPrefix}${lastStepKey}`]: { ...this.steps[lastStepKey], next },
     } as unknown as { [key: string]: Omit<FormWizard.Step, 'controller'> & { controller: typeof FormInitialStep } }
   }
 

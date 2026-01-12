@@ -27,10 +27,9 @@ export default class Capacities extends BaseController {
       } else if (req.form.options.name === 'edit-cells') {
         prefix = 'edit-cells'
       }
+      const suffix = `${action === 'set' ? '/init' : ''}${req.isEditing ? '/edit' : ''}`
 
-      res.redirect(
-        `/${prefix}/${res.locals.locationId}/create-cells/${action}-cell-type/${cellId}${req.isEditing ? '/edit' : ''}`,
-      )
+      res.redirect(`/${prefix}/${res.locals.locationId}/create-cells/${cellId}/${action}-cell-type${suffix}`)
 
       return
     }
@@ -164,7 +163,7 @@ export default class Capacities extends BaseController {
     const capacitiesStep = history.find(s => s.path.endsWith('/capacities'))
     if (capacitiesStep) {
       const stepAfterCapacities = history.find(s => s.path.endsWith('/used-for')) ? 'used-for' : 'bulk-sanitation'
-      capacitiesStep.next = capacitiesStep.next.replace('set-cell-type/:cellId/type', stepAfterCapacities)
+      capacitiesStep.next = capacitiesStep.next.replace(':cellId/set-cell-type/type', stepAfterCapacities)
     }
 
     req.journeyModel.set('history', history)

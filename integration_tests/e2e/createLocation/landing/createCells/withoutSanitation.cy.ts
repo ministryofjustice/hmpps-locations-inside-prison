@@ -20,7 +20,7 @@ context('Create landing - Create cells - Without sanitation', () => {
         withoutSanitation: [],
       })
 
-      page.checkForError('create-cells_withoutSanitation', 'Select any cells without in-cell sanitation')
+      Page.checkForError('create-cells_withoutSanitation', 'Select any cells without in-cell sanitation')
     })
 
     it('navigates to confirm when cells are picked', () => {

@@ -17,6 +17,7 @@ export default class Details extends FormInitialStep {
 
     return {
       ...locals,
+      removeHeadingSpacing: true,
       titleCaption: `Cell ${capFirst(decoratedResidentialSummary.location.pathHierarchy)}`,
       buttonText: 'Save door number',
       cancelText: 'Cancel',

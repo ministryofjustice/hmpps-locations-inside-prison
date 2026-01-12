@@ -11,9 +11,10 @@ import WithoutSanitation from './withoutSanitation'
 import UsedFor from './usedFor'
 import RemoveCellType from './removeCellType'
 import Details from './details'
+import getCellPath from './getCellPath'
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
-  if (path === '/set-cell-type/:cellId') {
+  if (path === '/:cellId/set-cell-type/init') {
     return class WrappedSetCellTypeController extends step.controller {
       override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
         const pathPrefix = req.form.options.fullPath.replace(/\/set-cell-type\/.*/, '')
@@ -23,7 +24,7 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
           path: history.find(item => {
             return item.next.endsWith('/capacities')
           }).next,
-          next: `${pathPrefix}/set-cell-type/:cellId/type`,
+          next: `${pathPrefix}/set-cell-type/type`,
           wizard: req.form.options.name,
           revalidate: false,
           skip: false,
@@ -39,6 +40,11 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
     override middlewareSetup() {
       super.middlewareSetup()
       this.use(this.appendCellIdToFields)
+    }
+
+    getCellPath(req: FormWizard.Request, res: Response) {
+      const { cellId } = req.params
+      return getCellPath(req, res, Number(cellId))
     }
 
     appendCellIdToFields(req: FormWizard.Request, _res: Response, next: NextFunction) {
@@ -66,19 +72,23 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
     }
   }
 
-  if (path === '/set-cell-type/:cellId/type') {
+  if (path === '/:cellId/set-cell-type/type') {
     controller = class extends controller {
       override async getValues(
         req: FormWizard.Request,
         res: Response,
         callback: (err: Error, values?: FormWizard.Values) => void,
       ) {
+        const { cellId } = req.params
+        if (req.sessionModel.get<boolean>(`temp-cellTypes${cellId}-removed`)) {
+          return super.getValues(req, res, callback)
+        }
+
         const specialistCellTypesObject = await req.services.locationsService.getSpecialistCellTypes(
           req.session.systemToken,
         )
 
         return super.getValues(req, res, (err: Error, values?: FormWizard.Values) => {
-          const { cellId } = req.params
           const accommodationTypeKey = Object.keys(req.form.options.fields).find(f => f.includes('accommodationType'))
 
           const types =
@@ -99,14 +109,32 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
     }
   }
 
-  if (path === '/set-cell-type/:cellId/normal' || path === '/set-cell-type/:cellId/special') {
+  if (path === '/:cellId/set-cell-type/normal' || path === '/:cellId/set-cell-type/special') {
     controller = class extends controller {
-      override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+      getInitialValues(req: FormWizard.Request, _res: Response): FormWizard.Values {
+        const { cellId } = req.params
+        if (req.sessionModel.get<boolean>(`temp-cellTypes${cellId}-removed`)) {
+          return {}
+        }
+
+        const types =
+          req.sessionModel.get<string[]>(`temp-cellTypes${cellId}`) ||
+          req.sessionModel.get<string[]>(`saved-cellTypes${cellId}`) ||
+          []
+
+        return {
+          [`create-cells_set-cell-type_normalCellTypes${cellId}`]: types,
+          [`create-cells_set-cell-type_specialistCellTypes${cellId}`]: types,
+        }
+      }
+
+      override saveValues(req: FormWizard.Request, _res: Response, next: NextFunction) {
         const { cellId } = req.params
         const [, cellTypes] = Object.entries(req.body).find(([key]) => key.endsWith(`CellTypes${cellId}`))
         const cellTypesFlat = [cellTypes].flat()
 
         req.sessionModel.set(`temp-cellTypes${cellId}`, cellTypesFlat)
+        req.sessionModel.unset(`temp-cellTypes${cellId}-removed`)
         req.sessionModel.unset('errorValues')
         next()
       }
@@ -121,6 +149,7 @@ const setCellTypeSteps = Object.fromEntries(
   Object.entries(
     SetCellType.getSteps({
       next: 'capacities',
+      prefix: ':cellId',
     }),
   ).map(([k, step]) => [
     k,
@@ -166,7 +195,7 @@ const steps: FormWizard.Steps = {
     editable: true,
   },
   ...setCellTypeSteps,
-  '/remove-cell-type/:cellId': {
+  '/:cellId/remove-cell-type': {
     entryPoint: true,
     skip: true,
     controller: RemoveCellType,

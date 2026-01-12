@@ -2,6 +2,7 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeLocationCodePage from '../../pages/changeDraftLocationCode/confirm'
+import buildLocationHierarchy from '../../../server/testutils/buildLocationHierarchy'
 
 context('Change draft location code', () => {
   const draftWing = LocationFactory.build({
@@ -38,6 +39,23 @@ context('Change draft location code', () => {
     },
   })
 
+  const draftCell = LocationFactory.build({
+    level: 3,
+    leafLevel: true,
+    id: '7e570000-0000-1000-8000-000000000006',
+    pathHierarchy: 'WINGB-LANDB-001',
+    parentId: draftLanding.id,
+    locationType: 'CELL',
+    status: 'DRAFT',
+    active: false,
+    localName: null,
+    code: '001',
+    certification: {
+      certified: false,
+      capacityOfCertifiedCell: 0,
+    },
+  })
+
   const activeWing = LocationFactory.build({
     level: 1,
     id: 'ACTIVE000-0000-1000-8000-000000000005',
@@ -52,25 +70,6 @@ context('Change draft location code', () => {
       capacityOfCertifiedCell: 0,
     },
   })
-
-  const locationHierarchy = [
-    {
-      id: 'WING-1',
-      prisonId: 'TST',
-      code: '1',
-      type: 'WING',
-      pathHierarchy: 'WING1',
-      level: 1,
-    },
-    {
-      id: 'LANDING-1',
-      prisonId: 'TST',
-      code: '1',
-      type: 'LANDING',
-      pathHierarchy: 'WING1-LANDING-1',
-      level: 2,
-    },
-  ]
 
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
@@ -115,7 +114,6 @@ context('Change draft location code', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsDeleteLocation')
-      cy.task('stubPatchLocation')
       cy.task('stubLocationsLocationsResidentialSummary')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
         parentLocation: draftWing,
@@ -130,12 +128,15 @@ context('Change draft location code', () => {
     })
 
     context('Change draft WING location code', () => {
+      beforeEach(() => {
+        cy.task('stubPatchLocation', { ...draftWing, pathHierarchy: 'WINGB' })
+      })
+
       context('Validation checks', () => {
         beforeEach(() => {
           ViewLocationsShowPage.goTo(draftWing.prisonId, draftWing.id)
           const page = Page.verifyOnPage(ViewLocationsShowPage)
           page.changeLocationCodeLink().click()
-          ChangeLocationCodePage.goTo(draftWing.id)
         })
 
         it('shows the correct validation error for wing location code when submitting non-alphanumeric characters', () => {
@@ -143,21 +144,21 @@ context('Change draft location code', () => {
           page.submit({
             locationCode: '!@£$',
           })
-          page.checkForError('locationCode', 'Wing code can only include numbers or letters')
+          Page.checkForError('locationCode', 'Wing code can only include numbers or letters')
         })
 
         it('shows the correct validation error for wing location code when submitting nothing', () => {
           const page = new ChangeLocationCodePage('wing')
           page.submit({ locationCode: '' })
 
-          page.checkForError('locationCode', 'Enter a wing code')
+          Page.checkForError('locationCode', 'Enter a wing code')
         })
 
         it('shows the correct validation error for wing location code when submitting more than 5 characters', () => {
           const page = new ChangeLocationCodePage('wing')
           page.submit({ locationCode: 'thisistoolong' })
 
-          page.checkForError('locationCode', 'Wing code must be 5 characters or less')
+          Page.checkForError('locationCode', 'Wing code must be 5 characters or less')
         })
       })
 
@@ -186,7 +187,7 @@ context('Change draft location code', () => {
         page.locationCodeInputPrefix().should('not.exist')
         page.submit({ locationCode: '002' })
 
-        page.checkForError('locationCode', 'A location with this wing code already exists')
+        Page.checkForError('locationCode', 'A location with this wing code already exists')
       })
 
       it('shows the success banner after changing the location code of a DRAFT wing ', () => {
@@ -200,24 +201,21 @@ context('Change draft location code', () => {
         page.submit({ locationCode: 'WINGB' })
 
         Page.verifyOnPage(ViewLocationsShowPage)
-
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Wing code changed')
-        cy.get('.govuk-notification-banner__content p').contains('You have changed the wing code for WINGB.')
+        Page.checkForSuccessBanner('Wing code changed', 'You have changed the wing code for WINGB.')
       })
     })
 
     context('Change draft LANDING location code', () => {
       beforeEach(() => {
+        cy.task('stubPatchLocation', { ...draftLanding, pathHierarchy: 'WINGB-LANDB' })
         cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
           parentLocation: draftLanding,
-          locationHierarchy,
+          locationHierarchy: buildLocationHierarchy([draftWing, draftLanding]),
         })
         cy.task('stubLocations', draftLanding)
         ViewLocationsShowPage.goTo(draftLanding.prisonId, draftLanding.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeLocationCodeLink().click()
-        ChangeLocationCodePage.goTo(draftLanding.id)
       })
 
       it('shows the input prefix when changing the location code of a DRAFT landing', () => {
@@ -227,10 +225,32 @@ context('Change draft location code', () => {
         page.submit({ locationCode: 'LANDB' })
 
         Page.verifyOnPage(ViewLocationsShowPage)
+        Page.checkForSuccessBanner('Landing code changed', 'You have changed the landing code for WINGB-LANDB.')
+      })
+    })
 
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Landing code changed')
-        cy.get('.govuk-notification-banner__content p').contains('You have changed the landing code for LANDB.')
+    context('Change draft CELL location code', () => {
+      beforeEach(() => {
+        cy.task('stubPatchLocation', { ...draftCell, pathHierarchy: 'WINGB-LANDB-003' })
+        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+          parentLocation: draftCell,
+          locationHierarchy: buildLocationHierarchy([draftWing, draftLanding, draftCell]),
+        })
+        cy.task('stubLocations', draftLanding)
+        cy.task('stubLocations', draftCell)
+        ViewLocationsShowPage.goTo(draftCell.prisonId, draftCell.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.changeLocationCodeLink().click()
+      })
+
+      it('shows the input prefix when changing the location code of a DRAFT cell', () => {
+        const page = new ChangeLocationCodePage('cell')
+
+        page.locationCodeInputPrefix().should('exist')
+        page.submit({ locationCode: '3' })
+
+        Page.verifyOnPage(ViewLocationsShowPage)
+        Page.checkForSuccessBanner('Cell number changed', 'You have changed the cell number for WINGB-LANDB-003.')
       })
     })
   })
