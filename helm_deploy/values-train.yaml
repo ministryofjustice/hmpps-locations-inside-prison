@@ -19,6 +19,7 @@ generic-service:
     SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-preprod.hmpps.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-train.hmpps.service.justice.gov.uk"
     PRISON_API_URL: "http://hmpps-locations-inside-prison-api:8090"
+    DPR_API_URL: "http://hmpps-locations-inside-prison-api:3000"
     ENVIRONMENT_NAME: Training
     AUDIT_ENABLED: "false"
     PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"

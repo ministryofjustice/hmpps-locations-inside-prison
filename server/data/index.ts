@@ -5,6 +5,8 @@
  */
 import { AuthenticationClient, InMemoryTokenStore, RedisTokenStore } from '@ministryofjustice/hmpps-auth-clients'
 import { NotifyClient } from 'notifications-node-client'
+import { initDprReportingClients } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/data/dprReportingClient'
+import { RedisClient } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/data/reportDataStore'
 import { initialiseAppInsights, buildAppInsightsClient } from '../utils/azureAppInsights'
 import applicationInfoSupplier from '../applicationInfo'
 
@@ -30,6 +32,11 @@ export const dataAccess = () => {
   )
   const notificationClient = new NotifyClient(config.email.notifyKey)
 
+  const { reportingClient, dashboardClient, reportDataStore, missingReportClient } = initDprReportingClients(
+    config.apis.dpr,
+    redisClient as unknown as RedisClient,
+  )
+
   return {
     applicationInfo,
     feComponentsClient: new FeComponentsClient(hmppsAuthClient),
@@ -40,6 +47,10 @@ export const dataAccess = () => {
     manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
     prisonApiClient: new PrisonApiClient(redisClient, hmppsAuthClient),
     notificationClient,
+    reportingClient,
+    dashboardClient,
+    reportDataStore,
+    missingReportClient,
     redisClient,
   }
 }

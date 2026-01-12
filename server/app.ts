@@ -4,6 +4,7 @@ import 'express-async-errors'
 import createError from 'http-errors'
 import cookieParser from 'cookie-parser'
 
+import { setupResources } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/middleware/setUpDprResources'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import { appInsightsMiddleware } from './utils/azureAppInsights'
@@ -54,7 +55,7 @@ export default function createApp(services: Services): express.Application {
   if (config.environmentName !== 'Training') {
     app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
   }
-
+  app.use(setupResources(services, config.dpr))
   app.use(routes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

@@ -20,5 +20,6 @@ generic-service:
     SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-preprod.hmpps.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-preprod.hmpps.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api-preprod.prison.service.justice.gov.uk"
+    DPR_API_URL: "https://digital-prison-reporting-mi-ui-preprod.hmpps.service.justice.gov.uk"
     ENVIRONMENT_NAME: PRE-PRODUCTION
     AUDIT_ENABLED: "false"
