@@ -5,6 +5,7 @@ import populatePrisonersInLocation from '../../middleware/populatePrisonersInLoc
 import populateLocation from '../../middleware/populateLocation'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
+import canEditCna from '../../utils/canEditCna'
 
 export default class ReviewCellCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -13,8 +14,16 @@ export default class ReviewCellCapacity extends FormInitialStep {
     this.use(populatePrisonersInLocation())
   }
 
-  override getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
-    return res.locals.decoratedLocation.capacity
+  override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
+    const { capacity, certification, pendingChanges } = res.locals.decoratedLocation
+    let values = { ...capacity, baselineCna: certification?.certifiedNormalAccommodation }
+
+    if (pendingChanges) {
+      const { workingCapacity, maxCapacity, certifiedNormalAccommodation } = pendingChanges
+      values = { ...values, ...{ workingCapacity, maxCapacity, baselineCna: certifiedNormalAccommodation } }
+    }
+
+    return values
   }
 
   override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
@@ -35,10 +44,16 @@ export default class ReviewCellCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const { decoratedLocation } = res.locals
+    const locals = super.locals(req, res)
+    const { prisonConfiguration, decoratedLocation } = res.locals
+
+    const showCna = canEditCna(prisonConfiguration, decoratedLocation)
+    if (showCna) {
+      locals.buttonText = 'Update cell'
+    }
 
     return {
-      ...super.locals(req, res),
+      ...locals,
       title: 'Review cell capacity',
       titleCaption: capFirst(decoratedLocation.displayName),
     }
