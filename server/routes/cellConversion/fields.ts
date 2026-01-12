@@ -1,4 +1,3 @@
-import setCellTypeFields from '../setCellTypeOld/fields'
 import capacityFields from '../changeCellCapacity/fields'
 
 const fields = {
@@ -40,7 +39,19 @@ const fields = {
     ...capacityFields.maxCapacity,
   },
   specialistCellTypes: {
-    ...setCellTypeFields.specialistCellTypes,
+    component: 'govukCheckboxes',
+    multiple: true,
+    validate: ['required'],
+    errorMessages: { required: 'Select a cell type' },
+    id: 'specialistCellTypes',
+    name: 'specialistCellTypes',
+    label: {
+      text: 'Set specific cell type',
+    },
+    hint: {
+      text: 'Select all that apply.',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
     fieldset: {
       legend: {
         text: 'Set specific cell type',
