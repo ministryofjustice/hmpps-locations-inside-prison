@@ -4,6 +4,26 @@ import minLength from '../../validators/minLength'
 import numericString from '../../validators/numericString'
 
 const fields = {
+  reduceWorkingCapacity: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'reduceWorkingCapacity',
+    name: 'reduceWorkingCapacity',
+    errorMessages: {
+      required: 'Select yes if you want to reduce the cell’s certified working capacity to 0',
+    },
+    items: [
+      {
+        text: "Yes, reduce the cell's certified working capacity to 0",
+        value: 'YES',
+      },
+      {
+        text: 'No, the cell will only be unavailable temporarily',
+        value: 'NO',
+      },
+    ],
+    autocomplete: 'off',
+  },
   deactivationReason: {
     component: 'govukRadios',
     validate: ['required'],
