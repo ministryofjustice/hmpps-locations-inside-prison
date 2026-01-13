@@ -24,7 +24,6 @@ const steps: FormWizard.Steps = {
     next: 'details',
     title: (_req, _res) => `Changing cell door number`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedResidentialSummary.location.displayName)}`,
-    description: (_req, _res) => `changing cell door number`,
   }),
   '/details': {
     fields: ['doorNumber', 'explanation'],
