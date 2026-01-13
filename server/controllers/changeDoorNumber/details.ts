@@ -19,7 +19,7 @@ export default class Details extends FormInitialStep {
       ...locals,
       removeHeadingSpacing: true,
       titleCaption: `Cell ${capFirst(decoratedResidentialSummary.location.pathHierarchy)}`,
-      buttonText: 'Save door number',
+      buttonText: decoratedResidentialSummary.location.status === 'DRAFT' ? 'Save door number' : '',
       cancelText: 'Cancel',
     }
   }
@@ -56,6 +56,10 @@ export default class Details extends FormInitialStep {
   }
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    if (res.locals.decoratedResidentialSummary.location.status !== 'DRAFT') {
+      super.saveValues(req, res, next)
+      return
+    }
     try {
       const { systemToken } = req.session
       const { locationId, prisonId } = res.locals
@@ -75,7 +79,11 @@ export default class Details extends FormInitialStep {
     }
   }
 
-  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
+  override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+    if (res.locals.decoratedResidentialSummary.location.status !== 'DRAFT') {
+      super.successHandler(req, res, next)
+      return
+    }
     const { id: locationId, prisonId, pathHierarchy } = res.locals.decoratedResidentialSummary.location
 
     req.journeyModel.reset()

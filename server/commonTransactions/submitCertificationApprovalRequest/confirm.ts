@@ -14,14 +14,31 @@ async function locationToCertificationLocation(
   req: FormWizard.Request,
   location: Location,
 ): Promise<CertificateLocation> {
+  let { workingCapacity, maxCapacity } = location.capacity
+  let { certifiedNormalAccommodation: cna } = location.certification
+
+  const { pendingChanges } = location
+
+  if (pendingChanges?.certifiedNormalAccommodation !== undefined) {
+    cna = pendingChanges.certifiedNormalAccommodation
+  }
+
+  if (pendingChanges?.maxCapacity !== undefined) {
+    maxCapacity = pendingChanges.maxCapacity
+  }
+
+  if (pendingChanges?.workingCapacity !== undefined) {
+    workingCapacity = pendingChanges.workingCapacity
+  }
+
   const certificationLocation: CertificateLocation = {
     id: location.id,
     locationCode: location.code,
     pathHierarchy: location.pathHierarchy,
     level: location.level,
-    certifiedNormalAccommodation: location.pendingChanges.certifiedNormalAccommodation,
-    workingCapacity: location.pendingChanges.workingCapacity,
-    maxCapacity: location.pendingChanges.maxCapacity,
+    certifiedNormalAccommodation: cna,
+    workingCapacity,
+    maxCapacity,
     locationType: location.locationType,
     subLocations: [],
     inCellSanitation: location.inCellSanitation,
@@ -72,8 +89,10 @@ export default class Confirm extends FormInitialStep {
     const locals = super.locals(_req, res)
 
     locals.buttonText = 'Submit for approval'
-
-    return locals
+    return {
+      ...locals,
+      cancelText: 'Cancel',
+    }
   }
 
   async generateRequests(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -87,10 +106,23 @@ export default class Confirm extends FormInitialStep {
     }>('proposedSignedOpCapChange')
     const proposedCertificationApprovalRequests: TypedLocals['proposedCertificationApprovalRequests'] = []
 
-    proposedCertificationApprovalRequests.push({
-      approvalType: 'DRAFT',
-      locations: [await locationToCertificationLocation(req, locals.location)],
-    })
+    if (locals.location.status === 'DRAFT') {
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'DRAFT',
+        locations: [await locationToCertificationLocation(req, locals.location)],
+      })
+    }
+
+    if (req.form.options.name === 'change-door-number') {
+      const doorNumber = sessionModel.get<string>('doorNumber')
+      const explanation = sessionModel.get<string>('explanation')
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'CELL_MARK',
+        locations: [await locationToCertificationLocation(req, locals.location)],
+        reasonForCellMarkChange: explanation,
+        cellMarkChange: doorNumber,
+      })
+    }
 
     if (proposedSignedOpCapChange) {
       proposedCertificationApprovalRequests.push({
