@@ -150,9 +150,16 @@ export default class Confirm extends FormInitialStep {
     const { prisonId } = res.locals.location
     const submittedBy = res.locals.user.name
 
+    let approvalType: string
+    if (req.form?.options?.name === 'change-door-number') {
+      approvalType = 'CELL_MARK'
+    } else {
+      approvalType = 'DRAFT'
+    }
+
     const certificationApprovalRequest = await locationsService.createCertificationRequestForLocation(
       systemToken,
-      'DRAFT',
+      approvalType,
       res.locals.locationId,
     )
     const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}`
