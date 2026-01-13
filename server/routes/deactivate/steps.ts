@@ -8,6 +8,8 @@ import DeactivateTemporaryDetails from '../../controllers/deactivate/temporary/d
 import DeactivateOccupied from '../../controllers/deactivate/occupied'
 import DeactivateType from '../../controllers/deactivate/type'
 import CellCertChange from '../../controllers/deactivate/cell-cert-change'
+import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
+import capFirst from '../../formatters/capFirst'
 
 function isCellOccupied(req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
@@ -40,9 +42,14 @@ const steps: FormWizard.Steps = {
   },
   '/cell-cert-change': {
     fields: ['reduceWorkingCapacity'],
-    next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: '?' }, 'temporary/details'],
+    next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: 'cert-change-disclaimer' }, 'temporary/details'],
     controller: CellCertChange,
   },
+  ...CertChangeDisclaimer.getSteps({
+    next: 'cert-change-disclaimer',
+    title: (_req, _res) => `Decreasing certified working capacity`,
+    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
+  }),
   '/type': {
     fields: ['deactivationType'],
     next: [{ field: 'deactivationType', value: 'temporary', next: 'temporary/details' }, 'permanent/warning'],

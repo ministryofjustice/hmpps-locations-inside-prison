@@ -2,10 +2,11 @@ import LocationFactory from '../../../../server/testutils/factories/location'
 import Page from '../../../pages/page'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import DeactivateOccupiedPage from '../../../pages/deactivate/occupied'
-import DeactivateTemporaryDetailsPage from '../../../pages/deactivate/temporary/details'
 import CellCertChangePage from '../../../pages/deactivate/cell-cert-change'
+import AuthSignInPage from '../../../pages/authSignIn'
+import setupStubs from './setupStubs'
 
-context('Certification Deactivation - Cell', () => {
+context('Certification Deactivation - Cell - Init', () => {
   const location = LocationFactory.build({
     accommodationTypes: ['NORMAL_ACCOMMODATION'],
     capacity: {
@@ -17,34 +18,10 @@ context('Certification Deactivation - Cell', () => {
     specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   })
 
-  beforeEach(() => {
-    cy.task('reset')
-  })
-
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
-      })
-      cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      setupStubs('RESI__CERT_VIEWER', location)
+
       cy.signIn()
     })
 
@@ -53,56 +30,19 @@ context('Certification Deactivation - Cell', () => {
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.deactivateAction().should('not.exist')
     })
+
+    it('redirects user to sign in page when visited directly', () => {
+      cy.visit(`/location/${location.id}/deactivate`)
+      Page.verifyOnPage(AuthSignInPage)
+    })
   })
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
-      })
-      cy.task('stubLocations', location)
-      cy.task('stubPrisonerLocationsId', [])
-      cy.task('stubLocationsDeactivateTemporary')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', location)
 
       cy.signIn()
     })
-
-    function itDisplaysTheCellOccupiedPage() {
-      it('has a caption showing the cell description', () => {
-        Page.verifyOnPage(DeactivateOccupiedPage)
-        cy.get('.govuk-caption-m').contains('Cell A-1-001')
-      })
-
-      it('shows the correct error message', () => {
-        Page.verifyOnPage(DeactivateOccupiedPage)
-        cy.contains('You need to move everyone out of this location before you can deactivate it.')
-      })
-
-      it('has a cancel link', () => {
-        const cellOccupiedPage = Page.verifyOnPage(DeactivateOccupiedPage)
-        cellOccupiedPage.cancelLink().click()
-
-        Page.verifyOnPage(ViewLocationsShowPage)
-      })
-    }
 
     context('when the cell is occupied', () => {
       beforeEach(() => {
@@ -133,10 +73,12 @@ context('Certification Deactivation - Cell', () => {
           },
         ]
         cy.task('stubPrisonerLocationsId', prisonerLocations)
-        DeactivateTemporaryDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
       })
 
-      itDisplaysTheCellOccupiedPage()
+      it('displays the occupied page', () => {
+        cy.visit(`/location/${location.id}/deactivate`)
+        Page.verifyOnPage(DeactivateOccupiedPage)
+      })
     })
 
     context('when the cell is not occupied', () => {

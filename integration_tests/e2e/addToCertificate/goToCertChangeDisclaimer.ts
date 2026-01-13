@@ -8,7 +8,7 @@ const goToCertChangeDisclaimer = (locationId: string) => {
   cy.visit(`/view-and-update-locations/TST/${locationId}`)
   Page.verifyOnPage(ViewLocationsShowPage).draftBannerCertifyButton().click()
 
-  return Page.verifyOnPage(CertChangeDisclaimerPage)
+  return new CertChangeDisclaimerPage('Adding new locations')
 }
 
 export default goToCertChangeDisclaimer

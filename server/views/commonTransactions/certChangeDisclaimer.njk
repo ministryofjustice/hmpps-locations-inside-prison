@@ -1,9 +1,10 @@
 {% extends "../partials/formStep.njk" %}
 
 {% block fields %}
-  <p>As {{ certAction or 'this' }} will affect the establishment's certified working capacity, you must submit a change to the cell certificate.</p>
-
-  <p>This change will be sent to the authorising director for approval.</p>
+  <p>
+    You must submit a change to the cell certificate.
+    This change will be sent to the authorising director for approval.
+  </p>
 
   {{ super() }}
 {% endblock %}

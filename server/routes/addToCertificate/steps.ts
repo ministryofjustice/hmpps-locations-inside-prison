@@ -20,7 +20,6 @@ const steps: FormWizard.Steps = {
     next: 'update-signed-op-cap',
     title: (_req, _res) => `Adding new locations`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedResidentialSummary.location.displayName)}`,
-    description: (_req, _res) => `adding new locations`,
   }),
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
