@@ -45,7 +45,7 @@ context('Deactivate temporary', () => {
         parentLocation: location,
       })
       cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -81,7 +81,7 @@ context('Deactivate temporary', () => {
       cy.task('stubLocations', location)
       cy.task('stubPrisonerLocationsId', [])
       cy.task('stubLocationsDeactivateTemporary')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
 
       cy.signIn()
     })
