@@ -7,9 +7,16 @@ import DeactivateTemporaryConfirm from '../../controllers/deactivate/temporary/c
 import DeactivateTemporaryDetails from '../../controllers/deactivate/temporary/details'
 import DeactivateOccupied from '../../controllers/deactivate/occupied'
 import DeactivateType from '../../controllers/deactivate/type'
+import CellCertChange from '../../controllers/deactivate/cell-cert-change'
 
 function isCellOccupied(req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
+}
+
+function showCellCertChange(_req: FormWizard.Request, res: Response) {
+  const { prisonConfiguration, decoratedLocation } = res.locals
+
+  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType === 'CELL'
 }
 
 function permanentDeactivationForbidden(req: FormWizard.Request, res: Response) {
@@ -22,11 +29,19 @@ const steps: FormWizard.Steps = {
     reset: true,
     resetJourney: true,
     skip: true,
+    backLink: (_req, res) =>
+      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
     next: [
       { fn: isCellOccupied, next: 'occupied' },
       { fn: permanentDeactivationForbidden, next: 'temporary/details' },
+      { fn: showCellCertChange, next: 'cell-cert-change' },
       'type',
     ],
+  },
+  '/cell-cert-change': {
+    fields: ['reduceWorkingCapacity'],
+    next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: '?' }, 'temporary/details'],
+    controller: CellCertChange,
   },
   '/type': {
     fields: ['deactivationType'],
