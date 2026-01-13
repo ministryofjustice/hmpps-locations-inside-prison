@@ -1,0 +1,52 @@
+{% extends "../partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - " + title %}
+{% set mainClasses = "app-container govuk-body" %}
+
+{% block content %}
+<div class="govuk-body">
+  <h1 class="govuk-heading-xl govuk-!-margin-top-6">Accessibility Statement</h1> 
+
+  <p>This accessibility statement applies to the Digital Prison Reporting (DPS) service, available at https://digital-prison-reporting-mi-ui.hmpps.service.justice.gov.uk.</p>
+  <p>This website is run by HMPPS. We want as many people as possible to be able to use this website. For example, you should be able to:</p>
+
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>Change colours, contrast levels and fonts using browser or device settings</li>
+    <li>Zoom in up to 400% without text spilling off the screen</li>
+    <li>Navigate most of the website using a keyboard or speech recognition software</li> 
+    <li>Listen to most of the website using a screen reader (including JAWS, NVDA and VoiceOver)</li> 
+  </ul>
+
+  <p>We’ve also made the website text as simple as possible to understand.</p> 
+  <p>AbilityNet has advice on making your device easier to use if you have a disability: <a href="https://mcmw.abilitynet.org.uk/" target="_blank">https://mcmw.abilitynet.org.uk/</a></p> 
+
+  <h2 class="govuk-heading-m">How accessible this website is</h2>
+  <p>We know some parts of this website are not fully accessible:</p> 
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>There is no ‘Skip to content’ link (WCAG 2.4.1)</li>
+    <li>Some mobile views are functional but not fully optimised for small screens</li>
+    <li>Some focus indicators may not meet enhanced contrast requirements</li>
+  </ul>
+
+  <h2 class="govuk-heading-m">Feedback and contact information</h2> 
+  <p>If you find any problems not listed on this page or think we’re not meeting accessibility requirements, contact: DigitalPrisonReporting-gg@justice.gov.uk</p>
+
+  <h2 class="govuk-heading-m">Enforcement procedure</h2> 
+  <p>The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018. If you’re not happy with how we respond to your complaint, contact the Equality Advisory and Support Service (EASS): https://www.equalityadvisoryservice.com/</p> 
+
+  <h2 class="govuk-heading-m">Technical information about accessibility in this service</h2> 
+  <p>HMPPS is committed to making its website accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.</p> 
+
+  <h2 class="govuk-heading-m">Compliance status</h2> 
+  <p>This service is partially compliant with the Web Content Accessibility Guidelines version 2.2 AA standard, due to the non-compliances listed above.</p> 
+
+  <h2 class="govuk-heading-m">What we’re doing to improve accessibility</h2> 
+  <p>We have completed an internal accessibility test plan covering automated scans (Axe), manual checks (keyboard navigation, colour contrast, magnification, voice-over), and assistive technology validation. We will continue to monitor and improve accessibility as part of our ongoing development work. Issues outside our control have been raised with relevant teams.</p>
+
+  <h2 class="govuk-heading-m">Preparation of this accessibility statement</h2> 
+  <p>This statement was prepared on 9 December 2025.</p> 
+  <p>This website was last tested on 8 December 2025 by the DPS QA team using a combination of automated tools and manual checks against WCAG 2.2 AA.</p> 
+</div>
+{% endblock %}

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 
+import dprPlatformRoutes from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/routes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import { Page } from '../services/auditService'
@@ -98,6 +99,7 @@ export default function routes(services: Services): Router {
 
   // Digital Prison Reporting
   dprRouter(router, services)
+  router.use('/dpr', dprPlatformRoutes({ services, layoutPath: 'dpr/pages/home.njk' }))
 
   // admin
   router.use('/admin/:prisonId?', adminRouter(services))

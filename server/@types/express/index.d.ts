@@ -59,6 +59,9 @@ interface AllLocals {
   baseUrl: string
   bodyText: string
   bookmarkingEnabled: boolean
+  collectionsEnabled: boolean
+  requestMissingEnabled: boolean
+  definition: DashboardDefinition
   bookmarks: BookmarkStoreData[]
   breadcrumbs: {
     title: string
@@ -106,10 +109,10 @@ interface AllLocals {
     summaryCards: { type: string; text: string; linkHref?: string; linkLabel?: string; linkAriaLabel?: string }[]
     wingStructure?: string[]
   }
-  definitions: string[]
+  definitions: DashboardDefinition[]
   definitionsPath: string
-  dpdPathFromConfig: string
-  dpdPathFromQuery: string
+  dpdPathFromConfig: boolean
+  dpdPathFromQuery: boolean
   dprUser: DprUser
   downloadingEnabled: boolean
   errorlist: FormWizard.Controller.Error[]

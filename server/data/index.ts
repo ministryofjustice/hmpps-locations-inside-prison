@@ -32,10 +32,14 @@ export const dataAccess = () => {
   )
   const notificationClient = new NotifyClient(config.email.notifyKey)
 
-  const { reportingClient, dashboardClient, reportDataStore, missingReportClient } = initDprReportingClients(
-    config.apis.dpr,
-    redisClient as unknown as RedisClient,
-  )
+  const {
+    reportingClient,
+    dashboardClient,
+    reportDataStore,
+    missingReportClient,
+    productCollectionClient,
+    featureFlagService,
+  } = initDprReportingClients(config.apis.dpr, redisClient as unknown as RedisClient)
 
   return {
     applicationInfo,
@@ -51,6 +55,8 @@ export const dataAccess = () => {
     dashboardClient,
     reportDataStore,
     missingReportClient,
+    productCollectionClient,
+    featureFlagService,
     redisClient,
   }
 }

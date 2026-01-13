@@ -43,7 +43,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebSession())
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
-  nunjucksSetup(app, services.applicationInfo)
+  const env = nunjucksSetup(app, services.applicationInfo)
   app.use(setUpFeatureFlags())
   app.use(setUpAuthentication())
   app.use(setUpCsrf())
@@ -55,7 +55,7 @@ export default function createApp(services: Services): express.Application {
   if (config.environmentName !== 'Training') {
     app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
   }
-  app.use(setupResources(services, config.dpr))
+  app.use(setupResources(services, 'dpr/pages/error.njk', env, config.dpr))
   app.use(routes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

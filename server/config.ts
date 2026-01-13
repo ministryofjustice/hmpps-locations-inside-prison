@@ -125,7 +125,8 @@ export default {
       enabled: get('TOKEN_VERIFICATION_ENABLED', 'false') === 'true',
     },
     dpr: {
-      url: get('DPR_API_URL', 'http://127.0.0.1:3002', requiredInProduction),
+      url: get('DPR_API_URL', 'http://localhost:3002', requiredInProduction),
+      healthPath: '/health/ping',
       timeout: {
         response: Number(get('DPR_API_TIMEOUT_RESPONSE', 60000)),
         deadline: Number(get('DPR_API_TIMEOUT_DEADLINE', 60000)),

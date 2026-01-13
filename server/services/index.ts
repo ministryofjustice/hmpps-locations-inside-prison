@@ -1,4 +1,4 @@
-import createDprServices from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/utils/ReportStoreServiceUtils'
+import { createDprServices } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/utils/CreateDprServices'
 import { dataAccess } from '../data'
 import AuditService from './auditService'
 import FeComponentsService from './feComponentsService'
@@ -23,6 +23,8 @@ export const services = () => {
     reportingClient,
     dashboardClient,
     reportDataStore,
+    productCollectionClient,
+    featureFlagService,
     missingReportClient,
   } = dataAccess()
   const notificationService = new NotificationService(notificationClient)
@@ -41,7 +43,14 @@ export const services = () => {
   }
 
   const dprServices = createDprServices(
-    { reportingClient, dashboardClient, reportDataStore, missingReportClient },
+    {
+      reportingClient,
+      dashboardClient,
+      reportDataStore,
+      missingReportClient,
+      productCollectionClient,
+      featureFlagService,
+    },
     featureConfig,
   )
 

@@ -1,6 +1,5 @@
 import { Request, Router } from 'express'
 import ReportListUtils from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/components/report-list/utils'
-import dprPlatformRoutes from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/routes'
 import config from '../../config'
 import { Services } from '../../services'
 import { ManagementReportDefinition } from '../../data/types/locationsApi/managementReportDefinition'
@@ -48,8 +47,6 @@ export function dprRouter(router: Router, services: Services): Router {
   if (config.loadReportDefinitionsOnStartup === true && definitionsRoutesInitialised === false) {
     services.authService.getSystemClientToken().then(token => populateRoutes(services.locationsService, token, router))
   }
-
-  router.get('/m2', dprPlatformRoutes({ services, layoutPath: 'pages/managementReporting/index.njk' }))
 
   router.get(
     '/management-reporting',

@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
-import nunjucks from 'nunjucks'
+import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { setUpNunjucksFilters } from '@ministryofjustice/hmpps-digital-prison-reporting-frontend/dpr/setUpNunjucksFilters'
 
@@ -28,7 +28,7 @@ const ENV_TAG_COLOURS: Record<string, string> = {
   Training: 'govuk-tag--purple',
 }
 
-export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
+export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): Environment {
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
@@ -120,4 +120,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('isArray', function isArrayFilter(value) {
     return Array.isArray(value)
   })
+
+  return njkEnv
 }
