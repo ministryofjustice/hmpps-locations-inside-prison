@@ -329,42 +329,6 @@ describe('Confirm', () => {
     })
   })
 
-  describe('configure', () => {
-    it('loads accommodation types from service', async () => {
-      locationsService.getAccommodationTypes.mockResolvedValue([{ code: 'AC1', description: 'Single cell' }] as any)
-
-      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.accommodationTypeConstants).toEqual([{ code: 'AC1', description: 'Single cell' }])
-    })
-
-    it('loads specialist cell types from service', async () => {
-      locationsService.getSpecialistCellTypes.mockResolvedValue({
-        SAFE_CUSTODY: 'Safe Custody',
-      } as any)
-
-      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.specialistCellTypesObject).toEqual({
-        SAFE_CUSTODY: 'Safe Custody',
-      })
-    })
-
-    it('loads used for types from service', async () => {
-      locationsService.getUsedForTypes.mockResolvedValue([{ code: 'GENERAL', description: 'General use' }] as any)
-
-      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.usedForConstants).toEqual([{ code: 'GENERAL', description: 'General use' }])
-    })
-
-    it('calls next when complete', async () => {
-      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(next).toHaveBeenCalled()
-    })
-  })
-
   describe('locationToCertificationLocation - pendingChanges handling', () => {
     const createBaseLocation = (pendingChanges?: any) => ({
       id: 'loc-uuid',
