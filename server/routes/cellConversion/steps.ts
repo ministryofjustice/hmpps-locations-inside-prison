@@ -31,7 +31,6 @@ const steps: FormWizard.Steps = {
     next: 'accommodation-type',
     title: (_req, _res) => `Cell conversion`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)} conversion`,
-    description: (_req, _res) => `converting a non-residential to a cell`,
   }),
   '/accommodation-type': {
     controller: CellConversionAccommodationType,

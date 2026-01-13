@@ -140,7 +140,6 @@ interface AllLocals {
   locationType: string
   maxCapacity: string
   minLayout: string
-  certAction: string
   options: FormWizard.Request['form']['options']
   pathSuffix: string
   prisonConfiguration: PrisonConfiguration
