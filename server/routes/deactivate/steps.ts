@@ -15,7 +15,7 @@ function isCellOccupied(req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
-function showCellCertChange(_req: FormWizard.Request, res: Response) {
+export function showCellCertChange(_req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
 
   return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType === 'CELL'
@@ -46,7 +46,7 @@ const steps: FormWizard.Steps = {
     controller: CellCertChange,
   },
   ...CertChangeDisclaimer.getSteps({
-    next: 'cert-change-disclaimer',
+    next: 'temporary/details',
     title: (_req, _res) => `Decreasing certified working capacity`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
@@ -64,7 +64,14 @@ const steps: FormWizard.Steps = {
     next: [{ fn: isCellOccupied, next: 'occupied' }, 'temporary/details'],
   },
   '/temporary/details': {
-    fields: ['deactivationReason', 'estimatedReactivationDate', 'planetFmReference'],
+    fields: [
+      'deactivationReason',
+      'estimatedReactivationDate',
+      'mandatoryEstimatedReactivationDate',
+      'planetFmReference',
+      'facilitiesManagementReference',
+      'workingCapacityExplanation',
+    ],
     next: 'temporary/confirm',
     controller: DeactivateTemporaryDetails,
     template: '../../partials/formStep',

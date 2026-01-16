@@ -5,6 +5,7 @@ import setupStubs from './setupStubs'
 import CellCertChangePage from '../../../pages/deactivate/cell-cert-change'
 import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
 import DeactivateTemporaryDetailsPage from '../../../pages/deactivate/temporary/details'
+import goToCellCertChange from './goToCellCertChange'
 
 context('Certification Deactivation - Cell - Cell cert change', () => {
   const location = LocationFactory.build({
@@ -22,9 +23,7 @@ context('Certification Deactivation - Cell - Cell cert change', () => {
   beforeEach(() => {
     setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', location)
 
-    cy.signIn()
-    cy.visit(`/location/${location.id}/deactivate`)
-    page = Page.verifyOnPage(CellCertChangePage)
+    page = goToCellCertChange(location)
   })
 
   it('shows the correct content', () => {

@@ -69,14 +69,16 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     const { analyticsService, locationsService } = req.services
 
     try {
-      const reason = req.sessionModel.get('deactivationReason') as string
+      const reason = req.sessionModel.get<string>('deactivationReason')
       await locationsService.deactivateTemporary(
         req.session.systemToken,
         decoratedLocation.id,
         reason,
-        req.sessionModel.get(`deactivationReason${reason === 'OTHER' ? 'Other' : 'Description'}`) as string,
-        req.sessionModel.get('estimatedReactivationDate') as string,
-        req.sessionModel.get('planetFmReference') as string,
+        req.sessionModel.get<string>(`deactivationReason${reason === 'OTHER' ? 'Other' : 'Description'}`),
+        req.sessionModel.get<string>('estimatedReactivationDate') ||
+          req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
+        req.sessionModel.get<string>('planetFmReference') ||
+          req.sessionModel.get<string>('facilitiesManagementReference'),
       )
 
       analyticsService.sendEvent(req, 'deactivate_temp', {

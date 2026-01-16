@@ -20,11 +20,11 @@
       },
       {
         key: { text: "Estimated reactivation date" },
-        value: { text: (values.estimatedReactivationDate | formatDate) or "Not provided" }
+        value: { text: ((values.estimatedReactivationDate or values.mandatoryEstimatedReactivationDate) | formatDate) or "Not provided" }
       },
       {
         key: { text: "Planet FM reference number" },
-        value: { text: values.planetFmReference or "Not provided" }
+        value: { text: values.planetFmReference or values.facilitiesManagementReference or "Not provided" }
       }
     ]
   }) }}

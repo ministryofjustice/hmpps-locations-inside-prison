@@ -4,6 +4,8 @@ import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import setupStubs from './setupStubs'
 import CellCertChangePage from '../../../pages/deactivate/cell-cert-change'
 import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
+import DeactivateTemporaryDetailsPage from '../../../pages/deactivate/temporary/details'
+import goToCertChangeDisclaimer from './goToCertChangeDisclaimer'
 
 context('Certification Deactivation - Cell - Cert change disclaimer', () => {
   const location = LocationFactory.build({
@@ -21,10 +23,7 @@ context('Certification Deactivation - Cell - Cert change disclaimer', () => {
   beforeEach(() => {
     setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', location)
 
-    cy.signIn()
-    cy.visit(`/location/${location.id}/deactivate`)
-    Page.verifyOnPage(CellCertChangePage).submit({ certChange: true })
-    page = new CertChangeDisclaimerPage('Decreasing certified working capacity')
+    page = goToCertChangeDisclaimer(location)
   })
 
   it('has a cancel link', () => {
@@ -39,5 +38,9 @@ context('Certification Deactivation - Cell - Cert change disclaimer', () => {
     Page.verifyOnPage(CellCertChangePage)
   })
 
-  // TODO: add check for next step
+  it('proceeds to details when the button is pressed', () => {
+    page.continueButton().click()
+
+    Page.verifyOnPage(DeactivateTemporaryDetailsPage)
+  })
 })

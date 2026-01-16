@@ -1,9 +1,11 @@
+import FormWizard from 'hmpo-form-wizard'
 import dateTodayOrInFuture from '../../validators/dateTodayOrInFuture'
 import maxLength from '../../validators/maxLength'
 import minLength from '../../validators/minLength'
 import numericString from '../../validators/numericString'
+import { showCellCertChange } from './steps'
 
-const fields = {
+const fields: FormWizard.Fields = {
   reduceWorkingCapacity: {
     component: 'govukRadios',
     validate: ['required'],
@@ -89,6 +91,8 @@ const fields = {
     ],
   },
   estimatedReactivationDate: {
+    remove: (req, _res) => req.sessionModel.get<string>('reduceWorkingCapacity') === 'YES',
+    hideWhenRemoved: true,
     component: 'govukDateInput',
     validate: [dateTodayOrInFuture],
     id: 'estimatedReactivationDate',
@@ -99,6 +103,27 @@ const fields = {
     fieldset: {
       legend: {
         text: 'Estimated reactivation date (optional)',
+        classes: 'govuk-fieldset__legend--m',
+      },
+    },
+    nameForErrors: 'Estimated reactivation date',
+  },
+  mandatoryEstimatedReactivationDate: {
+    remove: (req, _res) => req.sessionModel.get<string>('reduceWorkingCapacity') !== 'YES',
+    hideWhenRemoved: true,
+    component: 'govukDateInput',
+    validate: ['required', dateTodayOrInFuture],
+    id: 'mandatoryEstimatedReactivationDate',
+    name: 'mandatoryEstimatedReactivationDate',
+    errorMessages: {
+      required: 'Enter an estimated reactivation date',
+    },
+    label: {
+      text: 'Estimated reactivation date',
+    },
+    fieldset: {
+      legend: {
+        text: 'Estimated reactivation date',
         classes: 'govuk-fieldset__legend--m',
       },
     },
@@ -116,6 +141,8 @@ const fields = {
     autocomplete: 'off',
   },
   planetFmReference: {
+    remove: showCellCertChange,
+    hideWhenRemoved: true,
     component: 'govukInput',
     validate: [minLength(6), maxLength(18), numericString],
     id: 'planetFmReference',
@@ -127,6 +154,44 @@ const fields = {
     },
     nameForErrors: 'Planet FM reference number',
     autocomplete: 'off',
+  },
+  facilitiesManagementReference: {
+    remove: (req, res) => !showCellCertChange(req, res),
+    hideWhenRemoved: true,
+    component: 'govukInput',
+    validate: [minLength(6), maxLength(18), numericString],
+    id: 'facilitiesManagementReference',
+    name: 'facilitiesManagementReference',
+    classes: 'govuk-input--width-10',
+    label: {
+      text: 'Facilities management reference number (optional)',
+      classes: 'govuk-label--m',
+    },
+    nameForErrors: 'Facilities management reference number',
+    autocomplete: 'off',
+  },
+  workingCapacityExplanation: {
+    remove: (req, res) => !showCellCertChange(req, res),
+    hideWhenRemoved: true,
+    validate: ['required'],
+    component: 'govukTextarea',
+    errorMessages: {
+      required: 'Enter a reason the certified working capacity needs to be decreased',
+    },
+    id: 'workingCapacityExplanation',
+    name: 'workingCapacityExplanation',
+    rows: 5,
+    label: {
+      text: 'Explain why the certified working capacity needs to be decreased',
+      classes: 'govuk-label--m',
+      for: 'explanation',
+    },
+    hint: {
+      text: 'This will help the authorising director understand the need for the reduced capacity.',
+    },
+    autocomplete: 'off',
+    // Don't strip newlines
+    'ignore-defaults': true,
   },
 }
 
