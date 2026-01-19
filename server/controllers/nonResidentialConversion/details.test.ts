@@ -158,7 +158,7 @@ describe('NonResidentialConversionDetails', () => {
             value: 'pet therapy room',
           },
         },
-        title: 'Convert to non-residential room',
+        title: 'Convert cell to non-residential room',
         titleCaption: 'A-1-001',
         validationErrors: [],
       })
