@@ -39,8 +39,8 @@ const steps: FormWizard.Steps = {
       },
       'warning',
     ],
-    title: (_req, _res) => `Non-residential conversion`,
-    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)} conversion`,
+    title: (_req, _res) => `Converting a cell to a non-residential room`,
+    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
   '/occupied': {
     controller: NonResidentialConversionOccupied,
