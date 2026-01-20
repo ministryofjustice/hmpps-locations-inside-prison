@@ -52,7 +52,7 @@ const steps: FormWizard.Steps = {
     buttonClasses: 'govuk-button--secondary',
   },
   '/details': {
-    fields: ['convertedCellType', 'otherConvertedCellType'],
+    fields: ['convertedCellType', 'otherConvertedCellType', 'explanation'],
     controller: NonResidentialConversionDetails,
     next: 'confirm',
     template: '../../partials/formStep',
