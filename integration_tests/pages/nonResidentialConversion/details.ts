@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class NonResidentialConversionDetailsPage extends Page {
   constructor() {
-    super('Convert to non-residential room')
+    super('Convert cell to non-residential room')
   }
 
   cellTypeRadioLabels = (): PageElement => cy.get('body').find('label.govuk-radios__label')

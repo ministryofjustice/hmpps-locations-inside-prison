@@ -9,7 +9,7 @@ describe('view locations show', () => {
   let deepRes: DeepPartial<Response>
 
   const convertToNonResAction = {
-    text: 'Convert to non-residential room',
+    text: 'Convert cell to non-residential room',
     href: '/location/7e570000-0000-0000-0000-000000000001/non-residential-conversion',
     class: 'govuk-button--secondary',
   }
