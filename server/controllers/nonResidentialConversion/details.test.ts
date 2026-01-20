@@ -56,6 +56,12 @@ describe('NonResidentialConversionDetails', () => {
         options: {
           fields,
         },
+        prisonConfiguration: {
+          prisonId: 'TST',
+          resiLocationServiceActive: 'ACTIVE',
+          includeSegregationInRollCount: 'INACTIVE',
+          certificationApprovalRequired: 'ACTIVE',
+        },
         user: {
           username: 'JTIMPSON',
         },
@@ -158,6 +164,8 @@ describe('NonResidentialConversionDetails', () => {
             value: 'pet therapy room',
           },
           explanation: {
+            remove: {},
+            hideWhenRemoved: true,
             validate: ['required'],
             component: 'govukTextarea',
             errorMessages: {

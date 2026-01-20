@@ -1,6 +1,7 @@
+import FormWizard from 'hmpo-form-wizard'
 import maxLength from '../../validators/maxLength'
 
-const fields = {
+const fields: FormWizard.Fields = {
   convertedCellType: {
     component: 'govukRadios',
     validate: ['required'],
@@ -26,6 +27,8 @@ const fields = {
     autocomplete: 'off',
   },
   explanation: {
+    remove: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'INACTIVE',
+    hideWhenRemoved: true,
     validate: ['required'],
     component: 'govukTextarea',
     errorMessages: {

@@ -82,6 +82,12 @@ describe('ChangeNonResidentialTypeDetails', () => {
         options: {
           fields,
         },
+        prisonConfiguration: {
+          prisonId: 'TST',
+          resiLocationServiceActive: 'ACTIVE',
+          includeSegregationInRollCount: 'INACTIVE',
+          certificationApprovalRequired: 'ACTIVE',
+        },
         user: {
           username: 'JTIMPSON',
         },
@@ -180,6 +186,8 @@ describe('ChangeNonResidentialTypeDetails', () => {
             value: '',
           },
           explanation: {
+            remove: {},
+            hideWhenRemoved: true,
             validate: ['required'],
             component: 'govukTextarea',
             errorMessages: {
