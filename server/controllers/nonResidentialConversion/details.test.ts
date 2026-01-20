@@ -164,7 +164,7 @@ describe('NonResidentialConversionDetails', () => {
             value: 'pet therapy room',
           },
           explanation: {
-            remove: {},
+            remove: expect.any(Function),
             hideWhenRemoved: true,
             validate: ['required'],
             component: 'govukTextarea',

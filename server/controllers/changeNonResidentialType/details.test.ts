@@ -186,7 +186,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
             value: '',
           },
           explanation: {
-            remove: {},
+            remove: expect.any(Function),
             hideWhenRemoved: true,
             validate: ['required'],
             component: 'govukTextarea',
