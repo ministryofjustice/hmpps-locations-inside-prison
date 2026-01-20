@@ -18,7 +18,10 @@ export declare interface CertificationApprovalRequest {
   certificateId: string
   cellMark: string
   currentCellMark: string
-  reasonForSignedOpChange: string
   reasonForChange: string
   locations: CertificateLocation[]
+  deactivatedReason: string
+  deactivationReasonDescription: string
+  proposedReactivationDate: string
+  planetFmReference: string
 }

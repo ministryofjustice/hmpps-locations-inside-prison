@@ -5,16 +5,24 @@ import { getUserEmails, sendNotification } from '../../../../utils/notificationH
 import { NotificationType, notificationGroups } from '../../../../services/notificationService'
 import formatDateWithTime from '../../../../formatters/formatDateWithTime'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
+import addConstantToLocals from '../../../../middleware/addConstantToLocals'
+import addLocationsToLocationMap from '../../../../middleware/addLocationsToLocationMap'
+import config from '../../../../config'
 
 export default class Reject extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
+    this.use(addConstantToLocals('locationTypes'))
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     res.locals.buttonText = 'Reject request'
     res.locals.cancelText = 'Cancel'
+    const { approvalRequest } = res.locals
+    if (approvalRequest.approvalType === 'DEACTIVATION') {
+      await addLocationsToLocationMap([approvalRequest.locationId])(req, res, null)
+    }
 
     await super._locals(req, res, next)
   }
@@ -32,29 +40,32 @@ export default class Reject extends FormInitialStep {
       explanation as string,
     )
 
-    // Send notifications to all cert roles
-    const emailAddresses = await getUserEmails(
-      manageUsersService,
-      systemToken,
-      prisonId,
-      notificationGroups.allCertUsers,
-    )
+    // Don't send emails in local dev (every deployed env counts as production)
+    if (config.production || process.env.NODE_ENV === 'test') {
+      // Send notifications to all cert roles
+      const emailAddresses = await getUserEmails(
+        manageUsersService,
+        systemToken,
+        prisonId,
+        notificationGroups.allCertUsers,
+      )
 
-    await sendNotification(
-      notifyService,
-      emailAddresses,
-      prisonName,
-      undefined,
-      NotificationType.REQUEST_REJECTED,
-      locationName,
-      changeType,
-      formatDateWithTime(requestedDate),
-      requestedBy,
-      undefined,
-      undefined,
-      res.locals.user.name,
-      explanation as string,
-    )
+      await sendNotification(
+        notifyService,
+        emailAddresses,
+        prisonName,
+        undefined,
+        NotificationType.REQUEST_REJECTED,
+        locationName,
+        changeType,
+        formatDateWithTime(requestedDate),
+        requestedBy,
+        undefined,
+        undefined,
+        res.locals.user.name,
+        explanation as string,
+      )
+    }
 
     req.journeyModel.reset()
     req.sessionModel.reset()

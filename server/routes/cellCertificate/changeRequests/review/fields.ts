@@ -18,13 +18,13 @@ const fields: FormWizard.Fields = {
       { text: 'Reject change', value: 'REJECT' },
     ],
   },
-  cellsMeetStandards: {
+  confirmation: {
     component: 'govukCheckboxes',
     multiple: false,
     validate: ['required'],
     errorMessages: { required: 'Confirm that the cells meet the certification standards' },
-    id: 'cellsMeetStandards',
-    name: 'cellsMeetStandards',
+    id: 'confirmation',
+    name: 'confirmation',
     label: {
       text: 'Confirm certification standards',
     },

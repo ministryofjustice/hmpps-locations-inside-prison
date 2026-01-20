@@ -7,11 +7,14 @@ import { getUserEmails, sendNotification } from '../../../../utils/notificationH
 import { NotificationType, notificationGroups } from '../../../../services/notificationService'
 import config from '../../../../config'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
+import addConstantToLocals from '../../../../middleware/addConstantToLocals'
+import addLocationsToLocationMap from '../../../../middleware/addLocationsToLocationMap'
 
 export default class Approve extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
+    this.use(addConstantToLocals('locationTypes'))
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -27,8 +30,10 @@ export default class Approve extends FormInitialStep {
     }
 
     res.locals.buttonText = 'Update cell certificate'
-
     res.locals.cancelText = 'Cancel'
+    if (approvalRequest.approvalType === 'DEACTIVATION') {
+      await addLocationsToLocationMap([approvalRequest.locationId])(req, res, null)
+    }
 
     await super._locals(req, res, next)
   }
@@ -42,21 +47,24 @@ export default class Approve extends FormInitialStep {
     const certification = await locationsService.approveCertificationRequest(systemToken, approvalRequest.id)
     const url = `${ingressUrl}/${prisonId}/cell-certificate/${certification.certificateId}`
 
-    // Send notifications to all cert roles
-    const emailAddresses = await getUserEmails(
-      manageUsersService,
-      systemToken,
-      prisonId,
-      notificationGroups.allCertUsers,
-    )
+    // Don't send emails in local dev (every deployed env counts as production)
+    if (config.production || process.env.NODE_ENV === 'test') {
+      // Send notifications to all cert roles
+      const emailAddresses = await getUserEmails(
+        manageUsersService,
+        systemToken,
+        prisonId,
+        notificationGroups.allCertUsers,
+      )
 
-    await sendNotification(
-      notifyService,
-      emailAddresses,
-      notificationDetails.prisonName,
-      url,
-      NotificationType.REQUEST_APPROVED,
-    )
+      await sendNotification(
+        notifyService,
+        emailAddresses,
+        notificationDetails.prisonName,
+        url,
+        NotificationType.REQUEST_APPROVED,
+      )
+    }
 
     req.journeyModel.reset()
     req.sessionModel.reset()

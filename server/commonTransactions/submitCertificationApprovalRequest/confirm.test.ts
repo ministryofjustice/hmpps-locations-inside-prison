@@ -6,6 +6,7 @@ import NotificationService, { NotificationType, notificationGroups } from '../..
 import LocationsService from '../../services/locationsService'
 import Confirm from './confirm'
 import * as notificationHelpers from '../../utils/notificationHelpers'
+import LocationFactory from '../../testutils/factories/location'
 
 jest.mock('../../utils/notificationHelpers')
 jest.mock('../../middleware/getPrisonResidentialSummary')
@@ -40,7 +41,7 @@ describe('Confirm', () => {
     deepReq = {
       form: {
         options: {
-          name: '',
+          name: 'add-to-certificate',
         },
       },
       session: {
@@ -284,7 +285,7 @@ describe('Confirm', () => {
 
   describe('generateRequests', () => {
     beforeEach(() => {
-      deepRes.locals.location = {
+      deepRes.locals.location = LocationFactory.build({
         id: 'some-uuid',
         prisonId: 'MDI',
         status: 'DRAFT',
@@ -297,15 +298,17 @@ describe('Confirm', () => {
           maxCapacity: 1,
           workingCapacity: 1,
         },
-      } as any
+        cellMark: 'A1-01',
+      })
       deepReq.form = {
         options: {
-          name: 'change-door-number',
+          name: '',
         },
       } as any
     })
 
-    it('adds DRAFT approval request when location status is DRAFT', async () => {
+    it('adds DRAFT approval request when form name is add-to-certificate', async () => {
+      deepReq.form.options.name = 'add-to-certificate'
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
@@ -315,8 +318,8 @@ describe('Confirm', () => {
       )
     })
 
-    it('does not add DRAFT approval request when location status is not DRAFT', async () => {
-      deepRes.locals.location.status = 'ACTIVE'
+    it('does not add DRAFT approval request when form name is not add-to-certificate', async () => {
+      deepReq.form.options.name = 'other-form'
 
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
@@ -326,6 +329,7 @@ describe('Confirm', () => {
     })
 
     it('adds CELL_MARK approval request when form name is change-door-number', async () => {
+      deepReq.form.options.name = 'change-door-number'
       deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
         if (key === 'doorNumber') return 'A1-02'
         if (key === 'explanation') return 'Need to change door number'
@@ -337,8 +341,9 @@ describe('Confirm', () => {
       expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
         expect.objectContaining({
           approvalType: 'CELL_MARK',
-          cellMarkChange: 'A1-02',
-          reasonForCellMarkChange: 'Need to change door number',
+          currentCellMark: 'A1-01',
+          cellMark: 'A1-02',
+          reasonForChange: 'Need to change door number',
         }),
       )
     })
@@ -366,7 +371,7 @@ describe('Confirm', () => {
         expect.objectContaining({
           approvalType: 'SIGNED_OP_CAP',
           signedOperationCapacityChange: expect.any(Number),
-          reasonForSignedOpChange: 'New capacity',
+          reasonForChange: 'New capacity',
         }),
       )
     })
@@ -381,6 +386,7 @@ describe('Confirm', () => {
     })
 
     it('sets correct title for multiple change requests', async () => {
+      deepReq.form.options.name = 'add-to-certificate'
       deepReq.sessionModel.get = jest.fn().mockReturnValue({
         signedOperationalCapacity: 550,
         reasonForChange: 'New capacity',
@@ -389,7 +395,7 @@ describe('Confirm', () => {
 
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepRes.locals.title).toContain('3 changes')
+      expect(deepRes.locals.title).toContain('2 changes')
     })
 
     it('calls next when complete', async () => {

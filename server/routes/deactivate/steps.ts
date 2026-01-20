@@ -10,21 +10,26 @@ import DeactivateType from '../../controllers/deactivate/type'
 import CellCertChange from '../../controllers/deactivate/cell-cert-change'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 function isCellOccupied(req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
-export function showCellCertChange(_req: FormWizard.Request, res: Response) {
+export function isCellCertChange(_req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
 
   return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType === 'CELL'
 }
 
-export function showCertChangeDisclaimer(_req: FormWizard.Request, res: Response) {
+export function isCertChange(req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
 
-  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType !== 'CELL'
+  return (
+    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    (decoratedLocation.raw.locationType !== 'CELL' || req.sessionModel.get<string>('reduceWorkingCapacity') === 'YES')
+  )
 }
 
 function permanentDeactivationForbidden(req: FormWizard.Request, res: Response) {
@@ -42,8 +47,8 @@ const steps: FormWizard.Steps = {
     next: [
       { fn: isCellOccupied, next: 'occupied' },
       { fn: permanentDeactivationForbidden, next: 'temporary/details' },
-      { fn: showCellCertChange, next: 'cell-cert-change' },
-      { fn: showCertChangeDisclaimer, next: 'cert-change-disclaimer' },
+      { fn: isCellCertChange, next: 'cell-cert-change' },
+      { fn: isCertChange, next: 'cert-change-disclaimer' },
       'type',
     ],
   },
@@ -57,11 +62,11 @@ const steps: FormWizard.Steps = {
     title: (_req, res) => {
       const { decoratedLocation } = res.locals
 
-      if (!decoratedLocation.leafLevel) {
-        return `Deactivating a ${decoratedLocation.locationType.toLowerCase()}`
+      if (decoratedLocation.raw.locationType === 'CELL') {
+        return `Decreasing certified working capacity`
       }
 
-      return `Decreasing certified working capacity`
+      return `Deactivating a ${decoratedLocation.locationType.toLowerCase()}`
     },
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
@@ -87,10 +92,16 @@ const steps: FormWizard.Steps = {
       'facilitiesManagementReference',
       'workingCapacityExplanation',
     ],
-    next: 'temporary/confirm',
+    next: [
+      { fn: isCellCertChange, next: 'submit-certification-approval-request' },
+      { fn: isCertChange, next: 'update-signed-op-cap' },
+      'temporary/confirm',
+    ],
     controller: DeactivateTemporaryDetails,
     template: '../../partials/formStep',
   },
+  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
   '/temporary/confirm': {
     fields: ['confirm'],
     controller: DeactivateTemporaryConfirm,

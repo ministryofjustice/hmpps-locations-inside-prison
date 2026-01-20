@@ -1,10 +1,11 @@
 import { Request, Response } from 'express'
 import { TypedLocals } from '../../@types/express'
 import formatDate from '../../formatters/formatDate'
+import addUsersToUserMap from '../../middleware/addUsersToUserMap'
 
 export default async (req: Request, res: Response) => {
-  const { prisonResidentialSummary, prisonId, user } = res.locals
-  const { locationsService, manageUsersService } = req.services
+  const { prisonResidentialSummary, prisonId } = res.locals
+  const { locationsService } = req.services
   const { systemToken } = req.session
   const locals: TypedLocals = {
     backLink: `/${prisonId}/cell-certificate/history`,
@@ -20,11 +21,7 @@ export default async (req: Request, res: Response) => {
 
   locals.certificate = await locationsService.getCellCertificate(systemToken, req.params.certificateId)
 
-  locals.userMap = {
-    [locals.certificate.approvedBy]:
-      (await manageUsersService.getUser(user.token, locals.certificate.approvedBy))?.name ||
-      locals.certificate.approvedBy,
-  }
+  await addUsersToUserMap([locals.certificate.approvedBy])(req, res, null)
   locals.title = `Previous cell certificate (${formatDate(locals.certificate.approvedDate)})`
 
   return res.render('pages/cellCertificate/show', locals)

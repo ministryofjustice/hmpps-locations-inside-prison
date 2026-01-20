@@ -19,7 +19,7 @@ const steps: FormWizard.Steps = {
   },
   '/approve': {
     pageTitle: 'You are about to approve a change to the cell certificate',
-    fields: ['cellsMeetStandards'],
+    fields: ['confirmation'],
     controller: Approve,
   },
   '/reject': {

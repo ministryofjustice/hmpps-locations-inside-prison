@@ -4,6 +4,7 @@ import BaseController from './baseController'
 import modifyFieldName from '../../helpers/field/modifyFieldName'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 import getCellPath from './getCellPath'
+import addConstantToLocals from '../../middleware/addConstantToLocals'
 
 export default class Capacities extends BaseController {
   override middlewareSetup() {
@@ -12,6 +13,7 @@ export default class Capacities extends BaseController {
     this.use(this.unsetCellTypeTypes)
     this.use(this.setEditingCapacities)
     this.use(this.fixHistory)
+    this.use(addConstantToLocals('specialistCellTypes'))
   }
 
   override validateFields(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -46,9 +48,7 @@ export default class Capacities extends BaseController {
       const { values } = req.form
 
       const cellsToCreate = Number(req.sessionModel.get<number>('create-cells_cellsToCreate')) || 0
-      const specialistCellTypesObject = await req.services.locationsService.getSpecialistCellTypes(
-        req.session.systemToken,
-      )
+      const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
 
       const validationErrors: FormWizard.Errors = {}
 
@@ -66,7 +66,7 @@ export default class Capacities extends BaseController {
           const workingCapacityKey = `create-cells_workingCapacity${i}`
           const baselineCnaKey = `create-cells_baselineCna${i}`
           const isSpecialistCellType = cellTypes.some(
-            type => specialistCellTypesObject.find(sct => sct.key === type)?.attributes?.affectsCapacity,
+            type => specialistCellTypes.find(sct => sct.key === type)?.attributes?.affectsCapacity,
           )
 
           if (!errors[workingCapacityKey] && values[workingCapacityKey] === '0' && !isSpecialistCellType) {
@@ -101,16 +101,6 @@ export default class Capacities extends BaseController {
 
       callback(err, modifiedValues)
     })
-  }
-
-  override async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { locals } = res
-
-    locals.specialistCellTypesObject = await req.services.locationsService.getSpecialistCellTypes(
-      req.session.systemToken,
-    )
-
-    next()
   }
 
   createDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -177,7 +167,6 @@ export default class Capacities extends BaseController {
     const newLocationCode = req.sessionModel.get<string>(`locationCode`)
 
     locals.locationPathPrefix = [pathHierarchy, newLocationCode].filter(s => s).join('-')
-    locals.specialistCellTypesObject = res.locals.specialistCellTypesObject
 
     return locals
   }

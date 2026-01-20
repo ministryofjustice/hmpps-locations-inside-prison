@@ -9,11 +9,13 @@ import decorateLocation from '../../decorators/location'
 import nonOxfordJoin from '../../formatters/nonOxfordJoin'
 import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
+import addConstantToLocals from '../../middleware/addConstantToLocals'
 
 export default class ConfirmCreateLocation extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(unsetTempValues)
+    this.use(addConstantToLocals('specialistCellTypes'))
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -77,8 +79,6 @@ export default class ConfirmCreateLocation extends FormInitialStep {
           },
         })
       }
-
-      res.locals.specialistCellTypesObject = await locationsService.getSpecialistCellTypes(systemToken)
     }
 
     await super._locals(req, res, next)

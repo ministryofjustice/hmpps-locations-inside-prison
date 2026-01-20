@@ -4,11 +4,13 @@ import { TypedLocals } from '../../@types/express'
 import FormInitialStep from '../base/formInitialStep'
 import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
+import addConstantToLocals from '../../middleware/addConstantToLocals'
 
 export default class ConfirmCreateCells extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(unsetTempValues)
+    this.use(addConstantToLocals('specialistCellTypes'))
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -70,8 +72,6 @@ export default class ConfirmCreateCells extends FormInitialStep {
         },
       })
     }
-
-    res.locals.specialistCellTypesObject = await locationsService.getSpecialistCellTypes(systemToken)
 
     await super._locals(req, res, next)
   }

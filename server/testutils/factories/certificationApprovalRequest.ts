@@ -24,8 +24,11 @@ const CertificationApprovalRequestFactory = Factory.define<CertificationApproval
     certificateId: 'some-certificate-uuid',
     cellMark: 'A-1x',
     currentCellMark: 'A-1',
-    reasonForSignedOpChange: 'Needed to change it',
     reasonForChange: 'Needed to change it',
+    deactivatedReason: 'DAMAGED',
+    deactivationReasonDescription: 'Sink smashed',
+    proposedReactivationDate: '2024-10-03T09:18:58',
+    planetFmReference: '123456',
     locations: [
       CertificateLocationFactory.build({
         locationCode: 'A',

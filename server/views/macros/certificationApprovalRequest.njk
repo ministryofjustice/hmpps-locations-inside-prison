@@ -3,7 +3,7 @@
 
 {% from './certificationApprovalRequestSummary.njk' import certificationApprovalRequestSummary %}
 
-{% macro recurseLocationTable(rows, location, specialistCellTypesObject) %}
+{% macro recurseLocationTable(rows, location, specialistCellTypes) %}
   {% set rows = (rows.push([
     {
       classes: 'govuk-table__cell',
@@ -22,7 +22,7 @@
       text: location.maxCapacity or '-'
     },
     {
-      html: (formatConstants(specialistCellTypesObject, location.specialistCellTypes) or '-') if location.locationType == 'CELL' else '-'
+      html: (formatConstants(specialistCellTypes, location.specialistCellTypes) or '-') if location.locationType == 'CELL' else '-'
     },
     {
       text: 'Yes' if location.inCellSanitation == true else ('No' if location.inCellSanitation == false else '-')
@@ -30,21 +30,31 @@
   ]), rows) %}
 
   {% for subLocation in location.subLocations %}
-    {{ recurseLocationTable(rows, subLocation, specialistCellTypesObject) }}
+    {{ recurseLocationTable(rows, subLocation, specialistCellTypes) }}
   {% endfor %}
 {% endmacro %}
 
-{% macro certificationApprovalRequest(request, multiple, index, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, includeChangeSummary) %}
-  {% if request.approvalType == 'SIGNED_OP_CAP' %}
-    {% set changeType = 'Change signed operational capacity' %}
-  {% elseif request.approvalType == 'DRAFT' %}
-    {% set changeType = 'Add new locations to certificate' %}
-  {% elseif request.approvalType == 'CELL_MARK' %}
-    {% set changeType = 'Change cell door number' %}
-  {% elseif request.approvalType == 'DEACTIVATION' %}
-  {% elseif request.approvalType == 'REACTIVATION' %}
-  {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
+{% macro recurseLocationDeactivationTable(rows, location) %}
+  {% if location.locationType === 'CELL' and location.currentWorkingCapacity > 0 %}
+    {% set rows = (rows.push([
+      {
+        classes: 'govuk-table__cell',
+        text: location.pathHierarchy
+      },
+      {
+        classes: 'govuk-table__cell',
+        text: location.currentWorkingCapacity + " → 0"
+      }
+    ]), rows) %}
   {% endif %}
+
+  {% for subLocation in location.subLocations %}
+    {{ recurseLocationDeactivationTable(rows, subLocation) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro certificationApprovalRequest(request, multiple, index, prisonResidentialSummary, includeChangeSummary, constants, locationMap) %}
+  {% set changeType = approvalTypeDescription(request.approvalType, constants, locationMap[request.locationId]) %}
 
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0" data-qa="approval-request-{{ request.approvalType }}">
@@ -57,7 +67,7 @@
       {% if request.approvalType == 'SIGNED_OP_CAP' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants) }}
           {% endif %}
 
           {% if multiple %}
@@ -82,6 +92,10 @@
         </div>
       {% elseif request.approvalType == 'DRAFT' %}
         <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants) }}
+          {% endif %}
+
           {% if multiple %}
             <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
           {% else %}
@@ -100,8 +114,8 @@
             ],
             rows: [[
               { text: request.locations[0].pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
-              { html: formatConstants(accommodationTypeConstants, request.locations[0].accommodationTypes) },
-              { html: formatConstants(usedForConstants, request.locations[0].usedFor) }
+              { html: formatConstants(constants.accommodationTypes, request.locations[0].accommodationTypes) },
+              { html: formatConstants(constants.usedForTypes, request.locations[0].usedFor) }
             ]]
           }) }}
 
@@ -112,7 +126,7 @@
 
         {% set locationTableRows = [] %}
         {% for location in request.locations %}
-          {{ recurseLocationTable(locationTableRows, location, specialistCellTypesObject) }}
+          {{ recurseLocationTable(locationTableRows, location, constants.specialistCellTypes) }}
         {% endfor %}
 
         <div class="govuk-grid-column-full">
@@ -159,7 +173,7 @@
                   text: 'Explanation'
                 },
                   value: {
-                  text: request.reasonForCellMarkChange
+                  text: request.reasonForChange
                 },
                   actions: {
                   items: [
@@ -181,7 +195,7 @@
               ],
               rows:[[
                 { text: request.locations[0].pathHierarchy },
-                { text: request.locations[0].cellMark + " → " + request.cellMarkChange }
+                { text: request.currentCellMark + " → " + request.cellMark }
               ]]
             }) }}
           {% else %}
@@ -195,7 +209,7 @@
                 { text: "Door number" }
               ],
               rows:[[
-                { text: request.locations[0].pathHierarchy },
+                { text: request.locationKey.replace(request.prisonId + '-', '') },
                 { text: request.currentCellMark + " → " + request.cellMark }
               ]]
             }) }}
@@ -203,6 +217,46 @@
         </div>
 
       {% elseif request.approvalType == 'DEACTIVATION' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants) }}
+          {% endif %}
+
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+
+          {% set locationTableRows = [] %}
+          {% for location in request.locations %}
+            {{ recurseLocationDeactivationTable(locationTableRows, location) }}
+          {% endfor %}
+
+          {% if request.locations[0].locationType !== 'CELL' %}
+            {% set locationTableRows = (locationTableRows.push([
+              {
+                classes: 'govuk-table__header',
+                text: 'Total'
+              },
+              {
+                classes: 'govuk-table__header',
+                text: -request.workingCapacityChange + " → 0"
+              }
+            ]), locationTableRows) %}
+          {% endif %}
+
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'locations-table'
+            },
+            head: [
+              { text: "Location" },
+              { text: "Certified working capacity" }
+            ],
+            rows: locationTableRows
+          }) }}
+        </div>
       {% elseif request.approvalType == 'REACTIVATION' %}
       {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
       {% endif %}
