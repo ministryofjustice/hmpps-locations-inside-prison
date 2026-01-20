@@ -157,6 +157,26 @@ describe('NonResidentialConversionDetails', () => {
             validate: ['required', maxLength(30)],
             value: 'pet therapy room',
           },
+          explanation: {
+            validate: ['required'],
+            component: 'govukTextarea',
+            errorMessages: {
+              required: 'Enter a reason for this change',
+            },
+            id: 'explanation',
+            name: 'explanation',
+            rows: 5,
+            label: {
+              text: 'Explain the reason for this change',
+              classes: 'govuk-label--m',
+              for: 'explanation',
+            },
+            hint: {
+              text: 'This will help the authorising director understand the need for the change.',
+            },
+            autocomplete: 'off',
+            'ignore-defaults': true,
+          },
         },
         title: 'Convert cell to non-residential room',
         titleCaption: 'A-1-001',

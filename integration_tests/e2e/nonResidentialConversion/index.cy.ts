@@ -230,6 +230,17 @@ context('Non-residential conversion', () => {
         cy.get('.govuk-error-summary__list').contains('Room description must be 30 characters or less')
         cy.get('#otherConvertedCellType-error').contains('Room description must be 30 characters or less')
       })
+
+      it('shows the correct validation error when no reason given', () => {
+        const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
+
+        detailsPage.cellTypeRadioItem('OFFICE').click()
+        detailsPage.continueButton().click()
+
+        cy.get('.govuk-error-summary__title').contains('There is a problem')
+        cy.get('.govuk-error-summary__list').contains('Enter a reason for this change')
+        cy.get('#explanation-error').contains('Enter a reason for this change')
+      })
     })
 
     describe('confirmation page', () => {
@@ -239,6 +250,7 @@ context('Non-residential conversion', () => {
         warningPage.continueButton().click()
         const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
         detailsPage.cellTypeRadioItem('OFFICE').click()
+        detailsPage.explanationInput().clear().type('Want to change the room usage')
         detailsPage.continueButton().click()
       })
 
@@ -265,6 +277,7 @@ context('Non-residential conversion', () => {
 
         detailsPage.cellTypeRadioItem('OTHER').click()
         detailsPage.otherFreeText().clear().type('pet therapy room')
+        detailsPage.explanationInput().clear().type('Want to change the room usage')
         detailsPage.continueButton().click()
 
         confirmationPage = Page.verifyOnPage(NonResidentialConversionConfirmPage)
@@ -289,6 +302,7 @@ context('Non-residential conversion', () => {
         const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
         detailsPage.cellTypeRadioItem('OTHER').click()
         detailsPage.otherFreeText().clear().type('pet therapy room')
+        detailsPage.explanationInput().clear().type('Want to change the room usage')
         detailsPage.continueButton().click()
 
         confirmationPage = Page.verifyOnPage(NonResidentialConversionConfirmPage)

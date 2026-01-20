@@ -10,6 +10,8 @@ export default class NonResidentialConversionDetailsPage extends Page {
   cellTypeRadioItem = (value: string): PageElement =>
     cy.get(`input[name="convertedCellType"][type="radio"][value="${value}"]`)
 
+  explanationInput = (): PageElement => cy.get(`textarea[name$="explanation"]`)
+
   otherFreeText = (): PageElement => cy.get('#otherConvertedCellType')
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
