@@ -56,6 +56,12 @@ describe('NonResidentialConversionDetails', () => {
         options: {
           fields,
         },
+        prisonConfiguration: {
+          prisonId: 'TST',
+          resiLocationServiceActive: 'ACTIVE',
+          includeSegregationInRollCount: 'INACTIVE',
+          certificationApprovalRequired: 'ACTIVE',
+        },
         user: {
           username: 'JTIMPSON',
         },
@@ -156,6 +162,28 @@ describe('NonResidentialConversionDetails', () => {
             name: 'otherConvertedCellType',
             validate: ['required', maxLength(30)],
             value: 'pet therapy room',
+          },
+          explanation: {
+            remove: expect.any(Function),
+            hideWhenRemoved: true,
+            validate: ['required'],
+            component: 'govukTextarea',
+            errorMessages: {
+              required: 'Enter a reason for this change',
+            },
+            id: 'explanation',
+            name: 'explanation',
+            rows: 5,
+            label: {
+              text: 'Explain the reason for this change',
+              classes: 'govuk-label--m',
+              for: 'explanation',
+            },
+            hint: {
+              text: 'This will help the authorising director understand the need for the change.',
+            },
+            autocomplete: 'off',
+            'ignore-defaults': true,
           },
         },
         title: 'Convert cell to non-residential room',

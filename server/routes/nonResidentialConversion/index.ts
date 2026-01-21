@@ -5,12 +5,14 @@ import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
+import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 
 const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('convert_non_residential'),
   populateLocation({ decorate: true }),
+  populatePrisonConfiguration(),
   populatePrisonersInLocation(),
   wizard(steps, fields, {
     name: 'non-residential-conversion',
