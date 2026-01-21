@@ -57,6 +57,15 @@ export default class Details extends FormInitialStep {
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     if (res.locals.decoratedResidentialSummary.location.status !== 'DRAFT') {
+      const { values, options } = req.form
+
+      if (options?.name === 'change-door-number') {
+        req.sessionModel.set('changeDoorNumber', {
+          doorNumber: values.doorNumber,
+          reasonForChange: values.explanation,
+        })
+      }
+
       super.saveValues(req, res, next)
       return
     }

@@ -138,9 +138,11 @@ describe('Confirm', () => {
     })
 
     it('creates certification request for signed op cap when present', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New location built',
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'proposedSignedOpCapChange') {
+          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
+        }
+        return undefined
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -180,9 +182,11 @@ describe('Confirm', () => {
     })
 
     it('sets flash success message for multiple change requests', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New location built',
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'proposedSignedOpCapChange') {
+          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
+        }
+        return undefined
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -196,6 +200,67 @@ describe('Confirm', () => {
     it('redirects to change requests page', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
+      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
+  describe('saveValues - changeDoorNumber', () => {
+    beforeEach(() => {
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'changeDoorNumber') {
+          return { doorNumber: 'A1-02', reasonForChange: 'Need to change door number' }
+        }
+        return undefined
+      })
+      ;(deepRes.locals as any).locationId = 'loc-123'
+      locationsService.updateCellMark = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
+    })
+
+    it('updates cell mark with doorNumber and reason', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.updateCellMark).toHaveBeenCalledWith('token', 'loc-123', {
+        cellMark: 'A1-02',
+        reasonForChange: 'Need to change door number',
+      })
+    })
+
+    it('sends notifications using pendingApprovalRequestId', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        1,
+        notifyService,
+        ['certificate_reviewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
+        NotificationType.REQUEST_RECEIVED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        2,
+        notifyService,
+        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
+        NotificationType.REQUEST_SUBMITTED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+    })
+
+    it('sets single request flash message and redirects', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'Change request sent',
+        content: 'You have submitted a request to update the cell certificate.',
+      })
       expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
     })
   })

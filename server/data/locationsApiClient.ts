@@ -393,6 +393,10 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/:locationId/capacity',
       requestType: 'put',
     }),
+    updateCellMark: this.apiCall<Location, { locationId: string }, { cellMark: string; reasonForChange?: string }>({
+      path: '/locations/residential/:locationId/cell-mark-change',
+      requestType: 'put',
+    }),
     updateSpecialistCellTypes: this.apiCall<Location, { locationId: string }, string[]>({
       path: '/locations/:locationId/specialist-cell-types',
       requestType: 'put',

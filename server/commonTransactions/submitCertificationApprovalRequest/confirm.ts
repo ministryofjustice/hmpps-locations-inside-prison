@@ -150,19 +150,30 @@ export default class Confirm extends FormInitialStep {
     const { prisonId } = res.locals.location
     const submittedBy = res.locals.user.name
 
-    let approvalType: string
-    if (req.form?.options?.name === 'change-door-number') {
-      approvalType = 'CELL_MARK'
+    let id = ''
+
+    const changeDoorNumber = req.sessionModel.get<{
+      doorNumber: string
+      reasonForChange: string
+    }>('changeDoorNumber')
+
+    if (changeDoorNumber) {
+      const { doorNumber, reasonForChange } = changeDoorNumber
+      const location = await locationsService.updateCellMark(systemToken, res.locals.locationId, {
+        cellMark: doorNumber,
+        reasonForChange,
+      })
+      id = location.pendingApprovalRequestId
     } else {
-      approvalType = 'DRAFT'
+      const certificationApprovalRequest = await locationsService.createCertificationRequestForLocation(
+        systemToken,
+        'DRAFT',
+        res.locals.locationId,
+      )
+      id = certificationApprovalRequest.id
     }
 
-    const certificationApprovalRequest = await locationsService.createCertificationRequestForLocation(
-      systemToken,
-      approvalType,
-      res.locals.locationId,
-    )
-    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequest.id}`
+    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${id}`
 
     const proposedSignedOpCapChange = req.sessionModel.get<{
       signedOperationalCapacity: number
