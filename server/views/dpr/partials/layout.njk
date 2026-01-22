@@ -1,0 +1,66 @@
+{% extends "govuk/template.njk" %}
+
+{% from "dpr/components/card-group/view.njk" import dprCardGroup %}
+
+{% block head %}
+  <link href="{{ '/assets/css/application.css' | assetMap }}" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  {% if feComponents.jsIncludes %}
+    {% for js in feComponents.jsIncludes %}
+      <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
+    {% endfor %}
+  {% endif %}
+
+  {% if feComponents.cssIncludes %}
+    {% for css in feComponents.cssIncludes %}
+      <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
+    {% endfor %}
+  {% endif %}
+{% endblock %}
+
+{% set pageTitle = applicationName + " - " + (title | default('Reports')) %}
+
+{% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
+
+{% block header %}
+  {% if feComponents.header %}
+    {{ feComponents.header | safe }}
+  {% else %}
+    {% include "./header.njk" %}
+  {% endif %}
+
+  {% include "./subheader.njk" %}
+{% endblock %}
+
+{% block bodyStart %}
+{% endblock %}
+
+{% block bodyEnd %}
+  <script type="module" src="{{ '/assets/js/index.js' | assetMap }}"></script>
+  {% if sentry and sentry.loaderScriptId %}
+    <script nonce="{{ cspNonce }}">
+      window.sentryOnLoad = function() {
+        Sentry.init({
+          release: "{{ sentry.release }}",
+          environment: "{{ sentry.environment }}",
+          tracesSampleRate: {{ sentry.tracesSampleRate }},
+          replaysSessionSampleRate: {{ sentry.replaySampleRate }},
+          replaysOnErrorSampleRate: {{ sentry.replayOnErrorSampleRate }},
+          initialScope: {
+            user: { username: "{{ user.username }}" },
+          },
+        });
+      };
+    </script>
+    <script src="https://js.sentry-cdn.com/{{ sentry.loaderScriptId }}.min.js" nonce="{{ cspNonce }}" crossorigin="anonymous"></script>
+  {% endif %}
+{% endblock %}
+
+{% block footer %}
+  {% if feComponents.footer %}
+    {{ feComponents.footer | safe }}
+  {% else %}
+    {% include "./footer.njk" %}
+  {% endif %}
+{% endblock %}

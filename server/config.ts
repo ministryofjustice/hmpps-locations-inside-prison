@@ -59,6 +59,9 @@ export default {
       CHANGE_REQUEST_SUBMITTED: '55fd714f-a553-4aeb-aa16-314c8ca9ee46',
     },
   },
+  dpr: {
+    dataProductDefinitionsPath: 'definitions/prisons/dps/locations',
+  },
   apis: {
     frontendComponents: {
       url: get('COMPONENT_API_URL', 'http://localhost:8082', requiredInProduction),
@@ -120,6 +123,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 5000))),
       enabled: get('TOKEN_VERIFICATION_ENABLED', 'false') === 'true',
+    },
+    dpr: {
+      url: get('DPR_API_URL', 'http://localhost:3002', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('DPR_API_TIMEOUT_RESPONSE', 60000)),
+        deadline: Number(get('DPR_API_TIMEOUT_DEADLINE', 60000)),
+      },
+      agent: new AgentConfig(Number(get('DPR_API_TIMEOUT_RESPONSE', 60000))),
     },
   },
   sqs: {

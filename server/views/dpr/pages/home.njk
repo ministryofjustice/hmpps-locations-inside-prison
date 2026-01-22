@@ -1,0 +1,31 @@
+{% extends "../partials/layout.njk" %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% from "dpr/components/_catalogue/catalogue/view.njk" import dprCatalogue %}
+{% from "dpr/components/user-reports/view.njk" import dprUserReports %}
+
+{% set pageTitle = applicationName + " - " + title %}
+
+{% block main %}
+<main class="dpr-home-wrapper app-container govuk-body" id="main-content">
+  <div class="dpr-heading-wrapper">
+    <div class="govuk-width-container">
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-1">{{ title }}</h1>
+      <a href='#reports-catalogue-section' class='govuk-body govuk-link govuk-link--no-visited-state'>Reports catalogue</a>
+    </div>
+  </div>
+
+  <div id="homepage-widget" class="dpr-reports-widget-wrapper">
+    <div class="govuk-width-container">
+      <h2 class="govuk-heading-m">My reports<h2>
+        {{ dprUserReports(userReportsLists)}}
+    </div>
+  </div>
+  
+
+  <div id="reports-catalogue-section" class="govuk-width-container govuk-!-padding-top-7">
+    {{ dprCatalogue(catalogue) }}
+  <div>
+</main>
+{% endblock %}

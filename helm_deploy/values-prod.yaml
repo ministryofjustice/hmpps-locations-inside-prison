@@ -18,6 +18,7 @@ generic-service:
     SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations.hmpps.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api.hmpps.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api.prison.service.justice.gov.uk"
+    DPR_API_URL: "https://digital-prison-reporting-mi-ui.hmpps.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
     FLAG_NON_RESI: disabled
 
