@@ -16,7 +16,7 @@ describe('Change door number', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   const decoratedResidentialSummaryMock: DeepPartial<any> = {
-    location: LocationFactory.build({ cellMark: 'A1-02' }),
+    location: LocationFactory.build({ cellMark: 'A1-02', status: 'DRAFT' }),
   }
 
   beforeEach(() => {
@@ -42,6 +42,7 @@ describe('Change door number', () => {
         set: jest.fn(),
         get: jest.fn(),
         reset: jest.fn(),
+        unset: jest.fn(),
       },
       journeyModel: {
         reset: jest.fn(),
@@ -142,24 +143,34 @@ describe('Change door number', () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalledWith(error)
     })
+
+    it('when active it calls super class saveValues', async () => {
+      deepRes.locals.decoratedResidentialSummary.location.status = 'ACTIVE'
+      const superSpy = jest.spyOn(Object.getPrototypeOf(controller), 'saveValues')
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(superSpy).toHaveBeenCalled()
+    })
   })
 
   describe('successHandler', () => {
     beforeEach(() => {
       deepReq.form.values.locationCode = 'WING5'
       deepRes.locals.decoratedResidentialSummary.location.locationType = 'Wing'
-      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+      deepRes.locals.decoratedResidentialSummary.location.status = 'DRAFT'
     })
 
     it('resets the journey model', () => {
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(deepReq.journeyModel.reset).toHaveBeenCalled()
     })
 
     it('resets the session model', () => {
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(deepReq.sessionModel.reset).toHaveBeenCalled()
     })
 
     it('sets the flash correctly', () => {
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(deepReq.flash).toHaveBeenCalledWith('success', {
         title: 'Cell door number changed',
         content: 'You have changed the door number for cell A-1-001.',
@@ -167,9 +178,17 @@ describe('Change door number', () => {
     })
 
     it('redirects to the view location page', () => {
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(deepRes.redirect).toHaveBeenCalledWith(
         '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
       )
+    })
+
+    it('when active it calls super class success handler', () => {
+      deepRes.locals.decoratedResidentialSummary.location.status = 'ACTIVE'
+      const superSpy = jest.spyOn(Object.getPrototypeOf(controller), 'successHandler')
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(superSpy).toHaveBeenCalled()
     })
   })
 })

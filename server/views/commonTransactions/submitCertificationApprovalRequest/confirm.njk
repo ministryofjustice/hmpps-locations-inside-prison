@@ -1,7 +1,9 @@
 {% extends "../../partials/formStep.njk" %}
 
 {% from '../../macros/certificationApprovalRequest.njk' import certificationApprovalRequest %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
+{% set isDraft = proposedCertificationApprovalRequests.length == 1 and proposedCertificationApprovalRequests[0].approvalType == 'DRAFT' %}
 {% block content %}
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
@@ -13,9 +15,11 @@
         <p>
           You will be unable to make changes to these locations while the request is being reviewed.
         </p>
-        {{ govukInsetText({
-          text: "New locations will change status from draft to inactive if approved."
-        }) }}
+        {% if isDraft %}
+          {{ govukInsetText({
+            text: "New locations will change status from draft to inactive if approved."
+          }) }}
+        {% endif %}
       </div>
 
       {% set i = 0 %}

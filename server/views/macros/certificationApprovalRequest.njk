@@ -1,3 +1,4 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
 {% from './certificationApprovalRequestSummary.njk' import certificationApprovalRequestSummary %}
@@ -38,6 +39,8 @@
     {% set changeType = 'Change signed operational capacity' %}
   {% elseif request.approvalType == 'DRAFT' %}
     {% set changeType = 'Add new locations to certificate' %}
+  {% elseif request.approvalType == 'CELL_MARK' %}
+    {% set changeType = 'Change cell door number' %}
   {% elseif request.approvalType == 'DEACTIVATION' %}
   {% elseif request.approvalType == 'REACTIVATION' %}
   {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
@@ -130,6 +133,59 @@
             firstCellIsHeader: true
           }) }}
         </div>
+      {% elseif request.approvalType == 'CELL_MARK' %}
+        <div class="govuk-grid-column-two-thirds">
+          {{ govukSummaryList({
+          rows:[
+            {
+              key: {
+                text: 'Location'
+              },
+              value: {
+                text: request.locations[0].pathHierarchy
+              }
+            },
+            {
+              key: {
+              text: 'Change type'
+            },
+              value: {
+                text: "Cell door number"
+              }
+            },
+              {
+                key: {
+                text: 'Explanation'
+              },
+                value: {
+                text: request.reasonForCellMarkChange
+              },
+                actions: {
+                items: [
+                  {
+                    href: '/location/' + request.locations[0].id + '/change-door-number/details',
+                    text: "Change",
+                    visuallyHiddenText: "reason",
+                    classes: "govuk-link--no-visited-state"}
+                ]
+              }
+              }
+            ]
+          }) }}
+          <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {{ govukTable({
+            head: [
+              { classes: 'govuk-table__cell', text: "Location" },
+              { text: "Door number" }
+            ],
+            rows:[[
+              { text: request.locations[0].pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
+              { text: request.locations[0].cellMark + " → " + request.cellMarkChange }
+            ]]
+          }) }}
+        </div>
+
+
       {% elseif request.approvalType == 'DEACTIVATION' %}
       {% elseif request.approvalType == 'REACTIVATION' %}
       {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
