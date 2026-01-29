@@ -16,7 +16,7 @@ function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
 }
 
 function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
-  return location.status === 'DRAFT' && req.canAccess('change_door_number')
+  return (location.active || location.status === 'DRAFT') && req.canAccess('change_door_number')
 }
 
 function showSanitationChangeLink(location: DecoratedLocation, req: Request) {

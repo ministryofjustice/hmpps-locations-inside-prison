@@ -1,5 +1,8 @@
 import FormWizard from 'hmpo-form-wizard'
 import Details from '../../controllers/changeDoorNumber/details'
+import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
+import capFirst from '../../formatters/capFirst'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -9,14 +12,33 @@ const steps: FormWizard.Steps = {
     reset: true,
     resetJourney: true,
     skip: true,
-    next: 'details',
+    next: [
+      {
+        fn: (_req, res) => res.locals.decoratedResidentialSummary.location.status !== 'DRAFT',
+        next: 'cert-change-disclaimer',
+      },
+      'details',
+    ],
   },
+  ...CertChangeDisclaimer.getSteps({
+    next: 'details',
+    title: (_req, _res) => `Changing cell door number`,
+    caption: (_req, res) => `${capFirst(res.locals.decoratedResidentialSummary.location.displayName)}`,
+  }),
   '/details': {
-    fields: ['doorNumber'],
+    fields: ['doorNumber', 'explanation'],
     controller: Details,
     template: '../../partials/formStep',
     pageTitle: 'Change door number',
+    next: [
+      {
+        fn: (_req, res) => res.locals.decoratedResidentialSummary.location.status !== 'DRAFT',
+        next: 'submit-certification-approval-request',
+      },
+      '#',
+    ],
   },
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 
 export default steps

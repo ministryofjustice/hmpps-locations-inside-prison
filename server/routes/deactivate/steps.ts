@@ -21,12 +21,6 @@ export function showCellCertChange(_req: FormWizard.Request, res: Response) {
   return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType === 'CELL'
 }
 
-export function showCertChangeDisclaimer(_req: FormWizard.Request, res: Response) {
-  const { prisonConfiguration, decoratedLocation } = res.locals
-
-  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType !== 'CELL'
-}
-
 function permanentDeactivationForbidden(req: FormWizard.Request, res: Response) {
   return !req.canAccess('deactivate:permanent')
 }
@@ -43,7 +37,6 @@ const steps: FormWizard.Steps = {
       { fn: isCellOccupied, next: 'occupied' },
       { fn: permanentDeactivationForbidden, next: 'temporary/details' },
       { fn: showCellCertChange, next: 'cell-cert-change' },
-      { fn: showCertChangeDisclaimer, next: 'cert-change-disclaimer' },
       'type',
     ],
   },
@@ -54,15 +47,7 @@ const steps: FormWizard.Steps = {
   },
   ...CertChangeDisclaimer.getSteps({
     next: 'temporary/details',
-    title: (_req, res) => {
-      const { decoratedLocation } = res.locals
-
-      if (!decoratedLocation.leafLevel) {
-        return `Deactivating a ${decoratedLocation.locationType.toLowerCase()}`
-      }
-
-      return `Decreasing certified working capacity`
-    },
+    title: (_req, _res) => `Decreasing certified working capacity`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
   '/type': {

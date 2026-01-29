@@ -138,9 +138,11 @@ describe('Confirm', () => {
     })
 
     it('creates certification request for signed op cap when present', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New location built',
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'proposedSignedOpCapChange') {
+          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
+        }
+        return undefined
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -180,9 +182,11 @@ describe('Confirm', () => {
     })
 
     it('sets flash success message for multiple change requests', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New location built',
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'proposedSignedOpCapChange') {
+          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
+        }
+        return undefined
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -197,6 +201,301 @@ describe('Confirm', () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
+  describe('saveValues - changeDoorNumber', () => {
+    beforeEach(() => {
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'changeDoorNumber') {
+          return { doorNumber: 'A1-02', reasonForChange: 'Need to change door number' }
+        }
+        return undefined
+      })
+      ;(deepRes.locals as any).locationId = 'loc-123'
+      locationsService.updateCellMark = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
+    })
+
+    it('updates cell mark with doorNumber and reason', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.updateCellMark).toHaveBeenCalledWith('token', 'loc-123', {
+        cellMark: 'A1-02',
+        reasonForChange: 'Need to change door number',
+      })
+    })
+
+    it('sends notifications using pendingApprovalRequestId', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        1,
+        notifyService,
+        ['certificate_reviewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
+        NotificationType.REQUEST_RECEIVED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        2,
+        notifyService,
+        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
+        NotificationType.REQUEST_SUBMITTED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+    })
+
+    it('sets single request flash message and redirects', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'Change request sent',
+        content: 'You have submitted a request to update the cell certificate.',
+      })
+      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
+  describe('locals', () => {
+    it('sets buttonText to Submit for approval', () => {
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect(result.buttonText).toBe('Submit for approval')
+    })
+
+    it('sets cancelText to Cancel', () => {
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect(result.cancelText).toBe('Cancel')
+    })
+  })
+
+  describe('generateRequests', () => {
+    beforeEach(() => {
+      deepRes.locals.location = {
+        id: 'some-uuid',
+        prisonId: 'MDI',
+        status: 'DRAFT',
+        leafLevel: true,
+        pathHierarchy: 'A-1-001',
+        certification: {
+          certifiedNormalAccommodation: 1,
+        },
+        capacity: {
+          maxCapacity: 1,
+          workingCapacity: 1,
+        },
+      } as any
+      deepReq.form = {
+        options: {
+          name: 'change-door-number',
+        },
+      } as any
+    })
+
+    it('adds DRAFT approval request when location status is DRAFT', async () => {
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'DRAFT',
+        }),
+      )
+    })
+
+    it('does not add DRAFT approval request when location status is not DRAFT', async () => {
+      deepRes.locals.location.status = 'ACTIVE'
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(
+        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'DRAFT'),
+      ).toHaveLength(0)
+    })
+
+    it('adds CELL_MARK approval request when form name is change-door-number', async () => {
+      deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
+        if (key === 'doorNumber') return 'A1-02'
+        if (key === 'explanation') return 'Need to change door number'
+        return undefined
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'CELL_MARK',
+          cellMarkChange: 'A1-02',
+          reasonForCellMarkChange: 'Need to change door number',
+        }),
+      )
+    })
+
+    it('does not add CELL_MARK approval request when form name is not change-door-number', async () => {
+      deepReq.form.options.name = 'other-form'
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(
+        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'CELL_MARK'),
+      ).toHaveLength(0)
+    })
+
+    it('adds SIGNED_OP_CAP approval request when proposedSignedOpCapChange exists', async () => {
+      deepReq.sessionModel.get = jest.fn().mockReturnValue({
+        signedOperationalCapacity: 550,
+        reasonForChange: 'New capacity',
+        prisonId: 'MDI',
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'SIGNED_OP_CAP',
+          signedOperationCapacityChange: expect.any(Number),
+          reasonForSignedOpChange: 'New capacity',
+        }),
+      )
+    })
+
+    it('sets correct title for single change request', async () => {
+      deepRes.locals.location.status = 'ACTIVE'
+      deepReq.sessionModel.get = jest.fn().mockReturnValue(undefined)
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.title).toBe('You are requesting a change to the cell certificate')
+    })
+
+    it('sets correct title for multiple change requests', async () => {
+      deepReq.sessionModel.get = jest.fn().mockReturnValue({
+        signedOperationalCapacity: 550,
+        reasonForChange: 'New capacity',
+        prisonId: 'MDI',
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.title).toContain('3 changes')
+    })
+
+    it('calls next when complete', async () => {
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(next).toHaveBeenCalled()
+    })
+  })
+
+  describe('locationToCertificationLocation - pendingChanges handling', () => {
+    const createBaseLocation = (pendingChanges?: any) => ({
+      id: 'loc-uuid',
+      code: 'A1',
+      pathHierarchy: 'A-1-001',
+      level: 1,
+      locationType: 'Cell',
+      leafLevel: true,
+      prisonId: 'MDI',
+      status: 'ACTIVE',
+      certification: {
+        certifiedNormalAccommodation: 1,
+      },
+      capacity: {
+        maxCapacity: 1,
+        workingCapacity: 1,
+      },
+      inCellSanitation: true,
+      cellMark: 'A1-01',
+      specialistCellTypes: ['SAFE_CUSTODY'],
+      accommodationTypes: ['SINGLE'],
+      usedFor: ['GENERAL_USE'],
+      parentId: 'parent-uuid',
+      ...(pendingChanges && { pendingChanges }),
+    })
+
+    beforeEach(() => {
+      deepReq.form = {
+        options: {
+          name: 'change-door-number',
+        },
+      } as any
+      deepReq.sessionModel.get = jest.fn().mockReturnValue(undefined)
+    })
+
+    it('uses pendingChanges.certifiedNormalAccommodation when defined', async () => {
+      deepRes.locals.location = createBaseLocation({ certifiedNormalAccommodation: 2 }) as any
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
+      expect(certLocation.certifiedNormalAccommodation).toBe(2)
+    })
+
+    it('uses current certification.certifiedNormalAccommodation when pendingChanges is undefined', async () => {
+      deepRes.locals.location = createBaseLocation() as any
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
+      expect(certLocation.certifiedNormalAccommodation).toBe(1)
+    })
+
+    it('uses pendingChanges.maxCapacity when defined', async () => {
+      deepRes.locals.location = createBaseLocation({ maxCapacity: 5 }) as any
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
+      expect(certLocation.maxCapacity).toBe(5)
+    })
+
+    it('uses current capacity.maxCapacity when pendingChanges is undefined', async () => {
+      deepRes.locals.location = createBaseLocation() as any
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
+      expect(certLocation.maxCapacity).toBe(1)
+    })
+
+    it('uses pendingChanges.workingCapacity when defined', async () => {
+      deepRes.locals.location = createBaseLocation({ workingCapacity: 3 }) as any
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
+      expect(certLocation.workingCapacity).toBe(3)
+    })
+
+    it('uses current capacity.workingCapacity when pendingChanges is undefined', async () => {
+      deepRes.locals.location = createBaseLocation() as any
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
+      expect(certLocation.workingCapacity).toBe(1)
+    })
+
+    it('uses all pendingChanges when all are defined', async () => {
+      deepRes.locals.location = createBaseLocation({
+        certifiedNormalAccommodation: 2,
+        maxCapacity: 5,
+        workingCapacity: 3,
+      }) as any
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
+      expect(certLocation.certifiedNormalAccommodation).toBe(2)
+      expect(certLocation.maxCapacity).toBe(5)
+      expect(certLocation.workingCapacity).toBe(3)
     })
   })
 })
