@@ -5,9 +5,6 @@ import ChangeDoorNumberPage from '../../pages/changeDoorNumber/details'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
-import CertificationApprovalRequestFactory from '../../../server/testutils/factories/certificationApprovalRequest'
-import LocationsApiStubber from '../../mockApis/locationsApi'
-import { CertificationApprovalRequest } from '../../../server/data/types/locationsApi/certificationApprovalRequest'
 
 context('Change door number', () => {
   const draftWing = LocationFactory.build({
