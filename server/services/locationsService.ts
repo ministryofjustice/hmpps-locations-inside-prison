@@ -124,7 +124,7 @@ export default class LocationsService {
     return [
       { key: 'DRAFT', description: 'Add new locations' },
       { key: 'SIGNED_OP_CAP', description: 'Change signed operational capacity' },
-      { key: 'CELL_MARK', description: 'Door number' },
+      { key: 'CELL_MARK', description: 'Cell door number' },
     ]
   }
 
