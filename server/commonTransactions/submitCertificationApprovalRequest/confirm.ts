@@ -120,6 +120,7 @@ export default class Confirm extends FormInitialStep {
         approvalType: 'CELL_MARK',
         locations: [await locationToCertificationLocation(req, locals.location)],
         reasonForCellMarkChange: explanation,
+        // FIXME currentCellMark: locals.location.cellMark,
         cellMarkChange: doorNumber,
       })
     }

@@ -56,6 +56,8 @@
           {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess) }}
         {% elseif decoratedResidentialSummary.location.status in ['DRAFT', 'LOCKED_DRAFT'] %}
           {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
+        {% elseif decoratedResidentialSummary.location.pendingChanges.cellMark %}
+            {# FIXME: banner, menu, buttons to remove. Should this be generic ?? #}
         {% endif %}
 
         {% if decoratedResidentialSummary.summaryCards | length %}

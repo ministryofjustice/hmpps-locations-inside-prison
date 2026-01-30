@@ -164,6 +164,7 @@ interface AllLocals {
       | 'currentSignedOperationCapacity'
       | 'reasonForCellMarkChange'
       | 'cellMarkChange'
+      | 'currentCellMark'
     >
   >[]
   recentlyViewedReports: StoredReportData[]
