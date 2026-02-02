@@ -38,6 +38,11 @@ describe('Confirm', () => {
     locationsService.createCertificationRequestForLocation.mockResolvedValue({ id: 'some-uuid' } as any)
 
     deepReq = {
+      form: {
+        options: {
+          name: '',
+        },
+      },
       session: {
         systemToken: 'token',
       },
@@ -206,10 +211,10 @@ describe('Confirm', () => {
 
   describe('saveValues - changeDoorNumber', () => {
     beforeEach(() => {
+      deepReq.form.options.name = 'change-door-number'
       ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
-        if (key === 'changeDoorNumber') {
-          return { doorNumber: 'A1-02', reasonForChange: 'Need to change door number' }
-        }
+        if (key === 'doorNumber') return 'A1-02'
+        if (key === 'explanation') return 'Need to change door number'
         return undefined
       })
       ;(deepRes.locals as any).locationId = 'loc-123'

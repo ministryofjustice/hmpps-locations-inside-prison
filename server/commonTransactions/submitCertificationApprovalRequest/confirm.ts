@@ -149,19 +149,16 @@ export default class Confirm extends FormInitialStep {
     const { prisonName } = res.locals.prisonResidentialSummary.prisonSummary
     const { prisonId } = res.locals.location
     const submittedBy = res.locals.user.name
+    const { options } = req.form
 
     let id = ''
 
-    const changeDoorNumber = req.sessionModel.get<{
-      doorNumber: string
-      reasonForChange: string
-    }>('changeDoorNumber')
-
-    if (changeDoorNumber) {
-      const { doorNumber, reasonForChange } = changeDoorNumber
+    if (options?.name === 'change-door-number') {
+      const doorNumber = req.sessionModel.get<string>('doorNumber')
+      const explanation = req.sessionModel.get<string>('explanation')
       const location = await locationsService.updateCellMark(systemToken, res.locals.locationId, {
         cellMark: doorNumber,
-        reasonForChange,
+        reasonForChange: explanation,
       })
       id = location.pendingApprovalRequestId
     } else {
