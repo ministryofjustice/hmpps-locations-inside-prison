@@ -1088,6 +1088,21 @@ const stubPatchLocation = (location: Partial<Location> = {}) =>
     },
   })
 
+const stubPutLocation = (location: Partial<Location> = {}) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/residential/[\\w-]+/cell-mark-change',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location,
+    },
+  })
+
 const stubUpdateLocationsConstantsUsedForType = () =>
   stubFor({
     request: {
@@ -1408,6 +1423,7 @@ const allStubs = {
   stubPrisonConfigurationResiActive,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
+  stubPutLocation,
   stubSignedOperationalCapacityGet,
   stubSignedOperationalCapacityGetNotFound,
   stubSignedOperationalCapacityUpdate,

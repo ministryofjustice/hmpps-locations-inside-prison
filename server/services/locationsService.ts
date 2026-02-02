@@ -124,6 +124,7 @@ export default class LocationsService {
     return [
       { key: 'DRAFT', description: 'Add new locations' },
       { key: 'SIGNED_OP_CAP', description: 'Change signed operational capacity' },
+      { key: 'CELL_MARK', description: 'Cell door number' },
     ]
   }
 
@@ -280,6 +281,14 @@ export default class LocationsService {
     capacities: { maxCapacity?: number; workingCapacity?: number; certifiedNormalAccommodation?: number },
   ) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, capacities)
+  }
+
+  async updateCellMark(
+    token: string,
+    locationId: string,
+    cellMarkChange: { cellMark: string; reasonForChange?: string },
+  ) {
+    return this.locationsApiClient.locations.updateCellMark(token, { locationId }, cellMarkChange)
   }
 
   async updateBulkCapacity(token: string, bulkCapacityUpdate: BulkCapacityUpdate) {
