@@ -16,15 +16,16 @@ export default class Review extends FormInitialStep {
     if (approvalRequest.locationId) {
       const location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
       res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
+      res.locals.location = location
     } else {
       res.locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
     }
 
-    // FIXME doesn't seem a correct way to do this. Also duplicated elsewhere
-    if (approvalRequest.approvalType === 'CELL_MARK') {
-      const location = await locationsService.getLocation(req.session.systemToken, approvalRequest.locationId)
-      res.locals.currentCellMark = location.cellMark
-    }
+    // FIXME doesn't seem a correct way to do this. Also duplicated elsewhere. Added above (line 19)
+    // if (approvalRequest.approvalType === 'CELL_MARK') {
+    //   const location = await locationsService.getLocation(req.session.systemToken, approvalRequest.locationId)
+    //   res.locals.currentCellMark = location.cellMark
+    // }
 
     res.locals.userMap = {
       [approvalRequest.requestedBy]:

@@ -29,6 +29,12 @@ export default async (req: Request, res: Response) => {
     locals.currentCellMark = location.cellMark
   }
 
+  // FIXME added for review of orignial location details i.e. cellMark
+  if (approvalRequest.locationId) {
+    const location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
+    res.locals.location = location
+  }
+
   if (approvalRequest.status === 'APPROVED') {
     locals.backLink = `/${prisonId}/cell-certificate/history`
   }
