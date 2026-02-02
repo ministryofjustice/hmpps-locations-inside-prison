@@ -6,6 +6,8 @@
     {% set changeType = 'Change signed operational capacity' %}
   {% elseif request.approvalType == 'DRAFT' %}
     {% set changeType = 'Add new locations to certificate' %}
+  {% elseif request.approvalType == 'CELL_MARK' %}
+    {% set changeType = 'Cell door number' %}
   {% elseif request.approvalType == 'DEACTIVATION' %}
   {% elseif request.approvalType == 'REACTIVATION' %}
   {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
@@ -38,6 +40,10 @@
         key: { text: 'Explanation' },
         value: { text: request.reasonForSignedOpChange }
       } if request.approvalType == 'SIGNED_OP_CAP',
+      {
+        key: { text: 'Explanation' },
+        value: { text: request.reasonForChange }
+      } if request.approvalType == 'CELL_MARK',
       {
         key: { text: 'Submitted on' },
         value: { text: request.requestedDate | formatDateWithTime }

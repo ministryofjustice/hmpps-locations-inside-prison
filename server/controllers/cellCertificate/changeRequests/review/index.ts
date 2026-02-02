@@ -16,6 +16,7 @@ export default class Review extends FormInitialStep {
     if (approvalRequest.locationId) {
       const location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
       res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
+      res.locals.location = location
     } else {
       res.locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
     }
