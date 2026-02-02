@@ -24,6 +24,11 @@ export default async (req: Request, res: Response) => {
     await getPrisonResidentialSummary(req, res, null)
   }
 
+  if (approvalRequest.approvalType === 'CELL_MARK') {
+    const location = await locationsService.getLocation(req.session.systemToken, approvalRequest.locationId)
+    locals.currentCellMark = location.cellMark
+  }
+
   if (approvalRequest.status === 'APPROVED') {
     locals.backLink = `/${prisonId}/cell-certificate/history`
   }

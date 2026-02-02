@@ -91,6 +91,7 @@ interface AllLocals {
   cspNonce: string
   csrfToken: string
   currentSignedOperationalCapacity: number
+  currentCellMark: string
   deactivationReason: string
   decoratedCell: DecoratedLocation
   decoratedCells: DecoratedLocation[]

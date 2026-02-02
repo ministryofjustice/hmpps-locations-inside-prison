@@ -20,6 +20,12 @@ export default class Review extends FormInitialStep {
       res.locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
     }
 
+    // FIXME doesn't seem a correct way to do this. Also duplicated elsewhere
+    if (approvalRequest.approvalType === 'CELL_MARK') {
+      const location = await locationsService.getLocation(req.session.systemToken, approvalRequest.locationId)
+      res.locals.currentCellMark = location.cellMark
+    }
+
     res.locals.userMap = {
       [approvalRequest.requestedBy]:
         (await manageUsersService.getUser(user.token, approvalRequest.requestedBy))?.name ||
