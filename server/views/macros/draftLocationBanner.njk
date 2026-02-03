@@ -12,8 +12,9 @@
   {% set bannerHtml %}
     <h3 class="govuk-heading-m">{{ locationName }} in draft</h3>
     <p>
-      This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
-
+      {% if location.id != topLevelDraftLocation.id %}
+        This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
+      {% endif %}
       {% if topLevelDraftLocation.numberOfCellLocations == 0 %}
         You can add the {{ topLevelDraftLocation.locationType | lower }} to the cell certificate once cells have been created.
         You can activate the {{ locationType }} once it is on the cell certificate.
