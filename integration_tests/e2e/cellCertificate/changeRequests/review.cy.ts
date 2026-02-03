@@ -142,5 +142,32 @@ context('Cell Certificate - Change Requests - Review', () => {
         testGovukTable('cap-change-table', [['TST', '5 → 9']])
       })
     })
+
+    context('When the approvalType is CELL_MARK', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'CELL_MARK',
+          }),
+        )
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('h1').should('contain', 'Review cell door number request')
+
+        testGovukSummaryList('overview-list', [
+          ['Location', 'A'],
+          ['Change type', 'Cell door number'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('cell-mark-change-table', [['A', 'A-1 → A-1x']])
+      })
+    })
   })
 })

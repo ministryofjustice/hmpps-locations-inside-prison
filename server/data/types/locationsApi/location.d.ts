@@ -25,6 +25,8 @@ export declare interface Location {
     maxCapacity?: number
     workingCapacity?: number
     certifiedNormalAccommodation?: number
+    cellMark?: string
+    inCellSanitation?: boolean
   }
   attributes: string[]
   usage: {

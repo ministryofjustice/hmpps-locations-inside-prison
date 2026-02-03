@@ -34,16 +34,26 @@ export default async function populateCertificationRequestDetails(
     }
   }
 
+  const getChangeType = (approvalType: string): string => {
+    switch (approvalType) {
+      case 'DRAFT':
+        return 'Add new locations to certificate'
+      case 'CELL_MARK':
+        return 'Cell door number'
+      case 'SIGNED_OP_CAP':
+        return 'Change signed operational capacity'
+      default:
+        return approvalType
+    }
+  }
+
   // set notification details
   res.locals.notificationDetails = {
     ...res.locals.notificationDetails,
     requestedDate: approvalRequest.requestedDate,
     locationKey: approvalRequest.locationKey,
     locationName: approvalRequest.locationKey ? approvalRequest.locationKey.replace(`${prisonId}-`, '') : prisonId,
-    changeType:
-      approvalRequest.approvalType === 'DRAFT'
-        ? 'Add new locations to certificate'
-        : 'Change signed operational capacity',
+    changeType: getChangeType(approvalRequest.approvalType),
   }
 
   return next()
