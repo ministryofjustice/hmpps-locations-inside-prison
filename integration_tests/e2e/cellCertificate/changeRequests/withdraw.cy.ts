@@ -39,5 +39,35 @@ context('Cell Certificate - Change Requests - Withdraw', () => {
         )
       })
     })
+
+    context('When the approvalType is CELL_MARK', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'CELL_MARK',
+          }),
+        )
+        LocationsApiStubber.stub.stubLocationsCertificationLocationWithdraw()
+
+        CellCertificateChangeRequestsWithdrawPage.goTo('id1')
+        withdrawPage = Page.verifyOnPage(CellCertificateChangeRequestsWithdrawPage)
+      })
+
+      it('Displays an error when no explanation is entered', () => {
+        withdrawPage.submit({})
+        Page.checkForError('explanation', 'Explain why you are withdrawing this request')
+      })
+
+      it('Redirects to change requests and displays a banner', () => {
+        withdrawPage.submit({ explanation: 'Not good enough' })
+
+        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
+        cy.get('#govuk-notification-banner-title').contains('Success')
+        cy.get('.govuk-notification-banner__content h3').contains('Change request withdrawn')
+        cy.get('.govuk-notification-banner__content p').contains(
+          'You have withdrawn the change request for cell A-1-001.',
+        )
+      })
+    })
   })
 })

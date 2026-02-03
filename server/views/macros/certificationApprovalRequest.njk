@@ -135,56 +135,72 @@
         </div>
       {% elseif request.approvalType == 'CELL_MARK' %}
         <div class="govuk-grid-column-two-thirds">
-          {{ govukSummaryList({
-          rows:[
-            {
-              key: {
-                text: 'Location'
-              },
-              value: {
-                text: request.locations[0].pathHierarchy
-              }
-            },
-            {
-              key: {
-              text: 'Change type'
-            },
-              value: {
-                text: "Cell door number"
-              }
-            },
+          {% if request.status != 'PENDING' %}
+            {{ govukSummaryList({
+            rows:[
               {
                 key: {
-                text: 'Explanation'
+                  text: 'Location'
+                },
+                value: {
+                  text: request.locations[0].pathHierarchy
+                }
+              },
+              {
+                key: {
+                text: 'Change type'
               },
                 value: {
-                text: request.reasonForCellMarkChange
+                  text: "Cell door number"
+                }
               },
-                actions: {
-                items: [
-                  {
-                    href: '/location/' + request.locations[0].id + '/change-door-number/details',
-                    text: "Change",
-                    visuallyHiddenText: "reason",
-                    classes: "govuk-link--no-visited-state"}
-                ]
-              }
-              }
-            ]
-          }) }}
-          <h2 class="govuk-heading-s">Proposed changes to the certificate</h2>
-          {{ govukTable({
-            head: [
-              { classes: 'govuk-table__cell', text: "Location" },
-              { text: "Door number" }
-            ],
-            rows:[[
-              { text: request.locations[0].pathHierarchy },
-              { text: request.locations[0].cellMark + " → " + request.cellMarkChange }
-            ]]
-          }) }}
+                {
+                  key: {
+                  text: 'Explanation'
+                },
+                  value: {
+                  text: request.reasonForCellMarkChange
+                },
+                  actions: {
+                  items: [
+                    {
+                      href: '/location/' + request.locations[0].id + '/change-door-number/details',
+                      text: "Change",
+                      visuallyHiddenText: "reason",
+                      classes: "govuk-link--no-visited-state"}
+                  ]
+                }
+                }
+              ]
+            }) }}
+            <h2 class="govuk-heading-s">Proposed changes to the certificate</h2>
+            {{ govukTable({
+              head: [
+                { classes: 'govuk-table__cell', text: "Location" },
+                { text: "Door number" }
+              ],
+              rows:[[
+                { text: request.locations[0].pathHierarchy },
+                { text: request.locations[0].cellMark + " → " + request.cellMarkChange }
+              ]]
+            }) }}
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+            {{ govukTable({
+              attributes: {
+                'data-qa': 'cell-mark-change-table'
+              },
+              head: [
+                { classes: 'govuk-table__cell', text: "Location" },
+                { text: "Door number" }
+              ],
+              rows:[[
+                { text: request.locations[0].pathHierarchy },
+                { text: request.currentCellMark + " → " + request.cellMark }
+              ]]
+            }) }}
+          {% endif %}
         </div>
-
 
       {% elseif request.approvalType == 'DEACTIVATION' %}
       {% elseif request.approvalType == 'REACTIVATION' %}
