@@ -57,7 +57,7 @@
           {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess) }}
         {% elseif decoratedResidentialSummary.location.status in ['DRAFT'] %}
           {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
-        {% elseif decoratedResidentialSummary.location.status in ['LOCKED_ACTIVE','LOCKED_DRAFT'] %}
+        {% elseif decoratedResidentialSummary.location.status.startsWith('LOCKED_') %}
           {{ lockedLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
         {% endif %}
 
