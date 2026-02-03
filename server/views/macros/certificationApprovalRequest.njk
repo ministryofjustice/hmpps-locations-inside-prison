@@ -187,6 +187,9 @@
           {% else %}
             <h2 class="govuk-heading-s">Proposed changes to the certificate</h2>
             {{ govukTable({
+              attributes: {
+                'data-qa': 'cell-mark-change-table'
+              },
               head: [
                 { classes: 'govuk-table__cell', text: "Location" },
                 { text: "Door number" }

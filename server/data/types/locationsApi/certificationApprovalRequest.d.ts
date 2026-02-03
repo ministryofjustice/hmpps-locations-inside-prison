@@ -19,5 +19,6 @@ export declare interface CertificationApprovalRequest {
   cellMark: string
   currentCellMark: string
   reasonForSignedOpChange: string
+  reasonForChange: string
   locations: CertificateLocation[]
 }
