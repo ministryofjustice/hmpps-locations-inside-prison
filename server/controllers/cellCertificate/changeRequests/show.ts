@@ -42,7 +42,6 @@ export default async (req: Request, res: Response) => {
   if (approvalRequest.locationId) {
     const location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
     locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
-    res.locals.location = location
   } else {
     locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
   }

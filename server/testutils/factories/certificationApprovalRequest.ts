@@ -23,6 +23,7 @@ const CertificationApprovalRequestFactory = Factory.define<CertificationApproval
     currentSignedOperationCapacity: 5,
     certificateId: 'some-certificate-uuid',
     cellMark: 'Some cell mark',
+    currentCellMark: 'Some current cell mark',
     reasonForSignedOpChange: 'Needed to change it',
     locations: [
       CertificateLocationFactory.build({

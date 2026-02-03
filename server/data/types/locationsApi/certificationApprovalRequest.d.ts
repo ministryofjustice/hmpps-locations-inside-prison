@@ -17,6 +17,7 @@ export declare interface CertificationApprovalRequest {
   currentSignedOperationCapacity: number
   certificateId: string
   cellMark: string
+  currentCellMark: string
   reasonForSignedOpChange: string
   locations: CertificateLocation[]
 }

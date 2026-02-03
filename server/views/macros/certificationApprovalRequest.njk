@@ -34,7 +34,7 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro certificationApprovalRequest(request, multiple, index, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, includeChangeSummary, location) %}
+{% macro certificationApprovalRequest(request, multiple, index, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, includeChangeSummary) %}
   {% if request.approvalType == 'SIGNED_OP_CAP' %}
     {% set changeType = 'Change signed operational capacity' %}
   {% elseif request.approvalType == 'DRAFT' %}
@@ -193,7 +193,7 @@
               ],
               rows:[[
                 { text: request.locations[0].pathHierarchy },
-                { text: location.cellMark + " → " + request.cellMark }
+                { text: request.currentCellMark + " → " + request.cellMark }
               ]]
             }) }}
           {% endif %}

@@ -5,38 +5,20 @@
 {% macro draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) %}
   {% set topLevelDraftLocation = topLevelDraftLocationSummary.parentLocation %}
   {% set location = decoratedResidentialSummary.location %}
-  {% set isLockedDraft = location.pendingApprovalRequestId or location.status == 'LOCKED_DRAFT' %}
   {% set locationName = location.displayName | capFirst %}
   {% set locationType = location.locationType | lower %}
-  {% set panelColour = isLockedDraft and 'purple' or 'orange' %}
+  {% set panelColour = 'orange' %}
 
   {% set bannerHtml %}
-    {% if isLockedDraft %}
-      <div class="moj-ticket-panel__wrapper"><h3 class="govuk-heading-m govuk-!-margin-bottom-0 govuk-!-margin-right-2">Cell certificate change requested for this location</h3>{{ govukTag({
-      text: 'Change requested',
-      classes: "govuk-tag--purple govuk-\!-float-right",
-      attributes: {
-        "data-qa": "change-requested"
-      }
-    }) }}</div>
-    {% else %}
-      <h3 class="govuk-heading-m">{{ locationName }} in draft</h3>
-    {% endif %}
-
+    <h3 class="govuk-heading-m">{{ locationName }} in draft</h3>
     <p>
-      {% if isLockedDraft %}
-        A change to this location on the cell certificate has been requested. You are unable to make any changes to this location until the request has been reviewed by the authorising director.
-      {% elseif location.id != topLevelDraftLocation.id %}
-        This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
-      {% endif %}
+      This location is part of a draft {{ topLevelDraftLocation.locationType | lower }}.
 
-      {% if not isLockedDraft %}
-        {% if topLevelDraftLocation.numberOfCellLocations == 0 %}
-          You can add the {{ topLevelDraftLocation.locationType | lower }} to the cell certificate once cells have been created.
-          You can activate the {{ locationType }} once it is on the cell certificate.
-        {% else %}
-          The {{ topLevelDraftLocation.locationType | lower }} must be added to the cell certificate before cells in the {{ topLevelDraftLocation.locationType | lower }} can be activated and used.
-        {% endif %}
+      {% if topLevelDraftLocation.numberOfCellLocations == 0 %}
+        You can add the {{ topLevelDraftLocation.locationType | lower }} to the cell certificate once cells have been created.
+        You can activate the {{ locationType }} once it is on the cell certificate.
+      {% else %}
+        The {{ topLevelDraftLocation.locationType | lower }} must be added to the cell certificate before cells in the {{ topLevelDraftLocation.locationType | lower }} can be activated and used.
       {% endif %}
     </p>
 
@@ -47,20 +29,6 @@
         href: "/location/" + topLevelDraftLocation.id + "/add-to-certificate",
         attributes: {
           'data-qa': 'add-to-cell-certificate'
-        }
-      }) }}
-    {% endif %}
-    {% if isLockedDraft %}
-      {% set viewRequestUrl = "/" + location.prisonId + "/cell-certificate/change-requests/" + (location.pendingApprovalRequestId or '') %}
-      {% if canAccess('certificate_change_request_review') %}
-        {% set viewRequestUrl = viewRequestUrl + '/review' %}
-      {% endif %}
-      {{ govukButton({
-        text: "View request details",
-        preventDoubleClick: true,
-        href: viewRequestUrl,
-        attributes: {
-          'data-qa': 'view-request-details'
         }
       }) }}
     {% endif %}
