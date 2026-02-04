@@ -1,7 +1,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% macro certificationApprovalRequestSummary(request, userMap, locationMap, constants, showWithdraw, showStatus) %}
+{% macro certificationApprovalRequestSummary(request, userMap, locationMap, constants, showWithdraw, showStatus, changeLinks) %}
   {% set changeType = approvalTypeDescription(request.approvalType, constants, locationMap[request.locationId]) %}
 
   {% if request.approvalType == 'DEACTIVATION' %}
@@ -36,19 +36,47 @@
       },
       {
         key: { text: 'Reason' },
-        value: { text: formattedDeactivationReason }
+        value: { text: formattedDeactivationReason },
+        actions: {
+          items: [{
+            href: changeLinks.deactivatedReason,
+            text: 'Change',
+            classes: 'govuk-link--no-visited-state'
+          }] if changeLinks.deactivatedReason
+        }
       } if formattedDeactivationReason,
       {
         key: { text: 'Estimated reactivation date' },
-        value: { text: request.proposedReactivationDate | formatDate }
+        value: { text: request.proposedReactivationDate | formatDate },
+        actions: {
+        items: [{
+          href: changeLinks.proposedReactivationDate,
+          text: 'Change',
+          classes: 'govuk-link--no-visited-state'
+        }] if changeLinks.proposedReactivationDate
+      }
       } if request.proposedReactivationDate,
       {
         key: { text: 'Facilities reference number' },
-        value: { text: request.planetFmReference }
+        value: { text: request.planetFmReference },
+        actions: {
+        items: [{
+          href: changeLinks.planetFmReference,
+          text: 'Change',
+          classes: 'govuk-link--no-visited-state'
+        }] if changeLinks.planetFmReference
+      }
       } if request.planetFmReference,
       {
         key: { text: 'Explanation' },
-        value: { html: request.reasonForChange.replaceAll('<', '&lt;').replaceAll('\n', '<br>') }
+        value: { html: request.reasonForChange.replaceAll('<', '&lt;').replaceAll('\n', '<br>') },
+        actions: {
+        items: [{
+          href: changeLinks.reasonForChange,
+          text: 'Change',
+          classes: 'govuk-link--no-visited-state'
+        }] if changeLinks.reasonForChange
+      }
       } if request.reasonForChange,
       {
         key: { text: 'Submitted on' },

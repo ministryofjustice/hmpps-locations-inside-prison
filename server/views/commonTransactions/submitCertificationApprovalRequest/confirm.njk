@@ -23,7 +23,7 @@
 
       {% set i = 0 %}
       {% for request in proposedCertificationApprovalRequests %}
-        {{ certificationApprovalRequest(request, proposedCertificationApprovalRequests.length > 1, i, prisonResidentialSummary, true, constants, locationMap) }}
+        {{ certificationApprovalRequest(request, proposedCertificationApprovalRequests.length > 1, i, prisonResidentialSummary, true, constants, locationMap, changeLinks) }}
         {% set i = i + 1 %}
       {% endfor %}
     </div>

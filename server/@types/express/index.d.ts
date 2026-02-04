@@ -68,6 +68,7 @@ interface AllLocals {
   cancelClasses: string
   cancelLink: string
   cancelText: string
+  changeLinks: { [field: string]: string }
   resiCards: card[]
   nonResiCards: card[]
   cell: Location

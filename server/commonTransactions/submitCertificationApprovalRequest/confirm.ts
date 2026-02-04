@@ -138,6 +138,14 @@ export default class Confirm extends FormInitialStep {
           })),
         ],
       })
+
+      const changeLink = `/location/${locals.location.id}/deactivate/temporary/details/edit`
+      locals.changeLinks = {
+        deactivatedReason: changeLink,
+        proposedReactivationDate: changeLink,
+        planetFmReference: changeLink,
+        reasonForChange: changeLink,
+      }
     } else if (req.form.options.name === 'add-to-certificate') {
       proposedCertificationApprovalRequests.push({
         approvalType: 'DRAFT',
@@ -148,11 +156,18 @@ export default class Confirm extends FormInitialStep {
       const explanation = sessionModel.get<string>('explanation')
       proposedCertificationApprovalRequests.push({
         approvalType: 'CELL_MARK',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
         locations: [await locationToCertificationLocation(req, locals.location)],
         reasonForChange: explanation,
         currentCellMark: locals.location.cellMark,
         cellMark: doorNumber,
       })
+
+      const changeLink = `/location/${locals.location.id}/change-door-number/details/edit`
+      locals.changeLinks = {
+        reasonForChange: changeLink,
+      }
     }
 
     if (proposedSignedOpCapChange) {
