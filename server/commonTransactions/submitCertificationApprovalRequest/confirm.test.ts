@@ -6,6 +6,7 @@ import NotificationService, { NotificationType, notificationGroups } from '../..
 import LocationsService from '../../services/locationsService'
 import Confirm from './confirm'
 import * as notificationHelpers from '../../utils/notificationHelpers'
+import LocationFactory from '../../testutils/factories/location'
 
 jest.mock('../../utils/notificationHelpers')
 jest.mock('../../middleware/getPrisonResidentialSummary')
@@ -40,7 +41,7 @@ describe('Confirm', () => {
     deepReq = {
       form: {
         options: {
-          name: '',
+          name: 'add-to-certificate',
         },
       },
       session: {
@@ -62,11 +63,11 @@ describe('Confirm', () => {
     }
     deepRes = {
       locals: {
-        location: {
+        location: LocationFactory.build({
           id: 'some-uuid',
           prisonId: 'MDI',
           leafLevel: true,
-        },
+        }),
         prisonResidentialSummary: {
           prisonSummary: {
             prisonName: 'Moorland (HMP & YOI)',
@@ -270,6 +271,116 @@ describe('Confirm', () => {
     })
   })
 
+  describe('deactivate form', () => {
+    beforeEach(() => {
+      deepReq.form.options.name = 'deactivate'
+      deepReq.sessionModel.get = jest.fn().mockImplementation(
+        (key: string) =>
+          ({
+            deactivationReason: 'OTHER',
+            deactivationReasonOther: 'Unidentified energy signature detected',
+            facilitiesManagementReference: '12345678',
+            mandatoryEstimatedReactivationDate: '2027-01-10',
+            workingCapacityExplanation: 'Future cell integrity uncertain',
+          })[key],
+      )
+    })
+
+    describe('generateRequests', () => {
+      it('adds DEACTIVATE approval request when form name is deactivate', async () => {
+        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+          expect.objectContaining({
+            approvalType: 'DEACTIVATION',
+            deactivatedReason: 'OTHER',
+            deactivationReasonDescription: 'Unidentified energy signature detected',
+            proposedReactivationDate: '2027-01-10',
+            reasonForChange: 'Future cell integrity uncertain',
+          }),
+        )
+
+        expect(deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]).toEqual(
+          expect.objectContaining({
+            workingCapacity: 0,
+            currentWorkingCapacity: 2,
+          }),
+        )
+      })
+
+      it('does not add DEACTIVATION approval request when form name is not deactivate', async () => {
+        deepReq.form.options.name = 'other-form'
+
+        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(
+          deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'DEACTIVATION'),
+        ).toHaveLength(0)
+      })
+    })
+
+    describe('saveValues', () => {
+      beforeEach(() => {
+        ;(deepRes.locals as any).locationId = 'loc-123'
+        locationsService.deactivateTemporary = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
+      })
+
+      it('deactivates the cell', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
+          'token',
+          'loc-123',
+          'OTHER',
+          'Unidentified energy signature detected',
+          '2027-01-10',
+          '12345678',
+          true,
+          'Future cell integrity uncertain',
+        )
+      })
+
+      it('sends notifications using pendingApprovalRequestId', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+          1,
+          notifyService,
+          ['certificate_reviewer@test.com'],
+          'Moorland (HMP & YOI)',
+          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
+          NotificationType.REQUEST_RECEIVED,
+          undefined,
+          undefined,
+          undefined,
+          'Joe Submitter',
+        )
+
+        expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+          2,
+          notifyService,
+          ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+          'Moorland (HMP & YOI)',
+          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
+          NotificationType.REQUEST_SUBMITTED,
+          undefined,
+          undefined,
+          undefined,
+          'Joe Submitter',
+        )
+      })
+
+      it('sets single request flash message and redirects', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(deepReq.flash).toHaveBeenCalledWith('success', {
+          title: 'Change request sent',
+          content: 'You have submitted a request to update the cell certificate.',
+        })
+        expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+      })
+    })
+  })
+
   describe('locals', () => {
     it('sets buttonText to Submit for approval', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
@@ -284,7 +395,7 @@ describe('Confirm', () => {
 
   describe('generateRequests', () => {
     beforeEach(() => {
-      deepRes.locals.location = {
+      deepRes.locals.location = LocationFactory.build({
         id: 'some-uuid',
         prisonId: 'MDI',
         status: 'DRAFT',
@@ -297,15 +408,17 @@ describe('Confirm', () => {
           maxCapacity: 1,
           workingCapacity: 1,
         },
-      } as any
+        cellMark: 'A1-01',
+      })
       deepReq.form = {
         options: {
-          name: 'change-door-number',
+          name: '',
         },
       } as any
     })
 
-    it('adds DRAFT approval request when location status is DRAFT', async () => {
+    it('adds DRAFT approval request when form name is add-to-certificate', async () => {
+      deepReq.form.options.name = 'add-to-certificate'
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
@@ -315,8 +428,8 @@ describe('Confirm', () => {
       )
     })
 
-    it('does not add DRAFT approval request when location status is not DRAFT', async () => {
-      deepRes.locals.location.status = 'ACTIVE'
+    it('does not add DRAFT approval request when form name is not add-to-certificate', async () => {
+      deepReq.form.options.name = 'other-form'
 
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
@@ -326,6 +439,7 @@ describe('Confirm', () => {
     })
 
     it('adds CELL_MARK approval request when form name is change-door-number', async () => {
+      deepReq.form.options.name = 'change-door-number'
       deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
         if (key === 'doorNumber') return 'A1-02'
         if (key === 'explanation') return 'Need to change door number'
@@ -337,8 +451,9 @@ describe('Confirm', () => {
       expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
         expect.objectContaining({
           approvalType: 'CELL_MARK',
-          cellMarkChange: 'A1-02',
-          reasonForCellMarkChange: 'Need to change door number',
+          currentCellMark: 'A1-01',
+          cellMark: 'A1-02',
+          reasonForChange: 'Need to change door number',
         }),
       )
     })
@@ -366,7 +481,7 @@ describe('Confirm', () => {
         expect.objectContaining({
           approvalType: 'SIGNED_OP_CAP',
           signedOperationCapacityChange: expect.any(Number),
-          reasonForSignedOpChange: 'New capacity',
+          reasonForChange: 'New capacity',
         }),
       )
     })
@@ -381,6 +496,7 @@ describe('Confirm', () => {
     })
 
     it('sets correct title for multiple change requests', async () => {
+      deepReq.form.options.name = 'add-to-certificate'
       deepReq.sessionModel.get = jest.fn().mockReturnValue({
         signedOperationalCapacity: 550,
         reasonForChange: 'New capacity',
@@ -389,7 +505,7 @@ describe('Confirm', () => {
 
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepRes.locals.title).toContain('3 changes')
+      expect(deepRes.locals.title).toContain('2 changes')
     })
 
     it('calls next when complete', async () => {

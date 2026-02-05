@@ -22,6 +22,9 @@ export default class DeactivateTemporaryDetailsPage extends Page {
 
   estimatedReactivationDateYearText = (): PageElement => cy.get('#estimatedReactivationDate-year')
 
+  reasonDescriptionText = (value: string): PageElement =>
+    cy.get(`input[type="text"][id^="deactivationReason"][id$="-${value}"]`)
+
   mandatoryEstimatedReactivationDateDayText = (): PageElement => cy.get('#mandatoryEstimatedReactivationDate-day')
 
   mandatoryEstimatedReactivationDateMonthText = (): PageElement => cy.get('#mandatoryEstimatedReactivationDate-month')
@@ -42,6 +45,7 @@ export default class DeactivateTemporaryDetailsPage extends Page {
 
   submit = ({
     reason,
+    reasonDescription,
     day,
     month,
     year,
@@ -49,6 +53,7 @@ export default class DeactivateTemporaryDetailsPage extends Page {
     explanation,
   }: {
     reason?: string
+    reasonDescription?: string
     day?: string
     month?: string
     year?: string
@@ -57,6 +62,11 @@ export default class DeactivateTemporaryDetailsPage extends Page {
   }) => {
     if (reason !== undefined) {
       this.reasonRadioItem(reason).check()
+
+      this.reasonDescriptionText(reason).clear()
+      if (reasonDescription !== undefined) {
+        this.reasonDescriptionText(reason).type(reasonDescription)
+      }
     }
 
     this.mandatoryEstimatedReactivationDateDayText().clear()

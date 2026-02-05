@@ -102,7 +102,7 @@ context('Add To Certificate - Submit Certification Approval Request', () => {
         page.submit({})
 
         Page.checkForError(
-          'submit-certification-approval-request_cellsMeetStandards',
+          'submit-certification-approval-request_confirmation',
           'Confirm that the cells meet the certification standards',
         )
       })
@@ -142,7 +142,7 @@ context('Add To Certificate - Submit Certification Approval Request', () => {
         page.submit({})
 
         Page.checkForError(
-          'submit-certification-approval-request_cellsMeetStandards',
+          'submit-certification-approval-request_confirmation',
           'Confirm that the cells meet the certification standards',
         )
       })

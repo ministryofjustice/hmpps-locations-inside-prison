@@ -1,10 +1,11 @@
 import { Request, Response } from 'express'
 import { TypedLocals } from '../../@types/express'
+import addUsersToUserMap from '../../middleware/addUsersToUserMap'
 
 export default async (req: Request, res: Response) => {
-  const { locationsService, manageUsersService } = req.services
+  const { locationsService } = req.services
   const { systemToken } = req.session
-  const { prisonResidentialSummary, prisonId, user } = res.locals
+  const { prisonResidentialSummary, prisonId } = res.locals
   const locals: TypedLocals = {
     title: 'Cell certificate',
     titleCaption: prisonResidentialSummary.prisonSummary.prisonName,
@@ -22,11 +23,7 @@ export default async (req: Request, res: Response) => {
   try {
     locals.certificate = await locationsService.getCurrentCellCertificate(systemToken, prisonId)
 
-    locals.userMap = {
-      [locals.certificate.approvedBy]:
-        (await manageUsersService.getUser(user.token, locals.certificate.approvedBy))?.name ||
-        locals.certificate.approvedBy,
-    }
+    await addUsersToUserMap([locals.certificate.approvedBy])(req, res, null)
   } catch (e) {
     if (!e.data?.userMessage?.startsWith('Cell certificate not found')) {
       throw e

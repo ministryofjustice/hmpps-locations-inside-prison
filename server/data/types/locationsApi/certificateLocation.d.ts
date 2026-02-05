@@ -6,6 +6,9 @@ export declare interface CertificateLocation {
   certifiedNormalAccommodation: number
   workingCapacity: number
   maxCapacity: number
+  currentCertifiedNormalAccommodation: number
+  currentWorkingCapacity: number
+  currentMaxCapacity: number
   locationType: LocationType
   subLocations: CertificateLocation[]
   inCellSanitation?: boolean

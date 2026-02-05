@@ -5,7 +5,7 @@ export default class CellCertificateChangeRequestsApprovePage extends Page {
     super('You are about to approve a change to the cell certificate')
   }
 
-  confirmCheckbox = (): PageElement => cy.get(`input[name="cellsMeetStandards"][type="checkbox"]`)
+  confirmCheckbox = (): PageElement => cy.get(`input[name="confirmation"][type="checkbox"]`)
 
   confirmButton = (): PageElement => cy.get('button:contains("Update cell certificate")')
 

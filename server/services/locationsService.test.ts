@@ -103,6 +103,8 @@ describe('Locations service', () => {
           deactivationReasonDescription: 'description',
           proposedReactivationDate: 'date',
           planetFmReference: 'pfm',
+          reasonForChange: undefined,
+          requiresApproval: false,
         },
       )
     })

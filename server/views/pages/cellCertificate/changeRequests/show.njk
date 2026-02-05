@@ -17,10 +17,10 @@
           request if you need to make changes.
         </p>
 
-        {{ certificationApprovalRequestSummary(approvalRequest, userMap, canAccess('certificate_change_request_withdraw'), true) }}
+        {{ certificationApprovalRequestSummary(approvalRequest, userMap, locationMap, constants, canAccess('certificate_change_request_withdraw'), true) }}
       </div>
     </div>
 
-    {{ certificationApprovalRequest(approvalRequest, false, 0, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, false) }}
+    {{ certificationApprovalRequest(approvalRequest, false, 0, prisonResidentialSummary, false, constants, locationMap) }}
   </div>
 {% endblock %}

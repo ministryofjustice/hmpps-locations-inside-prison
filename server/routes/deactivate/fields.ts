@@ -3,7 +3,9 @@ import dateTodayOrInFuture from '../../validators/dateTodayOrInFuture'
 import maxLength from '../../validators/maxLength'
 import minLength from '../../validators/minLength'
 import numericString from '../../validators/numericString'
-import { showCellCertChange } from './steps'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import { isCertChange } from './steps'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 const fields: FormWizard.Fields = {
   reduceWorkingCapacity: {
@@ -91,7 +93,7 @@ const fields: FormWizard.Fields = {
     ],
   },
   estimatedReactivationDate: {
-    remove: (req, _res) => req.sessionModel.get<string>('reduceWorkingCapacity') === 'YES',
+    remove: isCertChange,
     hideWhenRemoved: true,
     component: 'govukDateInput',
     validate: [dateTodayOrInFuture],
@@ -109,7 +111,7 @@ const fields: FormWizard.Fields = {
     nameForErrors: 'Estimated reactivation date',
   },
   mandatoryEstimatedReactivationDate: {
-    remove: (req, _res) => req.sessionModel.get<string>('reduceWorkingCapacity') !== 'YES',
+    remove: (req, res) => !isCertChange(req, res),
     hideWhenRemoved: true,
     component: 'govukDateInput',
     validate: ['required', dateTodayOrInFuture],
@@ -141,7 +143,7 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
   },
   planetFmReference: {
-    remove: showCellCertChange,
+    remove: isCertChange,
     hideWhenRemoved: true,
     component: 'govukInput',
     validate: [minLength(6), maxLength(18), numericString],
@@ -156,7 +158,7 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
   },
   facilitiesManagementReference: {
-    remove: (req, res) => !showCellCertChange(req, res),
+    remove: (req, res) => !isCertChange(req, res),
     hideWhenRemoved: true,
     component: 'govukInput',
     validate: [minLength(6), maxLength(18), numericString],
@@ -171,7 +173,7 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
   },
   workingCapacityExplanation: {
-    remove: (req, res) => !showCellCertChange(req, res),
+    remove: (req, res) => !isCertChange(req, res),
     hideWhenRemoved: true,
     validate: ['required'],
     component: 'govukTextarea',
@@ -193,6 +195,25 @@ const fields: FormWizard.Fields = {
     // Don't strip newlines
     'ignore-defaults': true,
   },
+  ...SubmitCertificationApprovalRequest.getFields(),
+  ...UpdateSignedOpCap.getFields(),
+}
+
+fields['submit-certification-approval-request_confirmation'] = {
+  ...fields['submit-certification-approval-request_confirmation'],
+  label: {
+    text: 'Confirm changes have been agreed',
+  },
+  hint: {
+    text: 'I confirm that these changes have been agreed with the PGD and capacity management team.',
+  },
+  fieldset: {
+    legend: {
+      ...fields['submit-certification-approval-request_confirmation'].fieldset.legend,
+      text: 'Confirm changes have been agreed',
+    },
+  },
+  errorMessages: { required: 'Confirm changes have been agreed' },
 }
 
 export default fields

@@ -92,6 +92,8 @@ export default class LocationsService {
     deactivationReasonDescription: string,
     proposedReactivationDate: string,
     planetFmReference: string,
+    requiresApproval = false,
+    reasonForChange?: string,
   ) {
     return this.locationsApiClient.locations.deactivate.temporary(
       token,
@@ -103,6 +105,8 @@ export default class LocationsService {
         deactivationReasonDescription,
         proposedReactivationDate,
         planetFmReference,
+        requiresApproval,
+        reasonForChange,
       },
     )
   }
@@ -117,15 +121,6 @@ export default class LocationsService {
 
   async getAccommodationTypes(token: string) {
     return (await this.locationsApiClient.constants.getAccommodationTypes(token)).accommodationTypes
-  }
-
-  async getApprovalTypes(_token: string) {
-    // TODO: replace with api call when available
-    return [
-      { key: 'DRAFT', description: 'Add new locations' },
-      { key: 'SIGNED_OP_CAP', description: 'Change signed operational capacity' },
-      { key: 'CELL_MARK', description: 'Cell door number' },
-    ]
   }
 
   async getArchivedLocations(token: string, prisonId: string) {
@@ -166,6 +161,26 @@ export default class LocationsService {
 
   async getDeactivatedReasons(token: string) {
     return this.getConstantDataMap(token, 'getDeactivatedReasons')
+  }
+
+  async getDeactivatedReasonsArray(token: string) {
+    return (await this.locationsApiClient.constants.getDeactivatedReasons(token)).deactivatedReasons
+  }
+
+  async getLocationTypes(token: string) {
+    return (await this.locationsApiClient.constants.getLocationTypes(token)).locationTypes
+  }
+
+  async getNonResidentialUsageTypes(token: string) {
+    return (await this.locationsApiClient.constants.getNonResidentialUsageTypes(token)).nonResidentialUsageTypes
+  }
+
+  async getResidentialAttributeTypes(token: string) {
+    return (await this.locationsApiClient.constants.getResidentialAttributeTypes(token)).residentialAttributeTypes
+  }
+
+  async getResidentialHousingTypes(token: string) {
+    return (await this.locationsApiClient.constants.getResidentialHousingTypes(token)).residentialHousingTypes
   }
 
   async getInactiveCells(token: string, prisonId: string, locationId?: string) {

@@ -1,9 +1,7 @@
 {% extends "../../partials/formStep.njk" %}
 
 {% from '../../macros/certificationApprovalRequest.njk' import certificationApprovalRequest %}
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
-{% set isDraft = proposedCertificationApprovalRequests.length == 1 and proposedCertificationApprovalRequests[0].approvalType == 'DRAFT' %}
 {% block content %}
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
@@ -15,7 +13,8 @@
         <p>
           You will be unable to make changes to these locations while the request is being reviewed.
         </p>
-        {% if isDraft %}
+
+        {% if proposedCertificationApprovalRequests[0].changeType == 'DRAFT' %}
           {{ govukInsetText({
             text: "New locations will change status from draft to inactive if approved."
           }) }}
@@ -24,7 +23,7 @@
 
       {% set i = 0 %}
       {% for request in proposedCertificationApprovalRequests %}
-        {{ certificationApprovalRequest(request, proposedCertificationApprovalRequests.length > 1, i, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, true) }}
+        {{ certificationApprovalRequest(request, proposedCertificationApprovalRequests.length > 1, i, prisonResidentialSummary, true, constants, locationMap, changeLinks) }}
         {% set i = i + 1 %}
       {% endfor %}
     </div>

@@ -310,6 +310,8 @@ export default class LocationsApiClient extends BaseApiClient {
           deactivationReasonDescription: string
           proposedReactivationDate: string
           planetFmReference: string
+          requiresApproval: boolean
+          reasonForChange?: string
         }
       >({
         path: '/locations/:locationId/deactivate/temporary',

@@ -73,7 +73,7 @@ context('Cell Certificate - Change Requests - Review', () => {
 
         it('Displays an error when the legal disclaimer is not checked', () => {
           approvePage.submit({})
-          Page.checkForError('cellsMeetStandards', 'Confirm that the cells meet the certification standards')
+          Page.checkForError('confirmation', 'Confirm that the cells meet the certification standards')
         })
 
         it('Redirects to change requests and displays a banner', () => {

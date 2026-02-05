@@ -1,28 +1,18 @@
-import LocationFactory from '../../../../server/testutils/factories/location'
-import Page from '../../../pages/page'
-import ViewLocationsShowPage from '../../../pages/viewLocations/show'
-import setupStubs from './setupStubs'
-import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
-import DeactivateTemporaryDetailsPage from '../../../pages/deactivate/temporary/details'
+import Page from '../../../../pages/page'
+import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
+import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
+import DeactivateTemporaryDetailsPage from '../../../../pages/deactivate/temporary/details'
 import goToDetails from './goToDetails'
+import SubmitCertificationApprovalRequestPage from '../../../../pages/commonTransactions/submitCertificationApprovalRequest'
+import { setupStubs } from './setupStubs'
 
 context('Certification Deactivation - Cell - Details', () => {
-  const location = LocationFactory.build({
-    accommodationTypes: ['NORMAL_ACCOMMODATION'],
-    capacity: {
-      maxCapacity: 2,
-      workingCapacity: 1,
-    },
-    leafLevel: true,
-    localName: null,
-    specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
-  })
   let page: DeactivateTemporaryDetailsPage
 
   beforeEach(() => {
-    setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', location)
+    setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
 
-    page = goToDetails(location)
+    page = goToDetails()
   })
 
   it('has a cancel link', () => {
@@ -110,5 +100,17 @@ context('Certification Deactivation - Cell - Details', () => {
     })
   })
 
-  // TODO: next step
+  it('proceeds to submit-certification-approval-request when the form is submitted with valid data', () => {
+    page.submit({
+      reason: 'TEST1',
+      reasonDescription: 'Hole in cell wall',
+      day: '12',
+      month: '12',
+      year: '2045',
+      reference: '123456',
+      explanation: 'The hole in the cell wall means the cell can no longer be certified as suitable for use.',
+    })
+
+    Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
+  })
 })

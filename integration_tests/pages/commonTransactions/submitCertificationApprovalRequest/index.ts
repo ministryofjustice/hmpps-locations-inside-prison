@@ -7,7 +7,7 @@ export default class SubmitCertificationApprovalRequestPage extends Page {
 
   request = (approvalType: string): PageElement => cy.get(`[data-qa=approval-request-${approvalType}]`)
 
-  checkbox = (): PageElement => cy.get(`input[name$="cellsMeetStandards"]`)
+  checkbox = (): PageElement => cy.get(`input[name$="confirmation"]`)
 
   submitButton = (): PageElement => cy.get('button:contains("Submit")')
 

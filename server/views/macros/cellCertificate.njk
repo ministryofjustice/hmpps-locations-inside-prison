@@ -3,7 +3,7 @@
 {% from "./collapsibleTable.njk" import collapsibleTable %}
 {% from "./miniSummary.njk" import miniSummary %}
 
-{% macro recurseLocationTable(rows, location, specialistCellTypesObject) %}
+{% macro recurseLocationTable(rows, location, specialistCellTypes) %}
   {% if location.inCellSanitation != undefined %}
     {% set rows = (rows.push([
       {
@@ -23,7 +23,7 @@
         text: location.maxCapacity or '-'
       },
       {
-        html: formatConstants(specialistCellTypesObject, location.specialistCellTypes) or '-'
+        html: formatConstants(specialistCellTypes, location.specialistCellTypes) or '-'
       },
       {
         text: 'Yes' if location.inCellSanitation == true else ('No' if location.inCellSanitation == false else '-')
@@ -32,11 +32,11 @@
   {% endif %}
 
   {% for subLocation in location.subLocations %}
-    {{ recurseLocationTable(rows, subLocation, specialistCellTypesObject) }}
+    {{ recurseLocationTable(rows, subLocation, specialistCellTypes) }}
   {% endfor %}
 {% endmacro %}
 
-{% macro cellCertificate(certificate, accommodationTypeConstants, usedForConstants, specialistCellTypesObject) %}
+{% macro cellCertificate(certificate, constants) %}
   {% set wingUsageRows = [] %}
   {% set cellRowGroups = [] %}
   {% for location in certificate.locations %}
@@ -45,15 +45,15 @@
         text: location.localName or (location.pathHierarchy + '-wing')
       },
       {
-        html: formatConstants(accommodationTypeConstants, location.accommodationTypes)
+        html: formatConstants(constants.accommodationTypes, location.accommodationTypes)
       },
       {
-        html: formatConstants(usedForConstants, location.usedFor)
+        html: formatConstants(constants.usedForTypes, location.usedFor)
       }
     ]), wingUsageRows) %}
 
     {% set cellRows = [] %}
-    {{ recurseLocationTable(cellRows, location, specialistCellTypesObject) }}
+    {{ recurseLocationTable(cellRows, location, constants.specialistCellTypes) }}
 
     {% set cellRowGroups = (cellRowGroups.push({
       parentRow: [
