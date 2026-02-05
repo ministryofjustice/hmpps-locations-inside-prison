@@ -63,11 +63,11 @@ describe('Confirm', () => {
     }
     deepRes = {
       locals: {
-        location: {
+        location: LocationFactory.build({
           id: 'some-uuid',
           prisonId: 'MDI',
           leafLevel: true,
-        },
+        }),
         prisonResidentialSummary: {
           prisonSummary: {
             prisonName: 'Moorland (HMP & YOI)',
@@ -268,6 +268,116 @@ describe('Confirm', () => {
         content: 'You have submitted a request to update the cell certificate.',
       })
       expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
+  describe('deactivate form', () => {
+    beforeEach(() => {
+      deepReq.form.options.name = 'deactivate'
+      deepReq.sessionModel.get = jest.fn().mockImplementation(
+        (key: string) =>
+          ({
+            deactivationReason: 'OTHER',
+            deactivationReasonOther: 'Unidentified energy signature detected',
+            facilitiesManagementReference: '12345678',
+            mandatoryEstimatedReactivationDate: '2027-01-10',
+            workingCapacityExplanation: 'Future cell integrity uncertain',
+          })[key],
+      )
+    })
+
+    describe('generateRequests', () => {
+      it('adds DEACTIVATE approval request when form name is deactivate', async () => {
+        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+          expect.objectContaining({
+            approvalType: 'DEACTIVATION',
+            deactivatedReason: 'OTHER',
+            deactivationReasonDescription: 'Unidentified energy signature detected',
+            proposedReactivationDate: '2027-01-10',
+            reasonForChange: 'Future cell integrity uncertain',
+          }),
+        )
+
+        expect(deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]).toEqual(
+          expect.objectContaining({
+            workingCapacity: 0,
+            currentWorkingCapacity: 2,
+          }),
+        )
+      })
+
+      it('does not add DEACTIVATION approval request when form name is not deactivate', async () => {
+        deepReq.form.options.name = 'other-form'
+
+        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(
+          deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'DEACTIVATION'),
+        ).toHaveLength(0)
+      })
+    })
+
+    describe('saveValues', () => {
+      beforeEach(() => {
+        ;(deepRes.locals as any).locationId = 'loc-123'
+        locationsService.deactivateTemporary = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
+      })
+
+      it('deactivates the cell', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
+          'token',
+          'loc-123',
+          'OTHER',
+          'Unidentified energy signature detected',
+          '2027-01-10',
+          '12345678',
+          true,
+          'Future cell integrity uncertain',
+        )
+      })
+
+      it('sends notifications using pendingApprovalRequestId', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+          1,
+          notifyService,
+          ['certificate_reviewer@test.com'],
+          'Moorland (HMP & YOI)',
+          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
+          NotificationType.REQUEST_RECEIVED,
+          undefined,
+          undefined,
+          undefined,
+          'Joe Submitter',
+        )
+
+        expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+          2,
+          notifyService,
+          ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+          'Moorland (HMP & YOI)',
+          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
+          NotificationType.REQUEST_SUBMITTED,
+          undefined,
+          undefined,
+          undefined,
+          'Joe Submitter',
+        )
+      })
+
+      it('sets single request flash message and redirects', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(deepReq.flash).toHaveBeenCalledWith('success', {
+          title: 'Change request sent',
+          content: 'You have submitted a request to update the cell certificate.',
+        })
+        expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+      })
     })
   })
 

@@ -153,7 +153,12 @@
             {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
           {% endif %}
 
-          <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+
           {{ govukTable({
             attributes: {
               'data-qa': 'cell-mark-change-table'
@@ -168,7 +173,6 @@
             ]]
           }) }}
         </div>
-
       {% elseif request.approvalType == 'DEACTIVATION' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
