@@ -7,41 +7,56 @@ export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
     setCanAccess(locationsService)
     const certificationEnabled = res.locals.prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
+    const resiActive = res.locals.prisonConfiguration?.resiLocationServiceActive === 'ACTIVE'
+    const nonResiActive = res.locals.prisonConfiguration?.nonResiServiceActive === 'ACTIVE'
+
+    // Residential locations cards and permission message
+    let manageLocationsCard = null
+    if (resiActive) {
+      if (certificationEnabled) {
+        manageLocationsCard = {
+          clickable: true,
+          visible: true,
+          heading: 'Manage residential locations',
+          href: `/view-and-update-locations`,
+          description: 'View and update information about existing locations or create new residential locations.',
+          'data-qa': 'manage-locations-card',
+        }
+      } else {
+        manageLocationsCard = {
+          clickable: true,
+          visible: true,
+          heading: `Manage residential locations`,
+          href: `/view-and-update-locations`,
+          description: 'View and update information about existing locations or create new residential locations.',
+          'data-qa': 'view-locations-card',
+        }
+      }
+    }
+
     res.locals.resiCards = [
-      certificationEnabled
+      manageLocationsCard,
+      resiActive
         ? {
             clickable: true,
             visible: true,
-            heading: 'Manage locations',
-            href: `/view-and-update-locations`,
-            description: 'View and update information about existing locations or create new residential locations',
-            'data-qa': 'manage-locations-card',
+            heading: 'View all inactive cells',
+            href: '/inactive-cells',
+            description: 'View details of all inactive cells in the establishment and reactivate them.',
+            'data-qa': 'inactive-cells-card',
           }
-        : {
+        : null,
+      resiActive
+        ? {
             clickable: true,
             visible: true,
-            heading: `View and update locations`,
-            href: `/view-and-update-locations`,
-            description: 'View and update information about existing residential locations.',
-            'data-qa': 'view-locations-card',
-          },
-      {
-        clickable: true,
-        visible: true,
-        heading: 'View all inactive cells',
-        href: '/inactive-cells',
-        description: 'View details of all inactive cells in the establishment and reactivate them.',
-        'data-qa': 'inactive-cells-card',
-      },
-      {
-        clickable: true,
-        visible: true,
-        heading: 'Archived locations',
-        href: '/archived-locations',
-        description: 'View locations that have been permanently deactivated as residential locations.',
-        'data-qa': 'archived-locations-card',
-      },
-      certificationEnabled
+            heading: 'Archived locations',
+            href: '/archived-locations',
+            description: 'View locations that have been permanently deactivated as residential locations.',
+            'data-qa': 'archived-locations-card',
+          }
+        : null,
+      resiActive && certificationEnabled
         ? {
             clickable: true,
             visible: true,
@@ -69,19 +84,41 @@ export default function populateCards(locationsService: LocationsService) {
       },
     ]
 
-    res.locals.nonResiCards =
-      req.featureFlags.nonResi && res.locals.prisonConfiguration?.nonResiServiceActive === 'ACTIVE'
-        ? [
-            {
+    res.locals.resiPermissionMessage = resiActive ? null : 'You do not have permission to view Residential locations.'
+
+    // Non-residential locations cards and permission message
+    if (req.featureFlags.nonResi && nonResiActive) {
+      // Check for non-resi specific roles (these are used by the non-resi app)
+      const userRoles = res.locals.user.userRoles || []
+      const hasEditRole = userRoles.includes('NONRESI__MAINTAIN_LOCATION')
+
+      res.locals.nonResiCards = [
+        hasEditRole
+          ? {
               clickable: true,
               visible: true,
               heading: 'Edit non-residential locations',
               href: config.services.nonResidentialLocations,
               description: 'Add, change or archive non-residential locations.',
-              'data-qa': 'non-resi-card',
+              'data-qa': 'non-resi-edit-card',
+            }
+          : {
+              clickable: true,
+              visible: true,
+              heading: 'View non-residential locations',
+              href: config.services.nonResidentialLocations,
+              description: 'View non-residential locations and the services that use them.',
+              'data-qa': 'non-resi-view-card',
             },
-          ]
-        : null
+      ]
+      res.locals.nonResiPermissionMessage = null
+    } else if (req.featureFlags.nonResi) {
+      res.locals.nonResiCards = null
+      res.locals.nonResiPermissionMessage = 'You do not have permission to view Non-residential locations.'
+    } else {
+      res.locals.nonResiCards = null
+      res.locals.nonResiPermissionMessage = null
+    }
 
     next()
   })

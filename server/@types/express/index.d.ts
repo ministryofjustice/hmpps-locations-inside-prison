@@ -71,6 +71,8 @@ interface AllLocals {
   changeLinks: { [field: string]: string }
   resiCards: card[]
   nonResiCards: card[]
+  resiPermissionMessage: string
+  nonResiPermissionMessage: string
   cell: Location
   cellCount: number
   cells: Location[]
