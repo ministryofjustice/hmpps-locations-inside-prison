@@ -65,7 +65,7 @@ function testRequests(
   } else {
     const capRequest = requests[1]
 
-    testGovukSummaryList('overview-list', [
+    testGovukSummaryList('overview-list-SIGNED_OP_CAP', [
       ['Location', 'TST'],
       ['Change type', 'Change signed operational capacity'],
       ['Explanation', capRequest.explanation],

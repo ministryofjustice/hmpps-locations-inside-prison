@@ -149,6 +149,7 @@ export default class Confirm extends FormInitialStep {
     } else if (req.form.options.name === 'add-to-certificate') {
       proposedCertificationApprovalRequests.push({
         approvalType: 'DRAFT',
+        prisonId: locals.prisonId,
         locations: [await locationToCertificationLocation(req, locals.location)],
       })
     } else if (req.form.options.name === 'change-door-number') {

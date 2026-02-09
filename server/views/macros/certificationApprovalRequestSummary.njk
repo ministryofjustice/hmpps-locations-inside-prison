@@ -23,7 +23,7 @@
 
   {{ govukSummaryList({
     attributes: {
-      'data-qa': 'overview-list'
+      'data-qa': 'overview-list-' + request.approvalType
     },
     rows:[
       {

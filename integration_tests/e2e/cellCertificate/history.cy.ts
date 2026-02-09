@@ -41,7 +41,13 @@ context('Cell Certificate - History', () => {
             'john smith',
             ['View details', 'View certificate'],
           ],
-          ['A', 'Add new locations', '3 October 2024', 'john smith', ['View details', 'View certificate']],
+          [
+            'A',
+            'Add new locations to certificate',
+            '3 October 2024',
+            'john smith',
+            ['View details', 'View certificate'],
+          ],
         ])
       })
     })
