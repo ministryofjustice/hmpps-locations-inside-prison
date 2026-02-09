@@ -42,8 +42,9 @@ export default class Details extends BaseController {
       const { values } = req.form
       let { maxCapacity } = res.locals.prisonResidentialSummary.prisonSummary
 
-      const { capacity, pendingChanges } = res.locals.decoratedResidentialSummary.location
-      if (pendingChanges.maxCapacity !== undefined) {
+      const { capacity, pendingChanges } =
+        res.locals.decoratedResidentialSummary?.location || res.locals.decoratedLocation || res.locals.location
+      if (pendingChanges?.maxCapacity !== undefined) {
         maxCapacity += pendingChanges.maxCapacity - capacity.maxCapacity
       }
 

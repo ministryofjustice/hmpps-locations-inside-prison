@@ -36,7 +36,7 @@
         <a href="/{{ prisonId }}/cell-certificate/history" class="govuk-link">View history of certificate changes</a>
       </p>
 
-      {{ cellCertificate(certificate, accommodationTypeConstants, usedForConstants, specialistCellTypesObject) }}
+      {{ cellCertificate(certificate, constants) }}
     {% else %}
       <p>This prison does not have a cell certificate.</p>
     {% endif %}

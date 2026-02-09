@@ -1,29 +1,18 @@
-import LocationFactory from '../../../../server/testutils/factories/location'
-import Page from '../../../pages/page'
-import ViewLocationsShowPage from '../../../pages/viewLocations/show'
-import setupStubs from './setupStubs'
-import CellCertChangePage from '../../../pages/deactivate/cell-cert-change'
-import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
-import DeactivateTemporaryDetailsPage from '../../../pages/deactivate/temporary/details'
+import Page from '../../../../pages/page'
+import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
+import CellCertChangePage from '../../../../pages/deactivate/cell-cert-change'
+import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
+import DeactivateTemporaryDetailsPage from '../../../../pages/deactivate/temporary/details'
 import goToCellCertChange from './goToCellCertChange'
+import { setupStubs } from './setupStubs'
 
 context('Certification Deactivation - Cell - Cell cert change', () => {
-  const location = LocationFactory.build({
-    accommodationTypes: ['NORMAL_ACCOMMODATION'],
-    capacity: {
-      maxCapacity: 2,
-      workingCapacity: 1,
-    },
-    leafLevel: true,
-    localName: null,
-    specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
-  })
   let page: CellCertChangePage
 
   beforeEach(() => {
-    setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', location)
+    setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
 
-    page = goToCellCertChange(location)
+    page = goToCellCertChange()
   })
 
   it('shows the correct content', () => {

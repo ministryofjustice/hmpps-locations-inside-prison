@@ -84,9 +84,7 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
           return super.getValues(req, res, callback)
         }
 
-        const specialistCellTypesObject = await req.services.locationsService.getSpecialistCellTypes(
-          req.session.systemToken,
-        )
+        const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
 
         return super.getValues(req, res, (err: Error, values?: FormWizard.Values) => {
           const accommodationTypeKey = Object.keys(req.form.options.fields).find(f => f.includes('accommodationType'))
@@ -97,7 +95,7 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
             []
           let typeType: string = null
           if (types.length) {
-            typeType = `${specialistCellTypesObject.find(sct => sct.key === types[0])?.attributes?.affectsCapacity ? 'SPECIAL' : 'NORMAL'}_ACCOMMODATION`
+            typeType = `${specialistCellTypes.find(sct => sct.key === types[0])?.attributes?.affectsCapacity ? 'SPECIAL' : 'NORMAL'}_ACCOMMODATION`
           }
 
           callback(err, {

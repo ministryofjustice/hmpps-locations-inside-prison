@@ -217,7 +217,7 @@ context('Change door number', () => {
 
         const confirmPage = Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
 
-        cy.contains('Cell door number').should('be.visible')
+        cy.contains('Change cell door number').should('be.visible')
         cy.contains('Updating door number for operational reasons').should('be.visible')
         cy.contains('B1-01 → B-02').should('be.visible')
 

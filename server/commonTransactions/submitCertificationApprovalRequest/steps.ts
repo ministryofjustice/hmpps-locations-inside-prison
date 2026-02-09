@@ -4,7 +4,7 @@ import Confirm from './confirm'
 const steps: FormWizard.Steps = {
   '/': {
     template: '../../commonTransactions/submitCertificationApprovalRequest/confirm',
-    fields: ['cellsMeetStandards'],
+    fields: ['confirmation'],
     controller: Confirm,
   },
 }

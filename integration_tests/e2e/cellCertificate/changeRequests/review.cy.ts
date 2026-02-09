@@ -27,9 +27,9 @@ context('Cell Certificate - Change Requests - Review', () => {
       })
 
       it('Correctly displays the change request info', () => {
-        cy.get('h1').should('contain', 'Review add new locations request')
+        cy.get('h1').should('contain', 'Review add new locations to certificate request')
 
-        testGovukSummaryList('overview-list', [
+        testGovukSummaryList('overview-list-DRAFT', [
           ['Location', 'A'],
           ['Change type', 'Add new locations to certificate'],
           ['Submitted on', '3 October 2024'],
@@ -73,7 +73,7 @@ context('Cell Certificate - Change Requests - Review', () => {
 
         it('Displays an error when the legal disclaimer is not checked', () => {
           approvePage.submit({})
-          Page.checkForError('cellsMeetStandards', 'Confirm that the cells meet the certification standards')
+          Page.checkForError('confirmation', 'Confirm that the cells meet the certification standards')
         })
 
         it('Redirects to change requests and displays a banner', () => {
@@ -121,6 +121,7 @@ context('Cell Certificate - Change Requests - Review', () => {
           CertificationApprovalRequestFactory.build({
             approvalType: 'SIGNED_OP_CAP',
             locations: [],
+            reasonForChange: 'Needed to change it',
           }),
         )
 
@@ -131,7 +132,7 @@ context('Cell Certificate - Change Requests - Review', () => {
       it('Correctly displays the change request info', () => {
         cy.get('h1').should('contain', 'Review change signed operational capacity request')
 
-        testGovukSummaryList('overview-list', [
+        testGovukSummaryList('overview-list-SIGNED_OP_CAP', [
           ['Location', 'A'],
           ['Change type', 'Change signed operational capacity'],
           ['Explanation', 'Needed to change it'],
@@ -148,6 +149,7 @@ context('Cell Certificate - Change Requests - Review', () => {
         LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
           CertificationApprovalRequestFactory.build({
             approvalType: 'CELL_MARK',
+            reasonForChange: 'Needed to change it',
           }),
         )
 
@@ -156,11 +158,11 @@ context('Cell Certificate - Change Requests - Review', () => {
       })
 
       it('Correctly displays the change request info', () => {
-        cy.get('h1').should('contain', 'Review cell door number request')
+        cy.get('h1').should('contain', 'Review change cell door number request')
 
-        testGovukSummaryList('overview-list', [
+        testGovukSummaryList('overview-list-CELL_MARK', [
           ['Location', 'A'],
-          ['Change type', 'Cell door number'],
+          ['Change type', 'Change cell door number'],
           ['Explanation', 'Needed to change it'],
           ['Submitted on', '3 October 2024'],
           ['Submitted by', 'john smith'],

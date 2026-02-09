@@ -17,7 +17,7 @@ services:
       - NOMIS_ENABLED=true
 
   nomis-user-roles-api:
-    image: ghcr.io/ministryofjustice/nomis-user-roles-api:latest
+    image: ghcr.io/ministryofjustice/nomis-user-roles-api:2025-11-25.29.b39ec25
     container_name: nomis-user-roles-api
     networks:
       - hmpps
@@ -31,7 +31,7 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
   manage-users-api:
-    image: ghcr.io/ministryofjustice/hmpps-manage-users-api:latest
+    image: ghcr.io/ministryofjustice/hmpps-manage-users-api:2025-11-25.67.a48505c
     container_name: manage-users-api
     networks:
       - hmpps

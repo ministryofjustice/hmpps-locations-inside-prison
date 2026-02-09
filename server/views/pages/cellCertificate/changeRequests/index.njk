@@ -44,7 +44,7 @@
               text: (request.locationKey.replace(prisonId + '-', '') if request.locationKey) or request.prisonId
             },
             {
-              text: formatConstants(approvalTypeConstants, request.approvalType)
+              text: approvalTypeDescription(request.approvalType, constants, locationMap[request.locationId])
             },
             {
               text: request.requestedDate | formatDate
