@@ -4,7 +4,7 @@ import { singularizeString } from '../../utils/utils'
 
 export default async (req: Request, res: Response) => {
   const locals: TypedLocals = {
-    title: 'Manage locations',
+    title: 'Manage residential locations',
     minLayout: 'three-quarters',
   }
 

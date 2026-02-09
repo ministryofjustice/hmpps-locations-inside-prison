@@ -49,7 +49,7 @@ describe('view locations show', () => {
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
       minLayout: 'three-quarters',
-      title: 'Manage locations',
+      title: 'Manage residential locations',
     })
   })
 
@@ -67,7 +67,7 @@ describe('view locations show', () => {
         success,
       },
       minLayout: 'three-quarters',
-      title: 'Manage locations',
+      title: 'Manage residential locations',
     })
   })
 
@@ -248,7 +248,7 @@ describe('view locations show', () => {
       expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
         banner: undefined,
         minLayout: 'three-quarters',
-        title: 'Manage locations',
+        title: 'Manage residential locations',
       })
     })
 
@@ -264,7 +264,7 @@ describe('view locations show', () => {
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -285,7 +285,7 @@ describe('view locations show', () => {
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -306,7 +306,7 @@ describe('view locations show', () => {
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -327,7 +327,7 @@ describe('view locations show', () => {
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -348,7 +348,7 @@ describe('view locations show', () => {
             banner: undefined,
             createButton: undefined,
             minLayout: 'three-quarters',
-            title: 'Manage locations',
+            title: 'Manage residential locations',
           })
         })
       })
@@ -368,7 +368,7 @@ describe('view locations show', () => {
             banner: undefined,
             createButton: undefined,
             minLayout: 'three-quarters',
-            title: 'Manage locations',
+            title: 'Manage residential locations',
           })
         })
       })
@@ -391,7 +391,7 @@ describe('view locations show', () => {
               banner: undefined,
               createButton: undefined,
               minLayout: 'three-quarters',
-              title: 'Manage locations',
+              title: 'Manage residential locations',
             })
           })
         })
@@ -416,7 +416,7 @@ describe('view locations show', () => {
                 text: 'Create new landing',
               },
               minLayout: 'three-quarters',
-              title: 'Manage locations',
+              title: 'Manage residential locations',
             })
           })
         })
