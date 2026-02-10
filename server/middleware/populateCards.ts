@@ -114,7 +114,7 @@ export default function populateCards(locationsService: LocationsService) {
       res.locals.nonResiPermissionMessage = null
     } else if (req.featureFlags.nonResi) {
       res.locals.nonResiCards = null
-      res.locals.nonResiPermissionMessage = 'You do not have permission to view Non-residential locations.'
+      res.locals.nonResiPermissionMessage = 'You do not have permission to view non-residential locations.'
     } else {
       res.locals.nonResiCards = null
       res.locals.nonResiPermissionMessage = null
