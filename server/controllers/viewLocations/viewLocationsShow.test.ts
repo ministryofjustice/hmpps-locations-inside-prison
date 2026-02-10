@@ -129,6 +129,19 @@ describe('view locations show', () => {
 
           expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
         })
+
+        it('does not add the action when location status is LOCKED_ACTIVE', async () => {
+          deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            active: true,
+            isResidential: true,
+            leafLevel: true,
+            status: 'LOCKED_ACTIVE',
+          })
+
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
+
+          expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
+        })
       })
     })
 
@@ -173,6 +186,14 @@ describe('view locations show', () => {
 
         it('does not add the action when location is not a CELL', async () => {
           deepRes.locals.decoratedResidentialSummary.location.raw.locationType = 'OFFICE'
+
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
+
+          expect(deepRes.locals.actions || []).not.toContainEqual(deactivateCellAction)
+        })
+
+        it('does not add the action when location status is LOCKED_ACTIVE', async () => {
+          deepRes.locals.decoratedResidentialSummary.location.status = 'LOCKED_ACTIVE'
 
           await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
@@ -317,6 +338,28 @@ describe('view locations show', () => {
           active: true,
           isResidential: false,
           leafLevel: false,
+        })
+      })
+
+      it('renders the page without the action button', () => {
+        controller(deepReq as Request, deepRes as Response)
+
+        expect(deepRes.locals.actions).toEqual(undefined)
+        expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+          banner: undefined,
+          minLayout: 'three-quarters',
+          title: 'Manage locations',
+        })
+      })
+    })
+
+    describe('when location status is LOCKED', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+          active: true,
+          isResidential: false,
+          leafLevel: true,
+          status: 'LOCKED_ACTIVE',
         })
       })
 

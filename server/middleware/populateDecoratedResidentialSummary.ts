@@ -6,33 +6,59 @@ import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
 import canEditCna from '../utils/canEditCna'
 
-function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
+export function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   const { active, capacity, leafLevel, status } = location
-  return (active || status === 'DRAFT') && capacity && leafLevel && req.canAccess('change_cell_capacity')
+  return (
+    (active || status === 'DRAFT') &&
+    capacity &&
+    leafLevel &&
+    !status.includes('LOCKED_') &&
+    req.canAccess('change_cell_capacity')
+  )
 }
 
-function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
+export function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
   return location.status === 'DRAFT' && req.canAccess('change_location_code')
 }
 
-function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('change_door_number')
+export function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_door_number')
+  )
 }
 
-function showSanitationChangeLink(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('change_sanitation')
+export function showSanitationChangeLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_sanitation')
+  )
 }
 
-function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('change_local_name')
+export function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_local_name')
+  )
 }
 
-function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('set_cell_type')
+export function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('set_cell_type')
+  )
 }
 
-function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('change_used_for')
+export function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_used_for')
+  )
 }
 
 function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow {
