@@ -165,7 +165,7 @@ context('Change sanitation', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsDeleteLocation')
       cy.task('stubPatchLocation')
-      cy.task('stubPutLocation')
+      cy.task('stubPutLocationForSanitation')
       cy.task('stubLocationsLocationsResidentialSummary')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
         parentLocation: draftWing,
