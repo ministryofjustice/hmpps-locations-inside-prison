@@ -370,7 +370,7 @@ describe('view locations show', () => {
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
