@@ -37,7 +37,7 @@ context('Index', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.viewLocations().contains('View and update locations')
+      indexPage.cards.viewLocations().contains('Manage residential locations')
       indexPage.cards.manageLocations().should('not.exist')
       indexPage.cards.cellCertificate().should('not.exist')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
@@ -68,7 +68,7 @@ context('Index', () => {
       const indexPage = Page.verifyOnPage(IndexPage)
 
       indexPage.cards.viewLocations().should('not.exist')
-      indexPage.cards.manageLocations().contains('Manage locations')
+      indexPage.cards.manageLocations().contains('Manage residential locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
@@ -98,7 +98,7 @@ context('Index', () => {
       const indexPage = Page.verifyOnPage(IndexPage)
 
       indexPage.cards.viewLocations().should('not.exist')
-      indexPage.cards.manageLocations().contains('Manage locations')
+      indexPage.cards.manageLocations().contains('Manage residential locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
