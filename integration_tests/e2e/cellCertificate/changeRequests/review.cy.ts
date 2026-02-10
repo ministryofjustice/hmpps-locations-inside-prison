@@ -171,5 +171,33 @@ context('Cell Certificate - Change Requests - Review', () => {
         testGovukTable('cell-mark-change-table', [['A', 'A-1 → A-1x']])
       })
     })
+
+    context('When the approvalType is CELL_SANITATION', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'CELL_SANITATION',
+            reasonForChange: 'Needed to change it',
+          }),
+        )
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('h1').should('contain', 'Review change cell sanitation request')
+
+        testGovukSummaryList('overview-list-CELL_SANITATION', [
+          ['Location', 'A'],
+          ['Change type', 'Change cell sanitation'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('cell-sanitation-change-table', [['A', 'No → Yes']])
+      })
+    })
   })
 })

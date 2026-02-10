@@ -20,7 +20,7 @@ function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
 }
 
 function showSanitationChangeLink(location: DecoratedLocation, req: Request) {
-  return location.status === 'DRAFT' && req.canAccess('change_sanitation')
+  return (location.active || location.status === 'DRAFT') && req.canAccess('change_sanitation')
 }
 
 function showEditLocalNameLink(location: DecoratedLocation, req: Request) {

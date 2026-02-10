@@ -169,6 +169,23 @@ export default class Confirm extends FormInitialStep {
       locals.changeLinks = {
         reasonForChange: changeLink,
       }
+    } else if (req.form.options.name === 'change-sanitation') {
+      const inCellSanitation = sessionModel.get<string>('inCellSanitation')
+      const explanation = sessionModel.get<string>('explanation')
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'CELL_SANITATION',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        locations: [await locationToCertificationLocation(req, locals.location)],
+        reasonForChange: explanation,
+        currentInCellSanitation: locals.location.inCellSanitation,
+        inCellSanitation: inCellSanitation === 'YES',
+      })
+
+      const changeLink = `/location/${locals.location.id}/change-sanitation/details/edit`
+      locals.changeLinks = {
+        reasonForChange: changeLink,
+      }
     }
 
     if (proposedSignedOpCapChange) {
@@ -223,6 +240,15 @@ export default class Confirm extends FormInitialStep {
       certificationApprovalRequestId = (
         await locationsService.updateCellMark(systemToken, res.locals.locationId, {
           cellMark: doorNumber,
+          reasonForChange: explanation,
+        })
+      ).pendingApprovalRequestId
+    } else if (options.name === 'change-sanitation') {
+      const inCellSanitation = req.sessionModel.get<string>('inCellSanitation')
+      const explanation = req.sessionModel.get<string>('explanation')
+      certificationApprovalRequestId = (
+        await locationsService.updateCellSanitation(systemToken, res.locals.locationId, {
+          inCellSanitation: inCellSanitation === 'YES',
           reasonForChange: explanation,
         })
       ).pendingApprovalRequestId

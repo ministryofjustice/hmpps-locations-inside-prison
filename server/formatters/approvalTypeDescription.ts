@@ -19,6 +19,8 @@ export default function approvalTypeDescription(
       return 'Change signed operational capacity'
     case 'CELL_MARK':
       return 'Change cell door number'
+    case 'CELL_SANITATION':
+      return 'Change cell sanitation'
     default:
       break
   }

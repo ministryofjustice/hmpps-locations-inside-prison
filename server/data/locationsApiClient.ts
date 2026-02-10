@@ -399,6 +399,14 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/residential/:locationId/cell-mark-change',
       requestType: 'put',
     }),
+    updateCellSanitation: this.apiCall<
+      Location,
+      { locationId: string },
+      { inCellSanitation: boolean; reasonForChange?: string }
+    >({
+      path: '/locations/residential/:locationId/cell-sanitation-change',
+      requestType: 'put',
+    }),
     updateSpecialistCellTypes: this.apiCall<Location, { locationId: string }, string[]>({
       path: '/locations/:locationId/specialist-cell-types',
       requestType: 'put',

@@ -173,6 +173,30 @@
             ]]
           }) }}
         </div>
+
+      {% elseif request.approvalType == 'CELL_SANITATION' %}
+        {% set currentInCellSanitation = request.currentInCellSanitation  | yesNo %}
+        {% set inCellSanitation = request.inCellSanitation | yesNo %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+          {% endif %}
+
+          <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'cell-sanitation-change-table'
+            },
+            head: [
+              { classes: 'govuk-table__cell', text: "Location" },
+              { text: "Sanitation" }
+            ],
+            rows:[[
+              { text: request.locationKey.replace(request.prisonId + '-', '') },
+              { text: currentInCellSanitation + " → " + inCellSanitation }
+            ]]
+          }) }}
+        </div>
       {% elseif request.approvalType == 'DEACTIVATION' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
