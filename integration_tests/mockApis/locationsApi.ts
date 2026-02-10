@@ -1088,11 +1088,26 @@ const stubPatchLocation = (location: Partial<Location> = {}) =>
     },
   })
 
-const stubPutLocation = (location: Partial<Location> = {}) =>
+const stubPutLocationForCellMark = (location: Partial<Location> = {}) =>
   stubFor({
     request: {
       method: 'PUT',
       urlPattern: '/locations-api/locations/residential/[\\w-]+/cell-mark-change',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location,
+    },
+  })
+
+const stubPutLocationForSanitation = (location: Partial<Location> = {}) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/residential/[\\w-]+/cell-sanitation-change',
     },
     response: {
       status: 200,
@@ -1423,7 +1438,8 @@ const allStubs = {
   stubPrisonConfigurationResiActive,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
-  stubPutLocation,
+  stubPutLocationForCellMark,
+  stubPutLocationForSanitation,
   stubSignedOperationalCapacityGet,
   stubSignedOperationalCapacityGetNotFound,
   stubSignedOperationalCapacityUpdate,
