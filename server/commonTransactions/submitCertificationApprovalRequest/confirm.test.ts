@@ -271,6 +271,67 @@ describe('Confirm', () => {
     })
   })
 
+  describe('saveValues - changeCellSanitation', () => {
+    beforeEach(() => {
+      deepReq.form.options.name = 'change-sanitation'
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'inCellSanitation') return 'YES'
+        if (key === 'explanation') return 'Adding sanitation facilities'
+        return undefined
+      })
+      ;(deepRes.locals as any).locationId = 'loc-456'
+      locationsService.updateCellSanitation = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-456' })
+    })
+
+    it('updates in cell sanitation with inCellSanitation and reason', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.updateCellSanitation).toHaveBeenCalledWith('token', 'loc-456', {
+        inCellSanitation: true,
+        reasonForChange: 'Adding sanitation facilities',
+      })
+    })
+
+    it('sends notifications using pendingApprovalRequestId', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        1,
+        notifyService,
+        ['certificate_reviewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-456/review'),
+        NotificationType.REQUEST_RECEIVED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        2,
+        notifyService,
+        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-456'),
+        NotificationType.REQUEST_SUBMITTED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+    })
+
+    it('sets single request flash message and redirects', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'Change request sent',
+        content: 'You have submitted a request to update the cell certificate.',
+      })
+      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
   describe('deactivate form', () => {
     beforeEach(() => {
       deepReq.form.options.name = 'deactivate'
@@ -465,6 +526,51 @@ describe('Confirm', () => {
 
       expect(
         deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'CELL_MARK'),
+      ).toHaveLength(0)
+    })
+
+    it('adds CELL_SANITATION approval request when form name is change-sanitation', async () => {
+      deepRes.locals.location = LocationFactory.build({
+        id: 'some-uuid',
+        prisonId: 'MDI',
+        status: 'ACTIVE',
+        leafLevel: true,
+        pathHierarchy: 'A-1-001',
+        certification: {
+          certifiedNormalAccommodation: 1,
+        },
+        capacity: {
+          maxCapacity: 1,
+          workingCapacity: 1,
+        },
+        inCellSanitation: false,
+      })
+      deepReq.form.options.name = 'change-sanitation'
+      deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
+        if (key === 'inCellSanitation') return 'YES'
+        if (key === 'explanation') return 'Adding sanitation facilities'
+        return undefined
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'CELL_SANITATION',
+          currentInCellSanitation: false,
+          inCellSanitation: true,
+          reasonForChange: 'Adding sanitation facilities',
+        }),
+      )
+    })
+
+    it('does not add CELL_SANITATION approval request when form name is not change-sanitation', async () => {
+      deepReq.form.options.name = 'other-form'
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(
+        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'CELL_SANITATION'),
       ).toHaveLength(0)
     })
 

@@ -18,6 +18,8 @@ export declare interface CertificationApprovalRequest {
   certificateId: string
   cellMark: string
   currentCellMark: string
+  inCellSanitation: boolean
+  currentInCellSanitation: boolean
   reasonForChange: string
   locations: CertificateLocation[]
   deactivatedReason: string

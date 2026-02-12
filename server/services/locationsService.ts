@@ -306,6 +306,14 @@ export default class LocationsService {
     return this.locationsApiClient.locations.updateCellMark(token, { locationId }, cellMarkChange)
   }
 
+  async updateCellSanitation(
+    token: string,
+    locationId: string,
+    cellSanitationChange: { inCellSanitation: boolean; reasonForChange?: string },
+  ) {
+    return this.locationsApiClient.locations.updateCellSanitation(token, { locationId }, cellSanitationChange)
+  }
+
   async updateBulkCapacity(token: string, bulkCapacityUpdate: BulkCapacityUpdate) {
     return this.locationsApiClient.locations.bulk.capacityUpdate(token, null, { locations: bulkCapacityUpdate })
   }

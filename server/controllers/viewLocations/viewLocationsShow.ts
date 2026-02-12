@@ -55,7 +55,13 @@ export default async (req: Request, res: Response) => {
     }
   }
 
-  if (req.canAccess('convert_non_residential') && active && !isResidential && leafLevel) {
+  if (
+    req.canAccess('convert_non_residential') &&
+    active &&
+    !isResidential &&
+    leafLevel &&
+    !location.status.includes('LOCKED_')
+  ) {
     addAction({
       text: 'Convert to cell',
       href: `/location/${location.id}/cell-conversion`,
