@@ -459,6 +459,21 @@ const stubLocationsConstantsUsedForTypeForPrison = (
     },
   })
 
+const stubLocationByCellMark = (prisonId = 'TST') =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations/${prisonId}/cell-mark/\\w+`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: [],
+    },
+  })
+
 const stubLocationsLocationsResidentialSummary = (
   returnData: PrisonResidentialSummary = {
     prisonSummary: {
@@ -1384,6 +1399,7 @@ const allStubs = {
   stubGetPrisonConfiguration,
   stubLocations,
   stubLocationsBulkReactivate,
+  stubLocationByCellMark,
   stubLocationsCellCertificates,
   stubLocationsCellCertificatesPrison,
   stubLocationsCellCertificatesPrisonCurrent,
