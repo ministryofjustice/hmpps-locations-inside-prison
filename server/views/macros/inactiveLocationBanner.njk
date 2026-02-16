@@ -87,9 +87,9 @@
             text: 'Explanation'
           },
           value: {
-            text: location.lastDeactivationReasonForChange or '-'
+            text: location.lastDeactivationReasonForChange
           }
-        } if isCertActive
+        } if isCertActive and location.lastDeactivationReasonForChange
       ],
       classes: 'hmpps-inactive-location-banner-summary-list' }) }}
     </span>

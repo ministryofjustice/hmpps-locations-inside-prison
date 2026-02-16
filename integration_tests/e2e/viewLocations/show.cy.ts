@@ -109,7 +109,9 @@ context('View Locations Show', () => {
       viewLocationsShowPage.inactiveBanner().should('exist')
 
       if (isCertActive) {
-        viewLocationsShowPage.inactiveBannerRows().should('have.length', 5)
+        viewLocationsShowPage
+          .inactiveBannerRows()
+          .should('have.length', location.lastDeactivationReasonForChange ? 5 : 4)
         viewLocationsShowPage.inactiveBannerRows().eq(0).find('.govuk-summary-list__key').contains('Reason')
         viewLocationsShowPage.inactiveBannerRows().eq(0).find('.govuk-summary-list__value').contains('Test type 1')
         viewLocationsShowPage
@@ -142,12 +144,14 @@ context('View Locations Show', () => {
           .eq(3)
           .find('.govuk-summary-list__value')
           .contains(location.currentCellCertificate ? location.currentCellCertificate.workingCapacity.toString() : '-')
-        viewLocationsShowPage.inactiveBannerRows().eq(4).find('.govuk-summary-list__key').contains('Explanation')
-        viewLocationsShowPage
-          .inactiveBannerRows()
-          .eq(4)
-          .find('.govuk-summary-list__value')
-          .contains(location.lastDeactivationReasonForChange || '-')
+        if (location.lastDeactivationReasonForChange) {
+          viewLocationsShowPage.inactiveBannerRows().eq(4).find('.govuk-summary-list__key').contains('Explanation')
+          viewLocationsShowPage
+            .inactiveBannerRows()
+            .eq(4)
+            .find('.govuk-summary-list__value')
+            .contains(location.lastDeactivationReasonForChange)
+        }
       } else {
         viewLocationsShowPage.inactiveBannerRows().should('have.length', 3)
         viewLocationsShowPage.inactiveBannerRows().eq(0).find('.govuk-summary-list__key').contains('Reason')
@@ -1311,6 +1315,7 @@ context('View Locations Show', () => {
               status: 'INACTIVE',
               proposedReactivationDate: undefined,
               planetFmReference: '',
+              lastDeactivationReasonForChange: undefined,
             })
 
             cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
