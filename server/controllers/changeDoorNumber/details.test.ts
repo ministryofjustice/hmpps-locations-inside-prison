@@ -61,7 +61,7 @@ describe('Change door number', () => {
 
     next = jest.fn()
     analyticsService.sendEvent = jest.fn()
-    locationsService.getResidentialSummary = jest.fn().mockResolvedValue({ subLocations: [{ cellMark: 'A1-02' }] })
+    locationsService.getLocationByCellMark = jest.fn().mockResolvedValue([LocationFactory.build({ cellMark: 'A1-02' })])
   })
 
   afterEach(() => {
@@ -92,7 +92,9 @@ describe('Change door number', () => {
     })
 
     it('calls back with error if the cellMark is not unique', async () => {
-      locationsService.getResidentialSummary = jest.fn().mockResolvedValue({ subLocations: [{ cellMark: 'A1-01' }] })
+      locationsService.getLocationByCellMark = jest
+        .fn()
+        .mockResolvedValue([LocationFactory.build({ cellMark: 'A1-01' })])
 
       const expectedError = controller.formError('doorNumber', 'taken')
       const callback = jest.fn()
@@ -102,6 +104,7 @@ describe('Change door number', () => {
     })
 
     it('calls back without error if the locationCode is unique', async () => {
+      locationsService.getLocationByCellMark = jest.fn().mockResolvedValue([])
       const callback = jest.fn()
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 

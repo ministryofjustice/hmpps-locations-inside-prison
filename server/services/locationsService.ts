@@ -199,6 +199,10 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getLocationTypes'))[key] || 'Unknown'
   }
 
+  async getLocationByCellMark(token: string, prisonId: string, cellMark: string) {
+    return this.locationsApiClient.locations.getLocationByCellMark(token, { prisonId, cellMark })
+  }
+
   async getLocationByLocalName(token: string, prisonId: string, localName: string, parentLocationId?: string) {
     return this.locationsApiClient.locations.getLocationByLocalName(token, { prisonId, localName, parentLocationId })
   }

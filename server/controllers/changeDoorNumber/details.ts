@@ -31,20 +31,21 @@ export default class Details extends FormInitialStep {
       const { decoratedResidentialSummary, prisonId, locationId } = res.locals
       const { locationsService } = req.services
       const validationErrors: FormWizard.Errors = {}
+      const doorNumber = values.doorNumber as string
 
-      if (values.doorNumber === decoratedResidentialSummary.location.cellMark) {
+      if (doorNumber === decoratedResidentialSummary.location.cellMark) {
         return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
       }
 
       try {
         if (!validationErrors.doorNumber) {
-          const parentSummary = await locationsService.getResidentialSummary(
+          const duplicateDoorNumberLocations = await locationsService.getLocationByCellMark(
             systemToken,
             prisonId,
-            decoratedResidentialSummary.location.parentId,
+            doorNumber,
           )
 
-          if (parentSummary.subLocations.find(l => l.cellMark === values.doorNumber)) {
+          if (duplicateDoorNumberLocations.length > 0) {
             validationErrors.doorNumber = this.formError('doorNumber', 'taken')
           }
         }

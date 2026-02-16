@@ -228,6 +228,10 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
+    getLocationByCellMark: this.apiCall<Location[], { prisonId: string; cellMark: string }>({
+      path: '/locations/:prisonId/cell-mark/:cellMark',
+      requestType: 'get',
+    }),
     getLocationByLocalName: this.apiCall<
       LocationForLocalName,
       { prisonId: string; localName: string; parentLocationId?: string }
