@@ -1,6 +1,7 @@
 import { Factory } from 'fishery'
 
 import { Location } from '../../data/types/locationsApi'
+import CertificateLocationFactory from './certificateLocation'
 
 const LocationFactory = Factory.define<Location>(() => {
   return {
@@ -17,11 +18,7 @@ const LocationFactory = Factory.define<Location>(() => {
     capacity: {
       maxCapacity: 2,
       workingCapacity: 2,
-    },
-    certification: {
-      certified: true,
-      capacityOfCertifiedCell: 1,
-      certifiedNormalAccommodation: 1,
+      certifiedNormalAccommodation: 2,
     },
     attributes: ['ANTI_BARRICADE_DOOR'],
     usage: [
@@ -64,6 +61,7 @@ const LocationFactory = Factory.define<Location>(() => {
     key: 'TST-A-1-001',
     isResidential: true,
     leafLevel: false,
+    locked: false,
     level: 1,
     sortName: 'A-1-001',
     numberOfCellLocations: 0,
@@ -71,6 +69,8 @@ const LocationFactory = Factory.define<Location>(() => {
     wingStructure: [],
     cellMark: undefined,
     inCellSanitation: false,
+    currentCellCertificate: CertificateLocationFactory.build(),
+    certifiedCell: true,
   }
 })
 

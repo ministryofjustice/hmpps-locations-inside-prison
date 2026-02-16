@@ -5,24 +5,16 @@ import CheckRemoveCellType from '../../controllers/removeCellType/check'
 import ReviewCellCapacity from '../../controllers/removeCellType/review'
 import ConfirmRemoveCellType from '../../controllers/removeCellType/confirm'
 import canEditCna from '../../utils/canEditCna'
+import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 
 function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
-  const { accommodationTypes, active, capacity, certification, status, pendingChanges } = res.locals.location
+  const { accommodationTypes, active, status } = res.locals.location
 
-  let { workingCapacity } = capacity
-  let { certifiedNormalAccommodation: cna } = certification
-
-  if (pendingChanges?.certifiedNormalAccommodation !== undefined) {
-    cna = pendingChanges.certifiedNormalAccommodation
-  }
-
-  if (pendingChanges?.workingCapacity !== undefined) {
-    workingCapacity = pendingChanges.workingCapacity
-  }
+  const { certifiedNormalAccommodation, workingCapacity } = getLocationAttributesIncludePending(res.locals.location)
 
   return (
     (active || status === 'DRAFT') &&
-    (workingCapacity === 0 || cna === 0) &&
+    (workingCapacity === 0 || certifiedNormalAccommodation === 0) &&
     accommodationTypes.includes('NORMAL_ACCOMMODATION')
   )
 }

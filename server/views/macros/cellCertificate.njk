@@ -11,19 +11,19 @@
         text: location.pathHierarchy
       },
       {
-        text: location.cellMark or '-'
+        text: location.cellMark | dashIfUndefined
       },
       {
-        text: location.certifiedNormalAccommodation or '-'
+        text: location.certifiedNormalAccommodation | dashIfUndefined
       },
       {
-        text: location.workingCapacity or '-'
+        text: location.workingCapacity | dashIfUndefined
       },
       {
-        text: location.maxCapacity or '-'
+        text: location.maxCapacity | dashIfUndefined
       },
       {
-        html: formatConstants(specialistCellTypes, location.specialistCellTypes) or '-'
+        html: formatConstants(specialistCellTypes, location.specialistCellTypes) | dashIfUndefined
       },
       {
         text: 'Yes' if location.inCellSanitation == true else ('No' if location.inCellSanitation == false else '-')

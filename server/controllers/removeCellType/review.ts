@@ -6,6 +6,7 @@ import populateLocation from '../../middleware/populateLocation'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 import canEditCna from '../../utils/canEditCna'
+import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 
 export default class ReviewCellCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -15,15 +16,11 @@ export default class ReviewCellCapacity extends FormInitialStep {
   }
 
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
-    const { capacity, certification, pendingChanges } = res.locals.decoratedLocation
-    let values = { ...capacity, baselineCna: certification?.certifiedNormalAccommodation }
+    const { certifiedNormalAccommodation, maxCapacity, workingCapacity } = getLocationAttributesIncludePending(
+      res.locals.location,
+    )
 
-    if (pendingChanges) {
-      const { workingCapacity, maxCapacity, certifiedNormalAccommodation } = pendingChanges
-      values = { ...values, ...{ workingCapacity, maxCapacity, baselineCna: certifiedNormalAccommodation } }
-    }
-
-    return values
+    return { baselineCna: certifiedNormalAccommodation, maxCapacity, workingCapacity }
   }
 
   override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {

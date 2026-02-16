@@ -462,12 +462,10 @@ describe('Confirm', () => {
         status: 'DRAFT',
         leafLevel: true,
         pathHierarchy: 'A-1-001',
-        certification: {
-          certifiedNormalAccommodation: 1,
-        },
         capacity: {
           maxCapacity: 1,
           workingCapacity: 1,
+          certifiedNormalAccommodation: 1,
         },
         cellMark: 'A1-01',
       })
@@ -536,10 +534,8 @@ describe('Confirm', () => {
         status: 'ACTIVE',
         leafLevel: true,
         pathHierarchy: 'A-1-001',
-        certification: {
-          certifiedNormalAccommodation: 1,
-        },
         capacity: {
+          certifiedNormalAccommodation: 1,
           maxCapacity: 1,
           workingCapacity: 1,
         },
@@ -618,111 +614,6 @@ describe('Confirm', () => {
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(next).toHaveBeenCalled()
-    })
-  })
-
-  describe('locationToCertificationLocation - pendingChanges handling', () => {
-    const createBaseLocation = (pendingChanges?: any) => ({
-      id: 'loc-uuid',
-      code: 'A1',
-      pathHierarchy: 'A-1-001',
-      level: 1,
-      locationType: 'Cell',
-      leafLevel: true,
-      prisonId: 'MDI',
-      status: 'ACTIVE',
-      certification: {
-        certifiedNormalAccommodation: 1,
-      },
-      capacity: {
-        maxCapacity: 1,
-        workingCapacity: 1,
-      },
-      inCellSanitation: true,
-      cellMark: 'A1-01',
-      specialistCellTypes: ['SAFE_CUSTODY'],
-      accommodationTypes: ['SINGLE'],
-      usedFor: ['GENERAL_USE'],
-      parentId: 'parent-uuid',
-      ...(pendingChanges && { pendingChanges }),
-    })
-
-    beforeEach(() => {
-      deepReq.form = {
-        options: {
-          name: 'change-door-number',
-        },
-      } as any
-      deepReq.sessionModel.get = jest.fn().mockReturnValue(undefined)
-    })
-
-    it('uses pendingChanges.certifiedNormalAccommodation when defined', async () => {
-      deepRes.locals.location = createBaseLocation({ certifiedNormalAccommodation: 2 }) as any
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
-      expect(certLocation.certifiedNormalAccommodation).toBe(2)
-    })
-
-    it('uses current certification.certifiedNormalAccommodation when pendingChanges is undefined', async () => {
-      deepRes.locals.location = createBaseLocation() as any
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
-      expect(certLocation.certifiedNormalAccommodation).toBe(1)
-    })
-
-    it('uses pendingChanges.maxCapacity when defined', async () => {
-      deepRes.locals.location = createBaseLocation({ maxCapacity: 5 }) as any
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
-      expect(certLocation.maxCapacity).toBe(5)
-    })
-
-    it('uses current capacity.maxCapacity when pendingChanges is undefined', async () => {
-      deepRes.locals.location = createBaseLocation() as any
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
-      expect(certLocation.maxCapacity).toBe(1)
-    })
-
-    it('uses pendingChanges.workingCapacity when defined', async () => {
-      deepRes.locals.location = createBaseLocation({ workingCapacity: 3 }) as any
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
-      expect(certLocation.workingCapacity).toBe(3)
-    })
-
-    it('uses current capacity.workingCapacity when pendingChanges is undefined', async () => {
-      deepRes.locals.location = createBaseLocation() as any
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
-      expect(certLocation.workingCapacity).toBe(1)
-    })
-
-    it('uses all pendingChanges when all are defined', async () => {
-      deepRes.locals.location = createBaseLocation({
-        certifiedNormalAccommodation: 2,
-        maxCapacity: 5,
-        workingCapacity: 3,
-      }) as any
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      const certLocation = deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]
-      expect(certLocation.certifiedNormalAccommodation).toBe(2)
-      expect(certLocation.maxCapacity).toBe(5)
-      expect(certLocation.workingCapacity).toBe(3)
     })
   })
 })

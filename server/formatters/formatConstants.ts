@@ -12,5 +12,5 @@ export default function formatConstants(
     return keys.map(key => formatConstants(constants, key)).join('<br>')
   }
 
-  return constants.find(o => o.key === keys).description
+  return constants.find(o => o.key === keys)?.description
 }

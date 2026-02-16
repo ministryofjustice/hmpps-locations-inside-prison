@@ -53,12 +53,9 @@ context('Change temporary deactivations details', () => {
           capacity: {
             maxCapacity: 2,
             workingCapacity: 0,
+            certifiedNormalAccommodation: 2,
           },
           oldWorkingCapacity: 0,
-          certification: {
-            certified: true,
-            capacityOfCertifiedCell: 2,
-          },
           accommodationTypes: ['NORMAL_ACCOMMODATION'],
           specialistCellTypes: [],
           usedFor: ['STANDARD_ACCOMMODATION'],
@@ -208,12 +205,9 @@ context('Change temporary deactivations details', () => {
           capacity: {
             maxCapacity: 2,
             workingCapacity: 0,
+            certifiedNormalAccommodation: 2,
           },
           oldWorkingCapacity: 0,
-          certification: {
-            certified: true,
-            capacityOfCertifiedCell: 2,
-          },
           accommodationTypes: ['NORMAL_ACCOMMODATION'],
           specialistCellTypes: [],
           usedFor: ['STANDARD_ACCOMMODATION'],

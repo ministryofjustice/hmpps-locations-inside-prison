@@ -7,6 +7,7 @@ import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 
 function changesMadeToCells(
   existingCells: DecoratedLocation[],
@@ -20,13 +21,16 @@ function changesMadeToCells(
     const oldCell = existingCells[i]
     const newCell = newCells[i]
 
+    const { certifiedNormalAccommodation, maxCapacity, workingCapacity, cellMark, inCellSanitation } =
+      getLocationAttributesIncludePending(oldCell)
+
     if (
       oldCell.code !== newCell.code ||
-      oldCell.cellMark !== newCell.cellMark ||
-      oldCell.pendingChanges.certifiedNormalAccommodation !== newCell.certifiedNormalAccommodation ||
-      oldCell.pendingChanges.workingCapacity !== newCell.workingCapacity ||
-      oldCell.pendingChanges.maxCapacity !== newCell.maxCapacity ||
-      oldCell.inCellSanitation !== newCell.inCellSanitation ||
+      cellMark !== newCell.cellMark ||
+      certifiedNormalAccommodation !== newCell.certifiedNormalAccommodation ||
+      workingCapacity !== newCell.workingCapacity ||
+      maxCapacity !== newCell.maxCapacity ||
+      inCellSanitation !== newCell.inCellSanitation ||
       oldCell.raw.specialistCellTypes.length !== newCell.specialistCellTypes.length ||
       uniq([...oldCell.raw.specialistCellTypes, ...newCell.specialistCellTypes]).length !==
         newCell.specialistCellTypes.length

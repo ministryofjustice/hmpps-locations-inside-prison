@@ -18,10 +18,7 @@ context('Change sanitation', () => {
     active: false,
     localName: 'draftW',
     code: 'WINGA',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const draftLanding = LocationFactory.build({
@@ -35,10 +32,7 @@ context('Change sanitation', () => {
     active: false,
     localName: 'draftL',
     code: 'LANDA',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const draftCell = LocationFactory.build({
@@ -53,10 +47,7 @@ context('Change sanitation', () => {
     localName: null,
     code: '001',
     cellMark: 'A1-01',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const activeWing = LocationFactory.build({
@@ -70,10 +61,6 @@ context('Change sanitation', () => {
     active: true,
     localName: 'activeW',
     code: 'WINGB',
-    certification: {
-      certified: true,
-      capacityOfCertifiedCell: 10,
-    },
   })
 
   const activeLanding = LocationFactory.build({
@@ -87,10 +74,6 @@ context('Change sanitation', () => {
     active: true,
     localName: 'activeL',
     code: 'LANDB',
-    certification: {
-      certified: true,
-      capacityOfCertifiedCell: 10,
-    },
   })
 
   const activeCell = LocationFactory.build({
@@ -105,10 +88,6 @@ context('Change sanitation', () => {
     localName: null,
     code: '001',
     inCellSanitation: true,
-    certification: {
-      certified: true,
-      capacityOfCertifiedCell: 1,
-    },
   })
 
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
