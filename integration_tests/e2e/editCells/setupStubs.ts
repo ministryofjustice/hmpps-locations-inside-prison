@@ -17,6 +17,7 @@ const existingLandingLocation = LocationFactory.build({
   pathHierarchy: 'A-2',
   parentId: '7e570000-0000-1000-8000-000000000002',
   locationType: 'LANDING',
+  status: 'DRAFT',
   localName: undefined,
 })
 const residentialSummary: LocationResidentialSummary = {
@@ -30,6 +31,7 @@ const residentialSummary: LocationResidentialSummary = {
       cellMark: '1',
       parentId: '7e570000-0000-1000-8000-000000000003',
       locationType: 'CELL',
+      status: 'DRAFT',
       localName: undefined,
       pendingChanges: {
         certifiedNormalAccommodation: 1,
@@ -44,6 +46,7 @@ const residentialSummary: LocationResidentialSummary = {
       cellMark: '2',
       parentId: '7e570000-0000-1000-8000-000000000003',
       locationType: 'CELL',
+      status: 'DRAFT',
       localName: undefined,
       specialistCellTypes: [],
       pendingChanges: {

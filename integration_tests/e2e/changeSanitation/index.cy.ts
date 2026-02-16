@@ -18,10 +18,7 @@ context('Change sanitation', () => {
     active: false,
     localName: 'draftW',
     code: 'WINGA',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const draftLanding = LocationFactory.build({
@@ -35,10 +32,7 @@ context('Change sanitation', () => {
     active: false,
     localName: 'draftL',
     code: 'LANDA',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const draftCell = LocationFactory.build({
@@ -53,10 +47,7 @@ context('Change sanitation', () => {
     localName: null,
     code: '001',
     cellMark: 'A1-01',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const activeWing = LocationFactory.build({

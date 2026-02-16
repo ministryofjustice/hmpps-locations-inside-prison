@@ -19,6 +19,25 @@ context('Cell Certificate - History', () => {
           CellCertificateFactory.build({
             current: true,
             approvedRequest: CertificationApprovalRequestFactory.build({
+              approvalType: 'DEACTIVATION',
+              locationKey: 'A-1-001',
+            }),
+          }),
+          CellCertificateFactory.build({
+            approvedRequest: CertificationApprovalRequestFactory.build({
+              approvalType: 'DEACTIVATION',
+              locationKey: 'A',
+              locationId: '7e570000-0000-1000-8000-000000000002',
+            }),
+          }),
+          CellCertificateFactory.build({
+            approvedRequest: CertificationApprovalRequestFactory.build({
+              approvalType: 'CELL_MARK',
+              locationKey: 'A-1-001',
+            }),
+          }),
+          CellCertificateFactory.build({
+            approvedRequest: CertificationApprovalRequestFactory.build({
               approvalType: 'SIGNED_OP_CAP',
               locationKey: undefined,
             }),
@@ -34,6 +53,21 @@ context('Cell Certificate - History', () => {
 
       it('Correctly displays the history', () => {
         testGovukTable('change-requests-history-table', [
+          [
+            'A-1-001',
+            'Cell deactivation (decrease certified working capacity)',
+            '3 October 2024',
+            'john smith',
+            ['View details', 'View certificate'],
+          ],
+          [
+            'A',
+            'Wing deactivation (decrease certified working capacity)',
+            '3 October 2024',
+            'john smith',
+            ['View details', 'View certificate'],
+          ],
+          ['A-1-001', 'Change cell door number', '3 October 2024', 'john smith', ['View details', 'View certificate']],
           [
             'TST',
             'Change signed operational capacity',

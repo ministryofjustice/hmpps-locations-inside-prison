@@ -2,8 +2,11 @@ import { Request, Response } from 'express'
 import { singularizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
 import addAction from '../../middleware/addAction'
+import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 
 export default async (req: Request, res: Response) => {
+  await populatePrisonConfiguration()(req, res, null)
+
   const locals: TypedLocals = {
     title: 'Manage residential locations',
     minLayout: 'three-quarters',

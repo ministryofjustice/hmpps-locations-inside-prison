@@ -5,6 +5,7 @@ import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
 import canEditCna from '../utils/canEditCna'
+import getLocationAttributesIncludePending from '../utils/getLocationAttributesIncludePending'
 
 export function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   const { active, capacity, leafLevel, status } = location
@@ -353,28 +354,15 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         }
 
         const { numberOfCellLocations } = residentialSummary.location
-        let { workingCapacity, maxCapacity } = residentialSummary.location.capacity
-        let { certifiedNormalAccommodation: cna } = residentialSummary.location.certification
-
-        const { pendingChanges } = residentialSummary.location
-
-        if (pendingChanges?.certifiedNormalAccommodation !== undefined) {
-          cna = pendingChanges.certifiedNormalAccommodation
-        }
-
-        if (pendingChanges?.maxCapacity !== undefined) {
-          maxCapacity = pendingChanges.maxCapacity
-        }
-
-        if (pendingChanges?.workingCapacity !== undefined) {
-          workingCapacity = pendingChanges.workingCapacity
-        }
+        const { certifiedNormalAccommodation, maxCapacity, workingCapacity } = getLocationAttributesIncludePending(
+          residentialSummary.location,
+        )
 
         if (residentialSummary.location.status.includes('DRAFT')) {
           residentialSummary.summaryCards.push({
             title: 'CNA',
             type: 'cna',
-            text: numberOfCellLocations ? `${cna}` : '-',
+            text: numberOfCellLocations ? `${certifiedNormalAccommodation}` : '-',
             ...cnaLink,
           })
         }

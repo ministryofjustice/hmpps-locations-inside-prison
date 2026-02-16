@@ -20,7 +20,7 @@
   <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
   <h1 class="govuk-heading-l">
     {{ locationName }}
-    {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certification and decoratedResidentialSummary.location.certification.certified %}
+    {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certifiedCell %}
       {{ govukTag({
         text: 'Certified',
         classes: "govuk-tag--hollow",
@@ -53,12 +53,14 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0">
       <div class="govuk-grid-column-three-quarters">
-        {% if decoratedResidentialSummary.location.status == 'INACTIVE' %}
-          {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess) }}
-        {% elseif decoratedResidentialSummary.location.status in ['DRAFT'] %}
-          {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
-        {% elseif decoratedResidentialSummary.location.status.startsWith('LOCKED_') %}
+        {% if decoratedResidentialSummary.location.status.startsWith('LOCKED_') %}
           {{ lockedLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
+        {% endif %}
+
+        {% if decoratedResidentialSummary.location.status.includes('INACTIVE') %}
+          {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess, prisonConfiguration.certificationApprovalRequired == 'ACTIVE') }}
+        {% elseif decoratedResidentialSummary.location.status == 'DRAFT' %}
+          {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
         {% endif %}
 
         {% if decoratedResidentialSummary.summaryCards | length %}

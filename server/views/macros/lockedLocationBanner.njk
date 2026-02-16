@@ -23,28 +23,18 @@
         A change to this location on the cell certificate has been requested. You are unable to make any changes to this location until the request has been reviewed by the authorising director.
     </p>
 
-    {% if topLevelLocation.numberOfCellLocations > 0 and canAccess('certificate_change_request_create') %}
-      {{ govukButton({
-        text: "Add " + (topLevelLocation.locationType | lower) + " to cell certificate",
-        preventDoubleClick: true,
-        href: "/location/" + topLevelLocation.id + "/add-to-certificate",
-        attributes: {
-          'data-qa': 'add-to-cell-certificate'
-        }
-      }) }}
+    {% set viewRequestUrl = "/" + location.prisonId + "/cell-certificate/change-requests/" + (location.pendingApprovalRequestId or '') %}
+    {% if canAccess('certificate_change_request_review') %}
+      {% set viewRequestUrl = viewRequestUrl + '/review' %}
     {% endif %}
-      {% set viewRequestUrl = "/" + location.prisonId + "/cell-certificate/change-requests/" + (location.pendingApprovalRequestId or '') %}
-      {% if canAccess('certificate_change_request_review') %}
-        {% set viewRequestUrl = viewRequestUrl + '/review' %}
-      {% endif %}
-      {{ govukButton({
-        text: "View request details",
-        preventDoubleClick: true,
-        href: viewRequestUrl,
-        attributes: {
-          'data-qa': 'view-request-details'
-        }
-      }) }}
+    {{ govukButton({
+      text: "View request details",
+      preventDoubleClick: true,
+      href: viewRequestUrl,
+      attributes: {
+        'data-qa': 'view-request-details'
+      }
+    }) }}
   {% endset %}
 
   {{ mojTicketPanel({

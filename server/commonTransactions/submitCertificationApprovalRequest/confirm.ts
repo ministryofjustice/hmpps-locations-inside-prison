@@ -12,7 +12,7 @@ import { getUserEmails, sendNotification } from '../../utils/notificationHelpers
 import displayName from '../../formatters/displayName'
 import capFirst from '../../formatters/capFirst'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
-import getLocationCapacity from '../../utils/getLocationCapacity'
+import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMap'
 
 async function locationToCertificationLocation(
@@ -20,7 +20,7 @@ async function locationToCertificationLocation(
   location: Location,
   modifier?: (location: CertificateLocation) => CertificateLocation,
 ): Promise<CertificateLocation> {
-  const { certifiedNormalAccommodation, maxCapacity, workingCapacity } = getLocationCapacity(location)
+  const { certifiedNormalAccommodation, maxCapacity, workingCapacity } = getLocationAttributesIncludePending(location)
 
   let certificationLocation: CertificateLocation = {
     id: location.id,

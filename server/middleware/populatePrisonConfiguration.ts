@@ -9,10 +9,16 @@ export default function populatePrisonConfiguration() {
     try {
       res.locals.prisonConfiguration = await req.services.locationsService.getPrisonConfiguration(systemToken, prisonId)
 
-      next()
+      if (next) {
+        next()
+      }
     } catch (error) {
       logger.error(error, `Failed to populate prison configuration for: prisonId: ${prisonId}`)
-      next(error)
+      if (next) {
+        next(error)
+      } else {
+        throw error
+      }
     }
   }
 }

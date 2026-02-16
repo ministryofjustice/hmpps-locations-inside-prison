@@ -11,12 +11,12 @@
           [
             { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
             { html: "<p class='govuk-tag__wrapper'>" + locationStatusTag(item) + "</p>" },
-            { text: item.cellMark },
-            { text: item.pendingChanges.certifiedNormalAccommodation or item.certification.certifiedNormalAccommodation },
-            { text: item.pendingChanges.workingCapacity or item.capacity.workingCapacity },
-            { text: item.pendingChanges.maxCapacity or item.capacity.maxCapacity },
+            { text: (item | includePending).cellMark },
+            { text: (item | includePending).certifiedNormalAccommodation },
+            { text: (item | includePending).workingCapacity },
+            { text: (item | includePending).maxCapacity },
             { html: (item.specialistCellTypes | join('<br>')) or '-' },
-            { text: 'Yes' if item.inCellSanitation else 'No' }
+            { text: 'Yes' if (item | includePending).inCellSanitation else 'No' }
           ]
         ), rows) %}
       {% endfor %}

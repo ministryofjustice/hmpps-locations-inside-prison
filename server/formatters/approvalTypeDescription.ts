@@ -1,6 +1,7 @@
 import { Response } from 'express'
 import formatConstants from './formatConstants'
 import { Location } from '../data/types/locationsApi'
+import capFirst from './capFirst'
 
 export default function approvalTypeDescription(
   approvalType: string,
@@ -11,10 +12,9 @@ export default function approvalTypeDescription(
     case 'DRAFT':
       return 'Add new locations to certificate'
     case 'DEACTIVATION':
-      return `${formatConstants(
-        constants.locationTypes,
-        location.locationType,
-      )} deactivation (decrease certified working capacity)`
+      return `${
+        formatConstants(constants.locationTypes, location.locationType) || capFirst(location.locationType.toLowerCase())
+      } deactivation (decrease certified working capacity)`
     case 'SIGNED_OP_CAP':
       return 'Change signed operational capacity'
     case 'CELL_MARK':
