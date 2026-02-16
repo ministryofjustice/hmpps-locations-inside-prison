@@ -371,8 +371,8 @@ describe('view locations show', () => {
         })
       })
 
-      it('renders the page without the action button', () => {
-        controller(deepReq as Request, deepRes as Response)
+      it('renders the page without the action button', async () => {
+        await controller(deepReq as Request, deepRes as Response)
 
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {

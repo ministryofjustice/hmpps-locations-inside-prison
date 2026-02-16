@@ -38,13 +38,9 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
       displayName: 'Test Cell',
       otherConvertedCellType: '',
       capacity: {
+        certifiedNormalAccommodation: 1,
         maxCapacity: 1,
         workingCapacity: 1,
-      },
-      certification: {
-        certified: true,
-        capacityOfCertifiedCell: 1,
-        certifiedNormalAccommodation: 1,
       },
       numberOfCellLocations: 1,
       pendingChanges: undefined as any,
@@ -208,7 +204,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         status: 'ACTIVE',
         active: true,
         leafLevel: true,
-        capacity: { maxCapacity: 2, workingCapacity: 1 },
+        capacity: { certifiedNormalAccommodation: 1, maxCapacity: 2, workingCapacity: 1 },
       })
       const request = createMockRequest(true)
 
@@ -220,7 +216,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         status: 'DRAFT',
         active: false,
         leafLevel: true,
-        capacity: { maxCapacity: 2, workingCapacity: 1 },
+        capacity: { certifiedNormalAccommodation: 1, maxCapacity: 2, workingCapacity: 1 },
       })
       const request = createMockRequest(true)
 
@@ -232,7 +228,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         status: 'LOCKED_ACTIVE',
         active: true,
         leafLevel: true,
-        capacity: { maxCapacity: 2, workingCapacity: 1 },
+        capacity: { certifiedNormalAccommodation: 1, maxCapacity: 2, workingCapacity: 1 },
       })
       const request = createMockRequest(true)
 
@@ -244,7 +240,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         status: 'LOCKED_DRAFT',
         active: false,
         leafLevel: true,
-        capacity: { maxCapacity: 2, workingCapacity: 1 },
+        capacity: { certifiedNormalAccommodation: 1, maxCapacity: 2, workingCapacity: 1 },
       })
       const request = createMockRequest(true)
 
@@ -256,7 +252,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         status: 'ACTIVE',
         active: true,
         leafLevel: false,
-        capacity: { maxCapacity: 2, workingCapacity: 1 },
+        capacity: { certifiedNormalAccommodation: 1, maxCapacity: 2, workingCapacity: 1 },
       })
       const request = createMockRequest(true)
 
@@ -268,7 +264,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         status: 'ACTIVE',
         active: true,
         leafLevel: true,
-        capacity: { maxCapacity: 2, workingCapacity: 1 },
+        capacity: { certifiedNormalAccommodation: 1, maxCapacity: 2, workingCapacity: 1 },
       })
       const request = createMockRequest(false)
 

@@ -534,10 +534,8 @@ describe('Confirm', () => {
         status: 'ACTIVE',
         leafLevel: true,
         pathHierarchy: 'A-1-001',
-        certification: {
-          certifiedNormalAccommodation: 1,
-        },
         capacity: {
+          certifiedNormalAccommodation: 1,
           maxCapacity: 1,
           workingCapacity: 1,
         },
