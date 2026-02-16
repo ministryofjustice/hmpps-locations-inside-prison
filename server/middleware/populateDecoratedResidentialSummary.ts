@@ -6,6 +6,7 @@ import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
 import canEditCna from '../utils/canEditCna'
 import getLocationAttributesIncludePending from '../utils/getLocationAttributesIncludePending'
+import { PrisonConfiguration } from '../data/types/locationsApi'
 
 export function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   const { active, capacity, leafLevel, status } = location
@@ -224,7 +225,7 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
   return row
 }
 
-function getLocationDetails(location: DecoratedLocation, req: Request) {
+function getLocationDetails(location: DecoratedLocation, prisonConfiguration: PrisonConfiguration, req: Request) {
   const details: SummaryListRow[] = []
 
   details.push(locationCodeRow(location, req))
@@ -251,7 +252,7 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
 
     details.push(usedForRow(location, req))
 
-    if (location.raw.locationType === 'CELL') {
+    if (location.raw.locationType === 'CELL' && prisonConfiguration.certificationApprovalRequired === 'ACTIVE') {
       details.push(sanitationRow(location, req))
     }
   }
@@ -282,6 +283,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
 
   try {
     const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, locationId)
+    const prisonConfiguration = await locationsService.getPrisonConfiguration(systemToken, prisonId)
     const residentialSummary: {
       location?: DecoratedLocation
       locationDetails?: SummaryListRow[]
@@ -327,7 +329,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         userToken: user.token,
       })
 
-      residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, req)
+      residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, prisonConfiguration, req)
       residentialSummary.locationHistory = true
 
       if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
