@@ -1314,7 +1314,7 @@ const stubGetPrisonConfiguration = ({
   certificationActive,
 }: {
   prisonId: string
-  certificationActive: string
+  certificationActive: 'ACTIVE' | 'INACTIVE'
 }) =>
   stubFor({
     request: {

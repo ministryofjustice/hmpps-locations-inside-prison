@@ -104,39 +104,51 @@
     {% endif %}
 
     {% if not location.raw.status.includes('LOCKED_') %}
-      {% if canAccess('reactivate') %}
-        {% if location.raw.locationType == 'CELL' %}
+      {% if isCertActive %}
+        {% if canAccess('reactivate') %}
           {{ govukButton({
-            text: "Activate " + (location.locationType | lower),
+            text: "Activate " + ("entire " if location.raw.locationType !== 'CELL') + (location.locationType | lower),
             classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
             preventDoubleClick: true,
-            href: "/reactivate/cell/" + location.id
+            href: "/reactivate/location/" + location.id
           }) }}
-        {% elseif ['WING', 'LANDING', 'SPUR'].includes(location.raw.locationType) %}
-          {{ govukButton({
-            text: "Activate entire " + (location.locationType | lower),
-            classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
-            preventDoubleClick: true,
-            href: "/reactivate/parent/" + location.id
-          }) }}
+        {% endif %}
+      {% else %}
+        {% if canAccess('reactivate') %}
+          {% if location.raw.locationType == 'CELL' %}
+            {{ govukButton({
+              text: "Activate " + (location.locationType | lower),
+              classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
+              preventDoubleClick: true,
+              href: "/reactivate/cell/" + location.id
+            }) }}
+          {% elseif ['WING', 'LANDING', 'SPUR'].includes(location.raw.locationType) %}
+            {{ govukButton({
+              text: "Activate entire " + (location.locationType | lower),
+              classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
+              preventDoubleClick: true,
+              href: "/reactivate/parent/" + location.id
+            }) }}
 
+            {{ govukButton({
+              text: "Activate individual " + (residentialSummary.subLocationName | lower),
+              classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
+              preventDoubleClick: true,
+              href: "/reactivate/parent/" + location.id +"?select=1"
+            }) }}
+          {% endif %}
+        {% endif %}
+
+        {% if canAccess('deactivate:permanent') %}
           {{ govukButton({
-            text: "Activate individual " + (residentialSummary.subLocationName | lower),
-            classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
+            text: "Deactivate permanently",
+            classes: "govuk-button--secondary govuk-!-margin-top-5 govuk-!-margin-bottom-0",
             preventDoubleClick: true,
-            href: "/reactivate/parent/" + location.id +"?select=1"
+            href: "/location/" + location.id + "/deactivate/permanent"
           }) }}
         {% endif %}
       {% endif %}
 
-      {% if canAccess('deactivate:permanent') %}
-        {{ govukButton({
-          text: "Deactivate permanently",
-          classes: "govuk-button--secondary govuk-!-margin-top-5 govuk-!-margin-bottom-0",
-          preventDoubleClick: true,
-          href: "/location/" + location.id + "/deactivate/permanent"
-        }) }}
-      {% endif %}
     {% endif %}
   {% endset %}
 
