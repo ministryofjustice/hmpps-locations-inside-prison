@@ -88,7 +88,7 @@ context('Reactivate cell (from reactivate parent)', () => {
         parentLocation: inactiveLanding,
         subLocations: [inactiveCell1, inactiveCell2, inactiveCell3],
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
