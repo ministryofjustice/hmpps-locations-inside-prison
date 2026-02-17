@@ -230,7 +230,7 @@ function getLocationDetails(location: DecoratedLocation, prisonConfiguration: Pr
 
   details.push(locationCodeRow(location, req))
 
-  if (location.raw.locationType === 'CELL') {
+  if (location.raw.locationType === 'CELL' && prisonConfiguration.certificationApprovalRequired === 'ACTIVE') {
     details.push(doorNumberRow(location, req))
   }
 

@@ -243,7 +243,7 @@ context('View Locations Show', () => {
       .contains(location.pathHierarchy)
     detailsRows += 1
 
-    if (location.locationType === 'CELL') {
+    if (location.locationType === 'CELL' && isCertActive) {
       viewLocationsShowPage
         .locationDetailsRows()
         .eq(detailsRows)
@@ -319,22 +319,20 @@ context('View Locations Show', () => {
         .contains(location.usedFor.length ? 'Close Supervision Centre (CSC)' : '-')
       detailsRows += 1
 
-      if (location.locationType === 'CELL') {
-        if (isCertActive) {
-          viewLocationsShowPage
-            .locationDetailsRows()
-            .eq(detailsRows)
-            .find('.govuk-summary-list__key')
-            .contains('Sanitation')
+      if (location.locationType === 'CELL' && isCertActive) {
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__key')
+          .contains('Sanitation')
 
-          viewLocationsShowPage
-            .locationDetailsRows()
-            .eq(detailsRows)
-            .find('.govuk-summary-list__value')
-            .contains(location.inCellSanitation ? 'Yes' : 'No')
+        viewLocationsShowPage
+          .locationDetailsRows()
+          .eq(detailsRows)
+          .find('.govuk-summary-list__value')
+          .contains(location.inCellSanitation ? 'Yes' : 'No')
 
-          detailsRows += 1
-        }
+        detailsRows += 1
       }
     } else {
       viewLocationsShowPage
