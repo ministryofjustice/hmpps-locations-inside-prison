@@ -13,14 +13,18 @@ import capFirst from '../../formatters/capFirst'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
-function isCellOccupied(req: FormWizard.Request, res: Response) {
+function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
-export function isCellCertChange(_req: FormWizard.Request, res: Response) {
+export function isCellCertChange(req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
 
-  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType === 'CELL'
+  return (
+    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    decoratedLocation.raw.locationType === 'CELL' &&
+    req.sessionModel.get<string>('reduceWorkingCapacity') !== 'NO'
+  )
 }
 
 export function isCertChange(req: FormWizard.Request, res: Response) {
@@ -32,7 +36,7 @@ export function isCertChange(req: FormWizard.Request, res: Response) {
   )
 }
 
-function permanentDeactivationForbidden(req: FormWizard.Request, res: Response) {
+function permanentDeactivationForbidden(req: FormWizard.Request, _res: Response) {
   return !req.canAccess('deactivate:permanent')
 }
 

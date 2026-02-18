@@ -109,6 +109,16 @@ context('View Locations Show', () => {
       viewLocationsShowPage.inactiveBanner().should('exist')
 
       if (isCertActive) {
+        if (location.currentCellCertificate.workingCapacity === 0) {
+          viewLocationsShowPage
+            .inactiveBannerHeader()
+            .contains('is inactive with capacity decreased on the cell certificate')
+        } else if (location.lastDeactivationReasonForChange) {
+          viewLocationsShowPage.inactiveBannerHeader().contains('is inactive')
+        } else {
+          viewLocationsShowPage.inactiveBannerHeader().contains('is temporarily inactive')
+        }
+
         viewLocationsShowPage
           .inactiveBannerRows()
           .should('have.length', location.lastDeactivationReasonForChange ? 5 : 4)
