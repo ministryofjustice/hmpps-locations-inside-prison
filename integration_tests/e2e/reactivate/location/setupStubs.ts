@@ -25,9 +25,6 @@ export default function setupStubs(role: string, location: Location) {
       },
     }),
   )
-  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
-    parentLocation: location,
-  })
   LocationsApiStubber.stub.stubLocations(location)
   LocationsApiStubber.stub.stubPrisonerLocationsId([])
   LocationsApiStubber.stub.stubLocationsDeactivateTemporary()
