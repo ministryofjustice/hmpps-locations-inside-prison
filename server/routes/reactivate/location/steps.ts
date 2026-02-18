@@ -2,6 +2,7 @@ import FormWizard from 'hmpo-form-wizard'
 import ReactivateLocationInit from '../../../controllers/reactivate/location/init'
 import CertChangeDisclaimer from '../../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../../formatters/capFirst'
+import CheckCapacity from '../../../controllers/reactivate/location/checkCapacity'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -22,6 +23,10 @@ const steps: FormWizard.Steps = {
     title: (_req, res) => `${res.locals.decoratedLocation.locationType} activation`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
+  '/check-capacity': {
+    next: 'update-signed-op-cap',
+    controller: CheckCapacity,
+  },
 }
 
 export default steps

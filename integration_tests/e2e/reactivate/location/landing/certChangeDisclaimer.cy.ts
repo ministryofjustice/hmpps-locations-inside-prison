@@ -3,6 +3,7 @@ import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
 import goToCertChangeDisclaimer from '../goToCertChangeDisclaimer'
 import { setupStubs, location } from './setupStubs'
+import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 
 context('Certification Reactivation - Landing - Cert change disclaimer', () => {
   let page: CertChangeDisclaimerPage
@@ -25,9 +26,9 @@ context('Certification Reactivation - Landing - Cert change disclaimer', () => {
     Page.verifyOnPage(ViewLocationsShowPage)
   })
 
-  // it('proceeds to details when the button is pressed', () => {
-  //   page.continueButton().click()
-  //
-  //   Page.verifyOnPage(DeactivateTemporaryDetailsPage)
-  // })
+  it('proceeds to check capacity on submit', () => {
+    page.submit()
+
+    Page.verifyOnPage(CheckCapacityPage)
+  })
 })

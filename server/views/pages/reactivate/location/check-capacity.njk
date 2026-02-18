@@ -1,0 +1,87 @@
+{% extends "../../../partials/formStep.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro capacityTable(decoratedLocationTree) %}
+  {% set cells = decoratedLocationTree.filter(propEquals.bind(null, 'decoratedLocation.raw.locationType', 'CELL')) %}
+  {% if cells | length %}
+    {% set rows = [] %}
+    {% for cellData in cells %}
+      {% set cell = cellData.decoratedLocation %}
+      {% set baselineCna = (cell.capacity.certifiedNormalAccommodation or 0) | string %}
+      {% set workingCapacity = (cell.oldWorkingCapacity or 0) | string %}
+      {% set maxCapacity = (cell.capacity.maxCapacity or 0) | string %}
+      {% set cellTypes = cell.raw.specialistCellTypes %}
+      {% if values.capacityChanges and values.capacityChanges[cell.id] %}
+        {% if values.capacityChanges[cell.id].certifiedNormalAccommodation %}
+          {% set baselineCna = values.capacityChanges[cell.id].certifiedNormalAccommodation %}
+        {% endif %}
+        {% if values.capacityChanges[cell.id].workingCapacity %}
+          {% set workingCapacity = values.capacityChanges[cell.id].workingCapacity %}
+        {% endif %}
+        {% if values.capacityChanges[cell.id].maxCapacity %}
+          {% set maxCapacity = values.capacityChanges[cell.id].maxCapacity %}
+        {% endif %}
+        {% if values.capacityChanges[cell.id].specialistCellTypes %}
+          {% set cellTypes = values.capacityChanges[cell.id].specialistCellTypes %}
+        {% endif %}
+      {% endif %}
+
+      {% set rows = (rows.push(
+        [
+          { text: cell.pathHierarchy },
+          { text: baselineCna },
+          { text: workingCapacity },
+          { text: maxCapacity },
+          { html: formatConstants(constants.specialistCellTypes, cellTypes) }
+        ]
+      ), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      attributes: {
+        "data-qa": "check-capacity-table"
+      },
+      firstCellIsHeader: true,
+      head: [
+        { text: "Location" },
+        { text: "Baseline CNA" },
+        { text: "Working capacity" },
+        { text: "Maximum capacity" },
+        { text: "Cell type" }
+      ],
+      rows: rows
+    }) }}
+  {% else %}
+    {% for subData in data.decoratedSubLocations %}
+      {{ explodeLocation(subData, false) }}
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
+
+{% macro explodeLocation(data, topLevel) %}
+  <h{{ 2 if topLevel else 3 }} class="govuk-heading-{{ "m" if topLevel else "s" }}">
+    {{ data.decoratedLocation.displayName | capFirst }}
+  </h{{ 2 if topLevel else 3 }}>
+
+  {{ capacityTable(data.decoratedSubLocations) }}
+{% endmacro %}
+
+{% block fields %}
+  {{ govukButton({
+    text: "Edit cell " + ("capacity" if decoratedLocation.leafLevel else "capacities") + " and " + ("type" if decoratedLocation.leafLevel else "types"),
+    classes: "govuk-button--secondary",
+    preventDoubleClick: true,
+    href: "/reactivate/location/" + decoratedLocation.id + "/edit-capacity"
+  }) }}
+
+  {% if decoratedLocation.leafLevel %}
+    {{ capacityTable([{decoratedLocation: decoratedLocation}]) }}
+  {% elseif locationResidentialSummary.subLocationName == 'Cells' %}
+    {{ capacityTable(decoratedLocationTree) }}
+  {% else %}
+    {% for data in decoratedLocationTree %}
+      {{ explodeLocation(data, true) }}
+    {% endfor %}
+  {% endif %}
+{% endblock %}
