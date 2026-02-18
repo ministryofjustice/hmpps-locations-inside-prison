@@ -14,10 +14,13 @@
   {% set inactiveHtml %}
     <span class="hmpps-inactive-location-banner">
       <p class="govuk-notification-banner__heading">
-        {% if isCertActive %}
-          {{ locationType }} {{ locationName }} is inactive
+        {{ locationType }} {{ locationName }} is
+        {% if isCertActive and location.currentCellCertificate.workingCapacity === 0 and location.oldWorkingCapacity !== 0 %}
+          inactive with capacity decreased on the cell certificate
+        {% elseif isCertActive and location.lastDeactivationReasonForChange %}
+          inactive
         {% else %}
-          {{ locationType }} {{ locationName }} is temporarily inactive
+          temporarily inactive
         {% endif %}
       </p>
 

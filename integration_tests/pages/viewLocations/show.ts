@@ -31,6 +31,8 @@ export default class ViewLocationsShowPage extends Page {
 
   inactiveBanner = (): PageElement => cy.get('[data-qa=inactive-location-banner]')
 
+  inactiveBannerHeader = (): PageElement => this.inactiveBanner().find('.govuk-notification-banner__heading')
+
   inactiveBannerRows = (): PageElement => this.inactiveBanner().find('.govuk-summary-list__row')
 
   inactiveBannerActivateCellButton = (): PageElement => this.inactiveBanner().get(`a:contains("Activate cell")`)
