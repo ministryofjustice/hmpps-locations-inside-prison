@@ -43,13 +43,15 @@ describe('CommonTransaction', () => {
           fields: ['test-prefix_field1'],
           next: 'test-prefix/step2',
           pageTitle: 'Step 1',
-          template: '../../partials/formStep',
+          templatePath: 'commonTransactions',
+          template: '../partials/formStep',
         },
         '/test-prefix/step2': {
           controller: FormInitialStep,
           fields: ['test-prefix_field2'],
           next: 'next-step',
           pageTitle: 'Step 2',
+          templatePath: 'commonTransactions',
           template: 'customTemplate',
         },
       })

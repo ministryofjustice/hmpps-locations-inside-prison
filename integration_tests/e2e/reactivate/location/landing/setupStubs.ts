@@ -95,4 +95,7 @@ export function setupStubs(role: string) {
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: cell1 })
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: cell2 })
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: cell3 })
+  LocationsApiStubber.stub.stubLocations(cell1)
+  LocationsApiStubber.stub.stubLocations(cell2)
+  LocationsApiStubber.stub.stubLocations(cell3)
 }

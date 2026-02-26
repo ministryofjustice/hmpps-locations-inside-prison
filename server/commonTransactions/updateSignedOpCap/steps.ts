@@ -12,7 +12,7 @@ const steps: FormWizard.Steps = {
   '/is-update-needed': {
     pageTitle: "Check the establishment's signed operational capacity",
     fields: ['isUpdateNeeded'],
-    template: '../../commonTransactions/updateSignedOpCap/isUpdateNeeded',
+    template: 'updateSignedOpCap/isUpdateNeeded',
     controller: IsUpdateNeeded,
     next: [
       {
@@ -26,7 +26,7 @@ const steps: FormWizard.Steps = {
   },
   '/already-requested': {
     pageTitle: 'A change to the signed operational capacity has already been requested',
-    template: '../../commonTransactions/updateSignedOpCap/alreadyRequested',
+    template: 'updateSignedOpCap/alreadyRequested',
     controller: BaseController,
     next: '$END_OF_TRANSACTION$',
   },

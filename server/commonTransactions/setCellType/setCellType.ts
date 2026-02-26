@@ -3,7 +3,7 @@ import { NextFunction, Response } from 'express'
 import { TypedLocals } from '../../@types/express'
 import BaseController from './baseController'
 
-const FIELD_REGEX = /(.*)(?:normal|specialist)CellTypes(\d*)$/
+const FIELD_REGEX = /(.*)(?:normal|specialist)CellTypes(.*)$/
 
 export default class SetCellType extends BaseController {
   override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {

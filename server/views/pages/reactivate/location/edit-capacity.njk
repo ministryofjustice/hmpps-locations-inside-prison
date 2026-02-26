@@ -1,0 +1,77 @@
+{% extends "../../../partials/formStep.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro capacityTable(cells) %}
+  {% set rows = [] %}
+  {% for cell in cells %}
+    {% set cellTypesText = formatConstants(constants.specialistCellTypes, cell.specialistCellTypes) %}
+
+    {% if cell.specialistCellTypes and cell.specialistCellTypes.length %}
+      {% set cellTypeColumn =
+        {  html:
+          '<div data-qa="cell-types-' + cell.id + '" class="change-remove-container">' +
+          cellTypesText +
+          '<div class="change-remove-actions">' +
+          '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="remove/' + cell.id + '">Remove</button>' + '  |  ' +
+          '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + cell.id + '">Change</button>' + '</div>' + '</div>'
+
+        }
+      %}
+    {% else %}
+      {% set cellTypeColumn = {
+        html:
+        '<div data-qa="cell-types-' + cell.id + '">' +
+        '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + cell.id + '">Add</button>' +
+        '</div>'
+      }
+      %}
+    {% endif %}
+
+    {% set rows = (rows.push(
+      [
+        { text: cell.pathHierarchy },
+        {
+          html: callAsMacro(fields['baselineCna-' + cell.id].component)(fields['baselineCna-' + cell.id])
+        },
+        {
+          html: callAsMacro(fields['workingCapacity-' + cell.id].component)(fields['workingCapacity-' + cell.id])
+        },
+        {
+          html: callAsMacro(fields['maximumCapacity-' + cell.id].component)(fields['maximumCapacity-' + cell.id])
+        },
+        cellTypeColumn
+      ]
+    ), rows) %}
+  {% endfor %}
+
+  {{ govukTable({
+    attributes: {
+      "data-qa": "edit-capacity-table"
+    },
+    firstCellIsHeader: true,
+    head: [
+      { text: "Location" },
+      { text: "Baseline CNA" },
+      { text: "Working capacity" },
+      { text: "Maximum capacity" },
+      { text: "Cell type (optional)" }
+    ],
+    rows: rows
+  }) }}
+{% endmacro %}
+
+{% block fields %}
+  {{ govukDetails({
+    summaryText: "What the different types of cell capacity mean",
+    html: "<strong>Baseline certified normal accommodation (CNA)</strong><br>" +
+    "The number of people that can live in a cell without it being considered overcrowded.<br><br>" +
+    "<strong>Working capacity</strong><br>" +
+    "The number of people that can currently live in this location based on available beds, furniture and sanitation.<br><br>" +
+    "<strong>Maximum capacity</strong><br>" +
+    "The maximum number of people that could potentially live in this location.",
+    classes: 'govuk-!-margin-top-3'
+  }) }}
+
+  {{ capacityTable(cells) }}
+{% endblock %}

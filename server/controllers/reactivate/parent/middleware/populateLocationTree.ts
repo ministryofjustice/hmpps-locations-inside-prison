@@ -107,11 +107,34 @@ async function buildDecoratedLocationTree({
 }
 
 export default function populateLocationTree(decorate: boolean) {
-  return async (req: FormWizard.Request, res: Response, next: NextFunction) => {
+  return async (req: FormWizard.Request, res: Response, next?: NextFunction) => {
     const { decoratedLocation, location, locationResidentialSummary } = res.locals
     const { systemToken } = req.session
     const { prisonId } = decoratedLocation || location
     const { locationsService } = req.services
+
+    if (locationResidentialSummary.parentLocation.locationType === 'CELL') {
+      if (decorate) {
+        const decoratedCell = await decorateLocation({
+          location: locationResidentialSummary.parentLocation,
+          systemToken,
+          userToken: '', // not required when limited: true
+          manageUsersService: null, // not required when limited: true
+          locationsService,
+          limited: true,
+        })
+        res.locals.decoratedCells = [decoratedCell]
+        res.locals.decoratedLocationTree = [{ decoratedLocation: decoratedCell, decoratedSubLocations: [] }]
+      } else {
+        res.locals.cells = [locationResidentialSummary.parentLocation]
+        res.locals.locationTree = [{ location: locationResidentialSummary.parentLocation, subLocations: [] }]
+      }
+
+      if (next) {
+        next()
+      }
+      return
+    }
 
     let selectedLocationIds = req.sessionModel.get<string[]>('selectLocations')
     if (!selectedLocationIds?.length) {
@@ -146,6 +169,8 @@ export default function populateLocationTree(decorate: boolean) {
       )
     }
 
-    next()
+    if (next) {
+      next()
+    }
   }
 }
