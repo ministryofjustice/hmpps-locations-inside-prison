@@ -1,6 +1,7 @@
 {% extends "../../../partials/formStep.njk" %}
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
 
 {% macro capacityTable(cells) %}
   {% set rows = [] %}
@@ -72,6 +73,45 @@
     "The maximum number of people that could potentially live in this location.",
     classes: 'govuk-!-margin-top-3'
   }) }}
+
+  {% set autoFillHtml = '<h2 class="govuk-heading-m govuk-!-margin-bottom-5">Apply capacity values to all cells</h2>' %}
+
+  {% if cells.length > 1 %}
+    {% for i in [
+      {id: 'CNA', label: 'Baseline certified normal accommodation (CNA)'},
+      {id: 'WC', label: 'Working capacity'},
+      {id: 'MC', label: 'Maximum capacity'}
+    ] %}
+      {% set autoFillHtml = autoFillHtml + govukInput({
+        component: 'govukInput',
+        id: 'autoFill' + i.id,
+        name: 'autoFill' + i.id,
+        classes: 'govuk-input--width-3',
+        rows: 1,
+        autocomplete: 'off',
+        formGroup: {
+          beforeInput: {
+            html: '<label class="govuk-label govuk-input-prefix--plain" for="autoFill' + i.id + '">' + i.label + '</label>'
+          },
+          afterInput: {
+            html: '<a href="#" class="govuk-link govuk-link--no-visited-state govuk-input-suffix--plain" id="apply-autoFill' + i.id + '">Apply to all</a>'
+          }
+        }
+      }) %}
+    {% endfor %}
+
+    {{ mojTicketPanel({
+      attributes: {
+        'data-qa': 'auto-fill-capacities'
+      },
+      items: [
+        {
+          html: autoFillHtml,
+          classes: 'govuk-!-margin-bottom-5'
+        }
+      ]
+    }) }}
+  {% endif %}
 
   {{ capacityTable(cells) }}
 {% endblock %}
