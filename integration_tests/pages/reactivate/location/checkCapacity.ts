@@ -42,7 +42,7 @@ export default class CheckCapacityPage extends Page {
     })
   }
 
-  editCapacityLink = (locationId: string): PageElement => cy.get(`a[href$="/edit-capacity/${locationId}"]`)
+  editCapacityLink = (locationId: string): PageElement => cy.get(`a[href*="/edit-capacity/${locationId}"]`)
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 
