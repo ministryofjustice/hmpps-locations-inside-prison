@@ -25,9 +25,9 @@ autoFillNumbering(
   n => n + 1,
   n => `${n}`.padStart(3, '0'),
 )
-autoFillNumbering('apply-autoFillCNA', 'autoFillCNA', 'create-cells_baselineCna', n => n)
-autoFillNumbering('apply-autoFillWC', 'autoFillWC', 'create-cells_workingCapacity', n => n)
-autoFillNumbering('apply-autoFillMC', 'autoFillMC', 'create-cells_maximumCapacity', n => n)
+autoFillNumbering('apply-autoFillCNA', 'autoFillCNA', 'baselineCna', n => n)
+autoFillNumbering('apply-autoFillWC', 'autoFillWC', 'workingCapacity', n => n)
+autoFillNumbering('apply-autoFillMC', 'autoFillMC', 'maximumCapacity', n => n)
 
 $(() => {
   $('body').addClass('jquery-loaded')

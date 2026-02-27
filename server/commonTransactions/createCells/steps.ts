@@ -169,7 +169,7 @@ const steps: FormWizard.Steps = {
   },
   '/cell-numbers': {
     pageTitle: 'Enter cell numbers',
-    template: '../../commonTransactions/createCells/cellNumbers',
+    template: 'createCells/cellNumbers',
     controller: CellNumbers,
     next: 'door-numbers',
     editable: true,
@@ -177,14 +177,14 @@ const steps: FormWizard.Steps = {
   '/door-numbers': {
     pageTitle: 'Enter cell door numbers',
     controller: CellDoorNumbers,
-    template: '../../commonTransactions/createCells/doorNumbers',
+    template: 'createCells/doorNumbers',
     next: 'capacities',
     editable: true,
   },
   '/capacities': {
     pageTitle: 'Enter cell capacities and type',
     controller: Capacities,
-    template: '../../commonTransactions/createCells/capacities',
+    template: 'createCells/capacities',
     fields: ['baselineCna', 'workingCapacity', 'maximumCapacity'],
     next: [
       { field: 'accommodationType', op: '==', value: 'NORMAL_ACCOMMODATION', next: 'used-for' },

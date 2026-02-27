@@ -5,7 +5,7 @@ import goToCertChangeDisclaimer from '../goToCertChangeDisclaimer'
 import { setupStubs, location } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 
-context('Certification Reactivation - Landing - Cert change disclaimer', () => {
+context('Certification Reactivation - Wing - Cert change disclaimer', () => {
   let page: CertChangeDisclaimerPage
 
   beforeEach(() => {

@@ -18,14 +18,14 @@ const steps: FormWizard.Steps = {
   },
   '/normal': {
     pageTitle: 'Select normal cell type',
-    template: '../../commonTransactions/setCellType/normal',
+    template: 'setCellType/normal',
     fields: ['normalCellTypes'],
     controller: SetCellType,
     next: '$END_OF_TRANSACTION$',
   },
   '/special': {
     pageTitle: 'Select special cell type',
-    template: '../../commonTransactions/setCellType/special',
+    template: 'setCellType/special',
     fields: ['specialistCellTypes'],
     controller: SetCellType,
     next: '$END_OF_TRANSACTION$',

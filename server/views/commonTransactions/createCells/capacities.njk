@@ -126,28 +126,3 @@
     rows: tableRows
   }) }}
 {% endblock %}
-
-{#
-[
-      {
-        html: govukInput({
-          validate: ['numeric'],
-          component: 'govukInput',
-          id: 'autoFillCna',
-          name: 'autoFillCna',
-          classes: 'govuk-input--width-3 ',
-          rows: 1,
-          autocomplete: 'off',
-          formGroup: {
-            beforeInput: {
-              html: '<label class="govuk-label govuk-input-prefix--plain" for="autoFillCna">Baseline certified normal accommodation (CNA)</label>'
-            },
-            afterInput: {
-              html: '<a href="#" class="govuk-link govuk-link--no-visited-state govuk-input-suffix--plain" id="auto-fill-apply-cna">Apply to all</a>'
-            }
-          }
-        }),
-        classes: 'govuk-!-margin-bottom-5'
-      }
-    ]
-#}
