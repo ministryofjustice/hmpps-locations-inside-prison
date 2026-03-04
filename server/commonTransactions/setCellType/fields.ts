@@ -14,7 +14,7 @@ const fields: FormWizard.Fields = {
         text: 'Normal cell type',
         value: 'NORMAL_ACCOMMODATION',
         hint: {
-          text: 'For example, an accessible cell or constant supervision cell.',
+          text: 'For example, an accessible cell or escape list cell.',
         },
       },
       {
