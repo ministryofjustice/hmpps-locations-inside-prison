@@ -124,7 +124,7 @@ services:
       - ./wiremock:/home/wiremock
 
   redis:
-    image: 'redis:8.4'
+    image: 'redis:8.6'
     networks:
       - hmpps
     container_name: redis
