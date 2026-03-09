@@ -1,4 +1,8 @@
-const fields = {
+import FormWizard from 'hmpo-form-wizard'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+
+const fields: FormWizard.Fields = {
   newSignedOperationalCapacity: {
     component: 'govukInput',
     validate: ['required', 'numeric'],
@@ -37,6 +41,25 @@ const fields = {
       },
     ],
   },
+  ...SubmitCertificationApprovalRequest.getFields(),
+  ...UpdateSignedOpCap.getFields(),
+}
+
+fields['submit-certification-approval-request_confirmation'] = {
+  ...fields['submit-certification-approval-request_confirmation'],
+  label: {
+    text: 'Confirm changes have been agreed',
+  },
+  hint: {
+    text: 'I confirm that these changes have been agreed with the PGD and capacity management team.',
+  },
+  fieldset: {
+    legend: {
+      ...fields['submit-certification-approval-request_confirmation'].fieldset.legend,
+      text: 'Confirm changes have been agreed',
+    },
+  },
+  errorMessages: { required: 'Confirm changes have been agreed' },
 }
 
 export default fields

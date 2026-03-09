@@ -2,6 +2,8 @@ import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import Details from './details'
 import IsUpdateNeeded from './isUpdateNeeded'
+import IsUnderReview from './isUnderReview'
+import CertChangeDisclaimer from '../certChangeDisclaimer'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -24,6 +26,19 @@ const steps: FormWizard.Steps = {
       '$END_OF_TRANSACTION$',
     ],
   },
+  '/is-under-review': {
+    controller: IsUnderReview,
+    skip: true,
+    next: [
+      { fn: (_req, res) => !!res.locals.signedOpCapChangeRequest, next: 'already-requested' },
+      'cert-change-disclaimer',
+    ],
+  },
+  ...CertChangeDisclaimer.getSteps({
+    next: 'details',
+    title: (_req, _res) => `Update the signed operational capacity`,
+    caption: (req, res) => res.locals.titleCaption, // FIXME: not working
+  }),
   '/already-requested': {
     pageTitle: 'A change to the signed operational capacity has already been requested',
     template: 'updateSignedOpCap/alreadyRequested',
@@ -34,6 +49,12 @@ const steps: FormWizard.Steps = {
     pageTitle: 'Update the signed operational capacity',
     fields: ['currentSignedOpCap', 'newSignedOpCap', 'explanation'],
     controller: Details,
+    next: [
+      {
+        fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
+        next: 'submit-certification-approval-request' },
+      '$END_OF_TRANSACTION$',
+    ],
   },
 }
 

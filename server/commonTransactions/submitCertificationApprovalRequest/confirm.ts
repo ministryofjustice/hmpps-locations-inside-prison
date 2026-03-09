@@ -67,7 +67,7 @@ export default class Confirm extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
-    this.use(populateLocation())
+    this.use(this.conditionalPopulateLocation)
     this.use(
       addConstantToLocals([
         'accommodationTypes',
@@ -80,6 +80,14 @@ export default class Confirm extends FormInitialStep {
     this.use(this.generateRequests)
   }
 
+  async conditionalPopulateLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const locationId = req.params.locationId || res.locals.locationId
+    if (locationId) {
+      return populateLocation()(req, res, next)
+    }
+    return next()
+  }
+
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
     const { locationsService } = req.services
@@ -87,9 +95,8 @@ export default class Confirm extends FormInitialStep {
 
     if (location) {
       res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
+      await addLocationsToLocationMap([location])(req, res, null)
     }
-
-    await addLocationsToLocationMap([location])(req, res, null)
 
     return super._locals(req, res, next)
   }
@@ -212,7 +219,7 @@ export default class Confirm extends FormInitialStep {
     const { locationsService, manageUsersService, notifyService } = req.services
     const { prisonResidentialSummary, user, locationId, location } = res.locals
     const { prisonName } = prisonResidentialSummary.prisonSummary
-    const { prisonId } = location
+    const prisonId = res.locals.prisonId || req.sessionModel.get('prisonId') || location?.prisonId
     const submittedBy = user.name
     const { options } = req.form
 
