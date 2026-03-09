@@ -58,7 +58,7 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ matrix.environments }}
-  test-buildb:
+  test-build:
     name: Build docker image from hmpps-github-actions without publishing
     if: github.ref != 'refs/heads/main'
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
