@@ -113,6 +113,7 @@
     "jquery": "^4.0.0",
     "jwt-decode": "^4.0.0",
     "lodash": "4.17.23",
+    "minimatch": "^10.2.4",
     "multer": "^2.0.2",
     "nocache": "^4.0.0",
     "notifications-node-client": "^8.3.0",
@@ -188,6 +189,11 @@
   "overrides": {
     "@jgoz/esbuild-plugin-typecheck": {
       "esbuild": "$esbuild"
+    },
+    "cypress-multi-reporters": {
+      "mocha": {
+        "serialize-javascript": "7.0.4"
+      }
     },
     "jest": {
       "jest-core": {
