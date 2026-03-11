@@ -188,6 +188,7 @@ interface AllLocals {
   validationErrors: { text: string; href: string }[]
   values: FormWizard.Values
   valuesHaveChanged: boolean
+  viewChangeRequestLink: string
   workingCapacity: string
   capacityData: BulkCapacityUpdate
   capacitySummary: CapacitySummary

@@ -14,3 +14,13 @@
 
   {{ super() }}
 {% endblock %}
+
+{% block submitAction %}
+  {% if viewChangeRequestLink %}
+    <a href="{{ viewChangeRequestLink }}" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+      View change request
+    </a>
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
