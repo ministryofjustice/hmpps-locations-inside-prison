@@ -187,6 +187,7 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
+    "mocha": "11.7.5",
     "@jgoz/esbuild-plugin-typecheck": {
       "esbuild": "$esbuild"
     },
