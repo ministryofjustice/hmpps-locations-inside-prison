@@ -87,7 +87,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.1003.0",
-    "@ministryofjustice/frontend": "^8.0.1",
+    "@ministryofjustice/frontend": "^9.0.0",
     "@ministryofjustice/hmpps-auth-clients": "^1.0.2",
     "@ministryofjustice/hmpps-digital-prison-reporting-frontend": "^4.32.1",
     "@ministryofjustice/hmpps-monitoring": "^1.0.2",
@@ -106,7 +106,7 @@
     "express": "^4.22.1",
     "express-async-errors": "^3.1.1",
     "express-session": "^1.19.0",
-    "govuk-frontend": "^5.14.0",
+    "govuk-frontend": "^6.1.0",
     "helmet": "^8.1.0",
     "hmpo-form-wizard": "^13.0.2",
     "http-errors": "^2.0.1",
