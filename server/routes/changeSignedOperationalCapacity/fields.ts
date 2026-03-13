@@ -1,3 +1,6 @@
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+
 const fields = {
   newSignedOperationalCapacity: {
     component: 'govukInput',
@@ -36,6 +39,24 @@ const fields = {
         value: 'yes',
       },
     ],
+  },
+  ...UpdateSignedOpCap.getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
+  'submit-certification-approval-request_confirmation': {
+    ...SubmitCertificationApprovalRequest.getFields()['submit-certification-approval-request_confirmation'],
+    label: {
+      text: 'Confirm changes have been agreed',
+    },
+    fieldset: {
+      legend: {
+        text: 'Confirm changes have been agreed',
+        classes: 'govuk-fieldset__legend--m',
+      },
+    },
+    hint: {
+      text: 'By submitting this request, you confirm that this change has been agreed with the PGD or capacity management team.',
+    },
+    errorMessages: { required: 'Confirm that changes have been agreed' },
   },
 }
 

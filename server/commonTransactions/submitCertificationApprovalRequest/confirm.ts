@@ -67,7 +67,7 @@ export default class Confirm extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
-    this.use(populateLocation())
+    this.use(this.conditionalPopulateLocation)
     this.use(
       addConstantToLocals([
         'accommodationTypes',
@@ -80,6 +80,14 @@ export default class Confirm extends FormInitialStep {
     this.use(this.generateRequests)
   }
 
+  async conditionalPopulateLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const locationId = req.params?.locationId || res.locals.locationId
+    if (locationId) {
+      return populateLocation()(req, res, next)
+    }
+    return next()
+  }
+
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
     const { locationsService } = req.services
@@ -87,9 +95,8 @@ export default class Confirm extends FormInitialStep {
 
     if (location) {
       res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
+      await addLocationsToLocationMap([location])(req, res, null)
     }
-
-    await addLocationsToLocationMap([location])(req, res, null)
 
     return super._locals(req, res, next)
   }
@@ -212,11 +219,12 @@ export default class Confirm extends FormInitialStep {
     const { locationsService, manageUsersService, notifyService } = req.services
     const { prisonResidentialSummary, user, locationId, location } = res.locals
     const { prisonName } = prisonResidentialSummary.prisonSummary
-    const { prisonId } = location
+    const prisonId = res.locals.prisonId || req.sessionModel.get('prisonId') || location?.prisonId
     const submittedBy = user.name
     const { options } = req.form
 
     let certificationApprovalRequestId: string
+    let requestCount = 0
     if (options.name === 'deactivate') {
       const reason = req.sessionModel.get<string>('deactivationReason')
       const response = await locationsService.deactivateTemporary(
@@ -230,10 +238,12 @@ export default class Confirm extends FormInitialStep {
         req.sessionModel.get<string>('workingCapacityExplanation'),
       )
       certificationApprovalRequestId = response.pendingApprovalRequestId
+      requestCount += 1
     } else if (options.name === 'add-to-certificate') {
       certificationApprovalRequestId = (
         await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', locationId)
       ).id
+      requestCount += 1
     } else if (options.name === 'change-door-number') {
       const doorNumber = req.sessionModel.get<string>('doorNumber')
       const explanation = req.sessionModel.get<string>('explanation')
@@ -243,6 +253,7 @@ export default class Confirm extends FormInitialStep {
           reasonForChange: explanation,
         })
       ).pendingApprovalRequestId
+      requestCount += 1
     } else if (options.name === 'change-sanitation') {
       const inCellSanitation = req.sessionModel.get<string>('inCellSanitation')
       const explanation = req.sessionModel.get<string>('explanation')
@@ -252,8 +263,8 @@ export default class Confirm extends FormInitialStep {
           reasonForChange: explanation,
         })
       ).pendingApprovalRequestId
+      requestCount += 1
     }
-    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequestId}`
 
     const proposedSignedOpCapChange = req.sessionModel.get<{
       signedOperationalCapacity: number
@@ -261,13 +272,19 @@ export default class Confirm extends FormInitialStep {
     }>('proposedSignedOpCapChange')
     if (proposedSignedOpCapChange) {
       const { signedOperationalCapacity, reasonForChange } = proposedSignedOpCapChange
-      await locationsService.createCertificationRequestForSignedOpCap(
+      const signedOpCapResponse = await locationsService.createCertificationRequestForSignedOpCap(
         systemToken,
         prisonId,
         signedOperationalCapacity,
         reasonForChange,
       )
+      if (!certificationApprovalRequestId) {
+        certificationApprovalRequestId = signedOpCapResponse.id
+      }
+      requestCount += 1
     }
+
+    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequestId}`
 
     // Don't send emails in local dev (every deployed env counts as production)
     if (config.production || process.env.NODE_ENV === 'test') {
@@ -303,8 +320,8 @@ export default class Confirm extends FormInitialStep {
     req.sessionModel.reset()
 
     req.flash('success', {
-      title: `Change request${proposedSignedOpCapChange ? 's' : ''} sent`,
-      content: `You have submitted ${proposedSignedOpCapChange ? '2 requests' : 'a request'} to update the cell certificate.`,
+      title: `Change request${requestCount > 1 ? 's' : ''} sent`,
+      content: `You have submitted ${requestCount > 1 ? `${requestCount} requests` : 'a request'} to update the cell certificate.`,
     })
 
     res.redirect(`/${prisonId}/cell-certificate/change-requests`)
