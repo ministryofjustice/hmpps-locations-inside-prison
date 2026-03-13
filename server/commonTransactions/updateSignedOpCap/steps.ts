@@ -2,7 +2,7 @@ import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import Details from './details'
 import IsUpdateNeeded from './isUpdateNeeded'
-import IsUnderReview from './isUnderReview'
+
 import CertChangeDisclaimer from '../certChangeDisclaimer'
 
 const steps: FormWizard.Steps = {
@@ -13,7 +13,7 @@ const steps: FormWizard.Steps = {
   },
   '/is-under-review': {
     skip: true,
-    controller: IsUnderReview,
+    controller: BaseController,
     next: [
       { fn: (_req, res) => !!res.locals.signedOpCapChangeRequest, next: 'already-requested' },
       'cert-change-disclaimer',
