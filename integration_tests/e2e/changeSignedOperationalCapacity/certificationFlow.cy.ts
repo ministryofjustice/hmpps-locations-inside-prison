@@ -106,7 +106,10 @@ context('Change signed operational capacity - certification flow', () => {
       it('shows the summary with location, change type and explanation', () => {
         const summaryList = submitPage.request('SIGNED_OP_CAP')
         summaryList.find('dt:contains("Location")').next('dd').should('contain', prisonId)
-        summaryList.find('dt:contains("Change type")').next('dd').should('contain', 'Change signed operational capacity')
+        summaryList
+          .find('dt:contains("Change type")')
+          .next('dd')
+          .should('contain', 'Change signed operational capacity')
         summaryList.find('dt:contains("Explanation")').next('dd').should('contain', 'New wing opened')
       })
 
@@ -140,7 +143,10 @@ context('Change signed operational capacity - certification flow', () => {
       context('validation errors', () => {
         it('displays the correct error for the confirmation checkbox', () => {
           submitPage.submit({})
-          Page.checkForError('submit-certification-approval-request_confirmation', 'Confirm that changes have been agreed')
+          Page.checkForError(
+            'submit-certification-approval-request_confirmation',
+            'Confirm that changes have been agreed',
+          )
         })
       })
 
