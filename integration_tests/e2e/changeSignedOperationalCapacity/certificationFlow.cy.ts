@@ -91,14 +91,60 @@ context('Change signed operational capacity - certification flow', () => {
       Page.verifyOnPage(ViewLocationsIndexPage)
     })
 
-    context('full flow through to submission', () => {
-      it('can complete the full certification approval flow', () => {
+    context('submit certification approval request page', () => {
+      let submitPage: SubmitCertificationApprovalRequestPage
+
+      beforeEach(() => {
         page.continueButton().click()
 
         const detailsPage = Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
         detailsPage.submit({ opCap: 14, explanation: 'New wing opened' })
 
-        const submitPage = Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
+        submitPage = Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
+      })
+
+      it('shows the summary with location, change type and explanation', () => {
+        const summaryList = submitPage.request('SIGNED_OP_CAP')
+        summaryList.find('dt:contains("Location")').next('dd').should('contain', prisonId)
+        summaryList.find('dt:contains("Change type")').next('dd').should('contain', 'Change signed operational capacity')
+        summaryList.find('dt:contains("Explanation")').next('dd').should('contain', 'New wing opened')
+      })
+
+      it('shows the proposed changes table with signed operational capacity', () => {
+        cy.get('[data-qa=cap-change-table]').should('contain', prisonId)
+        cy.get('[data-qa=cap-change-table]').should('contain', '12 → 14')
+      })
+
+      it('does not show location locked text', () => {
+        cy.get('#main-content').should('not.contain', 'locked')
+      })
+
+      it('shows the custom confirmation heading and hint text', () => {
+        cy.get('legend').should('contain', 'Confirm changes have been agreed')
+        cy.get('.govuk-hint').should(
+          'contain',
+          'By submitting this request, you confirm that this change has been agreed with the PGD or capacity management team.',
+        )
+      })
+
+      it('has a cancel link that returns to the manage locations page', () => {
+        submitPage.cancelLink().click()
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a back link that returns to the details page', () => {
+        submitPage.backLink().click()
+        Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
+      })
+
+      context('validation errors', () => {
+        it('displays the correct error for the confirmation checkbox', () => {
+          submitPage.submit({})
+          Page.checkForError('submit-certification-approval-request_confirmation', 'Confirm that changes have been agreed')
+        })
+      })
+
+      it('proceeds to the requests index and displays a success banner when submitted', () => {
         submitPage.submit({ confirm: true })
 
         Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
