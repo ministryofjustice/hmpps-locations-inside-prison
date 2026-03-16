@@ -14,14 +14,14 @@ const fields: FormWizard.Fields = {
         text: 'Normal cell type',
         value: 'NORMAL_ACCOMMODATION',
         hint: {
-          text: 'For example, an accessible cell or constant supervision cell.',
+          text: 'For example, an accessible cell or an escape list cell.',
         },
       },
       {
         text: 'Special cell type',
         value: 'SPECIAL_ACCOMMODATION',
         hint: {
-          text: 'For example, a dry cell or unfurnished cell.',
+          text: 'For example, a dry cell or an unfurnished cell.',
         },
       },
     ],
