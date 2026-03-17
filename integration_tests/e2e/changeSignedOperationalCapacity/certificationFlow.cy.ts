@@ -104,13 +104,20 @@ context('Change signed operational capacity - certification flow', () => {
       })
 
       it('shows the summary with location, change type and explanation', () => {
-        const summaryList = submitPage.request('SIGNED_OP_CAP')
-        summaryList.find('dt:contains("Location")').next('dd').should('contain', prisonId)
-        summaryList
-          .find('dt:contains("Change type")')
-          .next('dd')
-          .should('contain', 'Change signed operational capacity')
-        summaryList.find('dt:contains("Explanation")').next('dd').should('contain', 'New wing opened')
+        cy.get('[data-qa=overview-list-SIGNED_OP_CAP]').within(() => {
+          cy.get('.govuk-summary-list__key')
+            .contains('Location')
+            .next('.govuk-summary-list__value')
+            .should('contain', prisonId)
+          cy.get('.govuk-summary-list__key')
+            .contains('Change type')
+            .next('.govuk-summary-list__value')
+            .should('contain', 'Change signed operational capacity')
+          cy.get('.govuk-summary-list__key')
+            .contains('Explanation')
+            .next('.govuk-summary-list__value')
+            .should('contain', 'New wing opened')
+        })
       })
 
       it('shows the proposed changes table with signed operational capacity', () => {
