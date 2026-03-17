@@ -35,6 +35,17 @@ export default class Approve extends FormInitialStep {
       await addLocationsToLocationMap([approvalRequest.locationId])(req, res, null)
     }
 
+    if (approvalRequest.approvalType === 'SIGNED_OP_CAP') {
+      const confirmationField = req.form.options.fields.confirmation
+      confirmationField.fieldset.legend.text = 'Confirm change agreed with capacity management'
+      confirmationField.hint = {
+        text: 'I confirm that this change has been agreed with capacity management.',
+      }
+      confirmationField.errorMessages = {
+        required: 'Confirm that the change has been agreed with capacity management',
+      }
+    }
+
     await super._locals(req, res, next)
   }
 
