@@ -120,6 +120,7 @@ context('Cell Certificate - Change Requests - Review', () => {
         LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
           CertificationApprovalRequestFactory.build({
             approvalType: 'SIGNED_OP_CAP',
+            locationId: null,
             locations: [],
             reasonForChange: 'Needed to change it',
           }),
