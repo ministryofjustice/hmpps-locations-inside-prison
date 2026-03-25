@@ -23,6 +23,10 @@ export default function populateLocation({ decorate, id, includeHistory, localNa
     const { locationsService, manageUsersService } = req.services
     let location = res.locals[localName || 'location']
 
+    if (!location) {
+      location = res.locals[decoratedLocationLocalsMap[localName || 'location']]?.raw
+    }
+
     try {
       const { systemToken } = req.session
 

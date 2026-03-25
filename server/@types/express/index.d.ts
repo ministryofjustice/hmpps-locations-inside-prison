@@ -152,6 +152,7 @@ interface AllLocals {
   locationTree: LocationTree[]
   locationType: string
   maxCapacity: string
+  modifiedLocationMap: { [locationId: string]: Location }
   minLayout: string
   options: FormWizard.Request['form']['options']
   pathSuffix: string

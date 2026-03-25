@@ -23,6 +23,13 @@ export default function approvalTypeDescription(
     } deactivation (decrease certified working capacity)`
   }
 
+  if (approvalType === 'REACTIVATION') {
+    const formatted = formatConstants(constants.locationTypes, location.locationType)
+    return `${
+      formatted === '-' ? capFirst(location.locationType.toLowerCase()) : formatted
+    } activation (increase certified working capacity)`
+  }
+
   if (approvalType in approvalTypeMap) {
     return approvalTypeMap[approvalType]
   }

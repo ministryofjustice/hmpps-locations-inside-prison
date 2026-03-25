@@ -79,6 +79,7 @@ describe('Change sanitation', () => {
         buttonText: 'Save sanitation',
         cancelText: 'Cancel',
         titleCaption: 'Cell A-1-001',
+        validationErrors: [],
       })
     })
   })

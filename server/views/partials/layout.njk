@@ -2,6 +2,7 @@
 
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% from "../macros/breadcrumb.njk" import breadcrumb %}
 {% from "../macros/feedbackBanner.njk" import feedbackBanner %}
@@ -137,7 +138,7 @@
             {{ breadcrumb('', breadcrumbs, false) }}
           {% endif %}
 
-          {% if errorlist.length %}
+          {% if validationErrors.length %}
             {{ govukErrorSummary({
               titleText: "There is a problem",
               errorList: validationErrors,

@@ -69,6 +69,7 @@ describe('adminResiSwitch', () => {
         cancelLink: '/admin/MDI',
         cancelText: 'Cancel and return to prison configuration details',
         title: 'Update residential location status',
+        validationErrors: [],
       })
     })
   })

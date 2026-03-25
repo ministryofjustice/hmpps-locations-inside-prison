@@ -42,10 +42,6 @@ async function locationToCertificationLocation(
     usedFor: location.usedFor,
   }
 
-  if (modifier) {
-    certificationLocation = modifier(certificationLocation)
-  }
-
   if (!location.leafLevel) {
     const locationSummary = await req.services.locationsService.getResidentialSummary(
       req.session.systemToken,
@@ -58,6 +54,13 @@ async function locationToCertificationLocation(
         locationToCertificationLocation(req, subLocation, modifier),
       ),
     )
+  } else if (req.form.options.name === 'reactivate') {
+    certificationLocation.currentWorkingCapacity = location.currentCellCertificate?.workingCapacity ?? 0
+    certificationLocation.workingCapacity = location.oldWorkingCapacity
+  }
+
+  if (modifier) {
+    certificationLocation = modifier(certificationLocation)
   }
 
   return certificationLocation
@@ -153,6 +156,35 @@ export default class Confirm extends FormInitialStep {
         planetFmReference: changeLink,
         reasonForChange: changeLink,
       }
+    } else if (req.form.options.name === 'reactivate') {
+      let workingCapacityChange = 0
+      const locations = [
+        await locationToCertificationLocation(req, locals.location, location => {
+          const workingCapacityString = sessionModel.get<string>(`workingCapacity-${location.id}`)
+          if (!workingCapacityString) {
+            if (location.locationType === 'CELL') {
+              workingCapacityChange += location.workingCapacity - location.currentWorkingCapacity
+            }
+
+            return location
+          }
+
+          workingCapacityChange += Number(workingCapacityString) - location.currentWorkingCapacity
+          return {
+            ...location,
+            workingCapacity: Number(workingCapacityString),
+          }
+        }),
+      ]
+
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'REACTIVATION',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        prisonId: locals.prisonId,
+        workingCapacityChange,
+        locations,
+      })
     } else if (req.form.options.name === 'add-to-certificate') {
       proposedCertificationApprovalRequests.push({
         approvalType: 'DRAFT',

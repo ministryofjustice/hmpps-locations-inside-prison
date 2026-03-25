@@ -27,7 +27,8 @@ export default function setupStubs(role: string, location: Location) {
   )
   LocationsApiStubber.stub.stubLocations(location)
   LocationsApiStubber.stub.stubPrisonerLocationsId([])
-  LocationsApiStubber.stub.stubLocationsDeactivateTemporary()
+  LocationsApiStubber.stub.stubLocationsCertificationPrisonSignedOpCapChange()
+  LocationsApiStubber.stub.stubLocationsBulkReactivate()
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
   LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
 }

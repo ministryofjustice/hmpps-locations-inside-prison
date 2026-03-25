@@ -77,6 +77,7 @@ describe('Change door number', () => {
         buttonText: 'Save door number',
         cancelText: 'Cancel',
         titleCaption: 'Cell A-1-001',
+        validationErrors: [],
       })
     })
   })

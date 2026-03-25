@@ -195,6 +195,8 @@ export default class FormInitialStep extends FormWizard.Controller {
 
       locals.fields = fields
       locals.validationErrors = validationErrors
+    } else {
+      locals.validationErrors = res.locals.errorlist
     }
 
     return locals

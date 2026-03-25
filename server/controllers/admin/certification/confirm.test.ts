@@ -64,6 +64,7 @@ describe('adminCertificationSwitch', () => {
         cancelLink: '/admin/MDI',
         cancelText: 'Cancel and return to prison configuration details',
         title: 'Update certification approval status',
+        validationErrors: [],
       })
     })
   })
