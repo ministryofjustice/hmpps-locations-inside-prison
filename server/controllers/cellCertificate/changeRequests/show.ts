@@ -1,24 +1,30 @@
 import { Request, Response } from 'express'
-import _ from 'lodash'
 import { TypedLocals } from '../../../@types/express'
 import displayName from '../../../formatters/displayName'
 import capFirst from '../../../formatters/capFirst'
-import formatConstants from '../../../formatters/formatConstants'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
+import addConstantToLocals from '../../../middleware/addConstantToLocals'
+import addUsersToUserMap from '../../../middleware/addUsersToUserMap'
+import { Location } from '../../../data/types/locationsApi'
+import approvalTypeDescription from '../../../formatters/approvalTypeDescription'
 
 export default async (req: Request, res: Response) => {
-  const { locationsService, manageUsersService } = req.services
+  await addConstantToLocals([
+    'accommodationTypes',
+    'deactivatedReasons',
+    'locationTypes',
+    'specialistCellTypes',
+    'usedForTypes',
+  ])(req, res, null)
+
+  const { locationsService } = req.services
   const { systemToken } = req.session
-  const { approvalRequest, user, prisonId } = res.locals
+  const { approvalRequest, constants, prisonId } = res.locals
   const locals: TypedLocals = {
+    ...res.locals,
     backLink: `/${res.locals.prisonId}/cell-certificate/change-requests`,
     backLinkText: `Back${approvalRequest.status === 'PENDING' ? ' to change requests' : ''}`,
   }
-
-  locals.accommodationTypeConstants = await locationsService.getAccommodationTypes(systemToken)
-  locals.approvalTypeConstants = await locationsService.getApprovalTypes(systemToken)
-  locals.specialistCellTypesObject = await locationsService.getSpecialistCellTypes(systemToken)
-  locals.usedForConstants = await locationsService.getUsedForTypes(systemToken)
 
   if (approvalRequest.approvalType === 'SIGNED_OP_CAP' && approvalRequest.status === 'PENDING') {
     await getPrisonResidentialSummary(req, res, null)
@@ -28,22 +34,28 @@ export default async (req: Request, res: Response) => {
     locals.backLink = `/${prisonId}/cell-certificate/history`
   }
 
-  locals.userMap = Object.fromEntries(
-    await Promise.all(
-      _.uniq([approvalRequest.requestedBy, approvalRequest.approvedOrRejectedBy].filter(u => u)).map(async username => [
-        username,
-        (await manageUsersService.getUser(user.token, username))?.name || username,
-      ]),
-    ),
+  await addUsersToUserMap([approvalRequest.requestedBy, approvalRequest.approvedOrRejectedBy].filter(u => u))(
+    req,
+    res,
+    null,
   )
 
-  locals.title = `${formatConstants(locals.approvalTypeConstants, approvalRequest.approvalType)} request details`
-
+  let location: Location
   if (approvalRequest.locationId) {
-    const location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
+    location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
     locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
   } else {
     locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
+  }
+
+  locals.title = `${approvalTypeDescription(approvalRequest.approvalType, constants, location)} request details`
+
+  if (location) {
+    if (!res.locals.locationMap) {
+      res.locals.locationMap = {}
+    }
+
+    res.locals.locationMap[location.id] = location
   }
 
   return res.render('pages/cellCertificate/changeRequests/show', locals)

@@ -6,6 +6,7 @@ import NotificationService, { NotificationType, notificationGroups } from '../..
 import LocationsService from '../../services/locationsService'
 import Confirm from './confirm'
 import * as notificationHelpers from '../../utils/notificationHelpers'
+import LocationFactory from '../../testutils/factories/location'
 
 jest.mock('../../utils/notificationHelpers')
 jest.mock('../../middleware/getPrisonResidentialSummary')
@@ -38,6 +39,11 @@ describe('Confirm', () => {
     locationsService.createCertificationRequestForLocation.mockResolvedValue({ id: 'some-uuid' } as any)
 
     deepReq = {
+      form: {
+        options: {
+          name: 'add-to-certificate',
+        },
+      },
       session: {
         systemToken: 'token',
       },
@@ -57,11 +63,11 @@ describe('Confirm', () => {
     }
     deepRes = {
       locals: {
-        location: {
+        location: LocationFactory.build({
           id: 'some-uuid',
           prisonId: 'MDI',
           leafLevel: true,
-        },
+        }),
         prisonResidentialSummary: {
           prisonSummary: {
             prisonName: 'Moorland (HMP & YOI)',
@@ -138,9 +144,11 @@ describe('Confirm', () => {
     })
 
     it('creates certification request for signed op cap when present', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New location built',
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'proposedSignedOpCapChange') {
+          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
+        }
+        return undefined
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -180,9 +188,11 @@ describe('Confirm', () => {
     })
 
     it('sets flash success message for multiple change requests', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New location built',
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'proposedSignedOpCapChange') {
+          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
+        }
+        return undefined
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -197,6 +207,413 @@ describe('Confirm', () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
+  describe('saveValues - changeDoorNumber', () => {
+    beforeEach(() => {
+      deepReq.form.options.name = 'change-door-number'
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'doorNumber') return 'A1-02'
+        if (key === 'explanation') return 'Need to change door number'
+        return undefined
+      })
+      ;(deepRes.locals as any).locationId = 'loc-123'
+      locationsService.updateCellMark = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
+    })
+
+    it('updates cell mark with doorNumber and reason', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.updateCellMark).toHaveBeenCalledWith('token', 'loc-123', {
+        cellMark: 'A1-02',
+        reasonForChange: 'Need to change door number',
+      })
+    })
+
+    it('sends notifications using pendingApprovalRequestId', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        1,
+        notifyService,
+        ['certificate_reviewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
+        NotificationType.REQUEST_RECEIVED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        2,
+        notifyService,
+        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
+        NotificationType.REQUEST_SUBMITTED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+    })
+
+    it('sets single request flash message and redirects', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'Change request sent',
+        content: 'You have submitted a request to update the cell certificate.',
+      })
+      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
+  describe('saveValues - changeCellSanitation', () => {
+    beforeEach(() => {
+      deepReq.form.options.name = 'change-sanitation'
+      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
+        if (key === 'inCellSanitation') return 'YES'
+        if (key === 'explanation') return 'Adding sanitation facilities'
+        return undefined
+      })
+      ;(deepRes.locals as any).locationId = 'loc-456'
+      locationsService.updateCellSanitation = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-456' })
+    })
+
+    it('updates in cell sanitation with inCellSanitation and reason', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.updateCellSanitation).toHaveBeenCalledWith('token', 'loc-456', {
+        inCellSanitation: true,
+        reasonForChange: 'Adding sanitation facilities',
+      })
+    })
+
+    it('sends notifications using pendingApprovalRequestId', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        1,
+        notifyService,
+        ['certificate_reviewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-456/review'),
+        NotificationType.REQUEST_RECEIVED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        2,
+        notifyService,
+        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/MDI/cell-certificate/change-requests/req-456'),
+        NotificationType.REQUEST_SUBMITTED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
+    })
+
+    it('sets single request flash message and redirects', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'Change request sent',
+        content: 'You have submitted a request to update the cell certificate.',
+      })
+      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+    })
+  })
+
+  describe('deactivate form', () => {
+    beforeEach(() => {
+      deepReq.form.options.name = 'deactivate'
+      deepReq.sessionModel.get = jest.fn().mockImplementation(
+        (key: string) =>
+          ({
+            deactivationReason: 'OTHER',
+            deactivationReasonOther: 'Unidentified energy signature detected',
+            facilitiesManagementReference: '12345678',
+            mandatoryEstimatedReactivationDate: '2027-01-10',
+            workingCapacityExplanation: 'Future cell integrity uncertain',
+          })[key],
+      )
+    })
+
+    describe('generateRequests', () => {
+      it('adds DEACTIVATE approval request when form name is deactivate', async () => {
+        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+          expect.objectContaining({
+            approvalType: 'DEACTIVATION',
+            deactivatedReason: 'OTHER',
+            deactivationReasonDescription: 'Unidentified energy signature detected',
+            proposedReactivationDate: '2027-01-10',
+            reasonForChange: 'Future cell integrity uncertain',
+          }),
+        )
+
+        expect(deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]).toEqual(
+          expect.objectContaining({
+            workingCapacity: 0,
+            currentWorkingCapacity: 2,
+          }),
+        )
+      })
+
+      it('does not add DEACTIVATION approval request when form name is not deactivate', async () => {
+        deepReq.form.options.name = 'other-form'
+
+        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(
+          deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'DEACTIVATION'),
+        ).toHaveLength(0)
+      })
+    })
+
+    describe('saveValues', () => {
+      beforeEach(() => {
+        ;(deepRes.locals as any).locationId = 'loc-123'
+        locationsService.deactivateTemporary = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
+      })
+
+      it('deactivates the cell', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
+          'token',
+          'loc-123',
+          'OTHER',
+          'Unidentified energy signature detected',
+          '2027-01-10',
+          '12345678',
+          true,
+          'Future cell integrity uncertain',
+        )
+      })
+
+      it('sends notifications using pendingApprovalRequestId', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+          1,
+          notifyService,
+          ['certificate_reviewer@test.com'],
+          'Moorland (HMP & YOI)',
+          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
+          NotificationType.REQUEST_RECEIVED,
+          undefined,
+          undefined,
+          undefined,
+          'Joe Submitter',
+        )
+
+        expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+          2,
+          notifyService,
+          ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+          'Moorland (HMP & YOI)',
+          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
+          NotificationType.REQUEST_SUBMITTED,
+          undefined,
+          undefined,
+          undefined,
+          'Joe Submitter',
+        )
+      })
+
+      it('sets single request flash message and redirects', async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(deepReq.flash).toHaveBeenCalledWith('success', {
+          title: 'Change request sent',
+          content: 'You have submitted a request to update the cell certificate.',
+        })
+        expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+      })
+    })
+  })
+
+  describe('locals', () => {
+    it('sets buttonText to Submit for approval', () => {
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect(result.buttonText).toBe('Submit for approval')
+    })
+
+    it('sets cancelText to Cancel', () => {
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect(result.cancelText).toBe('Cancel')
+    })
+  })
+
+  describe('generateRequests', () => {
+    beforeEach(() => {
+      deepRes.locals.location = LocationFactory.build({
+        id: 'some-uuid',
+        prisonId: 'MDI',
+        status: 'DRAFT',
+        leafLevel: true,
+        pathHierarchy: 'A-1-001',
+        capacity: {
+          maxCapacity: 1,
+          workingCapacity: 1,
+          certifiedNormalAccommodation: 1,
+        },
+        cellMark: 'A1-01',
+      })
+      deepReq.form = {
+        options: {
+          name: '',
+        },
+      } as any
+    })
+
+    it('adds DRAFT approval request when form name is add-to-certificate', async () => {
+      deepReq.form.options.name = 'add-to-certificate'
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'DRAFT',
+        }),
+      )
+    })
+
+    it('does not add DRAFT approval request when form name is not add-to-certificate', async () => {
+      deepReq.form.options.name = 'other-form'
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(
+        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'DRAFT'),
+      ).toHaveLength(0)
+    })
+
+    it('adds CELL_MARK approval request when form name is change-door-number', async () => {
+      deepReq.form.options.name = 'change-door-number'
+      deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
+        if (key === 'doorNumber') return 'A1-02'
+        if (key === 'explanation') return 'Need to change door number'
+        return undefined
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'CELL_MARK',
+          currentCellMark: 'A1-01',
+          cellMark: 'A1-02',
+          reasonForChange: 'Need to change door number',
+        }),
+      )
+    })
+
+    it('does not add CELL_MARK approval request when form name is not change-door-number', async () => {
+      deepReq.form.options.name = 'other-form'
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(
+        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'CELL_MARK'),
+      ).toHaveLength(0)
+    })
+
+    it('adds CELL_SANITATION approval request when form name is change-sanitation', async () => {
+      deepRes.locals.location = LocationFactory.build({
+        id: 'some-uuid',
+        prisonId: 'MDI',
+        status: 'ACTIVE',
+        leafLevel: true,
+        pathHierarchy: 'A-1-001',
+        capacity: {
+          certifiedNormalAccommodation: 1,
+          maxCapacity: 1,
+          workingCapacity: 1,
+        },
+        inCellSanitation: false,
+      })
+      deepReq.form.options.name = 'change-sanitation'
+      deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
+        if (key === 'inCellSanitation') return 'YES'
+        if (key === 'explanation') return 'Adding sanitation facilities'
+        return undefined
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'CELL_SANITATION',
+          currentInCellSanitation: false,
+          inCellSanitation: true,
+          reasonForChange: 'Adding sanitation facilities',
+        }),
+      )
+    })
+
+    it('does not add CELL_SANITATION approval request when form name is not change-sanitation', async () => {
+      deepReq.form.options.name = 'other-form'
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(
+        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'CELL_SANITATION'),
+      ).toHaveLength(0)
+    })
+
+    it('adds SIGNED_OP_CAP approval request when proposedSignedOpCapChange exists', async () => {
+      deepReq.sessionModel.get = jest.fn().mockReturnValue({
+        signedOperationalCapacity: 550,
+        reasonForChange: 'New capacity',
+        prisonId: 'MDI',
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
+        expect.objectContaining({
+          approvalType: 'SIGNED_OP_CAP',
+          signedOperationCapacityChange: expect.any(Number),
+          reasonForChange: 'New capacity',
+        }),
+      )
+    })
+
+    it('sets correct title for single change request', async () => {
+      deepRes.locals.location.status = 'ACTIVE'
+      deepReq.sessionModel.get = jest.fn().mockReturnValue(undefined)
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.title).toBe('You are requesting a change to the cell certificate')
+    })
+
+    it('sets correct title for multiple change requests', async () => {
+      deepReq.form.options.name = 'add-to-certificate'
+      deepReq.sessionModel.get = jest.fn().mockReturnValue({
+        signedOperationalCapacity: 550,
+        reasonForChange: 'New capacity',
+        prisonId: 'MDI',
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.title).toContain('2 changes')
+    })
+
+    it('calls next when complete', async () => {
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(next).toHaveBeenCalled()
     })
   })
 })

@@ -26,6 +26,7 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     active &&
     isResidential &&
     ['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType) &&
+    !status.includes('LOCKED_') &&
     req.canAccess('deactivate')
   ) {
     addAction({
@@ -40,9 +41,9 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     })(req, res, null)
   }
 
-  if (req.canAccess('convert_non_residential') && active && isResidential && leafLevel) {
+  if (req.canAccess('convert_non_residential') && active && isResidential && leafLevel && !status.includes('LOCKED_')) {
     addAction({
-      text: `Convert to non-residential room`,
+      text: `Convert cell to non-residential room`,
       href: `/location/${location.id}/non-residential-conversion`,
     })(req, res, null)
   }

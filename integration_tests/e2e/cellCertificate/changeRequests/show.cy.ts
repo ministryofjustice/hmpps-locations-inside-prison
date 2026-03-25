@@ -22,9 +22,9 @@ context('Cell Certificate - Change Requests - Show', () => {
       })
 
       it('Correctly displays the change request info', () => {
-        cy.get('h1').should('contain', 'Add new locations request details')
+        cy.get('h1').should('contain', 'Add new locations to certificate request details')
 
-        testGovukSummaryList('overview-list', [
+        testGovukSummaryList('overview-list-DRAFT', [
           ['Location', 'A'],
           ['Change type', 'Add new locations to certificate'],
           ['Submitted on', '3 October 2024'],
@@ -60,6 +60,7 @@ context('Cell Certificate - Change Requests - Show', () => {
           CertificationApprovalRequestFactory.build({
             approvalType: 'SIGNED_OP_CAP',
             locations: [],
+            reasonForChange: 'Needed to change it',
           }),
         )
 
@@ -70,7 +71,7 @@ context('Cell Certificate - Change Requests - Show', () => {
       it('Correctly displays the change request info', () => {
         cy.get('h1').should('contain', 'Change signed operational capacity request details')
 
-        testGovukSummaryList('overview-list', [
+        testGovukSummaryList('overview-list-SIGNED_OP_CAP', [
           ['Location', 'A'],
           ['Change type', 'Change signed operational capacity'],
           ['Explanation', 'Needed to change it'],

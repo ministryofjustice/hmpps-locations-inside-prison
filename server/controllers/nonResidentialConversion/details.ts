@@ -31,7 +31,7 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     return {
       ...locals,
       cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-      title: 'Convert to non-residential room',
+      title: 'Convert cell to non-residential room',
       titleCaption: capFirst(decoratedLocation.displayName),
     }
   }

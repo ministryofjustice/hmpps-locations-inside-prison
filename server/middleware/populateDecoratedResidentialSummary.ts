@@ -5,34 +5,62 @@ import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
 import canEditCna from '../utils/canEditCna'
+import getLocationAttributesIncludePending from '../utils/getLocationAttributesIncludePending'
+import { PrisonConfiguration } from '../data/types/locationsApi'
 
-function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
+export function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   const { active, capacity, leafLevel, status } = location
-  return (active || status === 'DRAFT') && capacity && leafLevel && req.canAccess('change_cell_capacity')
+  return (
+    (active || status === 'DRAFT') &&
+    capacity &&
+    leafLevel &&
+    !status.includes('LOCKED_') &&
+    req.canAccess('change_cell_capacity')
+  )
 }
 
-function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
+export function showChangeLocationCodeLink(location: DecoratedLocation, req: Request) {
   return location.status === 'DRAFT' && req.canAccess('change_location_code')
 }
 
-function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
-  return location.status === 'DRAFT' && req.canAccess('change_door_number')
+export function showChangeDoorNumberLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_door_number')
+  )
 }
 
-function showSanitationChangeLink(location: DecoratedLocation, req: Request) {
-  return location.status === 'DRAFT' && req.canAccess('change_sanitation')
+export function showSanitationChangeLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_sanitation')
+  )
 }
 
-function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('change_local_name')
+export function showEditLocalNameLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_local_name')
+  )
 }
 
-function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('set_cell_type')
+export function showEditCellTypeLinks(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('set_cell_type')
+  )
 }
 
-function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
-  return (location.active || location.status === 'DRAFT') && req.canAccess('change_used_for')
+export function showChangeUsedForLink(location: DecoratedLocation, req: Request) {
+  return (
+    (location.active || location.status === 'DRAFT') &&
+    !location.status.includes('LOCKED_') &&
+    req.canAccess('change_used_for')
+  )
 }
 
 function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow {
@@ -197,12 +225,12 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
   return row
 }
 
-function getLocationDetails(location: DecoratedLocation, req: Request) {
+function getLocationDetails(location: DecoratedLocation, prisonConfiguration: PrisonConfiguration, req: Request) {
   const details: SummaryListRow[] = []
 
   details.push(locationCodeRow(location, req))
 
-  if (location.raw.locationType === 'CELL') {
+  if (location.raw.locationType === 'CELL' && prisonConfiguration.certificationApprovalRequired === 'ACTIVE') {
     details.push(doorNumberRow(location, req))
   }
 
@@ -224,7 +252,7 @@ function getLocationDetails(location: DecoratedLocation, req: Request) {
 
     details.push(usedForRow(location, req))
 
-    if (location.raw.locationType === 'CELL') {
+    if (location.raw.locationType === 'CELL' && prisonConfiguration.certificationApprovalRequired === 'ACTIVE') {
       details.push(sanitationRow(location, req))
     }
   }
@@ -255,6 +283,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
 
   try {
     const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, locationId)
+    const prisonConfiguration = await locationsService.getPrisonConfiguration(systemToken, prisonId)
     const residentialSummary: {
       location?: DecoratedLocation
       locationDetails?: SummaryListRow[]
@@ -300,7 +329,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         userToken: user.token,
       })
 
-      residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, req)
+      residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, prisonConfiguration, req)
       residentialSummary.locationHistory = true
 
       if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
@@ -327,28 +356,15 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         }
 
         const { numberOfCellLocations } = residentialSummary.location
-        let { workingCapacity, maxCapacity } = residentialSummary.location.capacity
-        let { certifiedNormalAccommodation: cna } = residentialSummary.location.certification
-
-        const { pendingChanges } = residentialSummary.location
-
-        if (pendingChanges?.certifiedNormalAccommodation !== undefined) {
-          cna = pendingChanges.certifiedNormalAccommodation
-        }
-
-        if (pendingChanges?.maxCapacity !== undefined) {
-          maxCapacity = pendingChanges.maxCapacity
-        }
-
-        if (pendingChanges?.workingCapacity !== undefined) {
-          workingCapacity = pendingChanges.workingCapacity
-        }
+        const { certifiedNormalAccommodation, maxCapacity, workingCapacity } = getLocationAttributesIncludePending(
+          residentialSummary.location,
+        )
 
         if (residentialSummary.location.status.includes('DRAFT')) {
           residentialSummary.summaryCards.push({
             title: 'CNA',
             type: 'cna',
-            text: numberOfCellLocations ? `${cna}` : '-',
+            text: numberOfCellLocations ? `${certifiedNormalAccommodation}` : '-',
             ...cnaLink,
           })
         }

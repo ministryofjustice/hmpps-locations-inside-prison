@@ -27,9 +27,9 @@ context('Cell Certificate - Change Requests - Review', () => {
       })
 
       it('Correctly displays the change request info', () => {
-        cy.get('h1').should('contain', 'Review add new locations request')
+        cy.get('h1').should('contain', 'Review add new locations to certificate request')
 
-        testGovukSummaryList('overview-list', [
+        testGovukSummaryList('overview-list-DRAFT', [
           ['Location', 'A'],
           ['Change type', 'Add new locations to certificate'],
           ['Submitted on', '3 October 2024'],
@@ -73,7 +73,7 @@ context('Cell Certificate - Change Requests - Review', () => {
 
         it('Displays an error when the legal disclaimer is not checked', () => {
           approvePage.submit({})
-          Page.checkForError('cellsMeetStandards', 'Confirm that the cells meet the certification standards')
+          Page.checkForError('confirmation', 'Confirm that the cells meet the certification standards')
         })
 
         it('Redirects to change requests and displays a banner', () => {
@@ -120,7 +120,9 @@ context('Cell Certificate - Change Requests - Review', () => {
         LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
           CertificationApprovalRequestFactory.build({
             approvalType: 'SIGNED_OP_CAP',
+            locationId: null,
             locations: [],
+            reasonForChange: 'Needed to change it',
           }),
         )
 
@@ -131,7 +133,7 @@ context('Cell Certificate - Change Requests - Review', () => {
       it('Correctly displays the change request info', () => {
         cy.get('h1').should('contain', 'Review change signed operational capacity request')
 
-        testGovukSummaryList('overview-list', [
+        testGovukSummaryList('overview-list-SIGNED_OP_CAP', [
           ['Location', 'A'],
           ['Change type', 'Change signed operational capacity'],
           ['Explanation', 'Needed to change it'],
@@ -140,6 +142,109 @@ context('Cell Certificate - Change Requests - Review', () => {
         ])
 
         testGovukTable('cap-change-table', [['TST', '5 → 9']])
+      })
+
+      context('When approving', () => {
+        let approvePage: CellCertificateChangeRequestsApprovePage
+        beforeEach(() => {
+          LocationsApiStubber.stub.stubLocationsCertificationLocationApprove()
+
+          reviewPage.submit({ approve: true })
+          approvePage = Page.verifyOnPage(CellCertificateChangeRequestsApprovePage)
+        })
+
+        it('Shows the correct page content for signed op cap approval', () => {
+          approvePage.backLink().should('be.visible')
+          cy.get('[data-qa="title-caption"]').should('contain', 'Test (HMP)')
+          cy.get('h1').should('contain', 'You are about to approve a change to the cell certificate')
+          cy.get('.govuk-fieldset__legend--m').should('contain', 'Confirm change agreed with capacity management')
+          cy.get('.govuk-hint').should(
+            'contain',
+            'I confirm that this change has been agreed with capacity management.',
+          )
+          cy.get('label[for="confirmation"]').should('contain', 'I understand and agree with the above statement.')
+          approvePage.confirmButton().should('contain', 'Update cell certificate')
+          approvePage.cancelLink().should('be.visible')
+        })
+
+        it('Does not show the certification standards paragraph', () => {
+          cy.get('.govuk-grid-column-two-thirds').should(
+            'not.contain',
+            'You must confirm that all cells on the certificate meet the required standards',
+          )
+        })
+
+        it('Displays an error when the confirmation is not checked', () => {
+          approvePage.submit({})
+          Page.checkForError('confirmation', 'Confirm that the change has been agreed with capacity management')
+        })
+
+        it('Redirects to change requests and displays a banner', () => {
+          approvePage.submit({ confirm: true })
+
+          Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
+          cy.get('#govuk-notification-banner-title').contains('Success')
+          cy.get('.govuk-notification-banner__content h3').contains('Cell certificate updated')
+          cy.get('.govuk-notification-banner__content p').contains(
+            'The establishment has been notified that the change request has been approved.',
+          )
+        })
+      })
+    })
+
+    context('When the approvalType is CELL_MARK', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'CELL_MARK',
+            reasonForChange: 'Needed to change it',
+          }),
+        )
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('h1').should('contain', 'Review change cell door number request')
+
+        testGovukSummaryList('overview-list-CELL_MARK', [
+          ['Location', 'A'],
+          ['Change type', 'Change cell door number'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('cell-mark-change-table', [['A', 'A-1 → A-1x']])
+      })
+    })
+
+    context('When the approvalType is CELL_SANITATION', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'CELL_SANITATION',
+            reasonForChange: 'Needed to change it',
+          }),
+        )
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('h1').should('contain', 'Review change cell sanitation request')
+
+        testGovukSummaryList('overview-list-CELL_SANITATION', [
+          ['Location', 'A'],
+          ['Change type', 'Change cell sanitation'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('cell-sanitation-change-table', [['A', 'No → Yes']])
       })
     })
   })

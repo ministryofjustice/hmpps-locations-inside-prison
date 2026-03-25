@@ -34,7 +34,9 @@ context('Add To Certificate - Update Signed Operational Capacity - Is Update Nee
 
     it('has a back link to cert change disclaimer', () => {
       page.backLink().click()
-      Page.verifyOnPage(CertChangeDisclaimerPage)
+
+      // eslint-disable-next-line no-new
+      new CertChangeDisclaimerPage('Adding new locations')
     })
 
     it('has a cancel link to the view location show page', () => {

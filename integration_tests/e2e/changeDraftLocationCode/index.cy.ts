@@ -16,10 +16,7 @@ context('Change draft location code', () => {
     active: false,
     localName: 'draftW',
     code: 'WINGA',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const draftLanding = LocationFactory.build({
@@ -33,10 +30,7 @@ context('Change draft location code', () => {
     active: false,
     localName: 'draftL',
     code: 'LANDA',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const draftCell = LocationFactory.build({
@@ -50,10 +44,7 @@ context('Change draft location code', () => {
     active: false,
     localName: null,
     code: '001',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   const activeWing = LocationFactory.build({
@@ -65,10 +56,7 @@ context('Change draft location code', () => {
     status: 'ACTIVE',
     active: true,
     localName: 'activeW',
-    certification: {
-      certified: false,
-      capacityOfCertifiedCell: 0,
-    },
+    certifiedCell: false,
   })
 
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {

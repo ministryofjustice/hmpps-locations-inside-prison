@@ -85,7 +85,7 @@ module.exports = (applyButtonId, inputId, inputsToFillId, fillFunction, inputFor
     }
 
     let previousNumber = numberToStartFrom
-    $(`input[id^="${inputsToFillId}"]`).each(function () {
+    $(`input[id*="${inputsToFillId}"]`).each(function () {
       $(this).val(inputFormatter ? inputFormatter(previousNumber) : previousNumber)
       previousNumber = fillFunction(previousNumber)
     })

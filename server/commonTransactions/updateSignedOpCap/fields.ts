@@ -44,6 +44,9 @@ const fields: FormWizard.Fields = {
       classes: 'govuk-label--m',
       for: 'newSignedOpCap',
     },
+    errorMessages: {
+      notEqual: 'Enter a different signed operational capacity',
+    },
     autocomplete: 'off',
   },
   explanation: {

@@ -1,5 +1,6 @@
 import { LocationType } from './locationType'
 import { LocationStatus } from './locationStatus'
+import { CertificateLocation } from './certificateLocation'
 
 export declare interface Location {
   id: string
@@ -15,16 +16,15 @@ export declare interface Location {
   capacity: {
     maxCapacity: number
     workingCapacity: number
-  }
-  certification: {
-    certified: boolean
-    capacityOfCertifiedCell: number
     certifiedNormalAccommodation: number
   }
+  currentCellCertificate?: CertificateLocation
   pendingChanges?: {
     maxCapacity?: number
     workingCapacity?: number
     certifiedNormalAccommodation?: number
+    cellMark?: string
+    inCellSanitation?: boolean
   }
   attributes: string[]
   usage: {
@@ -66,6 +66,7 @@ export declare interface Location {
   isResidential: boolean
   leafLevel: boolean
   level: number
+  locked: boolean
   sortName: string
   planetFmReference: string
   numberOfCellLocations: number
@@ -73,4 +74,6 @@ export declare interface Location {
   wingStructure: LocationType[]
   cellMark: string
   inCellSanitation: boolean
+  lastDeactivationReasonForChange?: string
+  certifiedCell: boolean
 }

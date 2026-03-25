@@ -1,19 +1,31 @@
 {% from "../macros/card.njk" import card %}
 
-{% macro cardBlock(title, cards) %}
+{% macro cardBlock(title, cards, permissionMessage) %}
 
   <div class="body-tiles">
     <div class="govuk-width-container">
       {% if title %}
-        <h2 class="govuk-heading-l"> {{ title }} </h2>
+        <h2 class="govuk-heading-m"> {{ title }} </h2>
       {% endif %}
-      <div class="card-group govuk-grid-row">
+      {% set hasVisibleCards = false %}
+      {% if cards %}
         {% for cardDetails in cards -%}
-          <div class="govuk-grid-column-one-third card-group__item">
-            {{ card(cardDetails) }}
-          </div>
+          {% if cardDetails and cardDetails.visible %}
+            {% set hasVisibleCards = true %}
+          {% endif %}
         {%- endfor %}
-      </div>
+      {% endif %}
+      {% if hasVisibleCards %}
+        <div class="card-group govuk-grid-row">
+          {% for cardDetails in cards -%}
+            <div class="govuk-grid-column-one-third card-group__item">
+              {{ card(cardDetails) }}
+            </div>
+          {%- endfor %}
+        </div>
+      {% elif permissionMessage %}
+        <p class="govuk-body">{{ permissionMessage }}</p>
+      {% endif %}
     </div>
   </div>
 {% endmacro %}

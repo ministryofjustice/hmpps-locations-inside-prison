@@ -23,7 +23,7 @@ export default async function populateTopLevelDraftLocationSummary(
   const { locationsService } = req.services
   const { location } = res.locals.decoratedResidentialSummary
 
-  if (location.status !== 'DRAFT') {
+  if (!location.status.includes('DRAFT')) {
     return next()
   }
 

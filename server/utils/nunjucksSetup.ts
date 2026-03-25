@@ -20,6 +20,10 @@ import locationStatusTagClass from '../formatters/locationStatusTagClass'
 import locationStatusTagLabel from '../formatters/locationStatusTagLabel'
 import formatConstants from '../formatters/formatConstants'
 import formatDateWithTimeAndDay from '../formatters/formatDateWithTimeAndDay'
+import approvalTypeDescription from '../formatters/approvalTypeDescription'
+import getLocationAttributesIncludePending from './getLocationAttributesIncludePending'
+import dashIfUndefined from '../formatters/dashIfUndefined'
+import yesNo from '../formatters/yesNo'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -104,6 +108,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('feedbackFormUrl', config.feedbackFormUrl)
   njkEnv.addGlobal('propEquals', (k: string, v: unknown, o: object) => get(o, k) === v)
   njkEnv.addGlobal('formatConstants', formatConstants)
+  njkEnv.addGlobal('approvalTypeDescription', approvalTypeDescription)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
@@ -116,8 +121,10 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('locationStatusTagClass', locationStatusTagClass)
   njkEnv.addFilter('locationStatusTagLabel', locationStatusTagLabel)
   njkEnv.addFilter('nonOxfordJoin', nonOxfordJoin)
-  njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
   njkEnv.addFilter('isArray', function isArrayFilter(value) {
     return Array.isArray(value)
   })
+  njkEnv.addFilter('includePending', getLocationAttributesIncludePending)
+  njkEnv.addFilter('dashIfUndefined', dashIfUndefined)
+  njkEnv.addFilter('yesNo', yesNo)
 }

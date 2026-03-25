@@ -11,8 +11,8 @@
           [
             { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
             { html: "<p class='govuk-tag__wrapper'>" + locationStatusTag(item) + "</p>" },
-            { text: item.pendingChanges.workingCapacity or item.capacity.workingCapacity },
-            { text: item.pendingChanges.maxCapacity or item.capacity.maxCapacity },
+            { text: (item | includePending).workingCapacity },
+            { text: (item | includePending).maxCapacity },
             { html: (item.specialistCellTypes | join('<br>')) or '-' }
           ]
         ), rows) %}

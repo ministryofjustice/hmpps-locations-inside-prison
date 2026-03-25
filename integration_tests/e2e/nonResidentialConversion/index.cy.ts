@@ -6,6 +6,7 @@ import NonResidentialConversionOccupiedPage from '../../pages/nonResidentialConv
 import NonResidentialConversionWarningPage from '../../pages/nonResidentialConversion/warning'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
+import CellCertChangePage from '../../pages/nonResidentialConversion/cell-cert-change'
 
 context('Non-residential conversion', () => {
   const location = LocationFactory.build({
@@ -230,6 +231,18 @@ context('Non-residential conversion', () => {
         cy.get('.govuk-error-summary__list').contains('Room description must be 30 characters or less')
         cy.get('#otherConvertedCellType-error').contains('Room description must be 30 characters or less')
       })
+
+      it('shows the correct validation error when no reason given', () => {
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+        const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
+
+        detailsPage.cellTypeRadioItem('OFFICE').click()
+        detailsPage.continueButton().click()
+
+        cy.get('.govuk-error-summary__title').contains('There is a problem')
+        cy.get('.govuk-error-summary__list').contains('Enter a reason for this change')
+        cy.get('#explanation-error').contains('Enter a reason for this change')
+      })
     })
 
     describe('confirmation page', () => {
@@ -329,6 +342,27 @@ context('Non-residential conversion', () => {
         })
 
         itDisplaysTheCellOccupiedPage()
+      })
+    })
+
+    describe('confirmation page when certification active', () => {
+      beforeEach(() => {
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      })
+
+      it('when certification is active then a reason is required', () => {
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.actionsMenu().click()
+        viewLocationsShowPage.convertToNonResAction().click()
+        const cellCertChangePage = Page.verifyOnPage(CellCertChangePage)
+        cellCertChangePage.continueButton().click()
+        const warningPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
+        warningPage.continueButton().click()
+        const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
+        detailsPage.cellTypeRadioItem('OFFICE').click()
+        detailsPage.explanationInput().clear().type('Want to change the room usage')
+        detailsPage.continueButton().click()
       })
     })
   })

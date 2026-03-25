@@ -88,7 +88,7 @@ context('Reactivate cell (from reactivate parent)', () => {
         parentLocation: inactiveLanding,
         subLocations: [inactiveCell1, inactiveCell2, inactiveCell3],
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -198,7 +198,7 @@ context('Reactivate cell (from reactivate parent)', () => {
             reactivateCellConfirmPage.confirmButton().click()
 
             Page.verifyOnPage(ViewLocationsShowPage)
-            cy.title().should('eq', 'Landing A-1 - Manage locations - Residential locations')
+            cy.title().should('eq', 'Landing A-1 - Manage residential locations - Residential locations')
 
             cy.get('#govuk-notification-banner-title').contains('Success')
             cy.get('.govuk-notification-banner__content h3').contains('Cell activated')

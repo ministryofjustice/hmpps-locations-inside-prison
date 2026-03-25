@@ -20,7 +20,7 @@ context('Cell Certificate - Change Requests - Index', () => {
 
       testGovukTable('change-requests-table', [
         ['A', 'Change signed operational capacity', '3 October 2024', 'john smith', 'View details'],
-        ['A', 'Add new locations', '3 October 2024', 'john smith', 'View details'],
+        ['A', 'Add new locations to certificate', '3 October 2024', 'john smith', 'View details'],
       ])
     })
   })
@@ -39,7 +39,7 @@ context('Cell Certificate - Change Requests - Index', () => {
 
       testGovukTable('change-requests-table', [
         ['A', 'Change signed operational capacity', '3 October 2024', 'john smith', 'Review'],
-        ['A', 'Add new locations', '3 October 2024', 'john smith', 'Review'],
+        ['A', 'Add new locations to certificate', '3 October 2024', 'john smith', 'Review'],
       ])
     })
   })

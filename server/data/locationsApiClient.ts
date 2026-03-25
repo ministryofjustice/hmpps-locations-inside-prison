@@ -228,6 +228,10 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
+    getLocationByCellMark: this.apiCall<Location[], { prisonId: string; cellMark: string }>({
+      path: '/locations/:prisonId/cell-mark/:cellMark',
+      requestType: 'get',
+    }),
     getLocationByLocalName: this.apiCall<
       LocationForLocalName,
       { prisonId: string; localName: string; parentLocationId?: string }
@@ -310,6 +314,8 @@ export default class LocationsApiClient extends BaseApiClient {
           deactivationReasonDescription: string
           proposedReactivationDate: string
           planetFmReference: string
+          requiresApproval: boolean
+          reasonForChange?: string
         }
       >({
         path: '/locations/:locationId/deactivate/temporary',
@@ -391,6 +397,18 @@ export default class LocationsApiClient extends BaseApiClient {
       { maxCapacity?: number; workingCapacity?: number; certifiedNormalAccommodation?: number }
     >({
       path: '/locations/:locationId/capacity',
+      requestType: 'put',
+    }),
+    updateCellMark: this.apiCall<Location, { locationId: string }, { cellMark: string; reasonForChange?: string }>({
+      path: '/locations/residential/:locationId/cell-mark-change',
+      requestType: 'put',
+    }),
+    updateCellSanitation: this.apiCall<
+      Location,
+      { locationId: string },
+      { inCellSanitation: boolean; reasonForChange?: string }
+    >({
+      path: '/locations/residential/:locationId/cell-sanitation-change',
       requestType: 'put',
     }),
     updateSpecialistCellTypes: this.apiCall<Location, { locationId: string }, string[]>({

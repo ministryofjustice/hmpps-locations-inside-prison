@@ -1,9 +1,13 @@
+import FormWizard from 'hmpo-form-wizard'
 import dateTodayOrInFuture from '../../validators/dateTodayOrInFuture'
 import maxLength from '../../validators/maxLength'
 import minLength from '../../validators/minLength'
 import numericString from '../../validators/numericString'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import { isCertChange } from './steps'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
-const fields = {
+const fields: FormWizard.Fields = {
   reduceWorkingCapacity: {
     component: 'govukRadios',
     validate: ['required'],
@@ -89,6 +93,8 @@ const fields = {
     ],
   },
   estimatedReactivationDate: {
+    remove: isCertChange,
+    hideWhenRemoved: true,
     component: 'govukDateInput',
     validate: [dateTodayOrInFuture],
     id: 'estimatedReactivationDate',
@@ -99,6 +105,27 @@ const fields = {
     fieldset: {
       legend: {
         text: 'Estimated reactivation date (optional)',
+        classes: 'govuk-fieldset__legend--m',
+      },
+    },
+    nameForErrors: 'Estimated reactivation date',
+  },
+  mandatoryEstimatedReactivationDate: {
+    remove: (req, res) => !isCertChange(req, res),
+    hideWhenRemoved: true,
+    component: 'govukDateInput',
+    validate: ['required', dateTodayOrInFuture],
+    id: 'mandatoryEstimatedReactivationDate',
+    name: 'mandatoryEstimatedReactivationDate',
+    errorMessages: {
+      required: 'Enter an estimated reactivation date',
+    },
+    label: {
+      text: 'Estimated reactivation date',
+    },
+    fieldset: {
+      legend: {
+        text: 'Estimated reactivation date',
         classes: 'govuk-fieldset__legend--m',
       },
     },
@@ -116,6 +143,8 @@ const fields = {
     autocomplete: 'off',
   },
   planetFmReference: {
+    remove: isCertChange,
+    hideWhenRemoved: true,
     component: 'govukInput',
     validate: [minLength(6), maxLength(18), numericString],
     id: 'planetFmReference',
@@ -128,6 +157,63 @@ const fields = {
     nameForErrors: 'Planet FM reference number',
     autocomplete: 'off',
   },
+  facilitiesManagementReference: {
+    remove: (req, res) => !isCertChange(req, res),
+    hideWhenRemoved: true,
+    component: 'govukInput',
+    validate: [minLength(6), maxLength(18), numericString],
+    id: 'facilitiesManagementReference',
+    name: 'facilitiesManagementReference',
+    classes: 'govuk-input--width-10',
+    label: {
+      text: 'Facilities management reference number (optional)',
+      classes: 'govuk-label--m',
+    },
+    nameForErrors: 'Facilities management reference number',
+    autocomplete: 'off',
+  },
+  workingCapacityExplanation: {
+    remove: (req, res) => !isCertChange(req, res),
+    hideWhenRemoved: true,
+    validate: ['required'],
+    component: 'govukTextarea',
+    errorMessages: {
+      required: 'Enter a reason the certified working capacity needs to be decreased',
+    },
+    id: 'workingCapacityExplanation',
+    name: 'workingCapacityExplanation',
+    rows: 5,
+    label: {
+      text: 'Explain why the certified working capacity needs to be decreased',
+      classes: 'govuk-label--m',
+      for: 'explanation',
+    },
+    hint: {
+      text: 'This will help the authorising director understand the need for the reduced capacity.',
+    },
+    autocomplete: 'off',
+    // Don't strip newlines
+    'ignore-defaults': true,
+  },
+  ...SubmitCertificationApprovalRequest.getFields(),
+  ...UpdateSignedOpCap.getFields(),
+}
+
+fields['submit-certification-approval-request_confirmation'] = {
+  ...fields['submit-certification-approval-request_confirmation'],
+  label: {
+    text: 'Confirm changes have been agreed',
+  },
+  hint: {
+    text: 'I confirm that these changes have been agreed with the PGD and capacity management team.',
+  },
+  fieldset: {
+    legend: {
+      ...fields['submit-certification-approval-request_confirmation'].fieldset.legend,
+      text: 'Confirm changes have been agreed',
+    },
+  },
+  errorMessages: { required: 'Confirm changes have been agreed' },
 }
 
 export default fields

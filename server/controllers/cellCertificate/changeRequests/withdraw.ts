@@ -5,6 +5,7 @@ import { getUserEmails, sendNotification } from '../../../utils/notificationHelp
 import { NotificationType, notificationGroups } from '../../../services/notificationService'
 import formatDateWithTime from '../../../formatters/formatDateWithTime'
 import populateCertificationRequestDetails from '../../../middleware/populateCertificationRequestDetails'
+import config from '../../../config'
 
 export default class Withdraw extends FormInitialStep {
   override middlewareSetup() {
@@ -29,27 +30,30 @@ export default class Withdraw extends FormInitialStep {
 
     await locationsService.withdrawCertificationRequest(systemToken, requestId, explanation as string)
 
-    // Send notifications to all cert roles
-    const emailAddresses = await getUserEmails(
-      manageUsersService,
-      systemToken,
-      prisonId,
-      notificationGroups.allCertUsers,
-    )
+    // Don't send emails in local dev (every deployed env counts as production)
+    if (config.production || process.env.NODE_ENV === 'test') {
+      // Send notifications to all cert roles
+      const emailAddresses = await getUserEmails(
+        manageUsersService,
+        systemToken,
+        prisonId,
+        notificationGroups.allCertUsers,
+      )
 
-    await sendNotification(
-      notifyService,
-      emailAddresses,
-      prisonName,
-      undefined,
-      NotificationType.REQUEST_WITHDRAWN,
-      locationName,
-      changeType,
-      formatDateWithTime(requestedDate),
-      requestedBy,
-      res.locals.user.name,
-      explanation as string,
-    )
+      await sendNotification(
+        notifyService,
+        emailAddresses,
+        prisonName,
+        undefined,
+        NotificationType.REQUEST_WITHDRAWN,
+        locationName,
+        changeType,
+        formatDateWithTime(requestedDate),
+        requestedBy,
+        res.locals.user.name,
+        explanation as string,
+      )
+    }
 
     req.journeyModel.reset()
     req.sessionModel.reset()

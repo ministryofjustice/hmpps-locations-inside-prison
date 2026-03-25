@@ -60,7 +60,8 @@ export default class CommonTransaction {
     this.steps = Object.fromEntries(
       Object.entries(steps).map(([path, step]) => {
         const modifiedStep: FormWizard.Step = {
-          template: '../../partials/formStep',
+          templatePath: 'commonTransactions',
+          template: '../partials/formStep',
           controller: FormInitialStep,
           ...step,
         }

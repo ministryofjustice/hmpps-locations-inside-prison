@@ -39,9 +39,8 @@ const steps: FormWizard.Steps = {
       },
       'warning',
     ],
-    title: (_req, _res) => `Non-residential conversion`,
-    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)} conversion`,
-    description: (_req, res) => `converting a cell to non-residential`,
+    title: (_req, _res) => `Converting a cell to a non-residential room`,
+    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
   '/occupied': {
     controller: NonResidentialConversionOccupied,
@@ -53,7 +52,7 @@ const steps: FormWizard.Steps = {
     buttonClasses: 'govuk-button--secondary',
   },
   '/details': {
-    fields: ['convertedCellType', 'otherConvertedCellType'],
+    fields: ['convertedCellType', 'otherConvertedCellType', 'explanation'],
     controller: NonResidentialConversionDetails,
     next: 'confirm',
     template: '../../partials/formStep',

@@ -1,16 +1,21 @@
 export declare interface CertificateLocation {
   id: string
   locationCode: string
+  cellMark?: string
+  localName?: string
   pathHierarchy: string
   level: number
   certifiedNormalAccommodation: number
   workingCapacity: number
   maxCapacity: number
-  locationType: LocationType
-  subLocations: CertificateLocation[]
+  currentCertifiedNormalAccommodation: number
+  currentWorkingCapacity: number
+  currentMaxCapacity: number
   inCellSanitation?: boolean
-  cellMark?: string
-  specialistCellTypes?: string[]
+  locationType: LocationType
   accommodationTypes?: string[]
+  specialistCellTypes?: string[]
   usedFor?: string[]
+  convertedCellType?: string[]
+  subLocations: CertificateLocation[]
 }

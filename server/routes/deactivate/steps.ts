@@ -8,18 +8,35 @@ import DeactivateTemporaryDetails from '../../controllers/deactivate/temporary/d
 import DeactivateOccupied from '../../controllers/deactivate/occupied'
 import DeactivateType from '../../controllers/deactivate/type'
 import CellCertChange from '../../controllers/deactivate/cell-cert-change'
+import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
+import capFirst from '../../formatters/capFirst'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
-function isCellOccupied(req: FormWizard.Request, res: Response) {
+function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
-function showCellCertChange(_req: FormWizard.Request, res: Response) {
+export function isCellCertChange(req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
 
-  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.raw.locationType === 'CELL'
+  return (
+    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    decoratedLocation.raw.locationType === 'CELL' &&
+    req.sessionModel.get<string>('reduceWorkingCapacity') !== 'NO'
+  )
 }
 
-function permanentDeactivationForbidden(req: FormWizard.Request, res: Response) {
+export function isCertChange(req: FormWizard.Request, res: Response) {
+  const { prisonConfiguration, decoratedLocation } = res.locals
+
+  return (
+    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    (decoratedLocation.raw.locationType !== 'CELL' || req.sessionModel.get<string>('reduceWorkingCapacity') === 'YES')
+  )
+}
+
+function permanentDeactivationForbidden(req: FormWizard.Request, _res: Response) {
   return !req.canAccess('deactivate:permanent')
 }
 
@@ -34,15 +51,29 @@ const steps: FormWizard.Steps = {
     next: [
       { fn: isCellOccupied, next: 'occupied' },
       { fn: permanentDeactivationForbidden, next: 'temporary/details' },
-      { fn: showCellCertChange, next: 'cell-cert-change' },
+      { fn: isCellCertChange, next: 'cell-cert-change' },
+      { fn: isCertChange, next: 'cert-change-disclaimer' },
       'type',
     ],
   },
   '/cell-cert-change': {
     fields: ['reduceWorkingCapacity'],
-    next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: '?' }, 'temporary/details'],
+    next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: 'cert-change-disclaimer' }, 'temporary/details'],
     controller: CellCertChange,
   },
+  ...CertChangeDisclaimer.getSteps({
+    next: 'temporary/details',
+    title: (_req, res) => {
+      const { decoratedLocation } = res.locals
+
+      if (decoratedLocation.raw.locationType === 'CELL') {
+        return `Decreasing certified working capacity`
+      }
+
+      return `Deactivating a ${decoratedLocation.locationType.toLowerCase()}`
+    },
+    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
+  }),
   '/type': {
     fields: ['deactivationType'],
     next: [{ field: 'deactivationType', value: 'temporary', next: 'temporary/details' }, 'permanent/warning'],
@@ -57,11 +88,24 @@ const steps: FormWizard.Steps = {
     next: [{ fn: isCellOccupied, next: 'occupied' }, 'temporary/details'],
   },
   '/temporary/details': {
-    fields: ['deactivationReason', 'estimatedReactivationDate', 'planetFmReference'],
-    next: 'temporary/confirm',
+    fields: [
+      'deactivationReason',
+      'estimatedReactivationDate',
+      'mandatoryEstimatedReactivationDate',
+      'planetFmReference',
+      'facilitiesManagementReference',
+      'workingCapacityExplanation',
+    ],
+    next: [
+      { fn: isCellCertChange, next: 'submit-certification-approval-request' },
+      { fn: isCertChange, next: 'update-signed-op-cap' },
+      'temporary/confirm',
+    ],
     controller: DeactivateTemporaryDetails,
     template: '../../partials/formStep',
   },
+  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
   '/temporary/confirm': {
     fields: ['confirm'],
     controller: DeactivateTemporaryConfirm,

@@ -459,6 +459,21 @@ const stubLocationsConstantsUsedForTypeForPrison = (
     },
   })
 
+const stubLocationByCellMark = (prisonId = 'TST') =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations/${prisonId}/cell-mark/\\w+`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: [],
+    },
+  })
+
 const stubLocationsLocationsResidentialSummary = (
   returnData: PrisonResidentialSummary = {
     prisonSummary: {
@@ -1088,6 +1103,36 @@ const stubPatchLocation = (location: Partial<Location> = {}) =>
     },
   })
 
+const stubPutLocationForCellMark = (location: Partial<Location> = {}) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/residential/[\\w-]+/cell-mark-change',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location,
+    },
+  })
+
+const stubPutLocationForSanitation = (location: Partial<Location> = {}) =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/locations/residential/[\\w-]+/cell-sanitation-change',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location,
+    },
+  })
+
 const stubUpdateLocationsConstantsUsedForType = () =>
   stubFor({
     request: {
@@ -1269,7 +1314,7 @@ const stubGetPrisonConfiguration = ({
   certificationActive,
 }: {
   prisonId: string
-  certificationActive: string
+  certificationActive: 'ACTIVE' | 'INACTIVE'
 }) =>
   stubFor({
     request: {
@@ -1354,6 +1399,7 @@ const allStubs = {
   stubGetPrisonConfiguration,
   stubLocations,
   stubLocationsBulkReactivate,
+  stubLocationByCellMark,
   stubLocationsCellCertificates,
   stubLocationsCellCertificatesPrison,
   stubLocationsCellCertificatesPrisonCurrent,
@@ -1408,6 +1454,8 @@ const allStubs = {
   stubPrisonConfigurationResiActive,
   stubPrisonerLocations,
   stubPrisonerLocationsId,
+  stubPutLocationForCellMark,
+  stubPutLocationForSanitation,
   stubSignedOperationalCapacityGet,
   stubSignedOperationalCapacityGetNotFound,
   stubSignedOperationalCapacityUpdate,

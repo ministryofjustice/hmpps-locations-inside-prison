@@ -16,7 +16,7 @@ describe('Change sanitation', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   const decoratedResidentialSummaryMock: DeepPartial<any> = {
-    location: LocationFactory.build({ inCellSanitation: false }),
+    location: LocationFactory.build({ inCellSanitation: false, status: 'DRAFT' }),
   }
 
   beforeEach(() => {
@@ -42,6 +42,7 @@ describe('Change sanitation', () => {
         set: jest.fn(),
         get: jest.fn(),
         reset: jest.fn(),
+        unset: jest.fn(),
       },
       journeyModel: {
         reset: jest.fn(),
@@ -125,11 +126,19 @@ describe('Change sanitation', () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
       expect(next).toHaveBeenCalledWith(error)
     })
+
+    it('when active it calls super class saveValues', async () => {
+      deepRes.locals.decoratedResidentialSummary.location.status = 'ACTIVE'
+      const superSpy = jest.spyOn(Object.getPrototypeOf(controller), 'saveValues')
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+      expect(superSpy).toHaveBeenCalled()
+    })
   })
 
   describe('successHandler', () => {
     beforeEach(() => {
       deepReq.form.values.inCellSanitation = 'YES'
+      deepRes.locals.decoratedResidentialSummary.location.status = 'DRAFT'
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
     })
 

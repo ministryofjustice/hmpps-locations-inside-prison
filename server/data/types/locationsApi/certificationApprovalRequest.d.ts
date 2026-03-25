@@ -16,6 +16,14 @@ export declare interface CertificationApprovalRequest {
   signedOperationCapacityChange: number
   currentSignedOperationCapacity: number
   certificateId: string
-  reasonForSignedOpChange: string
+  cellMark: string
+  currentCellMark: string
+  inCellSanitation: boolean
+  currentInCellSanitation: boolean
+  reasonForChange: string
   locations: CertificateLocation[]
+  deactivatedReason: string
+  deactivationReasonDescription: string
+  proposedReactivationDate: string
+  planetFmReference: string
 }

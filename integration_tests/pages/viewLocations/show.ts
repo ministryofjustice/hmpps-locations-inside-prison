@@ -31,6 +31,8 @@ export default class ViewLocationsShowPage extends Page {
 
   inactiveBanner = (): PageElement => cy.get('[data-qa=inactive-location-banner]')
 
+  inactiveBannerHeader = (): PageElement => this.inactiveBanner().find('.govuk-notification-banner__heading')
+
   inactiveBannerRows = (): PageElement => this.inactiveBanner().find('.govuk-summary-list__row')
 
   inactiveBannerActivateCellButton = (): PageElement => this.inactiveBanner().get(`a:contains("Activate cell")`)
@@ -45,7 +47,7 @@ export default class ViewLocationsShowPage extends Page {
   actionsMenu = (): PageElement => cy.get('button.moj-button-menu__toggle-button')
 
   convertToNonResAction = (): PageElement =>
-    cy.get('.moj-button-menu__wrapper a:contains("Convert to non-residential room")')
+    cy.get('.moj-button-menu__wrapper a:contains("Convert cell to non-residential room")')
 
   convertToCellButton = (): PageElement => cy.get('.govuk-button:contains("Convert to cell")')
 

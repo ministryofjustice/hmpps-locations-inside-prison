@@ -10,10 +10,10 @@ import certificateShow from '../../controllers/cellCertificate/show'
 import current from '../../controllers/cellCertificate/current'
 import redirectToPrependPrisonId from '../../middleware/redirectToPrependPrisonId'
 import populateApprovalRequest from '../../middleware/populateApprovalRequest'
-import populateConstants from '../../middleware/populateConstants'
 import addBreadcrumb from '../../middleware/addBreadcrumb'
 import redirectNonPendingRequest from '../../middleware/redirectNonPendingRequest'
 import redirectCurrentCertificate from '../../middleware/redirectCurrentCertificate'
+import addConstantToLocals from '../../middleware/addConstantToLocals'
 
 const router = express.Router({ mergeParams: true })
 
@@ -21,24 +21,39 @@ router.use(populatePrisonAndLocationId)
 router.use(redirectToPrependPrisonId)
 router.use(getPrisonResidentialSummary)
 
-router.use('/current', addBreadcrumb({ title: '', href: '/' }), populateConstants, current)
+router.use(
+  '/current',
+  addBreadcrumb({ title: '', href: '/' }),
+  addConstantToLocals(['accommodationTypes', 'specialistCellTypes', 'usedForTypes']),
+  current,
+)
 router.use('/history', history)
 router.use(
   '/change-requests/:approvalRequestId/review',
   redirectNonPendingRequest,
-  populateConstants,
+  addConstantToLocals(['accommodationTypes', 'specialistCellTypes', 'usedForTypes']),
   populateApprovalRequest,
   changeRequestsReview,
 )
 router.use(
   '/change-requests/:approvalRequestId/withdraw',
   redirectNonPendingRequest,
-  populateConstants,
+  addConstantToLocals(['accommodationTypes', 'specialistCellTypes', 'usedForTypes']),
   populateApprovalRequest,
   changeRequestsWithdraw,
 )
-router.use('/change-requests/:approvalRequestId', populateConstants, populateApprovalRequest, changeRequestsShow)
+router.use(
+  '/change-requests/:approvalRequestId',
+  addConstantToLocals(['accommodationTypes', 'specialistCellTypes', 'usedForTypes']),
+  populateApprovalRequest,
+  changeRequestsShow,
+)
 router.use('/change-requests', addBreadcrumb({ title: '', href: '/' }), changeRequestsIndex)
-router.use('/:certificateId', redirectCurrentCertificate, populateConstants, certificateShow)
+router.use(
+  '/:certificateId',
+  redirectCurrentCertificate,
+  addConstantToLocals(['accommodationTypes', 'specialistCellTypes', 'usedForTypes']),
+  certificateShow,
+)
 
 export default router

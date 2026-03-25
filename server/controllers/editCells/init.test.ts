@@ -38,6 +38,7 @@ describe('CreateCellsInit', () => {
               pathHierarchy: 'A-1-001',
               code: '001',
               cellMark: '1',
+              status: 'DRAFT',
               pendingChanges: {
                 certifiedNormalAccommodation: 1,
                 workingCapacity: 2,
@@ -50,6 +51,7 @@ describe('CreateCellsInit', () => {
               pathHierarchy: 'A-1-002',
               code: '002',
               cellMark: '2',
+              status: 'DRAFT',
               pendingChanges: {
                 certifiedNormalAccommodation: 1,
                 workingCapacity: 2,

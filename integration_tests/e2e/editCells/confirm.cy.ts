@@ -8,7 +8,7 @@ import checkCellInformation from './checkCellInformation'
 import EditCellsConfirmPage from '../../pages/editCells/confirm'
 import CreateCellsDoorNumbersPage from '../../pages/commonTransactions/createCells/doorNumbers'
 
-context('Create Landing - Create cells - Confirm', () => {
+context('Create Landing - Edit cells - Confirm', () => {
   const newLandingLocation = LocationFactory.build({
     id: '7e570000-0000-1000-8000-000000000004',
     pathHierarchy: 'A-2',

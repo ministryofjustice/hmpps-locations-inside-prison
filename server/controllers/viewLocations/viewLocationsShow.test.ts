@@ -9,7 +9,7 @@ describe('view locations show', () => {
   let deepRes: DeepPartial<Response>
 
   const convertToNonResAction = {
-    text: 'Convert to non-residential room',
+    text: 'Convert cell to non-residential room',
     href: '/location/7e570000-0000-0000-0000-000000000001/non-residential-conversion',
     class: 'govuk-button--secondary',
   }
@@ -31,6 +31,14 @@ describe('view locations show', () => {
       canAccess: jest.fn().mockReturnValue(false),
       flash: jest.fn(),
       featureFlags: {},
+      session: {
+        systemToken: 'token',
+      },
+      services: {
+        locationsService: {
+          getPrisonConfiguration: jest.fn().mockResolvedValue({}),
+        },
+      },
     }
     deepRes = {
       locals: {
@@ -43,31 +51,31 @@ describe('view locations show', () => {
     }
   })
 
-  it('renders the page', () => {
-    controller(deepReq as Request, deepRes as Response)
+  it('renders the page', async () => {
+    await controller(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
       minLayout: 'three-quarters',
-      title: 'Manage locations',
+      title: 'Manage residential locations',
     })
   })
 
-  it('renders the page with a banner', () => {
+  it('renders the page with a banner', async () => {
     const success = {
       title: 'Your attention please',
       content: 'Dinner is served',
     }
     // @ts-expect-error: lint thinks that the jest.fn has 0 args
     deepReq.flash = jest.fn(_param => [success])
-    controller(deepReq as Request, deepRes as Response)
+    await controller(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: {
         success,
       },
       minLayout: 'three-quarters',
-      title: 'Manage locations',
+      title: 'Manage residential locations',
     })
   })
 
@@ -129,6 +137,19 @@ describe('view locations show', () => {
 
           expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
         })
+
+        it('does not add the action when location status is LOCKED_ACTIVE', async () => {
+          deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            active: true,
+            isResidential: true,
+            leafLevel: true,
+            status: 'LOCKED_ACTIVE',
+          })
+
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
+
+          expect(deepRes.locals.actions || []).not.toContainEqual(convertToNonResAction)
+        })
       })
     })
 
@@ -173,6 +194,14 @@ describe('view locations show', () => {
 
         it('does not add the action when location is not a CELL', async () => {
           deepRes.locals.decoratedResidentialSummary.location.raw.locationType = 'OFFICE'
+
+          await addActions(deepReq as Request, deepRes as Response, jest.fn())
+
+          expect(deepRes.locals.actions || []).not.toContainEqual(deactivateCellAction)
+        })
+
+        it('does not add the action when location status is LOCKED_ACTIVE', async () => {
+          deepRes.locals.decoratedResidentialSummary.location.status = 'LOCKED_ACTIVE'
 
           await addActions(deepReq as Request, deepRes as Response, jest.fn())
 
@@ -235,8 +264,8 @@ describe('view locations show', () => {
       })
     })
 
-    it('renders the page with the action button', () => {
-      controller(deepReq as Request, deepRes as Response)
+    it('renders the page with the action button', async () => {
+      await controller(deepReq as Request, deepRes as Response)
 
       expect(deepRes.locals.actions).toEqual([
         {
@@ -248,7 +277,7 @@ describe('view locations show', () => {
       expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
         banner: undefined,
         minLayout: 'three-quarters',
-        title: 'Manage locations',
+        title: 'Manage residential locations',
       })
     })
 
@@ -257,14 +286,14 @@ describe('view locations show', () => {
         deepReq.canAccess = jest.fn().mockReturnValue(false)
       })
 
-      it('renders the page without the action button', () => {
-        controller(deepReq as Request, deepRes as Response)
+      it('renders the page without the action button', async () => {
+        await controller(deepReq as Request, deepRes as Response)
 
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -278,14 +307,14 @@ describe('view locations show', () => {
         })
       })
 
-      it('renders the page without the action button', () => {
-        controller(deepReq as Request, deepRes as Response)
+      it('renders the page without the action button', async () => {
+        await controller(deepReq as Request, deepRes as Response)
 
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -299,14 +328,14 @@ describe('view locations show', () => {
         })
       })
 
-      it('renders the page without the action button', () => {
-        controller(deepReq as Request, deepRes as Response)
+      it('renders the page without the action button', async () => {
+        await controller(deepReq as Request, deepRes as Response)
 
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -320,14 +349,36 @@ describe('view locations show', () => {
         })
       })
 
-      it('renders the page without the action button', () => {
-        controller(deepReq as Request, deepRes as Response)
+      it('renders the page without the action button', async () => {
+        await controller(deepReq as Request, deepRes as Response)
 
         expect(deepRes.locals.actions).toEqual(undefined)
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
-          title: 'Manage locations',
+          title: 'Manage residential locations',
+        })
+      })
+    })
+
+    describe('when location status is LOCKED', () => {
+      beforeEach(() => {
+        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+          active: true,
+          isResidential: false,
+          leafLevel: true,
+          status: 'LOCKED_ACTIVE',
+        })
+      })
+
+      it('renders the page without the action button', async () => {
+        await controller(deepReq as Request, deepRes as Response)
+
+        expect(deepRes.locals.actions).toEqual(undefined)
+        expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+          banner: undefined,
+          minLayout: 'three-quarters',
+          title: 'Manage residential locations',
         })
       })
     })
@@ -340,15 +391,15 @@ describe('view locations show', () => {
           deepReq.canAccess = (permission: string) => permission === 'create_location'
         })
 
-        it('renders the page without the create button', () => {
-          controller(deepReq as Request, deepRes as Response)
+        it('renders the page without the create button', async () => {
+          await controller(deepReq as Request, deepRes as Response)
 
           expect(deepRes.locals.actions).toEqual(undefined)
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
             minLayout: 'three-quarters',
-            title: 'Manage locations',
+            title: 'Manage residential locations',
           })
         })
       })
@@ -360,15 +411,15 @@ describe('view locations show', () => {
       })
 
       describe('when canAccess("create_location") is false', () => {
-        it('renders the page without the create button', () => {
-          controller(deepReq as Request, deepRes as Response)
+        it('renders the page without the create button', async () => {
+          await controller(deepReq as Request, deepRes as Response)
 
           expect(deepRes.locals.actions).toEqual(undefined)
           expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
             banner: undefined,
             createButton: undefined,
             minLayout: 'three-quarters',
-            title: 'Manage locations',
+            title: 'Manage residential locations',
           })
         })
       })
@@ -383,15 +434,15 @@ describe('view locations show', () => {
             deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId = 'REQUEST-ID-0000-1000-8'
           })
 
-          it('does not render the create button', () => {
-            controller(deepReq as Request, deepRes as Response)
+          it('does not render the create button', async () => {
+            await controller(deepReq as Request, deepRes as Response)
 
             expect(deepRes.locals.actions).toEqual(undefined)
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
               banner: undefined,
               createButton: undefined,
               minLayout: 'three-quarters',
-              title: 'Manage locations',
+              title: 'Manage residential locations',
             })
           })
         })
@@ -401,8 +452,8 @@ describe('view locations show', () => {
             delete deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId
           })
 
-          it('renders the create button', () => {
-            controller(deepReq as Request, deepRes as Response)
+          it('renders the create button', async () => {
+            await controller(deepReq as Request, deepRes as Response)
 
             expect(deepRes.locals.actions).toEqual(undefined)
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
@@ -416,7 +467,7 @@ describe('view locations show', () => {
                 text: 'Create new landing',
               },
               minLayout: 'three-quarters',
-              title: 'Manage locations',
+              title: 'Manage residential locations',
             })
           })
         })

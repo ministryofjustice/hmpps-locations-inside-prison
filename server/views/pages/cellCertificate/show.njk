@@ -6,6 +6,6 @@
   <div class="govuk-width-container">
     <p data-qa="last-approval">Approved by {{ userMap[certificate.approvedBy] }} on {{ certificate.approvedDate | formatDateWithTimeAndDay }}.</p>
 
-    {{ cellCertificate(certificate, accommodationTypeConstants, usedForConstants, specialistCellTypesObject) }}
+    {{ cellCertificate(certificate, constants) }}
   </div>
 {% endblock %}

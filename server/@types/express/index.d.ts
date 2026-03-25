@@ -19,7 +19,6 @@ import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
 import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
-import { SpecialistCellTypesObject } from '../../data/types/locationsApi/specialistCellTypesObject'
 import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 import { NotificationDetails } from '../../data/types/locationsApi/notificationDetails'
 
@@ -69,8 +68,11 @@ interface AllLocals {
   cancelClasses: string
   cancelLink: string
   cancelText: string
+  changeLinks: { [field: string]: string }
   resiCards: card[]
   nonResiCards: card[]
+  resiPermissionMessage: string
+  nonResiPermissionMessage: string
   cell: Location
   cellCount: number
   cells: Location[]
@@ -78,6 +80,20 @@ interface AllLocals {
   changeSummary: string
   continueLink: string
   convertedCellTypeDetails: string
+  constants: {
+    accommodationTypes?: LocationsApiConstant[]
+    convertedCellTypes?: LocationsApiConstant[]
+    deactivatedReasons?: LocationsApiConstant[]
+    locationTypes?: LocationsApiConstant[]
+    nonResidentialUsageTypes?: LocationsApiConstant[]
+    residentialAttributeTypes?: LocationsApiConstant[]
+    residentialHousingTypes?: LocationsApiConstant[]
+    specialistCellTypes?: (LocationsApiConstant & {
+      additionalInformation?: string
+      attributes?: { affectsCapacity: boolean }
+    })[]
+    usedForTypes?: LocationsApiConstant[]
+  }
   createButton: {
     text: string
     href: string
@@ -134,13 +150,13 @@ interface AllLocals {
   location: Location
   locationId: string
   locationHierarchy: LocationSummary[]
+  locationMap: { [locationId: string]: Location }
   locationPathPrefix: string
   locationResidentialSummary: LocationResidentialSummary
   locationTree: LocationTree[]
   locationType: string
   maxCapacity: string
   minLayout: string
-  certAction: string
   options: FormWizard.Request['form']['options']
   pathSuffix: string
   prisonConfiguration: PrisonConfiguration
@@ -150,21 +166,7 @@ interface AllLocals {
   prisonId: string
   prisonerLocation: PrisonerLocation
   prisonResidentialSummary: PrisonResidentialSummary
-  proposedCertificationApprovalRequests: Partial<
-    Pick<
-      CertificationApprovalRequest,
-      | 'approvalType'
-      | 'certifiedNormalAccommodationChange'
-      | 'comments'
-      | 'prisonId'
-      | 'locations'
-      | 'reasonForSignedOpChange'
-      | 'maxCapacityChange'
-      | 'signedOperationCapacityChange'
-      | 'workingCapacityChange'
-      | 'currentSignedOperationCapacity'
-    >
-  >[]
+  proposedCertificationApprovalRequests: Partial<CertificationApprovalRequest>[]
   recentlyViewedReports: StoredReportData[]
   referrerRootUrl: string
   requestedReports: StoredReportData[]
@@ -172,10 +174,6 @@ interface AllLocals {
   saveDefaultsEnabled: boolean
   signedOpCapChangeRequest: CertificationApprovalRequest
   specialistCellTypes: string[]
-  specialistCellTypesObject: SpecialistCellTypesObject[]
-  usedForConstants: LocationsApiConstant[]
-  accommodationTypeConstants: LocationsApiConstant[]
-  approvalTypeConstants: LocationsApiConstant[]
   certificate: CellCertificate
   certificates: CellCertificate[]
   removeHeadingSpacing: boolean
@@ -190,6 +188,7 @@ interface AllLocals {
   validationErrors: { text: string; href: string }[]
   values: FormWizard.Values
   valuesHaveChanged: boolean
+  viewChangeRequestLink: string
   workingCapacity: string
   capacityData: BulkCapacityUpdate
   capacitySummary: CapacitySummary

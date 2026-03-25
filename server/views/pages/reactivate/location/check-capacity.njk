@@ -1,0 +1,71 @@
+{% extends "../../../partials/formStep.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro capacityTable(decoratedLocationTree, parentLocation) %}
+  {{ govukButton({
+    text: "Edit cell " + ("capacity" if decoratedLocation.leafLevel else "capacities") + " and " + ("type" if decoratedLocation.leafLevel else "types"),
+    classes: "govuk-button--secondary",
+    preventDoubleClick: true,
+    href: "/reactivate/location/" + decoratedLocation.id + "/edit-capacity/" + parentLocation.id
+  }) }}
+
+  {% set cells = decoratedLocationTree.filter(propEquals.bind(null, 'decoratedLocation.raw.locationType', 'CELL')) %}
+  {% if cells | length %}
+    {% set rows = [] %}
+    {% for cellData in cells %}
+      {% set cell = cellData.decoratedLocation %}
+      {% set baselineCna = (cell.capacity.certifiedNormalAccommodation or 0) | string %}
+      {% set workingCapacity = (cell.oldWorkingCapacity or 0) | string %}
+      {% set maxCapacity = (cell.capacity.maxCapacity or 0) | string %}
+      {% set cellTypes = cell.raw.specialistCellTypes %}
+
+      {% set rows = (rows.push(
+        [
+          { text: cell.pathHierarchy },
+          { text: baselineCna },
+          { text: workingCapacity },
+          { text: maxCapacity },
+          { html: formatConstants(constants.specialistCellTypes, cellTypes) }
+        ]
+      ), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      attributes: {
+        "data-qa": "check-capacity-table"
+      },
+      firstCellIsHeader: true,
+      head: [
+        { text: "Location" },
+        { text: "Baseline CNA" },
+        { text: "Working capacity" },
+        { text: "Maximum capacity" },
+        { text: "Cell type" }
+      ],
+      rows: rows
+    }) }}
+  {% else %}
+    {% for subData in data.decoratedSubLocations %}
+      {{ explodeLocation(subData, false) }}
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
+
+{% macro explodeLocation(data, topLevel) %}
+  <h{{ 2 if topLevel else 3 }} class="govuk-heading-{{ "m" if topLevel else "s" }}">
+    {{ data.decoratedLocation.displayName | capFirst }}
+  </h{{ 2 if topLevel else 3 }}>
+
+  {{ capacityTable(data.decoratedSubLocations, data.decoratedLocation) }}
+{% endmacro %}
+
+{% block fields %}
+  {% if decoratedLocationTree[0].decoratedLocation.leafLevel %}
+    {{ capacityTable(decoratedLocationTree, decoratedLocation) }}
+  {% else %}
+    {% for data in decoratedLocationTree %}
+      {{ explodeLocation(data, true) }}
+    {% endfor %}
+  {% endif %}
+{% endblock %}

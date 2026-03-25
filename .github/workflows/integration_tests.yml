@@ -31,7 +31,7 @@ jobs:
     needs: get-timings
     services:
       redis:
-        image: redis:8.4
+        image: redis:8.6
         ports:
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        container: [ 1, 2, 3, 4, 5, 6, 7 ]
+        container: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
     outputs:
       timings-1: ${{ steps.timings.outputs.t1 }}
       timings-2: ${{ steps.timings.outputs.t2 }}
@@ -49,6 +49,9 @@ jobs:
       timings-5: ${{ steps.timings.outputs.t5 }}
       timings-6: ${{ steps.timings.outputs.t6 }}
       timings-7: ${{ steps.timings.outputs.t7 }}
+      timings-8: ${{ steps.timings.outputs.t8 }}
+      timings-9: ${{ steps.timings.outputs.t9 }}
+      timings-10: ${{ steps.timings.outputs.t10 }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v6
@@ -66,13 +69,13 @@ jobs:
         run: npm install -g npm@^11.2.0
 
       - name: download artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: npm_build_artifacts
 
       - name: restore cache
         id: restore-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         env:
           cache-name: node-modules
         with:
@@ -95,7 +98,7 @@ jobs:
           sleep 5
 
       - name: Run split Cypress tests 🧪
-        uses: cypress-io/github-action@v6.10.4
+        uses: cypress-io/github-action@v7.1.1
         with:
           browser: chrome
         env:
@@ -105,7 +108,7 @@ jobs:
           SPLIT_FILE: 'timings.json'
 
       - name: Upload any screenshots due to failure
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: Upload screenshots
@@ -121,7 +124,7 @@ jobs:
 
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: npm_integration_test_artifacts
           path: |

@@ -11,11 +11,11 @@
           Review the proposed change to the establishment's cell certificate. If approved, the cell certificate will be updated with this change.
         </p>
 
-        {{ certificationApprovalRequestSummary(approvalRequest, userMap, false, false) }}
+        {{ certificationApprovalRequestSummary(approvalRequest, userMap, locationMap, constants, false, false) }}
       </div>
     </div>
 
-    {{ certificationApprovalRequest(approvalRequest, false, 0, prisonResidentialSummary, specialistCellTypesObject, accommodationTypeConstants, usedForConstants, false) }}
+    {{ certificationApprovalRequest(approvalRequest, false, 0, prisonResidentialSummary, false, constants, locationMap) }}
   </div>
 
   {{ super() }}

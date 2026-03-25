@@ -11,12 +11,10 @@ class ExtendedTransaction extends CommonTransaction {
     next,
     title,
     caption,
-    description,
   }: {
     next: FormWizard.Step['next']
     title?: (req: FormWizard.Request, res: Response) => string
     caption?: (req: FormWizard.Request, res: Response) => string
-    description?: (req: FormWizard.Request, res: Response) => string
   }) {
     const modifiedSteps = super.getSteps({ next })
 
@@ -32,9 +30,6 @@ class ExtendedTransaction extends CommonTransaction {
           }
           if (caption) {
             locals.titleCaption = caption(req, res)
-          }
-          if (description) {
-            locals.certAction = description(req, res)
           }
 
           return locals

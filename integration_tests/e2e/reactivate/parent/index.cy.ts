@@ -164,7 +164,7 @@ context('Reactivate parent', () => {
         parentLocation: inactiveWing,
         subLocations: [inactiveLanding1, inactiveLanding2, inactiveLanding3],
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -200,7 +200,7 @@ context('Reactivate parent', () => {
           subLocations: locations.filter(l => l.parentId === location.id),
         }),
       )
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
       ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
       viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)

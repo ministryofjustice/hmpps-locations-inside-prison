@@ -380,6 +380,7 @@ declare module 'hmpo-form-wizard' {
       resetJourney?: boolean
       checkJourney?: boolean
       entryPoint?: boolean
+      templatePath?: string
       template?: string
       next?: FormWizard.Step.NextStep
       fields?: string[]

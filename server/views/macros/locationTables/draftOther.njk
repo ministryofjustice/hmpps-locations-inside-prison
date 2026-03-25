@@ -11,9 +11,9 @@
           [
             { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
             { html: "<p class='govuk-tag__wrapper'>" + locationStatusTag(item) + "</p>" },
-            { text: '-' if item.numberOfCellLocations == 0 else (item.pendingChanges.certifiedNormalAccommodation or item.certification.certifiedNormalAccommodation) },
-            { text: '-' if item.numberOfCellLocations == 0 else (item.pendingChanges.workingCapacity or item.capacity.workingCapacity) },
-            { text: '-' if item.numberOfCellLocations == 0 else (item.pendingChanges.maxCapacity or item.capacity.maxCapacity) },
+            { text: '-' if item.numberOfCellLocations == 0 else (item | includePending).certifiedNormalAccommodation },
+            { text: '-' if item.numberOfCellLocations == 0 else (item | includePending).workingCapacity },
+            { text: '-' if item.numberOfCellLocations == 0 else (item | includePending).maxCapacity },
             { html: item.accommodationTypes | join('<br>') or '-' },
             { html: item.usedFor | join('<br>') or '-' }
           ]

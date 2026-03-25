@@ -8,5 +8,8 @@ export default class NonResidentialRoomPage extends Page {
   static goTo = (prisonId?: string, locationId?: string) =>
     cy.visit(`/view-and-update-locations/${[prisonId, locationId].join('/')}`)
 
-  changeLink = (): PageElement => cy.get('a:contains("Change")')
+  changeLink = (): PageElement =>
+    cy.get(
+      '.govuk-summary-list__row:has(.govuk-summary-list__key:contains("Non-residential room")) a:contains("Change")',
+    )
 }

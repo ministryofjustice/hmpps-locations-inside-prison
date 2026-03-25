@@ -48,7 +48,7 @@ import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocation
 export default function routes(services: Services): Router {
   const router = Router()
 
-  router.use(addBreadcrumb({ title: 'Residential locations', href: '/' }))
+  router.use(addBreadcrumb({ title: 'Locations', href: '/' }))
   router.use(addServicesToRequest(services))
   router.use(populatePrisonAndLocationId)
 
