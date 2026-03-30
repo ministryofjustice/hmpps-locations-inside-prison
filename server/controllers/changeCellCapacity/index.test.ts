@@ -33,6 +33,7 @@ describe('ChangeCellCapacity', () => {
         get: jest.fn(
           (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
         ) as FormWizard.Request['sessionModel']['get'],
+        set: jest.fn(),
       },
     }
     deepRes = {
@@ -87,7 +88,7 @@ describe('ChangeCellCapacity', () => {
       })
     })
 
-    it('does allow working capacity lower than current occupancy', () => {
+    it('does not allow working capacity lower than current occupancy for normal accommodation cells', () => {
       deepRes.locals.prisonerLocation.prisoners = [
         PrisonerFactory.build(),
         PrisonerFactory.build(),
@@ -96,13 +97,42 @@ describe('ChangeCellCapacity', () => {
       const callback = jest.fn()
       controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(callback).not.toHaveBeenCalledWith({
-        workingCapacity: {
-          args: {},
-          key: 'workingCapacity',
-          type: 'isNoLessThanOccupancy',
-        },
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workingCapacity: {
+            args: {},
+            key: 'workingCapacity',
+            type: 'isNoLessThanOccupancy',
+          },
+        }),
+      )
+    })
+
+    it('allows working capacity lower than occupancy for specialist cells', () => {
+      deepRes.locals.decoratedLocation = buildDecoratedLocation({
+        id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        capacity: { maxCapacity: 2, workingCapacity: 2 },
+        prisonId: 'MDI',
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
+        specialistCellTypes: ['ACCESSIBLE_CELL'],
       })
+      deepRes.locals.prisonerLocation.prisoners = [
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+        PrisonerFactory.build(),
+      ]
+      const callback = jest.fn()
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          workingCapacity: {
+            args: {},
+            key: 'workingCapacity',
+            type: 'isNoLessThanOccupancy',
+          },
+        }),
+      )
     })
 
     it('does not allow max capacity lower than current occupancy', () => {
@@ -114,13 +144,15 @@ describe('ChangeCellCapacity', () => {
       const callback = jest.fn()
       controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(callback).toHaveBeenCalledWith({
-        maxCapacity: {
-          args: {},
-          key: 'maxCapacity',
-          type: 'isNoLessThanOccupancy',
-        },
-      })
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          maxCapacity: {
+            args: {},
+            key: 'maxCapacity',
+            type: 'isNoLessThanOccupancy',
+          },
+        }),
+      )
     })
 
     it('does not break when current occupancy is undefined', () => {
@@ -134,7 +166,7 @@ describe('ChangeCellCapacity', () => {
 
   describe('validate', () => {
     it('redirects to the show location page when there are no changes', () => {
-      deepReq.form.values = { maxCapacity: '2', workingCapacity: '2' }
+      deepReq.form.values = { baselineCna: '2', maxCapacity: '2', workingCapacity: '2' }
       deepRes.redirect = jest.fn()
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
@@ -144,16 +176,37 @@ describe('ChangeCellCapacity', () => {
     })
 
     it('does not redirect to the show location page when the only change is max capacity', () => {
-      deepReq.form.values = { maxCapacity: '9', workingCapacity: '2' }
+      deepReq.form.values = { baselineCna: '2', maxCapacity: '9', workingCapacity: '2' }
       deepRes.redirect = jest.fn()
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
       expect(deepRes.redirect).not.toHaveBeenCalled()
     })
+
+    it('sets cnaOrMaxCapChanged flag when max capacity changes', () => {
+      deepReq.form.values = { baselineCna: '2', maxCapacity: '9', workingCapacity: '2' }
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
+
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('cnaOrMaxCapChanged', true)
+    })
+
+    it('sets cnaOrMaxCapChanged flag when CNA changes', () => {
+      deepReq.form.values = { baselineCna: '3', maxCapacity: '2', workingCapacity: '2' }
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
+
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('cnaOrMaxCapChanged', true)
+    })
+
+    it('sets onlyWorkingCapChanged flag when only working capacity changes', () => {
+      deepReq.form.values = { baselineCna: '2', maxCapacity: '2', workingCapacity: '1' }
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
+
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('onlyWorkingCapChanged', true)
+    })
   })
 
   describe('locals', () => {
-    it('returns the expected locals', () => {
+    it('returns the expected locals when cert is active', () => {
       deepRes.locals.errorlist = [
         {
           key: 'workingCapacity',
@@ -177,10 +230,20 @@ describe('ChangeCellCapacity', () => {
           },
         ],
         insetText:
-          'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
+          'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a baseline certified normal accommodation and working capacity of 0.',
         title: 'Change cell capacity',
         titleCaption: 'Cell A-1-001',
       })
+    })
+
+    it('returns inset text without CNA when cert is not active', () => {
+      deepRes.locals.prisonConfiguration = { certificationApprovalRequired: 'INACTIVE' }
+      deepRes.locals.errorlist = []
+      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      expect(result.insetText).toEqual(
+        'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
+      )
     })
   })
 })
