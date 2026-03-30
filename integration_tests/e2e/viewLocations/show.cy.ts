@@ -214,7 +214,10 @@ context('View Locations Show', () => {
     if (location.status === 'NON_RESIDENTIAL') {
       viewLocationsShowPage.summaryCards.all().should('have.length', 0)
     } else {
-      viewLocationsShowPage.summaryCards.all().should('have.length', location.leafLevel ? 2 : 3)
+      const hasCna = location.status.includes('DRAFT') || isCertActive
+      const hasInactiveCells = !location.status.includes('DRAFT') && !location.leafLevel
+      const expectedCards = 2 + (hasCna ? 1 : 0) + (hasInactiveCells ? 1 : 0)
+      viewLocationsShowPage.summaryCards.all().should('have.length', expectedCards)
       if (location.status.includes('DRAFT')) {
         viewLocationsShowPage.summaryCards
           .cnaText()
@@ -226,6 +229,9 @@ context('View Locations Show', () => {
           .maximumCapacityText()
           .contains(`${location.numberOfCellLocations > 0 ? location.capacity.maxCapacity : '-'}`)
       } else {
+        if (isCertActive) {
+          viewLocationsShowPage.summaryCards.cnaText().contains(`${location.capacity.certifiedNormalAccommodation}`)
+        }
         viewLocationsShowPage.summaryCards.workingCapacityText().contains(`${location.capacity.workingCapacity}`)
         viewLocationsShowPage.summaryCards.maximumCapacityText().contains(`${location.capacity.maxCapacity}`)
         if (!location.leafLevel) {

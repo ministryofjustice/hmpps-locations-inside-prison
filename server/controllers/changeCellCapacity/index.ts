@@ -56,9 +56,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
           !specialistCellTypes.length
         ) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
-        }
-
-        if (
+        } else if (
           Number(values?.workingCapacity) < occupants.length &&
           accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
           !specialistCellTypes.length
