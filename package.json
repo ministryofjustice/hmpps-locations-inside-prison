@@ -89,7 +89,7 @@
     "@aws-sdk/client-sqs": "^3.1003.0",
     "@ministryofjustice/frontend": "^8.0.1",
     "@ministryofjustice/hmpps-auth-clients": "^1.0.2",
-    "@ministryofjustice/hmpps-digital-prison-reporting-frontend": "^4.32.1",
+    "@ministryofjustice/hmpps-digital-prison-reporting-frontend": "^5.8.5",
     "@ministryofjustice/hmpps-monitoring": "^1.0.2",
     "@ministryofjustice/hmpps-rest-client": "^1.1.0",
     "applicationinsights": "^2.9.8",
