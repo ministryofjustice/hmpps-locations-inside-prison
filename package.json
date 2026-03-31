@@ -86,7 +86,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.1017.0",
+    "@aws-sdk/client-sqs": "^3.1018.0",
     "@ministryofjustice/frontend": "^8.0.1",
     "@ministryofjustice/hmpps-auth-clients": "^1.0.2",
     "@ministryofjustice/hmpps-digital-prison-reporting-frontend": "^4.32.1",
@@ -164,7 +164,7 @@
     "cypress-multi-reporters": "^2.0.5",
     "cypress-split": "^1.24.31",
     "dotenv": "^17.3.1",
-    "esbuild": "^0.27.3",
+    "esbuild": "^0.27.4",
     "esbuild-plugin-clean": "^1.0.1",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-plugin-manifest": "^1.0.5",
@@ -187,8 +187,8 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "@types/express": "5.0.3",
-    "@types/express-serve-static-core": "5.0.7",
+    "@types/express": "5.0.6",
+    "@types/express-serve-static-core": "5.1.1",
     "@jgoz/esbuild-plugin-typecheck": {
       "esbuild": "$esbuild"
     },
