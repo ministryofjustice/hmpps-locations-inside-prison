@@ -7,17 +7,19 @@
   <div class="govuk-width-container">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <p>
-          This request is being reviewed by the establishment’s authorising director. If approved, the cell certificate
-          will be updated with this change.
-        </p>
+        {% if approvalRequest.status == ‘PENDING’ %}
+          <p>
+            This request is being reviewed by the establishment’s authorising director. If approved, the cell certificate
+            will be updated with this change.
+          </p>
 
-        <p>
-          You are unable to make changes to this location while the request is being reviewed. You can withdraw the
-          request if you need to make changes.
-        </p>
+          <p>
+            You are unable to make changes to this location while the request is being reviewed. You can withdraw the
+            request if you need to make changes.
+          </p>
+        {% endif %}
 
-        {{ certificationApprovalRequestSummary(approvalRequest, userMap, locationMap, constants, canAccess('certificate_change_request_withdraw'), true) }}
+        {{ certificationApprovalRequestSummary(approvalRequest, userMap, locationMap, constants, canAccess(‘certificate_change_request_withdraw’), true) }}
       </div>
     </div>
 
