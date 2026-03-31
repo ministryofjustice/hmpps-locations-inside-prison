@@ -25,6 +25,8 @@ class ExtendedTransaction extends CommonTransaction {
         override locals(req: FormWizard.Request, res: Response): TypedLocals {
           const locals = super.locals(req, res)
 
+          locals.cancelText = 'Cancel'
+
           if (title) {
             locals.title = res.locals.title.replace('This', title(req, res))
           }
