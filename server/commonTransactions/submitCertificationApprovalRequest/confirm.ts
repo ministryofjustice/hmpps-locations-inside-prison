@@ -193,6 +193,38 @@ export default class Confirm extends FormInitialStep {
       locals.changeLinks = {
         reasonForChange: changeLink,
       }
+    } else if (req.form.options.name === 'change-cell-capacity') {
+      const newBaselineCna = Number(sessionModel.get<string>('baselineCna'))
+      const newWorkingCapacity = Number(sessionModel.get<string>('workingCapacity'))
+      const newMaxCapacity = Number(sessionModel.get<string>('maxCapacity'))
+      const explanation = sessionModel.get<string>('explanation')
+      const { certifiedNormalAccommodation, workingCapacity, maxCapacity } = getLocationAttributesIncludePending(
+        locals.location,
+      )
+
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'CAPACITY',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        prisonId: locals.prisonId,
+        reasonForChange: explanation,
+        certifiedNormalAccommodationChange: newBaselineCna - certifiedNormalAccommodation,
+        workingCapacityChange: newWorkingCapacity - workingCapacity,
+        maxCapacityChange: newMaxCapacity - maxCapacity,
+        locations: [
+          await locationToCertificationLocation(req, locals.location, location => ({
+            ...location,
+            certifiedNormalAccommodation: newBaselineCna,
+            workingCapacity: newWorkingCapacity,
+            maxCapacity: newMaxCapacity,
+          })),
+        ],
+      })
+
+      const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
+      locals.changeLinks = {
+        reasonForChange: changeLink,
+      }
     }
 
     if (proposedSignedOpCapChange) {
@@ -260,6 +292,20 @@ export default class Confirm extends FormInitialStep {
       certificationApprovalRequestId = (
         await locationsService.updateCellSanitation(systemToken, res.locals.locationId, {
           inCellSanitation: inCellSanitation === 'YES',
+          reasonForChange: explanation,
+        })
+      ).pendingApprovalRequestId
+      requestCount += 1
+    } else if (options.name === 'change-cell-capacity') {
+      const explanation = req.sessionModel.get<string>('explanation')
+      const capacities = {
+        maxCapacity: Number(req.sessionModel.get<string>('maxCapacity')),
+        workingCapacity: Number(req.sessionModel.get<string>('workingCapacity')),
+        certifiedNormalAccommodation: Number(req.sessionModel.get<string>('baselineCna')),
+      }
+      certificationApprovalRequestId = (
+        await locationsService.updateCapacity(systemToken, res.locals.locationId, {
+          ...capacities,
           reasonForChange: explanation,
         })
       ).pendingApprovalRequestId
