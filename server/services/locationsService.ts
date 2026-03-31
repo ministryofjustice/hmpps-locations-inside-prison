@@ -297,7 +297,12 @@ export default class LocationsService {
   async updateCapacity(
     token: string,
     locationId: string,
-    capacities: { maxCapacity?: number; workingCapacity?: number; certifiedNormalAccommodation?: number },
+    capacities: {
+      maxCapacity?: number
+      workingCapacity?: number
+      certifiedNormalAccommodation?: number
+      reasonForChange?: string
+    },
   ) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, capacities)
   }

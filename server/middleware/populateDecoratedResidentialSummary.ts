@@ -4,7 +4,6 @@ import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
-import canEditCna from '../utils/canEditCna'
 import getLocationAttributesIncludePending from '../utils/getLocationAttributesIncludePending'
 import { PrisonConfiguration } from '../data/types/locationsApi'
 
@@ -344,12 +343,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           workingCapLink.linkAriaLabel = 'Change working capacity'
           maxCapLink.linkAriaLabel = 'Change maximum capacity'
 
-          if (
-            canEditCna(
-              await locationsService.getPrisonConfiguration(systemToken, prisonId),
-              residentialSummary.location,
-            )
-          ) {
+          if (prisonConfiguration.certificationApprovalRequired === 'ACTIVE') {
             Object.assign(cnaLink, changeLink)
             cnaLink.linkAriaLabel = 'Change CNA'
           }
@@ -360,9 +354,12 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           residentialSummary.location,
         )
 
-        if (residentialSummary.location.status.includes('DRAFT')) {
+        if (
+          residentialSummary.location.status.includes('DRAFT') ||
+          prisonConfiguration.certificationApprovalRequired === 'ACTIVE'
+        ) {
           residentialSummary.summaryCards.push({
-            title: 'CNA',
+            title: 'Baseline CNA',
             type: 'cna',
             text: numberOfCellLocations ? `${certifiedNormalAccommodation}` : '-',
             ...cnaLink,
