@@ -1,11 +1,32 @@
 {% extends "../../../../partials/formStep.njk" %}
 
 {% block fields %}
-  {% if approvalRequest.approvalType !== 'SIGNED_OP_CAP' %}
+  {% if approvalRequest.approvalType === 'SIGNED_OP_CAP' %}
+    {{ govukCheckboxes({
+      name: 'confirmation',
+      id: 'confirmation',
+      fieldset: {
+        legend: {
+          text: 'Confirm change agreed with capacity management',
+          classes: 'govuk-fieldset__legend--m'
+        }
+      },
+      hint: {
+        text: 'I confirm this change has been agreed with capacity management'
+      },
+      errorMessage: fields.confirmation.errorMessage,
+      items: [
+        {
+          text: 'I understand and agree with the above statement.',
+          value: 'yes',
+          checked: fields.confirmation.value === 'yes'
+        }
+      ]
+    }) }}
+  {% else %}
     <p>
       You must confirm that all cells on the certificate meet the required standards to update the certificate.
     </p>
+    {{ super() }}
   {% endif %}
-
-  {{ super() }}
 {% endblock %}

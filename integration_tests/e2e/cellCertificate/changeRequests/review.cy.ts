@@ -158,10 +158,7 @@ context('Cell Certificate - Change Requests - Review', () => {
           cy.get('[data-qa="title-caption"]').should('contain', 'Test (HMP)')
           cy.get('h1').should('contain', 'You are about to approve a change to the cell certificate')
           cy.get('.govuk-fieldset__legend--m').should('contain', 'Confirm change agreed with capacity management')
-          cy.get('.govuk-hint').should(
-            'contain',
-            'I confirm that this change has been agreed with capacity management.',
-          )
+          cy.get('.govuk-hint').should('contain', 'I confirm this change has been agreed with capacity management')
           cy.get('label[for="confirmation"]').should('contain', 'I understand and agree with the above statement.')
           approvePage.confirmButton().should('contain', 'Update cell certificate')
           approvePage.cancelLink().should('be.visible')
