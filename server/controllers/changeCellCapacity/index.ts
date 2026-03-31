@@ -8,6 +8,14 @@ import capFirst from '../../formatters/capFirst'
 import canEditCna from '../../utils/canEditCna'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 
+function isCertActive(prisonConfiguration: { certificationApprovalRequired?: string }) {
+  return prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
+}
+
+function showCnaField(prisonConfiguration: { certificationApprovalRequired?: string }) {
+  return isCertActive(prisonConfiguration)
+}
+
 export default class ChangeCellCapacity extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
@@ -24,14 +32,14 @@ export default class ChangeCellCapacity extends FormInitialStep {
 
   override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     const { values } = req.form
-    const { decoratedLocation, prisonerLocation } = res.locals
+    const { decoratedLocation, prisonerLocation, prisonConfiguration } = res.locals
     const { accommodationTypes, specialistCellTypes } = decoratedLocation.raw
     const occupants = prisonerLocation?.prisoners || []
 
     const validationErrors: FormWizard.Errors = {}
 
     super.validateFields(req, res, errors => {
-      if (!errors.baselineCna && canEditCna(res.locals.prisonConfiguration, res.locals.decoratedLocation)) {
+      if (!errors.baselineCna && showCnaField(prisonConfiguration)) {
         if (
           values?.baselineCna === '0' &&
           accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
@@ -48,6 +56,12 @@ export default class ChangeCellCapacity extends FormInitialStep {
           !specialistCellTypes.length
         ) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
+        } else if (
+          Number(values?.workingCapacity) < occupants.length &&
+          accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
+          !specialistCellTypes.length
+        ) {
+          validationErrors.workingCapacity = this.formError('workingCapacity', 'isNoLessThanOccupancy')
         }
       }
 
@@ -67,13 +81,18 @@ export default class ChangeCellCapacity extends FormInitialStep {
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap, baselineCna: newBaselineCna } = req.form.values
     const { maxCapacity, workingCapacity, baselineCna } = this.getInitialValues(req, res)
 
-    if (
-      (!canEditCna(prisonConfiguration, decoratedLocation) || Number(newBaselineCna) === baselineCna) &&
-      Number(newMaxCap) === maxCapacity &&
-      Number(newWorkingCap) === workingCapacity
-    ) {
+    const cnaShown = showCnaField(prisonConfiguration)
+    const cnaChanged = cnaShown && Number(newBaselineCna) !== baselineCna
+    const maxCapChanged = Number(newMaxCap) !== maxCapacity
+    const workingCapChanged = Number(newWorkingCap) !== workingCapacity
+
+    if (!cnaChanged && !maxCapChanged && !workingCapChanged) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
+
+    // Store change flags in session for routing decisions in steps.ts
+    req.sessionModel.set('cnaOrMaxCapChanged', cnaChanged || maxCapChanged)
+    req.sessionModel.set('onlyWorkingCapChanged', !cnaChanged && !maxCapChanged && workingCapChanged)
 
     return next()
   }
@@ -81,7 +100,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation, prisonConfiguration } = res.locals
     const { displayName, id: locationId, prisonId } = decoratedLocation
-    const showCna = canEditCna(prisonConfiguration, decoratedLocation)
+    const cnaShown = showCnaField(prisonConfiguration)
 
     const cancelLink = backUrl(req, {
       fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
@@ -93,11 +112,11 @@ export default class ChangeCellCapacity extends FormInitialStep {
       backLink: cancelLink,
       cancelLink,
       title: `Change cell capacity`,
-      insetText: `Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a ${showCna ? 'baseline certified normal accommodation and ' : ''}working capacity of 0.`,
+      insetText: `Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a ${cnaShown ? 'baseline certified normal accommodation and ' : ''}working capacity of 0.`,
       titleCaption: capFirst(displayName),
     }
 
-    if (showCna) {
+    if (canEditCna(prisonConfiguration, decoratedLocation)) {
       locals.buttonText = 'Save cell capacity'
     }
 
