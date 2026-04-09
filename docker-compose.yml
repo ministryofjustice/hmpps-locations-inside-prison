@@ -205,7 +205,6 @@ services:
       - LOCATIONS_API_URL=http://localhost:8090
       - PRISON_API_URL=http://localhost:8091
       - NO_HTTPS=true
-      - LOAD_DPR_ON_STARTUP=true
 
 networks:
   hmpps:
