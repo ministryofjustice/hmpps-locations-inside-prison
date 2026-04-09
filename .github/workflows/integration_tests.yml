@@ -54,14 +54,14 @@ jobs:
       timings-10: ${{ steps.timings.outputs.t10 }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: ministryofjustice/hmpps-assess-risks-and-needs-github-actions/.github/actions/cypress/create_timings_file@v1
+      - uses: ministryofjustice/hmpps-assess-risks-and-needs-github-actions/.github/actions/cypress/create_timings_file@bd2ccc17cfc6c285638a4be7bbb280527a30c328 # v1
         with:
           timings: ${{ needs.get-timings.outputs.timings }}
 
       - name: Use Node.js ${{ inputs.node_version_file }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version-file: ${{ inputs.node_version_file }}
 
@@ -69,13 +69,13 @@ jobs:
         run: npm install -g npm@^11.2.0
 
       - name: download artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: npm_build_artifacts
 
       - name: restore cache
         id: restore-cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         env:
           cache-name: node-modules
         with:
@@ -98,7 +98,7 @@ jobs:
           sleep 5
 
       - name: Run split Cypress tests 🧪
-        uses: cypress-io/github-action@v7.1.9
+        uses: cypress-io/github-action@783cb3f07983868532cabaedaa1e6c00ff4786a8 # v7.1.9
         with:
           browser: chrome
         env:
@@ -108,7 +108,7 @@ jobs:
           SPLIT_FILE: 'timings.json'
 
       - name: Upload any screenshots due to failure
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         if: failure()
         with:
           name: Upload screenshots
@@ -124,7 +124,7 @@ jobs:
 
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: npm_integration_test_artifacts
           path: |
