@@ -12,7 +12,6 @@ import {
   StatusType,
   LocationType,
 } from './types/locationsApi'
-import { ManagementReportDefinition } from './types/locationsApi/managementReportDefinition'
 
 import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
@@ -478,13 +477,6 @@ export default class LocationsApiClient extends BaseApiClient {
     >({
       path: '/signed-op-cap/',
       requestType: 'post',
-    }),
-  }
-
-  managementReportDefinitions = {
-    get: this.apiCall<ManagementReportDefinition[], null>({
-      path: '/definitions',
-      requestType: 'get',
     }),
   }
 

@@ -68,14 +68,6 @@ export default function populateCards(locationsService: LocationsService) {
         : null,
       {
         clickable: true,
-        visible: req.canAccess('reporting_location_information'),
-        heading: 'Management reporting',
-        href: '/management-reporting',
-        description: 'Run management reports for printing or exporting.',
-        'data-qa': 'management-reporting-card',
-      },
-      {
-        clickable: true,
         visible: req.canAccess('administer_residential'),
         heading: 'Admin',
         href: '/admin',

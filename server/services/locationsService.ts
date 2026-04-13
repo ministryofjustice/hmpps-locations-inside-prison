@@ -1,6 +1,5 @@
 import { pickBy } from 'lodash'
 import LocationsApiClient from '../data/locationsApiClient'
-import { ManagementReportDefinition } from '../data/types/locationsApi/managementReportDefinition'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
 import { LocationType, StatusType } from '../data/types/locationsApi'
 import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
@@ -386,10 +385,6 @@ export default class LocationsService {
       otherConvertedCellType?: string
     }
     return this.locationsApiClient.locations.updateNonResCell(token, { locationId }, params)
-  }
-
-  async getManagementReportDefinitions(token: string): Promise<ManagementReportDefinition[]> {
-    return this.locationsApiClient.managementReportDefinitions.get(token)
   }
 
   async getPrisonConfiguration(token: string, prisonId: string) {

@@ -39,7 +39,6 @@ describe('rolesToPermissions', () => {
         'MANAGE_RES_LOCATIONS_OP_CAP',
         'RESI__CERT_REVIEWER',
         'RESI__CERT_VIEWER',
-        'REPORTING_LOCATION_INFORMATION',
         'MANAGE_RES_LOCATIONS_ADMIN',
       ]).sort(),
     ).toEqual([
@@ -62,7 +61,6 @@ describe('rolesToPermissions', () => {
       'deactivate',
       'deactivate:permanent',
       'reactivate',
-      'reporting_location_information',
       'set_cell_type',
     ])
   })
