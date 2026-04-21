@@ -2,23 +2,8 @@ import { DeepPartial } from 'fishery'
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import EditCapacity from './editCapacity'
-import LocationFactory from '../../../testutils/factories/location'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
-
-const mockModel = (originalValues: Record<string, any>) => {
-  const values = { ...originalValues }
-
-  return {
-    get: jest.fn((fieldName?: string) => values[fieldName]),
-    set: jest.fn((fieldName?: string, value?: any) => {
-      values[fieldName] = value
-    }),
-    unset: jest.fn((fieldName?: string) => {
-      delete values[fieldName]
-    }),
-    toJSON: jest.fn(() => values),
-  } as any as FormWizard.Request['sessionModel']
-}
+import mockModel from '../../../testutils/mockModel'
 
 describe('EditCapacity', () => {
   let req: DeepPartial<FormWizard.Request>
@@ -48,7 +33,11 @@ describe('EditCapacity', () => {
         }),
         decoratedLocationTree: [
           {
-            decoratedLocation: buildDecoratedLocation({ id: 'parent1', locationType: 'WING' }),
+            decoratedLocation: buildDecoratedLocation({
+              id: 'parent1',
+              localName: 'Parent Location',
+              locationType: 'WING',
+            }),
             decoratedSubLocations: [
               {
                 decoratedLocation: buildDecoratedLocation({ id: 'cell1', locationType: 'CELL', parentId: 'parent1' }),
@@ -58,8 +47,8 @@ describe('EditCapacity', () => {
           },
         ],
         locationResidentialSummary: { parentLocation: { accommodationTypes: [] } },
-        cells: [
-          LocationFactory.build({ id: 'cell1', parentId: 'parent1', locationType: 'CELL', specialistCellTypes: [] }),
+        decoratedCells: [
+          buildDecoratedLocation({ id: 'cell1', parentId: 'parent1', locationType: 'CELL', specialistCellTypes: [] }),
         ],
       },
       redirect: jest.fn(),
@@ -96,45 +85,52 @@ describe('EditCapacity', () => {
     })
 
     describe('when check-capacity step is present', () => {
-      it('should not modify history', () => {
-        req.journeyModel = mockModel({
-          history: [
+      describe('when step.next contains edit-capacity', () => {
+        it('should not modify history', () => {
+          req.journeyModel = mockModel({
+            history: [
+              {
+                path: '/reactivate/location/parent1/check-capacity',
+                next: '/reactivate/location/parent1/edit-capacity/parent1',
+              },
+            ],
+          })
+          editCapacity.fixHistory(req as FormWizard.Request, res as Response, next)
+          expect(req.journeyModel.set).not.toHaveBeenCalled()
+          expect(next).toHaveBeenCalled()
+        })
+      })
+
+      describe('when step.next does not contain edit-capacity', () => {
+        it('should modify the step.next to be edit-capacity', () => {
+          req.journeyModel = mockModel({
+            history: [
+              {
+                path: '/reactivate/location/parent1/check-capacity',
+                next: '/something-else',
+              },
+            ],
+          })
+          editCapacity.fixHistory(req as FormWizard.Request, res as Response, next)
+          expect(req.journeyModel.set).toHaveBeenCalledWith('history', [
             {
               path: '/reactivate/location/parent1/check-capacity',
+              next: '/reactivate/location/parent1/edit-capacity/parent1',
             },
-          ],
+          ])
+          expect(next).toHaveBeenCalled()
         })
-        editCapacity.fixHistory(req as FormWizard.Request, res as Response, next)
-        expect(req.journeyModel.set).not.toHaveBeenCalled()
-        expect(next).toHaveBeenCalled()
       })
     })
   })
 
-  describe('populateCells', () => {
-    it('should populate cells from decoratedLocationTree', () => {
-      res.locals.cells = []
-      req.params.parentLocationId = 'parent1'
-      editCapacity.populateCells(req as FormWizard.Request, res as Response, next)
-      expect(res.locals.cells.length).toBeGreaterThan(0)
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('should fallback to decoratedLocation.raw if no cells and locationType is CELL', () => {
-      res.locals.cells = []
-      res.locals.decoratedLocation = buildDecoratedLocation({ id: 'cell2', locationType: 'CELL', parentId: 'parent1' })
-      req.params.parentLocationId = 'parent1'
-      editCapacity.populateCells(req as FormWizard.Request, res as Response, next)
-      expect(res.locals.cells.length).toBe(1)
-      expect(next).toHaveBeenCalled()
-    })
-  })
-
   describe('getParent', () => {
-    it('should return correct parent in getParent', () => {
+    it('should return correct parent', () => {
       req.params.parentLocationId = 'parent1'
-      const parent = editCapacity.getParent(req as FormWizard.Request, res as Response)
-      expect(parent.id).toBe('parent1')
+      expect(editCapacity.getParent(req as FormWizard.Request, res as Response).id).toBe('parent1')
+
+      req.params.parentLocationId = 'cell1'
+      expect(editCapacity.getParent(req as FormWizard.Request, res as Response).id).toBe('cell1')
     })
   })
 
@@ -160,7 +156,7 @@ describe('EditCapacity', () => {
 
   describe('createDynamicFields', () => {
     it('should create dynamic fields for each cell', () => {
-      res.locals.cells = [LocationFactory.build({ id: 'cell1', parentId: 'parent1', locationType: 'CELL' })]
+      res.locals.decoratedCells = [buildDecoratedLocation({ id: 'cell1', parentId: 'parent1', locationType: 'CELL' })]
       req.form.options.fields = {
         workingCapacity: { validate: [], errorSummaryPrefix: '' },
         baselineCna: { validate: [], errorSummaryPrefix: '' },

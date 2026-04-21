@@ -3,12 +3,14 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
 
-{% macro capacityTable(cells) %}
+{% macro capacityTable(decoratedCells) %}
   {% set rows = [] %}
-  {% for cell in cells %}
-    {% set cellTypesText = formatConstants(constants.specialistCellTypes, cell.specialistCellTypes) %}
+  {% for decoratedCell in decoratedCells %}
+    {% set cell = decoratedCell.raw %}
+    {% set modifiedCell = modifiedLocationMap[cell.id] %}
+    {% set cellTypesText = formatConstants(constants.specialistCellTypes, modifiedCell.specialistCellTypes) %}
 
-    {% if cell.specialistCellTypes and cell.specialistCellTypes.length %}
+    {% if modifiedCell.specialistCellTypes and modifiedCell.specialistCellTypes.length %}
       {% set cellTypeColumn =
         {  html:
           '<div data-qa="cell-types-' + cell.id + '" class="change-remove-container">' +
@@ -113,5 +115,5 @@
     }) }}
   {% endif %}
 
-  {{ capacityTable(cells) }}
+  {{ capacityTable(decoratedCells) }}
 {% endblock %}

@@ -7,6 +7,14 @@ export default async function getPrisonResidentialSummary(
   res: Response,
   next: NextFunction | null,
 ) {
+  if (res.locals.prisonResidentialSummary) {
+    if (next) {
+      next()
+    }
+
+    return
+  }
+
   res.locals.prisonResidentialSummary = (await req.services.locationsService.getResidentialSummary(
     req.session.systemToken,
     (res.locals.location || res.locals.decoratedLocation)?.prisonId || res.locals.prisonId,

@@ -64,7 +64,6 @@ interface AllLocals {
   canAccess: (permission: string) => boolean
   cancelClasses: string
   cancelLink: string
-  cancelText: string
   changeLinks: { [field: string]: string }
   resiCards: card[]
   nonResiCards: card[]
@@ -152,6 +151,7 @@ interface AllLocals {
   locationTree: LocationTree[]
   locationType: string
   maxCapacity: string
+  modifiedLocationMap: { [locationId: string]: Location }
   minLayout: string
   options: FormWizard.Request['form']['options']
   pathSuffix: string

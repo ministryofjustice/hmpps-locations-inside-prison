@@ -4,7 +4,7 @@ import { Location } from '../data/types/locationsApi'
 import capFirst from './capFirst'
 
 const approvalTypeMap: { [key: string]: string } = {
-  CAPACITY: 'Change cell capacity',
+  CAPACITY_CHANGE: 'Change cell capacity',
   CELL_MARK: 'Change cell door number',
   CELL_SANITATION: 'Change cell sanitation',
   DRAFT: 'Add new locations to certificate',
@@ -21,6 +21,13 @@ export default function approvalTypeDescription(
     return `${
       formatted === '-' ? capFirst(location.locationType.toLowerCase()) : formatted
     } deactivation (decrease certified working capacity)`
+  }
+
+  if (approvalType === 'REACTIVATION') {
+    const formatted = formatConstants(constants.locationTypes, location.locationType)
+    return `${
+      formatted === '-' ? capFirst(location.locationType.toLowerCase()) : formatted
+    } activation (increase certified working capacity)`
   }
 
   if (approvalType in approvalTypeMap) {

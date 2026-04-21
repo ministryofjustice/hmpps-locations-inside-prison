@@ -2,6 +2,7 @@
 
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% from "../macros/breadcrumb.njk" import breadcrumb %}
 {% from "../macros/feedbackBanner.njk" import feedbackBanner %}
@@ -102,8 +103,8 @@
 
 {% block main %}
   {% block topBanner %}
-    {% if sandbox %}
-      {% block topBannerContent %}
+    {% block topBannerContent %}
+      {% if sandbox %}
         <div id="top-banner">
           <div class="govuk-width-container">
             <div class="govuk-grid-row">
@@ -118,8 +119,25 @@
             </div>
           </div>
         </div>
-      {% endblock %}
-    {% endif %}
+      {% endif %}
+
+      {% if user and user.userRoles and user.userRoles.includes('PERMISSION_OVERRIDE') %}
+        <div id="top-banner">
+          <div class="govuk-width-container">
+            <div class="govuk-grid-row">
+              <div class="govuk-grid-column-three-quarters">
+                <h1 class="govuk-heading-l govuk-!-padding-top-5 govuk-!-margin-bottom-5">
+                  Permission override enabled
+                </h1>
+                <p>
+                  {{ user.userRoles.join(', ') }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endblock %}
   {% endblock %}
 
   {% block beforeContent %}
@@ -137,7 +155,7 @@
             {{ breadcrumb('', breadcrumbs, false) }}
           {% endif %}
 
-          {% if errorlist.length %}
+          {% if validationErrors.length %}
             {{ govukErrorSummary({
               titleText: "There is a problem",
               errorList: validationErrors,

@@ -1,5 +1,6 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 
+import FormWizard from 'hmpo-form-wizard'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import { Page } from '../services/auditService'
@@ -43,6 +44,9 @@ import ingestRouter from './admin/ingest'
 import cellCertificateRouter from './cellCertificate'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
+import config from '../config'
+import FormInitialStep from '../controllers/base/formInitialStep'
+import { permissionNameMap } from '../lib/permissions'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -57,6 +61,13 @@ export default function routes(services: Services): Router {
     populateCards(services.locationsService),
     logPageView(services.auditService, Page.INDEX),
     asyncMiddleware(async (req, res) => {
+      const success = req.flash('success')
+      if (success?.length) {
+        res.locals.banner = {
+          success: success[0],
+        }
+      }
+
       res.render('pages/index')
     }),
   )
@@ -102,6 +113,82 @@ export default function routes(services: Services): Router {
   router.use('/admin/:prisonId/change-include-seg-in-roll-count', changeIncludeSegInRollCountStatusRouter)
   router.use('/admin/:prisonId/change-certification-status', changeCertApprovalStatusRouter)
   router.use('/admin/:prisonId/ingest-cert', ingestRouter)
+
+  if (!config.production) {
+    router.use(
+      '/dev-set-permissions',
+      FormWizard(
+        {
+          '/': {
+            entryPoint: true,
+            reset: true,
+            resetJourney: true,
+            skip: true,
+            backLink: '/',
+            next: 'permissions',
+          },
+          '/permissions': {
+            pageTitle: 'Set user permissions',
+            fields: ['roles'],
+            template: '../../partials/formStep',
+            controller: class extends FormInitialStep {
+              override getInitialValues(req: FormWizard.Request, res: Response): FormWizard.Values {
+                return { roles: req.cookies.roleOverride?.split(', ') || res.locals.user.userRoles }
+              }
+
+              override saveValues(req: FormWizard.Request, res: Response) {
+                res.cookie('roleOverride', (req.form.values.roles as string[]).join(', '))
+
+                req.journeyModel.reset()
+                req.sessionModel.reset()
+
+                req.flash('success', {
+                  title: 'Role override updated',
+                  content: `New roles: ${(req.form.values.roles as string[]).map(r => permissionNameMap[r]).join(', ')}.`,
+                })
+
+                res.redirect('/')
+              }
+            },
+          },
+        },
+        {
+          roles: {
+            component: 'govukCheckboxes',
+            multiple: true,
+            id: 'roles',
+            name: 'roles',
+            label: {
+              text: 'Roles',
+            },
+            fieldset: {
+              legend: {
+                text: 'Roles',
+                classes: 'govuk-fieldset__legend--m',
+              },
+            },
+            items: Object.entries(permissionNameMap).map(([value, text]) => ({ text, value })),
+          },
+        },
+        {
+          name: 'dev-set-permissions',
+          templatePath: 'pages/addToCertificate',
+          csrf: false,
+        },
+      ),
+    )
+
+    router.use('/dev-reset-permissions', (req, res) => {
+      res.clearCookie('roleOverride')
+
+      req.flash('success', {
+        title: 'Role override reset',
+        content: '',
+      })
+
+      res.redirect('/')
+    })
+  }
 
   return router
 }

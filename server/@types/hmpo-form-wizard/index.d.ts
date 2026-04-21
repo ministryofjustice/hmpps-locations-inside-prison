@@ -106,6 +106,7 @@ declare module 'hmpo-form-wizard' {
     }
 
     interface Request extends Omit<Express.Request, 'flash'> {
+      path: string
       query: Record<string, string | string[]>
       params: Record<string, string>
       cookies: Record<string, string>

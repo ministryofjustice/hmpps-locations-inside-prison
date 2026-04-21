@@ -62,8 +62,8 @@ describe('adminIncludeSegInRollCountSwitch', () => {
         backLink: '/admin/MDI',
         buttonText: 'Activate include seg in roll count',
         cancelLink: '/admin/MDI',
-        cancelText: 'Cancel and return to prison configuration details',
         title: 'Update include seg in roll count status',
+        validationErrors: [],
       })
     })
   })

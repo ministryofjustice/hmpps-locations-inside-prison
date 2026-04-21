@@ -8,6 +8,7 @@ import CellCertificateChangeRequestsReviewPage from '../../../pages/cellCertific
 import CellCertificateChangeRequestsApprovePage from '../../../pages/cellCertificate/changeRequests/review/approve'
 import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertificate/changeRequests'
 import CellCertificateChangeRequestsRejectPage from '../../../pages/cellCertificate/changeRequests/review/reject'
+import CertificateLocationFactory from '../../../../server/testutils/factories/certificateLocation'
 
 context('Cell Certificate - Change Requests - Review', () => {
   context('With RESI__CERT_REVIEWER role', () => {
@@ -41,19 +42,19 @@ context('Cell Certificate - Change Requests - Review', () => {
         ])
 
         testGovukTable('locations-table', [
-          ['A', '-', '20', '10', '30', '-', '-'],
-          ['A-1', '-', '10', '5', '15', '-', '-'],
-          ['A-1-001', 'A1-01', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-1-002', 'A1-02', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-1-003', 'A1-03', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-1-004', 'A1-04', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-1-005', 'A1-05', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-2', '-', '10', '5', '15', '-', '-'],
-          ['A-2-001', 'A2-01', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-2-002', 'A2-02', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-2-003', 'A2-03', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-2-004', 'A2-04', '2', '1', '3', 'Normal accommodation', 'Yes'],
-          ['A-2-005', 'A2-05', '2', '1', '3', 'Normal accommodation', 'Yes'],
+          ['A', '-', '20', '20', '20', '-', '-'],
+          ['A-1', '-', '10', '10', '10', '-', '-'],
+          ['A-1-001', 'A1-01', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-1-002', 'A1-02', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-1-003', 'A1-03', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-1-004', 'A1-04', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-1-005', 'A1-05', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-2', '-', '10', '10', '10', '-', '-'],
+          ['A-2-001', 'A2-01', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-2-002', 'A2-02', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-2-003', 'A2-03', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-2-004', 'A2-04', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+          ['A-2-005', 'A2-05', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
         ])
       })
 
@@ -245,6 +246,176 @@ context('Cell Certificate - Change Requests - Review', () => {
         ])
 
         testGovukTable('cell-sanitation-change-table', [['A', 'No → Yes']])
+      })
+    })
+
+    context('When the approvalType is DEACTIVATION', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'DEACTIVATION',
+            deactivatedReason: 'OTHER',
+            deactivationReasonDescription: 'Unidentified energy signature detected',
+            locationId: '7e570000-0000-1000-8000-000000000002',
+            locationKey: 'TST-A',
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000002',
+                locationType: 'WING',
+                certifiedNormalAccommodation: 3,
+                currentCertifiedNormalAccommodation: 3,
+                workingCapacity: 0,
+                maxCapacity: 4,
+                currentMaxCapacity: 4,
+                currentCellMark: undefined,
+                cellMark: undefined,
+                inCellSanitation: false,
+                level: 1,
+                subLocations: [
+                  CertificateLocationFactory.build({
+                    id: '7e570000-0000-1000-8000-000000000003',
+                    locationType: 'LANDING',
+                    certifiedNormalAccommodation: 3,
+                    currentCertifiedNormalAccommodation: 3,
+                    workingCapacity: 0,
+                    maxCapacity: 4,
+                    currentMaxCapacity: 4,
+                    currentCellMark: undefined,
+                    cellMark: undefined,
+                    inCellSanitation: false,
+                    level: 2,
+                    subLocations: [
+                      CertificateLocationFactory.build({
+                        id: '7e570000-0000-1000-8000-000000000004',
+                        specialistCellTypes: [],
+                        certifiedNormalAccommodation: 3,
+                        currentCertifiedNormalAccommodation: 3,
+                        workingCapacity: 0,
+                        maxCapacity: 4,
+                        currentMaxCapacity: 4,
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+            planetFmReference: '12345678',
+            prisonId: 'MDI',
+            proposedReactivationDate: '2027-01-10',
+            reasonForChange: 'Future cell integrity uncertain',
+            workingCapacityChange: -2,
+          }),
+        )
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('h1').should('contain', 'Review wing deactivation (decrease certified working capacity) request')
+
+        testGovukSummaryList('overview-list-DEACTIVATION', [
+          ['Location', 'A'],
+          ['Change type', 'Wing deactivation (decrease certified working capacity)'],
+          ['Reason', 'Other - Unidentified energy signature detected'],
+          ['Estimated reactivation date', '10 January 2027'],
+          ['Facilities reference number', '12345678'],
+          ['Explanation', 'Future cell integrity uncertain'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('locations-table', [['A-1-001', ' → 0']])
+      })
+    })
+
+    context('When the approvalType is REACTIVATION', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'REACTIVATION',
+            locationId: '7e570000-0000-1000-8000-000000000002',
+            locationKey: 'TST-A',
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000002',
+                locationType: 'WING',
+                certifiedNormalAccommodation: 6,
+                currentCertifiedNormalAccommodation: 2,
+                workingCapacity: 4,
+                currentWorkingCapacity: 0,
+                maxCapacity: 6,
+                currentMaxCapacity: 2,
+                specialistCellTypes: [],
+                currentCellMark: undefined,
+                cellMark: undefined,
+                inCellSanitation: false,
+                level: 1,
+                subLocations: [
+                  CertificateLocationFactory.build({
+                    id: '7e570000-0000-1000-8000-000000000003',
+                    locationType: 'LANDING',
+                    certifiedNormalAccommodation: 6,
+                    currentCertifiedNormalAccommodation: 2,
+                    workingCapacity: 4,
+                    currentWorkingCapacity: 0,
+                    maxCapacity: 6,
+                    currentMaxCapacity: 2,
+                    specialistCellTypes: [],
+                    currentCellMark: undefined,
+                    cellMark: undefined,
+                    inCellSanitation: false,
+                    level: 2,
+                    subLocations: [
+                      CertificateLocationFactory.build({
+                        id: '7e570000-0000-1000-8000-000000000004',
+                        specialistCellTypes: [],
+                        certifiedNormalAccommodation: 4,
+                        currentCertifiedNormalAccommodation: 1,
+                        workingCapacity: 2,
+                        currentWorkingCapacity: 0,
+                        maxCapacity: 4,
+                        currentMaxCapacity: 1,
+                      }),
+                      CertificateLocationFactory.build({
+                        id: '7e570000-0000-1000-8000-000000000005',
+                        specialistCellTypes: [],
+                        certifiedNormalAccommodation: 2,
+                        currentCertifiedNormalAccommodation: 1,
+                        workingCapacity: 2,
+                        currentWorkingCapacity: 0,
+                        maxCapacity: 2,
+                        currentMaxCapacity: 1,
+                        pathHierarchy: 'A-1-002',
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+            prisonId: 'MDI',
+          }),
+        )
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('h1').should('contain', 'Review wing activation (increase certified working capacity) request')
+
+        testGovukSummaryList('overview-list-REACTIVATION', [
+          ['Location', 'A'],
+          ['Change type', 'Wing activation (increase certified working capacity)'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('locations-table', [
+          ['A-1-001', '1 → 4', '0 → 2', '1 → 4', 'Biohazard / dirty protest cell → -'],
+          ['A-1-002', '1 → 2', '0 → 2', '1 → 2', 'Biohazard / dirty protest cell → -'],
+          ['Total', '2 → 6', '0 → 4', '2 → 6'],
+        ])
       })
     })
   })

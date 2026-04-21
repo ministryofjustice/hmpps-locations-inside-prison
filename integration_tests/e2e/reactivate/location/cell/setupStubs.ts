@@ -11,7 +11,10 @@ export const location = LocationFactory.build({
   },
   oldWorkingCapacity: 1,
   currentCellCertificate: {
-    workingCapacity: 0,
+    certifiedNormalAccommodation: 1,
+    workingCapacity: 1,
+    maxCapacity: 2,
+    specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   },
   leafLevel: true,
   localName: null,

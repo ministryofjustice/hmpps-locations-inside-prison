@@ -7,6 +7,11 @@ import LocationsService from '../../services/locationsService'
 import Confirm from './confirm'
 import * as notificationHelpers from '../../utils/notificationHelpers'
 import LocationFactory from '../../testutils/factories/location'
+import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
+import CertificationApprovalRequestFactory from '../../testutils/factories/certificationApprovalRequest'
+import CertificateLocationFactory from '../../testutils/factories/certificateLocation'
+import mockModel from '../../testutils/mockModel'
+import LocationResidentialSummaryFactory from '../../testutils/factories/locationResidentialSummary'
 
 jest.mock('../../utils/notificationHelpers')
 jest.mock('../../middleware/getPrisonResidentialSummary')
@@ -18,26 +23,405 @@ describe('Confirm', () => {
   let deepRes: DeepPartial<Response>
   let next: NextFunction
   const locationsService = {
-    getAccommodationTypes: jest.fn(),
-    getSpecialistCellTypes: jest.fn(),
-    getUsedForTypes: jest.fn(),
-    getResidentialSummary: jest.fn(),
-    createCertificationRequestForSignedOpCap: jest.fn(),
-    createCertificationRequestForLocation: jest.fn(),
+    getAccommodationTypes: jest.fn().mockResolvedValue([]),
+    getLocation: jest.fn(),
+    getSpecialistCellTypes: jest.fn().mockResolvedValue([]),
+    getUsedForTypes: jest.fn().mockResolvedValue([]),
+    getResidentialSummary: jest.fn().mockResolvedValue({
+      subLocations: [],
+    } as any),
+    createCertificationRequestForSignedOpCap: jest.fn().mockResolvedValue({ id: 'SIGNED_OP_CAP-id' } as any),
+    createCertificationRequestForLocation: jest.fn().mockImplementation((_token, type) => ({ id: `${type}-id` })),
+    updateCellSanitation: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_SANITATION-id' } as any),
+    updateCellMark: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_MARK-id' } as any),
+    requestReactivation: jest.fn().mockResolvedValue({ id: 'REACTIVATION-id' } as any),
+    deactivateTemporary: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'DEACTIVATION-id' } as any),
   } as unknown as jest.Mocked<LocationsService>
   const manageUsersService = {} as jest.Mocked<ManageUsersService>
   const notifyService = {} as jest.Mocked<NotificationService>
 
-  beforeEach(() => {
-    locationsService.getAccommodationTypes.mockResolvedValue([])
-    locationsService.getSpecialistCellTypes.mockResolvedValue([])
-    locationsService.getUsedForTypes.mockResolvedValue([])
-    locationsService.getResidentialSummary.mockResolvedValue({
-      subLocations: [],
-    } as any)
-    locationsService.createCertificationRequestForSignedOpCap.mockResolvedValue(undefined)
-    locationsService.createCertificationRequestForLocation.mockResolvedValue({ id: 'some-uuid' } as any)
+  const approvalTypesData: {
+    approvalRequestData: DeepPartial<CertificationApprovalRequest>
+    beforeGenerateRequests: (approvalRequestData: DeepPartial<CertificationApprovalRequest>) => void
+    checkSaveValues: (approvalRequestData: DeepPartial<CertificationApprovalRequest>) => void
+  }[] = [
+    {
+      approvalRequestData: {
+        approvalType: 'SIGNED_OP_CAP',
+        prisonId: 'MDI',
+        currentSignedOperationCapacity: 200,
+        signedOperationCapacityChange: 50,
+        reasonForChange: 'New location built',
+      },
+      beforeGenerateRequests: approvalRequestData => {
+        deepReq.form.options.name = 'other-form'
+        deepReq.sessionModel.set('proposedSignedOpCapChange', {
+          prisonId: approvalRequestData.prisonId,
+          signedOperationalCapacity:
+            approvalRequestData.currentSignedOperationCapacity + approvalRequestData.signedOperationCapacityChange,
+          reasonForChange: approvalRequestData.reasonForChange,
+        })
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.createCertificationRequestForSignedOpCap).toHaveBeenCalledWith(
+          'token',
+          approvalRequestData.prisonId,
+          approvalRequestData.currentSignedOperationCapacity + approvalRequestData.signedOperationCapacityChange,
+          approvalRequestData.reasonForChange,
+        ),
+    },
+    {
+      approvalRequestData: {
+        approvalType: 'DRAFT',
+        locationId: 'draftLocationId',
+        prisonId: 'MDI',
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'draftLocationId',
+            locationType: 'WING',
+            pathHierarchy: 'A',
+            locationCode: 'A',
+            cellMark: undefined,
+            currentCellMark: undefined,
+            inCellSanitation: false,
+            level: 1,
+            subLocations: [
+              CertificateLocationFactory.build({
+                id: 'draftLocationId-1',
+                locationType: 'LANDING',
+                pathHierarchy: 'A-1',
+                locationCode: '1',
+                cellMark: undefined,
+                currentCellMark: undefined,
+                inCellSanitation: false,
+                level: 2,
+                subLocations: [
+                  CertificateLocationFactory.build({
+                    id: 'draftLocationId-1-001',
+                    locationType: 'CELL',
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      },
+      beforeGenerateRequests: _approvalRequestData => {
+        deepReq.form.options.name = 'add-to-certificate'
+        const wing = LocationFactory.build({
+          id: 'draftLocationId',
+          locationType: 'WING',
+          pathHierarchy: 'A',
+          code: 'A',
+          status: 'DRAFT',
+          cellMark: undefined,
+          level: 1,
+          inCellSanitation: false,
+          currentCellCertificate: undefined,
+          leafLevel: false,
+        })
+        const landing = LocationFactory.build({
+          parentId: wing.id,
+          id: 'draftLocationId-1',
+          locationType: 'LANDING',
+          pathHierarchy: 'A-1',
+          code: '1',
+          status: 'DRAFT',
+          cellMark: undefined,
+          level: 2,
+          inCellSanitation: false,
+          currentCellCertificate: undefined,
+          leafLevel: false,
+        })
+        const cell = LocationFactory.build({
+          parentId: landing.id,
+          id: 'draftLocationId-1-001',
+          locationType: 'CELL',
+          status: 'DRAFT',
+          cellMark: 'A1-1',
+          level: 3,
+          inCellSanitation: true,
+          currentCellCertificate: undefined,
+        })
+        deepRes.locals.location = wing
+        locationsService.getResidentialSummary
+          .mockResolvedValueOnce(
+            LocationResidentialSummaryFactory.build({
+              parentLocation: wing,
+              subLocations: [landing],
+            }),
+          )
+          .mockResolvedValueOnce(
+            LocationResidentialSummaryFactory.build({
+              parentLocation: landing,
+              subLocations: [cell],
+            }),
+          )
+          .mockResolvedValueOnce(
+            LocationResidentialSummaryFactory.build({
+              parentLocation: cell,
+              subLocations: [],
+            }),
+          )
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.createCertificationRequestForLocation).toHaveBeenCalledWith(
+          'token',
+          'DRAFT',
+          approvalRequestData.locationId,
+        ),
+    },
+    {
+      approvalRequestData: {
+        approvalType: 'DEACTIVATION',
+        deactivatedReason: 'OTHER',
+        deactivationReasonDescription: 'Unidentified energy signature detected',
+        locationId: 'deactivationLocationId',
+        locationKey: 'TST-A-1-001',
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'deactivationLocationId',
+            workingCapacity: 0,
+          }),
+        ],
+        planetFmReference: '12345678',
+        prisonId: 'MDI',
+        proposedReactivationDate: '2027-01-10',
+        reasonForChange: 'Future cell integrity uncertain',
+        workingCapacityChange: -2,
+      },
+      beforeGenerateRequests: approvalRequestData => {
+        deepReq.form.options.name = 'deactivate'
+        deepReq.sessionModel.set('deactivationReason', approvalRequestData.deactivatedReason)
+        deepReq.sessionModel.set('deactivationReasonOther', approvalRequestData.deactivationReasonDescription)
+        deepReq.sessionModel.set('facilitiesManagementReference', approvalRequestData.planetFmReference)
+        deepReq.sessionModel.set('mandatoryEstimatedReactivationDate', approvalRequestData.proposedReactivationDate)
+        deepReq.sessionModel.set('workingCapacityExplanation', approvalRequestData.reasonForChange)
+        const certLocation = approvalRequestData.locations[0]
+        const location = LocationFactory.build({
+          id: 'deactivationLocationId',
+          currentCellCertificate: { ...certLocation, workingCapacity: certLocation.currentWorkingCapacity },
+        })
+        deepRes.locals.location = location
+        locationsService.getLocation.mockResolvedValueOnce(location)
+        locationsService.getResidentialSummary.mockResolvedValueOnce(
+          LocationResidentialSummaryFactory.build({
+            parentLocation: location,
+            subLocations: [],
+          }),
+        )
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
+          'token',
+          approvalRequestData.locationId,
+          approvalRequestData.deactivatedReason,
+          approvalRequestData.deactivationReasonDescription,
+          approvalRequestData.proposedReactivationDate,
+          approvalRequestData.planetFmReference,
+          true,
+          approvalRequestData.reasonForChange,
+        ),
+    },
+    {
+      approvalRequestData: {
+        approvalType: 'CELL_MARK',
+        locationId: 'cellMarkLocationId',
+        locationKey: 'TST-A-1-001',
+        currentCellMark: 'A1-1',
+        cellMark: 'A1-02',
+        reasonForChange: 'Need to change door number',
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'cellMarkLocationId',
+          }),
+        ],
+      },
+      beforeGenerateRequests: approvalRequestData => {
+        deepReq.form.options.name = 'change-door-number'
+        deepReq.sessionModel.set('doorNumber', approvalRequestData.cellMark)
+        deepReq.sessionModel.set('explanation', approvalRequestData.reasonForChange)
+        const certLocation = approvalRequestData.locations[0]
+        const location = LocationFactory.build({ id: 'cellMarkLocationId', currentCellCertificate: certLocation })
+        deepRes.locals.location = location
+        locationsService.getLocation.mockResolvedValueOnce(location)
+        locationsService.getResidentialSummary.mockResolvedValueOnce(
+          LocationResidentialSummaryFactory.build({
+            parentLocation: location,
+            subLocations: [],
+          }),
+        )
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.updateCellMark).toHaveBeenCalledWith('token', approvalRequestData.locationId, {
+          cellMark: approvalRequestData.cellMark,
+          reasonForChange: approvalRequestData.reasonForChange,
+        }),
+    },
+    {
+      approvalRequestData: {
+        approvalType: 'CELL_SANITATION',
+        locationId: 'cellSanitationLocationId',
+        locationKey: 'TST-A-1-001',
+        currentInCellSanitation: true,
+        inCellSanitation: false,
+        reasonForChange: 'Toilet vanished',
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'cellSanitationLocationId',
+          }),
+        ],
+      },
+      beforeGenerateRequests: approvalRequestData => {
+        deepReq.form.options.name = 'change-sanitation'
+        deepReq.sessionModel.set('inCellSanitation', 'NO')
+        deepReq.sessionModel.set('explanation', approvalRequestData.reasonForChange)
+        const certLocation = approvalRequestData.locations[0]
+        const location = LocationFactory.build({ id: 'cellSanitationLocationId', currentCellCertificate: certLocation })
+        deepRes.locals.location = location
+        locationsService.getResidentialSummary.mockResolvedValueOnce(
+          LocationResidentialSummaryFactory.build({
+            parentLocation: location,
+            subLocations: [],
+          }),
+        )
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.updateCellSanitation).toHaveBeenCalledWith('token', approvalRequestData.locationId, {
+          inCellSanitation: approvalRequestData.inCellSanitation,
+          reasonForChange: approvalRequestData.reasonForChange,
+        }),
+    },
+    {
+      approvalRequestData: {
+        prisonId: 'MDI',
+        locationKey: 'TST-A-1-001',
+        approvalType: 'REACTIVATION',
+        locationId: 'reactivationLocationId',
+        certifiedNormalAccommodationChange: 1,
+        workingCapacityChange: 1,
+        maxCapacityChange: 2,
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'reactivationLocationId',
+            locationType: 'WING',
+            certifiedNormalAccommodation: 3,
+            workingCapacity: 3,
+            maxCapacity: 4,
+            currentCellMark: undefined,
+            cellMark: undefined,
+            inCellSanitation: false,
+            level: 1,
+            subLocations: [
+              CertificateLocationFactory.build({
+                id: 'reactivationLocationId-1',
+                locationType: 'LANDING',
+                currentCellMark: undefined,
+                cellMark: undefined,
+                inCellSanitation: false,
+                level: 2,
+                subLocations: [
+                  CertificateLocationFactory.build({
+                    id: 'reactivationLocationId-1-1',
+                    specialistCellTypes: [],
+                    certifiedNormalAccommodation: 3,
+                    workingCapacity: 3,
+                    maxCapacity: 4,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      },
+      beforeGenerateRequests: approvalRequestData => {
+        const certWing = approvalRequestData.locations[0]
+        const wing = LocationFactory.build({
+          id: 'reactivationLocationId',
+          locationType: 'WING',
+          cellMark: undefined,
+          level: 1,
+          inCellSanitation: false,
+          currentCellCertificate: {
+            ...certWing,
+            workingCapacity: certWing.currentWorkingCapacity,
+            certifiedNormalAccommodation: certWing.currentCertifiedNormalAccommodation,
+            maxCapacity: certWing.currentMaxCapacity,
+            specialistCellTypes: certWing.currentSpecialistCellTypes,
+          },
+        })
+        const certLanding = certWing.subLocations[0]
+        const landing = LocationFactory.build({
+          parentId: wing.id,
+          id: 'reactivationLocationId-1',
+          locationType: 'LANDING',
+          cellMark: undefined,
+          level: 2,
+          inCellSanitation: false,
+          currentCellCertificate: {
+            ...certLanding,
+            workingCapacity: certLanding.currentWorkingCapacity,
+            certifiedNormalAccommodation: certLanding.currentCertifiedNormalAccommodation,
+            maxCapacity: certLanding.currentMaxCapacity,
+            specialistCellTypes: certLanding.currentSpecialistCellTypes,
+          },
+        })
+        const certCell = certLanding.subLocations[0]
+        const cell = LocationFactory.build({
+          parentId: landing.id,
+          id: 'reactivationLocationId-1-1',
+          locationType: 'CELL',
+          cellMark: 'A1-1',
+          level: 3,
+          inCellSanitation: true,
+          currentCellCertificate: {
+            ...certCell,
+            workingCapacity: certCell.currentWorkingCapacity,
+            certifiedNormalAccommodation: certCell.currentCertifiedNormalAccommodation,
+            maxCapacity: certCell.currentMaxCapacity,
+            specialistCellTypes: certCell.currentSpecialistCellTypes,
+          },
+        })
+        deepRes.locals.location = wing
+        locationsService.getResidentialSummary
+          .mockResolvedValueOnce(
+            LocationResidentialSummaryFactory.build({
+              parentLocation: wing,
+              subLocations: [landing],
+            }),
+          )
+          .mockResolvedValueOnce(
+            LocationResidentialSummaryFactory.build({
+              parentLocation: landing,
+              subLocations: [cell],
+            }),
+          )
+          .mockResolvedValueOnce(
+            LocationResidentialSummaryFactory.build({
+              parentLocation: cell,
+              subLocations: [],
+            }),
+          )
+        deepReq.form.options.name = 'reactivate'
+        deepReq.sessionModel.set('baselineCna-reactivationLocationId-1-1', '3')
+        deepReq.sessionModel.set('workingCapacity-reactivationLocationId-1-1', '3')
+        deepReq.sessionModel.set('maximumCapacity-reactivationLocationId-1-1', '4')
+        deepReq.sessionModel.set('saved-cellTypesreactivationLocationId-1-1-removed', true)
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.requestReactivation).toHaveBeenCalledWith('token', {
+          cellReactivationChanges: {
+            'reactivationLocationId-1-1': {
+              capacity: { certifiedNormalAccommodation: 3, maxCapacity: 4, workingCapacity: 3 },
+              specialistCellTypes: [],
+            },
+          },
+          topLevelLocationId: approvalRequestData.locationId,
+        }),
+    },
+  ]
 
+  beforeEach(() => {
     deepReq = {
       form: {
         options: {
@@ -52,13 +436,8 @@ describe('Confirm', () => {
         manageUsersService,
         notifyService,
       },
-      sessionModel: {
-        get: jest.fn(),
-        reset: jest.fn(),
-      },
-      journeyModel: {
-        reset: jest.fn(),
-      },
+      sessionModel: mockModel(),
+      journeyModel: mockModel(),
       flash: jest.fn(),
     }
     deepRes = {
@@ -83,362 +462,126 @@ describe('Confirm', () => {
     }
     next = jest.fn()
     jest.clearAllMocks()
-    ;(notificationHelpers.getUserEmails as jest.Mock)
-      .mockResolvedValueOnce(['certificate_reviewer@test.com'])
-      .mockResolvedValueOnce(['certificate_administrator@test.com', 'certificate_viewer@test.com'])
+    ;(notificationHelpers.getUserEmails as jest.Mock).mockImplementation(
+      (_manageUsersService: any, _systemToken: string, _prisonId: string, roles: string[]) => {
+        const emails = []
+
+        if (roles.includes('RESI__CERT_REVIEWER')) {
+          emails.push('certificate_reviewer@test.com')
+        }
+
+        if (roles.includes('MANAGE_RES_LOCATIONS_OP_CAP')) {
+          emails.push('certificate_administrator@test.com')
+        }
+
+        if (roles.includes('RESI__CERT_VIEWER')) {
+          emails.push('certificate_viewer@test.com')
+        }
+
+        return emails
+      },
+    )
     ;(notificationHelpers.sendNotification as jest.Mock).mockResolvedValue(undefined)
   })
 
-  describe('saveValues', () => {
-    it('gets user emails for both request received and request submitted groups', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+  describe('individual types', () => {
+    approvalTypesData.forEach(({ approvalRequestData, beforeGenerateRequests, checkSaveValues }) => {
+      const approvalRequest = CertificationApprovalRequestFactory.build(approvalRequestData)
 
-      expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
-        1,
-        manageUsersService,
-        'token',
-        'MDI',
-        notificationGroups.requestReceivedUsers,
-      )
-      expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
-        2,
-        manageUsersService,
-        'token',
-        'MDI',
-        notificationGroups.requestSubmittedUsers,
-      )
-    })
+      describe(approvalRequest.approvalType, () => {
+        describe('generateRequests', () => {
+          beforeEach(() => beforeGenerateRequests(approvalRequestData))
 
-    it('sends REQUEST_RECEIVED notification to reviewers', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+          it('generates the expected proposed approval request', async () => {
+            await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-        1,
-        notifyService,
-        ['certificate_reviewer@test.com'],
-        'Moorland (HMP & YOI)',
-        expect.stringContaining('/MDI/cell-certificate/change-requests/some-uuid/review'),
-        NotificationType.REQUEST_RECEIVED,
-        undefined,
-        undefined,
-        undefined,
-        'Joe Submitter',
-      )
-    })
+            expect(deepRes.locals.proposedCertificationApprovalRequests.length).toEqual(1)
+            expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(approvalRequestData)
+          })
+        })
 
-    it('sends REQUEST_SUBMITTED notification to admin and viewers', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+        describe('saveValues', () => {
+          beforeEach(() => {
+            deepRes.locals.proposedCertificationApprovalRequests = [approvalRequest]
+          })
 
-      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-        2,
-        notifyService,
-        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
-        'Moorland (HMP & YOI)',
-        expect.stringContaining('/MDI/cell-certificate/change-requests/some-uuid'),
-        NotificationType.REQUEST_SUBMITTED,
-        undefined,
-        undefined,
-        undefined,
-        'Joe Submitter',
-      )
-    })
+          it('creates certification request, sets flash message and redirects', async () => {
+            await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-    it('creates certification request for signed op cap when present', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
-        if (key === 'proposedSignedOpCapChange') {
-          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
-        }
-        return undefined
+            checkSaveValues(approvalRequestData)
+
+            expect(deepReq.flash).toHaveBeenCalledWith('success', {
+              title: 'Change request sent',
+              content: 'You have submitted a request to update the cell certificate.',
+            })
+
+            expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+          })
+        })
       })
-
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(locationsService.createCertificationRequestForSignedOpCap).toHaveBeenCalledWith(
-        'token',
-        'MDI',
-        550,
-        'New location built',
-      )
-    })
-
-    it('does not create signed op cap request when not present', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue(undefined)
-
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(locationsService.createCertificationRequestForSignedOpCap).not.toHaveBeenCalled()
-    })
-
-    it('resets journey and session models', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
-      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
-    })
-
-    it('sets flash success message for single change request', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockReturnValue(undefined)
-
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        title: 'Change request sent',
-        content: 'You have submitted a request to update the cell certificate.',
-      })
-    })
-
-    it('sets flash success message for multiple change requests', async () => {
-      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
-        if (key === 'proposedSignedOpCapChange') {
-          return { signedOperationalCapacity: 550, reasonForChange: 'New location built' }
-        }
-        return undefined
-      })
-
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        title: 'Change requests sent',
-        content: 'You have submitted 2 requests to update the cell certificate.',
-      })
-    })
-
-    it('redirects to change requests page', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
     })
   })
 
-  describe('saveValues - changeDoorNumber', () => {
+  describe('saveValues - when creating every type of request', () => {
     beforeEach(() => {
-      deepReq.form.options.name = 'change-door-number'
-      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
-        if (key === 'doorNumber') return 'A1-02'
-        if (key === 'explanation') return 'Need to change door number'
-        return undefined
-      })
-      ;(deepRes.locals as any).locationId = 'loc-123'
-      locationsService.updateCellMark = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
-    })
-
-    it('updates cell mark with doorNumber and reason', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(locationsService.updateCellMark).toHaveBeenCalledWith('token', 'loc-123', {
-        cellMark: 'A1-02',
-        reasonForChange: 'Need to change door number',
-      })
-    })
-
-    it('sends notifications using pendingApprovalRequestId', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-        1,
-        notifyService,
-        ['certificate_reviewer@test.com'],
-        'Moorland (HMP & YOI)',
-        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
-        NotificationType.REQUEST_RECEIVED,
-        undefined,
-        undefined,
-        undefined,
-        'Joe Submitter',
-      )
-
-      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-        2,
-        notifyService,
-        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
-        'Moorland (HMP & YOI)',
-        expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
-        NotificationType.REQUEST_SUBMITTED,
-        undefined,
-        undefined,
-        undefined,
-        'Joe Submitter',
+      deepRes.locals.proposedCertificationApprovalRequests = approvalTypesData.map(d =>
+        CertificationApprovalRequestFactory.build(d.approvalRequestData),
       )
     })
 
-    it('sets single request flash message and redirects', async () => {
+    it('sends out emails for all of the individual requests, sets flash message and redirects', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        title: 'Change request sent',
-        content: 'You have submitted a request to update the cell certificate.',
-      })
-      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
-    })
-  })
+      for (let i = 0; i < deepRes.locals.proposedCertificationApprovalRequests.length; i += 1) {
+        const approvalRequest = deepRes.locals.proposedCertificationApprovalRequests[i]
 
-  describe('saveValues - changeCellSanitation', () => {
-    beforeEach(() => {
-      deepReq.form.options.name = 'change-sanitation'
-      ;(deepReq.sessionModel.get as jest.Mock).mockImplementation((key: string) => {
-        if (key === 'inCellSanitation') return 'YES'
-        if (key === 'explanation') return 'Adding sanitation facilities'
-        return undefined
-      })
-      ;(deepRes.locals as any).locationId = 'loc-456'
-      locationsService.updateCellSanitation = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-456' })
-    })
-
-    it('updates in cell sanitation with inCellSanitation and reason', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(locationsService.updateCellSanitation).toHaveBeenCalledWith('token', 'loc-456', {
-        inCellSanitation: true,
-        reasonForChange: 'Adding sanitation facilities',
-      })
-    })
-
-    it('sends notifications using pendingApprovalRequestId', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-        1,
-        notifyService,
-        ['certificate_reviewer@test.com'],
-        'Moorland (HMP & YOI)',
-        expect.stringContaining('/MDI/cell-certificate/change-requests/req-456/review'),
-        NotificationType.REQUEST_RECEIVED,
-        undefined,
-        undefined,
-        undefined,
-        'Joe Submitter',
-      )
-
-      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-        2,
-        notifyService,
-        ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
-        'Moorland (HMP & YOI)',
-        expect.stringContaining('/MDI/cell-certificate/change-requests/req-456'),
-        NotificationType.REQUEST_SUBMITTED,
-        undefined,
-        undefined,
-        undefined,
-        'Joe Submitter',
-      )
-    })
-
-    it('sets single request flash message and redirects', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepReq.flash).toHaveBeenCalledWith('success', {
-        title: 'Change request sent',
-        content: 'You have submitted a request to update the cell certificate.',
-      })
-      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
-    })
-  })
-
-  describe('deactivate form', () => {
-    beforeEach(() => {
-      deepReq.form.options.name = 'deactivate'
-      deepReq.sessionModel.get = jest.fn().mockImplementation(
-        (key: string) =>
-          ({
-            deactivationReason: 'OTHER',
-            deactivationReasonOther: 'Unidentified energy signature detected',
-            facilitiesManagementReference: '12345678',
-            mandatoryEstimatedReactivationDate: '2027-01-10',
-            workingCapacityExplanation: 'Future cell integrity uncertain',
-          })[key],
-      )
-    })
-
-    describe('generateRequests', () => {
-      it('adds DEACTIVATE approval request when form name is deactivate', async () => {
-        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-        expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
-          expect.objectContaining({
-            approvalType: 'DEACTIVATION',
-            deactivatedReason: 'OTHER',
-            deactivationReasonDescription: 'Unidentified energy signature detected',
-            proposedReactivationDate: '2027-01-10',
-            reasonForChange: 'Future cell integrity uncertain',
-          }),
-        )
-
-        expect(deepRes.locals.proposedCertificationApprovalRequests[0].locations[0]).toEqual(
-          expect.objectContaining({
-            workingCapacity: 0,
-            currentWorkingCapacity: 2,
-          }),
-        )
-      })
-
-      it('does not add DEACTIVATION approval request when form name is not deactivate', async () => {
-        deepReq.form.options.name = 'other-form'
-
-        await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-        expect(
-          deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'DEACTIVATION'),
-        ).toHaveLength(0)
-      })
-    })
-
-    describe('saveValues', () => {
-      beforeEach(() => {
-        ;(deepRes.locals as any).locationId = 'loc-123'
-        locationsService.deactivateTemporary = jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'req-123' })
-      })
-
-      it('deactivates the cell', async () => {
-        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-        expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
+        expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
+          i * 2 + 1,
+          manageUsersService,
           'token',
-          'loc-123',
-          'OTHER',
-          'Unidentified energy signature detected',
-          '2027-01-10',
-          '12345678',
-          true,
-          'Future cell integrity uncertain',
+          'MDI',
+          notificationGroups.requestReceivedUsers,
         )
-      })
+        expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
+          i * 2 + 2,
+          manageUsersService,
+          'token',
+          'MDI',
+          notificationGroups.requestSubmittedUsers,
+        )
 
-      it('sends notifications using pendingApprovalRequestId', async () => {
-        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
         expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-          1,
+          i * 2 + 1,
           notifyService,
           ['certificate_reviewer@test.com'],
           'Moorland (HMP & YOI)',
-          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123/review'),
+          expect.stringContaining(`/MDI/cell-certificate/change-requests/${approvalRequest.approvalType}-id/review`),
           NotificationType.REQUEST_RECEIVED,
           undefined,
           undefined,
           undefined,
           'Joe Submitter',
         )
-
         expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
-          2,
+          i * 2 + 2,
           notifyService,
           ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
           'Moorland (HMP & YOI)',
-          expect.stringContaining('/MDI/cell-certificate/change-requests/req-123'),
+          expect.stringContaining(`/MDI/cell-certificate/change-requests/${approvalRequest.approvalType}-id`),
           NotificationType.REQUEST_SUBMITTED,
           undefined,
           undefined,
           undefined,
           'Joe Submitter',
         )
+      }
+
+      expect(deepReq.flash).toHaveBeenCalledWith('success', {
+        title: 'Change requests sent',
+        content: `You have submitted ${deepRes.locals.proposedCertificationApprovalRequests.length} requests to update the cell certificate.`,
       })
 
-      it('sets single request flash message and redirects', async () => {
-        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
-
-        expect(deepReq.flash).toHaveBeenCalledWith('success', {
-          title: 'Change request sent',
-          content: 'You have submitted a request to update the cell certificate.',
-        })
-        expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
-      })
+      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
     })
   })
 
@@ -446,11 +589,6 @@ describe('Confirm', () => {
     it('sets buttonText to Submit for approval', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result.buttonText).toBe('Submit for approval')
-    })
-
-    it('sets cancelText to Cancel', () => {
-      const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-      expect(result.cancelText).toBe('Cancel')
     })
   })
 
@@ -480,21 +618,7 @@ describe('Confirm', () => {
       deepReq.form.options.name = 'add-to-certificate'
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
-        expect.objectContaining({
-          approvalType: 'DRAFT',
-        }),
-      )
-    })
-
-    it('does not add DRAFT approval request when form name is not add-to-certificate', async () => {
-      deepReq.form.options.name = 'other-form'
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(
-        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'DRAFT'),
-      ).toHaveLength(0)
+      expect(deepRes.locals.proposedCertificationApprovalRequests.map(d => d.approvalType)).toEqual(['DRAFT'])
     })
 
     it('adds CELL_MARK approval request when form name is change-door-number', async () => {

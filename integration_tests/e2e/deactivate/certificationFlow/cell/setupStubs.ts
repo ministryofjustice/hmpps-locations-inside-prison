@@ -15,7 +15,7 @@ export const location = LocationFactory.build({
   specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
 })
 
-export function setupStubs(role: string) {
+export function setupStubs(role: string, stubLocation = location) {
   cy.task('reset')
   AuthStubber.stub.stubSignIn({ roles: [role] })
   ManageUsersApiStubber.stub.stubManageUsers()
@@ -37,9 +37,9 @@ export function setupStubs(role: string) {
     }),
   )
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
-    parentLocation: location,
+    parentLocation: stubLocation,
   })
-  LocationsApiStubber.stub.stubLocations(location)
+  LocationsApiStubber.stub.stubLocations(stubLocation)
   LocationsApiStubber.stub.stubPrisonerLocationsId([])
   LocationsApiStubber.stub.stubLocationsDeactivateTemporary()
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })

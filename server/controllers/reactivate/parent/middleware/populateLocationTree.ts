@@ -113,30 +113,10 @@ export default function populateLocationTree(decorate: boolean) {
     const { prisonId } = decoratedLocation || location
     const { locationsService } = req.services
 
-    if (locationResidentialSummary.parentLocation.locationType === 'CELL') {
-      if (decorate) {
-        const decoratedCell = await decorateLocation({
-          location: locationResidentialSummary.parentLocation,
-          systemToken,
-          userToken: '', // not required when limited: true
-          manageUsersService: null, // not required when limited: true
-          locationsService,
-          limited: true,
-        })
-        res.locals.decoratedCells = [decoratedCell]
-        res.locals.decoratedLocationTree = [{ decoratedLocation: decoratedCell, decoratedSubLocations: [] }]
-      } else {
-        res.locals.cells = [locationResidentialSummary.parentLocation]
-        res.locals.locationTree = [{ location: locationResidentialSummary.parentLocation, subLocations: [] }]
-      }
-
-      if (next) {
-        next()
-      }
-      return
-    }
-
     let selectedLocationIds = req.sessionModel.get<string[]>('selectLocations')
+    if (req.params.parentLocationId) {
+      selectedLocationIds = [req.params.parentLocationId]
+    }
     if (!selectedLocationIds?.length) {
       selectedLocationIds = locationResidentialSummary.subLocations.map(l => l.id)
     }
@@ -154,6 +134,7 @@ export default function populateLocationTree(decorate: boolean) {
           }),
         ),
       )
+      res.locals.decoratedCells.sort((a, b) => a.pathHierarchy.localeCompare(b.pathHierarchy))
     } else {
       res.locals.cells = []
       res.locals.locationTree = await Promise.all(
@@ -167,6 +148,7 @@ export default function populateLocationTree(decorate: boolean) {
           }),
         ),
       )
+      res.locals.cells.sort((a, b) => a.pathHierarchy.localeCompare(b.pathHierarchy))
     }
 
     if (next) {

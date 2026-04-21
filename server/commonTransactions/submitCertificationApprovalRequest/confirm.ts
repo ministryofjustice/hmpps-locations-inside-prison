@@ -4,7 +4,7 @@ import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
-import { Location } from '../../data/types/locationsApi'
+import { Location, LocationResidentialSummary } from '../../data/types/locationsApi'
 import { CertificateLocation } from '../../data/types/locationsApi/certificateLocation'
 import { notificationGroups, NotificationType } from '../../services/notificationService'
 import config from '../../config'
@@ -14,13 +14,74 @@ import capFirst from '../../formatters/capFirst'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMap'
+import LocationsService from '../../services/locationsService'
+import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
+
+function findCells(location: CertificateLocation): CertificateLocation[] {
+  if (location.locationType === 'CELL') {
+    return [location]
+  }
+
+  return location.subLocations.flatMap(findCells)
+}
 
 async function locationToCertificationLocation(
   req: FormWizard.Request,
   location: Location,
-  modifier?: (location: CertificateLocation) => CertificateLocation,
+  modifier?: (originalLocation: Location, certificateLocation: CertificateLocation) => CertificateLocation,
 ): Promise<CertificateLocation> {
-  const { certifiedNormalAccommodation, maxCapacity, workingCapacity } = getLocationAttributesIncludePending(location)
+  let certifiedNormalAccommodation = 0
+  let workingCapacity = 0
+  let maxCapacity = 0
+  let cellMark
+  let inCellSanitation = false
+  let specialistCellTypes: string[] = []
+  let subLocations: CertificateLocation[] = []
+  if (location.status.includes('DRAFT')) {
+    const locationAttributes = getLocationAttributesIncludePending(location)
+
+    certifiedNormalAccommodation = locationAttributes.certifiedNormalAccommodation
+    workingCapacity = locationAttributes.workingCapacity
+    maxCapacity = locationAttributes.maxCapacity
+    cellMark = locationAttributes.cellMark
+    inCellSanitation = locationAttributes.inCellSanitation
+    specialistCellTypes = location.specialistCellTypes
+  }
+
+  let locationWithCertification: Location
+  // Reactivate requires the use of getResidentialSummary to populate currentCertificate on the location
+  if (!location.leafLevel) {
+    const locationSummary = (await req.services.locationsService.getResidentialSummary(
+      req.session.systemToken,
+      location.prisonId,
+      location.id,
+    )) as LocationResidentialSummary
+
+    locationWithCertification = locationSummary.parentLocation
+
+    subLocations = await Promise.all(
+      locationSummary.subLocations.map((subLocation: Location) =>
+        locationToCertificationLocation(req, subLocation, modifier),
+      ),
+    )
+  } else if (['reactivate', 'deactivate'].includes(req.form.options.name)) {
+    locationWithCertification = await req.services.locationsService.getLocation(
+      req.session.systemToken,
+      location.id,
+      false,
+      true,
+    )
+  }
+
+  // Populate capacity values and cell types from current certificate
+  if (locationWithCertification?.currentCellCertificate) {
+    certifiedNormalAccommodation = locationWithCertification.currentCellCertificate.certifiedNormalAccommodation
+    workingCapacity = locationWithCertification.currentCellCertificate.workingCapacity
+    maxCapacity = locationWithCertification.currentCellCertificate.maxCapacity
+    cellMark = locationWithCertification.currentCellCertificate.cellMark
+    inCellSanitation = locationWithCertification.currentCellCertificate.inCellSanitation
+    specialistCellTypes = locationWithCertification.currentCellCertificate.specialistCellTypes
+  }
 
   let certificationLocation: CertificateLocation = {
     id: location.id,
@@ -34,30 +95,18 @@ async function locationToCertificationLocation(
     currentWorkingCapacity: workingCapacity,
     currentMaxCapacity: maxCapacity,
     locationType: location.locationType,
-    subLocations: [],
-    inCellSanitation: location.inCellSanitation,
-    cellMark: location.cellMark,
-    specialistCellTypes: location.specialistCellTypes,
+    subLocations,
+    inCellSanitation,
+    cellMark,
+    currentCellMark: cellMark,
+    currentSpecialistCellTypes: specialistCellTypes,
+    specialistCellTypes,
     accommodationTypes: location.accommodationTypes,
     usedFor: location.usedFor,
   }
 
   if (modifier) {
-    certificationLocation = modifier(certificationLocation)
-  }
-
-  if (!location.leafLevel) {
-    const locationSummary = await req.services.locationsService.getResidentialSummary(
-      req.session.systemToken,
-      location.prisonId,
-      location.id,
-    )
-
-    certificationLocation.subLocations = await Promise.all(
-      locationSummary.subLocations.map((subLocation: Location) =>
-        locationToCertificationLocation(req, subLocation, modifier),
-      ),
-    )
+    certificationLocation = modifier(locationWithCertification || location, certificationLocation)
   }
 
   return certificationLocation
@@ -83,7 +132,7 @@ export default class Confirm extends FormInitialStep {
   async conditionalPopulateLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
     const locationId = req.params?.locationId || res.locals.locationId
     if (locationId) {
-      return populateLocation()(req, res, next)
+      return populateLocation({ includeCurrentCertificate: true })(req, res, next)
     }
     return next()
   }
@@ -95,6 +144,7 @@ export default class Confirm extends FormInitialStep {
 
     if (location) {
       res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
+
       await addLocationsToLocationMap([location])(req, res, null)
     }
 
@@ -105,7 +155,6 @@ export default class Confirm extends FormInitialStep {
     const locals = super.locals(_req, res)
 
     locals.buttonText = 'Submit for approval'
-    locals.cancelText = 'Cancel'
 
     return locals
   }
@@ -139,7 +188,7 @@ export default class Confirm extends FormInitialStep {
         reasonForChange: req.sessionModel.get<string>('workingCapacityExplanation'),
         workingCapacityChange: -locals.location.capacity.workingCapacity,
         locations: [
-          await locationToCertificationLocation(req, locals.location, location => ({
+          await locationToCertificationLocation(req, locals.location, (_, location) => ({
             ...location,
             workingCapacity: 0,
           })),
@@ -153,9 +202,90 @@ export default class Confirm extends FormInitialStep {
         planetFmReference: changeLink,
         reasonForChange: changeLink,
       }
+    } else if (req.form.options.name === 'reactivate') {
+      let certifiedNormalAccommodationChange = 0
+      let workingCapacityChange = 0
+      let maxCapacityChange = 0
+      const locations = [
+        await locationToCertificationLocation(req, locals.location, (originalLocation, certificateLocation) => {
+          if (originalLocation.locationType !== 'CELL') {
+            return certificateLocation
+          }
+
+          const { id } = originalLocation
+
+          const currentCertifiedNormalAccommodation =
+            originalLocation.currentCellCertificate?.certifiedNormalAccommodation ?? 0
+          let newCertifiedNormalAccommodation = currentCertifiedNormalAccommodation
+          const certifiedNormalAccommodationString = sessionModel.get<string>(`baselineCna-${id}`)
+
+          if (certifiedNormalAccommodationString !== undefined) {
+            newCertifiedNormalAccommodation = Number(certifiedNormalAccommodationString)
+          }
+
+          certifiedNormalAccommodationChange += newCertifiedNormalAccommodation - currentCertifiedNormalAccommodation
+
+          const currentWorkingCapacity = originalLocation.currentCellCertificate?.workingCapacity ?? 0
+          let newWorkingCapacity = originalLocation.oldWorkingCapacity
+          const workingCapacityString = sessionModel.get<string>(`workingCapacity-${id}`)
+
+          if (workingCapacityString !== undefined) {
+            newWorkingCapacity = Number(workingCapacityString)
+          }
+
+          workingCapacityChange += newWorkingCapacity - currentWorkingCapacity
+
+          const currentMaxCapacity = originalLocation.currentCellCertificate?.maxCapacity ?? 0
+          let newMaxCapacity = currentMaxCapacity
+          const maxCapacityString = sessionModel.get<string>(`maximumCapacity-${id}`)
+
+          if (maxCapacityString !== undefined) {
+            newMaxCapacity = Number(maxCapacityString)
+          }
+
+          maxCapacityChange += newMaxCapacity - currentMaxCapacity
+
+          const currentSpecialistCellTypes = originalLocation.currentCellCertificate?.specialistCellTypes ?? []
+          let newSpecialistCellTypes = currentSpecialistCellTypes
+          if (sessionModel.get<boolean>(`saved-cellTypes${id}-removed`)) {
+            newSpecialistCellTypes = []
+          } else if (sessionModel.get<string[]>(`saved-cellTypes${id}`)) {
+            newSpecialistCellTypes = sessionModel.get<string[]>(`saved-cellTypes${id}`)
+          }
+
+          return {
+            ...certificateLocation,
+            currentCertifiedNormalAccommodation,
+            certifiedNormalAccommodation: newCertifiedNormalAccommodation,
+            currentWorkingCapacity,
+            workingCapacity: newWorkingCapacity,
+            currentMaxCapacity,
+            maxCapacity: newMaxCapacity,
+            currentSpecialistCellTypes,
+            specialistCellTypes: newSpecialistCellTypes,
+          }
+        }),
+      ]
+
+      locations[0].certifiedNormalAccommodation =
+        locations[0].currentCertifiedNormalAccommodation + certifiedNormalAccommodationChange
+      locations[0].workingCapacity = locations[0].currentWorkingCapacity + workingCapacityChange
+      locations[0].maxCapacity = locations[0].currentMaxCapacity + maxCapacityChange
+
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'REACTIVATION',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        prisonId: locals.prisonId,
+        certifiedNormalAccommodationChange,
+        workingCapacityChange,
+        maxCapacityChange,
+        locations,
+      })
     } else if (req.form.options.name === 'add-to-certificate') {
       proposedCertificationApprovalRequests.push({
         approvalType: 'DRAFT',
+        locationId: locals.location.id,
         prisonId: locals.prisonId,
         locations: [await locationToCertificationLocation(req, locals.location)],
       })
@@ -203,7 +333,7 @@ export default class Confirm extends FormInitialStep {
       )
 
       proposedCertificationApprovalRequests.push({
-        approvalType: 'CAPACITY',
+        approvalType: 'CAPACITY_CHANGE',
         locationId: locals.location.id,
         locationKey: locals.location.key,
         prisonId: locals.prisonId,
@@ -212,8 +342,8 @@ export default class Confirm extends FormInitialStep {
         workingCapacityChange: newWorkingCapacity - workingCapacity,
         maxCapacityChange: newMaxCapacity - maxCapacity,
         locations: [
-          await locationToCertificationLocation(req, locals.location, location => ({
-            ...location,
+          await locationToCertificationLocation(req, locals.location, (_originalLocation, certificateLocation) => ({
+            ...certificateLocation,
             certifiedNormalAccommodation: newBaselineCna,
             workingCapacity: newWorkingCapacity,
             maxCapacity: newMaxCapacity,
@@ -245,120 +375,162 @@ export default class Confirm extends FormInitialStep {
     next()
   }
 
-  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { ingressUrl } = config
-    const { systemToken } = req.session
-    const { locationsService, manageUsersService, notifyService } = req.services
-    const { prisonResidentialSummary, user, locationId, location } = res.locals
-    const { prisonName } = prisonResidentialSummary.prisonSummary
-    const prisonId = res.locals.prisonId || req.sessionModel.get('prisonId') || location?.prisonId
-    const submittedBy = user.name
-    const { options } = req.form
-
-    let certificationApprovalRequestId: string
-    let requestCount = 0
-    if (options.name === 'deactivate') {
-      const reason = req.sessionModel.get<string>('deactivationReason')
-      const response = await locationsService.deactivateTemporary(
-        req.session.systemToken,
-        locationId,
-        reason,
-        req.sessionModel.get<string>(`deactivationReason${reason === 'OTHER' ? 'Other' : 'Description'}`),
-        req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
-        req.sessionModel.get<string>('facilitiesManagementReference'),
-        true,
-        req.sessionModel.get<string>('workingCapacityExplanation'),
-      )
-      certificationApprovalRequestId = response.pendingApprovalRequestId
-      requestCount += 1
-    } else if (options.name === 'add-to-certificate') {
-      certificationApprovalRequestId = (
-        await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', locationId)
+  async submitApprovalRequest(
+    locationsService: LocationsService,
+    systemToken: string,
+    {
+      approvalType,
+      cellMark,
+      currentSignedOperationCapacity,
+      deactivatedReason,
+      deactivationReasonDescription,
+      inCellSanitation,
+      locationId,
+      locations,
+      planetFmReference,
+      prisonId,
+      proposedReactivationDate,
+      reasonForChange,
+      signedOperationCapacityChange,
+    }: Partial<CertificationApprovalRequest>,
+  ) {
+    if (approvalType === 'REACTIVATION') {
+      return (
+        await locationsService.requestReactivation(systemToken, {
+          topLevelLocationId: locationId,
+          cellReactivationChanges: Object.fromEntries(
+            locations
+              .flatMap(findCells)
+              .map(({ id, certifiedNormalAccommodation, workingCapacity, maxCapacity, specialistCellTypes }) => [
+                id,
+                {
+                  capacity: {
+                    certifiedNormalAccommodation,
+                    workingCapacity,
+                    maxCapacity,
+                  },
+                  specialistCellTypes,
+                },
+              ]),
+          ),
+        })
       ).id
-      requestCount += 1
-    } else if (options.name === 'change-door-number') {
-      const doorNumber = req.sessionModel.get<string>('doorNumber')
-      const explanation = req.sessionModel.get<string>('explanation')
-      certificationApprovalRequestId = (
-        await locationsService.updateCellMark(systemToken, res.locals.locationId, {
-          cellMark: doorNumber,
-          reasonForChange: explanation,
-        })
+    }
+
+    if (approvalType === 'DEACTIVATION') {
+      return (
+        await locationsService.deactivateTemporary(
+          systemToken,
+          locationId,
+          deactivatedReason,
+          deactivationReasonDescription,
+          proposedReactivationDate,
+          planetFmReference,
+          true,
+          reasonForChange,
+        )
       ).pendingApprovalRequestId
-      requestCount += 1
-    } else if (options.name === 'change-sanitation') {
-      const inCellSanitation = req.sessionModel.get<string>('inCellSanitation')
-      const explanation = req.sessionModel.get<string>('explanation')
-      certificationApprovalRequestId = (
-        await locationsService.updateCellSanitation(systemToken, res.locals.locationId, {
-          inCellSanitation: inCellSanitation === 'YES',
-          reasonForChange: explanation,
-        })
-      ).pendingApprovalRequestId
-      requestCount += 1
-    } else if (options.name === 'change-cell-capacity') {
-      const explanation = req.sessionModel.get<string>('explanation')
+    }
+
+    if (approvalType === 'CAPACITY_CHANGE') {
+      const explanation = reasonForChange
       const capacities = {
-        maxCapacity: Number(req.sessionModel.get<string>('maxCapacity')),
-        workingCapacity: Number(req.sessionModel.get<string>('workingCapacity')),
-        certifiedNormalAccommodation: Number(req.sessionModel.get<string>('baselineCna')),
+        maxCapacity: locations[0].maxCapacity,
+        workingCapacity: locations[0].workingCapacity,
+        certifiedNormalAccommodation: locations[0].certifiedNormalAccommodation,
       }
-      certificationApprovalRequestId = (
-        await locationsService.updateCapacity(systemToken, res.locals.locationId, {
+      return (
+        await locationsService.updateCapacity(systemToken, locationId, {
           ...capacities,
           reasonForChange: explanation,
         })
       ).pendingApprovalRequestId
-      requestCount += 1
     }
 
-    const proposedSignedOpCapChange = req.sessionModel.get<{
-      signedOperationalCapacity: number
-      reasonForChange: string
-    }>('proposedSignedOpCapChange')
-    if (proposedSignedOpCapChange) {
-      const { signedOperationalCapacity, reasonForChange } = proposedSignedOpCapChange
-      const signedOpCapResponse = await locationsService.createCertificationRequestForSignedOpCap(
-        systemToken,
-        prisonId,
-        signedOperationalCapacity,
-        reasonForChange,
-      )
-      if (!certificationApprovalRequestId) {
-        certificationApprovalRequestId = signedOpCapResponse.id
-      }
-      requestCount += 1
+    if (approvalType === 'DRAFT') {
+      return (await locationsService.createCertificationRequestForLocation(systemToken, 'DRAFT', locationId)).id
     }
 
-    const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${certificationApprovalRequestId}`
+    if (approvalType === 'CELL_MARK') {
+      return (
+        await locationsService.updateCellMark(systemToken, locationId, {
+          cellMark,
+          reasonForChange,
+        })
+      ).pendingApprovalRequestId
+    }
 
-    // Don't send emails in local dev (every deployed env counts as production)
+    if (approvalType === 'CELL_SANITATION') {
+      return (
+        await locationsService.updateCellSanitation(systemToken, locationId, {
+          inCellSanitation,
+          reasonForChange,
+        })
+      ).pendingApprovalRequestId
+    }
+
+    if (approvalType === 'SIGNED_OP_CAP') {
+      return (
+        await locationsService.createCertificationRequestForSignedOpCap(
+          systemToken,
+          prisonId,
+          currentSignedOperationCapacity + signedOperationCapacityChange,
+          reasonForChange,
+        )
+      ).id
+    }
+
+    throw new Error(`Unsupported approval request type: ${approvalType}`)
+  }
+
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { ingressUrl } = config
+    const { systemToken } = req.session
+    const { locationsService, manageUsersService, notifyService } = req.services
+    const { prisonResidentialSummary, proposedCertificationApprovalRequests, user, location } = res.locals
+    const { prisonName } = prisonResidentialSummary.prisonSummary
+    const prisonId = res.locals.prisonId || req.sessionModel.get('prisonId') || location?.prisonId
+    const submittedBy = user.name
+
+    const approvalRequestIds = await Promise.all(
+      proposedCertificationApprovalRequests.map(async r =>
+        this.submitApprovalRequest(locationsService, systemToken, r),
+      ),
+    )
+
     if (config.production || process.env.NODE_ENV === 'test') {
-      // Send notifications to both sets of relevant cert roles
-      const [requestReceivedAddresses, requestSubmittedEmails] = await Promise.all([
-        getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers),
-        getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers),
-      ])
-
-      const notifications = [
-        { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },
-        { emailAddresses: requestSubmittedEmails, type: NotificationType.REQUEST_SUBMITTED, url },
-      ]
-
       await Promise.all(
-        notifications.map(({ emailAddresses, type, url: notificationUrl }) =>
-          sendNotification(
-            notifyService,
-            emailAddresses,
-            prisonName,
-            notificationUrl,
-            type,
-            undefined,
-            undefined,
-            undefined,
-            submittedBy,
-          ),
-        ),
+        approvalRequestIds.map(async approvalRequestId => {
+          // Don't send emails in local dev (every deployed env counts as production)
+          const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${approvalRequestId}`
+
+          // Send notifications to both sets of relevant cert roles
+          const [requestReceivedAddresses, requestSubmittedEmails] = await Promise.all([
+            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers),
+            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers),
+          ])
+
+          const notifications = [
+            { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },
+            { emailAddresses: requestSubmittedEmails, type: NotificationType.REQUEST_SUBMITTED, url },
+          ]
+
+          await Promise.all(
+            notifications.map(({ emailAddresses, type, url: notificationUrl }) =>
+              sendNotification(
+                notifyService,
+                emailAddresses,
+                prisonName,
+                notificationUrl,
+                type,
+                undefined,
+                undefined,
+                undefined,
+                submittedBy,
+              ),
+            ),
+          )
+        }),
       )
     }
 
@@ -366,8 +538,8 @@ export default class Confirm extends FormInitialStep {
     req.sessionModel.reset()
 
     req.flash('success', {
-      title: `Change request${requestCount > 1 ? 's' : ''} sent`,
-      content: `You have submitted ${requestCount > 1 ? `${requestCount} requests` : 'a request'} to update the cell certificate.`,
+      title: `Change request${approvalRequestIds.length > 1 ? 's' : ''} sent`,
+      content: `You have submitted ${approvalRequestIds.length > 1 ? `${approvalRequestIds.length} requests` : 'a request'} to update the cell certificate.`,
     })
 
     res.redirect(`/${prisonId}/cell-certificate/change-requests`)

@@ -9,25 +9,44 @@
 {% set feedbackBannerBackground = 'feedbackBannerBackground'%}
 
 {% block topBannerContent %}
-  <div id="top-banner">
-    <div class="govuk-width-container">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
-          <h1 class="govuk-heading-xl govuk-!-padding-top-5 govuk-!-margin-bottom-5">
-            Practice using Locations
-          </h1>
-          <p class="govuk-body govuk-!-margin-bottom-6">
-            Use this practice version of the service to explore and learn how to use it
-            <br>
-            without making real changes.
-          </p>
-          <a role="button" class="govuk-button govuk-button--inverse" href="{{ productionUrl }}">
-            Switch to the live service
-          </a>
+  {% if sandbox %}
+    <div id="top-banner">
+      <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-xl govuk-!-padding-top-5 govuk-!-margin-bottom-5">
+              Practice using Locations
+            </h1>
+            <p class="govuk-body govuk-!-margin-bottom-6">
+              Use this practice version of the service to explore and learn how to use it
+              <br>
+              without making real changes.
+            </p>
+            <a role="button" class="govuk-button govuk-button--inverse" href="{{ productionUrl }}">
+              Switch to the live service
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {% endif %}
+
+  {% if user and user.userRoles and user.userRoles.includes('PERMISSION_OVERRIDE') %}
+    <div id="top-banner">
+      <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h1 class="govuk-heading-l govuk-!-padding-top-5 govuk-!-margin-bottom-5">
+              Permission override enabled
+            </h1>
+            <p>
+              {{ user.userRoles.join(', ') }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block content %}

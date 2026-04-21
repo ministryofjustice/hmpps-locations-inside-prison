@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode'
 import { convertToTitleCase } from '../utils/utils'
 import logger from '../../logger'
 import { Services } from '../services'
+import config from '../config'
 
 export default function setUpCurrentUser({ manageUsersService }: Services): Router {
   const router = Router({ mergeParams: true })
@@ -28,6 +29,10 @@ export default function setUpCurrentUser({ manageUsersService }: Services): Rout
         userRoles: roles.map(role => role.substring(role.indexOf('_') + 1)),
         activeCaseload: caseloadsData.activeCaseload,
         caseloads: caseloadsData.caseloads,
+      }
+
+      if (!config.production && req.cookies.roleOverride) {
+        res.locals.user.userRoles = ['PERMISSION_OVERRIDE', ...(req.cookies.roleOverride?.split(', ') || [])]
       }
 
       if (res.locals.user.authSource === 'nomis') {

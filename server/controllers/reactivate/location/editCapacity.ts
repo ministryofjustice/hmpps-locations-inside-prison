@@ -3,17 +3,31 @@ import { NextFunction, Response } from 'express'
 import FormInitialStep from '../../base/formInitialStep'
 import { TypedLocals } from '../../../@types/express'
 import getLocationResidentialSummary from '../parent/middleware/getLocationResidentialSummary'
-import populateLocationTree from '../parent/middleware/populateLocationTree'
+import populateLocationTree, { DecoratedLocationTree } from '../parent/middleware/populateLocationTree'
 import addConstantToLocals from '../../../middleware/addConstantToLocals'
 import capFirst from '../../../formatters/capFirst'
 import modifyFieldName from '../../../helpers/field/modifyFieldName'
 import lessThanOrEqualTo from '../../../validators/lessThanOrEqualTo'
 import { DecoratedLocation } from '../../../decorators/decoratedLocation'
-import getCells from './util/getCells'
-import applyChangesToLocationTree from './middleware/applyChangesToLocationTree'
 import { getValues } from './util/getValues'
+import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
 
 const CELL_TYPE_REGEX = /^temp-cellTypes(.+?)(?:-removed)?$/
+
+const findLocationInLocationTrees = (locationTrees: DecoratedLocationTree[], id: string): DecoratedLocation => {
+  for (const tree of locationTrees) {
+    if (tree.decoratedLocation.id === id) {
+      return tree.decoratedLocation
+    }
+
+    const location = findLocationInLocationTrees(tree.decoratedSubLocations, id)
+    if (location) {
+      return location
+    }
+  }
+
+  return null
+}
 
 export default class EditCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -21,9 +35,8 @@ export default class EditCapacity extends FormInitialStep {
     this.use(getLocationResidentialSummary)
     this.use(populateLocationTree(true))
     this.use(addConstantToLocals('specialistCellTypes'))
-    this.use(applyChangesToLocationTree)
+    this.use(populateModifiedLocationMap)
     this.use(this.fixHistory)
-    this.use(this.populateCells)
     this.use(this.createDynamicFields)
     this.use(this.unsetCellTypeTypes)
   }
@@ -52,6 +65,11 @@ export default class EditCapacity extends FormInitialStep {
 
     const checkCapacitiesStep = history.find(s => s.path.endsWith('/check-capacity'))
     if (checkCapacitiesStep) {
+      if (!checkCapacitiesStep.next.includes('/edit-capacity/')) {
+        checkCapacitiesStep.next = `/reactivate/location/${res.locals.decoratedLocation.id}/edit-capacity/${req.params.parentLocationId}`
+        req.journeyModel.set('history', history)
+      }
+
       next()
       return
     }
@@ -73,32 +91,19 @@ export default class EditCapacity extends FormInitialStep {
     next()
   }
 
-  populateCells(req: FormWizard.Request, res: Response, next: NextFunction) {
-    res.locals.cells = getCells(res.locals.decoratedLocationTree).filter(
-      c => c.parentId === req.params.parentLocationId || c.id === req.params.parentLocationId,
-    )
-
-    next()
-  }
-
   getParent(req: FormWizard.Request, res: Response): DecoratedLocation {
     const { parentLocationId } = req.params
-    const { decoratedLocation } = res.locals
-    if (parentLocationId === decoratedLocation.id) {
-      return decoratedLocation
-    }
 
-    return res.locals.decoratedLocationTree.find(tree => tree.decoratedLocation.id === parentLocationId)
-      ?.decoratedLocation
+    return findLocationInLocationTrees(res.locals.decoratedLocationTree, parentLocationId)
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
-    const { cells } = res.locals
+    const { decoratedCells } = res.locals
 
     return {
       ...locals,
-      title: `Edit capacity of cell${cells.length > 1 ? 's' : ''}`,
+      title: `Edit capacity of cell${decoratedCells.length > 1 ? 's' : ''}`,
       titleCaption: capFirst(this.getParent(req, res).displayName),
       minLayout: 'three-quarters',
       backLink: `/reactivate/location/${res.locals.decoratedLocation.id}/check-capacity`,
@@ -117,14 +122,16 @@ export default class EditCapacity extends FormInitialStep {
 
   createDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { options } = req.form
-    const { cells } = res.locals
+    const { decoratedCells } = res.locals
 
     options.fields = Object.fromEntries(
-      cells.flatMap(cell => {
+      decoratedCells.flatMap(cell => {
         const { id } = cell
         return Object.entries(options.fields).map(([fieldId, field]) => {
           const modifiedField = modifyFieldName(field, o => `${o}-${id}`)
 
+          modifiedField.remove = undefined
+          modifiedField.removed = false
           modifiedField.errorSummaryPrefix = `${cell.pathHierarchy}: `
           if (fieldId === 'workingCapacity' || fieldId === 'baselineCna') {
             modifiedField.validate = [...modifiedField.validate, lessThanOrEqualTo({ field: `maximumCapacity-${id}` })]
@@ -152,9 +159,11 @@ export default class EditCapacity extends FormInitialStep {
       return
     }
 
+    // Update the modified location map so that values from the form are accounted for
+    populateModifiedLocationMap(req, res, null)
+
     super.validateFields(req, res, async errors => {
-      const { values } = req.form
-      const { cells, locationResidentialSummary } = res.locals
+      const { modifiedLocationMap, locationResidentialSummary } = res.locals
       const { accommodationTypes } = locationResidentialSummary.parentLocation
 
       const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
@@ -166,7 +175,7 @@ export default class EditCapacity extends FormInitialStep {
         !accommodationTypes.includes('HEALTHCARE_INPATIENTS') &&
         !accommodationTypes.includes('CARE_AND_SEPARATION')
       ) {
-        cells.forEach(cell => {
+        Object.values(modifiedLocationMap).forEach(cell => {
           const { id } = cell
 
           const workingCapacityKey = `workingCapacity-${id}`
@@ -175,11 +184,11 @@ export default class EditCapacity extends FormInitialStep {
             type => specialistCellTypes.find(sct => sct.key === type)?.attributes?.affectsCapacity,
           )
 
-          if (!errors[workingCapacityKey] && values[workingCapacityKey] === '0' && !isSpecialistCellType) {
+          if (!errors[workingCapacityKey] && cell.oldWorkingCapacity === 0 && !isSpecialistCellType) {
             validationErrors[workingCapacityKey] = this.formError(workingCapacityKey, 'nonZeroForNormalCell')
           }
 
-          if (!errors[baselineCnaKey] && values[baselineCnaKey] === '0' && !isSpecialistCellType) {
+          if (!errors[baselineCnaKey] && cell.capacity.certifiedNormalAccommodation === 0 && !isSpecialistCellType) {
             validationErrors[baselineCnaKey] = this.formError(baselineCnaKey, 'nonZeroForNormalCell')
           }
         })

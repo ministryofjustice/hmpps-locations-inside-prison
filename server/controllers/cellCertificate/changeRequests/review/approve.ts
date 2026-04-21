@@ -30,7 +30,6 @@ export default class Approve extends FormInitialStep {
     }
 
     res.locals.buttonText = 'Update cell certificate'
-    res.locals.cancelText = 'Cancel'
     if (approvalRequest.approvalType === 'DEACTIVATION') {
       await addLocationsToLocationMap([approvalRequest.locationId])(req, res, null)
     }

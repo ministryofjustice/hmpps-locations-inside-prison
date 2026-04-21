@@ -31,7 +31,6 @@ export default class IngestConfirm extends FormInitialStep {
       capacitySummary,
       title: 'Confirm cell certification ingest',
       buttonText: 'Confirm ingestion',
-      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

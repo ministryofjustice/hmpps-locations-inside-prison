@@ -3,6 +3,7 @@ import LocationsApiStubber from '../../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
 import PrisonResidentialSummaryFactory from '../../../../server/testutils/factories/prisonResidentialSummary'
 import { Location } from '../../../../server/data/types/locationsApi'
+import LocationFactory from '../../../../server/testutils/factories/location'
 
 export default function setupStubs(role: string, location: Location) {
   cy.task('reset')
@@ -25,9 +26,18 @@ export default function setupStubs(role: string, location: Location) {
       },
     }),
   )
+  LocationsApiStubber.stub.stubLocations(
+    LocationFactory.build({
+      id: location.parentId,
+      parentId: undefined,
+      topLevelId: undefined,
+    }),
+  )
   LocationsApiStubber.stub.stubLocations(location)
   LocationsApiStubber.stub.stubPrisonerLocationsId([])
-  LocationsApiStubber.stub.stubLocationsDeactivateTemporary()
+  LocationsApiStubber.stub.stubLocationsCertificationPrisonSignedOpCapChange()
+  LocationsApiStubber.stub.stubLocationsBulkReactivate()
+  LocationsApiStubber.stub.stubLocationsCertificationLocationReactivationRequestApproval()
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
   LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
 }

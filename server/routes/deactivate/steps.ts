@@ -17,6 +17,10 @@ function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
+export function hasWorkingCapacity(_req: FormWizard.Request, res: Response) {
+  return res.locals.decoratedLocation.capacity.workingCapacity > 0
+}
+
 export function isCellCertChange(req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
 
@@ -50,9 +54,13 @@ const steps: FormWizard.Steps = {
       `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
     next: [
       { fn: isCellOccupied, next: 'occupied' },
-      { fn: permanentDeactivationForbidden, next: 'temporary/details' },
+      {
+        fn: (req, res) => (isCellCertChange(req, res) || isCertChange(req, res)) && !hasWorkingCapacity(req, res),
+        next: 'temporary/details',
+      },
       { fn: isCellCertChange, next: 'cell-cert-change' },
       { fn: isCertChange, next: 'cert-change-disclaimer' },
+      { fn: permanentDeactivationForbidden, next: 'temporary/details' },
       'type',
     ],
   },
@@ -97,8 +105,11 @@ const steps: FormWizard.Steps = {
       'workingCapacityExplanation',
     ],
     next: [
-      { fn: isCellCertChange, next: 'submit-certification-approval-request' },
-      { fn: isCertChange, next: 'update-signed-op-cap' },
+      {
+        fn: (req, res) => isCellCertChange(req, res) && hasWorkingCapacity(req, res),
+        next: 'submit-certification-approval-request',
+      },
+      { fn: (req, res) => isCertChange(req, res) && hasWorkingCapacity(req, res), next: 'update-signed-op-cap' },
       'temporary/confirm',
     ],
     controller: DeactivateTemporaryDetails,

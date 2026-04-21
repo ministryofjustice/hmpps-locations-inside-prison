@@ -80,6 +80,13 @@ export default class LocationsService {
     })
   }
 
+  async requestReactivation(
+    token: string,
+    data: Parameters<LocationsApiClient['certification']['location']['reactivationRequestApproval']>[2],
+  ) {
+    return this.locationsApiClient.certification.location.reactivationRequestApproval(token, null, data)
+  }
+
   async deactivatePermanent(token: string, locationId: string, reason: string) {
     return this.locationsApiClient.locations.deactivate.permanent(token, { locationId }, { reason })
   }
@@ -186,10 +193,16 @@ export default class LocationsService {
     return this.locationsApiClient.locations.prison.getInactiveCells(token, { prisonId, parentLocationId: locationId })
   }
 
-  async getLocation(token: string, locationId: string, includeHistory: boolean = false) {
+  async getLocation(
+    token: string,
+    locationId: string,
+    includeHistory: boolean = false,
+    includeCurrentCertificate: boolean = false,
+  ) {
     const params = {
       locationId,
       includeHistory: includeHistory ? 'true' : 'false',
+      includeCurrentCertificate: includeCurrentCertificate ? 'true' : 'false',
     }
     return this.locationsApiClient.locations.getLocation(token, params)
   }
@@ -289,8 +302,9 @@ export default class LocationsService {
   async reactivateBulk(
     token: string,
     locations: Parameters<LocationsApiClient['locations']['bulk']['reactivate']>[2]['locations'],
+    forceReactivation = false,
   ) {
-    return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations })
+    return this.locationsApiClient.locations.bulk.reactivate(token, null, { locations, forceReactivation })
   }
 
   async updateCapacity(

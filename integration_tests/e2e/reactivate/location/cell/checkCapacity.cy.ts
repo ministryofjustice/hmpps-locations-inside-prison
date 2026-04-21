@@ -1,10 +1,11 @@
 import Page from '../../../../pages/page'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
-import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
 import { setupStubs, location } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 import goToCheckCapacity from '../goToCheckCapacity'
-import capFirst from '../../../../../server/formatters/capFirst'
+import EditCapacityPage from '../../../../pages/reactivate/location/editCapacity'
+import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
+import NoCertChangeConfirmPage from '../../../../pages/reactivate/location/noCertChangeConfirm'
 
 context('Certification Reactivation - Cell - Check capacity', () => {
   let page: CheckCapacityPage
@@ -24,17 +25,27 @@ context('Certification Reactivation - Cell - Check capacity', () => {
   it('has a back link', () => {
     page.backLink().click()
 
-    // eslint-disable-next-line no-new
-    new CertChangeDisclaimerPage(`${capFirst(location.locationType.toLowerCase())} activation`)
+    Page.verifyOnPage(ViewLocationsShowPage)
   })
 
   it('displays the correct details for the cell', () => {
     page.testCellsTable([['A-1-001', '1', '1', '2', ['Accessible cell', 'Constant Supervision Cell']]])
   })
 
-  // it('proceeds to check capacity on submit', () => {
-  //   page.submit()
-  //
-  //   Page.verifyOnPage(CheckCapacityPage)
-  // })
+  it('proceeds to cert change disclaimer on submit', () => {
+    page.editCapacityLink(location.id).click()
+    Page.verifyOnPage(EditCapacityPage).submit({ capacities: [['1', '2', '2']] })
+    Page.verifyOnPage(CheckCapacityPage).submit()
+
+    // eslint-disable-next-line no-new
+    new CertChangeDisclaimerPage('Cell activation')
+  })
+
+  context('when there are no cert changes', () => {
+    it('proceeds to no cert change confirm on submit', () => {
+      page.submit()
+
+      Page.verifyOnPage(NoCertChangeConfirmPage)
+    })
+  })
 })

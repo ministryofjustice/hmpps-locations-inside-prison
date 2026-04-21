@@ -5,7 +5,6 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
@@ -78,10 +77,12 @@
 
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link {{ cancelClasses or 'govuk-link--no-visited-state' }}">
-            {% if cancelText %}
-              {{ cancelText }}
-            {% else %}
+            {% if cancelLink.startsWith('/view-and-update-locations/') %}
               Cancel and return to location details
+            {% elseif cancelLink.startsWith('/admin/') %}
+              Cancel and return to prison configuration details
+            {% else %}
+              Cancel
             {% endif %}
           </a>
         </p>

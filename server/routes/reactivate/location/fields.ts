@@ -2,9 +2,14 @@ import FormWizard from 'hmpo-form-wizard'
 import lessThanOrEqualTo from '../../../validators/lessThanOrEqualTo'
 import greaterThan from '../../../validators/greaterThan'
 import SetCellType from '../../../commonTransactions/setCellType'
+import UpdateSignedOpCap from '../../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../../commonTransactions/submitCertificationApprovalRequest'
 
 const fields: FormWizard.Fields = {
   baselineCna: {
+    // removed only when field is not dynamically added (in editCapacity.ts)
+    remove: () => true,
+    hideWhenRemoved: true,
     validate: ['required', 'numeric', lessThanOrEqualTo(99)],
     errorMessages: {
       nonZeroForNormalCell: 'Baseline CNA cannot be 0 for a normal accommodation cell',
@@ -26,6 +31,9 @@ const fields: FormWizard.Fields = {
     },
   },
   workingCapacity: {
+    // removed only when field is not dynamically added (in editCapacity.ts)
+    remove: () => true,
+    hideWhenRemoved: true,
     validate: ['required', 'numeric', lessThanOrEqualTo(99)],
     errorMessages: {
       nonZeroForNormalCell: 'Working capacity cannot be 0 for a normal accommodation cell',
@@ -68,6 +76,8 @@ const fields: FormWizard.Fields = {
     },
   },
   ...SetCellType.getFields(),
+  ...UpdateSignedOpCap.getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
 }
 
 export default fields

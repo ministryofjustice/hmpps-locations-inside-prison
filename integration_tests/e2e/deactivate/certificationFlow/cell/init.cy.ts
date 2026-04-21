@@ -5,6 +5,7 @@ import CellCertChangePage from '../../../../pages/deactivate/cell-cert-change'
 import AuthSignInPage from '../../../../pages/authSignIn'
 import LocationsApiStubber from '../../../../mockApis/locationsApi'
 import { setupStubs, location } from './setupStubs'
+import DeactivateTemporaryDetailsPage from '../../../../pages/deactivate/temporary/details'
 
 context('Certification Deactivation - Cell - Init', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -27,14 +28,10 @@ context('Certification Deactivation - Cell - Init', () => {
   })
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
-    beforeEach(() => {
-      setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
-
-      cy.signIn()
-    })
-
     context('when the cell is occupied', () => {
       beforeEach(() => {
+        setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
+
         const prisonerLocations = [
           {
             cellLocation: 'A-1-001',
@@ -62,6 +59,8 @@ context('Certification Deactivation - Cell - Init', () => {
           },
         ]
         LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+
+        cy.signIn()
       })
 
       it('displays the occupied page', () => {
@@ -71,9 +70,33 @@ context('Certification Deactivation - Cell - Init', () => {
     })
 
     context('when the cell is not occupied', () => {
-      it('displays the cell-cert-change page', () => {
-        cy.visit(`/location/${location.id}/deactivate`)
-        Page.verifyOnPage(CellCertChangePage)
+      context('when the cell has 0 working capacity', () => {
+        beforeEach(() => {
+          setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', {
+            ...location,
+            capacity: { ...location.capacity, workingCapacity: 0 },
+          })
+
+          cy.signIn()
+        })
+
+        it('navigates to the temporary/details page', () => {
+          cy.visit(`/location/${location.id}/deactivate`)
+          Page.verifyOnPage(DeactivateTemporaryDetailsPage)
+        })
+      })
+
+      context('when the cell has > 0 working capacity', () => {
+        beforeEach(() => {
+          setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
+
+          cy.signIn()
+        })
+
+        it('navigates to the cell-cert-change page', () => {
+          cy.visit(`/location/${location.id}/deactivate`)
+          Page.verifyOnPage(CellCertChangePage)
+        })
       })
     })
   })
