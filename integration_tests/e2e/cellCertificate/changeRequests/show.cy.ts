@@ -311,4 +311,40 @@ context('Cell Certificate - Change Requests - Show', () => {
       })
     })
   })
+
+  context('Review copy and withdraw button by status', () => {
+    context('As a certificate administrator (MANAGE_RES_LOCATIONS_OP_CAP)', () => {
+      beforeEach(() => {
+        setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
+        cy.signIn()
+      })
+
+      it('Shows the review copy and withdraw button when status is PENDING', () => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({ status: 'PENDING' }),
+        )
+
+        CellCertificateChangeRequestsShowPage.goTo('id1')
+        Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+
+        cy.contains('This request is being reviewed').should('be.visible')
+        cy.contains('You are unable to make changes to this location').should('be.visible')
+        cy.contains('.govuk-button', 'Withdraw request').should('be.visible')
+      })
+      ;(['APPROVED', 'REJECTED', 'WITHDRAWN'] as const).forEach(status => {
+        it(`Hides the review copy and withdraw button when status is ${status}`, () => {
+          LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+            CertificationApprovalRequestFactory.build({ status }),
+          )
+
+          CellCertificateChangeRequestsShowPage.goTo('id1')
+          Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+
+          cy.contains('This request is being reviewed').should('not.exist')
+          cy.contains('You are unable to make changes to this location').should('not.exist')
+          cy.contains('.govuk-button', 'Withdraw request').should('not.exist')
+        })
+      })
+    })
+  })
 })
