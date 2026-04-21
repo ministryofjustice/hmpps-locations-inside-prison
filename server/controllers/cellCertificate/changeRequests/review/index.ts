@@ -27,7 +27,11 @@ export default class Review extends FormInitialStep {
       res.locals.titleCaption = prisonResidentialSummary.prisonSummary.prisonName
     }
 
-    res.locals.title = `Review ${approvalTypeDescription(approvalRequest.approvalType, constants, location).toLowerCase()} request`
+    if (approvalRequest.approvalType === 'CAPACITY_CHANGE') {
+      res.locals.title = `${approvalTypeDescription(approvalRequest.approvalType, constants, location)} request details`
+    } else {
+      res.locals.title = `Review ${approvalTypeDescription(approvalRequest.approvalType, constants, location).toLowerCase()} request`
+    }
 
     await addUsersToUserMap([approvalRequest.requestedBy])(req, res, null)
 

@@ -30,7 +30,7 @@ context('Cell Certificate - Change Requests - Show', () => {
           ['Change type', 'Add new locations to certificate'],
           ['Submitted on', '3 October 2024'],
           ['Submitted by', 'john smith'],
-          ['Status', 'Awaiting approval'],
+          ['Status', 'Awaiting review'],
         ])
 
         testGovukTable('wing-table', [
@@ -78,7 +78,7 @@ context('Cell Certificate - Change Requests - Show', () => {
           ['Explanation', 'Needed to change it'],
           ['Submitted on', '3 October 2024'],
           ['Submitted by', 'john smith'],
-          ['Status', 'Awaiting approval'],
+          ['Status', 'Awaiting review'],
         ])
 
         testGovukTable('cap-change-table', [['TST', '5 → 9']])
@@ -261,7 +261,7 @@ context('Cell Certificate - Change Requests - Show', () => {
           ['Explanation', 'Needed to change it'],
           ['Submitted on', '3 October 2024'],
           ['Submitted by', 'john smith'],
-          ['Status', 'Awaiting approval'],
+          ['Status', 'Awaiting review'],
         ])
 
         testGovukTable('capacity-change-table', [['A-1-001', '1 → 2', '1 → 2', '2 → 3']])
