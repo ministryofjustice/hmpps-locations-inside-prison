@@ -489,7 +489,7 @@ export default class Confirm extends FormInitialStep {
     const { locationsService, manageUsersService, notifyService } = req.services
     const { prisonResidentialSummary, proposedCertificationApprovalRequests, user, location } = res.locals
     const { prisonName } = prisonResidentialSummary.prisonSummary
-    const { prisonId } = location
+    const prisonId = res.locals.prisonId || req.sessionModel.get('prisonId') || location?.prisonId
     const submittedBy = user.name
 
     const approvalRequestIds = await Promise.all(
