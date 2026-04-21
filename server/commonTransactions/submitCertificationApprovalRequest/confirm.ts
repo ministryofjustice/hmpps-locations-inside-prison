@@ -116,7 +116,7 @@ export default class Confirm extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
-    this.use(populateLocation({ includeCurrentCertificate: true }))
+    this.use(this.conditionalPopulateLocation)
     this.use(
       addConstantToLocals([
         'accommodationTypes',
@@ -129,6 +129,14 @@ export default class Confirm extends FormInitialStep {
     this.use(this.generateRequests)
   }
 
+  async conditionalPopulateLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const locationId = req.params?.locationId || res.locals.locationId
+    if (locationId) {
+      return populateLocation({ includeCurrentCertificate: true })(req, res, next)
+    }
+    return next()
+  }
+
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
     const { locationsService } = req.services
@@ -136,9 +144,9 @@ export default class Confirm extends FormInitialStep {
 
     if (location) {
       res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
-    }
 
-    await addLocationsToLocationMap([location])(req, res, null)
+      await addLocationsToLocationMap([location])(req, res, null)
+    }
 
     return super._locals(req, res, next)
   }
