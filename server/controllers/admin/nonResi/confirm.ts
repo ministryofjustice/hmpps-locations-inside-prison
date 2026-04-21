@@ -21,7 +21,6 @@ export default class NonResiStatusChangeConfirm extends FormInitialStep {
       cancelLink: backLink,
       title: 'Update non-residential locations status',
       buttonText: `${prisonConfiguration.nonResiServiceActive === 'INACTIVE' ? 'Activate' : 'Inactivate'} non-residential locations`,
-      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

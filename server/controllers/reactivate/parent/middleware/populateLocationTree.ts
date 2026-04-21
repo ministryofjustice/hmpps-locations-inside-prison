@@ -114,6 +114,9 @@ export default function populateLocationTree(decorate: boolean) {
     const { locationsService } = req.services
 
     let selectedLocationIds = req.sessionModel.get<string[]>('selectLocations')
+    if (req.params.parentLocationId) {
+      selectedLocationIds = [req.params.parentLocationId]
+    }
     if (!selectedLocationIds?.length) {
       selectedLocationIds = locationResidentialSummary.subLocations.map(l => l.id)
     }

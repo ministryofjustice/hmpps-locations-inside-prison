@@ -8,8 +8,9 @@ import populateLocationTree from '../parent/middleware/populateLocationTree'
 import getResidentialSummaries from '../parent/middleware/getResidentialSummaries'
 import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
 import capFirst from '../../../formatters/capFirst'
+import FormInitialStep from '../../base/formInitialStep'
 
-export default class NoCertChangeConfirm extends FormWizard.Controller {
+export default class NoCertChangeConfirm extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getResidentialSummaries)
@@ -58,7 +59,6 @@ export default class NoCertChangeConfirm extends FormWizard.Controller {
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     return {
-      cancelText: 'Cancel',
       changeSummary,
       title: `You are about to reactivate ${cells.length} cell${cells.length > 1 ? 's' : ''}`,
       titleCaption: capFirst(decoratedLocation.displayName),
@@ -99,10 +99,14 @@ export default class NoCertChangeConfirm extends FormWizard.Controller {
         .filter(e => e),
     ) as Parameters<LocationsService['reactivateBulk']>[1]
 
-    await locationsService.reactivateBulk(systemToken, {
-      [decoratedLocation.id]: { cascadeReactivation: true },
-      ...allCellChanges,
-    })
+    await locationsService.reactivateBulk(
+      systemToken,
+      {
+        [decoratedLocation.id]: { cascadeReactivation: true },
+        ...allCellChanges,
+      },
+      true,
+    )
 
     next()
   }

@@ -89,7 +89,6 @@ describe('NoCertChangeConfirm', () => {
       expect(result.changeSummary).toContain('increase')
       expect(result.changeSummary).toContain('decrease')
       expect(result.buttonText).toBe('Confirm activation')
-      expect(result.cancelText).toBe('Cancel')
     })
   })
 

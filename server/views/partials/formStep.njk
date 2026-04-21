@@ -77,10 +77,12 @@
 
         <p class="govuk-body">
           <a href="{{ cancelLink }}" class="govuk-link {{ cancelClasses or 'govuk-link--no-visited-state' }}">
-            {% if cancelText %}
-              {{ cancelText }}
-            {% else %}
+            {% if cancelLink.startsWith('/view-and-update-locations/') %}
               Cancel and return to location details
+            {% elseif cancelLink.startsWith('/admin/') %}
+              Cancel and return to prison configuration details
+            {% else %}
+              Cancel
             {% endif %}
           </a>
         </p>

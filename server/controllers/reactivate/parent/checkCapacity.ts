@@ -59,7 +59,6 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
       ...super.locals(req, res),
       backLink,
       cancelLink: backLink,
-      cancelText: 'Cancel',
       title: 'Check capacity of cells',
       titleCaption: capFirst(decoratedLocation.displayName),
       minLayout: 'one-half',

@@ -14,32 +14,38 @@ const decoratedLocationLocalsMap: {
 type PopulateLocationParams = {
   decorate?: boolean
   id?: string
+  includeCurrentCertificate?: boolean
   includeHistory?: boolean
   localName?: LocationLocals
 }
 
-export default function populateLocation({ decorate, id, includeHistory, localName }: PopulateLocationParams = {}) {
+export default function populateLocation({
+  decorate,
+  id,
+  includeCurrentCertificate,
+  includeHistory,
+  localName,
+}: PopulateLocationParams = {}) {
   return async (req: Request | FormWizard.Request, res: Response, next: NextFunction): Promise<void> => {
     const { locationsService, manageUsersService } = req.services
-    let location = res.locals[localName || 'location']
-
-    if (!location) {
-      location = res.locals[decoratedLocationLocalsMap[localName || 'location']]?.raw
-    }
+    let location =
+      res.locals[localName || 'location'] || res.locals[decoratedLocationLocalsMap[localName || 'location']]?.raw
+    const locationId = id || req.params.locationId || res.locals.locationId || location?.id
 
     try {
       const { systemToken } = req.session
 
-      if (!location) {
+      if (!location || (includeCurrentCertificate && !location.currentCellCertificate) || location?.id !== locationId) {
         location = await req.services.locationsService.getLocation(
           systemToken,
-          id || req.params.locationId || res.locals.locationId,
+          locationId,
           includeHistory,
+          includeCurrentCertificate,
         )
       }
 
+      res.locals[localName || 'location'] = location
       if (!decorate) {
-        res.locals[localName || 'location'] = location
         return next()
       }
 

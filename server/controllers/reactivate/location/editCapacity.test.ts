@@ -2,7 +2,6 @@ import { DeepPartial } from 'fishery'
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import EditCapacity from './editCapacity'
-import LocationFactory from '../../../testutils/factories/location'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 import mockModel from '../../../testutils/mockModel'
 

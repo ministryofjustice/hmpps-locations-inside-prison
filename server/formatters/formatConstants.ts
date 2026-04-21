@@ -3,6 +3,7 @@ import { LocationsApiConstant } from '../data/types/locationsApi'
 export default function formatConstants(
   constants: LocationsApiConstant[],
   keys: string[] | string | undefined,
+  joinString = '<br>',
 ): string {
   if (!keys || !keys.length) {
     return '-'
@@ -13,7 +14,7 @@ export default function formatConstants(
       keys
         .map(key => formatConstants(constants, key))
         .filter(s => s !== '-')
-        .join('<br>') || '-'
+        .join(joinString) || '-'
     )
   }
 

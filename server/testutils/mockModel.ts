@@ -12,5 +12,10 @@ export default function mockModel(originalValues: Record<string, unknown> = {}) 
       delete values[fieldName]
     }),
     toJSON: jest.fn(() => values),
+    reset: () => {
+      Object.keys(values).forEach(key => {
+        delete values[key]
+      })
+    },
   } as unknown as FormWizard.Request['sessionModel']
 }

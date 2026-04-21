@@ -35,7 +35,16 @@ const permissionsByRole: { [key: string]: string[] } = {
   MANAGE_RES_LOCATIONS_ADMIN: administerResLocationsPermissions,
 }
 
+const permissionNameMap: { [p: string]: string } = {
+  MANAGE_RESIDENTIAL_LOCATIONS: 'Cell status manager',
+  MANAGE_RES_LOCATIONS_OP_CAP: 'Certificate administrator',
+  RESI__CERT_REVIEWER: 'Certificate reviewer',
+  RESI__CERT_VIEWER: 'Certificate viewer',
+  REPORTING_LOCATION_INFORMATION: 'Reporting location information',
+  MANAGE_RES_LOCATIONS_ADMIN: 'Residential locations administrator',
+}
+
 const rolesToPermissions = (roles: string[], mapping = permissionsByRole) =>
   uniq(roles.map(role => mapping[role] || []).flat())
 
-export { permissionsByRole, rolesToPermissions }
+export { permissionsByRole, permissionNameMap, rolesToPermissions }

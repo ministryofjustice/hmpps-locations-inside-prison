@@ -35,7 +35,7 @@
 {% endmacro %}
 
 {% macro recurseLocationDeactivationTable(rows, location) %}
-  {% if location.locationType === 'CELL' and location.currentWorkingCapacity > 0 %}
+  {% if location.locationType === 'CELL' %}
     {% set rows = (rows.push([
       {
         classes: 'govuk-table__cell',
@@ -43,7 +43,7 @@
       },
       {
         classes: 'govuk-table__cell',
-        text: location.currentWorkingCapacity + " → 0"
+        text: location.currentWorkingCapacity + (" → 0" if location.currentWorkingCapacity > 0)
       }
     ]), rows) %}
   {% endif %}
@@ -54,7 +54,7 @@
 {% endmacro %}
 
 {% macro recurseLocationReactivationTable(rows, location, specialistCellTypes) %}
-  {% if location.locationType === 'CELL' and location.currentWorkingCapacity != location.workingCapacity %}
+  {% if location.locationType === 'CELL' %}
     {% set rows = (rows.push([
       {
         classes: 'govuk-table__cell',
@@ -62,19 +62,35 @@
       },
       {
         classes: 'govuk-table__cell',
-        text: location.currentCertifiedNormalAccommodation + " → " + location.certifiedNormalAccommodation
+        text: location.currentCertifiedNormalAccommodation
+          + (
+              (" → " + location.certifiedNormalAccommodation)
+                if location.currentCertifiedNormalAccommodation != location.certifiedNormalAccommodation
+            )
       },
       {
         classes: 'govuk-table__cell',
-        text: location.currentWorkingCapacity + " → " + location.workingCapacity
+        text: location.currentWorkingCapacity
+          + (
+              (" → " + location.workingCapacity)
+                if location.currentWorkingCapacity != location.workingCapacity
+            )
       },
       {
         classes: 'govuk-table__cell',
-        text: location.currentMaxCapacity + " → " + location.maxCapacity
+        text: location.currentMaxCapacity
+          + (
+              (" → " + location.maxCapacity)
+                if location.currentMaxCapacity != location.maxCapacity
+            )
       },
       {
         classes: 'govuk-table__cell',
-        text: (formatConstants(specialistCellTypes, location.specialistCellTypes) or '-') + " → " + (formatConstants(specialistCellTypes, location.specialistCellTypes) or '-')
+        text: (formatConstants(specialistCellTypes, location.currentSpecialistCellTypes, ', ') or '-')
+          + (
+              (" → " + (formatConstants(specialistCellTypes, location.specialistCellTypes, ', ') or '-'))
+                if (location.currentSpecialistCellTypes or []).toString() != (location.specialistCellTypes or []).toString()
+            )
       }
     ]), rows) %}
   {% endif %}
@@ -296,7 +312,26 @@
               },
               {
                 classes: 'govuk-table__header',
-                text: "0 → " + request.workingCapacityChange
+                text: request.locations[0].currentCertifiedNormalAccommodation
+                  + ((" → " + request.locations[0].certifiedNormalAccommodation)
+                    if request.locations[0].currentCertifiedNormalAccommodation != request.locations[0].certifiedNormalAccommodation)
+              },
+              {
+                classes: 'govuk-table__header',
+                text: request.locations[0].currentWorkingCapacity
+                  + ((" → " + request.locations[0].workingCapacity)
+                    if request.locations[0].currentWorkingCapacity != request.locations[0].workingCapacity)
+
+              },
+              {
+                classes: 'govuk-table__header',
+                text: request.locations[0].currentMaxCapacity
+                  + ((" → " + request.locations[0].maxCapacity)
+                    if request.locations[0].currentMaxCapacity != request.locations[0].maxCapacity)
+              },
+              {
+                classes: 'govuk-table__header',
+                text: ''
               }
             ]), locationTableRows) %}
           {% endif %}
@@ -307,7 +342,10 @@
             },
             head: [
               { text: "Location" },
-              { text: "Certified working capacity" }
+              { text: "Baseline CNA" },
+              { text: "Certified working capacity" },
+              { text: "Maximum capacity" },
+              { text: "Cell type" }
             ],
             rows: locationTableRows
           }) }}

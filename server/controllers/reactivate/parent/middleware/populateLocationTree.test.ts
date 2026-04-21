@@ -160,6 +160,7 @@ describe('populateLocationTree', () => {
       sessionModel: {
         get: (key: string) => sessionModelValues[key],
       },
+      params: {},
       services: {
         locationsService: {
           getResidentialSummary: (_token: string, prisonId: string, id: string) =>

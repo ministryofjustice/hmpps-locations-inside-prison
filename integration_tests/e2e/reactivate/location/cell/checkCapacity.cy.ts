@@ -4,8 +4,8 @@ import { setupStubs, location } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 import goToCheckCapacity from '../goToCheckCapacity'
 import EditCapacityPage from '../../../../pages/reactivate/location/editCapacity'
-import SetCellTypeTypePage from '../../../../pages/setCellType/type'
-import SetCellTypeSpecialPage from '../../../../pages/setCellType/special'
+import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
+import NoCertChangeConfirmPage from '../../../../pages/reactivate/location/noCertChangeConfirm'
 
 context('Certification Reactivation - Cell - Check capacity', () => {
   let page: CheckCapacityPage
@@ -32,22 +32,19 @@ context('Certification Reactivation - Cell - Check capacity', () => {
     page.testCellsTable([['A-1-001', '1', '1', '2', ['Accessible cell', 'Constant Supervision Cell']]])
   })
 
-  it('proceeds to check capacity on submit', () => {
-    page.submit()
+  it('proceeds to cert change disclaimer on submit', () => {
+    page.editCapacityLink(location.id).click()
+    Page.verifyOnPage(EditCapacityPage).submit({ capacities: [['1', '2', '2']] })
+    Page.verifyOnPage(CheckCapacityPage).submit()
 
-    Page.verifyOnPage(CheckCapacityPage)
+    // eslint-disable-next-line no-new
+    new CertChangeDisclaimerPage('Cell activation')
   })
 
-  context('when there is no working capacity change', () => {
+  context('when there are no cert changes', () => {
     it('proceeds to no cert change confirm on submit', () => {
-      page.editCapacityLink(location.id).click()
-      Page.verifyOnPage(EditCapacityPage)
-        .inputValues({ capacities: [['1', '0', '2']] })
-        .setCellType(0)
-        .click()
-      Page.verifyOnPage(SetCellTypeTypePage).submit({ special: true })
-      Page.verifyOnPage(SetCellTypeSpecialPage).submit({ type: 'BIOHAZARD_DIRTY_PROTEST' })
-      Page.verifyOnPage(CheckCapacityPage).submit()
+      page.submit()
+
       Page.verifyOnPage(NoCertChangeConfirmPage)
     })
   })

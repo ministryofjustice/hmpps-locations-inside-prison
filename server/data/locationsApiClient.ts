@@ -54,6 +54,27 @@ export default class LocationsApiClient extends BaseApiClient {
         path: '/certification/location/approve',
         requestType: 'put',
       }),
+      reactivationRequestApproval: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          topLevelLocationId: string
+          cascadeReactivation?: boolean
+          cellReactivationChanges?: {
+            [locationId: string]: {
+              capacity: {
+                workingCapacity: number
+                maxCapacity: number
+                certifiedNormalAccommodation: number
+              }
+              specialistCellTypes: string[]
+            }
+          }
+        }
+      >({
+        path: '/certification/location/reactivation-request-approval',
+        requestType: 'put',
+      }),
       reject: this.apiCall<
         CertificationApprovalRequest,
         null,
@@ -203,6 +224,7 @@ export default class LocationsApiClient extends BaseApiClient {
               capacity?: { maxCapacity?: number; workingCapacity?: number }
             }
           }
+          forceReactivation?: boolean
         }
       >({
         path: '/locations/bulk/reactivate',
@@ -350,7 +372,7 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     getLocation: this.apiCall<Location, { locationId: string; includeHistory: string }>({
       path: '/locations/:locationId',
-      queryParams: ['includeHistory'],
+      queryParams: ['includeHistory', 'includeCurrentCertificate'],
       requestType: 'get',
     }),
     getResidentialHierarchy: this.apiCall<ResidentialHierarchy[], { prisonId: string }>({

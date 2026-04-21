@@ -63,7 +63,6 @@ describe('adminNonResiSwitch', () => {
         backLink: '/admin/MDI',
         buttonText: 'Inactivate non-residential locations',
         cancelLink: '/admin/MDI',
-        cancelText: 'Cancel and return to prison configuration details',
         title: 'Update non-residential locations status',
         validationErrors: [],
       })

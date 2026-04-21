@@ -18,9 +18,11 @@
       {% if hasVisibleCards %}
         <div class="card-group govuk-grid-row">
           {% for cardDetails in cards -%}
-            <div class="govuk-grid-column-one-third card-group__item">
-              {{ card(cardDetails) }}
-            </div>
+            {% if cardDetails.visible %}
+              <div class="govuk-grid-column-one-third card-group__item">
+                {{ card(cardDetails) }}
+              </div>
+            {% endif %}
           {%- endfor %}
         </div>
       {% elif permissionMessage %}

@@ -36,36 +36,30 @@ export default function populateCards(locationsService: LocationsService) {
 
     res.locals.resiCards = [
       manageLocationsCard,
-      resiActive
-        ? {
-            clickable: true,
-            visible: true,
-            heading: 'View all inactive cells',
-            href: '/inactive-cells',
-            description: 'View details of all inactive cells in the establishment and reactivate them.',
-            'data-qa': 'inactive-cells-card',
-          }
-        : null,
-      resiActive
-        ? {
-            clickable: true,
-            visible: true,
-            heading: 'Archived locations',
-            href: '/archived-locations',
-            description: 'View locations that have been permanently deactivated as residential locations.',
-            'data-qa': 'archived-locations-card',
-          }
-        : null,
-      resiActive && certificationEnabled
-        ? {
-            clickable: true,
-            visible: true,
-            heading: 'Cell certificate',
-            href: '/cell-certificate/current',
-            description: 'View the current certificate and requested changes.',
-            'data-qa': 'cell-certificate-card',
-          }
-        : null,
+      {
+        clickable: true,
+        visible: resiActive,
+        heading: 'View all inactive cells',
+        href: '/inactive-cells',
+        description: 'View details of all inactive cells in the establishment and reactivate them.',
+        'data-qa': 'inactive-cells-card',
+      },
+      {
+        clickable: true,
+        visible: resiActive,
+        heading: 'Archived locations',
+        href: '/archived-locations',
+        description: 'View locations that have been permanently deactivated as residential locations.',
+        'data-qa': 'archived-locations-card',
+      },
+      {
+        clickable: true,
+        visible: resiActive && certificationEnabled,
+        heading: 'Cell certificate',
+        href: '/cell-certificate/current',
+        description: 'View the current certificate and requested changes.',
+        'data-qa': 'cell-certificate-card',
+      },
       {
         clickable: true,
         visible: req.canAccess('administer_residential'),
@@ -73,6 +67,25 @@ export default function populateCards(locationsService: LocationsService) {
         href: '/admin',
         description: 'Administer residential locations.',
         'data-qa': 'admin-card',
+      },
+      {
+        clickable: true,
+        visible: !config.production && process.env.NODE_ENV !== 'test',
+        heading: '[DEV] Set permissions',
+        href: '/dev-set-permissions',
+        description: 'Set current user permissions (local dev only).',
+        'data-qa': 'set-permissions-card',
+      },
+      {
+        clickable: true,
+        visible:
+          !config.production &&
+          process.env.NODE_ENV !== 'test' &&
+          res.locals.user.userRoles.includes('PERMISSION_OVERRIDE'),
+        heading: '[DEV] Reset permissions',
+        href: '/dev-reset-permissions',
+        description: 'Reset current user permissions (local dev only).',
+        'data-qa': 'reset-permissions-card',
       },
     ]
 

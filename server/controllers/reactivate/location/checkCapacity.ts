@@ -74,7 +74,7 @@ export default class CheckCapacity extends FormInitialStep {
             return
           }
 
-          const {id} = cell
+          const { id } = cell
           const workingCapacityKey = `workingCapacity-${id}`
           const baselineCnaKey = `baselineCna-${id}`
 
@@ -87,7 +87,9 @@ export default class CheckCapacity extends FormInitialStep {
           }
         })
 
-        const workingCapacityErrors = Object.keys(validationErrors).filter(key => key.startsWith('workingCapacity-')).length
+        const workingCapacityErrors = Object.keys(validationErrors).filter(key =>
+          key.startsWith('workingCapacity-'),
+        ).length
         const baselineCnaErrors = Object.keys(validationErrors).filter(key => key.startsWith('baselineCna-')).length
         if (workingCapacityErrors) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')

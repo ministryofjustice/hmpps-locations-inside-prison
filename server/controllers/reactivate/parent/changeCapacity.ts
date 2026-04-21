@@ -8,8 +8,8 @@ import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateParentChangeCapacity extends FormInitialStep {
   override middlewareSetup() {
-    super.middlewareSetup()
     this.use(this.populateCell)
+    super.middlewareSetup()
     this.use(this.resetErrors)
   }
 

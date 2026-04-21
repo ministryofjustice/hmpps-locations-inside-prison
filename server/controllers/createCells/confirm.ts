@@ -85,7 +85,6 @@ export default class ConfirmCreateCells extends FormInitialStep {
     locals.title = `Check and confirm the cell details`
     locals.titleCaption = `Create cells on ${locationType.toLowerCase()} ${localName || pathHierarchy}`
     locals.buttonText = `Create cells`
-    locals.cancelText = `Cancel`
 
     return locals
   }

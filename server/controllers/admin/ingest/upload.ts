@@ -21,7 +21,6 @@ export default class IngestUpload extends FormInitialStep {
       cancelLink: backLink,
       title: 'Upload cell cert data',
       buttonText: 'Upload',
-      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 

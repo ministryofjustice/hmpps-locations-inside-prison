@@ -1,7 +1,6 @@
 import Page from '../../../../pages/page'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
-import SubmitCertificationApprovalRequestPage
-  from '../../../../pages/commonTransactions/submitCertificationApprovalRequest'
+import SubmitCertificationApprovalRequestPage from '../../../../pages/commonTransactions/submitCertificationApprovalRequest'
 import goToSubmitCertificationApprovalRequest from '../goToSubmitCertificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../../../pages/cellCertificate/changeRequests'
 import { setupStubs, location } from './setupStubs'

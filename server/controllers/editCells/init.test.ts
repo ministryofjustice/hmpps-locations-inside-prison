@@ -44,6 +44,7 @@ describe('CreateCellsInit', () => {
                 workingCapacity: 2,
                 maxCapacity: 3,
               },
+              currentCellCertificate: undefined,
               inCellSanitation: true,
             }),
             buildDecoratedLocation({
@@ -57,6 +58,7 @@ describe('CreateCellsInit', () => {
                 workingCapacity: 2,
                 maxCapacity: 3,
               },
+              currentCellCertificate: undefined,
               inCellSanitation: false,
               specialistCellTypes: [],
             }),

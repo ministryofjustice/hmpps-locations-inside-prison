@@ -141,6 +141,7 @@ describe('Locations service', () => {
       await locationsService.getLocation('token', '481fc587-60f8-402b-804d-64462babddcc')
 
       expect(locationsApiClient.locations.getLocation).toHaveBeenCalledWith('token', {
+        includeCurrentCertificate: 'false',
         includeHistory: 'false',
         locationId: '481fc587-60f8-402b-804d-64462babddcc',
       })
@@ -150,6 +151,7 @@ describe('Locations service', () => {
       await locationsService.getLocation('token', '481fc587-60f8-402b-804d-64462babddcc', true)
 
       expect(locationsApiClient.locations.getLocation).toHaveBeenCalledWith('token', {
+        includeCurrentCertificate: 'false',
         includeHistory: 'true',
         locationId: '481fc587-60f8-402b-804d-64462babddcc',
       })
@@ -340,6 +342,7 @@ describe('Locations service', () => {
         locations: {
           'location-id': { capacity: { maxCapacity: 1, workingCapacity: 2 } },
         },
+        forceReactivation: false,
       })
     })
   })

@@ -39,8 +39,6 @@ export default class Review extends FormInitialStep {
       res.locals.locationMap[location.id] = location
     }
 
-    res.locals.cancelText = 'Cancel'
-
     await super._locals(req, res, next)
   }
 }

@@ -1,9 +1,11 @@
 import Page from '../../../../pages/page'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
-import { setupStubs, location } from './setupStubs'
+import { setupStubs, location, landing1 } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 import goToCheckCapacity from '../goToCheckCapacity'
+import EditCapacityPage from '../../../../pages/reactivate/location/editCapacity'
+import NoCertChangeConfirmPage from '../../../../pages/reactivate/location/noCertChangeConfirm'
 import capFirst from '../../../../../server/formatters/capFirst'
 
 context('Certification Reactivation - Wing - Check capacity', () => {
@@ -24,8 +26,7 @@ context('Certification Reactivation - Wing - Check capacity', () => {
   it('has a back link', () => {
     page.backLink().click()
 
-    // eslint-disable-next-line no-new
-    new CertChangeDisclaimerPage(`${capFirst(location.locationType.toLowerCase())} activation`)
+    Page.verifyOnPage(ViewLocationsShowPage)
   })
 
   it('displays the correct details for the cells', () => {
@@ -37,9 +38,20 @@ context('Certification Reactivation - Wing - Check capacity', () => {
     ])
   })
 
-  // it('proceeds to check capacity on submit', () => {
-  //   page.submit()
-  //
-  //   Page.verifyOnPage(CheckCapacityPage)
-  // })
+  it('proceeds to cert change disclaimer on submit', () => {
+    page.editCapacityLink(landing1.id).click()
+    Page.verifyOnPage(EditCapacityPage).submit({ capacities: [['1', '2', '2']] })
+    Page.verifyOnPage(CheckCapacityPage).submit()
+
+    // eslint-disable-next-line no-new
+    new CertChangeDisclaimerPage(`${capFirst(location.locationType.toLowerCase())} activation`)
+  })
+
+  context('when there are no cert changes', () => {
+    it('proceeds to no cert change confirm on submit', () => {
+      page.submit()
+
+      Page.verifyOnPage(NoCertChangeConfirmPage)
+    })
+  })
 })

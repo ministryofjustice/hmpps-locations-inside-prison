@@ -12,8 +12,8 @@ import populateLocation from '../../../middleware/populateLocation'
 import RemoveCellType from '../../../controllers/reactivate/location/removeCellType'
 import UpdateSignedOpCap from '../../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../../commonTransactions/submitCertificationApprovalRequest'
-import hasAnyWorkingCapacityChange from '../../../controllers/reactivate/location/util/hasAnyWorkingCapacityChange'
 import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
+import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/:cellId/set-cell-type/init') {
@@ -184,7 +184,7 @@ const steps: FormWizard.Steps = {
     controller: ReactivateLocationInit,
   },
   '/check-capacity': {
-    next: [{ fn: hasAnyWorkingCapacityChange, next: 'cert-change-disclaimer' }, 'no-cert-change-confirm'],
+    next: [{ fn: hasAnyCertCapacityChange, next: 'cert-change-disclaimer' }, 'no-cert-change-confirm'],
     fields: ['baselineCna', 'workingCapacity'],
     controller: CheckCapacity,
   },

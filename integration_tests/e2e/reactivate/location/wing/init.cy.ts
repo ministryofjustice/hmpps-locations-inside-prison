@@ -2,7 +2,7 @@ import Page from '../../../../pages/page'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import AuthSignInPage from '../../../../pages/authSignIn'
 import { setupStubs, location } from './setupStubs'
-import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
+import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 
 context('Certification Reactivation - Wing - Init', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -31,10 +31,10 @@ context('Certification Reactivation - Wing - Init', () => {
       cy.signIn()
     })
 
-    it('displays the cert-change-disclaimer page', () => {
+    it('displays the check-capacity page', () => {
       cy.visit(`/reactivate/location/${location.id}/`)
-      // eslint-disable-next-line no-new
-      new CertChangeDisclaimerPage('Wing activation')
+
+      Page.verifyOnPage(CheckCapacityPage)
     })
   })
 })

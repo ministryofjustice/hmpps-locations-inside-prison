@@ -41,6 +41,7 @@ describe('getLocationAttributesIncludePending', () => {
         cellMark: 'B',
         inCellSanitation: false,
       },
+      currentCellCertificate: undefined,
       capacity: {
         maxCapacity: 10,
         workingCapacity: 8,
@@ -65,6 +66,7 @@ describe('getLocationAttributesIncludePending', () => {
       pendingChanges: {
         maxCapacity: 15,
       },
+      currentCellCertificate: undefined,
       capacity: {
         maxCapacity: 10,
         workingCapacity: 8,
@@ -111,6 +113,7 @@ describe('getLocationAttributesIncludePending', () => {
       pendingChanges: {
         workingCapacity: 99,
       },
+      currentCellCertificate: undefined,
       capacity: {
         maxCapacity: 10,
         workingCapacity: 8,

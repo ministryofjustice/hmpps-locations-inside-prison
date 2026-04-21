@@ -1,6 +1,7 @@
 export declare interface CertificateLocation {
   id: string
   locationCode: string
+  currentCellMark?: string
   cellMark?: string
   localName?: string
   pathHierarchy: string
@@ -14,6 +15,7 @@ export declare interface CertificateLocation {
   inCellSanitation?: boolean
   locationType: LocationType
   accommodationTypes?: string[]
+  currentSpecialistCellTypes?: string[]
   specialistCellTypes?: string[]
   usedFor?: string[]
   convertedCellType?: string[]

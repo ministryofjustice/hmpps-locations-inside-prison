@@ -64,7 +64,6 @@ interface AllLocals {
   canAccess: (permission: string) => boolean
   cancelClasses: string
   cancelLink: string
-  cancelText: string
   changeLinks: { [field: string]: string }
   resiCards: card[]
   nonResiCards: card[]

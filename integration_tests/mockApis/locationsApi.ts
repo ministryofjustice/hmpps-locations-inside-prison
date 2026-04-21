@@ -41,6 +41,21 @@ const stubLocationsCertificationLocationRequestApproval = () =>
     },
   })
 
+const stubLocationsCertificationLocationReactivationRequestApproval = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/location/reactivation-request-approval',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubLocationsCertificationLocationApprove = () =>
   stubFor({
     request: {
@@ -576,6 +591,7 @@ const stubLocationsResidentialSummaryForCreateWing = (
         maxCapacity: 0,
         certifiedNormalAccommodation: 0,
       },
+      currentCellCertificate: undefined,
       oldWorkingCapacity: 0,
       certification: {
         certified: false,
@@ -774,7 +790,7 @@ const stubLocations = (location: Location) =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: `/locations-api/locations/${location.id}\\?includeHistory=(false|true)`,
+      urlPattern: `/locations-api/locations/${location.id}\\?includeHistory=(false|true)&includeCurrentCertificate=(false|true)`,
     },
     response: {
       status: 200,
@@ -1408,6 +1424,7 @@ const allStubs = {
   stubLocationsCertificationLocationApprove,
   stubLocationsCertificationLocationReject,
   stubLocationsCertificationLocationWithdraw,
+  stubLocationsCertificationLocationReactivationRequestApproval,
   stubLocationsCertificationLocationRequestApproval,
   stubLocationsCertificationRequestApprovals,
   stubLocationsCertificationRequestApprovalsPrison,
