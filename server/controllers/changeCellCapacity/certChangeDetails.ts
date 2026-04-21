@@ -12,7 +12,6 @@ export default class CertChangeDetails extends FormInitialStep {
       ...super.locals(req, res),
       removeHeadingSpacing: true,
       titleCaption: capFirst(decoratedLocation.displayName),
-      cancelText: 'Cancel',
       cancelLink: `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`,
     }
   }

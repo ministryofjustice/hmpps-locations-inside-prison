@@ -325,7 +325,7 @@ export default class Confirm extends FormInitialStep {
       )
 
       proposedCertificationApprovalRequests.push({
-        approvalType: 'CAPACITY',
+        approvalType: 'CAPACITY_CHANGE',
         locationId: locals.location.id,
         locationKey: locals.location.key,
         prisonId: locals.prisonId,
@@ -334,8 +334,8 @@ export default class Confirm extends FormInitialStep {
         workingCapacityChange: newWorkingCapacity - workingCapacity,
         maxCapacityChange: newMaxCapacity - maxCapacity,
         locations: [
-          await locationToCertificationLocation(req, locals.location, location => ({
-            ...location,
+          await locationToCertificationLocation(req, locals.location, (_originalLocation, certificateLocation) => ({
+            ...certificateLocation,
             certifiedNormalAccommodation: newBaselineCna,
             workingCapacity: newWorkingCapacity,
             maxCapacity: newMaxCapacity,
