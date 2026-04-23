@@ -357,7 +357,7 @@ context('Cell Certificate - Change Requests - Review', () => {
       })
 
       it('Correctly displays the change request info and approve/reject options', () => {
-        cy.get('h1').should('contain', 'Cell capacity request details')
+        cy.get('h1').should('contain', 'Review cell capacity request')
 
         testGovukSummaryList('overview-list-CAPACITY_CHANGE', [
           ['Location', 'A-1-001'],
