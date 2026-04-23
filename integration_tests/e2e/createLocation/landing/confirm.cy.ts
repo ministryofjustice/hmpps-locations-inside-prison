@@ -17,6 +17,8 @@ context('Create Landing Confirm', () => {
     locationType: 'LANDING',
     status: 'DRAFT',
     localName: 'testL',
+    level: 2,
+    leafLevel: false,
   })
   const createdLocationResidentialSummary = {
     parentLocation: newLandingLocation,
