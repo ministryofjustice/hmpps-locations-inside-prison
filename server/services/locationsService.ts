@@ -315,6 +315,7 @@ export default class LocationsService {
       workingCapacity?: number
       certifiedNormalAccommodation?: number
       reasonForChange?: string
+      temporaryWorkingCapacityChange?: boolean
     },
   ) {
     return this.locationsApiClient.locations.updateCapacity(token, { locationId }, capacities)

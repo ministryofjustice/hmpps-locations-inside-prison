@@ -145,7 +145,7 @@ describe('ChangeUsedForDetails', () => {
             ],
           },
         },
-        leafLevel: false,
+        leafLevel: true,
         title: 'Change what the location is used for',
         titleCaption: 'A-1-001',
         validationErrors: [],

@@ -1,0 +1,12 @@
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+
+{% macro workingCapacityMismatchBanner(decoratedResidentialSummary) %}
+  {{ mojAlert({
+    variant: "information",
+    title: "Check cell’s working capacity",
+    showTitleAsHeading: true,
+    dismissible: false,
+    html: "The cell’s working capacity does not match the cell certificate. <a href='/location/" +
+      decoratedResidentialSummary.location.id + "/working-capacity-mismatch'>Review working capacity</a>"
+  }) }}
+{% endmacro %}

@@ -38,6 +38,16 @@ describe('ChangeCellCapacity', () => {
     }
     deepRes = {
       locals: {
+        constants: {
+          specialistCellTypes: [
+            {
+              key: 'BIOHAZARD_DIRTY_PROTEST',
+              description: 'Biohazard / dirty protest cell',
+              attributes: { affectsCapacity: true },
+            },
+            { key: 'ACCESSIBLE_CELL', description: 'Accessible cell', attributes: { affectsCapacity: false } },
+          ],
+        },
         errorlist: [],
         decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -79,7 +89,30 @@ describe('ChangeCellCapacity', () => {
       const callback = jest.fn()
       controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(callback).toHaveBeenCalledWith({
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workingCapacity: {
+            args: {},
+            key: 'workingCapacity',
+            type: 'nonZeroForNormalCell',
+          },
+        }),
+      )
+    })
+
+    it('allows zero working capacity for special accommodation cells', () => {
+      deepRes.locals.decoratedLocation = buildDecoratedLocation({
+        id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        capacity: { maxCapacity: 2, workingCapacity: 2 },
+        prisonId: 'MDI',
+        accommodationTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+        specialistCellTypes: ['ACCESSIBLE_CELL'],
+      })
+      deepReq.form.values = { maxCapacity: '2', workingCapacity: '0' }
+      const callback = jest.fn()
+      controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).not.toHaveBeenCalledWith({
         workingCapacity: {
           args: {},
           key: 'workingCapacity',

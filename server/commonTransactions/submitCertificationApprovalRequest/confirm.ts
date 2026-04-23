@@ -49,7 +49,6 @@ async function locationToCertificationLocation(
   }
 
   let locationWithCertification: Location
-  // Reactivate requires the use of getResidentialSummary to populate currentCertificate on the location
   if (!location.leafLevel) {
     const locationSummary = (await req.services.locationsService.getResidentialSummary(
       req.session.systemToken,
@@ -64,7 +63,7 @@ async function locationToCertificationLocation(
         locationToCertificationLocation(req, subLocation, modifier),
       ),
     )
-  } else if (['reactivate', 'deactivate'].includes(req.form.options.name)) {
+  } else {
     locationWithCertification = await req.services.locationsService.getLocation(
       req.session.systemToken,
       location.id,
@@ -294,6 +293,7 @@ export default class Confirm extends FormInitialStep {
       const explanation = sessionModel.get<string>('explanation')
       proposedCertificationApprovalRequests.push({
         approvalType: 'CELL_MARK',
+        prisonId: locals.location.prisonId,
         locationId: locals.location.id,
         locationKey: locals.location.key,
         locations: [await locationToCertificationLocation(req, locals.location)],
@@ -311,6 +311,7 @@ export default class Confirm extends FormInitialStep {
       const explanation = sessionModel.get<string>('explanation')
       proposedCertificationApprovalRequests.push({
         approvalType: 'CELL_SANITATION',
+        prisonId: locals.location.prisonId,
         locationId: locals.location.id,
         locationKey: locals.location.key,
         locations: [await locationToCertificationLocation(req, locals.location)],
@@ -355,6 +356,25 @@ export default class Confirm extends FormInitialStep {
       locals.changeLinks = {
         reasonForChange: changeLink,
       }
+    } else if (req.form.options.name === 'working-capacity-mismatch') {
+      const { location } = res.locals
+      const certLocation = await locationToCertificationLocation(
+        req,
+        location,
+        (originalLocation, certificateLocation) => ({
+          ...certificateLocation,
+          workingCapacity: originalLocation.capacity.workingCapacity,
+        }),
+      )
+      const workingCapacityChange = certLocation.workingCapacity - certLocation.currentWorkingCapacity
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'CAPACITY_CHANGE',
+        prisonId: location.prisonId,
+        locationId: location.id,
+        locationKey: location.key,
+        workingCapacityChange,
+        locations: [certLocation],
+      })
     }
 
     if (proposedSignedOpCapChange) {
@@ -433,16 +453,14 @@ export default class Confirm extends FormInitialStep {
     }
 
     if (approvalType === 'CAPACITY_CHANGE') {
-      const explanation = reasonForChange
-      const capacities = {
-        maxCapacity: locations[0].maxCapacity,
-        workingCapacity: locations[0].workingCapacity,
-        certifiedNormalAccommodation: locations[0].certifiedNormalAccommodation,
-      }
+      const { maxCapacity, workingCapacity, certifiedNormalAccommodation } = locations[0]
+
       return (
         await locationsService.updateCapacity(systemToken, locationId, {
-          ...capacities,
-          reasonForChange: explanation,
+          maxCapacity,
+          workingCapacity,
+          certifiedNormalAccommodation,
+          reasonForChange,
         })
       ).pendingApprovalRequestId
     }

@@ -59,7 +59,13 @@ export default class ConfirmWorkingCapacity extends FormWizard.Controller {
 
       const capacities: Parameters<LocationsService['updateCapacity']>[2] = {
         workingCapacity: Number(req.sessionModel.get('workingCapacity')),
+        maxCapacity: Number(req.sessionModel.get('maxCapacity')),
       }
+
+      if (!res.locals.fields.baselineCna.removed) {
+        capacities.certifiedNormalAccommodation = Number(req.sessionModel.get('baselineCna'))
+      }
+
       await locationsService.updateCapacity(req.session.systemToken, decoratedLocation.id, capacities)
 
       req.services.analyticsService.sendEvent(req, 'change_cell_capacity', { prison_id: decoratedLocation.prisonId })

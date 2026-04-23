@@ -420,6 +420,7 @@ export default class LocationsApiClient extends BaseApiClient {
         workingCapacity?: number
         certifiedNormalAccommodation?: number
         reasonForChange?: string
+        temporaryWorkingCapacityChange?: boolean
       }
     >({
       path: '/locations/:locationId/capacity',

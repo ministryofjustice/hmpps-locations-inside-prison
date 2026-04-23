@@ -7,6 +7,7 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 import canEditCna from '../../utils/canEditCna'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
+import addConstantToLocals from '../../middleware/addConstantToLocals'
 
 function isCertActive(prisonConfiguration: { certificationApprovalRequired?: string }) {
   return prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
@@ -20,6 +21,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
+    this.use(addConstantToLocals('specialistCellTypes'))
   }
 
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
@@ -50,10 +52,18 @@ export default class ChangeCellCapacity extends FormInitialStep {
       }
 
       if (!errors.workingCapacity) {
+        const isNotSpecialType =
+          !specialistCellTypes.length ||
+          !specialistCellTypes.find(type =>
+            res.locals.constants.specialistCellTypes.find(
+              constType => constType.key === type && constType.attributes.affectsCapacity,
+            ),
+          )
+
         if (
           values?.workingCapacity === '0' &&
           accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
-          !specialistCellTypes.length
+          isNotSpecialType
         ) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
         } else if (

@@ -1,0 +1,25 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block fields %}
+  {{ govukSummaryList({
+    card: {
+      title: {
+        text: "Capacity"
+      }
+    },
+    rows: [
+      {
+        key: { text: "Working capacity" },
+        value: { text: locationResidentialSummary.parentLocation.currentCellCertificate.workingCapacity }
+      }
+    ]
+  }) }}
+
+  <div class="govuk-!-padding-bottom-2 change-summary">
+    <h2 class="govuk-heading-m">Change to cell's capacity</h2>
+
+    <p>{{ changeSummary | safe }}</p>
+  </div>
+{% endblock %}
