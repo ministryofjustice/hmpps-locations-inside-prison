@@ -344,7 +344,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           workingCapLink.linkAriaLabel = 'Change working capacity'
           maxCapLink.linkAriaLabel = 'Change maximum capacity'
 
-          if (canEditCna(prisonConfiguration, residentialSummary.location)) {
+          if (canEditCna(prisonConfiguration)) {
             Object.assign(cnaLink, changeLink)
             cnaLink.linkAriaLabel = 'Change CNA'
           }

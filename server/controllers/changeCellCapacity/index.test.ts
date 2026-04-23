@@ -5,6 +5,7 @@ import ChangeCellCapacity from './index'
 import fields from '../../routes/changeCellCapacity/fields'
 import PrisonerFactory from '../../testutils/factories/prisoner'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import mockModel from '../../testutils/mockModel'
 
 describe('ChangeCellCapacity', () => {
   const controller = new ChangeCellCapacity({ route: '/' })
@@ -29,12 +30,7 @@ describe('ChangeCellCapacity', () => {
         referrerUrl: '/referrer-url',
         systemToken: 'token',
       },
-      sessionModel: {
-        get: jest.fn(
-          (fieldName?: string) => ({ maxCapacity: '3', workingCapacity: '1' })[fieldName],
-        ) as FormWizard.Request['sessionModel']['get'],
-        set: jest.fn(),
-      },
+      sessionModel: mockModel({ maxCapacity: '3', workingCapacity: '1' }),
     }
     deepRes = {
       locals: {
@@ -216,21 +212,14 @@ describe('ChangeCellCapacity', () => {
       expect(deepRes.redirect).not.toHaveBeenCalled()
     })
 
-    it('sets cnaOrMaxCapChanged flag when max capacity changes', () => {
+    it('sets onlyWorkingCapChanged flag to false when max capacity changes', () => {
       deepReq.form.values = { baselineCna: '2', maxCapacity: '9', workingCapacity: '2' }
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('cnaOrMaxCapChanged', true)
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('onlyWorkingCapChanged', false)
     })
 
-    it('sets cnaOrMaxCapChanged flag when CNA changes', () => {
-      deepReq.form.values = { baselineCna: '3', maxCapacity: '2', workingCapacity: '2' }
-      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
-
-      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('cnaOrMaxCapChanged', true)
-    })
-
-    it('sets onlyWorkingCapChanged flag when only working capacity changes', () => {
+    it('sets onlyWorkingCapChanged flag to true when only working capacity changes', () => {
       deepReq.form.values = { baselineCna: '2', maxCapacity: '2', workingCapacity: '1' }
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
@@ -253,8 +242,6 @@ describe('ChangeCellCapacity', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/referrer-url',
-        cancelLink: '/referrer-url',
         fields,
         validationErrors: [
           {
@@ -264,8 +251,6 @@ describe('ChangeCellCapacity', () => {
         ],
         insetText:
           'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a baseline certified normal accommodation and working capacity of 0.',
-        title: 'Change cell capacity',
-        titleCaption: 'Cell A-1-001',
       })
     })
 

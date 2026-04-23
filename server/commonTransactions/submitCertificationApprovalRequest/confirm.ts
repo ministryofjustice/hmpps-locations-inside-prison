@@ -9,13 +9,12 @@ import { CertificateLocation } from '../../data/types/locationsApi/certificateLo
 import { notificationGroups, NotificationType } from '../../services/notificationService'
 import config from '../../config'
 import { getUserEmails, sendNotification } from '../../utils/notificationHelpers'
-import displayName from '../../formatters/displayName'
-import capFirst from '../../formatters/capFirst'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMap'
 import LocationsService from '../../services/locationsService'
 import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
+import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
 
 function findCells(location: CertificateLocation): CertificateLocation[] {
   if (location.locationType === 'CELL') {
@@ -126,6 +125,7 @@ export default class Confirm extends FormInitialStep {
       ]),
     )
     this.use(this.generateRequests)
+    this.use(populateTitleCaptionFromLocation)
   }
 
   async conditionalPopulateLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -138,12 +138,8 @@ export default class Confirm extends FormInitialStep {
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location } = res.locals
-    const { locationsService } = req.services
-    const { systemToken } = req.session
 
     if (location) {
-      res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
-
       await addLocationsToLocationMap([location])(req, res, null)
     }
 

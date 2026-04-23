@@ -49,7 +49,7 @@ const steps: FormWizard.Steps = {
     controller: ReviewCellCapacity,
     next: [
       {
-        fn: (_req, res) => canEditCna(res.locals.prisonConfiguration, res.locals.decoratedLocation),
+        fn: (_req, res) => canEditCna(res.locals.prisonConfiguration),
         next: 'confirm-skip',
       },
       'confirm',

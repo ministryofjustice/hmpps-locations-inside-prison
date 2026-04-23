@@ -5,7 +5,6 @@ import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
 import populatePrisonAndLocationId from '../../middleware/populatePrisonAndLocationId'
-import getLocationResidentialSummary from '../../controllers/reactivate/parent/middleware/getLocationResidentialSummary'
 import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
 
 const router = express.Router({ mergeParams: true })
