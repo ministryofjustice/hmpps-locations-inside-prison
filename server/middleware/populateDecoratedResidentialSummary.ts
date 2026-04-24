@@ -4,6 +4,7 @@ import formatDaysAgo from '../formatters/formatDaysAgo'
 import decorateLocation from '../decorators/location'
 import { SummaryListRow } from '../@types/govuk'
 import { DecoratedLocation } from '../decorators/decoratedLocation'
+import canEditCna from '../utils/canEditCna'
 import getLocationAttributesIncludePending from '../utils/getLocationAttributesIncludePending'
 import { PrisonConfiguration } from '../data/types/locationsApi'
 
@@ -343,7 +344,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
           workingCapLink.linkAriaLabel = 'Change working capacity'
           maxCapLink.linkAriaLabel = 'Change maximum capacity'
 
-          if (prisonConfiguration.certificationApprovalRequired === 'ACTIVE') {
+          if (canEditCna(prisonConfiguration)) {
             Object.assign(cnaLink, changeLink)
             cnaLink.linkAriaLabel = 'Change CNA'
           }

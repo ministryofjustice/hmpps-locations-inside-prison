@@ -1,14 +1,13 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import backUrl from '../../utils/backUrl'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
 import canEditCna from '../../utils/canEditCna'
 import LocationsService from '../../services/locationsService'
+import FormInitialStep from '../base/formInitialStep'
 
-export default class ConfirmCellCapacity extends FormWizard.Controller {
+export default class ConfirmCellCapacity extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
@@ -30,7 +29,6 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
@@ -54,15 +52,9 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/location/${locationId}/change-cell-capacity/change` })
-
     return {
-      backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
-      title: `Confirm cell capacity`,
-      titleCaption: capFirst(decoratedLocation.displayName),
-      buttonText: `Update cell capacity`,
+      buttonText: 'Update cell capacity',
     }
   }
 
@@ -75,9 +67,15 @@ export default class ConfirmCellCapacity extends FormWizard.Controller {
         maxCapacity: Number(req.sessionModel.get('maxCapacity')),
         workingCapacity: Number(req.sessionModel.get('workingCapacity')),
       }
-      if (canEditCna(prisonConfiguration, decoratedLocation)) {
+
+      if (req.sessionModel.get<boolean>('onlyWorkingCapChanged')) {
+        capacities.temporaryWorkingCapacityChange = true
+        capacities.certifiedNormalAccommodation = decoratedLocation.capacity.certifiedNormalAccommodation
+        capacities.maxCapacity = decoratedLocation.capacity.maxCapacity
+      } else if (canEditCna(prisonConfiguration)) {
         capacities.certifiedNormalAccommodation = Number(req.sessionModel.get('baselineCna'))
       }
+
       await locationsService.updateCapacity(req.session.systemToken, decoratedLocation.id, capacities)
 
       req.services.analyticsService.sendEvent(req, 'change_cell_capacity', { prison_id: decoratedLocation.prisonId })

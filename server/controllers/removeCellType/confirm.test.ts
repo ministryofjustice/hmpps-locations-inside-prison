@@ -92,7 +92,7 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
   describe('saveValues', () => {
     describe('when !canEditCna', () => {
       beforeEach(() => {
-        deepRes.locals.decoratedLocation.status = 'ACTIVE'
+        deepRes.locals.prisonConfiguration.certificationApprovalRequired = 'INACTIVE'
       })
 
       it('updates the capacity without cna and then the cell types via the locations API', async () => {

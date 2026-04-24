@@ -15,6 +15,8 @@ context('Create Wing Confirm', () => {
     locationType: 'WING',
     status: 'DRAFT',
     localName: 'testW',
+    level: 1,
+    leafLevel: false,
   })
   const createdLocationResidentialSummary = {
     parentLocation: newWingLocation,

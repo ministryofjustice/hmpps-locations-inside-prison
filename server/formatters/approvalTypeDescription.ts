@@ -4,7 +4,7 @@ import { Location } from '../data/types/locationsApi'
 import capFirst from './capFirst'
 
 const approvalTypeMap: { [key: string]: string } = {
-  CAPACITY_CHANGE: 'Change cell capacity',
+  CAPACITY_CHANGE: 'Cell capacity',
   CELL_MARK: 'Change cell door number',
   CELL_SANITATION: 'Change cell sanitation',
   DRAFT: 'Add new locations to certificate',

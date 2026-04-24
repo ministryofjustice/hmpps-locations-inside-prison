@@ -25,6 +25,8 @@ const otherDraftWing = LocationFactory.build({
   },
   currentCellCertificate: undefined,
   numberOfCellLocations: 10,
+  level: 1,
+  leafLevel: false,
 })
 const draftWing = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000200',
@@ -46,6 +48,8 @@ const draftWing = LocationFactory.build({
   numberOfCellLocations: 10,
   specialistCellTypes: [],
   inCellSanitation: undefined,
+  level: 1,
+  leafLevel: false,
 })
 const draftLanding = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000210',
@@ -67,6 +71,8 @@ const draftLanding = LocationFactory.build({
   numberOfCellLocations: 5,
   specialistCellTypes: [],
   inCellSanitation: undefined,
+  level: 2,
+  leafLevel: false,
 })
 const draftCell1 = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000211',

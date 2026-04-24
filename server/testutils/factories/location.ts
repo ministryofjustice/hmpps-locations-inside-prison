@@ -60,7 +60,7 @@ const LocationFactory = Factory.define<Location>(() => {
     lastModifiedDate: '2021-07-05T10:35:17',
     key: 'TST-A-1-001',
     isResidential: true,
-    leafLevel: false,
+    leafLevel: true,
     locked: false,
     level: 3,
     sortName: 'A-1-001',

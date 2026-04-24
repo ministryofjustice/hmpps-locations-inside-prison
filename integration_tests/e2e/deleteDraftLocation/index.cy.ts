@@ -13,6 +13,8 @@ context('Delete draft location', () => {
     status: 'DRAFT',
     active: false,
     localName: 'draftW',
+    level: 1,
+    leafLevel: false,
   })
 
   const activeWing = LocationFactory.build({
@@ -23,6 +25,8 @@ context('Delete draft location', () => {
     status: 'ACTIVE',
     active: true,
     localName: 'activeW',
+    level: 1,
+    leafLevel: false,
   })
 
   const draftCell = LocationFactory.build({

@@ -7,6 +7,7 @@
 {% from "../../macros/draftLocationBanner.njk" import draftLocationBanner %}
 {% from "../../macros/lockedLocationBanner.njk" import lockedLocationBanner %}
 {% from "../../macros/inactiveLocationBanner.njk" import inactiveLocationBanner %}
+{% from "../../macros/workingCapacityMismatchBanner.njk" import workingCapacityMismatchBanner %}
 {% from "../../macros/locationDetails.njk" import locationDetails %}
 {% from "../../macros/locationsTable.njk" import locationsTable %}
 {% from "../../macros/locationStatusTag.njk" import locationStatusTag %}
@@ -58,9 +59,16 @@
         {% endif %}
 
         {% if decoratedResidentialSummary.location.status.includes('INACTIVE') %}
-          {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess, prisonConfiguration.certificationApprovalRequired == 'ACTIVE') }}
-        {% elseif decoratedResidentialSummary.location.status == 'DRAFT' %}
+          {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess, prisonConfiguration.certificationApprovalRequired === 'ACTIVE') }}
+        {% elseif decoratedResidentialSummary.location.status === 'DRAFT' %}
           {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
+        {% elseif decoratedResidentialSummary.location.status === 'ACTIVE' and
+          decoratedResidentialSummary.location.raw.locationType === 'CELL' and
+          decoratedResidentialSummary.location.currentCellCertificate and
+          decoratedResidentialSummary.location.capacity.workingCapacity !== decoratedResidentialSummary.location.currentCellCertificate.workingCapacity and
+          canAccess('change_cell_capacity')
+        %}
+          {{ workingCapacityMismatchBanner(decoratedResidentialSummary) }}
         {% endif %}
 
         {% if decoratedResidentialSummary.summaryCards | length %}

@@ -47,6 +47,7 @@ import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocation
 import config from '../config'
 import FormInitialStep from '../controllers/base/formInitialStep'
 import { permissionNameMap } from '../lib/permissions'
+import workingCapacityMismatch from './workingCapacityMismatch'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -101,6 +102,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/remove-local-name', removeLocalNameRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
+  router.use('/location/:locationId/working-capacity-mismatch', workingCapacityMismatch)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
 

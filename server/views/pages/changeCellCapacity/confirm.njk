@@ -16,7 +16,7 @@
       {
         key: { text: "Baseline certified normal accommodation (CNA)" },
         value: { text: values.baselineCna }
-      } if values.baselineCna != '',
+      } if values.baselineCna != '' and values.baselineCna != decoratedLocation.capacity.certifiedNormalAccommodation,
       {
         key: { text: "Working capacity" },
         value: { text: values.workingCapacity }
@@ -24,7 +24,7 @@
       {
         key: { text: "Maximum capacity" },
         value: { text: values.maxCapacity }
-      }
+      } if  values.maxCapacity != decoratedLocation.capacity.maxCapacity
     ]
   }) }}
 

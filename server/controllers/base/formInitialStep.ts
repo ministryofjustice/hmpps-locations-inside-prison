@@ -85,7 +85,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       const formValues = { ...values }
 
       Object.keys(initialValues).forEach(fieldName => {
-        if (formValues[fieldName] === undefined) {
+        if (formValues[fieldName] === undefined || req.form.options.fields[fieldName].removed) {
           formValues[fieldName] = initialValues[fieldName]
         }
       })

@@ -11,6 +11,8 @@ const existingWingLocation = LocationFactory.build({
   parentId: undefined,
   locationType: 'WING',
   localName: undefined,
+  level: 1,
+  leafLevel: false,
 })
 const existingLandingLocation = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000003',
@@ -18,6 +20,8 @@ const existingLandingLocation = LocationFactory.build({
   parentId: '7e570000-0000-1000-8000-000000000002',
   locationType: 'LANDING',
   localName: undefined,
+  level: 2,
+  leafLevel: false,
 })
 const residentialSummary: LocationResidentialSummary = {
   parentLocation: existingWingLocation,

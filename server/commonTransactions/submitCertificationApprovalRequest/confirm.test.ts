@@ -22,21 +22,7 @@ describe('Confirm', () => {
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   let next: NextFunction
-  const locationsService = {
-    getAccommodationTypes: jest.fn().mockResolvedValue([]),
-    getLocation: jest.fn(),
-    getSpecialistCellTypes: jest.fn().mockResolvedValue([]),
-    getUsedForTypes: jest.fn().mockResolvedValue([]),
-    getResidentialSummary: jest.fn().mockResolvedValue({
-      subLocations: [],
-    } as any),
-    createCertificationRequestForSignedOpCap: jest.fn().mockResolvedValue({ id: 'SIGNED_OP_CAP-id' } as any),
-    createCertificationRequestForLocation: jest.fn().mockImplementation((_token, type) => ({ id: `${type}-id` })),
-    updateCellSanitation: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_SANITATION-id' } as any),
-    updateCellMark: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_MARK-id' } as any),
-    requestReactivation: jest.fn().mockResolvedValue({ id: 'REACTIVATION-id' } as any),
-    deactivateTemporary: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'DEACTIVATION-id' } as any),
-  } as unknown as jest.Mocked<LocationsService>
+  let locationsService: jest.Mocked<LocationsService>
   const manageUsersService = {} as jest.Mocked<ManageUsersService>
   const notifyService = {} as jest.Mocked<NotificationService>
 
@@ -48,7 +34,7 @@ describe('Confirm', () => {
     {
       approvalRequestData: {
         approvalType: 'SIGNED_OP_CAP',
-        prisonId: 'MDI',
+        prisonId: 'TST',
         currentSignedOperationCapacity: 200,
         signedOperationCapacityChange: 50,
         reasonForChange: 'New location built',
@@ -74,7 +60,7 @@ describe('Confirm', () => {
       approvalRequestData: {
         approvalType: 'DRAFT',
         locationId: 'draftLocationId',
-        prisonId: 'MDI',
+        prisonId: 'TST',
         locations: [
           CertificateLocationFactory.build({
             id: 'draftLocationId',
@@ -116,9 +102,9 @@ describe('Confirm', () => {
           status: 'DRAFT',
           cellMark: undefined,
           level: 1,
+          leafLevel: false,
           inCellSanitation: false,
           currentCellCertificate: undefined,
-          leafLevel: false,
         })
         const landing = LocationFactory.build({
           parentId: wing.id,
@@ -129,9 +115,9 @@ describe('Confirm', () => {
           status: 'DRAFT',
           cellMark: undefined,
           level: 2,
+          leafLevel: false,
           inCellSanitation: false,
           currentCellCertificate: undefined,
-          leafLevel: false,
         })
         const cell = LocationFactory.build({
           parentId: landing.id,
@@ -144,25 +130,24 @@ describe('Confirm', () => {
           currentCellCertificate: undefined,
         })
         deepRes.locals.location = wing
-        locationsService.getResidentialSummary
-          .mockResolvedValueOnce(
-            LocationResidentialSummaryFactory.build({
-              parentLocation: wing,
-              subLocations: [landing],
-            }),
-          )
-          .mockResolvedValueOnce(
-            LocationResidentialSummaryFactory.build({
-              parentLocation: landing,
-              subLocations: [cell],
-            }),
-          )
-          .mockResolvedValueOnce(
-            LocationResidentialSummaryFactory.build({
-              parentLocation: cell,
-              subLocations: [],
-            }),
-          )
+        locationsService.getResidentialSummary.mockImplementation((_token, _prisonId, id) =>
+          Promise.resolve(
+            {
+              [wing.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: wing,
+                subLocations: [landing],
+              }),
+              [landing.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: landing,
+                subLocations: [cell],
+              }),
+              [cell.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: cell,
+                subLocations: [],
+              }),
+            }[id],
+          ),
+        )
       },
       checkSaveValues: approvalRequestData =>
         expect(locationsService.createCertificationRequestForLocation).toHaveBeenCalledWith(
@@ -185,7 +170,7 @@ describe('Confirm', () => {
           }),
         ],
         planetFmReference: '12345678',
-        prisonId: 'MDI',
+        prisonId: 'TST',
         proposedReactivationDate: '2027-01-10',
         reasonForChange: 'Future cell integrity uncertain',
         workingCapacityChange: -2,
@@ -204,12 +189,6 @@ describe('Confirm', () => {
         })
         deepRes.locals.location = location
         locationsService.getLocation.mockResolvedValueOnce(location)
-        locationsService.getResidentialSummary.mockResolvedValueOnce(
-          LocationResidentialSummaryFactory.build({
-            parentLocation: location,
-            subLocations: [],
-          }),
-        )
       },
       checkSaveValues: approvalRequestData =>
         expect(locationsService.deactivateTemporary).toHaveBeenCalledWith(
@@ -226,6 +205,7 @@ describe('Confirm', () => {
     {
       approvalRequestData: {
         approvalType: 'CELL_MARK',
+        prisonId: 'TST',
         locationId: 'cellMarkLocationId',
         locationKey: 'TST-A-1-001',
         currentCellMark: 'A1-1',
@@ -245,12 +225,6 @@ describe('Confirm', () => {
         const location = LocationFactory.build({ id: 'cellMarkLocationId', currentCellCertificate: certLocation })
         deepRes.locals.location = location
         locationsService.getLocation.mockResolvedValueOnce(location)
-        locationsService.getResidentialSummary.mockResolvedValueOnce(
-          LocationResidentialSummaryFactory.build({
-            parentLocation: location,
-            subLocations: [],
-          }),
-        )
       },
       checkSaveValues: approvalRequestData =>
         expect(locationsService.updateCellMark).toHaveBeenCalledWith('token', approvalRequestData.locationId, {
@@ -261,6 +235,7 @@ describe('Confirm', () => {
     {
       approvalRequestData: {
         approvalType: 'CELL_SANITATION',
+        prisonId: 'TST',
         locationId: 'cellSanitationLocationId',
         locationKey: 'TST-A-1-001',
         currentInCellSanitation: true,
@@ -279,12 +254,7 @@ describe('Confirm', () => {
         const certLocation = approvalRequestData.locations[0]
         const location = LocationFactory.build({ id: 'cellSanitationLocationId', currentCellCertificate: certLocation })
         deepRes.locals.location = location
-        locationsService.getResidentialSummary.mockResolvedValueOnce(
-          LocationResidentialSummaryFactory.build({
-            parentLocation: location,
-            subLocations: [],
-          }),
-        )
+        locationsService.getLocation.mockResolvedValueOnce(location)
       },
       checkSaveValues: approvalRequestData =>
         expect(locationsService.updateCellSanitation).toHaveBeenCalledWith('token', approvalRequestData.locationId, {
@@ -294,8 +264,8 @@ describe('Confirm', () => {
     },
     {
       approvalRequestData: {
-        prisonId: 'MDI',
-        locationKey: 'TST-A-1-001',
+        prisonId: 'TST',
+        locationKey: 'TST-A',
         approvalType: 'REACTIVATION',
         locationId: 'reactivationLocationId',
         certifiedNormalAccommodationChange: 1,
@@ -341,7 +311,9 @@ describe('Confirm', () => {
           locationType: 'WING',
           cellMark: undefined,
           level: 1,
+          leafLevel: false,
           inCellSanitation: false,
+          key: 'TST-A',
           currentCellCertificate: {
             ...certWing,
             workingCapacity: certWing.currentWorkingCapacity,
@@ -357,6 +329,7 @@ describe('Confirm', () => {
           locationType: 'LANDING',
           cellMark: undefined,
           level: 2,
+          leafLevel: false,
           inCellSanitation: false,
           currentCellCertificate: {
             ...certLanding,
@@ -383,25 +356,25 @@ describe('Confirm', () => {
           },
         })
         deepRes.locals.location = wing
-        locationsService.getResidentialSummary
-          .mockResolvedValueOnce(
-            LocationResidentialSummaryFactory.build({
-              parentLocation: wing,
-              subLocations: [landing],
-            }),
-          )
-          .mockResolvedValueOnce(
-            LocationResidentialSummaryFactory.build({
-              parentLocation: landing,
-              subLocations: [cell],
-            }),
-          )
-          .mockResolvedValueOnce(
-            LocationResidentialSummaryFactory.build({
-              parentLocation: cell,
-              subLocations: [],
-            }),
-          )
+        locationsService.getResidentialSummary.mockImplementation((_token, _prisonId, id) =>
+          Promise.resolve(
+            {
+              [wing.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: wing,
+                subLocations: [landing],
+              }),
+              [landing.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: landing,
+                subLocations: [cell],
+              }),
+              [cell.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: cell,
+                subLocations: [],
+              }),
+            }[id],
+          ),
+        )
+        locationsService.getLocation.mockResolvedValueOnce(cell)
         deepReq.form.options.name = 'reactivate'
         deepReq.sessionModel.set('baselineCna-reactivationLocationId-1-1', '3')
         deepReq.sessionModel.set('workingCapacity-reactivationLocationId-1-1', '3')
@@ -419,9 +392,62 @@ describe('Confirm', () => {
           topLevelLocationId: approvalRequestData.locationId,
         }),
     },
+    {
+      approvalRequestData: {
+        prisonId: 'TST',
+        locationKey: 'TST-A-1-001',
+        approvalType: 'CAPACITY_CHANGE',
+        locationId: 'workingCapacityMismatchId-1-1',
+        workingCapacityChange: 1,
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'workingCapacityMismatchId-1-1',
+            locationType: 'CELL',
+            currentWorkingCapacity: 1,
+          }),
+        ],
+      },
+      beforeGenerateRequests: approvalRequestData => {
+        const certCell = approvalRequestData.locations[0]
+        const cell = LocationFactory.build({
+          parentId: 'workingCapacityMismatchId-1',
+          id: certCell.id,
+          currentCellCertificate: {
+            ...certCell,
+            workingCapacity: 1,
+          },
+        })
+        deepRes.locals.location = cell
+        locationsService.getLocation.mockResolvedValueOnce(cell)
+        deepReq.form.options.name = 'working-capacity-mismatch'
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.updateCapacity).toHaveBeenCalledWith('token', approvalRequestData.locationId, {
+          certifiedNormalAccommodation: 2,
+          maxCapacity: 2,
+          workingCapacity: 2,
+          reasonForChange: null,
+        }),
+    },
   ]
 
   beforeEach(() => {
+    locationsService = {
+      getAccommodationTypes: jest.fn().mockResolvedValue([]),
+      getLocation: jest.fn(),
+      getSpecialistCellTypes: jest.fn().mockResolvedValue([]),
+      getUsedForTypes: jest.fn().mockResolvedValue([]),
+      getResidentialSummary: jest.fn().mockResolvedValue({
+        subLocations: [],
+      } as any),
+      createCertificationRequestForSignedOpCap: jest.fn().mockResolvedValue({ id: 'SIGNED_OP_CAP-id' } as any),
+      createCertificationRequestForLocation: jest.fn().mockImplementation((_token, type) => ({ id: `${type}-id` })),
+      updateCapacity: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CAPACITY_CHANGE-id' } as any),
+      updateCellSanitation: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_SANITATION-id' } as any),
+      updateCellMark: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_MARK-id' } as any),
+      requestReactivation: jest.fn().mockResolvedValue({ id: 'REACTIVATION-id' } as any),
+      deactivateTemporary: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'DEACTIVATION-id' } as any),
+    } as unknown as jest.Mocked<LocationsService>
     deepReq = {
       form: {
         options: {
@@ -444,7 +470,7 @@ describe('Confirm', () => {
       locals: {
         location: LocationFactory.build({
           id: 'some-uuid',
-          prisonId: 'MDI',
+          prisonId: 'TST',
           leafLevel: true,
         }),
         prisonResidentialSummary: {
@@ -456,7 +482,7 @@ describe('Confirm', () => {
         user: {
           name: 'Joe Submitter',
         },
-        prisonId: 'MDI',
+        prisonId: 'TST',
       },
       redirect: jest.fn(),
     }
@@ -515,7 +541,7 @@ describe('Confirm', () => {
               content: 'You have submitted a request to update the cell certificate.',
             })
 
-            expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+            expect(deepRes.redirect).toHaveBeenCalledWith('/TST/cell-certificate/change-requests')
           })
         })
       })
@@ -539,14 +565,14 @@ describe('Confirm', () => {
           i * 2 + 1,
           manageUsersService,
           'token',
-          'MDI',
+          'TST',
           notificationGroups.requestReceivedUsers,
         )
         expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
           i * 2 + 2,
           manageUsersService,
           'token',
-          'MDI',
+          'TST',
           notificationGroups.requestSubmittedUsers,
         )
 
@@ -555,7 +581,7 @@ describe('Confirm', () => {
           notifyService,
           ['certificate_reviewer@test.com'],
           'Moorland (HMP & YOI)',
-          expect.stringContaining(`/MDI/cell-certificate/change-requests/${approvalRequest.approvalType}-id/review`),
+          expect.stringContaining(`/TST/cell-certificate/change-requests/${approvalRequest.approvalType}-id/review`),
           NotificationType.REQUEST_RECEIVED,
           undefined,
           undefined,
@@ -567,7 +593,7 @@ describe('Confirm', () => {
           notifyService,
           ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
           'Moorland (HMP & YOI)',
-          expect.stringContaining(`/MDI/cell-certificate/change-requests/${approvalRequest.approvalType}-id`),
+          expect.stringContaining(`/TST/cell-certificate/change-requests/${approvalRequest.approvalType}-id`),
           NotificationType.REQUEST_SUBMITTED,
           undefined,
           undefined,
@@ -581,7 +607,7 @@ describe('Confirm', () => {
         content: `You have submitted ${deepRes.locals.proposedCertificationApprovalRequests.length} requests to update the cell certificate.`,
       })
 
-      expect(deepRes.redirect).toHaveBeenCalledWith('/MDI/cell-certificate/change-requests')
+      expect(deepRes.redirect).toHaveBeenCalledWith('/TST/cell-certificate/change-requests')
     })
   })
 
@@ -589,155 +615,6 @@ describe('Confirm', () => {
     it('sets buttonText to Submit for approval', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result.buttonText).toBe('Submit for approval')
-    })
-  })
-
-  describe('generateRequests', () => {
-    beforeEach(() => {
-      deepRes.locals.location = LocationFactory.build({
-        id: 'some-uuid',
-        prisonId: 'MDI',
-        status: 'DRAFT',
-        leafLevel: true,
-        pathHierarchy: 'A-1-001',
-        capacity: {
-          maxCapacity: 1,
-          workingCapacity: 1,
-          certifiedNormalAccommodation: 1,
-        },
-        cellMark: 'A1-01',
-      })
-      deepReq.form = {
-        options: {
-          name: '',
-        },
-      } as any
-    })
-
-    it('adds DRAFT approval request when form name is add-to-certificate', async () => {
-      deepReq.form.options.name = 'add-to-certificate'
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.proposedCertificationApprovalRequests.map(d => d.approvalType)).toEqual(['DRAFT'])
-    })
-
-    it('adds CELL_MARK approval request when form name is change-door-number', async () => {
-      deepReq.form.options.name = 'change-door-number'
-      deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
-        if (key === 'doorNumber') return 'A1-02'
-        if (key === 'explanation') return 'Need to change door number'
-        return undefined
-      })
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
-        expect.objectContaining({
-          approvalType: 'CELL_MARK',
-          currentCellMark: 'A1-01',
-          cellMark: 'A1-02',
-          reasonForChange: 'Need to change door number',
-        }),
-      )
-    })
-
-    it('does not add CELL_MARK approval request when form name is not change-door-number', async () => {
-      deepReq.form.options.name = 'other-form'
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(
-        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'CELL_MARK'),
-      ).toHaveLength(0)
-    })
-
-    it('adds CELL_SANITATION approval request when form name is change-sanitation', async () => {
-      deepRes.locals.location = LocationFactory.build({
-        id: 'some-uuid',
-        prisonId: 'MDI',
-        status: 'ACTIVE',
-        leafLevel: true,
-        pathHierarchy: 'A-1-001',
-        capacity: {
-          certifiedNormalAccommodation: 1,
-          maxCapacity: 1,
-          workingCapacity: 1,
-        },
-        inCellSanitation: false,
-      })
-      deepReq.form.options.name = 'change-sanitation'
-      deepReq.sessionModel.get = jest.fn().mockImplementation((key: string) => {
-        if (key === 'inCellSanitation') return 'YES'
-        if (key === 'explanation') return 'Adding sanitation facilities'
-        return undefined
-      })
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
-        expect.objectContaining({
-          approvalType: 'CELL_SANITATION',
-          currentInCellSanitation: false,
-          inCellSanitation: true,
-          reasonForChange: 'Adding sanitation facilities',
-        }),
-      )
-    })
-
-    it('does not add CELL_SANITATION approval request when form name is not change-sanitation', async () => {
-      deepReq.form.options.name = 'other-form'
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(
-        deepRes.locals.proposedCertificationApprovalRequests.filter((r: any) => r.approvalType === 'CELL_SANITATION'),
-      ).toHaveLength(0)
-    })
-
-    it('adds SIGNED_OP_CAP approval request when proposedSignedOpCapChange exists', async () => {
-      deepReq.sessionModel.get = jest.fn().mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New capacity',
-        prisonId: 'MDI',
-      })
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(
-        expect.objectContaining({
-          approvalType: 'SIGNED_OP_CAP',
-          signedOperationCapacityChange: expect.any(Number),
-          reasonForChange: 'New capacity',
-        }),
-      )
-    })
-
-    it('sets correct title for single change request', async () => {
-      deepRes.locals.location.status = 'ACTIVE'
-      deepReq.sessionModel.get = jest.fn().mockReturnValue(undefined)
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.title).toBe('You are requesting a change to the cell certificate')
-    })
-
-    it('sets correct title for multiple change requests', async () => {
-      deepReq.form.options.name = 'add-to-certificate'
-      deepReq.sessionModel.get = jest.fn().mockReturnValue({
-        signedOperationalCapacity: 550,
-        reasonForChange: 'New capacity',
-        prisonId: 'MDI',
-      })
-
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(deepRes.locals.title).toContain('2 changes')
-    })
-
-    it('calls next when complete', async () => {
-      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
-
-      expect(next).toHaveBeenCalled()
     })
   })
 })

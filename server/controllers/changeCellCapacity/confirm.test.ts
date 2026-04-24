@@ -80,9 +80,7 @@ describe('ConfirmCellCapacity', () => {
     it('formats the change summary correctly', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual({
-        backLink: '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/change-cell-capacity/change',
         buttonText: 'Update cell capacity',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeSummary: `You are decreasing the cell’s working capacity by 1.
 <br/><br/>
 This will decrease the establishment’s working capacity from 20 to 19.
@@ -90,8 +88,6 @@ This will decrease the establishment’s working capacity from 20 to 19.
 You are increasing the cell’s maximum capacity by 1.
 <br/><br/>
 This will increase the establishment’s maximum capacity from 30 to 31.`,
-        title: 'Confirm cell capacity',
-        titleCaption: 'Cell A-1-001',
       })
     })
   })
@@ -99,7 +95,7 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
   describe('saveValues', () => {
     describe('when !canEditCna', () => {
       beforeEach(() => {
-        deepRes.locals.decoratedLocation.status = 'ACTIVE'
+        deepRes.locals.prisonConfiguration.certificationApprovalRequired = 'INACTIVE'
       })
 
       it('calls locationsService without CNA change', async () => {

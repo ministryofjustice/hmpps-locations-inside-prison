@@ -16,6 +16,8 @@ const residentialSummaryWithoutCellChild: LocationResidentialSummary = {
     parentId: undefined,
     locationType: 'WING',
     localName: undefined,
+    level: 1,
+    leafLevel: false,
   }),
   subLocationName: 'Spurs',
   subLocations: [LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000003', pathHierarchy: 'A-1' })],
