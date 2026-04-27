@@ -351,6 +351,7 @@ context('Cell Certificate - Change Requests - Review', () => {
             ],
           }),
         )
+        LocationsApiStubber.stub.stubPrisonerLocationsId([{ cellLocation: 'A-1-001', prisoners: [] }])
 
         CellCertificateChangeRequestsReviewPage.goTo('id1')
         reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
