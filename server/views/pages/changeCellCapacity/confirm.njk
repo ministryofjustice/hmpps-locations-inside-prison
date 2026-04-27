@@ -1,6 +1,7 @@
 {% extends "../../partials/formStep.njk" %}
 
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block fields %}
   {{ govukSummaryList({
@@ -33,4 +34,10 @@
 
     <p>{{ changeSummary | safe }}</p>
   </div>
+
+  {% if showCertMismatchWarning %}
+    {{ govukInsetText({
+      text: "The cell's working capacity will not match the certified working capacity once you update the capacity."
+    }) }}
+  {% endif %}
 {% endblock %}

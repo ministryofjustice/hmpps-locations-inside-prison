@@ -90,6 +90,29 @@ You are increasing the cell’s maximum capacity by 1.
 This will increase the establishment’s maximum capacity from 30 to 31.`,
       })
     })
+
+    describe('when only working capacity has changed and the cert is active', () => {
+      beforeEach(() => {
+        sessionModel.onlyWorkingCapChanged = true
+      })
+
+      it('sets showCertMismatchWarning', () => {
+        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+        expect(result).toMatchObject({ showCertMismatchWarning: true })
+      })
+
+      it('does not set showCertMismatchWarning when the cert is inactive', () => {
+        deepRes.locals.prisonConfiguration.certificationApprovalRequired = 'INACTIVE'
+        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+        expect(result).not.toHaveProperty('showCertMismatchWarning')
+      })
+
+      it('does not set showCertMismatchWarning when the location is DRAFT', () => {
+        deepRes.locals.decoratedLocation.status = 'DRAFT'
+        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+        expect(result).not.toHaveProperty('showCertMismatchWarning')
+      })
+    })
   })
 
   describe('saveValues', () => {
