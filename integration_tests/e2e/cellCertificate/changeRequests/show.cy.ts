@@ -30,7 +30,7 @@ context('Cell Certificate - Change Requests - Show', () => {
           ['Change type', 'Add new locations to certificate'],
           ['Submitted on', '3 October 2024'],
           ['Submitted by', 'john smith'],
-          ['Status', 'Awaiting approval'],
+          ['Status', 'Awaiting review'],
         ])
 
         testGovukTable('wing-table', [
@@ -78,7 +78,7 @@ context('Cell Certificate - Change Requests - Show', () => {
           ['Explanation', 'Needed to change it'],
           ['Submitted on', '3 October 2024'],
           ['Submitted by', 'john smith'],
-          ['Status', 'Awaiting approval'],
+          ['Status', 'Awaiting review'],
         ])
 
         testGovukTable('cap-change-table', [['TST', '5 → 9']])
@@ -218,6 +218,53 @@ context('Cell Certificate - Change Requests - Show', () => {
         ])
 
         testGovukTable('locations-table', [['A-1-001', ' → 0']])
+      })
+    })
+
+    context('When the approvalType is CAPACITY_CHANGE', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'CAPACITY_CHANGE',
+            locationId: '7e570000-0000-1000-8000-000000000001',
+            locationKey: 'TST-A-1-001',
+            reasonForChange: 'Needed to change it',
+            certifiedNormalAccommodationChange: 1,
+            workingCapacityChange: 1,
+            maxCapacityChange: 1,
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000001',
+                pathHierarchy: 'A-1-001',
+                certifiedNormalAccommodation: 2,
+                currentCertifiedNormalAccommodation: 1,
+                workingCapacity: 2,
+                currentWorkingCapacity: 1,
+                maxCapacity: 3,
+                currentMaxCapacity: 2,
+              }),
+            ],
+          }),
+        )
+
+        CellCertificateChangeRequestsShowPage.goTo('id1')
+        Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('[data-qa="title-caption"]').should('contain', 'Cell A-1-001')
+        cy.get('h1').should('contain', 'Cell capacity request details')
+
+        testGovukSummaryList('overview-list-CAPACITY_CHANGE', [
+          ['Location', 'A-1-001'],
+          ['Change type', 'Cell capacity'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+          ['Status', 'Awaiting review'],
+        ])
+
+        testGovukTable('capacity-change-table', [['A-1-001', '1 → 2', '1 → 2', '2 → 3']])
       })
     })
 
