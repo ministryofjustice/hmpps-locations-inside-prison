@@ -1,0 +1,22 @@
+{% extends "../../../../partials/layout.njk" %}
+
+{% block content %}
+  {% set occupantCount = prisonerLocation.prisoners.length %}
+  {% set prisonName = prisonResidentialSummary.prisonSummary.prisonName %}
+
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p>The cell's capacity can't be changed because there {{ "is 1 person" if occupantCount == 1 else "are " + occupantCount + " people" }} currently assigned to the cell.</p>
+
+        <p>You need to contact {{ prisonName }} and ask them to move someone out of the cell before you can approve this change.</p>
+
+        <p class="govuk-body">
+          <a href="/{{ prisonId }}/cell-certificate/change-requests" class="govuk-link govuk-link--no-visited-state">
+            Return to change requests
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
