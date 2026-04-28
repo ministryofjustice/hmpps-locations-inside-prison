@@ -188,5 +188,62 @@ context('Change cell capacity - confirm', () => {
       cy.get('.govuk-notification-banner__content h3').contains('Capacity updated')
       cy.get('.govuk-notification-banner__content p').contains('You have updated the capacity of 1-1-001.')
     })
+
+    it('does not show the cert mismatch warning when cert is inactive', () => {
+      ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
+      const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
+      changeCellCapacityPage.workingCapacityInput().clear().type('2')
+      changeCellCapacityPage.continueButton().click()
+
+      Page.verifyOnPage(ConfirmCellCapacityPage)
+      cy.get('.govuk-inset-text').should('not.exist')
+    })
+  })
+
+  context('with the certificate active and only working capacity changed', () => {
+    const location = LocationFactory.build({
+      accommodationTypes: ['NORMAL_ACCOMMODATION'],
+      capacity: {
+        certifiedNormalAccommodation: 2,
+        maxCapacity: 3,
+        workingCapacity: 3,
+      },
+      leafLevel: true,
+      specialistCellTypes: [],
+      localName: '1-1-001',
+    })
+
+    beforeEach(() => {
+      cy.task('reset')
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubPrisonerLocationsId([])
+      LocationsApiStubber.stub.stubUpdateCapacity()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.signIn()
+    })
+
+    it('shows the cert mismatch inset text', () => {
+      ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
+      const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
+      changeCellCapacityPage.workingCapacityInput().clear().type('2')
+      changeCellCapacityPage.continueButton().click()
+
+      Page.verifyOnPage(ConfirmCellCapacityPage)
+      cy.get('.govuk-inset-text').contains(
+        "The cell's working capacity will not match the certified working capacity once you update the capacity.",
+      )
+    })
   })
 })
