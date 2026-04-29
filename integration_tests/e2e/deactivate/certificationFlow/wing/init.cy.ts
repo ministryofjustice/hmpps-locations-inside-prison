@@ -34,8 +34,7 @@ context('Certification Deactivation - Wing - Init', () => {
     context('when no cells are occupied', () => {
       it('displays the cert-change-disclaimer page', () => {
         cy.visit(`/location/${location.id}/deactivate`)
-        // eslint-disable-next-line no-new
-        new CertChangeDisclaimerPage('Deactivating a wing')
+        Page.verifyOnPage(CertChangeDisclaimerPage, 'Deactivating a wing')
       })
     })
   })

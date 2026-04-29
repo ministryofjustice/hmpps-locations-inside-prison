@@ -2,6 +2,9 @@
 
 {% macro workingCapacityMismatchBanner(decoratedResidentialSummary) %}
   {{ mojAlert({
+    attributes: {
+      'data-qa': 'working-capacity-mismatch-banner'
+    },
     variant: "information",
     title: "Check cell’s working capacity",
     showTitleAsHeading: true,

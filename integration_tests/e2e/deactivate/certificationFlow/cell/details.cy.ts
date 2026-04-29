@@ -24,8 +24,7 @@ context('Certification Deactivation - Cell - Details', () => {
   it('has a back link', () => {
     page.backLink().click()
 
-    // eslint-disable-next-line no-new
-    new CertChangeDisclaimerPage('Decreasing certified working capacity')
+    Page.verifyOnPage(CertChangeDisclaimerPage, 'Decreasing certified working capacity')
   })
 
   context('validation errors', () => {

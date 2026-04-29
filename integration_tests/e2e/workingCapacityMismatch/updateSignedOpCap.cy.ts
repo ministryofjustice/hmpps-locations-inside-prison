@@ -1,20 +1,19 @@
-import Page from '../../../../pages/page'
-import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
-import { setupStubs, location } from './setupStubs'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
-import goToUpdateSignedOpCapIsUpdateNeeded from '../goToUpdateSignedOpCapIsUpdateNeeded'
-import UpdateSignedOpCapDetailsPage from '../../../../pages/commonTransactions/updateSignedOpCap/details'
-import SubmitCertificationApprovalRequestPage from '../../../../pages/commonTransactions/submitCertificationApprovalRequest'
-import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
-import capFirst from '../../../../../server/formatters/capFirst'
+import Page from '../../pages/page'
+import ViewLocationsShowPage from '../../pages/viewLocations/show'
+import { setupStubs } from './setupStubs'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import goToUpdateSignedOpCapIsUpdateNeeded from './goToUpdateSignedOpCapIsUpdateNeeded'
+import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
+import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
+import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 
-context('Certification Reactivation - Cell - Update signed op cap', () => {
+context('Working Capacity Mismatch - Update signed op cap', () => {
   let page: UpdateSignedOpCapIsUpdateNeededPage
 
   beforeEach(() => {
     setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
 
-    page = goToUpdateSignedOpCapIsUpdateNeeded(location)
+    page = goToUpdateSignedOpCapIsUpdateNeeded()
   })
 
   it('displays the correct validation error when no option is selected', () => {
@@ -39,7 +38,7 @@ context('Certification Reactivation - Cell - Update signed op cap', () => {
   it('has a back link to cert change disclaimer', () => {
     page.backLink().click()
 
-    Page.verifyOnPage(CertChangeDisclaimerPage, `${capFirst(location.locationType.toLowerCase())} activation`)
+    Page.verifyOnPage(CertChangeDisclaimerPage, 'Changing the cell’s capacity')
   })
 
   it('has a cancel link to the view location show page', () => {

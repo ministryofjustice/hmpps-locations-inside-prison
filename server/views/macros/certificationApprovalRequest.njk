@@ -376,7 +376,7 @@
               { text: "Baseline CNA" } if hasCnaChange,
               { text: "Certified working capacity" } if hasWcChange,
               { text: "Maximum capacity" } if hasMcChange
-            ],
+            ] | stripEmpty,
             rows:[[
               { text: request.locations[0].pathHierarchy },
               { text: request.locations[0].currentCertifiedNormalAccommodation + " → "
@@ -385,7 +385,7 @@
                 if hasWcChange,
               { text: request.locations[0].currentMaxCapacity + " → " + request.locations[0].maxCapacity }
                 if hasMcChange
-            ]]
+            ] | stripEmpty]
           }) }}
         </div>
       {% endif %}
