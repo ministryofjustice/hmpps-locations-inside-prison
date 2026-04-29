@@ -75,7 +75,7 @@ export default class ManageUsersApiClient extends BaseApiClient {
       PaginatedUsers,
       { caseload: string; accessRoles: string; page: string; size: string }
     >({
-      path: '/prisonusers/search?inclusiveRoles=true&status=ACTIVE&caseload=:caseload&accessRoles=:accessRoles&page=:page&size=:size',
+      path: '/prisonusers/search?inclusiveRoles=true&status=ACTIVE&activeCaseload=:caseload&accessRoles=:accessRoles&page=:page&size=:size',
       requestType: 'get',
     }),
   }

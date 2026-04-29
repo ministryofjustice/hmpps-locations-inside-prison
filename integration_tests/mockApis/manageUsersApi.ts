@@ -87,7 +87,7 @@ const stubManageUsersByCaseload = (page: string = '0') =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: `/manage-users-api/prisonusers/search\\?inclusiveRoles=true&status=ACTIVE&caseload=TST&accessRoles=[^&]+(,[^&]+)*&page=${page}&size=50`,
+      urlPattern: `/manage-users-api/prisonusers/search\\?inclusiveRoles=true&status=ACTIVE&activeCaseload=TST&accessRoles=[^&]+(,[^&]+)*&page=${page}&size=50`,
     },
     response: {
       status: 200,
