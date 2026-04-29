@@ -48,7 +48,7 @@ const steps: FormWizard.Steps = {
   },
   ...CertChangeDisclaimer.getSteps({
     next: 'update-signed-op-cap',
-    title: (_req, _res) => `Changing cell capacity`,
+    title: (_req, _res) => `Changing the cell's capacity`,
   }),
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
