@@ -28,7 +28,7 @@ export default class ConfirmCellCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const { decoratedLocation } = res.locals
+    const { decoratedLocation, prisonConfiguration } = res.locals
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
 
     const newWorkingCap = Number(req.sessionModel.get('workingCapacity'))
@@ -52,9 +52,15 @@ export default class ConfirmCellCapacity extends FormInitialStep {
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
+    const showCertMismatchWarning =
+      Boolean(req.sessionModel.get<boolean>('onlyWorkingCapChanged')) &&
+      prisonConfiguration?.certificationApprovalRequired === 'ACTIVE' &&
+      decoratedLocation.status !== 'DRAFT'
+
     return {
       changeSummary,
       buttonText: 'Update cell capacity',
+      ...(showCertMismatchWarning && { showCertMismatchWarning: true }),
     }
   }
 

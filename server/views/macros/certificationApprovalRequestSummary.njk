@@ -12,7 +12,7 @@
   {% endif %}
 
   {% if request.status == 'PENDING' %}
-    {% set statusText = 'Awaiting approval' %}
+    {% set statusText = 'Awaiting review' %}
   {% elseif request.status == 'APPROVED' %}
     {% set statusText = 'Approved' %}
   {% elseif request.status == 'REJECTED' %}

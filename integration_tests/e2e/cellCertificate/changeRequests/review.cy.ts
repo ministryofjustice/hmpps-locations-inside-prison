@@ -329,6 +329,56 @@ context('Cell Certificate - Change Requests - Review', () => {
       })
     })
 
+    context('When the approvalType is CAPACITY_CHANGE', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'CAPACITY_CHANGE',
+            locationId: '7e570000-0000-1000-8000-000000000001',
+            locationKey: 'TST-A-1-001',
+            reasonForChange: 'Needed to change it',
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000001',
+                pathHierarchy: 'A-1-001',
+                certifiedNormalAccommodation: 2,
+                currentCertifiedNormalAccommodation: 1,
+                workingCapacity: 2,
+                currentWorkingCapacity: 1,
+                maxCapacity: 3,
+                currentMaxCapacity: 2,
+              }),
+            ],
+          }),
+        )
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info and approve/reject options', () => {
+        cy.get('h1').should('contain', 'Review cell capacity request')
+
+        testGovukSummaryList('overview-list-CAPACITY_CHANGE', [
+          ['Location', 'A-1-001'],
+          ['Change type', 'Cell capacity'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('capacity-change-table', [['A-1-001', '1 → 2', '1 → 2', '2 → 3']])
+
+        cy.get('input[name="approveOrReject"][type="radio"][value="APPROVE"]').should('exist')
+        cy.get('input[name="approveOrReject"][type="radio"][value="REJECT"]').should('exist')
+      })
+
+      it('Displays an error when no option is checked', () => {
+        reviewPage.submit({})
+        Page.checkForError('approveOrReject', 'Select if you want to approve or reject this change')
+      })
+    })
+
     context('When the approvalType is REACTIVATION', () => {
       beforeEach(() => {
         LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(

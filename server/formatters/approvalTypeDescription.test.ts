@@ -34,6 +34,10 @@ describe('approvalTypeDescription', () => {
     expect(approvalTypeDescription('CELL_MARK', mockConstants, baseLocation)).toBe('Change cell door number')
   })
 
+  it('returns correct description for CAPACITY_CHANGE', () => {
+    expect(approvalTypeDescription('CAPACITY_CHANGE', mockConstants, baseLocation)).toBe('Cell capacity')
+  })
+
   it('returns approvalType for unknown type', () => {
     expect(approvalTypeDescription('UNKNOWN', mockConstants, baseLocation)).toBe('UNKNOWN')
   })
