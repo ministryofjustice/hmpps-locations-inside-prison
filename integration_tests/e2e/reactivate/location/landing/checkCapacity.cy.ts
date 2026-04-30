@@ -42,8 +42,7 @@ context('Certification Reactivation - Landing - Check capacity', () => {
     Page.verifyOnPage(EditCapacityPage).submit({ capacities: [['1', '2', '2']] })
     Page.verifyOnPage(CheckCapacityPage).submit()
 
-    // eslint-disable-next-line no-new
-    new CertChangeDisclaimerPage(`${capFirst(location.locationType.toLowerCase())} activation`)
+    Page.verifyOnPage(CertChangeDisclaimerPage, `${capFirst(location.locationType.toLowerCase())} activation`)
   })
 
   context('when there are no cert changes', () => {

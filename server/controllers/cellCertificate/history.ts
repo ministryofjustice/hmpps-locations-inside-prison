@@ -26,7 +26,7 @@ export default async (req: Request, res: Response) => {
   await addUsersToUserMap(locals.certificates.map(r => r.approvedRequest.approvedOrRejectedBy))(req, res, null)
   await addLocationsToLocationMap(
     locals.certificates
-      .filter(r => r.approvedRequest.approvalType === 'DEACTIVATION')
+      .filter(r => ['DEACTIVATION', 'REACTIVATION'].includes(r.approvedRequest.approvalType))
       .map(r => r.approvedRequest.locationId),
   )(req, res, null)
   await addConstantToLocals(['locationTypes'])(req, res, null)

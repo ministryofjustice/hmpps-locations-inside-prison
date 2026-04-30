@@ -6,6 +6,9 @@
   <p>The cell’s working capacity is different to the certified working capacity on the cell certificate.</p>
 
   {{ govukTable({
+    attributes: {
+      'data-qa': 'working-capacity-table'
+    },
     rows: [
       [
         { text: 'Working capacity', classes: "govuk-!-width-one-third" },

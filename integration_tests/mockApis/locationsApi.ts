@@ -1003,7 +1003,9 @@ const stubUpdateCapacity = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: {},
+      jsonBody: {
+        pendingApprovalRequestId: 'pending-update-capacity-request-id',
+      },
     },
   })
 

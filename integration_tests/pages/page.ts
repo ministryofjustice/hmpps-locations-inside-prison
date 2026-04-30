@@ -4,8 +4,8 @@ import { Result } from 'axe-core'
 export type PageElement = Cypress.Chainable<JQuery>
 
 export default abstract class Page {
-  static verifyOnPage<T>(constructor: new () => T): T {
-    return new constructor()
+  static verifyOnPage<T>(constructor: new (...args: unknown[]) => T, ...args: unknown[]): T {
+    return new constructor(...args)
   }
 
   protected constructor(

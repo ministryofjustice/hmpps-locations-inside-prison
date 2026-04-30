@@ -37,8 +37,7 @@ context('Certification Reactivation - Cell - Check capacity', () => {
     Page.verifyOnPage(EditCapacityPage).submit({ capacities: [['1', '2', '2']] })
     Page.verifyOnPage(CheckCapacityPage).submit()
 
-    // eslint-disable-next-line no-new
-    new CertChangeDisclaimerPage('Cell activation')
+    Page.verifyOnPage(CertChangeDisclaimerPage, 'Cell activation')
   })
 
   context('when there are no cert changes', () => {
