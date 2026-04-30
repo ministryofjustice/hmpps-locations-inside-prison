@@ -1,6 +1,7 @@
 import { AgentConfig } from '@ministryofjustice/hmpps-rest-client'
 
 const production = process.env.NODE_ENV === 'production'
+const developerMode = !production && process.env.NODE_ENV !== 'test' && process.env.DEVELOPER_MODE === 'true'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
   if (process.env[name]) {
@@ -31,6 +32,7 @@ const auditConfig = () => {
 const environmentName = get('ENVIRONMENT_NAME', '')
 
 export default {
+  developerMode,
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
   gitRef: get('GIT_REF', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),

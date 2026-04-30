@@ -70,7 +70,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible: !config.production && process.env.NODE_ENV !== 'test',
+        visible: config.developerMode,
         heading: '[DEV] Set permissions',
         href: '/dev-set-permissions',
         description: 'Set current user permissions (local dev only).',
@@ -78,10 +78,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible:
-          !config.production &&
-          process.env.NODE_ENV !== 'test' &&
-          res.locals.user.userRoles.includes('PERMISSION_OVERRIDE'),
+        visible: config.developerMode && res.locals.user.userRoles.includes('PERMISSION_OVERRIDE'),
         heading: '[DEV] Reset permissions',
         href: '/dev-reset-permissions',
         description: 'Reset current user permissions (local dev only).',

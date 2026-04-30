@@ -116,7 +116,7 @@ export default function routes(services: Services): Router {
   router.use('/admin/:prisonId/change-certification-status', changeCertApprovalStatusRouter)
   router.use('/admin/:prisonId/ingest-cert', ingestRouter)
 
-  if (!config.production) {
+  if (config.developerMode) {
     router.use(
       '/dev-set-permissions',
       FormWizard(

@@ -31,7 +31,7 @@ export default function setUpCurrentUser({ manageUsersService }: Services): Rout
         caseloads: caseloadsData.caseloads,
       }
 
-      if (!config.production && req.cookies.roleOverride) {
+      if (config.developerMode && req.cookies.roleOverride) {
         res.locals.user.userRoles = ['PERMISSION_OVERRIDE', ...(req.cookies.roleOverride?.split(', ') || [])]
       }
 

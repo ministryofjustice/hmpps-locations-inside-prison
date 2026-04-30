@@ -7,11 +7,13 @@ import addConstantToLocals from '../../../../middleware/addConstantToLocals'
 import addUsersToUserMap from '../../../../middleware/addUsersToUserMap'
 import { Location } from '../../../../data/types/locationsApi'
 import approvalTypeDescription from '../../../../formatters/approvalTypeDescription'
+import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
 
 export default class Review extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(addConstantToLocals('locationTypes'))
+    this.use(conditionallyPopulatePrisoners)
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {

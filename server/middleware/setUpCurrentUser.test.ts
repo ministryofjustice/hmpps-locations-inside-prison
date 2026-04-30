@@ -19,7 +19,6 @@ const baseServices: Services = {
 
 describe('setUpCurrentUser middleware', () => {
   let app: express.Express
-  let originalProduction: boolean
 
   beforeEach(() => {
     app = express()
@@ -37,11 +36,10 @@ describe('setUpCurrentUser middleware', () => {
       activeCaseload: 'MDI',
       caseloads: ['MDI', 'LEI'],
     })
-    originalProduction = config.production
   })
 
   afterEach(() => {
-    config.production = originalProduction
+    config.developerMode = false
     jest.clearAllMocks()
   })
 
@@ -59,8 +57,8 @@ describe('setUpCurrentUser middleware', () => {
   })
 
   describe('permission override', () => {
-    it('applies permission override in non-production with roleOverride cookie', async () => {
-      config.production = false
+    it('applies permission override in developerMode with roleOverride cookie', async () => {
+      config.developerMode = true
       app.use((req, res, next) => {
         req.cookies = { roleOverride: 'OVERRIDE1, OVERRIDE2' }
         next()
@@ -71,8 +69,8 @@ describe('setUpCurrentUser middleware', () => {
       expect(res.body.userRoles).toEqual(['PERMISSION_OVERRIDE', 'OVERRIDE1', 'OVERRIDE2'])
     })
 
-    it('does not apply permission override in production', async () => {
-      config.production = true
+    it('does not apply permission override without developerMode', async () => {
+      config.developerMode = false
       app.use((req, res, next) => {
         req.cookies = { roleOverride: 'OVERRIDE1, OVERRIDE2' }
         next()

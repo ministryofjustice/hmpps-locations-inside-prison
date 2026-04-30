@@ -9,12 +9,15 @@ import config from '../../../../config'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 import addConstantToLocals from '../../../../middleware/addConstantToLocals'
 import addLocationsToLocationMap from '../../../../middleware/addLocationsToLocationMap'
+import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
+import approvalCellWouldBeOvercrowded from '../../../../routes/cellCertificate/changeRequests/review/approvalCellWouldBeOvercrowded'
 
 export default class Approve extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
     this.use(addConstantToLocals('locationTypes'))
+    this.use(conditionallyPopulatePrisoners)
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -48,7 +51,12 @@ export default class Approve extends FormInitialStep {
     await super._locals(req, res, next)
   }
 
-  override async saveValues(req: FormWizard.Request, res: Response, _next: NextFunction) {
+  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+    if (approvalCellWouldBeOvercrowded(req, res)) {
+      next()
+      return
+    }
+
     const { ingressUrl } = config
     const { systemToken } = req.session
     const { locationsService, manageUsersService, notifyService } = req.services
