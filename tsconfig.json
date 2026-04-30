@@ -1,9 +1,9 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compileOnSave": true,
   "compilerOptions": {
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "node10",
     "isolatedModules": true,
     "outDir": "./dist",
     "sourceMap": true,
@@ -15,7 +15,8 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./server/@types", "./node_modules/@types"]
+    "typeRoots": ["./server/@types", "./node_modules/@types"],
+    "types": ["node", "jest"]
   },
   "exclude": [
     "node_modules",
