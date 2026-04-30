@@ -1,11 +1,13 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
+import superagent, { SuperAgentRequest } from 'superagent'
 import ManageUsersService from '../../../../services/manageUsersService'
 import NotificationService, { notificationGroups, NotificationType } from '../../../../services/notificationService'
 import LocationsService from '../../../../services/locationsService'
 import Approve from './approve'
 import * as notificationHelpers from '../../../../utils/notificationHelpers'
+import mockModel from '../../../../testutils/mockModel'
 
 jest.mock('../../../../utils/notificationHelpers')
 jest.mock('../../../../middleware/populateCertificationRequestDetails')
@@ -36,9 +38,7 @@ describe('Approve', () => {
       journeyModel: {
         reset: jest.fn(),
       },
-      sessionModel: {
-        reset: jest.fn(),
-      },
+      sessionModel: mockModel(),
       flash: jest.fn(),
     }
     deepRes = {

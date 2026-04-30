@@ -1,21 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
-import { Response } from 'express'
 import Review from '../../../../controllers/cellCertificate/changeRequests/review'
 import Approve from '../../../../controllers/cellCertificate/changeRequests/review/approve'
 import Reject from '../../../../controllers/cellCertificate/changeRequests/review/reject'
-import TooManyOccupants from '../../../../controllers/cellCertificate/changeRequests/review/tooManyOccupants'
-
-function approvalCellWouldBeOvercrowded(req: FormWizard.Request, res: Response): boolean {
-  if (req.form.values?.approveOrReject !== 'APPROVE') return false
-
-  const { approvalRequest, prisonerLocation } = res.locals
-  if (approvalRequest?.approvalType !== 'CAPACITY_CHANGE') return false
-
-  const occupants = prisonerLocation?.prisoners?.length ?? 0
-  const proposedWorkingCapacity = approvalRequest.locations?.[0]?.workingCapacity
-
-  return typeof proposedWorkingCapacity === 'number' && occupants > proposedWorkingCapacity
-}
+import approvalCellWouldBeOvercrowded from './approvalCellWouldBeOvercrowded'
+import FormInitialStep from '../../../../controllers/base/formInitialStep'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -39,6 +27,8 @@ const steps: FormWizard.Steps = {
     pageTitle: 'You are about to approve a change to the cell certificate',
     fields: ['confirmation'],
     controller: Approve,
+    // only used as a fallback - Approve redirects away if cell won't be overcrowded
+    next: 'too-many-occupants',
   },
   '/reject': {
     pageTitle: 'Reject change request',
@@ -47,7 +37,7 @@ const steps: FormWizard.Steps = {
   },
   '/too-many-occupants': {
     pageTitle: 'You can’t approve this change because too many people are occupying the cell',
-    controller: TooManyOccupants,
+    controller: FormInitialStep,
   },
 }
 

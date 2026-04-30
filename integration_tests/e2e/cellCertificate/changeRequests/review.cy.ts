@@ -9,6 +9,8 @@ import CellCertificateChangeRequestsApprovePage from '../../../pages/cellCertifi
 import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertificate/changeRequests'
 import CellCertificateChangeRequestsRejectPage from '../../../pages/cellCertificate/changeRequests/review/reject'
 import CertificateLocationFactory from '../../../../server/testutils/factories/certificateLocation'
+import PrisonerFactory from '../../../../server/testutils/factories/prisoner'
+import TooManyOccupantsPage from '../../../pages/cellCertificate/changeRequests/review/tooManyOccupants'
 
 context('Cell Certificate - Change Requests - Review', () => {
   context('With RESI__CERT_REVIEWER role', () => {
@@ -377,6 +379,41 @@ context('Cell Certificate - Change Requests - Review', () => {
       it('Displays an error when no option is checked', () => {
         reviewPage.submit({})
         Page.checkForError('approveOrReject', 'Select if you want to approve or reject this change')
+      })
+
+      context('When approving the request would make the cell be overcrowded', () => {
+        beforeEach(() => {
+          LocationsApiStubber.stub.stubPrisonerLocationsId([
+            {
+              cellLocation: 'A-1-001',
+              prisoners: [PrisonerFactory.build(), PrisonerFactory.build(), PrisonerFactory.build()],
+            },
+          ])
+        })
+
+        it('displays the too many occupants page on approve', () => {
+          reviewPage.submit({ approve: true })
+
+          Page.verifyOnPage(TooManyOccupantsPage)
+        })
+      })
+
+      // This tests changes to occupancy during the transaction
+      context('When the occupancy changes while approving', () => {
+        it('displays the too many occupants page when submitting the approve page', () => {
+          reviewPage.submit({ approve: true })
+
+          LocationsApiStubber.stub.stubPrisonerLocationsId([
+            {
+              cellLocation: 'A-1-001',
+              prisoners: [PrisonerFactory.build(), PrisonerFactory.build(), PrisonerFactory.build()],
+            },
+          ])
+
+          Page.verifyOnPage(CellCertificateChangeRequestsApprovePage).submit({ confirm: true })
+
+          Page.verifyOnPage(TooManyOccupantsPage)
+        })
       })
     })
 
