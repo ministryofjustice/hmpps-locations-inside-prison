@@ -2,9 +2,10 @@
 
 /* eslint-disable max-classes-per-file */
 import { NextFunction, Response } from 'express'
-import { TypedLocals } from '../express'
 
 declare module 'hmpo-form-wizard' {
+  type TypedLocals = Partial<AllLocals>
+
   // These enums have to live here because of TS/Jest and Enums work..  ¯\_(ツ)_/¯
   // Also this ESLint override because of how TS/Eslint works.
 
