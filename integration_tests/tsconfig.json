@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["es2015", "dom"],
     "noEmit": true,
-    "lib": ["es5", "dom", "es2015.promise"],
     "types": ["cypress", "express", "express-session"],
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "noImplicitAny": false
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "../cypress.config.ts"]
 }

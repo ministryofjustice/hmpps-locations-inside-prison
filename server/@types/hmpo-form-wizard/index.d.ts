@@ -1,10 +1,10 @@
 // Copied from https://github.com/ministryofjustice/hmpps-strengths-based-needs-assessments-ui/blob/c1d2e0ac64ce2be0ea0a27919cd34f8882b2d5c0/server/%40types/hmpo-form-wizard/index.d.ts
 
 /* eslint-disable max-classes-per-file */
-import { NextFunction, Response } from 'express'
-import { TypedLocals } from '../express'
 
 declare module 'hmpo-form-wizard' {
+  import { NextFunction, Response, TypedLocals } from 'express'
+
   // These enums have to live here because of TS/Jest and Enums work..  ¯\_(ツ)_/¯
   // Also this ESLint override because of how TS/Eslint works.
 
