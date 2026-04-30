@@ -1,7 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
-import superagent, { SuperAgentRequest } from 'superagent'
 import ManageUsersService from '../../../../services/manageUsersService'
 import NotificationService, { notificationGroups, NotificationType } from '../../../../services/notificationService'
 import LocationsService from '../../../../services/locationsService'
