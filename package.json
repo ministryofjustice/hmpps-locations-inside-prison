@@ -127,6 +127,8 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@cypress/webpack-preprocessor": "^5.4.4",
+    "@cypress/webpack-batteries-included-preprocessor": "^3.1.2",
     "@jest/globals": "^29.7.0",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.4",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
@@ -158,7 +160,7 @@
     "chokidar": "^3.6.0",
     "concurrently": "^9.2.1",
     "cookie-session": "^2.1.1",
-    "cypress": "^14.5.4",
+    "cypress": "^15.14.2",
     "cypress-axe": "^1.7.0",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-split": "^1.24.31",
@@ -183,7 +185,7 @@
     "prettier-plugin-jinja-template": "^2.1.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "overrides": {
     "axios": ">=1.15.0",
