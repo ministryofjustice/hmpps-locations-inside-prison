@@ -3,16 +3,28 @@ import setCanAccess from './setCanAccess'
 import LocationsService from '../services/locationsService'
 import config from '../config'
 
+const RESI_ROLES = [
+  'VIEW_INTERNAL_LOCATION',
+  'MANAGE_RESIDENTIAL_LOCATIONS',
+  'MANAGE_RES_LOCATIONS_OP_CAP',
+  'MANAGE_RES_LOCATIONS_ADMIN',
+  'RESI__CERT_VIEWER',
+  'RESI__CERT_REVIEWER',
+]
+
 export default function populateCards(locationsService: LocationsService) {
   return asyncMiddleware((req, res, next) => {
     setCanAccess(locationsService)
     const certificationEnabled = res.locals.prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
     const resiActive = res.locals.prisonConfiguration?.resiLocationServiceActive === 'ACTIVE'
     const nonResiActive = res.locals.prisonConfiguration?.nonResiServiceActive === 'ACTIVE'
+    const userRoles = res.locals.user.userRoles || []
+    const hasResiRole = userRoles.some(role => RESI_ROLES.includes(role))
+    const showResiCards = resiActive && hasResiRole
 
     // Residential locations cards and permission message
     let manageLocationsCard = null
-    if (resiActive) {
+    if (showResiCards) {
       if (certificationEnabled) {
         manageLocationsCard = {
           clickable: true,
@@ -38,7 +50,7 @@ export default function populateCards(locationsService: LocationsService) {
       manageLocationsCard,
       {
         clickable: true,
-        visible: resiActive,
+        visible: showResiCards,
         heading: 'View all inactive cells',
         href: '/inactive-cells',
         description: 'View details of all inactive cells in the establishment and reactivate them.',
@@ -46,7 +58,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible: resiActive,
+        visible: showResiCards,
         heading: 'Archived locations',
         href: '/archived-locations',
         description: 'View locations that have been permanently deactivated as residential locations.',
@@ -54,7 +66,7 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
-        visible: resiActive && certificationEnabled,
+        visible: showResiCards && certificationEnabled,
         heading: 'Cell certificate',
         href: '/cell-certificate/current',
         description: 'View the current certificate and requested changes.',
@@ -86,7 +98,13 @@ export default function populateCards(locationsService: LocationsService) {
       },
     ]
 
-    res.locals.resiPermissionMessage = resiActive ? null : 'You do not have permission to view Residential locations.'
+    if (!resiActive) {
+      res.locals.resiPermissionMessage = 'You do not have permission to view Residential locations.'
+    } else if (!hasResiRole) {
+      res.locals.resiPermissionMessage = 'You do not have permission to manage Residential locations.'
+    } else {
+      res.locals.resiPermissionMessage = null
+    }
 
     // Non-residential locations cards and permission message
     if (req.featureFlags.nonResi && nonResiActive) {
