@@ -23,7 +23,7 @@ const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
 router.use(
   protectRoute('deactivate'),
   populatePrisonAndLocationId,
-  populateLocation({ decorate: true }),
+  populateLocation({ decorate: true, includeCurrentCertificate: true }),
   populatePrisonersInLocation(),
   populatePrisonConfiguration(),
   checkSupportedLocationType,

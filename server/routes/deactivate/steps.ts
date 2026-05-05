@@ -17,8 +17,8 @@ function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
-export function hasWorkingCapacity(_req: FormWizard.Request, res: Response) {
-  return res.locals.decoratedLocation.capacity.workingCapacity > 0
+export function hasCertifiedWorkingCapacity(_req: FormWizard.Request, res: Response) {
+  return (res.locals.decoratedLocation.currentCellCertificate?.workingCapacity || 0) > 0
 }
 
 export function isCellCertChange(req: FormWizard.Request, res: Response) {
@@ -55,7 +55,8 @@ const steps: FormWizard.Steps = {
     next: [
       { fn: isCellOccupied, next: 'occupied' },
       {
-        fn: (req, res) => (isCellCertChange(req, res) || isCertChange(req, res)) && !hasWorkingCapacity(req, res),
+        fn: (req, res) =>
+          (isCellCertChange(req, res) || isCertChange(req, res)) && !hasCertifiedWorkingCapacity(req, res),
         next: 'temporary/details',
       },
       { fn: isCellCertChange, next: 'cell-cert-change' },
@@ -106,10 +107,13 @@ const steps: FormWizard.Steps = {
     ],
     next: [
       {
-        fn: (req, res) => isCellCertChange(req, res) && hasWorkingCapacity(req, res),
+        fn: (req, res) => isCellCertChange(req, res) && hasCertifiedWorkingCapacity(req, res),
         next: 'submit-certification-approval-request',
       },
-      { fn: (req, res) => isCertChange(req, res) && hasWorkingCapacity(req, res), next: 'update-signed-op-cap' },
+      {
+        fn: (req, res) => isCertChange(req, res) && hasCertifiedWorkingCapacity(req, res),
+        next: 'update-signed-op-cap',
+      },
       'temporary/confirm',
     ],
     controller: DeactivateTemporaryDetails,
