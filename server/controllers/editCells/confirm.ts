@@ -138,7 +138,6 @@ export default class EditCellsConfirm extends FormInitialStep {
     locals.title = 'Edit cells'
     locals.titleCaption = `${locationType} ${localName || pathHierarchy}`
     locals.buttonText = 'Update cells'
-    locals.cancelText = 'Cancel'
     locals.backLink = `/view-and-update-locations/${[prisonId, id].join('/')}`
 
     return locals

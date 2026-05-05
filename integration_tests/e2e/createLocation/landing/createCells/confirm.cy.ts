@@ -22,6 +22,9 @@ context('Create Landing - Create cells - Confirm', () => {
       workingCapacity: 8,
       maxCapacity: 12,
     },
+    currentCellCertificate: undefined,
+    level: 2,
+    leafLevel: false,
   })
   const createdLocationResidentialSummary = {
     parentLocation: newLandingLocation,

@@ -6,6 +6,7 @@ import NotificationService, { notificationGroups, NotificationType } from '../..
 import LocationsService from '../../../../services/locationsService'
 import Approve from './approve'
 import * as notificationHelpers from '../../../../utils/notificationHelpers'
+import mockModel from '../../../../testutils/mockModel'
 
 jest.mock('../../../../utils/notificationHelpers')
 jest.mock('../../../../middleware/populateCertificationRequestDetails')
@@ -36,9 +37,7 @@ describe('Approve', () => {
       journeyModel: {
         reset: jest.fn(),
       },
-      sessionModel: {
-        reset: jest.fn(),
-      },
+      sessionModel: mockModel(),
       flash: jest.fn(),
     }
     deepRes = {

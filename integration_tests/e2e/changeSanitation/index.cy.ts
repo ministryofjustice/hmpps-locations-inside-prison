@@ -48,6 +48,7 @@ context('Change sanitation', () => {
     code: '001',
     cellMark: 'A1-01',
     certifiedCell: false,
+    inCellSanitation: false,
   })
 
   const activeWing = LocationFactory.build({

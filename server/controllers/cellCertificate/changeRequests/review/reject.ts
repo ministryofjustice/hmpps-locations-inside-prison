@@ -18,7 +18,6 @@ export default class Reject extends FormInitialStep {
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     res.locals.buttonText = 'Reject request'
-    res.locals.cancelText = 'Cancel'
     const { approvalRequest } = res.locals
     if (approvalRequest.approvalType === 'DEACTIVATION') {
       await addLocationsToLocationMap([approvalRequest.locationId])(req, res, null)

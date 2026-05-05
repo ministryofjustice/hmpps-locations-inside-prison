@@ -15,7 +15,6 @@ export default class Withdraw extends FormInitialStep {
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     res.locals.buttonText = 'Confirm withdrawal'
-    res.locals.cancelText = 'Cancel'
 
     await super._locals(req, res, next)
   }

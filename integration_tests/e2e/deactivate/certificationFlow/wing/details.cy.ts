@@ -23,8 +23,7 @@ context('Certification Deactivation - Wing - Details', () => {
   it('has a back link', () => {
     page.backLink().click()
 
-    // eslint-disable-next-line no-new
-    new CertChangeDisclaimerPage('Deactivating a wing')
+    Page.verifyOnPage(CertChangeDisclaimerPage, 'Deactivating a wing')
   })
 
   context('validation errors', () => {

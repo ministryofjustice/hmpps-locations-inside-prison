@@ -8,9 +8,9 @@ import { Location } from '../../../../data/types/locationsApi'
 import decorateLocation from '../../../../decorators/location'
 import LocationsService from '../../../../services/locationsService'
 
-const populateLocationsFunc = populateLocationTree(false)
+const populateLocationTreeFunc = populateLocationTree(false)
 
-describe('populateLocations', () => {
+describe('populateLocationTree', () => {
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   let next: any
@@ -160,6 +160,7 @@ describe('populateLocations', () => {
       sessionModel: {
         get: (key: string) => sessionModelValues[key],
       },
+      params: {},
       services: {
         locationsService: {
           getResidentialSummary: (_token: string, prisonId: string, id: string) =>
@@ -190,7 +191,7 @@ describe('populateLocations', () => {
     })
 
     it('populates the locations', async () => {
-      await populateLocationsFunc(deepReq as FormWizard.Request, deepRes as Response, next)
+      await populateLocationTreeFunc(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.locals.cells).toEqual([location1b1])
       expect(deepRes.locals.locationTree).toEqual([
@@ -229,7 +230,7 @@ describe('populateLocations', () => {
 
   describe('when selectLocations is not populated', () => {
     it('populates the locations', async () => {
-      await populateLocationsFunc(deepReq as FormWizard.Request, deepRes as Response, next)
+      await populateLocationTreeFunc(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.locals.cells.sort((a: Location, b: Location) => a.id.localeCompare(b.id))).toEqual([
         location1b1,

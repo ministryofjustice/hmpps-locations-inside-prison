@@ -36,17 +36,17 @@ context('Cell Certificate - Show', () => {
       ])
 
       testGovukTable('cell-schedule-table', [
-        ['A-wing', '-', '20', '10', '30', '-', '-'],
-        ['A-1-001', 'A1-01', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-1-002', 'A1-02', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-1-003', 'A1-03', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-1-004', 'A1-04', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-1-005', 'A1-05', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-2-001', 'A2-01', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-2-002', 'A2-02', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-2-003', 'A2-03', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-2-004', 'A2-04', '2', '1', '3', 'Normal accommodation', 'Yes'],
-        ['A-2-005', 'A2-05', '2', '1', '3', 'Normal accommodation', 'Yes'],
+        ['A-wing', '-', '20', '20', '20', '-', '-'],
+        ['A-1-001', 'A1-01', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-1-002', 'A1-02', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-1-003', 'A1-03', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-1-004', 'A1-04', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-1-005', 'A1-05', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-2-001', 'A2-01', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-2-002', 'A2-02', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-2-003', 'A2-03', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-2-004', 'A2-04', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-2-005', 'A2-05', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
       ])
     })
   })

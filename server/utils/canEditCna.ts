@@ -1,6 +1,5 @@
-import { Location, PrisonConfiguration } from '../data/types/locationsApi'
-import { DecoratedLocation } from '../decorators/decoratedLocation'
+import { PrisonConfiguration } from '../data/types/locationsApi'
 
-export default function canEditCna(prisonConfiguration: PrisonConfiguration, location: Location | DecoratedLocation) {
-  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && location.status === 'DRAFT'
+export default function canEditCna(prisonConfiguration: PrisonConfiguration) {
+  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE'
 }

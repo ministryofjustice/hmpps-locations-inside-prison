@@ -3,6 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import LocationFactory from '../../../testutils/factories/location'
 import ReactivateLocationInit from './init'
+import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 
 describe('ReactivateLocationInit', () => {
   let req: DeepPartial<FormWizard.Request>
@@ -21,6 +22,7 @@ describe('ReactivateLocationInit', () => {
     }
     res = {
       locals: {
+        decoratedLocation: buildDecoratedLocation(),
         locationTree: [
           {
             location: LocationFactory.build({ id: 'cell1', locationType: 'CELL', specialistCellTypes: ['TYPE1'] }),
@@ -42,6 +44,11 @@ describe('ReactivateLocationInit', () => {
   })
 
   describe('successHandler', () => {
+    it('sets selectLocations', async () => {
+      await reactivateLocationInit.successHandler(req as FormWizard.Request, res as Response, next)
+      expect(req.sessionModel.set).toHaveBeenCalledWith('selectLocations', [res.locals.decoratedLocation.id])
+    })
+
     it('sets saved-cellTypes for cells with specialistCellTypes', async () => {
       await reactivateLocationInit.successHandler(req as FormWizard.Request, res as Response, next)
       expect(req.sessionModel.set).toHaveBeenCalledWith('saved-cellTypescell1', ['TYPE1'])

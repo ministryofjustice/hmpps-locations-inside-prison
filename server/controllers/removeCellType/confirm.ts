@@ -61,7 +61,7 @@ export default class ConfirmRemoveCellType extends FormInitialStep {
         maxCapacity: Number(req.sessionModel.get('maxCapacity')),
         workingCapacity: Number(req.sessionModel.get('workingCapacity')),
       }
-      if (canEditCna(prisonConfiguration, location)) {
+      if (canEditCna(prisonConfiguration)) {
         capacities.certifiedNormalAccommodation = Number(req.sessionModel.get('baselineCna'))
       }
       await locationsService.updateCapacity(token, location.id, capacities)

@@ -1,0 +1,33 @@
+{% extends "../../../partials/formStep.njk" %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% block fields %}
+  <div class="govuk-!-padding-bottom-2 change-summary">
+    <h2 class="govuk-heading-m">Change to establishment capacity</h2>
+    {% set topLevelLocationNames = [] %}
+    {% for topLevelLocationData in locationTree %}
+      {% if not topLevelLocationData.location.leafLevel %}
+        {% set topLevelLocationNames = (topLevelLocationNames.push(
+          topLevelLocationData.location.localName or
+          ((topLevelLocationData.location.locationType | lower) + ' ' + topLevelLocationData.location.pathHierarchy)
+        ), topLevelLocationNames) %}
+      {% endif %}
+    {% endfor %}
+    {% if topLevelLocationNames | length %}
+      {{ govukWarningText({
+        text: "Every cell in " + (topLevelLocationNames | nonOxfordJoin) + " will be activated.",
+        iconFallbackText: "Warning"
+      }) }}
+    {% endif %}
+
+    <p data-qa="change-summary">{{ changeSummary | safe }}</p>
+
+    {% for parentLocation in inactiveParentLocations | sort(attribute='pathHierarchy') %}
+      <p data-qa="inactive-parent-{{ parentLocation.id }}">
+        The status of {{ parentLocation.displayName }} will change to active because it will contain active
+        locations.
+      </p>
+    {% endfor %}
+</div>
+{% endblock %}

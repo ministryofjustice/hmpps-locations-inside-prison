@@ -2,10 +2,12 @@ import FormWizard from 'hmpo-form-wizard'
 import greaterThan from '../../validators/greaterThan'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import canEditCna from '../../utils/canEditCna'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 const fields: FormWizard.Fields = {
   baselineCna: {
-    remove: (_req, res) => res.locals.prisonConfiguration?.certificationApprovalRequired !== 'ACTIVE',
+    remove: (_req, res) => !canEditCna(res.locals.prisonConfiguration),
     hideWhenRemoved: true,
     validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'maxCapacity' })],
     errorMessages: {
@@ -55,31 +57,7 @@ const fields: FormWizard.Fields = {
     },
     autocomplete: 'off',
   },
-  explanation: {
-    remove: (_req, res) =>
-      res.locals.prisonConfiguration?.certificationApprovalRequired !== 'ACTIVE' ||
-      res.locals.decoratedLocation?.status === 'DRAFT',
-    hideWhenRemoved: true,
-    validate: ['required'],
-    component: 'govukTextarea',
-    errorMessages: {
-      required: 'Explain the reason for this change',
-    },
-    id: 'explanation',
-    name: 'explanation',
-    rows: 5,
-    label: {
-      text: 'Explain the reason for this change',
-      classes: 'govuk-label--m',
-      for: 'explanation',
-    },
-    hint: {
-      text: 'This will help the authorising director understand the need for the change.',
-    },
-    autocomplete: 'off',
-    // Don't strip newlines
-    'ignore-defaults': true,
-  },
+  ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 

@@ -20,7 +20,6 @@ export default class Details extends FormInitialStep {
       removeHeadingSpacing: true,
       titleCaption: `Cell ${capFirst(decoratedResidentialSummary.location.pathHierarchy)}`,
       buttonText: decoratedResidentialSummary.location.status === 'DRAFT' ? 'Save door number' : '',
-      cancelText: 'Cancel',
     }
   }
 

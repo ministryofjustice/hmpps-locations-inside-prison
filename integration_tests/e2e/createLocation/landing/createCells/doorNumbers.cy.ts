@@ -39,7 +39,6 @@ context('Create landing - Create cells - Door numbers', () => {
         doorNumbers: ['0', '1', '2', '3'],
       })
 
-      // TODO: change this page when the next step is added
       Page.verifyOnPage(CreateCellsCapacitiesPage)
     })
 

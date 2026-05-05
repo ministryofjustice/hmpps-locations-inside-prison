@@ -44,8 +44,7 @@ export default class ReviewCellCapacity extends FormInitialStep {
     const locals = super.locals(req, res)
     const { prisonConfiguration, decoratedLocation } = res.locals
 
-    const showCna = canEditCna(prisonConfiguration, decoratedLocation)
-    if (showCna) {
+    if (canEditCna(prisonConfiguration) && decoratedLocation.status === 'DRAFT') {
       locals.buttonText = 'Update cell'
     }
 

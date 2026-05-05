@@ -16,6 +16,8 @@ export default class ReactivateLocationInit extends FormInitialStep {
     let cells = getCells(res.locals.locationTree)
     const { parentLocation } = res.locals.locationResidentialSummary
 
+    req.sessionModel.set('selectLocations', [res.locals.decoratedLocation.id])
+
     if (!cells.length && parentLocation.locationType === 'CELL') {
       cells = [parentLocation]
     }

@@ -7,8 +7,8 @@ import capFirst from '../../../formatters/capFirst'
 
 export default class ReactivateCellsChangeCapacity extends FormInitialStep {
   override middlewareSetup() {
-    super.middlewareSetup()
     this.use(populateLocation())
+    super.middlewareSetup()
     this.use(this.resetErrors)
   }
 
@@ -68,7 +68,6 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
     return {
       ...locals,
       cancelLink,
-      cancelText: 'cancel',
       title: 'Change cell capacity',
       titleCaption: `${capFirst(location.locationType.toLowerCase())} ${location.localName || location.pathHierarchy}`,
       insetText:

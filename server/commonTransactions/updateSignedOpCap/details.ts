@@ -1,8 +1,14 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import BaseController from './baseController'
+import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 
 export default class Details extends BaseController {
+  override middlewareSetup() {
+    this.use(getPrisonResidentialSummary)
+    super.middlewareSetup()
+  }
+
   override _process(req: FormWizard.Request, res: Response, next: NextFunction) {
     super._process(
       {

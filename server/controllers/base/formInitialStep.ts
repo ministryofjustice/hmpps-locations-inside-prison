@@ -13,6 +13,29 @@ export default class FormInitialStep extends FormWizard.Controller {
     this.use(this.setPageTitle)
     this.use(this.setupConditionalFields)
     this.use(this.setupRemovedFields)
+    this.use(this.checkCheckboxes)
+  }
+
+  checkCheckboxes(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const { options } = req.form
+    this.getValues(req, res, (err, values) => {
+      options.fields = Object.fromEntries(
+        Object.entries(options.fields).map(([fieldName, field]) => {
+          const modifiedField = { ...field }
+
+          if (field.component === 'govukCheckboxes' && field.multiple) {
+            modifiedField.items = modifiedField.items.map(item => ({
+              ...item,
+              checked: (values[fieldName] as string[])?.includes(item.value),
+            }))
+          }
+
+          return [fieldName, modifiedField]
+        }),
+      )
+
+      next()
+    })
   }
 
   override getBackLink(req: FormWizard.Request, res: Response) {
@@ -62,7 +85,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       const formValues = { ...values }
 
       Object.keys(initialValues).forEach(fieldName => {
-        if (formValues[fieldName] === undefined) {
+        if (formValues[fieldName] === undefined || req.form.options.fields[fieldName].removed) {
           formValues[fieldName] = initialValues[fieldName]
         }
       })
@@ -195,6 +218,8 @@ export default class FormInitialStep extends FormWizard.Controller {
 
       locals.fields = fields
       locals.validationErrors = validationErrors
+    } else {
+      locals.validationErrors = res.locals.errorlist
     }
 
     return locals

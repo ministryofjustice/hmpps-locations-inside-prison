@@ -1,25 +1,17 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../utils/backUrl'
 import FormInitialStep from '../base/formInitialStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
 import canEditCna from '../../utils/canEditCna'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
-
-function isCertActive(prisonConfiguration: { certificationApprovalRequired?: string }) {
-  return prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
-}
-
-function showCnaField(prisonConfiguration: { certificationApprovalRequired?: string }) {
-  return isCertActive(prisonConfiguration)
-}
+import addConstantToLocals from '../../middleware/addConstantToLocals'
 
 export default class ChangeCellCapacity extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
+    this.use(addConstantToLocals('specialistCellTypes'))
   }
 
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
@@ -39,7 +31,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     const validationErrors: FormWizard.Errors = {}
 
     super.validateFields(req, res, errors => {
-      if (!errors.baselineCna && showCnaField(prisonConfiguration)) {
+      if (!errors.baselineCna && canEditCna(prisonConfiguration)) {
         if (
           values?.baselineCna === '0' &&
           accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
@@ -50,10 +42,18 @@ export default class ChangeCellCapacity extends FormInitialStep {
       }
 
       if (!errors.workingCapacity) {
+        const isNotSpecialType =
+          !specialistCellTypes.length ||
+          !specialistCellTypes.find(type =>
+            res.locals.constants.specialistCellTypes.find(
+              constType => constType.key === type && constType.attributes.affectsCapacity,
+            ),
+          )
+
         if (
           values?.workingCapacity === '0' &&
           accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
-          !specialistCellTypes.length
+          isNotSpecialType
         ) {
           validationErrors.workingCapacity = this.formError('workingCapacity', 'nonZeroForNormalCell')
         } else if (
@@ -81,42 +81,35 @@ export default class ChangeCellCapacity extends FormInitialStep {
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap, baselineCna: newBaselineCna } = req.form.values
     const { maxCapacity, workingCapacity, baselineCna } = this.getInitialValues(req, res)
 
-    const cnaShown = showCnaField(prisonConfiguration)
+    const cnaShown = canEditCna(prisonConfiguration)
     const cnaChanged = cnaShown && Number(newBaselineCna) !== baselineCna
     const maxCapChanged = Number(newMaxCap) !== maxCapacity
     const workingCapChanged = Number(newWorkingCap) !== workingCapacity
+    const onlyWorkingCapChanged = !cnaChanged && !maxCapChanged && workingCapChanged
 
     if (!cnaChanged && !maxCapChanged && !workingCapChanged) {
       return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
     }
 
-    // Store change flags in session for routing decisions in steps.ts
-    req.sessionModel.set('cnaOrMaxCapChanged', cnaChanged || maxCapChanged)
-    req.sessionModel.set('onlyWorkingCapChanged', !cnaChanged && !maxCapChanged && workingCapChanged)
+    req.sessionModel.set('onlyWorkingCapChanged', onlyWorkingCapChanged)
+    if (onlyWorkingCapChanged) {
+      req.sessionModel.unset('baselineCna')
+      req.sessionModel.unset('maxCapacity')
+    }
 
     return next()
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation, prisonConfiguration } = res.locals
-    const { displayName, id: locationId, prisonId } = decoratedLocation
-    const cnaShown = showCnaField(prisonConfiguration)
-
-    const cancelLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-      nextStepUrl: `/location/${locationId}/change-cell-capacity/confirm`,
-    })
+    const cnaShown = canEditCna(prisonConfiguration)
 
     const locals = {
       ...super.locals(req, res),
-      backLink: cancelLink,
-      cancelLink,
-      title: `Change cell capacity`,
       insetText: `Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a ${cnaShown ? 'baseline certified normal accommodation and ' : ''}working capacity of 0.`,
-      titleCaption: capFirst(displayName),
     }
 
-    if (canEditCna(prisonConfiguration, decoratedLocation)) {
+    if (decoratedLocation.status === 'DRAFT') {
       locals.buttonText = 'Save cell capacity'
     }
 

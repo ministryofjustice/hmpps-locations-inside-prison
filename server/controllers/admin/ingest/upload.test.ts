@@ -59,7 +59,6 @@ describe('Upload file csv', () => {
         backLink: '/admin/TST',
         buttonText: 'Upload',
         cancelLink: '/admin/TST',
-        cancelText: 'Cancel and return to prison configuration details',
         title: 'Upload cell cert data',
       })
     })

@@ -10,6 +10,10 @@ import SetCellType from '../../../commonTransactions/setCellType'
 import modifyFieldName from '../../../helpers/field/modifyFieldName'
 import populateLocation from '../../../middleware/populateLocation'
 import RemoveCellType from '../../../controllers/reactivate/location/removeCellType'
+import UpdateSignedOpCap from '../../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../../commonTransactions/submitCertificationApprovalRequest'
+import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
+import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/:cellId/set-cell-type/init') {
@@ -176,16 +180,12 @@ const steps: FormWizard.Steps = {
 
       return `/view-and-update-locations/${prisonId}/${id}`
     },
-    next: 'cert-change-disclaimer',
+    next: 'check-capacity',
     controller: ReactivateLocationInit,
   },
-  ...CertChangeDisclaimer.getSteps({
-    next: 'check-capacity',
-    title: (_req, res) => `${res.locals.decoratedLocation.locationType} activation`,
-    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
-  }),
   '/check-capacity': {
-    next: 'update-signed-op-cap',
+    next: [{ fn: hasAnyCertCapacityChange, next: 'cert-change-disclaimer' }, 'no-cert-change-confirm'],
+    fields: ['baselineCna', 'workingCapacity'],
     controller: CheckCapacity,
   },
   '/edit-capacity/:parentLocationId': {
@@ -202,6 +202,16 @@ const steps: FormWizard.Steps = {
     next: '#', // redirect handled in controller
     editable: true,
     continueOnEdit: true,
+  },
+  ...CertChangeDisclaimer.getSteps({
+    next: 'update-signed-op-cap',
+    title: (_req, res) => `${res.locals.decoratedLocation.locationType} activation`,
+    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
+  }),
+  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
+  '/no-cert-change-confirm': {
+    controller: NoCertChangeConfirm,
   },
 }
 

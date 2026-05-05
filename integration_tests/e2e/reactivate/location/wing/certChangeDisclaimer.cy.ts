@@ -4,6 +4,7 @@ import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certC
 import goToCertChangeDisclaimer from '../goToCertChangeDisclaimer'
 import { setupStubs, location } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
 
 context('Certification Reactivation - Wing - Cert change disclaimer', () => {
   let page: CertChangeDisclaimerPage
@@ -23,12 +24,12 @@ context('Certification Reactivation - Wing - Cert change disclaimer', () => {
   it('has a back link', () => {
     page.backLink().click()
 
-    Page.verifyOnPage(ViewLocationsShowPage)
+    Page.verifyOnPage(CheckCapacityPage)
   })
 
-  it('proceeds to check capacity on submit', () => {
+  it('proceeds to update signed op cap on submit', () => {
     page.submit()
 
-    Page.verifyOnPage(CheckCapacityPage)
+    Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
   })
 })

@@ -17,7 +17,7 @@ services:
       - NOMIS_ENABLED=true
 
   nomis-user-roles-api:
-    image: ghcr.io/ministryofjustice/nomis-user-roles-api:2025-11-25.29.b39ec25
+    image: ghcr.io/ministryofjustice/nomis-user-roles-api:latest
     container_name: nomis-user-roles-api
     networks:
       - hmpps
@@ -31,7 +31,7 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
   manage-users-api:
-    image: ghcr.io/ministryofjustice/hmpps-manage-users-api:2025-11-25.67.a48505c
+    image: ghcr.io/ministryofjustice/hmpps-manage-users-api:latest
     container_name: manage-users-api
     networks:
       - hmpps
@@ -77,7 +77,7 @@ services:
       - LOCATIONS_INSIDE_PRISON_API_CLIENT_SECRET=clientsecret
 
   localstack:
-    image: localstack/localstack:stable
+    image: localstack/localstack:community-archive
     networks:
       - hmpps
     container_name: localstack

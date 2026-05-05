@@ -1,6 +1,7 @@
 {% extends "../../partials/formStep.njk" %}
 
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block fields %}
   {{ govukSummaryList({
@@ -16,7 +17,7 @@
       {
         key: { text: "Baseline certified normal accommodation (CNA)" },
         value: { text: values.baselineCna }
-      } if values.baselineCna != '',
+      } if values.baselineCna != '' and values.baselineCna != decoratedLocation.capacity.certifiedNormalAccommodation,
       {
         key: { text: "Working capacity" },
         value: { text: values.workingCapacity }
@@ -24,7 +25,7 @@
       {
         key: { text: "Maximum capacity" },
         value: { text: values.maxCapacity }
-      }
+      } if  values.maxCapacity != decoratedLocation.capacity.maxCapacity
     ]
   }) }}
 
@@ -33,4 +34,10 @@
 
     <p>{{ changeSummary | safe }}</p>
   </div>
+
+  {% if showCertMismatchWarning %}
+    {{ govukInsetText({
+      text: "The cell's working capacity will not match the certified working capacity once you update the capacity."
+    }) }}
+  {% endif %}
 {% endblock %}

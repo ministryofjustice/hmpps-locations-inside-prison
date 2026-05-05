@@ -1,4 +1,5 @@
 import { ResidentialSummary } from './residentialSummary'
+import { CellCertificate } from './cellCertificate'
 
 export declare interface PrisonResidentialSummary extends ResidentialSummary {
   prisonSummary: {
@@ -7,5 +8,6 @@ export declare interface PrisonResidentialSummary extends ResidentialSummary {
     signedOperationalCapacity: number
     maxCapacity: number
     numberOfCellLocations: number
+    currentCertificate?: CellCertificate
   }
 }

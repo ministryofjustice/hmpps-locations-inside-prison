@@ -11,6 +11,8 @@ const existingWingLocation = LocationFactory.build({
   parentId: undefined,
   locationType: 'WING',
   localName: undefined,
+  level: 1,
+  leafLevel: false,
 })
 const residentialSummary: PrisonResidentialSummary = {
   prisonSummary: {

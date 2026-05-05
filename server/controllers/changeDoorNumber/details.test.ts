@@ -75,8 +75,8 @@ describe('Change door number', () => {
       expect(result).toEqual({
         removeHeadingSpacing: true,
         buttonText: 'Save door number',
-        cancelText: 'Cancel',
         titleCaption: 'Cell A-1-001',
+        validationErrors: [],
       })
     })
   })

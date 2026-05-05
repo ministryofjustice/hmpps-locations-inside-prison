@@ -15,10 +15,11 @@
     {% set rows = [] %}
     {% for cellData in cells %}
       {% set cell = cellData.decoratedLocation %}
-      {% set baselineCna = (cell.capacity.certifiedNormalAccommodation or 0) | string %}
-      {% set workingCapacity = (cell.oldWorkingCapacity or 0) | string %}
-      {% set maxCapacity = (cell.capacity.maxCapacity or 0) | string %}
-      {% set cellTypes = cell.raw.specialistCellTypes %}
+      {% set modifiedCell = modifiedLocationMap[cell.id] %}
+      {% set baselineCna = (modifiedCell.capacity.certifiedNormalAccommodation or 0) | string %}
+      {% set workingCapacity = (modifiedCell.oldWorkingCapacity or 0) | string %}
+      {% set maxCapacity = (modifiedCell.capacity.maxCapacity or 0) | string %}
+      {% set cellTypes = modifiedCell.specialistCellTypes %}
 
       {% set rows = (rows.push(
         [
@@ -52,12 +53,20 @@
   {% endif %}
 {% endmacro %}
 
-{% macro explodeLocation(data, topLevel) %}
-  <h{{ 2 if topLevel else 3 }} class="govuk-heading-{{ "m" if topLevel else "s" }}">
-    {{ data.decoratedLocation.displayName | capFirst }}
-  </h{{ 2 if topLevel else 3 }}>
+{% macro explodeLocation(data) %}
+  {% if data.decoratedSubLocations.length %}
+    {% if data.decoratedSubLocations[0].decoratedLocation.leafLevel %}
+      <h2 class="govuk-heading-m">
+        {{ data.decoratedLocation.displayName | capFirst }}
+      </h2>
 
-  {{ capacityTable(data.decoratedSubLocations, data.decoratedLocation) }}
+      {{ capacityTable(data.decoratedSubLocations, data.decoratedLocation) }}
+    {% else %}
+      {% for subLocation in data.decoratedSubLocations %}
+        {{ explodeLocation(subLocation) }}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% block fields %}
@@ -65,7 +74,7 @@
     {{ capacityTable(decoratedLocationTree, decoratedLocation) }}
   {% else %}
     {% for data in decoratedLocationTree %}
-      {{ explodeLocation(data, true) }}
+      {{ explodeLocation(data) }}
     {% endfor %}
   {% endif %}
 {% endblock %}

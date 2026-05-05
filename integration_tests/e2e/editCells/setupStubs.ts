@@ -38,6 +38,8 @@ const residentialSummary: LocationResidentialSummary = {
         workingCapacity: 2,
         maxCapacity: 3,
       },
+      currentCellCertificate: undefined,
+      inCellSanitation: false,
     }),
     LocationFactory.build({
       id: '7e570000-0000-1000-8000-000000000005',
@@ -54,6 +56,7 @@ const residentialSummary: LocationResidentialSummary = {
         workingCapacity: 3,
         maxCapacity: 4,
       },
+      currentCellCertificate: undefined,
       inCellSanitation: true,
     }),
   ],

@@ -29,6 +29,11 @@ export default class ViewLocationsShowPage extends Page {
 
   draftBannerCertifyLinkButton = (): PageElement => this.draftBanner().get('[data-qa=view-request-details]')
 
+  workingCapacityMismatchBanner = (): PageElement => cy.get('[data-qa=working-capacity-mismatch-banner]')
+
+  workingCapacityMismatchBannerButton = (): PageElement =>
+    this.workingCapacityMismatchBanner().get(`a:contains("Review working capacity")`)
+
   inactiveBanner = (): PageElement => cy.get('[data-qa=inactive-location-banner]')
 
   inactiveBannerHeader = (): PageElement => this.inactiveBanner().find('.govuk-notification-banner__heading')

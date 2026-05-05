@@ -68,7 +68,6 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
 
     return {
       cancelLink,
-      cancelText: 'Cancel',
       changeSummary,
       title: `You are about to reactivate ${cells.length} cells`,
       buttonText: 'Confirm activation',

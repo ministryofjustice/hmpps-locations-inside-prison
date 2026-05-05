@@ -24,7 +24,11 @@ export default async function populateCertificationRequestDetails(
   promises.push(addUsersToUserMap([approvalRequest.requestedBy])(req, res, null))
 
   if (approvalRequest.approvalType === 'DEACTIVATION') {
-    promises.push(addConstantToLocals(['deactivatedReasons', 'locationTypes'])(req, res, null))
+    promises.push(addConstantToLocals('deactivatedReasons')(req, res, null))
+  }
+
+  if (['DEACTIVATION', 'REACTIVATION'].includes(approvalRequest.approvalType)) {
+    promises.push(addConstantToLocals('locationTypes')(req, res, null))
     promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res, null))
   }
 

@@ -41,8 +41,7 @@ context('Certification Deactivation - Cell - Cell cert change', () => {
   it('proceeds to cert change disclaimer if yes is ticked', () => {
     page.submit({ certChange: true })
 
-    // eslint-disable-next-line no-new
-    new CertChangeDisclaimerPage('Decreasing certified working capacity')
+    Page.verifyOnPage(CertChangeDisclaimerPage, 'Decreasing certified working capacity')
   })
 
   it('proceeds to details if no is ticked', () => {

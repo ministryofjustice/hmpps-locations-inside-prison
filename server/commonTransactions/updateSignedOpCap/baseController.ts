@@ -28,13 +28,8 @@ export default class BaseController extends FormInitialStep {
     const { prisonResidentialSummary, signedOpCapChangeRequest, prisonId } = res.locals
     locals.titleCaption = prisonResidentialSummary.prisonSummary.prisonName
 
-    if (req.form.options.name === 'change-signed-operational-capacity') {
-      locals.cancelLink = `/view-and-update-locations/${prisonId}`
-      locals.cancelText = 'Cancel'
-
-      if (signedOpCapChangeRequest) {
-        locals.viewChangeRequestLink = `/${prisonId}/cell-certificate/change-requests/${signedOpCapChangeRequest.id}`
-      }
+    if (req.form.options.name === 'change-signed-operational-capacity' && signedOpCapChangeRequest) {
+      locals.viewChangeRequestLink = `/${prisonId}/cell-certificate/change-requests/${signedOpCapChangeRequest.id}`
     }
 
     return locals

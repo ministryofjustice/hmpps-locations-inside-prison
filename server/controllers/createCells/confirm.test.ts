@@ -114,7 +114,6 @@ describe('Confirm create cells', () => {
           title: 'Check and confirm the cell details',
           titleCaption: 'Create cells on landing A-1',
           buttonText: 'Create cells',
-          cancelText: 'Cancel',
         }),
       )
     })

@@ -26,7 +26,9 @@ export default async (req: Request, res: Response) => {
 
   await addUsersToUserMap(locals.approvalRequests.map(r => r.requestedBy))(req, res, null)
   await addLocationsToLocationMap(
-    locals.approvalRequests.filter(r => r.approvalType === 'DEACTIVATION').map(r => r.locationId),
+    locals.approvalRequests
+      .filter(r => ['DEACTIVATION', 'REACTIVATION'].includes(r.approvalType))
+      .map(r => r.locationId),
   )(req, res, null)
 
   return res.render('pages/cellCertificate/changeRequests/index', locals)

@@ -76,5 +76,7 @@ export default class EditCapacityPage extends Page {
         }
       }
     }
+
+    return this
   }
 }

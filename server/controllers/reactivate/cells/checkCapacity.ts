@@ -53,7 +53,6 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
       ...super.locals(req, res),
       backLink,
       cancelLink: backLink,
-      cancelText: 'Cancel',
       title: 'Check capacity of cells',
       minLayout: 'one-half',
     }

@@ -1,7 +1,15 @@
 export declare interface CertificationApprovalRequest {
   id: string
   locationId: string
-  approvalType: string
+  approvalType:
+    | 'SIGNED_OP_CAP'
+    | 'DRAFT'
+    | 'DEACTIVATION'
+    | 'CELL_MARK'
+    | 'CELL_SANITATION'
+    | 'REACTIVATION'
+    | 'CAPACITY_CHANGE'
+    | 'PRISON_BASELINE'
   prisonId: string
   locationKey: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'

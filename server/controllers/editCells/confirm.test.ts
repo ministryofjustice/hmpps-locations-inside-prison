@@ -115,6 +115,7 @@ describe('Confirm create cells', () => {
                 workingCapacity: 2,
                 maxCapacity: 3,
               },
+              currentCellCertificate: undefined,
             }),
             buildDecoratedLocation({
               id: '7e570000-0000-1000-8000-000000000003',
@@ -127,6 +128,7 @@ describe('Confirm create cells', () => {
                 workingCapacity: 2,
                 maxCapacity: 3,
               },
+              currentCellCertificate: undefined,
             }),
           ],
         },
@@ -148,7 +150,6 @@ describe('Confirm create cells', () => {
           title: 'Edit cells',
           titleCaption: 'Landing A-1',
           buttonText: 'Update cells',
-          cancelText: 'Cancel',
           backLink: '/view-and-update-locations/TST/7e570000-0000-1000-8000-000000000001',
         }),
       )
@@ -220,7 +221,7 @@ describe('Confirm create cells', () => {
       Object.assign(sessionModelData, {
         'create-cells_cellsToCreate': '2',
         'create-cells_bulkSanitation': 'NO',
-        'create-cells_withoutSanitation': ['0', '1'],
+        'create-cells_withoutSanitation': [],
         'create-cells_cellNumber0': '001',
         'create-cells_doorNumber0': '1',
         'create-cells_baselineCna0': '1',

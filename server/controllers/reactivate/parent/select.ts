@@ -53,7 +53,6 @@ export default class ReactivateParentSelect extends FormInitialStep {
       ...super.locals(req, res),
       backLink,
       cancelLink: backLink,
-      cancelText: 'Cancel',
       title: `Activate individual ${locationResidentialSummary.subLocationName.toLowerCase()}`,
       titleCaption: capFirst(decoratedLocation.displayName),
       minLayout: 'one-half',

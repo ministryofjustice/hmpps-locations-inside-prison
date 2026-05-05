@@ -23,7 +23,10 @@ const otherDraftWing = LocationFactory.build({
     workingCapacity: 20,
     maxCapacity: 40,
   },
+  currentCellCertificate: undefined,
   numberOfCellLocations: 10,
+  level: 1,
+  leafLevel: false,
 })
 const draftWing = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000200',
@@ -41,9 +44,12 @@ const draftWing = LocationFactory.build({
     workingCapacity: 20,
     maxCapacity: 40,
   },
+  currentCellCertificate: undefined,
   numberOfCellLocations: 10,
   specialistCellTypes: [],
   inCellSanitation: undefined,
+  level: 1,
+  leafLevel: false,
 })
 const draftLanding = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000210',
@@ -61,9 +67,12 @@ const draftLanding = LocationFactory.build({
     workingCapacity: 10,
     maxCapacity: 20,
   },
+  currentCellCertificate: undefined,
   numberOfCellLocations: 5,
   specialistCellTypes: [],
   inCellSanitation: undefined,
+  level: 2,
+  leafLevel: false,
 })
 const draftCell1 = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000211',
@@ -81,6 +90,7 @@ const draftCell1 = LocationFactory.build({
     workingCapacity: 5,
     maxCapacity: 10,
   },
+  currentCellCertificate: undefined,
   leafLevel: true,
   cellMark: 'B1 001',
   specialistCellTypes: ['NORMAL_ACCOMMODATION'],
@@ -101,6 +111,7 @@ const draftCell2 = LocationFactory.build({
     workingCapacity: 5,
     maxCapacity: 10,
   },
+  currentCellCertificate: undefined,
   leafLevel: true,
   cellMark: 'B1 002',
   specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],

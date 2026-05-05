@@ -1,11 +1,10 @@
 import { PaginatedUsers } from '../data/manageUsersApiClient'
 import { NotificationDetails, NotificationType } from '../services/notificationService'
+import ManageUsersService from '../services/manageUsersService'
 
 // Get distinct email addresses from manageUsersService, passing in caseload and roles.
 export async function getUserEmails(
-  manageUsersService: {
-    getAllUsersByCaseload: (systemToken: string, prisonId: string, roles: string[]) => Promise<PaginatedUsers>
-  },
+  manageUsersService: ManageUsersService,
   systemToken: string,
   prisonId: string,
   roles: string[],

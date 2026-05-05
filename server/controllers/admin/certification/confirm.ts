@@ -21,7 +21,6 @@ export default class CertApprovalStatusChangeConfirm extends FormInitialStep {
       cancelLink: backLink,
       title: 'Update certification approval status',
       buttonText: `${prisonConfiguration.certificationApprovalRequired === 'INACTIVE' ? 'Activate' : 'Inactivate'} certification approval`,
-      cancelText: 'Cancel and return to prison configuration details',
     }
   }
 
