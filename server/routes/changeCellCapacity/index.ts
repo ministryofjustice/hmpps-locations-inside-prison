@@ -11,7 +11,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('change_cell_capacity'),
-  populateLocation({ decorate: true }),
+  populateLocation({ decorate: true, includeCurrentCertificate: true }),
   populateTitleCaptionFromLocation,
   populatePrisonConfiguration(),
   wizard(steps, fields, {

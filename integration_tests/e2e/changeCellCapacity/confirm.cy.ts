@@ -6,6 +6,7 @@ import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import AuthStubber from '../../mockApis/auth'
+import ShouldUpdateCertPage from '../../pages/changeCellCapacity/shouldUpdateCert'
 
 context('Change cell capacity - confirm', () => {
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -239,6 +240,8 @@ context('Change cell capacity - confirm', () => {
       const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
       changeCellCapacityPage.workingCapacityInput().clear().type('2')
       changeCellCapacityPage.continueButton().click()
+
+      Page.verifyOnPage(ShouldUpdateCertPage).submit({ updateCert: false })
 
       Page.verifyOnPage(ConfirmCellCapacityPage)
       cy.get('.govuk-inset-text').contains(
