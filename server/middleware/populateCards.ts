@@ -109,7 +109,6 @@ export default function populateCards(locationsService: LocationsService) {
     // Non-residential locations cards and permission message
     if (req.featureFlags.nonResi && nonResiActive) {
       // Check for non-resi specific roles (these are used by the non-resi app)
-      const userRoles = res.locals.user.userRoles || []
       const hasEditRole = userRoles.includes('NONRESI__MAINTAIN_LOCATION')
 
       res.locals.nonResiCards = [
