@@ -1,7 +1,7 @@
 import hmppsConfig from '@ministryofjustice/eslint-config-hmpps'
 
 const config = hmppsConfig({
-  extraPathsAllowingDevDependencies: ['.allowed-scripts.mjs'],
+  extraPathsAllowingDevDependencies: ['.allowed-scripts.mjs', 'cypress.config*'],
 })
 
 config.push({
