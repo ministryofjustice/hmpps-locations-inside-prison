@@ -194,10 +194,15 @@
     "@jgoz/esbuild-plugin-typecheck": {
       "esbuild": "$esbuild"
     },
-    "mocha": {
-      "serialize-javascript": "^7.0.5"
+    "cypress-multi-reporters": {
+      "mocha": {
+        "serialize-javascript": "7.0.4"
+      }
     },
-    "uuid": "^14.0.0",
-    "diff": "^8.0.3"
+    "jest": {
+      "jest-core": {
+        "micromatch": "4.0.8"
+      }
+    }
   }
 }
