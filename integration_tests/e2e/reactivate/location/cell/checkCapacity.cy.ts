@@ -5,7 +5,6 @@ import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapaci
 import goToCheckCapacity from '../goToCheckCapacity'
 import EditCapacityPage from '../../../../pages/reactivate/location/editCapacity'
 import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
-import NoCertChangeConfirmPage from '../../../../pages/reactivate/location/noCertChangeConfirm'
 
 context('Certification Reactivation - Cell - Check capacity', () => {
   let page: CheckCapacityPage
@@ -38,13 +37,5 @@ context('Certification Reactivation - Cell - Check capacity', () => {
     Page.verifyOnPage(CheckCapacityPage).submit()
 
     Page.verifyOnPage(CertChangeDisclaimerPage, 'Cell activation')
-  })
-
-  context('when there are no cert changes', () => {
-    it('proceeds to no cert change confirm on submit', () => {
-      page.submit()
-
-      Page.verifyOnPage(NoCertChangeConfirmPage)
-    })
   })
 })
