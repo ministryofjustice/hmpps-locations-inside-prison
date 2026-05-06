@@ -12,7 +12,10 @@ interface UserToken {
 
 const createToken = (userToken: UserToken) => {
   // authorities in the session are always prefixed by ROLE.
-  const authorities = (userToken.roles || []).map(role => (role.startsWith('ROLE_') ? role : `ROLE_${role}`)) || []
+  // Defaults to VIEW_INTERNAL_LOCATION so most tests, which assume the user has
+  // baseline residential read access, do not need to opt in explicitly.
+  const roles = userToken.roles ?? ['VIEW_INTERNAL_LOCATION']
+  const authorities = roles.map(role => (role.startsWith('ROLE_') ? role : `ROLE_${role}`))
   const payload = {
     name: userToken.name || 'john smith',
     user_name: 'USER1',
