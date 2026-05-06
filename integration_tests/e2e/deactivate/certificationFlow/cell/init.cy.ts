@@ -70,11 +70,11 @@ context('Certification Deactivation - Cell - Init', () => {
     })
 
     context('when the cell is not occupied', () => {
-      context('when the cell has 0 working capacity', () => {
+      context('when the cell has 0 certified working capacity', () => {
         beforeEach(() => {
           setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', {
             ...location,
-            capacity: { ...location.capacity, workingCapacity: 0 },
+            currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 0 },
           })
 
           cy.signIn()

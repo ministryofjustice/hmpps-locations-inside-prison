@@ -61,6 +61,7 @@ describe('NoCertChangeConfirm', () => {
           localName: 'Wing 1',
           locationType: 'WING',
           prisonId: 'P1',
+          leafLevel: false,
         }),
       },
       redirect: jest.fn(),

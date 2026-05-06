@@ -20,7 +20,7 @@ const checkIsInactive = asyncMiddleware(async (_req, res, next) => {
 
 router.use(
   protectRoute('reactivate'),
-  populateLocation({ decorate: true }),
+  populateLocation({ decorate: true, includeCurrentCertificate: true }),
   populatePrisonConfiguration(),
   checkIsInactive,
   wizard(steps, fields, {
