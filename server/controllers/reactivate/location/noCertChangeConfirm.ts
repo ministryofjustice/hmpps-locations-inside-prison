@@ -9,6 +9,7 @@ import getResidentialSummaries from '../parent/middleware/getResidentialSummarie
 import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
 import capFirst from '../../../formatters/capFirst'
 import FormInitialStep from '../../base/formInitialStep'
+import { TypedLocals } from '../../../@types/express'
 
 export default class NoCertChangeConfirm extends FormInitialStep {
   override middlewareSetup() {
@@ -40,7 +41,7 @@ export default class NoCertChangeConfirm extends FormInitialStep {
     cells.forEach(cell => {
       const modifiedLocation = modifiedLocationMap[cell.id]
       const originalCellMaxCapacity = cell.capacity.maxCapacity
-      const originalCellWorkingCapacity = cell.oldWorkingCapacity
+      const originalCellWorkingCapacity = cell.capacity.workingCapacity
       const originalCellCna = cell.capacity.certifiedNormalAccommodation
       const newCellMaxCapacity = modifiedLocation.capacity.maxCapacity
       const newCellWorkingCapacity = modifiedLocation.oldWorkingCapacity
@@ -56,14 +57,24 @@ export default class NoCertChangeConfirm extends FormInitialStep {
       this.generateChangeSummary('maximum capacity', establishmentMaxCapacity, newEstablishmentMaxCapacity),
     ])
 
-    const changeSummary = changeSummaries.join('\n<br/><br/>\n')
+    if (changeSummaries.length === 0) {
+      changeSummaries.push("There will be no change to the establishment's capacity.")
+    }
 
-    return {
+    const changeSummary = changeSummaries.join('\n<br/><br/>\n')
+    const locals: TypedLocals = {
       changeSummary,
-      title: `You are about to reactivate ${cells.length} cell${cells.length > 1 ? 's' : ''}`,
-      titleCaption: capFirst(decoratedLocation.displayName),
       buttonText: 'Confirm activation',
     }
+
+    if (decoratedLocation.leafLevel) {
+      locals.title = `You are about to reactivate ${decoratedLocation.pathHierarchy}`
+    } else {
+      locals.title = `You are about to reactivate ${cells.length} cell${cells.length > 1 ? 's' : ''}`
+      locals.titleCaption = capFirst(decoratedLocation.displayName)
+    }
+
+    return locals
   }
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {

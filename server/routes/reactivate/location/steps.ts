@@ -15,6 +15,15 @@ import SubmitCertificationApprovalRequest from '../../../commonTransactions/subm
 import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
 import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
 
+function isTemporaryDeactivation(_req: FormWizard.Request, res: Response) {
+  const { prisonConfiguration, decoratedLocation } = res.locals
+  if (prisonConfiguration.certificationApprovalRequired !== 'ACTIVE') {
+    return true
+  }
+
+  return !(decoratedLocation.currentCellCertificate.workingCapacity === 0 && decoratedLocation.oldWorkingCapacity !== 0)
+}
+
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/:cellId/set-cell-type/init') {
     return class WrappedSetCellTypeController extends step.controller {
@@ -180,7 +189,13 @@ const steps: FormWizard.Steps = {
 
       return `/view-and-update-locations/${prisonId}/${id}`
     },
-    next: 'check-capacity',
+    next: [
+      {
+        fn: isTemporaryDeactivation,
+        next: 'no-cert-change-confirm',
+      },
+      'check-capacity',
+    ],
     controller: ReactivateLocationInit,
   },
   '/check-capacity': {

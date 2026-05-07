@@ -57,6 +57,17 @@ const fields: FormWizard.Fields = {
     },
     autocomplete: 'off',
   },
+  updateCert: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'updateCert',
+    name: 'updateCert',
+    errorMessages: {
+      required: 'Select yes if want to change the certified working capacity',
+    },
+    items: [{ text: 'set at runtime', value: '' }],
+    autocomplete: 'off',
+  },
   ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }

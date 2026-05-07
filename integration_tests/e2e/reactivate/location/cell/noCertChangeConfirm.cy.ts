@@ -1,7 +1,6 @@
 import Page from '../../../../pages/page'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import { setupStubs, location } from './setupStubs'
-import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 import NoCertChangeConfirmPage from '../../../../pages/reactivate/location/noCertChangeConfirm'
 import goToNoCertChangeConfirm from '../goToNoCertChangeConfirm'
 
@@ -9,7 +8,7 @@ context('Certification Reactivation - Cell - No cert change confirm', () => {
   let page: NoCertChangeConfirmPage
 
   beforeEach(() => {
-    setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
+    setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', false)
 
     page = goToNoCertChangeConfirm(location)
   })
@@ -23,7 +22,7 @@ context('Certification Reactivation - Cell - No cert change confirm', () => {
   it('has a back link', () => {
     page.backLink().click()
 
-    Page.verifyOnPage(CheckCapacityPage)
+    Page.verifyOnPage(ViewLocationsShowPage)
   })
 
   it('navigates to view location with a success banner on submit', () => {

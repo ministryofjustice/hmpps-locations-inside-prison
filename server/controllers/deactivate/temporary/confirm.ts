@@ -48,11 +48,9 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
     const { workingCapacity } = decoratedLocation.capacity
     const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/deactivate/temporary/details` })
-    const changeSummary = this.generateChangeSummary(
-      cellCount,
-      workingCapacity,
-      prisonResidentialSummary.prisonSummary.workingCapacity,
-    )
+    const changeSummary =
+      this.generateChangeSummary(cellCount, workingCapacity, prisonResidentialSummary.prisonSummary.workingCapacity) ||
+      "There will be no change to the establishment's capacity."
 
     return {
       backLink,

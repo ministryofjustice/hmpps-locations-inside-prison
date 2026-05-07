@@ -2,7 +2,7 @@ import Page, { PageElement } from '../../page'
 
 export default class NoCertChangeConfirmPage extends Page {
   constructor() {
-    super(/You are about to reactivate \d+ cells?/)
+    super(/You are about to reactivate/)
   }
 
   warningText = (): PageElement => cy.get('.govuk-warning-text__text')

@@ -117,6 +117,11 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('isArray', function isArrayFilter(value) {
     return Array.isArray(value)
   })
+  njkEnv.addFilter('setAttribute', function setAttribute(dictionary, key, value) {
+    dictionary[key] = value
+    return dictionary
+  })
+  njkEnv.addFilter('keys', Object.keys)
   njkEnv.addFilter('stripEmpty', function stripEmptyFilter(array: unknown[]) {
     return array.filter(v => v)
   })

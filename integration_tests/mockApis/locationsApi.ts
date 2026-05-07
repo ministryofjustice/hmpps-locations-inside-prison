@@ -593,10 +593,6 @@ const stubLocationsResidentialSummaryForCreateWing = (
       },
       currentCellCertificate: undefined,
       oldWorkingCapacity: 0,
-      certification: {
-        certified: false,
-        certifiedNormalAccommodation: 0,
-      },
       usage: [],
       accommodationTypes: [],
       specialistCellTypes: [],
