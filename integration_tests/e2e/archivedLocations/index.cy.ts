@@ -27,7 +27,7 @@ context('Archived Locations Index', () => {
   context('With location in caseload', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
