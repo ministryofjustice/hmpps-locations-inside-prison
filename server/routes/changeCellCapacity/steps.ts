@@ -5,6 +5,7 @@ import ConfirmCellCapacity from '../../controllers/changeCellCapacity/confirm'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import ShouldUpdateCert from '../../controllers/changeCellCapacity/shouldUpdateCert'
 
 function isCertActiveAndNotDraft(_req: FormWizard.Request, res: Response): boolean {
   const { prisonConfiguration, decoratedLocation } = res.locals
@@ -29,6 +30,10 @@ const steps: FormWizard.Steps = {
         next: 'cert-change-disclaimer',
       },
       {
+        fn: (req, res) => isCertActiveAndNotDraft(req, res),
+        next: 'should-update-cert',
+      },
+      {
         fn: (_req, res) => res.locals.decoratedLocation.status === 'DRAFT',
         next: 'confirm-skip',
       },
@@ -36,6 +41,13 @@ const steps: FormWizard.Steps = {
     ],
     controller: ChangeCellCapacity,
     pageTitle: 'Change cell capacity',
+    template: '../../partials/formStep',
+  },
+  '/should-update-cert': {
+    controller: ShouldUpdateCert,
+    fields: ['updateCert'],
+    next: [{ field: 'updateCert', value: 'YES', next: 'cert-change-disclaimer' }, 'confirm'],
+    pageTitle: 'Do you also want to change the certified working capacity on the cell certificate?',
     template: '../../partials/formStep',
   },
   '/confirm': {
