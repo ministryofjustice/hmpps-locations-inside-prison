@@ -196,13 +196,14 @@
     },
     "cypress-multi-reporters": {
       "mocha": {
-        "serialize-javascript": "7.0.4"
+        "serialize-javascript": "7.0.5"
       }
     },
     "jest": {
       "jest-core": {
         "micromatch": "4.0.8"
       }
-    }
+    },
+    "diff": "8.0.3"
   }
 }
