@@ -203,6 +203,7 @@
       "jest-core": {
         "micromatch": "4.0.8"
       }
-    }
+    },
+    "diff": "8.0.3"
   }
 }
