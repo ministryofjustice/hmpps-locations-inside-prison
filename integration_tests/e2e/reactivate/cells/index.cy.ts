@@ -239,8 +239,7 @@ context('Reactivate cells', () => {
 
     describe('when a cell has oldWorkingCapacity of 0', () => {
       it('shows an error when the user tries to continue', () => {
-        locations[1].oldWorkingCapacity = 0
-        cy.task('stubLocations', locations[1])
+        cy.task('stubLocations', { ...locations[1], oldWorkingCapacity: 0 })
 
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
