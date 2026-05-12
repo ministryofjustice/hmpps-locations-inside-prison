@@ -62,7 +62,8 @@
           {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess, prisonConfiguration.certificationApprovalRequired === 'ACTIVE') }}
         {% elseif decoratedResidentialSummary.location.status === 'DRAFT' %}
           {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
-        {% elseif decoratedResidentialSummary.location.status === 'ACTIVE' and
+        {% elseif prisonConfiguration.certificationApprovalRequired === 'ACTIVE' and
+          decoratedResidentialSummary.location.status === 'ACTIVE' and
           decoratedResidentialSummary.location.raw.locationType === 'CELL' and
           decoratedResidentialSummary.location.currentCellCertificate and
           decoratedResidentialSummary.location.capacity.workingCapacity !== decoratedResidentialSummary.location.currentCellCertificate.workingCapacity and
