@@ -11,6 +11,7 @@ import populateBreadcrumbsForLocation from '../middleware/populateBreadcrumbsFor
 import populateDecoratedResidentialSummary from '../middleware/populateDecoratedResidentialSummary'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
+import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 
 const router = express.Router({ mergeParams: true })
 
@@ -18,6 +19,7 @@ const controller = (services: Services) => {
   router.use(populatePrisonAndLocationId)
   router.use(redirectToAddPrisonId)
   router.use(validateCaseload())
+  router.use(populatePrisonConfiguration())
 
   router.get(
     '/:locationId?',

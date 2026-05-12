@@ -17,12 +17,19 @@ function testInactiveCellsTable(
     cy.wrap(cells.location.find('a'))
       .should('have.attr', 'href')
       .and('equal', `/view-and-update-locations/${location.prisonId}/${location.id}`)
-    cy.wrap(cells.reason).contains('Test type 1')
-    cy.wrap(cells.estimatedReactivationDate).contains(formatDate(location.proposedReactivationDate))
-    if (location.planetFmReference) {
-      cy.wrap(cells.planetFmReference).contains(location.planetFmReference)
+
+    if (location.inactiveStatus === 'INACTIVE_PEND_CHANGE_REQ') {
+      cy.wrap(cells.changeType).contains('TEST?!?')
+      cy.wrap(cells.requestedBy).contains('john smith on 11 May 2026')
+      cy.wrap(cells.action).contains('View request details')
+    } else {
+      cy.wrap(cells.reason).contains('Test type 1')
+      cy.wrap(cells.estimatedReactivationDate).contains(
+        location.proposedReactivationDate ? formatDate(location.proposedReactivationDate) : 'Not provided',
+      )
+      cy.wrap(cells.planetFmReference).contains(location.planetFmReference || 'Not provided')
+      cy.wrap(cells.deactivatedBy).contains('john smith')
     }
-    cy.wrap(cells.deactivatedBy).contains('john smith')
   })
 }
 
