@@ -21,7 +21,10 @@ export default function setCanAccess(locationService: LocationsService) {
     const permissionOverrides: { [permission: string]: boolean | { [role: string]: boolean } } = {}
 
     if (prisonIdFromParams !== undefined) {
-      const prisonConfiguration = await locationService.getPrisonConfiguration(systemToken, prisonIdFromParams)
+      const prisonConfiguration = await locationService.getPrisonConfiguration(
+        systemToken,
+        prisonIdFromParams as string,
+      )
       if (prisonConfiguration.certificationApprovalRequired === 'INACTIVE') {
         permissionOverrides.create_location = false
       }

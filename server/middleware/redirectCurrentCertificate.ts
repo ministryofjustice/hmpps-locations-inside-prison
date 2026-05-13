@@ -10,7 +10,7 @@ export default async function redirectCurrentCertificate(
   const { systemToken } = req.session
   const { locationsService } = req.services
 
-  const certificate = await locationsService.getCellCertificate(systemToken, certificateId)
+  const certificate = await locationsService.getCellCertificate(systemToken, certificateId as string)
 
   if (certificate.current) {
     res.redirect('./current')

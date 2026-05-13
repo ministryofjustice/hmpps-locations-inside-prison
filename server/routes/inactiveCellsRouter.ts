@@ -26,7 +26,7 @@ const controller = (services: Services) => {
     asyncMiddleware(async (req, res, next) => {
       res.locals.options = { action: '/reactivate/cells', method: 'get' }
       if (req.params.locationId) {
-        res.locals.locationId = req.params.locationId
+        res.locals.locationId = req.params.locationId as string
         await populateDecoratedResidentialSummary(req, res, next)
         return
       }
