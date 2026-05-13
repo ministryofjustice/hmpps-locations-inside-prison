@@ -22,7 +22,7 @@ context('Deactivate temporary', () => {
     cy.task('reset')
   })
 
-  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+  context('without any roles', () => {
     beforeEach(() => {
       cy.task('stubSignIn')
       cy.task('stubManageUsers')
@@ -53,6 +53,78 @@ context('Deactivate temporary', () => {
       ViewLocationsShowPage.goTo(location.prisonId, location.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.deactivateAction().should('not.exist')
+    })
+  })
+
+  context('with only the MANAGE_RESIDENTIAL_LOCATIONS role, when the location is a cell', () => {
+    const cell = LocationFactory.build({ ...location, locationType: 'CELL', leafLevel: true })
+
+    beforeEach(() => {
+      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      cy.task('stubManageUsers')
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubLocationsConstantsAccommodationType')
+      cy.task('stubLocationsConstantsConvertedCellType')
+      cy.task('stubLocationsConstantsDeactivatedReason')
+      cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsSpecialistCellType')
+      cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubLocationsLocationsResidentialSummary', {
+        prisonSummary: {
+          workingCapacity: 9,
+          signedOperationalCapacity: 11,
+          maxCapacity: 10,
+        },
+      })
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        parentLocation: cell,
+      })
+      cy.task('stubLocations', cell)
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      cy.signIn()
+    })
+
+    it('shows the action in the menu on the show location page', () => {
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
+      Page.verifyOnPage(ViewLocationsShowPage)
+      cy.get('a:contains("Deactivate cell")').should('be.visible')
+    })
+  })
+
+  context('with only the MANAGE_RESIDENTIAL_LOCATIONS role, when the location is a wing', () => {
+    const wing = LocationFactory.build({ ...location, locationType: 'WING' })
+
+    beforeEach(() => {
+      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      cy.task('stubManageUsers')
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubLocationsConstantsAccommodationType')
+      cy.task('stubLocationsConstantsConvertedCellType')
+      cy.task('stubLocationsConstantsDeactivatedReason')
+      cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsSpecialistCellType')
+      cy.task('stubLocationsConstantsUsedForType')
+      cy.task('stubLocationsLocationsResidentialSummary', {
+        prisonSummary: {
+          workingCapacity: 9,
+          signedOperationalCapacity: 11,
+          maxCapacity: 10,
+        },
+      })
+      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        parentLocation: wing,
+      })
+      cy.task('stubLocations', wing)
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      cy.signIn()
+    })
+
+    it('does not show the action in the menu on the show location page', () => {
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
+      Page.verifyOnPage(ViewLocationsShowPage)
+      cy.get('a:contains("Deactivate")').should('not.exist')
     })
   })
 

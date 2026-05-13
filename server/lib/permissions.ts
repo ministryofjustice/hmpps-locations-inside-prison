@@ -20,6 +20,7 @@ const certificateAdministratorPermissions: string[] = [
   'convert_non_residential',
   'create_location',
   'deactivate:permanent',
+  'deactivate:parent_location',
   'set_cell_type',
 ]
 
