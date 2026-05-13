@@ -6,7 +6,7 @@ export default async function redirectNonPendingRequest(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const { approvalRequestId} = req.params
+  const { approvalRequestId } = req.params
   const { systemToken } = req.session
   const { locationsService } = req.services
 
