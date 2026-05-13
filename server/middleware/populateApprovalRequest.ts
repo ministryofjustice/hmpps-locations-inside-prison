@@ -10,7 +10,7 @@ export default async function populateApprovalRequest(
   const { systemToken } = req.session
   res.locals.approvalRequest = await locationsService.getCertificateApprovalRequest(
     systemToken,
-    req.params.approvalRequestId,
+    req.params.approvalRequestId as string,
   )
 
   return next()
