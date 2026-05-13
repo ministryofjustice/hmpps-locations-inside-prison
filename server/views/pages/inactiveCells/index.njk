@@ -30,7 +30,7 @@
 
     {{ govukTable({
       attributes: {
-        "data-qa": "inactive-cells-table"
+        "data-qa": "inactive-cells-table-" + inactiveCells[0].inactiveStatus
       },
       head: [
         { text: "Location" },
@@ -62,7 +62,7 @@
 
     {{ govukTable({
       attributes: {
-        "data-qa": "inactive-cells-table"
+        "data-qa": "inactive-cells-table-" + inactiveCells[0].inactiveStatus
       },
       head: [
         { text: "Location" },
