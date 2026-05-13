@@ -2,10 +2,80 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
 {% from "../../macros/multiSelectFooter.njk" import multiSelectFooter %}
+
+{% macro inactiveCellTable(inactiveCells) %}
+  {% set rows = [] %}
+
+  {% if inactiveCells[0].inactiveStatus === 'INACTIVE_PEND_CHANGE_REQ' %}
+    {% for cell in inactiveCells %}
+      {% set approvalRequest = approvalRequestMap[cell.pendingApprovalRequestId] %}
+      {% set rows = (rows.push(
+        [
+          { html: '<a href="/view-and-update-locations/' + cell.prisonId + '/' + cell.id + '">' + cell.pathHierarchy + '</a>' },
+          { text: approvalTypeDescription(approvalRequest.approvalType, constants, locationMap[approvalRequest.locationId]) },
+          { text: userMap[approvalRequest.requestedBy] + ' on ' + approvalRequest.requestedDate | formatDate },
+          {
+            html: '<a class="govuk-link" href="/' + approvalRequest.prisonId + '/cell-certificate/change-requests/' +
+              approvalRequest.id + ('/review' if canAccess('certificate_change_request_review') else '') + '">' +
+              ('Review request' if canAccess('certificate_change_request_review') else 'View request details') + '</a>'
+          }
+        ]
+      ), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      attributes: {
+        "data-qa": "inactive-cells-table-" + inactiveCells[0].inactiveStatus
+      },
+      head: [
+        { text: "Location" },
+        { text: "Change type" },
+        { text: "Requested by" },
+        { text: "Action" }
+      ],
+      rows: rows,
+      firstCellIsHeader: true
+    }) }}
+  {% else %}
+    {% for cell in inactiveCells %}
+      {% if cell.deactivationReasonDescription %}
+        {% set deactivationDescription = ' - ' + cell.deactivationReasonDescription %}
+      {% else %}
+        {% set deactivationDescription = '' %}
+      {% endif %}
+
+      {% set rows = (rows.push(
+        [
+          { html: '<a href="/view-and-update-locations/' + cell.prisonId + '/' + cell.id + '">' + cell.pathHierarchy + '</a>' },
+          { text: cell.deactivatedReason + deactivationDescription },
+          { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
+          { text: cell.planetFmReference or 'Not provided' },
+          { text: cell.deactivatedBy + ' on ' + (cell.deactivatedDate | formatDate) }
+        ]
+      ), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      attributes: {
+        "data-qa": "inactive-cells-table-" + inactiveCells[0].inactiveStatus
+      },
+      head: [
+        { text: "Location" },
+        { text: "Reason" },
+        { html: "Estimated<br>reactivation date" },
+        { html: "Planet FM<br>reference number" },
+        { text: "Deactivated by" }
+      ],
+      rows: rows,
+      firstCellIsHeader: true
+    }) }}
+  {% endif %}
+{% endmacro %}
 
 {% block pageTitle %}
   {% if decoratedResidentialSummary.location %}
@@ -17,7 +87,7 @@
 {% endblock %}
 
 {% block stickyFooterContent %}
-  {% if canAccess('reactivate') %}
+  {% if canAccess('reactivate') and prisonConfiguration.certificationApprovalRequired !== 'ACTIVE' %}
     {{ multiSelectFooter({
       actions: [{
         text: 'Activate selected cells',
@@ -39,86 +109,131 @@
   </h1>
 {% endblock %}
 
-{% set rows = [] %}
-
-{% for cell in inactiveCells %}
-  {% set row = [] %}
-  {% if canAccess('reactivate') %}
-    {% set row = (row.push({
-      html: '<div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
-               <input type="checkbox" class="govuk-checkboxes__input" name="selectedLocations" id="location-' + cell.id + '" value="' + cell.id + '" autocomplete="off">
-               <label class="govuk-label govuk-checkboxes__label" for="location-' + cell.id + '">
-                 <span class="govuk-visually-hidden">' + cell.pathHierarchy + '</span>
-               </label>
-             </div>'
-    }), row) %}
-  {% endif %}
-  {% if cell.deactivationReasonDescription %}
-    {% set deactivationDescription = ' - ' + cell.deactivationReasonDescription %}
-  {% else %}
-    {% set deactivationDescription = '' %}
-  {% endif %}
-
-  {% set row = (row.push(
-    { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>", classes: 'govuk-table__header' },
-    { text: cell.deactivatedReason + deactivationDescription },
-    { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
-    { text: cell.planetFmReference or 'Not provided' },
-    { text: cell.deactivatedBy }
-  ), row) %}
-
-  {% set rows = (rows.push(row), rows) %}
-{% endfor %}
-
 {% block content %}
   <div class="govuk-width-container">
-    {% set formMethod = options.method | default('post') %}
-    {% set formAction = options.action | default('') %}
-    {% set formEnctype = options.enctype | default('') %}
+    {% if prisonConfiguration.certificationApprovalRequired === 'ACTIVE' %}
+      {% set tempCells = [] %}
+      {% set certChangeCells = [] %}
+      {% set capDecreasedCells = [] %}
 
-    <form id="reactivate-cells" method={{ formMethod }} action={{ formAction }}
-      {% if formEnctype %}
-        enctype="{{ formEnctype }}"
-      {% endif %}
-    >
-      <input type="hidden" name="prisonId" value={{ prisonId }}>
-      <input type="hidden" name="locationId" value={{ locationId }}>
+      {% for cell in inactiveCells %}
+        {% if cell.inactiveStatus === 'INACTIVE_TEMP' %}
+          {% set tempCells = (tempCells.push(cell), tempCells) %}
+        {% elseif cell.inactiveStatus === 'INACTIVE_PEND_CHANGE_REQ' %}
+          {% set certChangeCells = (certChangeCells.push(cell), certChangeCells) %}
+        {% elseif cell.inactiveStatus === 'INACTIVE_MATCHING_CELL_CERT' %}
+          {% set capDecreasedCells = (capDecreasedCells.push(cell), capDecreasedCells) %}
+        {% endif %}
+      {% endfor %}
 
-      {% if canAccess('reactivate') %}
-        {{ govukButton({
-          text: "Activate selected cells",
-          preventDoubleClick: true,
-          type: "submit",
-          classes: "moj-js-hidden"
-        }) }}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h2 class="govuk-heading-m">
+            Temporary inactive cells
+            <span class="govuk-caption-m">({{ tempCells.length }})</span>
+          </h2>
+
+          <p>
+            Cells that are expected to be out of action for less than 7 days.
+            The working capacity of these cells is included in the establishment’s certified capacity.
+          </p>
+        </div>
+
+        <div class="govuk-grid-column-full">
+          {% if tempCells.length > 0 %}
+            {{ inactiveCellTable(tempCells) }}
+          {% else %}
+            {{ govukInsetText({
+              text: 'There are no temporary inactive cells.'
+            }) }}
+          {% endif %}
+        </div>
+      </div>
+
+      {% if certChangeCells.length > 0 %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">
+              Inactive cells with certificate change requests
+              <span class="govuk-caption-m">({{ certChangeCells.length }})</span>
+            </h2>
+
+            <p>
+              Cells that are waiting for the authorising director to review a change to the cell certificate.
+            </p>
+          </div>
+
+          <div class="govuk-grid-column-full">
+            {{ inactiveCellTable(certChangeCells) }}
+          </div>
+        </div>
       {% endif %}
 
-      {% set tableHead = [] %}
-      {% if canAccess('reactivate') %}
-        {% set tableHead = (tableHead.push({
-          text: '',
-          attributes: {
-            id: 'locations-select-all'
-          }
-        }), tableHead) %}
-      {% endif %}
-      {% set tableHead = (tableHead.push(
-        { text: "Location" },
-        { text: "Reason" },
-        { text: "Estimated reactivation date" },
-        { text: "Planet FM reference number" },
-        { text: "Deactivated by" }
-      ), tableHead) %}
-      {% if rows | length %}
-        {{ govukTable({
-          attributes: {
-            "data-qa": "inactive-cells-table",
-            "data-module": "moj-multi-select",
-            "data-id-prefix": "locations-"
-          },
-          head: tableHead,
-          rows: rows
-        }) }}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h2 class="govuk-heading-m">
+            Inactive cells with capacity decreased on cell certificate
+            <span class="govuk-caption-m">({{ capDecreasedCells.length }})</span>
+          </h2>
+
+          <p>
+            Cells that are inactive and their working capacity has been decreased on the cell certificate.
+          </p>
+        </div>
+
+        <div class="govuk-grid-column-full">
+          {% if capDecreasedCells.length > 0 %}
+            {{ inactiveCellTable(capDecreasedCells) }}
+          {% else %}
+            {{ govukInsetText({
+              text: 'There are no inactive cells with decreased capacity on the cell certificate.'
+            }) }}
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      {% set rows = [] %}
+
+      {% for cell in inactiveCells %}
+        {% set row = [] %}
+        {% if canAccess('reactivate') %}
+          {% set row = (row.push({
+            html: '<div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
+                 <input type="checkbox" class="govuk-checkboxes__input" name="selectedLocations" id="location-' + cell.id + '" value="' + cell.id + '" autocomplete="off">
+                 <label class="govuk-label govuk-checkboxes__label" for="location-' + cell.id + '">
+                   <span class="govuk-visually-hidden">' + cell.pathHierarchy + '</span>
+                 </label>
+               </div>'
+          }), row) %}
+        {% endif %}
+        {% if cell.deactivationReasonDescription %}
+          {% set deactivationDescription = ' - ' + cell.deactivationReasonDescription %}
+        {% else %}
+          {% set deactivationDescription = '' %}
+        {% endif %}
+
+        {% set row = (row.push(
+          { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>", classes: 'govuk-table__header' },
+          { text: cell.deactivatedReason + deactivationDescription },
+          { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
+          { text: cell.planetFmReference or 'Not provided' },
+          { text: cell.deactivatedBy }
+        ), row) %}
+
+        {% set rows = (rows.push(row), rows) %}
+      {% endfor %}
+
+      {% set formMethod = options.method | default('post') %}
+      {% set formAction = options.action | default('') %}
+      {% set formEnctype = options.enctype | default('') %}
+
+      <form id="reactivate-cells" method={{ formMethod }} action={{ formAction }}
+        {% if formEnctype %}
+          enctype="{{ formEnctype }}"
+        {% endif %}
+      >
+        <input type="hidden" name="prisonId" value={{ prisonId }}>
+        <input type="hidden" name="locationId" value={{ locationId }}>
 
         {% if canAccess('reactivate') %}
           {{ govukButton({
@@ -128,9 +243,46 @@
             classes: "moj-js-hidden"
           }) }}
         {% endif %}
-      {% else %}
-        <p data-qa="empty-state-message">There are no inactive locations.</p>
-      {% endif %}
-    </form>
+
+        {% set tableHead = [] %}
+        {% if canAccess('reactivate') %}
+          {% set tableHead = (tableHead.push({
+            text: '',
+            attributes: {
+              id: 'locations-select-all'
+            }
+          }), tableHead) %}
+        {% endif %}
+        {% set tableHead = (tableHead.push(
+          { text: "Location" },
+          { text: "Reason" },
+          { text: "Estimated reactivation date" },
+          { text: "Planet FM reference number" },
+          { text: "Deactivated by" }
+        ), tableHead) %}
+        {% if rows | length %}
+          {{ govukTable({
+            attributes: {
+              "data-qa": "inactive-cells-table",
+              "data-module": "moj-multi-select",
+              "data-id-prefix": "locations-"
+            },
+            head: tableHead,
+            rows: rows
+          }) }}
+
+          {% if canAccess('reactivate') %}
+            {{ govukButton({
+              text: "Activate selected cells",
+              preventDoubleClick: true,
+              type: "submit",
+              classes: "moj-js-hidden"
+            }) }}
+          {% endif %}
+        {% else %}
+          <p data-qa="empty-state-message">There are no inactive locations.</p>
+        {% endif %}
+      </form>
+    {% endif %}
   </div>
 {% endblock %}

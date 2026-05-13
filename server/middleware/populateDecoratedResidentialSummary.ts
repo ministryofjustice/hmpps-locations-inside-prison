@@ -280,7 +280,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
   const { locationsService, manageUsersService } = req.services
   const { systemToken } = req.session
   const { prisonId, user } = res.locals
-  const locationId = req.params.locationId || res.locals.locationId
+  const locationId = (req.params.locationId as string) || res.locals.locationId
 
   try {
     const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, locationId)
@@ -402,7 +402,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         if (config.developerMode) {
           const prisonerLocations = await req.services.locationsService.getPrisonersInLocation(
             req.session.systemToken,
-            locationId,
+            locationId as string,
           )
 
           residentialSummary.summaryCards.push({

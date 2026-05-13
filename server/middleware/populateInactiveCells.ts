@@ -10,14 +10,15 @@ export default function populateInactiveCells({ locationsService, manageUsersSer
 
     try {
       res.locals.inactiveCells = await Promise.all(
-        ((await locationsService.getInactiveCells(systemToken, prisonId, req.params.locationId)) || []).map(location =>
-          decorateLocation({
-            location,
-            systemToken,
-            userToken: user.token,
-            manageUsersService,
-            locationsService,
-          }),
+        ((await locationsService.getInactiveCells(systemToken, prisonId, req.params.locationId as string)) || []).map(
+          location =>
+            decorateLocation({
+              location,
+              systemToken,
+              userToken: user.token,
+              manageUsersService,
+              locationsService,
+            }),
         ),
       )
 

@@ -52,6 +52,7 @@ export declare interface Location {
   topLevelApprovalLocationId?: string
   parentLocation: string
   inactiveCells: number
+  inactiveStatus?: 'INACTIVE_TEMP' | 'INACTIVE_PEND_CHANGE_REQ' | 'INACTIVE_MATCHING_CELL_CERT'
   childLocations: string[]
   changeHistory: {
     attribute: string
