@@ -42,6 +42,7 @@ interface AllLocals {
   accommodationType: string
   actions: { text: string; href: string; class: string }[]
   approvalRequest: CertificationApprovalRequest
+  approvalRequestMap: Record<string, CertificationApprovalRequest>
   approvalRequests: CertificationApprovalRequest[]
   archivedLocations: DecoratedLocation[]
   backLink: string
