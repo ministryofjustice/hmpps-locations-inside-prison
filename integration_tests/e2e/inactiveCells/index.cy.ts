@@ -7,7 +7,6 @@ import formatDate from '../../../server/formatters/formatDate'
 import AuthStubber from '../../mockApis/auth'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import LocationsApiStubber from '../../mockApis/locationsApi'
-import LocationsApi from '../../mockApis/locationsApi'
 import CertificationApprovalRequestFactory from '../../../server/testutils/factories/certificationApprovalRequest'
 
 function testInactiveCellsTable(
