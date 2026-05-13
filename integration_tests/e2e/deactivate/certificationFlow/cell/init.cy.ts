@@ -100,4 +100,21 @@ context('Certification Deactivation - Cell - Init', () => {
       })
     })
   })
+
+  context('with only the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+    context('when the cell is not occupied', () => {
+      context('when the cell has > 0 working capacity', () => {
+        beforeEach(() => {
+          setupStubs('MANAGE_RESIDENTIAL_LOCATIONS')
+
+          cy.signIn()
+        })
+
+        it('navigates straight to the deactivation details page', () => {
+          cy.visit(`/location/${location.id}/deactivate`)
+          Page.verifyOnPage(DeactivateTemporaryDetailsPage)
+        })
+      })
+    })
+  })
 })

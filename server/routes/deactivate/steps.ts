@@ -27,6 +27,7 @@ export function isCellCertChange(req: FormWizard.Request, res: Response) {
   return (
     prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
     decoratedLocation.raw.locationType === 'CELL' &&
+    req.canAccess('certificate_change_request_create') &&
     req.sessionModel.get<string>('reduceWorkingCapacity') !== 'NO'
   )
 }
