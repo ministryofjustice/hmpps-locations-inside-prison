@@ -1,4 +1,4 @@
-import multiSort from './multiSort'
+import sortByFirstPresentAttribute from './sortByFirstPresentAttribute'
 
 const objects = [
   { index: 3, localName: 'Cell wing', pathHierarchy: '1' },
@@ -8,10 +8,10 @@ const objects = [
   { index: 0, localName: '123 ABC', pathHierarchy: 'D' },
 ]
 
-describe('multiSort', () => {
+describe('sortByFirstPresentAttribute', () => {
   it('correctly sorts the passed array of objects', () => {
     expect(
-      multiSort(objects, 'localName', 'pathHierarchy')
+      sortByFirstPresentAttribute(objects, 'localName', 'pathHierarchy')
         .map(o => o.index)
         .toString(),
     ).toEqual('0,1,2,3,4')
