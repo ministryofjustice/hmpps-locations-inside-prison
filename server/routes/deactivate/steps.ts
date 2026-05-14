@@ -21,22 +21,29 @@ export function hasCertifiedWorkingCapacity(_req: FormWizard.Request, res: Respo
   return (res.locals.decoratedLocation.currentCellCertificate?.workingCapacity || 0) > 0
 }
 
-export function isCellCertChange(req: FormWizard.Request, res: Response) {
-  const { prisonConfiguration, decoratedLocation } = res.locals
+function canRequestCertChange(req: FormWizard.Request, res: Response) {
+  const { prisonConfiguration } = res.locals
 
   return (
-    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && req.canAccess('certificate_change_request_create')
+  )
+}
+
+export function isCellCertChange(req: FormWizard.Request, res: Response) {
+  const { decoratedLocation } = res.locals
+
+  return (
+    canRequestCertChange(req, res) &&
     decoratedLocation.raw.locationType === 'CELL' &&
-    req.canAccess('certificate_change_request_create') &&
     req.sessionModel.get<string>('reduceWorkingCapacity') !== 'NO'
   )
 }
 
 export function isCertChange(req: FormWizard.Request, res: Response) {
-  const { prisonConfiguration, decoratedLocation } = res.locals
+  const { decoratedLocation } = res.locals
 
   return (
-    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    canRequestCertChange(req, res) &&
     (decoratedLocation.raw.locationType !== 'CELL' || req.sessionModel.get<string>('reduceWorkingCapacity') === 'YES')
   )
 }
