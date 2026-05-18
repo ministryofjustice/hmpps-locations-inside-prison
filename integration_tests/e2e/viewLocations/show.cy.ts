@@ -214,14 +214,16 @@ context('View Locations Show', () => {
     if (location.status === 'NON_RESIDENTIAL') {
       viewLocationsShowPage.summaryCards.all().should('have.length', 0)
     } else {
-      const hasCna = location.status.includes('DRAFT') || isCertActive
+      const hasCna = isCertActive && (location.status.includes('DRAFT') || location.leafLevel)
       const hasInactiveCells = !location.status.includes('DRAFT') && !location.leafLevel
       const expectedCards = 2 + (hasCna ? 1 : 0) + (hasInactiveCells ? 1 : 0)
       viewLocationsShowPage.summaryCards.all().should('have.length', expectedCards)
       if (location.status.includes('DRAFT')) {
-        viewLocationsShowPage.summaryCards
-          .cnaText()
-          .contains(`${location.numberOfCellLocations > 0 ? location.capacity.certifiedNormalAccommodation : '-'}`)
+        if (hasCna) {
+          viewLocationsShowPage.summaryCards
+            .cnaText()
+            .contains(`${location.numberOfCellLocations > 0 ? location.capacity.certifiedNormalAccommodation : '-'}`)
+        }
         viewLocationsShowPage.summaryCards
           .workingCapacityText()
           .contains(`${location.numberOfCellLocations > 0 ? location.capacity.workingCapacity : '-'}`)
@@ -229,7 +231,7 @@ context('View Locations Show', () => {
           .maximumCapacityText()
           .contains(`${location.numberOfCellLocations > 0 ? location.capacity.maxCapacity : '-'}`)
       } else {
-        if (isCertActive) {
+        if (hasCna) {
           viewLocationsShowPage.summaryCards.cnaText().contains(`${location.capacity.certifiedNormalAccommodation}`)
         }
         viewLocationsShowPage.summaryCards.workingCapacityText().contains(`${location.capacity.workingCapacity}`)
