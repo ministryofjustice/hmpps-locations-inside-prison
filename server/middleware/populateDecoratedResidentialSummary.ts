@@ -288,7 +288,6 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
     const residentialSummary: {
       location?: DecoratedLocation
       locationDetails?: SummaryListRow[]
-      locationHistory?: boolean // TODO: change this type when location history tab is implemented
       subLocationName: string
       subLocations: DecoratedLocation[]
       summaryCards: {
@@ -331,7 +330,6 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
       })
 
       residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, prisonConfiguration, req)
-      residentialSummary.locationHistory = true
 
       if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
         const changeLink: { linkHref?: string; linkLabel?: string } = {}
@@ -357,8 +355,8 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         )
 
         if (
-          residentialSummary.location.status.includes('DRAFT') ||
-          prisonConfiguration.certificationApprovalRequired === 'ACTIVE'
+          prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+          (residentialSummary.location.status.includes('DRAFT') || residentialSummary.location.leafLevel)
         ) {
           residentialSummary.summaryCards.push({
             title: 'Baseline CNA',

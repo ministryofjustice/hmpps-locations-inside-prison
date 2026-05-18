@@ -1,7 +1,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
 
-{% macro locationDetails(location, details, history) %}
+{% macro locationDetails(location, details) %}
   <h3 class="govuk-heading-m">{{ location.locationType }} details</h3>
 
   {{ govukSummaryList({
