@@ -25,8 +25,10 @@ context('Certification Deactivation - Cell - Temporary to certified - Init', () 
       cy.signIn()
     })
 
-    it('navigates to cert change disclaimer', () => {
-      cy.visit(`/location/${location.id}/deactivate`)
+    it('shows the action in the inactive banner and navigates to cert change disclaimer', () => {
+      ViewLocationsShowPage.goTo(location.prisonId, location.id)
+      const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+      viewLocationsShowPage.inactiveBannerDecreaseCertifiedWorkingCapacityButton().click()
 
       Page.verifyOnPage(CertChangeDisclaimerPage, 'Decreasing certified working capacity')
     })
