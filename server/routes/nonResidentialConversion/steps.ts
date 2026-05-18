@@ -21,7 +21,7 @@ const steps: FormWizard.Steps = {
     skip: true,
     next: [
       {
-        fn: (req, _res) => req.canAccess('create_location'),
+        fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
         next: 'cert-change-disclaimer',
       },
       {
@@ -37,7 +37,7 @@ const steps: FormWizard.Steps = {
         fn: isCellOccupied,
         next: 'occupied',
       },
-      'warning',
+      'details',
     ],
     title: (_req, _res) => `Converting a cell to a non-residential room`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
