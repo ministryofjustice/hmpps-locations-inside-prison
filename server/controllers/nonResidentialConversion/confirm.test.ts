@@ -36,7 +36,7 @@ describe('NonResidentialConversionConfirm', () => {
         get: jest.fn(
           (fieldName?: string) =>
             ({
-              convertedCellType: { text: 'Treatment room', value: 'TREATMENT_ROOM' },
+              convertedCellType: 'TREATMENT_ROOM',
               otherConvertedCellType: '',
             })[fieldName],
         ) as FormWizard.Request['sessionModel']['get'],
@@ -45,6 +45,18 @@ describe('NonResidentialConversionConfirm', () => {
     }
     deepRes = {
       locals: {
+        constants: {
+          convertedCellTypes: [
+            {
+              key: 'TREATMENT_ROOM',
+              description: 'Treatment room',
+            },
+            {
+              key: 'OTHER',
+              description: 'Other',
+            },
+          ],
+        },
         errorlist: [],
         decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
@@ -68,10 +80,7 @@ describe('NonResidentialConversionConfirm', () => {
           username: 'JTIMPSON',
         },
         values: {
-          convertedCellType: {
-            text: 'Treatment room',
-            value: 'TREATMENT_ROOM',
-          },
+          convertedCellType: 'TREATMENT_ROOM',
           otherConvertedCellType: '',
         },
       },
@@ -102,7 +111,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
       deepReq.sessionModel.get = jest.fn(
         (fieldName?: string): any =>
           ({
-            convertedCellType: { text: 'Other', value: 'OTHER' },
+            convertedCellType: 'OTHER',
             otherConvertedCellType: 'Server room',
           })[fieldName],
       )

@@ -35,6 +35,8 @@ async function locationToCertificationLocation(
   let cellMark
   let inCellSanitation = false
   let specialistCellTypes: string[] = []
+  let convertedCellType: string
+  let otherConvertedCellType: string
   let subLocations: CertificateLocation[] = []
   if (location.status.includes('DRAFT')) {
     const locationAttributes = getLocationAttributesIncludePending(location)
@@ -45,6 +47,8 @@ async function locationToCertificationLocation(
     cellMark = locationAttributes.cellMark
     inCellSanitation = locationAttributes.inCellSanitation
     specialistCellTypes = location.specialistCellTypes
+    convertedCellType = location.convertedCellType
+    otherConvertedCellType = location.otherConvertedCellType
   }
 
   let locationWithCertification: Location
@@ -79,6 +83,8 @@ async function locationToCertificationLocation(
     cellMark = locationWithCertification.currentCellCertificate.cellMark
     inCellSanitation = locationWithCertification.currentCellCertificate.inCellSanitation
     specialistCellTypes = locationWithCertification.currentCellCertificate.specialistCellTypes
+    convertedCellType = locationWithCertification.currentCellCertificate.convertedCellType
+    otherConvertedCellType = locationWithCertification.currentCellCertificate.otherConvertedCellType
   }
 
   let certificationLocation: CertificateLocation = {
@@ -94,11 +100,16 @@ async function locationToCertificationLocation(
     currentMaxCapacity: maxCapacity,
     locationType: location.locationType,
     subLocations,
+    currentInCellSanitation: inCellSanitation,
     inCellSanitation,
     cellMark,
     currentCellMark: cellMark,
     currentSpecialistCellTypes: specialistCellTypes,
     specialistCellTypes,
+    currentConvertedCellType: convertedCellType,
+    convertedCellType,
+    currentOtherConvertedCellType: otherConvertedCellType,
+    otherConvertedCellType,
     accommodationTypes: location.accommodationTypes,
     usedFor: location.usedFor,
   }
@@ -118,6 +129,7 @@ export default class Confirm extends FormInitialStep {
     this.use(
       addConstantToLocals([
         'accommodationTypes',
+        'convertedCellTypes',
         'deactivatedReasons',
         'locationTypes',
         'specialistCellTypes',
@@ -371,6 +383,34 @@ export default class Confirm extends FormInitialStep {
         workingCapacityChange,
         locations: [certLocation],
       })
+    } else if (req.form.options.name === 'non-residential-conversion') {
+      const { location } = res.locals
+      const certLocation = await locationToCertificationLocation(
+        req,
+        location,
+        (_originalLocation, certificateLocation) => ({
+          ...certificateLocation,
+          workingCapacity: 0,
+          maxCapacity: 0,
+          certifiedNormalAccommodation: 0,
+          convertedCellType: req.sessionModel.get<string>('convertedCellType'),
+          otherConvertedCellType: req.sessionModel.get<string>('otherConvertedCellType'),
+          inCellSanitation: false,
+        }),
+      )
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'TEMP_NON_RESIDENTIAL_CONVERSION',
+        prisonId: location.prisonId,
+        locationId: location.id,
+        locationKey: location.key,
+        locations: [certLocation],
+        reasonForChange: req.sessionModel.get<string>('explanation'),
+      })
+      const changeLink = `/location/${locals.location.id}/non-residential-conversion/details/edit`
+      locals.changeLinks = {
+        nonResidentialRoom: changeLink,
+        reasonForChange: changeLink,
+      }
     }
 
     if (proposedSignedOpCapChange) {

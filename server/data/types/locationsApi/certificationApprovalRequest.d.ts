@@ -10,6 +10,7 @@ export declare interface CertificationApprovalRequest {
     | 'REACTIVATION'
     | 'CAPACITY_CHANGE'
     | 'PRISON_BASELINE'
+    | 'TEMP_NON_RESIDENTIAL_CONVERSION'
   prisonId: string
   locationKey: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'

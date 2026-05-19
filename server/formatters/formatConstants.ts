@@ -4,9 +4,10 @@ export default function formatConstants(
   constants: LocationsApiConstant[],
   keys: string[] | string | undefined,
   joinString = '<br>',
+  dfault = '-',
 ): string {
   if (!keys || !keys.length) {
-    return '-'
+    return dfault
   }
 
   if (Array.isArray(keys)) {
@@ -14,9 +15,9 @@ export default function formatConstants(
       keys
         .map(key => formatConstants(constants, key))
         .filter(s => s !== '-')
-        .join(joinString) || '-'
+        .join(joinString) || dfault
     )
   }
 
-  return constants.find(o => o.key === keys)?.description || '-'
+  return constants.find(o => o.key === keys)?.description || dfault
 }

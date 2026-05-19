@@ -70,6 +70,7 @@ describe('Confirm', () => {
             cellMark: undefined,
             currentCellMark: undefined,
             inCellSanitation: false,
+            currentInCellSanitation: false,
             level: 1,
             subLocations: [
               CertificateLocationFactory.build({
@@ -80,6 +81,7 @@ describe('Confirm', () => {
                 cellMark: undefined,
                 currentCellMark: undefined,
                 inCellSanitation: false,
+                currentInCellSanitation: false,
                 level: 2,
                 subLocations: [
                   CertificateLocationFactory.build({
@@ -105,6 +107,8 @@ describe('Confirm', () => {
           leafLevel: false,
           inCellSanitation: false,
           currentCellCertificate: undefined,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
         })
         const landing = LocationFactory.build({
           parentId: wing.id,
@@ -118,6 +122,8 @@ describe('Confirm', () => {
           leafLevel: false,
           inCellSanitation: false,
           currentCellCertificate: undefined,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
         })
         const cell = LocationFactory.build({
           parentId: landing.id,
@@ -128,6 +134,8 @@ describe('Confirm', () => {
           level: 3,
           inCellSanitation: true,
           currentCellCertificate: undefined,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
         })
         deepRes.locals.location = wing
         locationsService.getResidentialSummary.mockImplementation((_token, _prisonId, id) =>
@@ -281,6 +289,7 @@ describe('Confirm', () => {
             currentCellMark: undefined,
             cellMark: undefined,
             inCellSanitation: false,
+            currentInCellSanitation: false,
             level: 1,
             subLocations: [
               CertificateLocationFactory.build({
@@ -289,6 +298,7 @@ describe('Confirm', () => {
                 currentCellMark: undefined,
                 cellMark: undefined,
                 inCellSanitation: false,
+                currentInCellSanitation: false,
                 level: 2,
                 subLocations: [
                   CertificateLocationFactory.build({
@@ -313,6 +323,8 @@ describe('Confirm', () => {
           level: 1,
           leafLevel: false,
           inCellSanitation: false,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
           key: 'TST-A',
           currentCellCertificate: {
             ...certWing,
@@ -331,6 +343,8 @@ describe('Confirm', () => {
           level: 2,
           leafLevel: false,
           inCellSanitation: false,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
           currentCellCertificate: {
             ...certLanding,
             workingCapacity: certLanding.currentWorkingCapacity,
@@ -347,6 +361,8 @@ describe('Confirm', () => {
           cellMark: 'A1-1',
           level: 3,
           inCellSanitation: true,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
           currentCellCertificate: {
             ...certCell,
             workingCapacity: certCell.currentWorkingCapacity,

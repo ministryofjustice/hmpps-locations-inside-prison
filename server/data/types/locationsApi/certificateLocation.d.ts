@@ -12,12 +12,16 @@ export declare interface CertificateLocation {
   currentCertifiedNormalAccommodation: number
   currentWorkingCapacity: number
   currentMaxCapacity: number
+  currentInCellSanitation?: boolean
   inCellSanitation?: boolean
   locationType: LocationType
   accommodationTypes?: string[]
   currentSpecialistCellTypes?: string[]
   specialistCellTypes?: string[]
   usedFor?: string[]
-  convertedCellType?: string[]
+  currentConvertedCellType?: string
+  convertedCellType?: string
+  currentOtherConvertedCellType?: string
+  otherConvertedCellType?: string
   subLocations: CertificateLocation[]
 }

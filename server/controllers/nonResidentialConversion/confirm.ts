@@ -5,17 +5,22 @@ import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
+import addConstantToLocals from '../../middleware/addConstantToLocals'
+import formatConstants from '../../formatters/formatConstants'
 
 export default class NonResidentialConversionConfirm extends FormWizard.Controller {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
+    this.use(addConstantToLocals('convertedCellTypes'))
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const convertedCellType = req.sessionModel.get('convertedCellType') as { text: string; value: string }
-    let convertedCellTypeDetails = convertedCellType?.text
-    const otherConvertedCellType = req.sessionModel.get('otherConvertedCellType') as string
+    let convertedCellTypeDetails = formatConstants(
+      res.locals.constants.convertedCellTypes,
+      req.sessionModel.get<string>('convertedCellType'),
+    )
+    const otherConvertedCellType = req.sessionModel.get<string>('otherConvertedCellType')
     if (otherConvertedCellType?.length) {
       convertedCellTypeDetails += ` - ${otherConvertedCellType}`
     }
@@ -52,8 +57,8 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
     const { analyticsService, locationsService } = req.services
 
     try {
-      const convertedCellType = req.sessionModel.get('convertedCellType') as { text: string; value: string }
-      let otherConvertedCellType = req.sessionModel.get('otherConvertedCellType') as string
+      const convertedCellType = req.sessionModel.get<string>('convertedCellType')
+      let otherConvertedCellType = req.sessionModel.get<string>('otherConvertedCellType')
       if (!otherConvertedCellType?.length) {
         otherConvertedCellType = undefined
       }
@@ -61,13 +66,13 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
       await locationsService.convertCellToNonResCell(
         req.session.systemToken,
         decoratedLocation.id,
-        convertedCellType?.value,
+        convertedCellType,
         otherConvertedCellType,
       )
 
       analyticsService.sendEvent(req, 'convert_to_non_res', {
         prison_id: decoratedLocation.prisonId,
-        converted_cell_type: convertedCellType.value,
+        converted_cell_type: convertedCellType,
       })
 
       return next()
