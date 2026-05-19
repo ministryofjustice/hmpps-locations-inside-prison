@@ -42,6 +42,7 @@ export default class Details extends FormInitialStep {
             systemToken,
             prisonId,
             doorNumber,
+            decoratedResidentialSummary.location.parentId,
           )
 
           if (duplicateDoorNumberLocations.length > 0) {
