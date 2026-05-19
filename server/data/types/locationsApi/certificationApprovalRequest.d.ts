@@ -10,6 +10,7 @@ export declare interface CertificationApprovalRequest {
     | 'REACTIVATION'
     | 'CAPACITY_CHANGE'
     | 'PRISON_BASELINE'
+    | 'TEMP_NON_RESIDENTIAL_CONVERSION'
     | 'SPECIALIST_CELL_TYPE'
     | 'CONVERT_ROOM_TO_CELL'
   prisonId: string

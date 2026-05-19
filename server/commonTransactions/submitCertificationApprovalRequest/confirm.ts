@@ -88,7 +88,7 @@ async function locationToCertificationLocation(
     inCellSanitation = locationWithCertification.currentCellCertificate.inCellSanitation
     specialistCellTypes = locationWithCertification.currentCellCertificate.specialistCellTypes
     convertedCellType = locationWithCertification.currentCellCertificate.convertedCellType
-    // otherConvertedCellType = locationWithCertification.currentCellCertificate.otherConvertedCellType
+    otherConvertedCellType = locationWithCertification.currentCellCertificate.otherConvertedCellType
   }
 
   let certificationLocation: CertificateLocation = {
@@ -133,10 +133,10 @@ export default class Confirm extends FormInitialStep {
     this.use(
       addConstantToLocals([
         'accommodationTypes',
+        'convertedCellTypes',
         'deactivatedReasons',
         'locationTypes',
         'specialistCellTypes',
-        'convertedCellTypes',
         'usedForTypes',
       ]),
     )
@@ -392,6 +392,34 @@ export default class Confirm extends FormInitialStep {
         workingCapacityChange,
         locations: [certLocation],
       })
+    } else if (req.form.options.name === 'non-residential-conversion') {
+      const { location } = res.locals
+      const certLocation = await locationToCertificationLocation(
+        req,
+        location,
+        (_originalLocation, certificateLocation) => ({
+          ...certificateLocation,
+          workingCapacity: 0,
+          maxCapacity: 0,
+          certifiedNormalAccommodation: 0,
+          convertedCellType: req.sessionModel.get<string>('convertedCellType'),
+          otherConvertedCellType: req.sessionModel.get<string>('otherConvertedCellType'),
+          inCellSanitation: false,
+        }),
+      )
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'TEMP_NON_RESIDENTIAL_CONVERSION',
+        prisonId: location.prisonId,
+        locationId: location.id,
+        locationKey: location.key,
+        locations: [certLocation],
+        reasonForChange: req.sessionModel.get<string>('explanation'),
+      })
+      const changeLink = `/location/${locals.location.id}/non-residential-conversion/details/edit`
+      locals.changeLinks = {
+        nonResidentialRoom: changeLink,
+        reasonForChange: changeLink,
+      }
     } else if (req.form.options.name === 'set-cell-type') {
       const newSpecialistCellType = sessionModel.get<string>('set-cell-type_specialistCellTypes')
       const newBaselineCna = Number(sessionModel.get<string>('set-cell-type_baselineCna'))

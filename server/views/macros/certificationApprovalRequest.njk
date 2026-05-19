@@ -450,6 +450,52 @@
             ] | stripEmpty]
           }) }}
         </div>
+      {% elseif request.approvalType == 'TEMP_NON_RESIDENTIAL_CONVERSION' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+          {% endif %}
+        </div>
+
+        {% set currentConvertedCellType = formatConstants(constants.convertedCellTypes, request.locations[0].currentConvertedCellType, '<br>', 'None') %}
+        {% if request.locations[0].currentOtherConvertedCellType %}
+          {% set currentConvertedCellType = currentConvertedCellType + ' - ' + request.locations[0].currentOtherConvertedCellType %}
+        {% endif %}
+        {% set convertedCellType = formatConstants(constants.convertedCellTypes, request.locations[0].convertedCellType, '<br>', 'None') %}
+        {% if request.locations[0].otherConvertedCellType %}
+          {% set convertedCellType = convertedCellType + ' - ' + request.locations[0].otherConvertedCellType %}
+        {% endif %}
+
+        <div class="govuk-grid-column-full">
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'capacity-change-table'
+            },
+            head: [
+              { text: "Location" },
+              { text: "Baseline CNA" },
+              { text: "Certified working capacity" },
+              { text: "Maximum capacity" },
+              { text: "Cell type" },
+              { text: "Sanitation" }
+            ],
+            rows:[[
+              { text: request.locations[0].pathHierarchy },
+              { text: request.locations[0].currentCertifiedNormalAccommodation + " → None" },
+              { text: request.locations[0].currentWorkingCapacity+ " → None" },
+              { text: request.locations[0].currentMaxCapacity + " → None" },
+              { text: currentConvertedCellType + " → " + convertedCellType },
+              { text: request.locations[0].currentInCellSanitation | yesNo + " → None" }
+            ]],
+            firstCellIsHeader: true
+          }) }}
+        </div>
         {% elseif request.approvalType == 'CONVERT_ROOM_TO_CELL' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}

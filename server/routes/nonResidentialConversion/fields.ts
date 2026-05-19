@@ -1,5 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
 import maxLength from '../../validators/maxLength'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 const fields: FormWizard.Fields = {
   convertedCellType: {
@@ -47,6 +49,24 @@ const fields: FormWizard.Fields = {
     },
     autocomplete: 'off',
     'ignore-defaults': true,
+  },
+  ...UpdateSignedOpCap.getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
+  'submit-certification-approval-request_confirmation': {
+    ...SubmitCertificationApprovalRequest.getFields()['submit-certification-approval-request_confirmation'],
+    label: {
+      text: 'Confirm changes have been agreed',
+    },
+    fieldset: {
+      legend: {
+        text: 'Confirm changes have been agreed',
+        classes: 'govuk-fieldset__legend--m',
+      },
+    },
+    hint: {
+      text: 'By submitting this request, you confirm that this change has been agreed by the PGD.',
+    },
+    errorMessages: { required: 'Confirm that changes have been agreed' },
   },
 }
 

@@ -39,10 +39,15 @@ export default class FormInitialStep extends FormWizard.Controller {
   }
 
   override getBackLink(req: FormWizard.Request, res: Response) {
-    const backLink = super.getBackLink(req, res) || res.locals.cancelLink
+    const backLink: string | ((req: FormWizard.Request, res: Response) => string) =
+      super.getBackLink(req, res) || res.locals.cancelLink
 
     if (typeof backLink === 'string') {
       return backLink.replace(/:(\w+)/g, (_, param) => req.params[param])
+    }
+
+    if (typeof backLink === 'function') {
+      return (backLink as (req: FormWizard.Request, res: Response) => string)(req, res)
     }
 
     return backLink
