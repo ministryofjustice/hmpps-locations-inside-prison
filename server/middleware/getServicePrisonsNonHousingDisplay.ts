@@ -2,6 +2,7 @@ import { type NextFunction, Request, type Response } from 'express'
 import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../logger'
 import PrisonService from '../services/prisonService'
+import { ModuleName } from '../data/types/locationsApi/moduleName'
 
 export default function getServicePrisonsNonHousingDisplay() {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -31,7 +32,14 @@ export function getSplashScreenStatus() {
     const { prisonId } = res.locals
 
     try {
-      res.locals.nomisScreenBlocked = await getScreenBlockStatus(req.services.prisonService, systemToken, prisonId)
+      const [housing, location, usage] = await Promise.all([
+        getScreenBlockStatus(req.services.prisonService, systemToken, prisonId, 'OIMMHOLO'),
+        getScreenBlockStatus(req.services.prisonService, systemToken, prisonId, 'OIMILOCA'),
+        getScreenBlockStatus(req.services.prisonService, systemToken, prisonId, 'OIMULOCA'),
+      ])
+      res.locals.nomisScreenBlocked = housing
+      res.locals.nomisLocationScreenBlocked = location
+      res.locals.nomisUsageScreenBlocked = usage
       next()
     } catch (error) {
       handleScreenStatusError(error, prisonId, next)
@@ -39,21 +47,30 @@ export function getSplashScreenStatus() {
   }
 }
 
-async function getScreenBlockStatus(prisonService: PrisonService, token: string, prisonId: string): Promise<boolean> {
+async function getScreenBlockStatus(
+  prisonService: PrisonService,
+  token: string,
+  prisonId: string,
+  moduleName: ModuleName,
+): Promise<boolean> {
   try {
-    const condition = await prisonService.getScreenStatus(token, prisonId)
+    const condition = await prisonService.getScreenStatus(token, prisonId, moduleName)
     return condition.blockAccess
   } catch (error) {
     if (error.responseStatus === 404) {
-      return getFallbackScreenStatus(prisonService, token)
+      return getFallbackScreenStatus(prisonService, token, moduleName)
     }
     throw error
   }
 }
 
-async function getFallbackScreenStatus(prisonService: PrisonService, token: string): Promise<boolean> {
+async function getFallbackScreenStatus(
+  prisonService: PrisonService,
+  token: string,
+  moduleName: ModuleName,
+): Promise<boolean> {
   try {
-    const condition = await prisonService.getScreenStatus(token, '**ALL**')
+    const condition = await prisonService.getScreenStatus(token, '**ALL**', moduleName)
     return condition.blockAccess
   } catch (error) {
     if (error.responseStatus === 404) {
