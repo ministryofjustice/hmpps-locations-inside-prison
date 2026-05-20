@@ -40,6 +40,7 @@ import changeResiStatusRouter from './admin/resi'
 import changeNonResiStatusRouter from './admin/nonResi'
 import changeCertApprovalStatusRouter from './admin/certApproval'
 import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
+import changeNomisScreenStatusRouter from './admin/nomisScreen'
 import ingestRouter from './admin/ingest'
 import cellCertificateRouter from './cellCertificate'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
@@ -114,6 +115,7 @@ export default function routes(services: Services): Router {
   router.use('/admin/:prisonId/change-non-resi-status', changeNonResiStatusRouter)
   router.use('/admin/:prisonId/change-include-seg-in-roll-count', changeIncludeSegInRollCountStatusRouter)
   router.use('/admin/:prisonId/change-certification-status', changeCertApprovalStatusRouter)
+  router.use('/admin/:prisonId/change-nomis-screen-status/:moduleName', changeNomisScreenStatusRouter)
   router.use('/admin/:prisonId/ingest-cert', ingestRouter)
 
   if (config.developerMode) {

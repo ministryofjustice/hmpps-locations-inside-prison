@@ -1,0 +1,34 @@
+{% extends "../../../partials/formStep.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% set nomisScreenHtml %}
+  <span class="hmpps-inactive-location-banner">
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: { text: 'Prison' },
+            value: { text: prisonConfiguration.prisonId }
+          },
+          {
+            key: { text: 'Screen' },
+            value: { text: screenLabel }
+          },
+          {
+            key: { text: 'Current status' },
+            value: { text: currentStatusDescription }
+          }
+        ],
+        classes: 'hmpps-inactive-location-banner-summary-list' }) }}
+  </span>
+{% endset %}
+
+{% block fields %}
+  {{ govukNotificationBanner({
+    html: nomisScreenHtml,
+    classes: 'govuk-notification-banner__headerless'
+  }) }}
+
+  {{ super() }}
+{% endblock %}

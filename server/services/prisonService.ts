@@ -1,5 +1,6 @@
 import { PrisonApiClient } from '../data/prisonApiClient'
 import { ServiceCode } from '../data/types/locationsApi/serviceCode'
+import { ModuleName } from '../data/types/locationsApi/moduleName'
 
 export default class PrisonService {
   constructor(private readonly prisonApiClient: PrisonApiClient) {}
@@ -16,16 +17,16 @@ export default class PrisonService {
     return this.prisonApiClient.servicePrisons.deactivatePrisonService(token, { prisonId, serviceCode })
   }
 
-  async getScreenStatus(token: string, prisonId: string) {
-    return this.prisonApiClient.splashScreen.getScreenStatus(token, { prisonId, moduleName: 'OIMMHOLO' })
+  async getScreenStatus(token: string, prisonId: string, moduleName: ModuleName = 'OIMMHOLO') {
+    return this.prisonApiClient.splashScreen.getScreenStatus(token, { prisonId, moduleName })
   }
 
-  async addCondition(token: string, prisonId: string, block: boolean = true) {
+  async addCondition(token: string, prisonId: string, block: boolean = true, moduleName: ModuleName = 'OIMMHOLO') {
     return this.prisonApiClient.splashScreen.addCondition(
       token,
       {
         prisonId,
-        moduleName: 'OIMMHOLO',
+        moduleName,
       },
       {
         conditionType: 'CASELOAD',
@@ -35,14 +36,14 @@ export default class PrisonService {
     )
   }
 
-  async removeCondition(token: string, prisonId: string) {
-    return this.prisonApiClient.splashScreen.removeCondition(token, { prisonId, moduleName: 'OIMMHOLO' })
+  async removeCondition(token: string, prisonId: string, moduleName: ModuleName = 'OIMMHOLO') {
+    return this.prisonApiClient.splashScreen.removeCondition(token, { prisonId, moduleName })
   }
 
-  async updateScreen(token: string, prisonId: string, block: boolean) {
+  async updateScreen(token: string, prisonId: string, block: boolean, moduleName: ModuleName = 'OIMMHOLO') {
     return this.prisonApiClient.splashScreen.updateScreen(token, {
       prisonId,
-      moduleName: 'OIMMHOLO',
+      moduleName,
       blockScreen: block === true ? 'true' : 'false',
     })
   }
