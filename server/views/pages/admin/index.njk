@@ -29,6 +29,22 @@
   {% endif %}
 {% endset %}
 
+{% set locationScreenBlocked %}
+  {% if nomisLocationScreenBlocked %}
+    Blocked
+  {% else %}
+    Not-Blocked
+  {% endif %}
+{% endset %}
+
+{% set usageScreenBlocked %}
+  {% if nomisUsageScreenBlocked %}
+    Blocked
+  {% else %}
+    Not-Blocked
+  {% endif %}
+{% endset %}
+
 {% set resiHtml %}
   <span class="hmpps-inactive-location-banner">
         {{ govukSummaryList({rows:[
@@ -122,6 +138,40 @@
         },
           value: {
             text: screenBlocked
+          }
+        },
+        {
+          key: {
+            text: 'OIMILOCA screen blocked'
+          },
+          value: {
+            text: locationScreenBlocked
+          },
+          actions: {
+            items: [
+              {
+                href: '/admin/' + prisonConfiguration.prisonId + '/change-nomis-screen-status/OIMILOCA',
+                text: "Change",
+                visuallyHiddenText: "OIMILOCA NOMIS screen",
+                classes: "govuk-link--no-visited-state"}
+            ]
+          }
+        },
+        {
+          key: {
+            text: 'OIMULOCA screen blocked'
+          },
+          value: {
+            text: usageScreenBlocked
+          },
+          actions: {
+            items: [
+              {
+                href: '/admin/' + prisonConfiguration.prisonId + '/change-nomis-screen-status/OIMULOCA',
+                text: "Change",
+                visuallyHiddenText: "OIMULOCA NOMIS screen",
+                classes: "govuk-link--no-visited-state"}
+            ]
           }
         },
         {

@@ -160,6 +160,12 @@ interface AllLocals {
   prisonNonHousingDisabled: boolean
   nestedBaseUrl: string
   nomisScreenBlocked: boolean
+  nomisLocationScreenBlocked: boolean
+  nomisUsageScreenBlocked: boolean
+  moduleName: string
+  currentScreenStatus: string
+  screenLabel: string
+  currentStatusDescription: string
   prisonId: string
   prisonerLocation: PrisonerLocation
   prisonResidentialSummary: PrisonResidentialSummary
