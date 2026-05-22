@@ -52,9 +52,8 @@ export default class NomisScreenStatusChangeConfirm extends FormInitialStep {
 
   async loadCurrentStatus(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
-      const moduleName = parseModuleName(req.params.moduleName)
+      const moduleName = parseModuleName(res.locals.moduleName)
       const { prisonId } = res.locals.prisonConfiguration
-      res.locals.moduleName = moduleName
       res.locals.currentScreenStatus = await fetchStatus(
         req.services.prisonService,
         req.session.systemToken,

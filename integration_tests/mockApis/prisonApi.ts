@@ -74,14 +74,15 @@ const stubDisplayHousingCheckboxesPost = (returnData: { prisonid: 'TST'; prison:
     jsonBody: returnData,
   })
 
-const stubGetSplashScreenCondition = (
-  prisonId: string = 'TST',
-  returnData: SplashCondition = { conditionType: 'CASELOAD', conditionValue: 'TST', blockAccess: false },
-) =>
+const stubGetSplashScreenCondition = ({
+  prisonId = 'TST',
+  moduleName = 'OIMMHOLO',
+  returnData = { conditionType: 'CASELOAD', conditionValue: 'TST', blockAccess: false },
+}: { prisonId?: string; moduleName?: string; returnData?: SplashCondition } = {}) =>
   stubFor({
     request: {
       method: 'GET',
-      urlPath: `/prison-api/api/splash-screen/OIMMHOLO/condition/CASELOAD/${prisonId}`,
+      urlPath: `/prison-api/api/splash-screen/${moduleName}/condition/CASELOAD/${prisonId}`,
     },
     response: {
       status: 200,
@@ -99,11 +100,14 @@ const sampleSplashResult = {
   blockedText: 'BLOCKED',
   blockAccessType: 'COND',
 }
-const stubCreateSplashScreenCondition = (returnData: SplashScreen = sampleSplashResult) =>
+const stubCreateSplashScreenCondition = ({
+  moduleName = 'OIMMHOLO',
+  returnData = sampleSplashResult,
+}: { moduleName?: string; returnData?: SplashScreen } = {}) =>
   stubFor({
     request: {
       method: 'POST',
-      urlPath: '/prison-api/api/splash-screen/OIMMHOLO/condition',
+      urlPath: `/prison-api/api/splash-screen/${moduleName}/condition`,
     },
     response: {
       status: 200,
@@ -114,15 +118,16 @@ const stubCreateSplashScreenCondition = (returnData: SplashScreen = sampleSplash
     },
   })
 
-const stubUpdateSplashScreenCondition = (
-  prisonId: string = 'TST',
-  blockScreen: boolean = false,
-  returnData: SplashScreen = sampleSplashResult,
-) =>
+const stubUpdateSplashScreenCondition = ({
+  prisonId = 'TST',
+  moduleName = 'OIMMHOLO',
+  blockScreen = false,
+  returnData = sampleSplashResult,
+}: { prisonId?: string; moduleName?: string; blockScreen?: boolean; returnData?: SplashScreen } = {}) =>
   stubFor({
     request: {
       method: 'PUT',
-      urlPattern: `/prison-api/api/splash-screen/OIMMHOLO/condition/CASELOAD/${prisonId}/${blockScreen}`,
+      urlPattern: `/prison-api/api/splash-screen/${moduleName}/condition/CASELOAD/${prisonId}/${blockScreen}`,
     },
     response: {
       status: 200,
