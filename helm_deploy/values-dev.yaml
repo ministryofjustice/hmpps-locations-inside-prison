@@ -25,5 +25,8 @@ generic-service:
     AUDIT_ENABLED: "false"
     FLAG_NON_RESI: enabled
 
+  allowlist:
+    accessibility-audit: 5.181.59.114/32
+
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
