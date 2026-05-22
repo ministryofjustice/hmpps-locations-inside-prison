@@ -17,7 +17,6 @@ describe('adminNomisScreenSwitch', () => {
   beforeEach(() => {
     deepReq = {
       flash: jest.fn(),
-      params: { moduleName: 'OIMILOCA' },
       session: {
         referrerUrl: '',
         systemToken: 'token',
@@ -201,7 +200,7 @@ describe('adminNomisScreenSwitch', () => {
     })
 
     it('forwards an error for unsupported moduleName', async () => {
-      deepReq.params.moduleName = 'OIMMHOLO'
+      deepRes.locals.moduleName = 'OIMMHOLO'
 
       await controller.loadCurrentStatus(deepReq as FormWizard.Request, deepRes as Response, next)
 

@@ -6,6 +6,7 @@ import ResiStatusConfirmPage from '../../pages/admin/resi/confirm'
 import NonResiStatusConfirmPage from '../../pages/admin/nonResi/confirm'
 import CertApprovalConfirmPage from '../../pages/admin/certApproval/confirm'
 import SegInRollCountConfirmPage from '../../pages/admin/segInRollCount/confirm'
+import NomisScreenStatusConfirmPage from '../../pages/admin/nomisScreen/confirm'
 
 context('Admin Index', () => {
   context('Without the MANAGE_RES_LOCATIONS_ADMIN role', () => {
@@ -162,6 +163,41 @@ context('Admin Index', () => {
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Residential location status')
       cy.get('.govuk-notification-banner__content p').contains('You have changed the residential location status.')
+    })
+  })
+
+  context('With the MANAGE_RES_LOCATIONS_ADMIN role - NOMIS screen toggle', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
+      cy.task('stubManageUsers')
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubPrisonConfiguration')
+      cy.task('stubGetSplashScreenCondition')
+      cy.task('stubCreateSplashScreenCondition', { moduleName: 'OIMILOCA' })
+      cy.signIn()
+    })
+
+    it('Change link opens the OIMILOCA wizard and saves a new status', () => {
+      PrisonConfigurationIndexPage.goTo('TST')
+      const prisonConfigurationIndexPage = Page.verifyOnPage(PrisonConfigurationIndexPage)
+      prisonConfigurationIndexPage.checkOnPage()
+
+      cy.get('a[href$="/change-nomis-screen-status/OIMILOCA"]').click()
+
+      const nomisScreenPage = Page.verifyOnPage(NomisScreenStatusConfirmPage)
+      nomisScreenPage.checkOnPage()
+
+      nomisScreenPage.radio('BLOCKED').check()
+      nomisScreenPage.saveButton().click()
+
+      Page.verifyOnPage(PrisonConfigurationIndexPage)
+      cy.get('#govuk-notification-banner-title').contains('Success')
+      cy.get('.govuk-notification-banner__content h3').contains('Maintain internal locations (OIMILOCA) status')
+      cy.get('.govuk-notification-banner__content p').contains(
+        'You have changed the Maintain internal locations (OIMILOCA) status.',
+      )
     })
   })
 })
