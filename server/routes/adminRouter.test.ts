@@ -141,30 +141,28 @@ describe('GET /admin/PRISON_ID', () => {
     })
     prisonService.getServiceStatus.mockResolvedValue('')
 
-    // First call to getScreenStatus fails with 404
-    const error: SanitisedError<object> = new Error('Not Found')
-    error.responseStatus = 404
-    prisonService.getScreenStatus.mockImplementationOnce(() => Promise.reject(error))
-
-    // Second call to getScreenStatus (with **ALL**) succeeds
-    prisonService.getScreenStatus.mockImplementationOnce(() =>
-      Promise.resolve({
-        conditionType: 'CASELOAD',
-        conditionValue: '**ALL**',
-        blockAccess: true,
-      }),
-    )
+    const notFound: SanitisedError<object> = new Error('Not Found')
+    notFound.responseStatus = 404
+    // Primary lookup (per-prison) returns 404 for every module, fallback (**ALL**) succeeds with blockAccess=true
+    prisonService.getScreenStatus.mockImplementation(async (_token, prisonId) => {
+      if (prisonId === '**ALL**') {
+        return { conditionType: 'CASELOAD', conditionValue: '**ALL**', blockAccess: true }
+      }
+      throw notFound
+    })
 
     return request(app)
       .get('/admin/TST')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        // Check that getScreenStatus was called twice
-        // First with 'TST', then with '**ALL**'
-        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
-        expect(prisonService.getScreenStatus.mock.calls[0][1]).toBe('TST')
-        expect(prisonService.getScreenStatus.mock.calls[1][1]).toBe('**ALL**')
+        // 3 modules × (primary + fallback) = 6 calls
+        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(6)
+        const callsByPrison = prisonService.getScreenStatus.mock.calls.map(args => args[1])
+        expect(callsByPrison.filter(p => p === 'TST')).toHaveLength(3)
+        expect(callsByPrison.filter(p => p === '**ALL**')).toHaveLength(3)
+        const modulesCalled = prisonService.getScreenStatus.mock.calls.map(args => args[2])
+        expect(modulesCalled).toEqual(expect.arrayContaining(['OIMMHOLO', 'OIMILOCA', 'OIMULOCA']))
 
         // Check that the page was rendered with blockAccess=true from the fallback
         expect(res.text).toContain('govuk-breadcrumbs')
@@ -184,26 +182,21 @@ describe('GET /admin/PRISON_ID', () => {
     })
     prisonService.getServiceStatus.mockResolvedValue('')
 
-    // Create a 404 error
-    const error: SanitisedError<object> = new Error('Not Found')
-    error.responseStatus = 404
-
-    // First call to getScreenStatus fails with 404
-    prisonService.getScreenStatus.mockImplementationOnce(() => Promise.reject(error))
-
-    // Second call to getScreenStatus (with **ALL**) also fails with 404
-    prisonService.getScreenStatus.mockImplementationOnce(() => Promise.reject(error))
+    const notFound: SanitisedError<object> = new Error('Not Found')
+    notFound.responseStatus = 404
+    // Both per-prison and fallback return 404 for every module
+    prisonService.getScreenStatus.mockImplementation(() => Promise.reject(notFound))
 
     return request(app)
       .get('/admin/TST')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        // Check that getScreenStatus was called twice
-        // First with 'TST', then with '**ALL**'
-        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
-        expect(prisonService.getScreenStatus.mock.calls[0][1]).toBe('TST')
-        expect(prisonService.getScreenStatus.mock.calls[1][1]).toBe('**ALL**')
+        // 3 modules × (primary + fallback) = 6 calls
+        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(6)
+        const callsByPrison = prisonService.getScreenStatus.mock.calls.map(args => args[1])
+        expect(callsByPrison.filter(p => p === 'TST')).toHaveLength(3)
+        expect(callsByPrison.filter(p => p === '**ALL**')).toHaveLength(3)
 
         // Check that the page was rendered (blockAccess should default to false)
         expect(res.text).toContain('govuk-breadcrumbs')
