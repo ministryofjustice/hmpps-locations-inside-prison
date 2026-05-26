@@ -7,6 +7,8 @@ import CellConversionSetCellCapacity from '../../controllers/cellConversion/setC
 import CellConversionConfirm from '../../controllers/cellConversion/confirm'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
+import CellConversionDoorNumber from '../../controllers/cellConversion/doorNumber'
+import CellConversionCapacity from '../../controllers/cellConversion/capacity'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -21,7 +23,7 @@ const steps: FormWizard.Steps = {
     skip: true,
     next: [
       {
-        fn: (req, _res) => req.canAccess('create_location'),
+        fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
         next: 'cert-change-disclaimer',
       },
       'accommodation-type',
@@ -30,19 +32,32 @@ const steps: FormWizard.Steps = {
   ...CertChangeDisclaimer.getSteps({
     next: 'accommodation-type',
     title: (_req, _res) => `Cell conversion`,
-    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)} conversion`,
+    caption: (_req, res) => capFirst(res.locals.decoratedLocation.displayName),
   }),
   '/accommodation-type': {
     controller: CellConversionAccommodationType,
     editable: true,
     fields: ['accommodationType'],
-    next: [{ field: 'accommodationType', value: 'NORMAL_ACCOMMODATION', next: 'used-for' }, 'specific-cell-type'],
+    next: [
+      { field: 'accommodationType', value: 'NORMAL_ACCOMMODATION', next: 'used-for' },
+      {
+        fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
+        next: 'door-number',
+      },
+      'specific-cell-type',
+    ],
   },
   '/used-for': {
     editable: true,
     controller: CellConversionUsedFor,
     fields: ['usedForTypes'],
-    next: 'specific-cell-type',
+    next: [
+      {
+        fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
+        next: 'door-number',
+      },
+      'specific-cell-type',
+    ],
   },
   '/specific-cell-type': {
     editable: true,
@@ -54,7 +69,13 @@ const steps: FormWizard.Steps = {
     editable: true,
     fields: ['specialistCellTypes'],
     controller: CellConversionSetCellType,
-    next: 'set-cell-capacity',
+    next: [
+      {
+        fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
+        next: 'door-number',
+      },
+      'set-cell-capacity',
+    ],
   },
   '/set-cell-capacity': {
     editable: true,
@@ -64,6 +85,18 @@ const steps: FormWizard.Steps = {
   },
   '/confirm': {
     controller: CellConversionConfirm,
+  },
+  '/door-number': {
+    fields: ['doorNumber'],
+    next: 'capacity',
+    controller: CellConversionDoorNumber,
+    pageTitle: 'Convert to cell',
+  },
+  '/capacity': {
+    fields: ['CERT_baselineCna', 'CERT_workingCapacity', 'CERT_maximumCapacity'],
+    next: '',
+    controller: CellConversionCapacity,
+    pageTitle: 'Convert to cell',
   },
 }
 
