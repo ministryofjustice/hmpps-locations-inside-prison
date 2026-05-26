@@ -10,8 +10,9 @@
   {% if location.deactivationReasonDescription %}
     {% set deactivatedReason = deactivatedReason + " - " + location.deactivationReasonDescription %}
   {% endif %}
-  {% set isCertifiedDeactivation = isCertActive and location.currentCellCertificate.workingCapacity === 0 and location.oldWorkingCapacity !== 0 %}
+  {% set isCertifiedDeactivation = isCertActive and location.inactiveStatus === 'INACTIVE_MATCHING_CELL_CERT' %}
   {% set isTemporaryDeactivation = not isCertifiedDeactivation and (not isCertActive or not location.pendingApprovalRequestId) %}
+  {% set canReactivate = canAccess('reactivate') and (not isCertifiedDeactivation or canAccess('certificate_change_request_create')) %}
 
   {% set inactiveHtml %}
     <span class="hmpps-inactive-location-banner">
@@ -110,7 +111,7 @@
 
     {% if not location.raw.status.includes('LOCKED_') %}
       {% if isCertActive %}
-        {% if canAccess('reactivate') %}
+        {% if canReactivate %}
           {{ govukButton({
             text: "Activate " + ("entire " if location.raw.locationType !== 'CELL') + (location.locationType | lower),
             classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
