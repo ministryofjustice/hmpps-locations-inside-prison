@@ -21,6 +21,7 @@ export const location = LocationFactory.build({
   specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   status: 'INACTIVE',
   locationType: 'LANDING',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const cell1 = LocationFactory.build({
@@ -45,6 +46,7 @@ export const cell1 = LocationFactory.build({
   localName: null,
   specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const cell2 = LocationFactory.build({
@@ -69,6 +71,7 @@ export const cell2 = LocationFactory.build({
   localName: null,
   specialistCellTypes: [],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const cell3 = LocationFactory.build({
@@ -93,6 +96,7 @@ export const cell3 = LocationFactory.build({
   localName: null,
   specialistCellTypes: [],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export function setupStubs(role: string, hasCertChange = true) {
@@ -105,18 +109,22 @@ export function setupStubs(role: string, hasCertChange = true) {
     stubLocation = LocationFactory.build({
       ...location,
       currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 4 },
+      inactiveStatus: 'INACTIVE_TEMP',
     })
     stubCell1 = LocationFactory.build({
       ...cell1,
       currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
     })
     stubCell2 = LocationFactory.build({
       ...cell2,
       currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 2 },
+      inactiveStatus: 'INACTIVE_TEMP',
     })
     stubCell3 = LocationFactory.build({
       ...cell3,
       currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
     })
   }
 

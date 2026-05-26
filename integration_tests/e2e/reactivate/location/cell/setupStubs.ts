@@ -20,6 +20,7 @@ export const location = LocationFactory.build({
   localName: null,
   specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export function setupStubs(role: string, hasCertChange = true) {
@@ -29,6 +30,7 @@ export function setupStubs(role: string, hasCertChange = true) {
     stubLocation = LocationFactory.build({
       ...location,
       currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
     })
   }
 
