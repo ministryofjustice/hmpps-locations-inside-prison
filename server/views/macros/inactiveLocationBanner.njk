@@ -120,7 +120,7 @@
           }) }}
         {% endif %}
 
-        {% if isTemporaryDeactivation and canAccess('certificate_change_request_create') %}
+        {% if isTemporaryDeactivation and canAccess('certificate_change_request_create') and location.currentCellCertificate.workingCapacity > 0 %}
           {{ govukButton({
             text: 'Decrease certified working capacity',
             classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0 govuk-button--secondary",
