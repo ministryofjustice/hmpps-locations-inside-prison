@@ -50,6 +50,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         prisonId: 'MDI',
         code: 'A-1-001',
         pathHierarchy: 'A-1-001',
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
       },
     }
     return { ...base, ...overrides } as DecoratedLocation
@@ -195,6 +196,30 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
       const request = createMockRequest(true)
 
       expect(showChangeUsedForLink(location, request)).toBe(false)
+    })
+
+    it('shows link for NORMAL_ACCOMMODATION location', () => {
+      const location = createMockLocation({ active: true })
+      location.accommodationTypes = ['NORMAL_ACCOMMODATION']
+      const request = createMockRequest(true)
+
+      expect(showChangeUsedForLink(location, request)).toBe(true)
+    })
+
+    it('does not show link for non-NORMAL_ACCOMMODATION location', () => {
+      const location = createMockLocation({ active: true })
+      location.raw.accommodationTypes = ['CARE_AND_SEPARATION']
+      const request = createMockRequest(true)
+
+      expect(showChangeUsedForLink(location, request)).toBe(false)
+    })
+
+    it('shows link for parent with at least one NORMAL_ACCOMMODATION location', () => {
+      const location = createMockLocation({ active: true })
+      location.raw.accommodationTypes = ['NORMAL_ACCOMMODATION', 'CARE_AND_SEPARATION']
+      const request = createMockRequest(true)
+
+      expect(showChangeUsedForLink(location, request)).toBe(true)
     })
   })
 
