@@ -60,6 +60,7 @@ export function showChangeUsedForLink(location: DecoratedLocation, req: Request)
   return (
     (location.active || location.status === 'DRAFT') &&
     !location.status.includes('LOCKED_') &&
+    location.raw.accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
     req.canAccess('change_used_for')
   )
 }
