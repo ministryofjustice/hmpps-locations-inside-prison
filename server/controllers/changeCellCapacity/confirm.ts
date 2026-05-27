@@ -6,6 +6,7 @@ import { TypedLocals } from '../../@types/express'
 import canEditCna from '../../utils/canEditCna'
 import LocationsService from '../../services/locationsService'
 import FormInitialStep from '../base/formInitialStep'
+import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 
 export default class ConfirmCellCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -76,8 +77,9 @@ export default class ConfirmCellCapacity extends FormInitialStep {
 
       if (req.sessionModel.get<boolean>('onlyWorkingCapChanged')) {
         capacities.temporaryWorkingCapacityChange = true
-        capacities.certifiedNormalAccommodation = decoratedLocation.capacity.certifiedNormalAccommodation
-        capacities.maxCapacity = decoratedLocation.capacity.maxCapacity
+        const { certifiedNormalAccommodation, maxCapacity } = getLocationAttributesIncludePending(decoratedLocation)
+        capacities.certifiedNormalAccommodation = certifiedNormalAccommodation
+        capacities.maxCapacity = maxCapacity
       } else if (canEditCna(prisonConfiguration)) {
         capacities.certifiedNormalAccommodation = Number(req.sessionModel.get('baselineCna'))
       }
