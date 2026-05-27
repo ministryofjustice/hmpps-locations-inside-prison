@@ -177,7 +177,7 @@ export default class Confirm extends FormInitialStep {
         deactivationReasonDescription,
         locationId: locals.location.id,
         locationKey: locals.location.key,
-        planetFmReference: req.sessionModel.get<string>('facilitiesManagementReference'),
+        planetFmReference: req.sessionModel.get<string>('planetFmReference'),
         prisonId: locals.prisonId,
         proposedReactivationDate: req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
         reasonForChange: req.sessionModel.get<string>('workingCapacityExplanation'),

@@ -143,27 +143,10 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
   },
   planetFmReference: {
-    remove: (req, res) => isCertChange(req, res) && hasCertifiedWorkingCapacity(req, res),
-    hideWhenRemoved: true,
     component: 'govukInput',
     validate: [minLength(6), maxLength(18), numericString],
     id: 'planetFmReference',
     name: 'planetFmReference',
-    classes: 'govuk-input--width-10',
-    label: {
-      text: 'Planet FM reference number (optional)',
-      classes: 'govuk-label--m',
-    },
-    nameForErrors: 'Planet FM reference number',
-    autocomplete: 'off',
-  },
-  facilitiesManagementReference: {
-    remove: (req, res) => !isCertChange(req, res) || !hasCertifiedWorkingCapacity(req, res),
-    hideWhenRemoved: true,
-    component: 'govukInput',
-    validate: [minLength(6), maxLength(18), numericString],
-    id: 'facilitiesManagementReference',
-    name: 'facilitiesManagementReference',
     classes: 'govuk-input--width-10',
     label: {
       text: 'Facilities management reference number (optional)',
