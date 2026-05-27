@@ -28,7 +28,6 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
       estimatedReactivationDate: decoratedLocation.proposedReactivationDate,
       mandatoryEstimatedReactivationDate: decoratedLocation.proposedReactivationDate,
       planetFmReference: decoratedLocation.planetFmReference,
-      facilitiesManagementReference: decoratedLocation.planetFmReference,
     }
   }
 

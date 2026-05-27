@@ -75,8 +75,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
         req.sessionModel.get<string>(`deactivationReason${reason === 'OTHER' ? 'Other' : 'Description'}`),
         req.sessionModel.get<string>('estimatedReactivationDate') ||
           req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
-        req.sessionModel.get<string>('planetFmReference') ||
-          req.sessionModel.get<string>('facilitiesManagementReference'),
+        req.sessionModel.get<string>('planetFmReference'),
       )
 
       analyticsService.sendEvent(req, 'deactivate_temp', {
