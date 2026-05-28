@@ -122,7 +122,6 @@ const steps: FormWizard.Steps = {
       'estimatedReactivationDate',
       'mandatoryEstimatedReactivationDate',
       'planetFmReference',
-      'facilitiesManagementReference',
       'workingCapacityExplanation',
     ],
     next: [

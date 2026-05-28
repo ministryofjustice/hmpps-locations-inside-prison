@@ -180,7 +180,7 @@ context('View Locations Show', () => {
           .inactiveBannerRows()
           .eq(2)
           .find('.govuk-summary-list__key')
-          .contains('Planet FM reference number')
+          .contains('Facilities reference number')
         viewLocationsShowPage
           .inactiveBannerRows()
           .eq(2)

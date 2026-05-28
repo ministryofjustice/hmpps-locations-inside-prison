@@ -66,10 +66,10 @@ const fields = {
     name: 'planetFmReference',
     classes: 'govuk-input--width-10',
     label: {
-      text: 'Planet FM reference number (optional)',
+      text: 'Facilities management reference number (optional)',
       classes: 'govuk-label--m',
     },
-    nameForErrors: 'Planet FM reference number',
+    nameForErrors: 'Facilities management reference number',
     autocomplete: 'off',
   },
 }

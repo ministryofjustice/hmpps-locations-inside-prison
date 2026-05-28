@@ -179,7 +179,7 @@ describe('Confirm', () => {
         deepReq.form.options.name = 'deactivate'
         deepReq.sessionModel.set('deactivationReason', approvalRequestData.deactivatedReason)
         deepReq.sessionModel.set('deactivationReasonOther', approvalRequestData.deactivationReasonDescription)
-        deepReq.sessionModel.set('facilitiesManagementReference', approvalRequestData.planetFmReference)
+        deepReq.sessionModel.set('planetFmReference', approvalRequestData.planetFmReference)
         deepReq.sessionModel.set('mandatoryEstimatedReactivationDate', approvalRequestData.proposedReactivationDate)
         deepReq.sessionModel.set('workingCapacityExplanation', approvalRequestData.reasonForChange)
         const certLocation = approvalRequestData.locations[0]

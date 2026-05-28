@@ -33,8 +33,6 @@ export default class DeactivateTemporaryDetailsPage extends Page {
 
   planetFmReferenceText = (): PageElement => cy.get('#planetFmReference')
 
-  facilitiesManagementReferenceText = (): PageElement => cy.get('#facilitiesManagementReference')
-
   workingCapacityExplanationText = (): PageElement => cy.get('#workingCapacityExplanation')
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
@@ -72,7 +70,7 @@ export default class DeactivateTemporaryDetailsPage extends Page {
     this.mandatoryEstimatedReactivationDateDayText().clear()
     this.mandatoryEstimatedReactivationDateMonthText().clear()
     this.mandatoryEstimatedReactivationDateYearText().clear()
-    this.facilitiesManagementReferenceText().clear()
+    this.planetFmReferenceText().clear()
     this.workingCapacityExplanationText().clear()
 
     if (day) {
@@ -88,7 +86,7 @@ export default class DeactivateTemporaryDetailsPage extends Page {
     }
 
     if (reference) {
-      this.facilitiesManagementReferenceText().type(reference)
+      this.planetFmReferenceText().type(reference)
     }
 
     if (explanation) {
