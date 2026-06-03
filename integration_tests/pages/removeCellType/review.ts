@@ -5,11 +5,11 @@ export default class ReviewCellCapacityPage extends Page {
     super('Review cell capacity')
   }
 
-  cnaInput = (): PageElement => cy.get('#baselineCna')
+  cnaInput = (): PageElement => cy.get('[id$="baselineCna"]')
 
-  workingCapacityInput = (): PageElement => cy.get('#workingCapacity')
+  workingCapacityInput = (): PageElement => cy.get('[id$="workingCapacity"]')
 
-  maxCapacityInput = (): PageElement => cy.get('#maxCapacity')
+  maxCapacityInput = (): PageElement => cy.get('[id$="maxCapacity"]')
 
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 

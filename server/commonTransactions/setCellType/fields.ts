@@ -1,4 +1,8 @@
 import FormWizard from 'hmpo-form-wizard'
+import capacityFields from '../../routes/changeCellCapacity/fields'
+import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
+import UpdateSignedOpCap from '../updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../submitCertificationApprovalRequest'
 
 const fields: FormWizard.Fields = {
   accommodationType: {
@@ -47,6 +51,19 @@ const fields: FormWizard.Fields = {
     hint: { text: 'Select all that apply.' },
     items: [{ text: 'set at runtime', value: '' }],
   },
+  baselineCna: {
+    ...capacityFields.baselineCna,
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'maxCapacity' })],
+  },
+  workingCapacity: {
+    ...capacityFields.workingCapacity,
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'maxCapacity' })],
+  },
+  maxCapacity: {
+    ...capacityFields.maxCapacity,
+  },
+  ...UpdateSignedOpCap.getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
 }
 
 export default fields

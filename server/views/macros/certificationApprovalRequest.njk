@@ -414,6 +414,48 @@
             ] | stripEmpty]
           }) }}
         </div>
+      {% elseif request.approvalType == 'SPECIALIST_CELL_TYPE' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+          {% endif %}
+
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+
+          {% set hasCnaChange = request.locations[0].currentCertifiedNormalAccommodation
+            != request.locations[0].certifiedNormalAccommodation %}
+          {% set hasWcChange = request.locations[0].currentWorkingCapacity != request.locations[0].workingCapacity %}
+          {% set hasMcChange = request.locations[0].currentMaxCapacity != request.locations[0].maxCapacity %}
+          {% set hasStChange = request.locations[0].specialistCellTypes[0] and request.locations[0].specialistCellTypes[0] != request.locations[0].currentSpecialistCellTypes[0] %}
+
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'specialist-cell-type-table'
+            },
+            head: [
+              { text: "Location" },
+              { text: "Baseline CNA" } if hasCnaChange,
+              { text: "Certified working capacity" } if hasWcChange,
+              { text: "Maximum capacity" } if hasMcChange,
+              { text: "Cell type" } if hasStChange
+            ] | stripEmpty,
+            rows:[[
+              { text: request.locations[0].pathHierarchy },
+              { text: request.locations[0].currentCertifiedNormalAccommodation + " → "
+                + request.locations[0].certifiedNormalAccommodation } if hasCnaChange,
+              { text: request.locations[0].currentWorkingCapacity+ " → " + request.locations[0].workingCapacity}
+                if hasWcChange,
+              { text: request.locations[0].currentMaxCapacity + " → " + request.locations[0].maxCapacity }
+                if hasMcChange,
+              { text: formatConstants(constants.specialistCellTypes, request.locations[0].currentSpecialistCellTypes[0], "<br>", "None") + " → " + formatConstants(constants.specialistCellTypes, request.locations[0].specialistCellTypes[0], "<br>", "None") }
+                if hasStChange
+            ] | stripEmpty]
+          }) }}
+        </div>
       {% endif %}
     </div>
   </div>

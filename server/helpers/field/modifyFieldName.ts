@@ -1,10 +1,13 @@
 import FormWizard from 'hmpo-form-wizard'
+import { cloneDeep } from 'lodash'
 
 export default function modifyFieldName(
   field: FormWizard.Field,
   nameModifierFunc: (originalName: string) => string,
 ): FormWizard.Field {
-  const modifiedField = { ...field }
+  // A deep clone is essential here so that we don't modify the same validators
+  // more than once on fields that are reused across the application.
+  const modifiedField = cloneDeep(field)
 
   if (modifiedField.id) {
     modifiedField.id = nameModifierFunc(modifiedField.id)

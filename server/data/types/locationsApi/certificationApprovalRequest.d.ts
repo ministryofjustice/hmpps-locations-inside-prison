@@ -10,6 +10,7 @@ export declare interface CertificationApprovalRequest {
     | 'REACTIVATION'
     | 'CAPACITY_CHANGE'
     | 'PRISON_BASELINE'
+    | 'SPECIALIST_CELL_TYPE'
   prisonId: string
   locationKey: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'
@@ -34,4 +35,5 @@ export declare interface CertificationApprovalRequest {
   deactivationReasonDescription: string
   proposedReactivationDate: string
   planetFmReference: string
+  specialistCellTypes?: string[]
 }

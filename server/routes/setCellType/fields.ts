@@ -1,5 +1,5 @@
 import SetCellType from '../../commonTransactions/setCellType'
 
-const fields = SetCellType.getFields()
+const fields = new SetCellType().getFields()
 
 export default fields

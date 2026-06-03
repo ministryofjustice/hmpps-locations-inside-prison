@@ -12,7 +12,7 @@ const steps: FormWizard.Steps = {
     skip: true,
     next: 'set-cell-type/init',
   },
-  ...SetCellType.getSteps({ next: 'save' }),
+  ...new SetCellType({ includeCertificationSteps: true }).getSteps({ next: 'save' }),
   '/save': {
     controller: SetCellTypeController,
     skip: true,

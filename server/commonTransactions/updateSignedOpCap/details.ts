@@ -75,10 +75,13 @@ export default class Details extends BaseController {
   override saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { values } = req.form
 
+    const newValuekey = Object.keys(values).find(k => k.endsWith('update-signed-op-cap_newSignedOpCap'))
+    const explanationKey = Object.keys(values).find(k => k.endsWith('update-signed-op-cap_explanation'))
+
     req.sessionModel.set('proposedSignedOpCapChange', {
       prisonId: res.locals.prisonId,
-      signedOperationalCapacity: Number(values['update-signed-op-cap_newSignedOpCap']),
-      reasonForChange: values['update-signed-op-cap_explanation'],
+      signedOperationalCapacity: Number(values[newValuekey]),
+      reasonForChange: values[explanationKey],
     })
 
     super.saveValues(req, res, next)

@@ -304,4 +304,25 @@ describe('locationsApiClient', () => {
       { locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
     )
   })
+
+  describe('certification', () => {
+    describe('location', () => {
+      testCall(
+        'specialistCellTypeChange',
+        '/certification/location/specialist-cell-type-change',
+        false,
+        () => apiClient.certification.location.specialistCellTypeChange,
+        {},
+        'put',
+        {
+          locationId: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6',
+          specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+          workingCapacity: 0,
+          maxCapacity: 1,
+          certifiedNormalAccommodation: 0,
+          reasonForChange: 'because of reasons',
+        },
+      )
+    })
+  })
 })
