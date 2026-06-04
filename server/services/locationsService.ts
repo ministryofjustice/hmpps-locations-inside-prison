@@ -90,18 +90,17 @@ export default class LocationsService {
   async requestSpecialistCellTypeChange(
     token: string,
     locationId: string,
-    specialistCellTypes: string[],
-    workingCapacity: number,
-    maxCapacity: number,
-    certifiedNormalAccommodation: number,
+    data: {
+      specialistCellTypes: string[]
+      workingCapacity: number
+      maxCapacity: number
+      certifiedNormalAccommodation: number
+    },
   ) {
     return this.locationsApiClient.certification.location.specialistCellTypeChange(token, null, {
       locationId,
-      specialistCellTypes,
-      workingCapacity,
-      maxCapacity,
-      certifiedNormalAccommodation,
       reasonForChange: null,
+      ...data,
     })
   }
 

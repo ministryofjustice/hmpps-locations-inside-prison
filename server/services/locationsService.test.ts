@@ -446,7 +446,12 @@ describe('Locations service', () => {
 
   describe('requestSpecialistCellTypeChange', () => {
     it('calls the correct client function', async () => {
-      await locationsService.requestSpecialistCellTypeChange('token', 'location-id', ['PINEAPPLE_CELL'], 1, 2, 3)
+      await locationsService.requestSpecialistCellTypeChange('token', 'location-id', {
+        specialistCellTypes: ['PINEAPPLE_CELL'],
+        workingCapacity: 1,
+        maxCapacity: 2,
+        certifiedNormalAccommodation: 3,
+      })
 
       expect(locationsApiClient.certification.location.specialistCellTypeChange).toHaveBeenCalledWith('token', null, {
         locationId: 'location-id',

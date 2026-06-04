@@ -533,14 +533,12 @@ export default class Confirm extends FormInitialStep {
       const { maxCapacity, workingCapacity, certifiedNormalAccommodation, specialistCellTypes } = locations[0]
 
       return (
-        await locationsService.requestSpecialistCellTypeChange(
-          systemToken,
-          locationId,
+        await locationsService.requestSpecialistCellTypeChange(systemToken, locationId, {
           specialistCellTypes,
           maxCapacity,
           workingCapacity,
           certifiedNormalAccommodation,
-        )
+        })
       ).id
     }
 
