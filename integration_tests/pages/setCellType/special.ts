@@ -8,7 +8,7 @@ export default class SetCellTypeSpecialPage extends Page {
   cellTypeRadio = (value: string): PageElement =>
     cy.get(`input[name^="set-cell-type_specialistCellTypes"][type="radio"][value="${value}"]`)
 
-  submitButton = (): PageElement => cy.get('button:contains("Save cell type")')
+  submitButton = (): PageElement => cy.get('button:contains("Save cell type"),button:contains("Continue")')
 
   backLink = (): PageElement => cy.get('.govuk-back-link')
 

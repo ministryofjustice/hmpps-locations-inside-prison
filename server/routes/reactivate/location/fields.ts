@@ -75,7 +75,7 @@ const fields: FormWizard.Fields = {
       classes: 'govuk-!-margin-bottom-0',
     },
   },
-  ...SetCellType.getFields(),
+  ...new SetCellType().getFields(),
   ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }

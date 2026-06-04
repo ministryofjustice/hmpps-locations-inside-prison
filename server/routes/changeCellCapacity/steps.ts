@@ -1,4 +1,3 @@
-import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import ChangeCellCapacity from '../../controllers/changeCellCapacity'
 import ConfirmCellCapacity from '../../controllers/changeCellCapacity/confirm'
@@ -6,11 +5,7 @@ import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import ShouldUpdateCert from '../../controllers/changeCellCapacity/shouldUpdateCert'
-
-function isCertActiveAndNotDraft(_req: FormWizard.Request, res: Response): boolean {
-  const { prisonConfiguration, decoratedLocation } = res.locals
-  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.status !== 'DRAFT'
-}
+import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -26,11 +21,11 @@ const steps: FormWizard.Steps = {
     fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
     next: [
       {
-        fn: (req, res) => isCertActiveAndNotDraft(req, res) && !req.sessionModel.get('onlyWorkingCapChanged'),
+        fn: (req, res) => isCertActiveAndNotDraft(res.locals) && !req.sessionModel.get('onlyWorkingCapChanged'),
         next: 'cert-change-disclaimer',
       },
       {
-        fn: (req, res) => isCertActiveAndNotDraft(req, res),
+        fn: (_req, res) => isCertActiveAndNotDraft(res.locals),
         next: 'should-update-cert',
       },
       {

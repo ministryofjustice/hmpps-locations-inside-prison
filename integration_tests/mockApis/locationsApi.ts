@@ -56,6 +56,21 @@ const stubLocationsCertificationLocationReactivationRequestApproval = () =>
     },
   })
 
+const stubLocationsRequestSpecialistCellTypeChange = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/location/specialist-cell-type-change',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubLocationsCertificationLocationApprove = () =>
   stubFor({
     request: {
@@ -1456,6 +1471,7 @@ const allStubs = {
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
   stubLocationsPrisonLocalName,
+  stubLocationsRequestSpecialistCellTypeChange,
   stubLocationsResidentialHierarchy,
   stubLocationsResidentialSummaryForCreateWing,
   stubLocationsUpdateNonResCell,

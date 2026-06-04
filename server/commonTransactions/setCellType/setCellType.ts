@@ -6,6 +6,10 @@ import BaseController from './baseController'
 const FIELD_REGEX = /(.*)(?:normal|specialist)CellTypes(.*)$/
 
 export default class SetCellType extends BaseController {
+  buttonText() {
+    return 'Save cell type'
+  }
+
   override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
     const [, prefix] = Object.keys(req.form.options.fields)
       .find(k => FIELD_REGEX.test(k))
@@ -55,6 +59,9 @@ export default class SetCellType extends BaseController {
         checked: selectedValues.includes(item.value),
       }))
     }
-    return locals
+    return {
+      ...locals,
+      buttonText: this.buttonText(),
+    }
   }
 }
