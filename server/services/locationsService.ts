@@ -87,6 +87,24 @@ export default class LocationsService {
     return this.locationsApiClient.certification.location.reactivationRequestApproval(token, null, data)
   }
 
+  async requestSpecialistCellTypeChange(
+    token: string,
+    locationId: string,
+    specialistCellTypes: string[],
+    workingCapacity: number,
+    maxCapacity: number,
+    certifiedNormalAccommodation: number,
+  ) {
+    return this.locationsApiClient.certification.location.specialistCellTypeChange(token, null, {
+      locationId,
+      specialistCellTypes,
+      workingCapacity,
+      maxCapacity,
+      certifiedNormalAccommodation,
+      reasonForChange: null,
+    })
+  }
+
   async deactivatePermanent(token: string, locationId: string, reason: string) {
     return this.locationsApiClient.locations.deactivate.permanent(token, { locationId }, { reason })
   }

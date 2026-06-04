@@ -23,8 +23,10 @@ describe('Locations service', () => {
     locationsApiClient.constants = deepMock(locationsApiClient.constants, {
       a: [{ key: 'KEY', description: 'description' }],
     }) as typeof locationsApiClient.constants
-    ;['locations', 'prisonerLocations', 'signedOperationalCapacity', 'prisonConfiguration'].forEach(
-      (k: 'locations' | 'prisonerLocations' | 'signedOperationalCapacity' | 'prisonConfiguration') => {
+    ;['locations', 'prisonerLocations', 'signedOperationalCapacity', 'prisonConfiguration', 'certification'].forEach(
+      (
+        k: 'locations' | 'prisonerLocations' | 'signedOperationalCapacity' | 'prisonConfiguration' | 'certification',
+      ) => {
         locationsApiClient[k] = deepMock(locationsApiClient[k]) as any
       },
     )
@@ -438,6 +440,21 @@ describe('Locations service', () => {
       })
       expect(locationsApiClient.prisonConfiguration.get.clearCache).toHaveBeenCalledWith({
         prisonId: 'MDI',
+      })
+    })
+  })
+
+  describe('requestSpecialistCellTypeChange', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.requestSpecialistCellTypeChange('token', 'location-id', ['PINEAPPLE_CELL'], 1, 2, 3)
+
+      expect(locationsApiClient.certification.location.specialistCellTypeChange).toHaveBeenCalledWith('token', null, {
+        locationId: 'location-id',
+        specialistCellTypes: ['PINEAPPLE_CELL'],
+        workingCapacity: 1,
+        maxCapacity: 2,
+        certifiedNormalAccommodation: 3,
+        reasonForChange: null,
       })
     })
   })

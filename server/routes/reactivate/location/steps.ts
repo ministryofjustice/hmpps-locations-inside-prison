@@ -15,13 +15,13 @@ import SubmitCertificationApprovalRequest from '../../../commonTransactions/subm
 import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
 import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
 
-function isTemporaryDeactivation(_req: FormWizard.Request, res: Response) {
+export function isTemporaryDeactivation(_req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
   if (prisonConfiguration.certificationApprovalRequired !== 'ACTIVE') {
     return true
   }
 
-  return !(decoratedLocation.currentCellCertificate.workingCapacity === 0 && decoratedLocation.oldWorkingCapacity !== 0)
+  return decoratedLocation.inactiveStatus !== 'INACTIVE_MATCHING_CELL_CERT'
 }
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
@@ -164,7 +164,7 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
 // Wrap the setCellType steps controller with another controller that appends the field names with cellId
 const setCellTypeSteps = Object.fromEntries(
   Object.entries(
-    SetCellType.getSteps({
+    new SetCellType().getSteps({
       next: 'capacities',
       prefix: ':cellId',
     }),

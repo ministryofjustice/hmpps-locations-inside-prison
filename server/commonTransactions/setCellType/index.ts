@@ -1,10 +1,13 @@
 import CommonTransaction from '../commonTransaction'
-import steps from './steps'
+import { steps, stepsWithCertChange } from './steps'
 import fields from './fields'
 
-const SetCellType = new CommonTransaction({
-  fields,
-  steps,
-  pathPrefix: '/set-cell-type',
-})
-export default SetCellType
+export default class SetCellType extends CommonTransaction {
+  constructor({ includeCertificationSteps }: { includeCertificationSteps?: boolean } = {}) {
+    super({
+      fields,
+      steps: includeCertificationSteps ? stepsWithCertChange : steps,
+      pathPrefix: '/set-cell-type',
+    })
+  }
+}

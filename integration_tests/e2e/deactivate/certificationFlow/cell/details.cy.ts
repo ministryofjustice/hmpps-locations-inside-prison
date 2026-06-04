@@ -76,25 +76,16 @@ context('Certification Deactivation - Cell - Details', () => {
       })
     })
 
-    context('facilitiesManagementReference', () => {
+    context('planetFmReference', () => {
       it('displays the correct errors', () => {
         page.submit({ reference: '1'.repeat(5) }) // minLength
-        Page.checkForError(
-          'facilitiesManagementReference',
-          'Facilities management reference number must be at least 6 characters',
-        )
+        Page.checkForError('planetFmReference', 'Facilities management reference number must be at least 6 characters')
 
         page.submit({ reference: '1'.repeat(19) }) // maxLength
-        Page.checkForError(
-          'facilitiesManagementReference',
-          'Facilities management reference number must be 18 characters or less',
-        )
+        Page.checkForError('planetFmReference', 'Facilities management reference number must be 18 characters or less')
 
         page.submit({ reference: 'abcdef' }) // numericString
-        Page.checkForError(
-          'facilitiesManagementReference',
-          'Facilities management reference number must only include numbers',
-        )
+        Page.checkForError('planetFmReference', 'Facilities management reference number must only include numbers')
       })
     })
   })

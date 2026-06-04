@@ -5,6 +5,7 @@ import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
 import populatePrisonAndLocationId from '../../middleware/populatePrisonAndLocationId'
+import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 
 const router = express.Router({ mergeParams: true })
 
@@ -12,6 +13,7 @@ router.use(
   protectRoute('set_cell_type'),
   populatePrisonAndLocationId,
   populateLocation({ decorate: true }),
+  populatePrisonConfiguration(),
   wizard(steps, fields, {
     name: 'set-cell-type',
     templatePath: 'pages/setCellType',

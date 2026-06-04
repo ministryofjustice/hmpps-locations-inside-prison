@@ -177,7 +177,7 @@ export default class Confirm extends FormInitialStep {
         deactivationReasonDescription,
         locationId: locals.location.id,
         locationKey: locals.location.key,
-        planetFmReference: req.sessionModel.get<string>('facilitiesManagementReference'),
+        planetFmReference: req.sessionModel.get<string>('planetFmReference'),
         prisonId: locals.prisonId,
         proposedReactivationDate: req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
         reasonForChange: req.sessionModel.get<string>('workingCapacityExplanation'),
@@ -371,6 +371,41 @@ export default class Confirm extends FormInitialStep {
         workingCapacityChange,
         locations: [certLocation],
       })
+    } else if (req.form.options.name === 'set-cell-type') {
+      const newSpecialistCellType = sessionModel.get<string>('set-cell-type_specialistCellTypes')
+      const newBaselineCna = Number(sessionModel.get<string>('set-cell-type_baselineCna'))
+      const newWorkingCapacity = Number(sessionModel.get<string>('set-cell-type_workingCapacity'))
+      const newMaxCapacity = Number(sessionModel.get<string>('set-cell-type_maxCapacity'))
+      const { certifiedNormalAccommodation, workingCapacity, maxCapacity } = getLocationAttributesIncludePending(
+        locals.location,
+      )
+      const certifiedNormalAccommodationChange = newBaselineCna - certifiedNormalAccommodation
+      const workingCapacityChange = newWorkingCapacity - workingCapacity
+      const maxCapacityChange = newMaxCapacity - maxCapacity
+
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'SPECIALIST_CELL_TYPE',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        prisonId: locals.prisonId,
+        certifiedNormalAccommodationChange,
+        workingCapacityChange,
+        maxCapacityChange,
+        locations: [
+          await locationToCertificationLocation(req, locals.location, (_originalLocation, certificateLocation) => ({
+            ...certificateLocation,
+            certifiedNormalAccommodation: newBaselineCna,
+            workingCapacity: newWorkingCapacity,
+            maxCapacity: newMaxCapacity,
+            specialistCellTypes: [newSpecialistCellType],
+          })),
+        ],
+      })
+
+      const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
+      locals.changeLinks = {
+        reasonForChange: changeLink,
+      }
     }
 
     if (proposedSignedOpCapChange) {
@@ -490,6 +525,21 @@ export default class Confirm extends FormInitialStep {
           prisonId,
           currentSignedOperationCapacity + signedOperationCapacityChange,
           reasonForChange,
+        )
+      ).id
+    }
+
+    if (approvalType === 'SPECIALIST_CELL_TYPE') {
+      const { maxCapacity, workingCapacity, certifiedNormalAccommodation, specialistCellTypes } = locations[0]
+
+      return (
+        await locationsService.requestSpecialistCellTypeChange(
+          systemToken,
+          locationId,
+          specialistCellTypes,
+          maxCapacity,
+          workingCapacity,
+          certifiedNormalAccommodation,
         )
       ).id
     }

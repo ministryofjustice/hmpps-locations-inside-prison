@@ -340,8 +340,12 @@ context('Deactivate temporary', () => {
         detailsPage.continueButton().click()
 
         cy.get('.govuk-error-summary__title').contains('There is a problem')
-        cy.get('.govuk-error-summary__list').contains('Planet FM reference number must be at least 6 characters')
-        cy.get('#planetFmReference-error').contains('Planet FM reference number must be at least 6 characters')
+        cy.get('.govuk-error-summary__list').contains(
+          'Facilities management reference number must be at least 6 characters',
+        )
+        cy.get('#planetFmReference-error').contains(
+          'Facilities management reference number must be at least 6 characters',
+        )
       })
 
       it('does not require a description for non-OTHER reasons, date or planet rm reference', () => {
@@ -374,7 +378,7 @@ context('Deactivate temporary', () => {
         cy.get('#estimatedReactivationDate-year').should('have.attr', 'autocomplete', 'off')
       })
 
-      it('planet FM reference number input field contains an autocomplete off attribute', () => {
+      it('Facilities management reference number input field contains an autocomplete off attribute', () => {
         cy.get('#planetFmReference').should('have.attr', 'autocomplete', 'off')
       })
     })
@@ -440,7 +444,7 @@ context('Deactivate temporary', () => {
         cy.get('.govuk-summary-list__value').eq(0).contains('Test type 2 - Test description')
         cy.get('.govuk-summary-list__key').eq(1).contains('Estimated reactivation date')
         cy.get('.govuk-summary-list__value').eq(1).contains('13 January 3024')
-        cy.get('.govuk-summary-list__key').eq(2).contains('Planet FM reference number')
+        cy.get('.govuk-summary-list__key').eq(2).contains('Facilities management reference number')
         cy.get('.govuk-summary-list__value').eq(2).contains('123456')
       })
 
@@ -462,7 +466,7 @@ context('Deactivate temporary', () => {
         cy.get('.govuk-summary-list__value').eq(0).contains('Other - some other reason')
         cy.get('.govuk-summary-list__key').eq(1).contains('Estimated reactivation date')
         cy.get('.govuk-summary-list__value').eq(1).contains('4 October 3000')
-        cy.get('.govuk-summary-list__key').eq(2).contains('Planet FM reference number')
+        cy.get('.govuk-summary-list__key').eq(2).contains('Facilities management reference number')
         cy.get('.govuk-summary-list__value').eq(2).contains('654321')
       })
 
