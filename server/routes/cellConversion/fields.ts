@@ -1,6 +1,8 @@
 import capacityFields from '../changeCellCapacity/fields'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 import greaterThan from '../../validators/greaterThan'
+import SetCellType from '../../commonTransactions/setCellType'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 const fields = {
   accommodationType: {
@@ -167,6 +169,25 @@ const fields = {
       classes: 'govuk-!-margin-bottom-0',
     },
   },
+  inCellSanitation: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'inCellSanitation',
+    name: 'inCellSanitation',
+    errorMessages: {
+      required: 'Select yes if the cell has in-cell sanitation',
+    },
+    items: [
+      { text: 'Yes', value: 'YES' },
+      { text: 'No', value: 'NO' },
+    ],
+    autocomplete: 'off',
+    hint: {
+      text: 'This means a cell includes both a toilet and wash basin.',
+    },
+  },
+  ...SetCellType.getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
 }
 
 export default fields

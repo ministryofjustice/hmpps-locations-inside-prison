@@ -3,7 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import _ from 'lodash'
 
 export default function addUsersToUserMap(usernames: string[]) {
-  return async (req: Request | FormWizard.Request, res: Response, next: NextFunction) => {
+  return async (req: Request | FormWizard.Request, res: Response, next?: NextFunction) => {
     const { locals } = res
     const { services } = req
     const { manageUsersService } = services

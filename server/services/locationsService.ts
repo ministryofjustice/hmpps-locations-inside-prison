@@ -50,17 +50,18 @@ export default class LocationsService {
   async convertToCell(
     token: string,
     locationId: string,
-    accommodationType: string,
-    specialistCellTypes: string[],
-    maxCapacity: number,
-    workingCapacity: number,
-    usedForTypes: string[],
+    data: {
+      accommodationType: string
+      specialistCellTypes: string[]
+      certifiedNormalAccommodation?: number
+      maxCapacity: number
+      workingCapacity: number
+      usedForTypes: string[]
+      inCellSanitation?: boolean
+      cellMark?: string
+    },
   ) {
-    return this.locationsApiClient.locations.convertToCell(
-      token,
-      { locationId },
-      { accommodationType, specialistCellTypes, maxCapacity, workingCapacity, usedForTypes },
-    )
+    return this.locationsApiClient.locations.convertToCell(token, { locationId }, data)
   }
 
   async createCertificationRequestForLocation(token: string, approvalType: string, locationId: string) {

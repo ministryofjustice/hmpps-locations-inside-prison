@@ -3,9 +3,9 @@ import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
-import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
+import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
 
-const CELL_TYPE_REGEX = /^temp-cellTypes(.+?)(?:-removed)?$/
+const CELL_TYPE_REGEX = /^temp-cellTypes(?:-removed)?$/
 
 export default class CellConversionCapacity extends FormInitialStep {
   override middlewareSetup() {
@@ -13,6 +13,7 @@ export default class CellConversionCapacity extends FormInitialStep {
     this.use(addConstantToLocals('specialistCellTypes'))
     this.use(this.fixHistory)
     this.use(this.unsetCellTypeTypes)
+    this.use(populateModifiedLocationMap)
   }
 
   unsetCellTypeTypes(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -22,14 +23,6 @@ export default class CellConversionCapacity extends FormInitialStep {
       .forEach(key => req.sessionModel.unset(key))
 
     next()
-  }
-
-  override allowedJourneyStep(req: FormWizard.Request, res: Response, path: string) {
-    if (path.endsWith('/edit-capacity/:parentLocationId')) {
-      return true
-    }
-
-    return super.allowedJourneyStep(req, res, path)
   }
 
   fixHistory(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -48,50 +41,61 @@ export default class CellConversionCapacity extends FormInitialStep {
     }
   }
 
+  override getValues(
+    req: FormWizard.Request,
+    res: Response,
+    callback: (err: Error, values?: FormWizard.Values) => void,
+  ) {
+    return super.getValues(req, res, (err: Error, values?: FormWizard.Values) => {
+      const modifiedValues = {
+        ...(values || {}),
+        ...Object.fromEntries(
+          Object.entries(req.sessionModel.get('temp-capacitiesValues') || {}).filter(
+            ([key]) => key in req.form.options.fields,
+          ),
+        ),
+        ...(req.sessionModel.get<object>('errorValues') || {}),
+      }
+
+      callback(err, modifiedValues)
+    })
+  }
+
   override validateFields(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { cellTypeAction } = req.body
     if (cellTypeAction) {
-      const [action, cellId] = cellTypeAction.split('/')
-
       req.sessionModel.set('temp-capacitiesValues', req.body)
 
-      const suffix = `${action === 'set' ? '/init' : ''}${req.isEditing ? '/edit' : ''}`
+      const suffix = `${cellTypeAction === 'set' ? '/init' : ''}${req.isEditing ? '/edit' : ''}`
 
-      res.redirect(`/location/${res.locals.decoratedLocation.id}/cell-conversion/${action}-cell-type${suffix}`)
+      res.redirect(`/location/${res.locals.decoratedLocation.id}/cell-conversion/${cellTypeAction}-cell-type${suffix}`)
 
       return
     }
 
-    super.validateFields(req, res, async errors => {
-      const { modifiedLocationMap, locationResidentialSummary } = res.locals
-      const { accommodationTypes } = locationResidentialSummary.parentLocation
-
-      const specialistCellTypes = await req.services.locationsService.getSpecialistCellTypes(req.session.systemToken)
+    super.validateFields(req, res, errors => {
+      const { modifiedLocationMap, decoratedLocation, constants } = res.locals
+      const { specialistCellTypes } = constants
 
       const validationErrors: FormWizard.Errors = {}
 
       // CARE_AND_SEPARATION and HEALTHCARE_INPATIENTS landings allow 0 cna/working cap, so skip this loop for those
-      if (
-        !accommodationTypes.includes('HEALTHCARE_INPATIENTS') &&
-        !accommodationTypes.includes('CARE_AND_SEPARATION')
-      ) {
-        Object.values(modifiedLocationMap).forEach(cell => {
-          const { id } = cell
+      if (req.sessionModel.get<string>('accommodationType') === 'NORMAL_ACCOMMODATION') {
+        const cell = modifiedLocationMap[decoratedLocation.id]
 
-          const workingCapacityKey = `workingCapacity-${id}`
-          const baselineCnaKey = `baselineCna-${id}`
-          const isSpecialistCellType = cell.specialistCellTypes.some(
-            type => specialistCellTypes.find(sct => sct.key === type)?.attributes?.affectsCapacity,
-          )
+        const workingCapacityKey = `CERT_workingCapacity`
+        const baselineCnaKey = `CERT_baselineCna`
+        const isSpecialistCellType = cell.specialistCellTypes.some(
+          type => specialistCellTypes.find(sct => sct.key === type)?.attributes?.affectsCapacity,
+        )
 
-          if (!errors[workingCapacityKey] && cell.oldWorkingCapacity === 0 && !isSpecialistCellType) {
-            validationErrors[workingCapacityKey] = this.formError(workingCapacityKey, 'nonZeroForNormalCell')
-          }
+        if (!errors[workingCapacityKey] && cell.capacity.workingCapacity === 0 && !isSpecialistCellType) {
+          validationErrors[workingCapacityKey] = this.formError(workingCapacityKey, 'nonZeroForNormalCell')
+        }
 
-          if (!errors[baselineCnaKey] && cell.capacity.certifiedNormalAccommodation === 0 && !isSpecialistCellType) {
-            validationErrors[baselineCnaKey] = this.formError(baselineCnaKey, 'nonZeroForNormalCell')
-          }
-        })
+        if (!errors[baselineCnaKey] && cell.capacity.certifiedNormalAccommodation === 0 && !isSpecialistCellType) {
+          validationErrors[baselineCnaKey] = this.formError(baselineCnaKey, 'nonZeroForNormalCell')
+        }
       }
 
       next({ ...errors, ...validationErrors })
@@ -105,19 +109,18 @@ export default class CellConversionCapacity extends FormInitialStep {
     Object.entries(modelData)
       .filter(([key]) => CELL_TYPE_REGEX.test(key))
       .forEach(([key, data]) => {
-        const cellId = key.match(CELL_TYPE_REGEX)[1]
         req.sessionModel.unset(key)
 
         if (key.endsWith('-removed')) {
           // Remove the saved types
-          req.sessionModel.unset(`saved-cellTypes${cellId}`)
-          req.sessionModel.set(`saved-cellTypes${cellId}-removed`, true)
+          req.sessionModel.unset(`saved-cellTypes`)
+          req.sessionModel.set(`saved-cellTypes-removed`, true)
           return
         }
 
         // Convert the temp data to saved data
-        req.sessionModel.unset(`saved-cellTypes${cellId}-removed`)
-        req.sessionModel.set(`saved-cellTypes${cellId}`, data)
+        req.sessionModel.unset(`saved-cellTypes-removed`)
+        req.sessionModel.set(`saved-cellTypes`, data)
       })
 
     req.sessionModel.unset('temp-capacitiesValues')

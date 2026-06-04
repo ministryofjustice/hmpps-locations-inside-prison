@@ -23,8 +23,8 @@
         '<div data-qa="cell-types-' + cell.id + '" class="change-remove-container">' +
         cellTypesText +
         '<div class="change-remove-actions">' +
-        '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="remove/' + cell.id + '">Remove</button>' + '  |  ' +
-        '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + cell.id + '">Change</button>' + '</div>' + '</div>'
+        '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="remove">Remove</button>' + '  |  ' +
+        '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set">Change</button>' + '</div>' + '</div>'
 
       }
     %}
@@ -32,7 +32,7 @@
     {% set cellTypeColumn = {
       html:
       '<div data-qa="cell-types-' + cell.id + '">' +
-      '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set/' + cell.id + '">Add</button>' +
+      '<button type="submit" class="govuk-link govuk-link--no-visited-state" name="cellTypeAction" value="set">Add</button>' +
       '</div>'
     }
     %}
