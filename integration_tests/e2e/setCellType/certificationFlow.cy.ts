@@ -415,7 +415,7 @@ context('Set cell type', () => {
           it('displays the correct change summary', () => {
             const rowsSelector = '[data-qa="overview-list-SPECIALIST_CELL_TYPE"] .govuk-summary-list__value'
             cy.get(rowsSelector).eq(0).contains('A-1-001')
-            cy.get(rowsSelector).eq(1).contains('Specialist cell type')
+            cy.get(rowsSelector).eq(1).contains('Set special cell type')
 
             const cellTypeTableSelector = '[data-qa="specialist-cell-type-table"]'
             const cellTypeHeaderSelector = `${cellTypeTableSelector} .govuk-table__header`
@@ -457,10 +457,10 @@ context('Set cell type', () => {
           })
 
           it('displays the correct change summaries', () => {
-            cy.get('[data-qa="approval-request-SPECIALIST_CELL_TYPE"] h2').contains('Change 1 - Specialist cell type')
+            cy.get('[data-qa="approval-request-SPECIALIST_CELL_TYPE"] h2').contains('Change 1 - Set special cell type')
             const rowsSelector = '[data-qa="overview-list-SPECIALIST_CELL_TYPE"] .govuk-summary-list__value'
             cy.get(rowsSelector).eq(0).contains('A-1-001')
-            cy.get(rowsSelector).eq(1).contains('Specialist cell type')
+            cy.get(rowsSelector).eq(1).contains('Set special cell type')
 
             const cellTypeTableSelector = '[data-qa="specialist-cell-type-table"]'
             const cellTypeHeaderSelector = `${cellTypeTableSelector} .govuk-table__header`
