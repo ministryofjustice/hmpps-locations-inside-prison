@@ -53,7 +53,28 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro recurseLocationReactivationTable(rows, location, specialistCellTypes) %}
+{% macro recurseLocationReactivationCheckChanges(location, changes) %}
+  {% if location.locationType === 'CELL' %}
+    {% if not changes.cna and location.currentCertifiedNormalAccommodation != location.certifiedNormalAccommodation %}
+      {% set changes = changes | setAttribute('cna', true) %}
+    {% endif %}
+    {% if not changes.wc and location.currentWorkingCapacity != location.workingCapacity %}
+      {% set changes = changes | setAttribute('wc', true) %}
+    {% endif %}
+    {% if not changes.mc and location.currentMaxCapacity != location.maxCapacity %}
+      {% set changes = changes | setAttribute('mc', true) %}
+    {% endif %}
+    {% if not changes.types and (location.currentSpecialistCellTypes or []).toString() != (location.specialistCellTypes or []).toString() %}
+      {% set changes = changes | setAttribute('types', true) %}
+    {% endif %}
+  {% endif %}
+
+  {% for subLocation in location.subLocations %}
+    {{ recurseLocationReactivationCheckChanges(subLocation, changes) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro recurseLocationReactivationTable(rows, location, specialistCellTypes, changes) %}
   {% if location.locationType === 'CELL' %}
     {% set rows = (rows.push([
       {
@@ -67,7 +88,7 @@
               (" → " + location.certifiedNormalAccommodation)
                 if location.currentCertifiedNormalAccommodation != location.certifiedNormalAccommodation
             )
-      },
+      } if changes.cna,
       {
         classes: 'govuk-table__cell',
         text: location.currentWorkingCapacity
@@ -75,7 +96,7 @@
               (" → " + location.workingCapacity)
                 if location.currentWorkingCapacity != location.workingCapacity
             )
-      },
+      } if changes.wc,
       {
         classes: 'govuk-table__cell',
         text: location.currentMaxCapacity
@@ -83,7 +104,7 @@
               (" → " + location.maxCapacity)
                 if location.currentMaxCapacity != location.maxCapacity
             )
-      },
+      } if changes.mc,
       {
         classes: 'govuk-table__cell',
         text: (formatConstants(specialistCellTypes, location.currentSpecialistCellTypes, ', ') or '-')
@@ -91,12 +112,12 @@
               (" → " + (formatConstants(specialistCellTypes, location.specialistCellTypes, ', ') or '-'))
                 if (location.currentSpecialistCellTypes or []).toString() != (location.specialistCellTypes or []).toString()
             )
-      }
-    ]), rows) %}
+      } if changes.types
+    ] | stripEmpty), rows) %}
   {% endif %}
 
   {% for subLocation in location.subLocations %}
-    {{ recurseLocationReactivationTable(rows, subLocation, specialistCellTypes) }}
+    {{ recurseLocationReactivationTable(rows, subLocation, specialistCellTypes, changes) }}
   {% endfor %}
 {% endmacro %}
 
@@ -292,7 +313,12 @@
           {% endif %}
         </div>
 
-        <div class="govuk-grid-column-full">
+        {% set changes = {} %}
+        {% for location in request.locations %}
+          {{ recurseLocationReactivationCheckChanges(location, changes) }}
+        {% endfor %}
+
+        <div class="govuk-grid-column-{{ 'full' if (changes | keys | length) >= 3 else 'two-thirds' }}">
           {% if multiple %}
             <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
           {% else %}
@@ -301,7 +327,7 @@
 
           {% set locationTableRows = [] %}
           {% for location in request.locations %}
-            {{ recurseLocationReactivationTable(locationTableRows, location, constants.specialistCellTypes) }}
+            {{ recurseLocationReactivationTable(locationTableRows, location, constants.specialistCellTypes, changes) }}
           {% endfor %}
 
           {% if request.locations[0].locationType !== 'CELL' %}
@@ -315,25 +341,25 @@
                 text: request.locations[0].currentCertifiedNormalAccommodation
                   + ((" → " + request.locations[0].certifiedNormalAccommodation)
                     if request.locations[0].currentCertifiedNormalAccommodation != request.locations[0].certifiedNormalAccommodation)
-              },
+              } if changes.cna,
               {
                 classes: 'govuk-table__header',
                 text: request.locations[0].currentWorkingCapacity
                   + ((" → " + request.locations[0].workingCapacity)
                     if request.locations[0].currentWorkingCapacity != request.locations[0].workingCapacity)
 
-              },
+              } if changes.wc,
               {
                 classes: 'govuk-table__header',
                 text: request.locations[0].currentMaxCapacity
                   + ((" → " + request.locations[0].maxCapacity)
                     if request.locations[0].currentMaxCapacity != request.locations[0].maxCapacity)
-              },
+              } if changes.mc,
               {
                 classes: 'govuk-table__header',
                 text: ''
-              }
-            ]), locationTableRows) %}
+              } if changes.types
+            ] | stripEmpty), locationTableRows) %}
           {% endif %}
 
           {{ govukTable({
@@ -342,11 +368,11 @@
             },
             head: [
               { text: "Location" },
-              { text: "Baseline CNA" },
-              { text: "Certified working capacity" },
-              { text: "Maximum capacity" },
-              { text: "Cell type" }
-            ],
+              { text: "Baseline CNA" } if changes.cna,
+              { text: "Certified working capacity" } if changes.wc,
+              { text: "Maximum capacity" } if changes.mc,
+              { text: "Cell type" } if changes.types
+            ] | stripEmpty,
             rows: locationTableRows
           }) }}
         </div>
@@ -385,6 +411,48 @@
                 if hasWcChange,
               { text: request.locations[0].currentMaxCapacity + " → " + request.locations[0].maxCapacity }
                 if hasMcChange
+            ] | stripEmpty]
+          }) }}
+        </div>
+      {% elseif request.approvalType == 'SPECIALIST_CELL_TYPE' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+          {% endif %}
+
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+
+          {% set hasCnaChange = request.locations[0].currentCertifiedNormalAccommodation
+            != request.locations[0].certifiedNormalAccommodation %}
+          {% set hasWcChange = request.locations[0].currentWorkingCapacity != request.locations[0].workingCapacity %}
+          {% set hasMcChange = request.locations[0].currentMaxCapacity != request.locations[0].maxCapacity %}
+          {% set hasStChange = request.locations[0].specialistCellTypes[0] and request.locations[0].specialistCellTypes[0] != request.locations[0].currentSpecialistCellTypes[0] %}
+
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'specialist-cell-type-table'
+            },
+            head: [
+              { text: "Location" },
+              { text: "Baseline CNA" } if hasCnaChange,
+              { text: "Certified working capacity" } if hasWcChange,
+              { text: "Maximum capacity" } if hasMcChange,
+              { text: "Cell type" } if hasStChange
+            ] | stripEmpty,
+            rows:[[
+              { text: request.locations[0].pathHierarchy },
+              { text: request.locations[0].currentCertifiedNormalAccommodation + " → "
+                + request.locations[0].certifiedNormalAccommodation } if hasCnaChange,
+              { text: request.locations[0].currentWorkingCapacity+ " → " + request.locations[0].workingCapacity}
+                if hasWcChange,
+              { text: request.locations[0].currentMaxCapacity + " → " + request.locations[0].maxCapacity }
+                if hasMcChange,
+              { text: formatConstants(constants.specialistCellTypes, request.locations[0].currentSpecialistCellTypes[0], "<br>", "None") + " → " + formatConstants(constants.specialistCellTypes, request.locations[0].specialistCellTypes[0], "<br>", "None") }
+                if hasStChange
             ] | stripEmpty]
           }) }}
         </div>

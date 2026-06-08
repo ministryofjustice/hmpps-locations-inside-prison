@@ -10,16 +10,18 @@ export const location = LocationFactory.build({
   capacity: {
     certifiedNormalAccommodation: 4,
     maxCapacity: 8,
-    workingCapacity: 4,
+    workingCapacity: 0,
   },
   currentCellCertificate: {
     workingCapacity: 0,
   },
+  oldWorkingCapacity: 4,
   leafLevel: false,
   localName: null,
   specialistCellTypes: [],
   status: 'INACTIVE',
   locationType: 'WING',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const landing1 = LocationFactory.build({
@@ -31,16 +33,18 @@ export const landing1 = LocationFactory.build({
   capacity: {
     certifiedNormalAccommodation: 2,
     maxCapacity: 4,
-    workingCapacity: 2,
+    workingCapacity: 0,
   },
   currentCellCertificate: {
     workingCapacity: 0,
   },
+  oldWorkingCapacity: 2,
   leafLevel: false,
   localName: null,
   specialistCellTypes: [],
   status: 'INACTIVE',
   locationType: 'LANDING',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const landing2 = LocationFactory.build({
@@ -52,16 +56,18 @@ export const landing2 = LocationFactory.build({
   capacity: {
     certifiedNormalAccommodation: 2,
     maxCapacity: 4,
-    workingCapacity: 2,
+    workingCapacity: 0,
   },
   currentCellCertificate: {
     workingCapacity: 0,
   },
+  oldWorkingCapacity: 2,
   leafLevel: false,
   localName: null,
   specialistCellTypes: [],
   status: 'INACTIVE',
   locationType: 'LANDING',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const cell1 = LocationFactory.build({
@@ -78,7 +84,7 @@ export const cell1 = LocationFactory.build({
   oldWorkingCapacity: 1,
   currentCellCertificate: {
     certifiedNormalAccommodation: 1,
-    workingCapacity: 1,
+    workingCapacity: 0,
     maxCapacity: 2,
     specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   },
@@ -86,6 +92,7 @@ export const cell1 = LocationFactory.build({
   localName: null,
   specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const cell2 = LocationFactory.build({
@@ -102,7 +109,7 @@ export const cell2 = LocationFactory.build({
   oldWorkingCapacity: 1,
   currentCellCertificate: {
     certifiedNormalAccommodation: 1,
-    workingCapacity: 1,
+    workingCapacity: 0,
     maxCapacity: 2,
     specialistCellTypes: [],
   },
@@ -110,6 +117,7 @@ export const cell2 = LocationFactory.build({
   localName: null,
   specialistCellTypes: [],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const cell3 = LocationFactory.build({
@@ -126,7 +134,7 @@ export const cell3 = LocationFactory.build({
   oldWorkingCapacity: 1,
   currentCellCertificate: {
     certifiedNormalAccommodation: 1,
-    workingCapacity: 1,
+    workingCapacity: 0,
     maxCapacity: 2,
     specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   },
@@ -134,6 +142,7 @@ export const cell3 = LocationFactory.build({
   localName: null,
   specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
 export const cell4 = LocationFactory.build({
@@ -150,7 +159,7 @@ export const cell4 = LocationFactory.build({
   oldWorkingCapacity: 1,
   currentCellCertificate: {
     certifiedNormalAccommodation: 1,
-    workingCapacity: 1,
+    workingCapacity: 0,
     maxCapacity: 2,
     specialistCellTypes: [],
   },
@@ -158,33 +167,80 @@ export const cell4 = LocationFactory.build({
   localName: null,
   specialistCellTypes: [],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
-export function setupStubs(role: string) {
-  setupStubsBase(role, location)
+export function setupStubs(role: string, hasCertChange = true) {
+  let stubLocation = location
+  let stubLanding1 = landing1
+  let stubLanding2 = landing2
+  let stubCell1 = cell1
+  let stubCell2 = cell2
+  let stubCell3 = cell3
+  let stubCell4 = cell4
+
+  if (!hasCertChange) {
+    stubLocation = LocationFactory.build({
+      ...location,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 4 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+    stubLanding1 = LocationFactory.build({
+      ...landing1,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 2 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+    stubLanding2 = LocationFactory.build({
+      ...landing2,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 2 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+    stubCell1 = LocationFactory.build({
+      ...cell1,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+    stubCell2 = LocationFactory.build({
+      ...cell2,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+    stubCell3 = LocationFactory.build({
+      ...cell3,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+    stubCell4 = LocationFactory.build({
+      ...cell4,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+  }
+
+  setupStubsBase(role, stubLocation)
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
-    parentLocation: location,
-    subLocations: [landing1, landing2],
+    parentLocation: stubLocation,
+    subLocations: [stubLanding1, stubLanding2],
     subLocationName: 'Landings',
   })
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
-    parentLocation: landing1,
-    subLocations: [cell1, cell2],
+    parentLocation: stubLanding1,
+    subLocations: [stubCell1, stubCell2],
     subLocationName: 'Cells',
   })
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
-    parentLocation: landing2,
-    subLocations: [cell3, cell4],
+    parentLocation: stubLanding2,
+    subLocations: [stubCell3, stubCell4],
     subLocationName: 'Cells',
   })
-  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: cell1 })
-  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: cell2 })
-  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: cell3 })
-  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: cell4 })
-  LocationsApiStubber.stub.stubLocations(landing1)
-  LocationsApiStubber.stub.stubLocations(landing2)
-  LocationsApiStubber.stub.stubLocations(cell1)
-  LocationsApiStubber.stub.stubLocations(cell2)
-  LocationsApiStubber.stub.stubLocations(cell3)
-  LocationsApiStubber.stub.stubLocations(cell4)
+  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: stubCell1 })
+  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: stubCell2 })
+  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: stubCell3 })
+  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: stubCell4 })
+  LocationsApiStubber.stub.stubLocations(stubLanding1)
+  LocationsApiStubber.stub.stubLocations(stubLanding2)
+  LocationsApiStubber.stub.stubLocations(stubCell1)
+  LocationsApiStubber.stub.stubLocations(stubCell2)
+  LocationsApiStubber.stub.stubLocations(stubCell3)
+  LocationsApiStubber.stub.stubLocations(stubCell4)
 }

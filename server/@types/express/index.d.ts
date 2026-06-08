@@ -42,6 +42,7 @@ interface AllLocals {
   accommodationType: string
   actions: { text: string; href: string; class: string }[]
   approvalRequest: CertificationApprovalRequest
+  approvalRequestMap: Record<string, CertificationApprovalRequest>
   approvalRequests: CertificationApprovalRequest[]
   archivedLocations: DecoratedLocation[]
   backLink: string
@@ -159,6 +160,12 @@ interface AllLocals {
   prisonNonHousingDisabled: boolean
   nestedBaseUrl: string
   nomisScreenBlocked: boolean
+  nomisLocationScreenBlocked: boolean
+  nomisUsageScreenBlocked: boolean
+  moduleName: string
+  currentScreenStatus: string
+  screenLabel: string
+  currentStatusDescription: string
   prisonId: string
   prisonerLocation: PrisonerLocation
   prisonResidentialSummary: PrisonResidentialSummary

@@ -48,11 +48,9 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
     const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
     const { workingCapacity } = decoratedLocation.capacity
     const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/deactivate/temporary/details` })
-    const changeSummary = this.generateChangeSummary(
-      cellCount,
-      workingCapacity,
-      prisonResidentialSummary.prisonSummary.workingCapacity,
-    )
+    const changeSummary =
+      this.generateChangeSummary(cellCount, workingCapacity, prisonResidentialSummary.prisonSummary.workingCapacity) ||
+      "There will be no change to the establishment's capacity."
 
     return {
       backLink,
@@ -77,8 +75,7 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
         req.sessionModel.get<string>(`deactivationReason${reason === 'OTHER' ? 'Other' : 'Description'}`),
         req.sessionModel.get<string>('estimatedReactivationDate') ||
           req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
-        req.sessionModel.get<string>('planetFmReference') ||
-          req.sessionModel.get<string>('facilitiesManagementReference'),
+        req.sessionModel.get<string>('planetFmReference'),
       )
 
       analyticsService.sendEvent(req, 'deactivate_temp', {

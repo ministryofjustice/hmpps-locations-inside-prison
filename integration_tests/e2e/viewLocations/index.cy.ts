@@ -49,7 +49,7 @@ context('View Locations Index', () => {
   context('With the default role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
       cy.task('stubManageUsers')
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')

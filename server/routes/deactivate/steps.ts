@@ -12,30 +12,39 @@ import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import TemporaryInactiveInit from '../../controllers/deactivate/temporaryInactiveInit'
 
 function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
 }
 
-export function hasWorkingCapacity(_req: FormWizard.Request, res: Response) {
-  return res.locals.decoratedLocation.capacity.workingCapacity > 0
+export function hasCertifiedWorkingCapacity(_req: FormWizard.Request, res: Response) {
+  return (res.locals.decoratedLocation.currentCellCertificate?.workingCapacity || 0) > 0
+}
+
+function canRequestCertChange(req: FormWizard.Request, res: Response) {
+  const { prisonConfiguration } = res.locals
+
+  return (
+    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && req.canAccess('certificate_change_request_create')
+  )
 }
 
 export function isCellCertChange(req: FormWizard.Request, res: Response) {
-  const { prisonConfiguration, decoratedLocation } = res.locals
+  const { decoratedLocation } = res.locals
 
   return (
-    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    canRequestCertChange(req, res) &&
     decoratedLocation.raw.locationType === 'CELL' &&
     req.sessionModel.get<string>('reduceWorkingCapacity') !== 'NO'
   )
 }
 
 export function isCertChange(req: FormWizard.Request, res: Response) {
-  const { prisonConfiguration, decoratedLocation } = res.locals
+  const { decoratedLocation } = res.locals
 
   return (
-    prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+    canRequestCertChange(req, res) &&
     (decoratedLocation.raw.locationType !== 'CELL' || req.sessionModel.get<string>('reduceWorkingCapacity') === 'YES')
   )
 }
@@ -55,7 +64,14 @@ const steps: FormWizard.Steps = {
     next: [
       { fn: isCellOccupied, next: 'occupied' },
       {
-        fn: (req, res) => (isCellCertChange(req, res) || isCertChange(req, res)) && !hasWorkingCapacity(req, res),
+        fn: (_req, res) =>
+          res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+          res.locals.decoratedLocation.status === 'INACTIVE',
+        next: 'temporary-inactive-init',
+      },
+      {
+        fn: (req, res) =>
+          (isCellCertChange(req, res) || isCertChange(req, res)) && !hasCertifiedWorkingCapacity(req, res),
         next: 'temporary/details',
       },
       { fn: isCellCertChange, next: 'cell-cert-change' },
@@ -68,6 +84,11 @@ const steps: FormWizard.Steps = {
     fields: ['reduceWorkingCapacity'],
     next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: 'cert-change-disclaimer' }, 'temporary/details'],
     controller: CellCertChange,
+  },
+  '/temporary-inactive-init': {
+    skip: true,
+    controller: TemporaryInactiveInit,
+    next: 'cert-change-disclaimer',
   },
   ...CertChangeDisclaimer.getSteps({
     next: 'temporary/details',
@@ -101,15 +122,17 @@ const steps: FormWizard.Steps = {
       'estimatedReactivationDate',
       'mandatoryEstimatedReactivationDate',
       'planetFmReference',
-      'facilitiesManagementReference',
       'workingCapacityExplanation',
     ],
     next: [
       {
-        fn: (req, res) => isCellCertChange(req, res) && hasWorkingCapacity(req, res),
+        fn: (req, res) => isCellCertChange(req, res) && hasCertifiedWorkingCapacity(req, res),
         next: 'submit-certification-approval-request',
       },
-      { fn: (req, res) => isCertChange(req, res) && hasWorkingCapacity(req, res), next: 'update-signed-op-cap' },
+      {
+        fn: (req, res) => isCertChange(req, res) && hasCertifiedWorkingCapacity(req, res),
+        next: 'update-signed-op-cap',
+      },
       'temporary/confirm',
     ],
     controller: DeactivateTemporaryDetails,

@@ -38,7 +38,7 @@ export default function populateLocation({
       if (!location || (includeCurrentCertificate && !location.currentCellCertificate) || location?.id !== locationId) {
         location = await req.services.locationsService.getLocation(
           systemToken,
-          locationId,
+          locationId as string,
           includeHistory,
           includeCurrentCertificate,
         )

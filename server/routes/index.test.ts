@@ -62,7 +62,40 @@ describe('GET /', () => {
     })
   })
 
-  it('should render index page with "Manage residential locations" when certificationApprovalRequired is ACTIVE', async () => {
+  it('should render index page with "Manage residential locations" when user has a residential role and certificationApprovalRequired is ACTIVE', async () => {
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
+    })
+
+    app = appWithAllRoutes({
+      services: {
+        auditService,
+        locationsService,
+      },
+      userSupplier: () => ({ ...user, userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'] }),
+    })
+
+    auditService.logPageView.mockResolvedValue(null)
+    const res = await request(app).get('/')
+
+    expect(res.text).toContain('govuk-breadcrumbs')
+    expect(res.text).toContain('Residential locations')
+    expect(res.text).toContain('Manage residential locations')
+    expect(res.text).toContain('View all inactive cells')
+    expect(res.text).toContain('Archived locations')
+    expect(res.text).toContain('Cell certificate')
+
+    expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
+      who: user.username,
+      correlationId: expect.any(String),
+    })
+  })
+
+  it('should render permission message when resi service is active but user has no residential role', async () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
@@ -82,16 +115,12 @@ describe('GET /', () => {
     auditService.logPageView.mockResolvedValue(null)
     const res = await request(app).get('/')
 
-    expect(res.text).toContain('govuk-breadcrumbs')
     expect(res.text).toContain('Residential locations')
-    expect(res.text).toContain('Manage residential locations')
-    expect(res.text).toContain('View all inactive cells')
-    expect(res.text).toContain('Archived locations')
-    expect(res.text).toContain('Cell certificate')
+    expect(res.text).toContain('You do not have permission to manage Residential locations.')
 
-    expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
-      who: user.username,
-      correlationId: expect.any(String),
-    })
+    expect(res.text).not.toContain('Manage residential locations')
+    expect(res.text).not.toContain('View all inactive cells')
+    expect(res.text).not.toContain('Archived locations')
+    expect(res.text).not.toContain('Cell certificate')
   })
 })

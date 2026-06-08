@@ -87,6 +87,23 @@ export default class LocationsService {
     return this.locationsApiClient.certification.location.reactivationRequestApproval(token, null, data)
   }
 
+  async requestSpecialistCellTypeChange(
+    token: string,
+    locationId: string,
+    data: {
+      specialistCellTypes: string[]
+      workingCapacity: number
+      maxCapacity: number
+      certifiedNormalAccommodation: number
+    },
+  ) {
+    return this.locationsApiClient.certification.location.specialistCellTypeChange(token, null, {
+      locationId,
+      reasonForChange: null,
+      ...data,
+    })
+  }
+
   async deactivatePermanent(token: string, locationId: string, reason: string) {
     return this.locationsApiClient.locations.deactivate.permanent(token, { locationId }, { reason })
   }
@@ -211,8 +228,8 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getLocationTypes'))[key] || 'Unknown'
   }
 
-  async getLocationByCellMark(token: string, prisonId: string, cellMark: string) {
-    return this.locationsApiClient.locations.getLocationByCellMark(token, { prisonId, cellMark })
+  async getLocationByCellMark(token: string, prisonId: string, cellMark: string, parentLocationId?: string) {
+    return this.locationsApiClient.locations.getLocationByCellMark(token, { prisonId, cellMark, parentLocationId })
   }
 
   async getLocationByLocalName(token: string, prisonId: string, localName: string, parentLocationId?: string) {

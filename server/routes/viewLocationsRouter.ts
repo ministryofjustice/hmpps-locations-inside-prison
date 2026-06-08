@@ -21,13 +21,14 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
   const { location } = res.locals.decoratedResidentialSummary
   const { active, isResidential, leafLevel, raw, status } = location
   const { locationType } = raw
+  const requiredPermission = locationType === 'CELL' ? 'deactivate' : 'deactivate:parent_location'
 
   if (
     active &&
     isResidential &&
     ['CELL', 'LANDING', 'WING', 'SPUR'].includes(locationType) &&
     !status.includes('LOCKED_') &&
-    req.canAccess('deactivate')
+    req.canAccess(requiredPermission)
   ) {
     addAction({
       text: `Deactivate ${location.locationType.toLowerCase()}`,

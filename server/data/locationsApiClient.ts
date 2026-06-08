@@ -108,6 +108,21 @@ export default class LocationsApiClient extends BaseApiClient {
         path: '/certification/location/withdraw',
         requestType: 'put',
       }),
+      specialistCellTypeChange: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          locationId: string
+          specialistCellTypes: string[]
+          workingCapacity: number
+          maxCapacity: number
+          certifiedNormalAccommodation: number
+          reasonForChange: string | null
+        }
+      >({
+        path: '/certification/location/specialist-cell-type-change',
+        requestType: 'put',
+      }),
     },
     prison: {
       signedOpCapChange: this.apiCall<
@@ -249,8 +264,9 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
     },
-    getLocationByCellMark: this.apiCall<Location[], { prisonId: string; cellMark: string }>({
+    getLocationByCellMark: this.apiCall<Location[], { prisonId: string; cellMark: string; parentLocationId?: string }>({
       path: '/locations/:prisonId/cell-mark/:cellMark',
+      queryParams: ['parentLocationId'],
       requestType: 'get',
     }),
     getLocationByLocalName: this.apiCall<

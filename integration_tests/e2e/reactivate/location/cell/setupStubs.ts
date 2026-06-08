@@ -12,7 +12,7 @@ export const location = LocationFactory.build({
   oldWorkingCapacity: 1,
   currentCellCertificate: {
     certifiedNormalAccommodation: 1,
-    workingCapacity: 1,
+    workingCapacity: 0,
     maxCapacity: 2,
     specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   },
@@ -20,11 +20,22 @@ export const location = LocationFactory.build({
   localName: null,
   specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
   status: 'INACTIVE',
+  inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
 })
 
-export function setupStubs(role: string) {
-  setupStubsBase(role, location)
+export function setupStubs(role: string, hasCertChange = true) {
+  let stubLocation = location
+
+  if (!hasCertChange) {
+    stubLocation = LocationFactory.build({
+      ...location,
+      currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 1 },
+      inactiveStatus: 'INACTIVE_TEMP',
+    })
+  }
+
+  setupStubsBase(role, stubLocation)
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
-    parentLocation: location,
+    parentLocation: stubLocation,
   })
 }

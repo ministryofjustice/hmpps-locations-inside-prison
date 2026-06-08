@@ -10,7 +10,7 @@ export default async function redirectNonPendingRequest(
   const { systemToken } = req.session
   const { locationsService } = req.services
 
-  const certificate = await locationsService.getCertificateApprovalRequest(systemToken, approvalRequestId)
+  const certificate = await locationsService.getCertificateApprovalRequest(systemToken, approvalRequestId as string)
 
   if (certificate.status !== 'PENDING') {
     return res.redirect(`/${certificate.prisonId}/cell-certificate/change-requests/${approvalRequestId}`)

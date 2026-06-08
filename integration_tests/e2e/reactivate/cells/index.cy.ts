@@ -135,7 +135,7 @@ context('Reactivate cells', () => {
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsPrisonInactiveCells', locations)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -169,7 +169,7 @@ context('Reactivate cells', () => {
       cy.task('stubLocations', genericLocation)
       cy.task('stubLocationsBulkReactivate')
       cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -239,8 +239,7 @@ context('Reactivate cells', () => {
 
     describe('when a cell has oldWorkingCapacity of 0', () => {
       it('shows an error when the user tries to continue', () => {
-        locations[1].oldWorkingCapacity = 0
-        cy.task('stubLocations', locations[1])
+        cy.task('stubLocations', { ...locations[1], oldWorkingCapacity: 0 })
 
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)

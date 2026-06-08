@@ -26,10 +26,26 @@ describe('rolesToPermissions', () => {
       'convert_non_residential',
       'create_location',
       'deactivate',
+      'deactivate:parent_location',
       'deactivate:permanent',
       'reactivate',
       'set_cell_type',
     ])
+  })
+
+  it('returns the correct permissions for RESI__CERT_REVIEWER', () => {
+    expect(rolesToPermissions(['RESI__CERT_REVIEWER']).sort()).toEqual([
+      'certificate_change_request_review',
+      'certificate_view_management',
+    ])
+  })
+
+  it('returns the correct permissions for RESI__CERT_VIEWER', () => {
+    expect(rolesToPermissions(['RESI__CERT_VIEWER']).sort()).toEqual(['certificate_view_management'])
+  })
+
+  it('returns the correct permissions for MANAGE_RES_LOCATIONS_ADMIN', () => {
+    expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_ADMIN']).sort()).toEqual(['administer_residential'])
   })
 
   it('returns the correct permissions for all roles', () => {
@@ -59,6 +75,7 @@ describe('rolesToPermissions', () => {
       'convert_non_residential',
       'create_location',
       'deactivate',
+      'deactivate:parent_location',
       'deactivate:permanent',
       'reactivate',
       'set_cell_type',

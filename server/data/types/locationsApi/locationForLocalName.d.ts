@@ -13,10 +13,6 @@ export declare interface LocationForLocalName {
     workingCapacity: number
   }
   oldWorkingCapacity: number
-  certification: {
-    certified: boolean
-    capacityOfCertifiedCell: number
-  }
   usage: {
     usageType: string
     capacity: number

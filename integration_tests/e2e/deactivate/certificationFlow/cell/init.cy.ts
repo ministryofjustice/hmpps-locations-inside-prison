@@ -70,11 +70,11 @@ context('Certification Deactivation - Cell - Init', () => {
     })
 
     context('when the cell is not occupied', () => {
-      context('when the cell has 0 working capacity', () => {
+      context('when the cell has 0 certified working capacity', () => {
         beforeEach(() => {
           setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', {
             ...location,
-            capacity: { ...location.capacity, workingCapacity: 0 },
+            currentCellCertificate: { ...location.currentCellCertificate, workingCapacity: 0 },
           })
 
           cy.signIn()
@@ -96,6 +96,23 @@ context('Certification Deactivation - Cell - Init', () => {
         it('navigates to the cell-cert-change page', () => {
           cy.visit(`/location/${location.id}/deactivate`)
           Page.verifyOnPage(CellCertChangePage)
+        })
+      })
+    })
+  })
+
+  context('with only the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
+    context('when the cell is not occupied', () => {
+      context('when the cell has > 0 working capacity', () => {
+        beforeEach(() => {
+          setupStubs('MANAGE_RESIDENTIAL_LOCATIONS')
+
+          cy.signIn()
+        })
+
+        it('navigates straight to the deactivation details page', () => {
+          cy.visit(`/location/${location.id}/deactivate`)
+          Page.verifyOnPage(DeactivateTemporaryDetailsPage)
         })
       })
     })

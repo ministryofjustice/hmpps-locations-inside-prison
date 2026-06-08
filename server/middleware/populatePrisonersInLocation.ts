@@ -7,7 +7,7 @@ export default function populatePrisonersInLocation() {
     const locationId = (decoratedLocation || location).id || req.params.locationId || res.locals.locationId
     const [prisonerLocation] = await req.services.locationsService.getPrisonersInLocation(
       req.session.systemToken,
-      locationId,
+      locationId as string,
     )
 
     res.locals.prisonerLocation = prisonerLocation

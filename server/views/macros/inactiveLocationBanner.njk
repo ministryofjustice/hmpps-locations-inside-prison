@@ -10,17 +10,20 @@
   {% if location.deactivationReasonDescription %}
     {% set deactivatedReason = deactivatedReason + " - " + location.deactivationReasonDescription %}
   {% endif %}
+  {% set isCertifiedDeactivation = isCertActive and location.inactiveStatus === 'INACTIVE_MATCHING_CELL_CERT' %}
+  {% set isTemporaryDeactivation = not isCertifiedDeactivation and (not isCertActive or not location.pendingApprovalRequestId) %}
+  {% set canReactivate = canAccess('reactivate') and (not isCertifiedDeactivation or canAccess('certificate_change_request_create')) %}
 
   {% set inactiveHtml %}
     <span class="hmpps-inactive-location-banner">
       <p class="govuk-notification-banner__heading">
         {{ locationType }} {{ locationName }} is
-        {% if isCertActive and location.currentCellCertificate.workingCapacity === 0 and location.oldWorkingCapacity !== 0 %}
+        {% if isCertifiedDeactivation %}
           inactive with capacity decreased on the cell certificate
-        {% elseif isCertActive and location.lastDeactivationReasonForChange %}
-          inactive
-        {% else %}
+        {% elseif isTemporaryDeactivation %}
           temporarily inactive
+        {% else %}
+          inactive
         {% endif %}
       </p>
 
@@ -38,7 +41,7 @@
                 href: '/location/' + location.id + '/change-temporary-deactivation-details',
                 text: "Change",
                 visuallyHiddenText: "reason",
-                classes: "govuk-link--no-visited-state"} if canAccess('deactivate')
+                classes: "govuk-link--no-visited-state"} if canAccess('deactivate') and isTemporaryDeactivation
             ]
           }
         },
@@ -55,13 +58,13 @@
                 href: '/location/' + location.id + '/change-temporary-deactivation-details',
                 text: "Change",
                 visuallyHiddenText: "estimatedReactivationDate",
-                classes: "govuk-link--no-visited-state"} if canAccess('deactivate')
+                classes: "govuk-link--no-visited-state"} if canAccess('deactivate') and isTemporaryDeactivation
             ]
           }
         },
         {
           key: {
-            text: 'Facilities reference number' if isCertActive else 'Planet FM reference number'
+            text: 'Facilities reference number'
           },
           value: {
             text: location.planetFmReference or "Not provided"
@@ -73,7 +76,7 @@
                 text: "Change",
                 visuallyHiddenText: "planetFMReferenceNumber",
                 classes: "govuk-link--no-visited-state"
-              } if canAccess('deactivate')
+              } if canAccess('deactivate') and isTemporaryDeactivation
             ]
           }
         },
@@ -108,12 +111,21 @@
 
     {% if not location.raw.status.includes('LOCKED_') %}
       {% if isCertActive %}
-        {% if canAccess('reactivate') %}
+        {% if canReactivate %}
           {{ govukButton({
             text: "Activate " + ("entire " if location.raw.locationType !== 'CELL') + (location.locationType | lower),
             classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0",
             preventDoubleClick: true,
             href: "/reactivate/location/" + location.id
+          }) }}
+        {% endif %}
+
+        {% if isTemporaryDeactivation and canAccess('certificate_change_request_create') and location.currentCellCertificate.workingCapacity > 0 %}
+          {{ govukButton({
+            text: 'Decrease certified working capacity',
+            classes: "govuk-!-margin-top-5 govuk-!-margin-right-1 govuk-!-margin-bottom-0 govuk-button--secondary",
+            preventDoubleClick: true,
+            href: "/location/" + location.id + '/deactivate'
           }) }}
         {% endif %}
       {% else %}

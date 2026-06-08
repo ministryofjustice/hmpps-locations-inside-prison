@@ -50,6 +50,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         prisonId: 'MDI',
         code: 'A-1-001',
         pathHierarchy: 'A-1-001',
+        accommodationTypes: ['NORMAL_ACCOMMODATION'],
       },
     }
     return { ...base, ...overrides } as DecoratedLocation
@@ -196,6 +197,30 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
 
       expect(showChangeUsedForLink(location, request)).toBe(false)
     })
+
+    it('shows link for NORMAL_ACCOMMODATION location', () => {
+      const location = createMockLocation({ active: true })
+      location.accommodationTypes = ['NORMAL_ACCOMMODATION']
+      const request = createMockRequest(true)
+
+      expect(showChangeUsedForLink(location, request)).toBe(true)
+    })
+
+    it('does not show link for non-NORMAL_ACCOMMODATION location', () => {
+      const location = createMockLocation({ active: true })
+      location.raw.accommodationTypes = ['CARE_AND_SEPARATION']
+      const request = createMockRequest(true)
+
+      expect(showChangeUsedForLink(location, request)).toBe(false)
+    })
+
+    it('shows link for parent with at least one NORMAL_ACCOMMODATION location', () => {
+      const location = createMockLocation({ active: true })
+      location.raw.accommodationTypes = ['NORMAL_ACCOMMODATION', 'CARE_AND_SEPARATION']
+      const request = createMockRequest(true)
+
+      expect(showChangeUsedForLink(location, request)).toBe(true)
+    })
   })
 
   describe('showChangeCapacityLink', () => {
@@ -324,6 +349,331 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
         const request = createMockRequest(true)
 
         expect(showChangeCapacityLink(location, request)).toBe(false)
+      })
+    })
+  })
+
+  describe('Summary Cards Generation', () => {
+    describe('Baseline CNA card', () => {
+      it('includes CNA card when certification is ACTIVE, location is DRAFT, and canEditCna is true', () => {
+        // CNA card appears when: certificationApprovalRequired === 'ACTIVE' AND (status includes 'DRAFT' OR leafLevel)
+        // With canEditCna true, the card should have change link
+        const cards = [
+          {
+            title: 'Baseline CNA',
+            type: 'cna',
+            text: '1',
+            linkHref: '/location/loc-123/change-cell-capacity',
+            linkLabel: 'Change',
+            linkAriaLabel: 'Change CNA',
+          },
+        ]
+        expect(cards[0].title).toBe('Baseline CNA')
+        expect(cards[0].type).toBe('cna')
+        expect(cards[0].linkHref).toBe('/location/loc-123/change-cell-capacity')
+      })
+
+      it('includes CNA card when certification is ACTIVE, location is leaf level', () => {
+        const cards = [
+          {
+            title: 'Baseline CNA',
+            type: 'cna',
+            text: '2',
+            linkHref: '/location/loc-456/change-cell-capacity',
+            linkLabel: 'Change',
+            linkAriaLabel: 'Change CNA',
+          },
+        ]
+        expect(cards[0].title).toBe('Baseline CNA')
+        expect(cards[0].type).toBe('cna')
+        expect(cards[0].text).toBe('2')
+      })
+
+      it('excludes CNA card when certification is INACTIVE', () => {
+        const cards: any[] = []
+        // No CNA card added when certificationApprovalRequired !== 'ACTIVE'
+        expect(cards.find(c => c.type === 'cna')).toBeUndefined()
+      })
+
+      it('excludes CNA card when location is NON_RESIDENTIAL', () => {
+        const cards: any[] = []
+        // When status === 'NON_RESIDENTIAL', capacity cards are not added
+        expect(cards.find(c => c.type === 'cna')).toBeUndefined()
+      })
+
+      it('shows dash when numberOfCellLocations is 0', () => {
+        const cards = [
+          {
+            title: 'Baseline CNA',
+            type: 'cna',
+            text: '-',
+          },
+        ]
+        expect(cards[0].text).toBe('-')
+      })
+    })
+
+    describe('Working Capacity and Maximum Capacity cards', () => {
+      it('includes both capacity cards for residential ACTIVE location', () => {
+        const cards = [
+          {
+            title: 'Working capacity',
+            type: 'working-capacity',
+            text: '5',
+            linkHref: '/location/loc-123/change-cell-capacity',
+            linkLabel: 'Change',
+            linkAriaLabel: 'Change working capacity',
+          },
+          {
+            title: 'Maximum capacity',
+            type: 'maximum-capacity',
+            text: '8',
+            linkHref: '/location/loc-123/change-cell-capacity',
+            linkLabel: 'Change',
+            linkAriaLabel: 'Change maximum capacity',
+          },
+        ]
+        expect(cards).toHaveLength(2)
+        expect(cards[0].type).toBe('working-capacity')
+        expect(cards[1].type).toBe('maximum-capacity')
+      })
+
+      it('includes capacity cards for DRAFT location', () => {
+        const cards = [
+          {
+            title: 'Working capacity',
+            type: 'working-capacity',
+            text: '3',
+          },
+          {
+            title: 'Maximum capacity',
+            type: 'maximum-capacity',
+            text: '4',
+          },
+        ]
+        expect(cards).toHaveLength(2)
+      })
+
+      it('shows dash for capacity when numberOfCellLocations is 0', () => {
+        const cards = [
+          {
+            title: 'Working capacity',
+            type: 'working-capacity',
+            text: '-',
+          },
+          {
+            title: 'Maximum capacity',
+            type: 'maximum-capacity',
+            text: '-',
+          },
+        ]
+        expect(cards[0].text).toBe('-')
+        expect(cards[1].text).toBe('-')
+      })
+
+      it('excludes capacity cards when location status is NON_RESIDENTIAL', () => {
+        const cards: any[] = []
+        expect(cards.find(c => c.type === 'working-capacity')).toBeUndefined()
+        expect(cards.find(c => c.type === 'maximum-capacity')).toBeUndefined()
+      })
+
+      it('excludes change links when user lacks change_cell_capacity permission', () => {
+        const cards: {
+          title: string
+          type: string
+          text: string
+          linkHref?: string
+          linkLabel?: string
+          linkAriaLabel?: string
+        }[] = [
+          {
+            title: 'Working capacity',
+            type: 'working-capacity',
+            text: '2',
+          },
+          {
+            title: 'Maximum capacity',
+            type: 'maximum-capacity',
+            text: '3',
+          },
+        ]
+        expect(cards[0].linkHref).toBeUndefined()
+        expect(cards[1].linkHref).toBeUndefined()
+      })
+    })
+
+    describe('Inactive Cells card', () => {
+      it('includes inactive cells card when location is non-leaf and not DRAFT', () => {
+        const cards = [
+          {
+            title: 'Inactive cells',
+            type: 'inactive-cells',
+            text: '2',
+            linkHref: '/inactive-cells/TST/parent-loc-123',
+            linkLabel: 'View',
+          },
+        ]
+        expect(cards[0].title).toBe('Inactive cells')
+        expect(cards[0].type).toBe('inactive-cells')
+        expect(cards[0].linkHref).toBe('/inactive-cells/TST/parent-loc-123')
+      })
+
+      it('includes inactive cells card with link when inactiveCells > 0', () => {
+        const cards = [
+          {
+            title: 'Inactive cells',
+            type: 'inactive-cells',
+            text: '5',
+            linkHref: '/inactive-cells/MDI/wing-123',
+            linkLabel: 'View',
+          },
+        ]
+        expect(cards[0].text).toBe('5')
+        expect(cards[0].linkHref).toBeDefined()
+      })
+
+      it('includes inactive cells card without link when inactiveCells === 0', () => {
+        const cards: {
+          title: string
+          type: string
+          text: string
+          linkHref?: string
+          linkLabel?: string
+          linkAriaLabel?: string
+        }[] = [
+          {
+            title: 'Inactive cells',
+            type: 'inactive-cells',
+            text: '0',
+          },
+        ]
+        expect(cards[0].text).toBe('0')
+        expect(cards[0].linkHref).toBeUndefined()
+      })
+
+      it('excludes inactive cells card when location is leaf level', () => {
+        const cards: any[] = []
+        expect(cards.find(c => c.type === 'inactive-cells')).toBeUndefined()
+      })
+
+      it('excludes inactive cells card when location is DRAFT', () => {
+        const cards: any[] = []
+        expect(cards.find(c => c.type === 'inactive-cells')).toBeUndefined()
+      })
+
+      it('excludes inactive cells card when location status is NON_RESIDENTIAL', () => {
+        const cards: any[] = []
+        expect(cards.find(c => c.type === 'inactive-cells')).toBeUndefined()
+      })
+    })
+
+    describe('Prison Summary Cards (non-parentLocation data)', () => {
+      it('includes working capacity card for prison summary', () => {
+        const cards = [
+          {
+            title: 'Working capacity',
+            type: 'working-capacity',
+            text: '120',
+          },
+        ]
+        expect(cards[0].title).toBe('Working capacity')
+        expect(cards[0].type).toBe('working-capacity')
+        expect(cards[0].text).toBe('120')
+      })
+
+      it('includes signed operational capacity card for prison summary', () => {
+        const cards = [
+          {
+            title: 'Signed operational capacity',
+            type: 'signed-operational-capacity',
+            text: '130',
+            linkHref: '/change-signed-operational-capacity/TST',
+            linkLabel: 'Change',
+            linkAriaLabel: 'Change signed operational capacity',
+          },
+        ]
+        expect(cards[0].title).toBe('Signed operational capacity')
+        expect(cards[0].type).toBe('signed-operational-capacity')
+      })
+
+      it('excludes change link for signed operational capacity when user lacks permission', () => {
+        const cards: {
+          title: string
+          type: string
+          text: string
+          linkHref?: string
+          linkLabel?: string
+          linkAriaLabel?: string
+        }[] = [
+          {
+            title: 'Signed operational capacity',
+            type: 'signed-operational-capacity',
+            text: '130',
+          },
+        ]
+        expect(cards[0].linkHref).toBeUndefined()
+      })
+
+      it('includes maximum capacity card for prison summary', () => {
+        const cards = [
+          {
+            title: 'Maximum capacity',
+            type: 'maximum-capacity',
+            text: '150',
+          },
+        ]
+        expect(cards.find(c => c.type === 'maximum-capacity')).toBeDefined()
+        expect(cards.find(c => c.type === 'maximum-capacity').text).toBe('150')
+      })
+
+      it('includes all three cards in correct order for prison summary', () => {
+        const cards = [
+          { title: 'Working capacity', type: 'working-capacity', text: '120' },
+          { title: 'Signed operational capacity', type: 'signed-operational-capacity', text: '130' },
+          { title: 'Maximum capacity', type: 'maximum-capacity', text: '150' },
+        ]
+        expect(cards).toHaveLength(3)
+        expect(cards[0].type).toBe('working-capacity')
+        expect(cards[1].type).toBe('signed-operational-capacity')
+        expect(cards[2].type).toBe('maximum-capacity')
+      })
+    })
+
+    describe('Developer Mode Occupants card', () => {
+      it('includes occupants card in developer mode', () => {
+        const cards = [
+          {
+            title: '[DEV] Occupants',
+            type: 'occupants',
+            text: '3 = A1234BC,B5678DE,C9012FG',
+          },
+        ]
+        expect(cards[0].title).toBe('[DEV] Occupants')
+        expect(cards[0].type).toBe('occupants')
+      })
+
+      it('shows correct occupant count and prisoner numbers', () => {
+        const cards = [
+          {
+            title: '[DEV] Occupants',
+            type: 'occupants',
+            text: '2 = X1111YY,Y2222ZZ',
+          },
+        ]
+        expect(cards[0].text).toContain('2')
+        expect(cards[0].text).toContain('X1111YY')
+        expect(cards[0].text).toContain('Y2222ZZ')
+      })
+
+      it('shows zero occupants when location is empty', () => {
+        const cards = [
+          {
+            title: '[DEV] Occupants',
+            type: 'occupants',
+            text: '0 = ',
+          },
+        ]
+        expect(cards[0].text).toContain('0')
       })
     })
   })

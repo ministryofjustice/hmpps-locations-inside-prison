@@ -27,14 +27,39 @@ export default class ManageUsersService {
     accessRoles: string[],
     size = 50,
   ): Promise<PaginatedUsers> {
-    const firstPage: PaginatedUsers = await this.getPagedUsersByCaseload(token, caseload, accessRoles, 0, size)
+    const apiCall = this.manageUsersApiClient.users.getUsersByCaseload
+    return this.getAllUsersByFilter(token, caseload, accessRoles, size, apiCall)
+  }
+
+  async getAllUsersByActiveCaseload(
+    token: string,
+    caseload: string,
+    accessRoles: string[],
+    size = 50,
+  ): Promise<PaginatedUsers> {
+    const apiCall = this.manageUsersApiClient.users.getUsersByActiveCaseload
+    return this.getAllUsersByFilter(token, caseload, accessRoles, size, apiCall)
+  }
+
+  async getAllUsersByFilter(
+    token: string,
+    caseload: string,
+    accessRoles: string[],
+    size = 50,
+    apiCall = this.manageUsersApiClient.users.getUsersByCaseload,
+  ): Promise<PaginatedUsers> {
+    const firstPage: PaginatedUsers = await this.getPagedUsersByCaseload(token, caseload, accessRoles, 0, size, apiCall)
     const { totalPages } = firstPage
+    const responses: PaginatedUsers[] = [firstPage]
 
-    const pagedResponses = Array.from({ length: totalPages }, (_, page) =>
-      this.getPagedUsersByCaseload(token, caseload, accessRoles, page, size),
-    )
+    if (totalPages > 1) {
+      const pagePromises = Array.from({ length: totalPages - 1 }, (_, page) =>
+        this.getPagedUsersByCaseload(token, caseload, accessRoles, page + 1, size, apiCall),
+      )
+      const pages = await Promise.all(pagePromises)
+      responses.push(...pages)
+    }
 
-    const responses: PaginatedUsers[] = await Promise.all(pagedResponses)
     const allUsers: UserAccount[] = responses.flatMap(response => response.content)
 
     return {
@@ -49,8 +74,9 @@ export default class ManageUsersService {
     accessRoles: string[],
     page: number,
     size: number,
+    apiCall: typeof this.manageUsersApiClient.users.getUsersByCaseload,
   ): Promise<PaginatedUsers> {
-    return this.manageUsersApiClient.users.getUsersByCaseload(token, {
+    return apiCall(token, {
       caseload,
       accessRoles: accessRoles.join(','),
       page: page.toString(),

@@ -4,7 +4,7 @@ import maxLength from '../../validators/maxLength'
 import minLength from '../../validators/minLength'
 import numericString from '../../validators/numericString'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
-import { hasWorkingCapacity, isCertChange } from './steps'
+import { hasCertifiedWorkingCapacity, isCertChange } from './steps'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 const fields: FormWizard.Fields = {
@@ -93,7 +93,7 @@ const fields: FormWizard.Fields = {
     ],
   },
   estimatedReactivationDate: {
-    remove: (req, res) => isCertChange(req, res) && hasWorkingCapacity(req, res),
+    remove: (req, res) => isCertChange(req, res) && hasCertifiedWorkingCapacity(req, res),
     hideWhenRemoved: true,
     component: 'govukDateInput',
     validate: [dateTodayOrInFuture],
@@ -111,7 +111,7 @@ const fields: FormWizard.Fields = {
     nameForErrors: 'Estimated reactivation date',
   },
   mandatoryEstimatedReactivationDate: {
-    remove: (req, res) => !isCertChange(req, res) || !hasWorkingCapacity(req, res),
+    remove: (req, res) => !isCertChange(req, res) || !hasCertifiedWorkingCapacity(req, res),
     hideWhenRemoved: true,
     component: 'govukDateInput',
     validate: ['required', dateTodayOrInFuture],
@@ -143,27 +143,10 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
   },
   planetFmReference: {
-    remove: (req, res) => isCertChange(req, res) && hasWorkingCapacity(req, res),
-    hideWhenRemoved: true,
     component: 'govukInput',
     validate: [minLength(6), maxLength(18), numericString],
     id: 'planetFmReference',
     name: 'planetFmReference',
-    classes: 'govuk-input--width-10',
-    label: {
-      text: 'Planet FM reference number (optional)',
-      classes: 'govuk-label--m',
-    },
-    nameForErrors: 'Planet FM reference number',
-    autocomplete: 'off',
-  },
-  facilitiesManagementReference: {
-    remove: (req, res) => !isCertChange(req, res) || !hasWorkingCapacity(req, res),
-    hideWhenRemoved: true,
-    component: 'govukInput',
-    validate: [minLength(6), maxLength(18), numericString],
-    id: 'facilitiesManagementReference',
-    name: 'facilitiesManagementReference',
     classes: 'govuk-input--width-10',
     label: {
       text: 'Facilities management reference number (optional)',
@@ -173,7 +156,7 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
   },
   workingCapacityExplanation: {
-    remove: (req, res) => !isCertChange(req, res) || !hasWorkingCapacity(req, res),
+    remove: (req, res) => !isCertChange(req, res) || !hasCertifiedWorkingCapacity(req, res),
     hideWhenRemoved: true,
     validate: ['required'],
     component: 'govukTextarea',

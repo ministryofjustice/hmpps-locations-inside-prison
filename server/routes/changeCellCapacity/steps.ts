@@ -1,15 +1,11 @@
-import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import ChangeCellCapacity from '../../controllers/changeCellCapacity'
 import ConfirmCellCapacity from '../../controllers/changeCellCapacity/confirm'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
-
-function isCertActiveAndNotDraft(_req: FormWizard.Request, res: Response): boolean {
-  const { prisonConfiguration, decoratedLocation } = res.locals
-  return prisonConfiguration.certificationApprovalRequired === 'ACTIVE' && decoratedLocation.status !== 'DRAFT'
-}
+import ShouldUpdateCert from '../../controllers/changeCellCapacity/shouldUpdateCert'
+import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -25,8 +21,12 @@ const steps: FormWizard.Steps = {
     fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
     next: [
       {
-        fn: (req, res) => isCertActiveAndNotDraft(req, res) && !req.sessionModel.get('onlyWorkingCapChanged'),
+        fn: (req, res) => isCertActiveAndNotDraft(res.locals) && !req.sessionModel.get('onlyWorkingCapChanged'),
         next: 'cert-change-disclaimer',
+      },
+      {
+        fn: (_req, res) => isCertActiveAndNotDraft(res.locals),
+        next: 'should-update-cert',
       },
       {
         fn: (_req, res) => res.locals.decoratedLocation.status === 'DRAFT',
@@ -36,6 +36,13 @@ const steps: FormWizard.Steps = {
     ],
     controller: ChangeCellCapacity,
     pageTitle: 'Change cell capacity',
+    template: '../../partials/formStep',
+  },
+  '/should-update-cert': {
+    controller: ShouldUpdateCert,
+    fields: ['updateCert'],
+    next: [{ field: 'updateCert', value: 'YES', next: 'cert-change-disclaimer' }, 'confirm'],
+    pageTitle: 'Do you also want to change the certified working capacity on the cell certificate?',
     template: '../../partials/formStep',
   },
   '/confirm': {

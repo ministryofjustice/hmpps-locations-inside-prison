@@ -15,6 +15,15 @@ import SubmitCertificationApprovalRequest from '../../../commonTransactions/subm
 import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
 import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
 
+export function isTemporaryDeactivation(_req: FormWizard.Request, res: Response) {
+  const { prisonConfiguration, decoratedLocation } = res.locals
+  if (prisonConfiguration.certificationApprovalRequired !== 'ACTIVE') {
+    return true
+  }
+
+  return decoratedLocation.inactiveStatus !== 'INACTIVE_MATCHING_CELL_CERT'
+}
+
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/:cellId/set-cell-type/init') {
     return class WrappedSetCellTypeController extends step.controller {
@@ -155,7 +164,7 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
 // Wrap the setCellType steps controller with another controller that appends the field names with cellId
 const setCellTypeSteps = Object.fromEntries(
   Object.entries(
-    SetCellType.getSteps({
+    new SetCellType().getSteps({
       next: 'capacities',
       prefix: ':cellId',
     }),
@@ -180,7 +189,13 @@ const steps: FormWizard.Steps = {
 
       return `/view-and-update-locations/${prisonId}/${id}`
     },
-    next: 'check-capacity',
+    next: [
+      {
+        fn: isTemporaryDeactivation,
+        next: 'no-cert-change-confirm',
+      },
+      'check-capacity',
+    ],
     controller: ReactivateLocationInit,
   },
   '/check-capacity': {

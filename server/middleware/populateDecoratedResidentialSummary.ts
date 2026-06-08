@@ -60,6 +60,7 @@ export function showChangeUsedForLink(location: DecoratedLocation, req: Request)
   return (
     (location.active || location.status === 'DRAFT') &&
     !location.status.includes('LOCKED_') &&
+    location.raw.accommodationTypes.includes('NORMAL_ACCOMMODATION') &&
     req.canAccess('change_used_for')
   )
 }
@@ -280,7 +281,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
   const { locationsService, manageUsersService } = req.services
   const { systemToken } = req.session
   const { prisonId, user } = res.locals
-  const locationId = req.params.locationId || res.locals.locationId
+  const locationId = (req.params.locationId as string) || res.locals.locationId
 
   try {
     const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, locationId)
@@ -288,7 +289,6 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
     const residentialSummary: {
       location?: DecoratedLocation
       locationDetails?: SummaryListRow[]
-      locationHistory?: boolean // TODO: change this type when location history tab is implemented
       subLocationName: string
       subLocations: DecoratedLocation[]
       summaryCards: {
@@ -331,7 +331,6 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
       })
 
       residentialSummary.locationDetails = getLocationDetails(residentialSummary.location, prisonConfiguration, req)
-      residentialSummary.locationHistory = true
 
       if (residentialSummary.location.status !== 'NON_RESIDENTIAL') {
         const changeLink: { linkHref?: string; linkLabel?: string } = {}
@@ -357,8 +356,8 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         )
 
         if (
-          residentialSummary.location.status.includes('DRAFT') ||
-          prisonConfiguration.certificationApprovalRequired === 'ACTIVE'
+          prisonConfiguration.certificationApprovalRequired === 'ACTIVE' &&
+          (residentialSummary.location.status.includes('DRAFT') || residentialSummary.location.leafLevel)
         ) {
           residentialSummary.summaryCards.push({
             title: 'Baseline CNA',
@@ -402,7 +401,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         if (config.developerMode) {
           const prisonerLocations = await req.services.locationsService.getPrisonersInLocation(
             req.session.systemToken,
-            locationId,
+            locationId as string,
           )
 
           residentialSummary.summaryCards.push({

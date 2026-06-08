@@ -15,6 +15,7 @@ import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMa
 import LocationsService from '../../services/locationsService'
 import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
+import logger from '../../../logger'
 
 function findCells(location: CertificateLocation): CertificateLocation[] {
   if (location.locationType === 'CELL') {
@@ -177,7 +178,7 @@ export default class Confirm extends FormInitialStep {
         deactivationReasonDescription,
         locationId: locals.location.id,
         locationKey: locals.location.key,
-        planetFmReference: req.sessionModel.get<string>('facilitiesManagementReference'),
+        planetFmReference: req.sessionModel.get<string>('planetFmReference'),
         prisonId: locals.prisonId,
         proposedReactivationDate: req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
         reasonForChange: req.sessionModel.get<string>('workingCapacityExplanation'),
@@ -371,6 +372,41 @@ export default class Confirm extends FormInitialStep {
         workingCapacityChange,
         locations: [certLocation],
       })
+    } else if (req.form.options.name === 'set-cell-type') {
+      const newSpecialistCellType = sessionModel.get<string>('set-cell-type_specialistCellTypes')
+      const newBaselineCna = Number(sessionModel.get<string>('set-cell-type_baselineCna'))
+      const newWorkingCapacity = Number(sessionModel.get<string>('set-cell-type_workingCapacity'))
+      const newMaxCapacity = Number(sessionModel.get<string>('set-cell-type_maxCapacity'))
+      const { certifiedNormalAccommodation, workingCapacity, maxCapacity } = getLocationAttributesIncludePending(
+        locals.location,
+      )
+      const certifiedNormalAccommodationChange = newBaselineCna - certifiedNormalAccommodation
+      const workingCapacityChange = newWorkingCapacity - workingCapacity
+      const maxCapacityChange = newMaxCapacity - maxCapacity
+
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'SPECIALIST_CELL_TYPE',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        prisonId: locals.prisonId,
+        certifiedNormalAccommodationChange,
+        workingCapacityChange,
+        maxCapacityChange,
+        locations: [
+          await locationToCertificationLocation(req, locals.location, (_originalLocation, certificateLocation) => ({
+            ...certificateLocation,
+            certifiedNormalAccommodation: newBaselineCna,
+            workingCapacity: newWorkingCapacity,
+            maxCapacity: newMaxCapacity,
+            specialistCellTypes: [newSpecialistCellType],
+          })),
+        ],
+      })
+
+      const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
+      locals.changeLinks = {
+        reasonForChange: changeLink,
+      }
     }
 
     if (proposedSignedOpCapChange) {
@@ -494,6 +530,19 @@ export default class Confirm extends FormInitialStep {
       ).id
     }
 
+    if (approvalType === 'SPECIALIST_CELL_TYPE') {
+      const { maxCapacity, workingCapacity, certifiedNormalAccommodation, specialistCellTypes } = locations[0]
+
+      return (
+        await locationsService.requestSpecialistCellTypeChange(systemToken, locationId, {
+          specialistCellTypes,
+          maxCapacity,
+          workingCapacity,
+          certifiedNormalAccommodation,
+        })
+      ).id
+    }
+
     throw new Error(`Unsupported approval request type: ${approvalType}`)
   }
 
@@ -520,9 +569,12 @@ export default class Confirm extends FormInitialStep {
 
           // Send notifications to both sets of relevant cert roles
           const [requestReceivedAddresses, requestSubmittedEmails] = await Promise.all([
-            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers),
+            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
             getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers),
           ])
+
+          logger.debug(`Found ${requestReceivedAddresses.length} cert reviewer email addresses`)
+          logger.debug(`Found ${requestSubmittedEmails.length} admin email addresses`)
 
           const notifications = [
             { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },

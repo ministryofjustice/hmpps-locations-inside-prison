@@ -72,7 +72,7 @@ const fields: FormWizard.Fields = {
       classes: 'govuk-!-margin-bottom-0',
     },
   },
-  ...SetCellType.getFields(),
+  ...new SetCellType().getFields(),
   baselineCna: {
     validate: ['required', 'numeric', lessThanOrEqualTo(99)],
     errorMessages: {

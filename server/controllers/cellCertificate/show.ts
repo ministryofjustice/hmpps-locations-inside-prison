@@ -19,7 +19,7 @@ export default async (req: Request, res: Response) => {
     }
   }
 
-  locals.certificate = await locationsService.getCellCertificate(systemToken, req.params.certificateId)
+  locals.certificate = await locationsService.getCellCertificate(systemToken, req.params.certificateId as string)
 
   await addUsersToUserMap([locals.certificate.approvedBy])(req, res, null)
   locals.title = `Previous cell certificate (${formatDate(locals.certificate.approvedDate)})`
