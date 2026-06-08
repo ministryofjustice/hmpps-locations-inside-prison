@@ -34,7 +34,7 @@ describe('NotificationService', () => {
 
   const baseNotificationDetails: NotificationDetails = {
     type: NotificationType.REQUEST_RECEIVED,
-    emailAddresses: ['user@example.com'],
+    emailAddresses: ['user1@example.com', 'user2@example.com'],
     establishment: 'Test Establishment',
     submittedBy: 'John Doe',
   }
@@ -49,7 +49,7 @@ describe('NotificationService', () => {
     })
 
     const baseDetails: Partial<NotificationDetails> = {
-      emailAddresses: ['user@example.com'],
+      emailAddresses: ['user1@example.com', 'user2@example.com'],
       establishment: 'Test Establishment',
       submittedBy: 'John Doe',
       location: 'Test Location',
@@ -109,17 +109,21 @@ describe('NotificationService', () => {
     ]
 
     testCases.forEach(({ type, expectedPersonalisation }) => {
-      it(`should send ${type} email to actual recipient`, async () => {
+      it(`should send ${type} emails to both recipients`, async () => {
         const details: NotificationDetails = {
           ...baseDetails,
           type,
-          emailAddress: ['user@example.com'],
+          emailAddresses: ['user1@example.com', 'user2@example.com'],
         } as NotificationDetails
 
         const service = new NotificationService(mockNotifyClient)
         await service.notify(details)
 
-        expect(mockSendEmail).toHaveBeenCalledWith(config.email.templates[`CHANGE_${type}`], 'user@example.com', {
+        expect(mockSendEmail).toHaveBeenCalledTimes(2)
+        expect(mockSendEmail).toHaveBeenCalledWith(config.email.templates[`CHANGE_${type}`], 'user1@example.com', {
+          personalisation: expectedPersonalisation,
+        })
+        expect(mockSendEmail).toHaveBeenCalledWith(config.email.templates[`CHANGE_${type}`], 'user2@example.com', {
           personalisation: expectedPersonalisation,
         })
       })
@@ -134,10 +138,10 @@ describe('NotificationService', () => {
 
     expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Email failed to send'))
     expect(logger.info).toHaveBeenCalledWith(
-      'Starting batch send for Test Establishment. Sending 1 REQUEST_RECEIVED emails to GovUK Notify.',
+      'Starting batch send for Test Establishment. Sending 2 REQUEST_RECEIVED emails to GovUK Notify.',
     )
     expect(logger.info).toHaveBeenCalledWith(
-      'Finished batch send for Test Establishment. Sent 0/1 REQUEST_RECEIVED emails to GovUK Notify.',
+      'Finished batch send for Test Establishment. Sent 1/2 REQUEST_RECEIVED emails to GovUK Notify.',
     )
     expect(logger.info).toHaveBeenCalledWith(
       'Failed to send 1 REQUEST_RECEIVED emails for Test Establishment. Check GovUK Notify dashboard for details.',

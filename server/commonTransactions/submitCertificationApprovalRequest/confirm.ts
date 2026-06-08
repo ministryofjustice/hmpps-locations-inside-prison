@@ -568,7 +568,7 @@ export default class Confirm extends FormInitialStep {
 
           // Send notifications to both sets of relevant cert roles
           const [requestReceivedAddresses, requestSubmittedEmails] = await Promise.all([
-            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers),
+            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
             getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers),
           ])
 

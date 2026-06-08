@@ -567,6 +567,7 @@ describe('Confirm', () => {
           'token',
           'TST',
           notificationGroups.requestReceivedUsers,
+          false,
         )
         expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
           i * 2 + 2,
