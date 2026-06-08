@@ -9,7 +9,7 @@ const approvalTypeMap: { [key: string]: string } = {
   CELL_SANITATION: 'Change cell sanitation',
   DRAFT: 'Add new locations to certificate',
   SIGNED_OP_CAP: 'Change signed operational capacity',
-  SPECIALIST_CELL_TYPE: 'Specialist cell type',
+  SPECIALIST_CELL_TYPE: 'Set special cell type',
 }
 
 export default function approvalTypeDescription(
