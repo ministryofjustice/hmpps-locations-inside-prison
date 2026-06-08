@@ -15,6 +15,7 @@ import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMa
 import LocationsService from '../../services/locationsService'
 import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
+import logger from '../../../logger'
 
 function findCells(location: CertificateLocation): CertificateLocation[] {
   if (location.locationType === 'CELL') {
@@ -571,6 +572,9 @@ export default class Confirm extends FormInitialStep {
             getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
             getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers),
           ])
+
+          logger.debug(`Found ${requestReceivedAddresses.length} cert reviewer email addresses`)
+          logger.debug(`Found ${requestSubmittedEmails.length} admin email addresses`)
 
           const notifications = [
             { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },
