@@ -35,6 +35,19 @@ describe('Manage users service', () => {
           ) => Promise<PaginatedUsers>
         >,
       ),
+      getUsersByActiveCaseload: Object.assign(
+        jest.fn() as jest.MockedFunction<
+          (
+            token: string,
+            parameters: {
+              caseload: string
+              accessRoles: string
+              page: string
+              size: string
+            },
+          ) => Promise<PaginatedUsers>
+        >,
+      ),
     }
 
     service = new ManageUsersService(apiClient)
@@ -80,13 +93,19 @@ describe('Manage users service', () => {
       apiClient.users.getUsersByCaseload.mockImplementation((_token, { page }) => {
         if (page === '0') {
           return Promise.resolve({
-            content: [{ username: 'joe1', email: 'joe1@test.com' }],
+            content: [
+              { username: 'joe1', email: 'joe1@test.com' },
+              { username: 'joe2', email: 'joe2@test.com' },
+            ],
             totalPages: 2,
           })
         }
         if (page === '1') {
           return Promise.resolve({
-            content: [{ username: 'joe2', email: 'joe2@test.com' }],
+            content: [
+              { username: 'joe3', email: 'joe3@test.com' },
+              { username: 'joe4', email: 'joe4@test.com' },
+            ],
             totalPages: 2,
           })
         }
@@ -95,6 +114,7 @@ describe('Manage users service', () => {
 
       const result = await service.getAllUsersByCaseload('token', 'CASELOAD', ['ROLE'])
 
+      expect(apiClient.users.getUsersByCaseload).toHaveBeenCalledTimes(2)
       expect(apiClient.users.getUsersByCaseload).toHaveBeenCalledWith('token', {
         caseload: 'CASELOAD',
         accessRoles: 'ROLE',
@@ -112,8 +132,121 @@ describe('Manage users service', () => {
         content: [
           { username: 'joe1', email: 'joe1@test.com' },
           { username: 'joe2', email: 'joe2@test.com' },
+          { username: 'joe3', email: 'joe3@test.com' },
+          { username: 'joe4', email: 'joe4@test.com' },
         ],
         totalPages: 2,
+      })
+    })
+
+    it('calls the API only once when there is only one page', async () => {
+      // @ts-expect-error @ts-ignore
+      apiClient.users.getUsersByCaseload.mockResolvedValue({
+        content: [
+          { username: 'joe1', email: 'joe1@test.com' },
+          { username: 'joe2', email: 'joe2@test.com' },
+        ],
+        totalPages: 1,
+      })
+
+      const result = await service.getAllUsersByCaseload('token', 'CASELOAD', ['ROLE'])
+
+      expect(apiClient.users.getUsersByCaseload).toHaveBeenCalledTimes(1)
+      expect(apiClient.users.getUsersByCaseload).toHaveBeenCalledWith('token', {
+        caseload: 'CASELOAD',
+        accessRoles: 'ROLE',
+        page: '0',
+        size: '50',
+      })
+
+      expect(result).toEqual({
+        content: [
+          { username: 'joe1', email: 'joe1@test.com' },
+          { username: 'joe2', email: 'joe2@test.com' },
+        ],
+        totalPages: 1,
+      })
+    })
+  })
+
+  describe('getAllUsersByActiveCaseload', () => {
+    it('calls the correct client function, gets all pages and concatenates users', async () => {
+      // @ts-expect-error @ts-ignore
+      apiClient.users.getUsersByActiveCaseload.mockImplementation((_token, { page }) => {
+        if (page === '0') {
+          return Promise.resolve({
+            content: [
+              { username: 'joe1', email: 'joe1@test.com' },
+              { username: 'joe2', email: 'joe2@test.com' },
+            ],
+            totalPages: 2,
+          })
+        }
+        if (page === '1') {
+          return Promise.resolve({
+            content: [
+              { username: 'joe3', email: 'joe3@test.com' },
+              { username: 'joe4', email: 'joe4@test.com' },
+            ],
+            totalPages: 2,
+          })
+        }
+        return Promise.resolve({ content: [], totalPages: 2 })
+      })
+
+      const result = await service.getAllUsersByActiveCaseload('token', 'CASELOAD', ['ROLE'])
+
+      expect(apiClient.users.getUsersByActiveCaseload).toHaveBeenCalledTimes(2)
+      expect(apiClient.users.getUsersByActiveCaseload).toHaveBeenCalledWith('token', {
+        caseload: 'CASELOAD',
+        accessRoles: 'ROLE',
+        page: '0',
+        size: '50',
+      })
+      expect(apiClient.users.getUsersByActiveCaseload).toHaveBeenCalledWith('token', {
+        caseload: 'CASELOAD',
+        accessRoles: 'ROLE',
+        page: '1',
+        size: '50',
+      })
+
+      expect(result).toEqual({
+        content: [
+          { username: 'joe1', email: 'joe1@test.com' },
+          { username: 'joe2', email: 'joe2@test.com' },
+          { username: 'joe3', email: 'joe3@test.com' },
+          { username: 'joe4', email: 'joe4@test.com' },
+        ],
+        totalPages: 2,
+      })
+    })
+
+    it('calls the API only once when there is only one page', async () => {
+      // @ts-expect-error @ts-ignore
+      apiClient.users.getUsersByActiveCaseload.mockResolvedValue({
+        content: [
+          { username: 'joe1', email: 'joe1@test.com' },
+          { username: 'joe2', email: 'joe2@test.com' },
+        ],
+        totalPages: 1,
+      })
+
+      const result = await service.getAllUsersByActiveCaseload('token', 'CASELOAD', ['ROLE'])
+
+      expect(apiClient.users.getUsersByActiveCaseload).toHaveBeenCalledTimes(1)
+      expect(apiClient.users.getUsersByActiveCaseload).toHaveBeenCalledWith('token', {
+        caseload: 'CASELOAD',
+        accessRoles: 'ROLE',
+        page: '0',
+        size: '50',
+      })
+
+      expect(result).toEqual({
+        content: [
+          { username: 'joe1', email: 'joe1@test.com' },
+          { username: 'joe2', email: 'joe2@test.com' },
+        ],
+        totalPages: 1,
       })
     })
   })

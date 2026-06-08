@@ -8,8 +8,12 @@ export async function getUserEmails(
   systemToken: string,
   prisonId: string,
   roles: string[],
+  onlyActiveCaseload = true,
 ): Promise<string[]> {
-  const users: PaginatedUsers = await manageUsersService.getAllUsersByCaseload(systemToken, prisonId, roles)
+  const getterFunction = onlyActiveCaseload
+    ? manageUsersService.getAllUsersByActiveCaseload
+    : manageUsersService.getAllUsersByCaseload
+  const users: PaginatedUsers = await getterFunction(systemToken, prisonId, roles)
   const emails = users.content.map(user => user.email).filter(email => email)
   return [...new Set(emails)]
 }
