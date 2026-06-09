@@ -10,6 +10,7 @@ import {
 import LocationFactory from '../../server/testutils/factories/location'
 import TypedStubber from './typedStubber'
 import { CertificationApprovalRequest } from '../../server/data/types/locationsApi/certificationApprovalRequest'
+import { CellCertificateUpload } from '../../server/data/types/locationsApi/cellCertificateUpload'
 
 const stubLocationsCertificationPrisonSignedOpCapChange = () =>
   stubFor({
@@ -1424,7 +1425,49 @@ const stubLocationsDeleteLocation = () =>
     },
   })
 
+const stubCellCertificateUploadsList = (uploads: CellCertificateUpload[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/locations/bulk/update-cell-certificate/TST(\\?status=\\w+)?`,
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: uploads,
+    },
+  })
+
+const stubCellCertificateUpload = (upload: CellCertificateUpload) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/locations/bulk/update-cell-certificate/upload/[\\w-]+`,
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: upload,
+    },
+  })
+
+const stubRequestCellCertificateUpload = (upload: CellCertificateUpload) =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern: `/locations-api/locations/bulk/update-cell-certificate/TST`,
+    },
+    response: {
+      status: 202,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: upload,
+    },
+  })
+
 const allStubs = {
+  stubCellCertificateUploadsList,
+  stubCellCertificateUpload,
+  stubRequestCellCertificateUpload,
   stubGetPrisonConfiguration,
   stubLocations,
   stubLocationsBulkReactivate,

@@ -1,32 +1,37 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import IngestConfirm, { processBulkCapacityUpdate } from './confirm'
+import IngestConfirm from './confirm'
 import fields from '../../../routes/changeLocalName/fields'
 import LocationsService from '../../../services/locationsService'
-import { BulkCapacityUpdate } from '../../../data/types/locationsApi/bulkCapacityChanges'
 
-describe('Ingest the cell cert data', () => {
+describe('Ingest the cell cert data - confirm', () => {
   const controller = new IngestConfirm({ route: '/' })
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   let next: NextFunction
 
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
-  const mockUpdateBulkCapacity = jest.fn()
+
+  const capacityData = {
+    'TST-A-1-001': {
+      maxCapacity: 2,
+      workingCapacity: 1,
+      certifiedNormalAccommodation: 2,
+      cellMark: 'A1-01',
+      inCellSanitation: true,
+    },
+  }
 
   beforeEach(() => {
     deepReq = {
       flash: jest.fn(),
-      file: undefined,
       session: {
         referrerUrl: '',
         systemToken: 'token',
       },
       form: {
-        options: {
-          fields,
-        },
+        options: { fields },
         values: {},
       },
       services: {
@@ -59,252 +64,72 @@ describe('Ingest the cell cert data', () => {
 
   describe('locals', () => {
     it('returns the correct locals', () => {
-      deepRes.locals.prisonConfiguration.prisonId = 'TST'
-      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        backLink: '/admin/TST',
-        buttonText: 'Confirm ingestion',
-        cancelLink: '/admin/TST',
-        capacityData: undefined,
-        capacitySummary: undefined,
-        title: 'Confirm cell certification ingest',
-      })
+      expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual(
+        expect.objectContaining({
+          backLink: '/admin/TST/ingest-cert',
+          cancelLink: '/admin/TST/ingest-cert',
+          buttonText: 'Confirm ingestion',
+          title: 'Confirm cell certification ingest',
+        }),
+      )
     })
   })
 
   describe('saveValues', () => {
-    it('the capacity data is transformed and saved', async () => {
-      deepReq.sessionModel.get = jest.fn().mockImplementation(key =>
-        key === 'capacityData'
-          ? {
-              'EYI-HB1-1-001': {
-                cellMark: 'A1-01',
-                certifiedNormalAccommodation: 1,
-                inCellSanitation: true,
-                maxCapacity: 1,
-                workingCapacity: 1,
-              },
-              'EYI-HB1-1-004': {
-                cellMark: 'A1-04',
-                certifiedNormalAccommodation: 1,
-                inCellSanitation: true,
-                maxCapacity: 1,
-                workingCapacity: 1,
-              },
-            }
-          : null,
-      )
+    it('requests an async cell certificate upload and stores the upload id', async () => {
+      deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'capacityData' ? capacityData : null))
+      locationsService.requestCellCertificateUpload = jest.fn().mockResolvedValueOnce({ id: 'upload-1' })
 
-      locationsService.updateBulkCapacity = mockUpdateBulkCapacity.mockResolvedValueOnce({
-        'EYI-HB1-1-001': [
-          {
-            key: 'EYI-HB1-1-001',
-            message: 'Capacity updated',
-          },
-        ],
-        'EYI-HB1-1-004': [
-          {
-            key: 'EYI-HB1-1-004',
-            message: 'Capacity not changed',
-          },
-        ],
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.requestCellCertificateUpload).toHaveBeenCalledWith('token', 'TST', capacityData)
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('uploadId', 'upload-1')
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('captures the API error message when the upload cannot be started', async () => {
+      deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'capacityData' ? capacityData : null))
+      locationsService.requestCellCertificateUpload = jest.fn().mockRejectedValueOnce({
+        data: { userMessage: 'A cell certificate upload is already in progress for prison TST' },
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepReq.sessionModel.get).toHaveBeenCalledTimes(1)
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledTimes(1)
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledWith('token', {
-        'EYI-HB1-1-001': {
-          maxCapacity: 1,
-          workingCapacity: 1,
-          certifiedNormalAccommodation: 1,
-          cellMark: 'A1-01',
-          inCellSanitation: true,
-        },
-        'EYI-HB1-1-004': {
-          maxCapacity: 1,
-          workingCapacity: 1,
-          certifiedNormalAccommodation: 1,
-          cellMark: 'A1-04',
-          inCellSanitation: true,
-        },
-      })
-
-      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('updateMessages', [
-        'EYI-HB1-1-001 = Capacity updated',
-        'EYI-HB1-1-004 = Capacity not changed',
-      ])
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith(
+        'ingestError',
+        'A cell certificate upload is already in progress for prison TST',
+      )
+      expect(next).toHaveBeenCalled()
     })
   })
 
-  describe('processBulkCapacityUpdate', () => {
-    beforeEach(() => {
-      jest.clearAllMocks()
+  describe('successHandler', () => {
+    it('redirects to the new upload detail page on success', () => {
+      deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'uploadId' ? 'upload-1' : undefined))
+
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.journeyModel.reset).toHaveBeenCalled()
+      expect(deepReq.sessionModel.reset).toHaveBeenCalled()
+      expect(deepReq.flash).toHaveBeenCalledWith(
+        'success',
+        expect.objectContaining({ title: 'Cell certificate upload started' }),
+      )
+      expect(deepRes.redirect).toHaveBeenCalledWith('/admin/TST/ingest-cert/upload/upload-1')
     })
 
-    const expectedChunks = {
-      HB1: {
-        'EYI-HB1-1-001': {
-          maxCapacity: 1,
-          workingCapacity: 1,
-          certifiedNormalAccommodation: 1,
-          cellMark: 'A1-01',
-          inCellSanitation: true,
-        },
-        'EYI-HB1-1-002': {
-          maxCapacity: 1,
-          workingCapacity: 1,
-          certifiedNormalAccommodation: 1,
-          cellMark: 'A1-02',
-          inCellSanitation: false,
-        },
-      },
-      HB2: {
-        'EYI-HB2-1-001': {
-          maxCapacity: 1,
-          workingCapacity: 1,
-          certifiedNormalAccommodation: 1,
-          cellMark: 'A1-03',
-          inCellSanitation: true,
-        },
-        'EYI-HB2-1-002': {
-          maxCapacity: 1,
-          workingCapacity: 1,
-          certifiedNormalAccommodation: 1,
-          cellMark: 'A1-04',
-          inCellSanitation: false,
-        },
-      },
-    }
+    it('redirects to the list with an error when the upload failed to start', () => {
+      deepReq.sessionModel.get = jest
+        .fn()
+        .mockImplementation(key => (key === 'ingestError' ? 'Something went wrong' : undefined))
 
-    const mockChangeHB1Response = {
-      'EYI-HB1-1-001': [
-        {
-          key: 'EYI-HB1-1-001',
-          message: 'Capacity not changed',
-        },
-      ],
-      'EYI-HB1-1-002': [
-        {
-          key: 'EYI-HB1-1-002',
-          message: 'Capacity not changed',
-        },
-      ],
-    }
-    const mockChangeHB2Response = {
-      'EYI-HB2-1-001': [
-        {
-          key: 'EYI-HB2-1-001',
-          message: 'Capacity not changed',
-        },
-      ],
-      'EYI-HB2-1-002': [
-        {
-          key: 'EYI-HB2-1-002',
-          message: 'Capacity not changed',
-        },
-      ],
-    }
+      controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-    const expectedMerged = {
-      'EYI-HB1-1-001': [
-        {
-          key: 'EYI-HB1-1-001',
-          message: 'Capacity not changed',
-        },
-      ],
-      'EYI-HB1-1-002': [
-        {
-          key: 'EYI-HB1-1-002',
-          message: 'Capacity not changed',
-        },
-      ],
-      'EYI-HB2-1-001': [
-        {
-          key: 'EYI-HB2-1-001',
-          message: 'Capacity not changed',
-        },
-      ],
-      'EYI-HB2-1-002': [
-        {
-          key: 'EYI-HB2-1-002',
-          message: 'Capacity not changed',
-        },
-      ],
-    }
-
-    it('should group and process data and perform a bulk update in order', async () => {
-      const input: BulkCapacityUpdate = {
-        'EYI-HB1-1-001': expectedChunks.HB1['EYI-HB1-1-001'],
-        'EYI-HB1-1-002': expectedChunks.HB1['EYI-HB1-1-002'],
-        'EYI-HB2-1-001': expectedChunks.HB2['EYI-HB2-1-001'],
-        'EYI-HB2-1-002': expectedChunks.HB2['EYI-HB2-1-002'],
-      }
-      locationsService.updateBulkCapacity = mockUpdateBulkCapacity.mockResolvedValueOnce(mockChangeHB1Response)
-      locationsService.updateBulkCapacity = mockUpdateBulkCapacity.mockResolvedValueOnce(mockChangeHB2Response)
-
-      const result = await processBulkCapacityUpdate('token', locationsService, input)
-
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledTimes(2)
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledWith('token', expectedChunks.HB1)
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledWith('token', expectedChunks.HB2)
-
-      expect(result).toEqual(expectedMerged)
-    })
-
-    it('should group and process data and perform a bulk update out of order', async () => {
-      const input: BulkCapacityUpdate = {
-        'EYI-HB2-1-001': expectedChunks.HB2['EYI-HB2-1-001'],
-        'EYI-HB1-1-002': expectedChunks.HB1['EYI-HB1-1-002'],
-        'EYI-HB2-1-002': expectedChunks.HB2['EYI-HB2-1-002'],
-        'EYI-HB1-1-001': expectedChunks.HB1['EYI-HB1-1-001'],
-      }
-
-      locationsService.updateBulkCapacity = mockUpdateBulkCapacity.mockResolvedValueOnce(mockChangeHB1Response)
-      locationsService.updateBulkCapacity = mockUpdateBulkCapacity.mockResolvedValueOnce(mockChangeHB2Response)
-
-      const result = await processBulkCapacityUpdate('token', locationsService, input)
-
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledTimes(2)
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledWith('token', expectedChunks.HB1)
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledWith('token', expectedChunks.HB2)
-
-      expect(result).toEqual(expectedMerged)
-    })
-
-    it('should handle a not found location', async () => {
-      const input: BulkCapacityUpdate = {
-        'EYI-HB1-1-001': expectedChunks.HB1['EYI-HB1-1-001'],
-        'EYI-HB1-1-002': expectedChunks.HB1['EYI-HB1-1-002'],
-      }
-
-      const errorObj = {
-        data: {
-          status: 404,
-          userMessage: 'Location not found: There is no location found for ID = EYI-HB1-1-001',
-          developerMessage: 'There is no location found for ID = EYI-HB1-1-001',
-          errorCode: 101,
-        },
-        message: 'Not Found',
-      }
-
-      locationsService.updateBulkCapacity = mockUpdateBulkCapacity.mockRejectedValueOnce(errorObj)
-
-      const result = await processBulkCapacityUpdate('token', locationsService, input)
-
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledTimes(1)
-      expect(mockUpdateBulkCapacity).toHaveBeenCalledWith('token', expectedChunks.HB1)
-
-      const expectedWithError = {
-        'EYI-HB1-1-001': [
-          {
-            key: 'ERROR: (complete wing HB1 not ingested)',
-            message: 'Location not found: There is no location found for ID = EYI-HB1-1-001',
-          },
-        ],
-      }
-
-      expect(result).toEqual(expectedWithError)
+      expect(deepReq.flash).toHaveBeenCalledWith('error', {
+        title: 'There is a problem',
+        content: 'Something went wrong',
+      })
+      expect(deepRes.redirect).toHaveBeenCalledWith('/admin/TST/ingest-cert')
     })
   })
 })

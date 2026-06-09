@@ -12,7 +12,7 @@ export default class IngestUpload extends FormInitialStep {
     const { prisonId } = res.locals.prisonConfiguration
 
     const backLink = backUrl(req, {
-      fallbackUrl: `/admin/${prisonId}`,
+      fallbackUrl: `/admin/${prisonId}/ingest-cert`,
     })
 
     return {

@@ -15,9 +15,10 @@ import {
 
 import { RedisClient } from './redisClient'
 import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
-import { BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
+import { BulkCapacityUpdate, BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
 import { CertificationApprovalRequest } from './types/locationsApi/certificationApprovalRequest'
 import { CellCertificate } from './types/locationsApi/cellCertificate'
+import { CellCertificateUpload } from './types/locationsApi/cellCertificateUpload'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
@@ -39,6 +40,26 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'get',
       }),
     },
+  }
+
+  cellCertificateUploads = {
+    request: this.apiCall<
+      CellCertificateUpload,
+      { prisonId: string },
+      { locations: BulkCapacityUpdate; reasonForChange?: string }
+    >({
+      path: '/locations/bulk/update-cell-certificate/:prisonId',
+      requestType: 'post',
+    }),
+    listForPrison: this.apiCall<CellCertificateUpload[], { prisonId: string; status?: string }>({
+      path: '/locations/bulk/update-cell-certificate/:prisonId',
+      queryParams: ['status'],
+      requestType: 'get',
+    }),
+    getUpload: this.apiCall<CellCertificateUpload, { uploadId: string }>({
+      path: '/locations/bulk/update-cell-certificate/upload/:uploadId',
+      requestType: 'get',
+    }),
   }
 
   certification = {
