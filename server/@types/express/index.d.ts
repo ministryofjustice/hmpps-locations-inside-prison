@@ -16,6 +16,7 @@ import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
 import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
+import { CellCertificateUpload } from '../../data/types/locationsApi/cellCertificateUpload'
 import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 import { NotificationDetails } from '../../data/types/locationsApi/notificationDetails'
 
@@ -195,6 +196,21 @@ interface AllLocals {
   workingCapacity: string
   capacityData: BulkCapacityUpdate
   capacitySummary: CapacitySummary
+  uploads: CellCertificateUpload[]
+  upload: CellCertificateUpload
+  hasInProgress: boolean
+  inProgress: boolean
+  newUploadUrl: string
+  listUrl: string
+  cellCertificateUrl: string
+  locationRows: {
+    locationKey: string
+    status: string
+    message?: string
+    maxCapacityText: string
+    workingCapacityText: string
+    certifiedNormalAccommodationText: string
+  }[]
 }
 
 type TypedLocals = Partial<AllLocals>

@@ -1,0 +1,23 @@
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% macro uploadStatusTag(status) %}
+  {% if status == 'FINISHED' %}
+    {{ govukTag({ text: "Complete", classes: "govuk-tag--green", attributes: { "data-qa": "upload-status-tag" } }) }}
+  {% elif status == 'STARTED' %}
+    {{ govukTag({ text: "Processing", classes: "govuk-tag--blue", attributes: { "data-qa": "upload-status-tag" } }) }}
+  {% else %}
+    {{ govukTag({ text: "Pending", classes: "govuk-tag--grey", attributes: { "data-qa": "upload-status-tag" } }) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro uploadLocationStatusTag(status) %}
+  {% if status == 'PROCESSED' %}
+    {{ govukTag({ text: "Processed", classes: "govuk-tag--green", attributes: { "data-qa": "location-status-tag" } }) }}
+  {% elif status == 'SKIPPED' %}
+    {{ govukTag({ text: "Skipped", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
+  {% elif status == 'FAILED' %}
+    {{ govukTag({ text: "Failed", classes: "govuk-tag--red", attributes: { "data-qa": "location-status-tag" } }) }}
+  {% else %}
+    {{ govukTag({ text: "Pending", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
+  {% endif %}
+{% endmacro %}

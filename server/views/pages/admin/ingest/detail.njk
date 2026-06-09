@@ -1,0 +1,84 @@
+{% extends "../../../partials/layout.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "../../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag, uploadLocationStatusTag %}
+
+{% block head %}
+  {{ super() }}
+  {% if inProgress %}
+    <script nonce="{{ cspNonce }}">setTimeout(function () { window.location.reload() }, 5000)</script>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+
+        {% if inProgress %}
+          {{ govukInsetText({
+            text: "This cell certificate is still being processed. This page updates automatically.",
+            attributes: { "data-qa": "in-progress-message" }
+          }) }}
+          <p class="govuk-body">
+            <a class="govuk-link" href="{{ listUrl }}/upload/{{ upload.id }}" data-qa="refresh-link">Refresh</a>
+          </p>
+        {% endif %}
+
+        {{ govukSummaryList({
+          attributes: { "data-qa": "upload-summary" },
+          rows: [
+            { key: { text: "Status" }, value: { html: uploadStatusTag(upload.status) } },
+            { key: { text: "Requested by" }, value: { text: upload.requestedBy } },
+            { key: { text: "Requested" }, value: { text: upload.requestedDate | formatDateWithTime } },
+            { key: { text: "Started" }, value: { text: (upload.startTime | formatDateWithTime) if upload.startTime else "-" } },
+            { key: { text: "Completed" }, value: { text: (upload.endTime | formatDateWithTime) if upload.endTime else "-" } },
+            { key: { text: "Total records" }, value: { text: upload.totalRecords } },
+            { key: { text: "Processed" }, value: { text: upload.processedRecords } },
+            { key: { text: "Skipped" }, value: { text: upload.skippedRecords } },
+            { key: { text: "Failed" }, value: { text: upload.failedRecords } }
+          ]
+        }) }}
+
+        {% if cellCertificateUrl %}
+          <p class="govuk-body">
+            <a class="govuk-link" href="{{ cellCertificateUrl }}" data-qa="cell-certificate-link">View the cell certificate</a>
+          </p>
+        {% endif %}
+
+        <h2 class="govuk-heading-m">Cells</h2>
+        {% if locationRows.length %}
+          {% set rows = [] %}
+          {% for location in locationRows %}
+            {% set rows = (rows.push([
+              { text: location.locationKey },
+              { html: uploadLocationStatusTag(location.status) },
+              { text: location.maxCapacityText },
+              { text: location.workingCapacityText },
+              { text: location.certifiedNormalAccommodationText },
+              { text: location.message or "" }
+            ]), rows) %}
+          {% endfor %}
+
+          {{ govukTable({
+            attributes: { "data-qa": "locations-table" },
+            head: [
+              { text: "Location" },
+              { text: "Result" },
+              { text: "Max capacity" },
+              { text: "Working capacity" },
+              { text: "CNA" },
+              { text: "Details" }
+            ],
+            rows: rows
+          }) }}
+        {% else %}
+          <p class="govuk-body" data-qa="no-locations">No cell results are available for this upload.</p>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

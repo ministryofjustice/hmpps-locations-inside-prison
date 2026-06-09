@@ -170,6 +170,18 @@ export default class LocationsService {
     return this.locationsApiClient.cellCertificates.getById(token, { id })
   }
 
+  async requestCellCertificateUpload(token: string, prisonId: string, locations: BulkCapacityUpdate) {
+    return this.locationsApiClient.cellCertificateUploads.request(token, { prisonId }, { locations })
+  }
+
+  async getCellCertificateUploads(token: string, prisonId: string, status?: string) {
+    return this.locationsApiClient.cellCertificateUploads.listForPrison(token, { prisonId, status })
+  }
+
+  async getCellCertificateUpload(token: string, uploadId: string) {
+    return this.locationsApiClient.cellCertificateUploads.getUpload(token, { uploadId })
+  }
+
   async getConvertedCellType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getConvertedCellTypes'))[key] || 'Unknown'
   }

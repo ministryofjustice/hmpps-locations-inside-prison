@@ -1,0 +1,72 @@
+{% extends "../../../partials/layout.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "../../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag %}
+
+{% block head %}
+  {{ super() }}
+  {% if hasInProgress %}
+    <script nonce="{{ cspNonce }}">setTimeout(function () { window.location.reload() }, 5000)</script>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+
+        {% if hasInProgress %}
+          {{ govukInsetText({
+            text: "A cell certificate upload is in progress. You can upload a new certificate once it has finished. This page updates automatically.",
+            attributes: { "data-qa": "in-progress-message" }
+          }) }}
+          <p class="govuk-body">
+            <a class="govuk-link" href="{{ listUrl }}" data-qa="refresh-link">Refresh</a>
+          </p>
+        {% else %}
+          {{ govukButton({
+            text: "Upload a new cell certificate",
+            href: newUploadUrl,
+            attributes: { "data-qa": "upload-new-button" }
+          }) }}
+        {% endif %}
+
+        {% if uploads.length %}
+          {% set rows = [] %}
+          {% for upload in uploads %}
+            {% set rows = (rows.push([
+              { html: "<a class='govuk-link' href='/admin/" + prisonId + "/ingest-cert/upload/" + upload.id + "'>" + (upload.requestedDate | formatDateWithTime) + "</a>" },
+              { html: uploadStatusTag(upload.status) },
+              { text: (upload.startTime | formatDateWithTime) if upload.startTime else "-" },
+              { text: (upload.endTime | formatDateWithTime) if upload.endTime else "-" },
+              { text: upload.totalRecords, format: "numeric" },
+              { text: upload.processedRecords, format: "numeric" },
+              { text: upload.skippedRecords, format: "numeric" },
+              { text: upload.failedRecords, format: "numeric" }
+            ]), rows) %}
+          {% endfor %}
+
+          {{ govukTable({
+            attributes: { "data-qa": "uploads-table" },
+            head: [
+              { text: "Requested" },
+              { text: "Status" },
+              { text: "Started" },
+              { text: "Completed" },
+              { text: "Total records", format: "numeric" },
+              { text: "Processed", format: "numeric" },
+              { text: "Skipped", format: "numeric" },
+              { text: "Failed", format: "numeric" }
+            ],
+            rows: rows
+          }) }}
+        {% else %}
+          <p class="govuk-body" data-qa="no-uploads">No cell certificate uploads have been made for this establishment.</p>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
