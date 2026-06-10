@@ -59,6 +59,8 @@ export default class ReviewCellCapacity extends FormInitialStep {
       ...locals,
       title: 'Review cell capacity',
       titleCaption: capFirst(decoratedLocation.displayName),
+      insetText:
+        'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
     }
   }
 }
