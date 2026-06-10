@@ -132,6 +132,8 @@ describe('ReviewCellCapacity', () => {
         fields,
         title: 'Review cell capacity',
         titleCaption: 'Cell A-1-001',
+        insetText:
+          'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
         validationErrors: [
           {
             href: '#workingCapacity',
