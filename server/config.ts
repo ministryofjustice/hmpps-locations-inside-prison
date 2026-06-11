@@ -150,5 +150,6 @@ export default {
   feedbackFormUrl: get('FEEDBACK_FORM_URL', ''),
   featureFlags: {
     nonResi: get('FLAG_NON_RESI', 'disabled') === 'enabled',
+    nonResiConversionCertified: get('FLAG_NON_RESI_CONVERSION_CERTIFIED', 'disabled') === 'enabled',
   },
 }

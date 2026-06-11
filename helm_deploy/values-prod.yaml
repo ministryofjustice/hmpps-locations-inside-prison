@@ -20,6 +20,7 @@ generic-service:
     PRISON_API_URL: "https://prison-api.prison.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
     FLAG_NON_RESI: enabled
+    FLAG_NON_RESI_CONVERSION_CERTIFIED: disabled
 
 generic-prometheus-alerts:
   alertSeverity: move-a-prisoner-alerts-prod

@@ -6,9 +6,14 @@ import NonResidentialConversionDetails from '../../controllers/nonResidentialCon
 import NonResidentialConversionConfirm from '../../controllers/nonResidentialConversion/confirm'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
+import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 
 function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
+}
+
+function hasCertApprovalSteps(req: FormWizard.Request, res: Response) {
+  return req.featureFlags.nonResiConversionCertified && isCertActiveAndNotDraft(res.locals)
 }
 
 const steps: FormWizard.Steps = {
@@ -21,12 +26,12 @@ const steps: FormWizard.Steps = {
     skip: true,
     next: [
       {
-        fn: (req, _res) => req.canAccess('create_location'),
-        next: 'cert-change-disclaimer',
-      },
-      {
         fn: isCellOccupied,
         next: 'occupied',
+      },
+      {
+        fn: hasCertApprovalSteps,
+        next: 'cert-change-disclaimer',
       },
       'warning',
     ],
@@ -37,7 +42,7 @@ const steps: FormWizard.Steps = {
         fn: isCellOccupied,
         next: 'occupied',
       },
-      'warning',
+      'details',
     ],
     title: (_req, _res) => `Converting a cell to a non-residential room`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
