@@ -128,7 +128,7 @@
   },
   "devDependencies": {
     "@cypress/webpack-batteries-included-preprocessor": "^3.1.2",
-    "@cypress/webpack-preprocessor": "^5.17.1",
+    "@cypress/webpack-preprocessor": "^7.1.1",
     "@jest/globals": "^30.4.1",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.4",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
