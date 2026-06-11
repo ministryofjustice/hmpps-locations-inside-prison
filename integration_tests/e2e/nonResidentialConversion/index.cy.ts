@@ -347,6 +347,7 @@ context('Non-residential conversion', () => {
 
     describe('confirmation page when certification active', () => {
       beforeEach(() => {
+        cy.task('setFeatureFlag', { nonResiConversionCertified: true })
         cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       })
 
@@ -357,8 +358,6 @@ context('Non-residential conversion', () => {
         viewLocationsShowPage.convertToNonResAction().click()
         const cellCertChangePage = Page.verifyOnPage(CellCertChangePage)
         cellCertChangePage.continueButton().click()
-        const warningPage = Page.verifyOnPage(NonResidentialConversionWarningPage)
-        warningPage.continueButton().click()
         const detailsPage = Page.verifyOnPage(NonResidentialConversionDetailsPage)
         detailsPage.cellTypeRadioItem('OFFICE').click()
         detailsPage.explanationInput().clear().type('Want to change the room usage')
