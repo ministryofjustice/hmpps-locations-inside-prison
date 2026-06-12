@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import CellConversionAccommodationType from '../../controllers/cellConversion/accommodationType'
@@ -104,7 +105,7 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
 // Wrap the setCellType steps controller with another controller that appends the field names with cellId
 const setCellTypeSteps = Object.fromEntries(
   Object.entries(
-    SetCellType.getSteps({
+    new SetCellType().getSteps({
       next: 'capacity',
     }),
   ).map(([k, step]) => [

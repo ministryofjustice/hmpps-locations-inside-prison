@@ -220,17 +220,13 @@ describe('CellConversionConfirm', () => {
     it('converts the location to a cell via the locations API', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(locationsService.convertToCell).toHaveBeenCalledWith(
-        'token',
-        '7e570000-0000-0000-0000-000000000001',
-        {
-          accommodationType: 'NORMAL_ACCOMMODATION',
-          specialistCellTypes: ['ACCESSIBLE_CELL', 'CSU'],
-          maxCapacity: 2,
-          workingCapacity: 1,
-          usedForTypes: ['CLOSE_SUPERVISION_CENTRE', 'FIRST_NIGHT_CENTRE'],
-        },
-      )
+      expect(locationsService.convertToCell).toHaveBeenCalledWith('token', '7e570000-0000-0000-0000-000000000001', {
+        accommodationType: 'NORMAL_ACCOMMODATION',
+        specialistCellTypes: ['ACCESSIBLE_CELL', 'CSU'],
+        maxCapacity: 2,
+        workingCapacity: 1,
+        usedForTypes: ['CLOSE_SUPERVISION_CENTRE', 'FIRST_NIGHT_CENTRE'],
+      })
     })
 
     it('calls next when successful', async () => {

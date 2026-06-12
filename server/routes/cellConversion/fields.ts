@@ -186,7 +186,7 @@ const fields = {
       text: 'This means a cell includes both a toilet and wash basin.',
     },
   },
-  ...SetCellType.getFields(),
+  ...new SetCellType().getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 

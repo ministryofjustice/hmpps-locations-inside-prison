@@ -131,17 +131,13 @@ export default class CellConversionConfirm extends FormInitialStep {
       const workingCapacity = sessionModel.get<number>('workingCapacity')
       const usedForTypes = sessionModel.get<string[]>('usedForTypes')
 
-      await locationsService.convertToCell(
-        req.session.systemToken,
-        decoratedLocation.id,
-        {
-          accommodationType,
-          specialistCellTypes,
-          maxCapacity,
-          workingCapacity,
-          usedForTypes,
-        },
-      )
+      await locationsService.convertToCell(req.session.systemToken, decoratedLocation.id, {
+        accommodationType,
+        specialistCellTypes,
+        maxCapacity,
+        workingCapacity,
+        usedForTypes,
+      })
 
       req.services.analyticsService.sendEvent(req, 'convert_to_cell', {
         prison_id: decoratedLocation.prisonId,
