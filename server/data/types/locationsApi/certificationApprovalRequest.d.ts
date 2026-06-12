@@ -11,6 +11,8 @@ export declare interface CertificationApprovalRequest {
     | 'CAPACITY_CHANGE'
     | 'PRISON_BASELINE'
     | 'SPECIALIST_CELL_TYPE'
+    | 'CONVERT_ROOM_TO_CELL'
+    | 'CONVERT_CELL_TO_ROOM'
   prisonId: string
   locationKey: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'
