@@ -265,11 +265,13 @@ describe('Locations service', () => {
       await locationsService.convertToCell(
         'token',
         '481fc587-60f8-402b-804d-64462babddcc',
-        'NORMAL_ACCOMMODATION',
-        ['ACCESSIBLE_CELL'],
-        2,
-        1,
-        ['CLOSE_SUPERVISION_CENTRE'],
+        {
+          accommodationType: 'NORMAL_ACCOMMODATION',
+          specialistCellTypes: ['ACCESSIBLE_CELL'],
+          maxCapacity: 2,
+          workingCapacity: 1,
+          usedForTypes: ['CLOSE_SUPERVISION_CENTRE'],
+        },
       )
 
       expect(locationsApiClient.locations.convertToCell).toHaveBeenCalledWith(

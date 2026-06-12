@@ -71,6 +71,11 @@ describe('Confirm', () => {
             currentCellMark: undefined,
             inCellSanitation: false,
             level: 1,
+            convertedCellType: 'OFFICE',
+            currentConvertedCellType: 'OFFICE',
+            currentInCellSanitation: false,
+            otherConvertedCellType: 'string',
+            currentOtherConvertedCellType: 'string',
             subLocations: [
               CertificateLocationFactory.build({
                 id: 'draftLocationId-1',
@@ -81,10 +86,20 @@ describe('Confirm', () => {
                 currentCellMark: undefined,
                 inCellSanitation: false,
                 level: 2,
+                convertedCellType: 'OFFICE',
+                currentConvertedCellType: 'OFFICE',
+                currentInCellSanitation: false,
+                otherConvertedCellType: 'string',
+                currentOtherConvertedCellType: 'string',
                 subLocations: [
                   CertificateLocationFactory.build({
                     id: 'draftLocationId-1-001',
                     locationType: 'CELL',
+                    convertedCellType: 'OFFICE',
+                    currentConvertedCellType: 'OFFICE',
+                    currentInCellSanitation: true,
+                    otherConvertedCellType: 'string',
+                    currentOtherConvertedCellType: 'string',
                   }),
                 ],
               }),
@@ -167,6 +182,11 @@ describe('Confirm', () => {
           CertificateLocationFactory.build({
             id: 'deactivationLocationId',
             workingCapacity: 0,
+            convertedCellType: undefined,
+            currentConvertedCellType: undefined,
+            currentInCellSanitation: true,
+            otherConvertedCellType: 'string',
+            currentOtherConvertedCellType: 'string',
           }),
         ],
         planetFmReference: '12345678',
@@ -214,6 +234,11 @@ describe('Confirm', () => {
         locations: [
           CertificateLocationFactory.build({
             id: 'cellMarkLocationId',
+            convertedCellType: undefined,
+            currentConvertedCellType: undefined,
+            currentInCellSanitation: true,
+            otherConvertedCellType: 'string',
+            currentOtherConvertedCellType: 'string',
           }),
         ],
       },
@@ -244,6 +269,11 @@ describe('Confirm', () => {
         locations: [
           CertificateLocationFactory.build({
             id: 'cellSanitationLocationId',
+            convertedCellType: undefined,
+            currentConvertedCellType: undefined,
+            currentInCellSanitation: true,
+            otherConvertedCellType: 'string',
+            currentOtherConvertedCellType: 'string',
           }),
         ],
       },
@@ -282,6 +312,11 @@ describe('Confirm', () => {
             cellMark: undefined,
             inCellSanitation: false,
             level: 1,
+            convertedCellType: undefined,
+            currentConvertedCellType: undefined,
+            currentInCellSanitation: false,
+            otherConvertedCellType: 'string',
+            currentOtherConvertedCellType: 'string',
             subLocations: [
               CertificateLocationFactory.build({
                 id: 'reactivationLocationId-1',
@@ -290,6 +325,11 @@ describe('Confirm', () => {
                 cellMark: undefined,
                 inCellSanitation: false,
                 level: 2,
+                convertedCellType: undefined,
+                currentConvertedCellType: undefined,
+                currentInCellSanitation: false,
+                otherConvertedCellType: 'string',
+                currentOtherConvertedCellType: 'string',
                 subLocations: [
                   CertificateLocationFactory.build({
                     id: 'reactivationLocationId-1-1',
@@ -297,6 +337,11 @@ describe('Confirm', () => {
                     certifiedNormalAccommodation: 3,
                     workingCapacity: 3,
                     maxCapacity: 4,
+                    convertedCellType: undefined,
+                    currentConvertedCellType: undefined,
+                    currentInCellSanitation: true,
+                    otherConvertedCellType: 'string',
+                    currentOtherConvertedCellType: 'string',
                   }),
                 ],
               }),
@@ -404,6 +449,11 @@ describe('Confirm', () => {
             id: 'workingCapacityMismatchId-1-1',
             locationType: 'CELL',
             currentWorkingCapacity: 1,
+            convertedCellType: undefined,
+            currentConvertedCellType: undefined,
+            currentInCellSanitation: true,
+            otherConvertedCellType: 'string',
+            currentOtherConvertedCellType: 'string',
           }),
         ],
       },
@@ -522,7 +572,7 @@ describe('Confirm', () => {
             await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
             expect(deepRes.locals.proposedCertificationApprovalRequests.length).toEqual(1)
-            expect(deepRes.locals.proposedCertificationApprovalRequests).toContainEqual(approvalRequestData)
+            expect(deepRes.locals.proposedCertificationApprovalRequests[0]).toEqual(approvalRequestData)
           })
         })
 

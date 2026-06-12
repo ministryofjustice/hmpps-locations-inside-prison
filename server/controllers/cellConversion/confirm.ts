@@ -134,11 +134,13 @@ export default class CellConversionConfirm extends FormInitialStep {
       await locationsService.convertToCell(
         req.session.systemToken,
         decoratedLocation.id,
-        accommodationType,
-        specialistCellTypes,
-        maxCapacity,
-        workingCapacity,
-        usedForTypes,
+        {
+          accommodationType,
+          specialistCellTypes,
+          maxCapacity,
+          workingCapacity,
+          usedForTypes,
+        },
       )
 
       req.services.analyticsService.sendEvent(req, 'convert_to_cell', {

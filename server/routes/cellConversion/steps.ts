@@ -13,7 +13,6 @@ import CellConversionCapacity from '../../controllers/cellConversion/capacity'
 import SetCellType from '../../commonTransactions/setCellType'
 import RemoveCellType from '../../controllers/cellConversion/removeCellType'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
-import Details from '../../controllers/changeSanitation/details'
 import FormInitialStep from '../../controllers/base/formInitialStep'
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {

@@ -223,11 +223,13 @@ describe('CellConversionConfirm', () => {
       expect(locationsService.convertToCell).toHaveBeenCalledWith(
         'token',
         '7e570000-0000-0000-0000-000000000001',
-        'NORMAL_ACCOMMODATION',
-        ['ACCESSIBLE_CELL', 'CSU'],
-        2,
-        1,
-        ['CLOSE_SUPERVISION_CENTRE', 'FIRST_NIGHT_CENTRE'],
+        {
+          accommodationType: 'NORMAL_ACCOMMODATION',
+          specialistCellTypes: ['ACCESSIBLE_CELL', 'CSU'],
+          maxCapacity: 2,
+          workingCapacity: 1,
+          usedForTypes: ['CLOSE_SUPERVISION_CENTRE', 'FIRST_NIGHT_CENTRE'],
+        },
       )
     })
 
