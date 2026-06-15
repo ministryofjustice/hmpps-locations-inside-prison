@@ -471,6 +471,40 @@ export default class Confirm extends FormInitialStep {
       }
 
       proposedCertificationApprovalRequests.push(request)
+    } else if (req.form.options.name === 'non-residential-conversion') {
+      const inCellSanitation = sessionModel.get<string>('inCellSanitation')
+      const newSpecialistCellType = sessionModel.get<string>('set-cell-type_specialistCellTypes')
+      const newBaselineCna = Number(sessionModel.get<string>('set-cell-type_baselineCna'))
+      const newWorkingCapacity = Number(sessionModel.get<string>('set-cell-type_workingCapacity'))
+      const newMaxCapacity = Number(sessionModel.get<string>('set-cell-type_maxCapacity'))
+      const { certifiedNormalAccommodation, workingCapacity, maxCapacity } = getLocationAttributesIncludePending(
+        locals.location,
+      )
+      const certifiedNormalAccommodationChange = newBaselineCna - certifiedNormalAccommodation
+      const workingCapacityChange = newWorkingCapacity - workingCapacity
+      const maxCapacityChange = newMaxCapacity - maxCapacity
+
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'CONVERT_CELL_TO_ROOM',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        prisonId: locals.prisonId,
+        certifiedNormalAccommodationChange,
+        workingCapacityChange,
+        maxCapacityChange,
+        inCellSanitation: false,
+        locations: [
+          await locationToCertificationLocation(req, locals.location, (_originalLocation, certificateLocation) => ({
+            ...certificateLocation,
+            certifiedNormalAccommodation: newBaselineCna,
+            workingCapacity: newWorkingCapacity,
+            maxCapacity: newMaxCapacity,
+            specialistCellTypes: [newSpecialistCellType],
+            currentInCellSanitation: false,
+            inCellSanitation: false,
+          })),
+        ],
+      })
     }
 
     if (proposedSignedOpCapChange) {

@@ -7,6 +7,8 @@ import NonResidentialConversionConfirm from '../../controllers/nonResidentialCon
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
@@ -59,12 +61,20 @@ const steps: FormWizard.Steps = {
   '/details': {
     fields: ['convertedCellType', 'otherConvertedCellType', 'explanation'],
     controller: NonResidentialConversionDetails,
-    next: 'confirm',
+    next: [
+      {
+        fn: hasCertApprovalSteps,
+        next: 'update-signed-op-cap',
+      },
+      'confirm',
+    ],
     template: '../../partials/formStep',
   },
   '/confirm': {
     controller: NonResidentialConversionConfirm,
   },
+  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 
 export default steps

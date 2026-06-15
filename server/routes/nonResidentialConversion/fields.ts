@@ -1,5 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
 import maxLength from '../../validators/maxLength'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 const fields: FormWizard.Fields = {
   convertedCellType: {
@@ -48,6 +50,8 @@ const fields: FormWizard.Fields = {
     autocomplete: 'off',
     'ignore-defaults': true,
   },
+  ...UpdateSignedOpCap.getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
 }
 
 export default fields
