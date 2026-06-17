@@ -17,6 +17,14 @@ export default class CellConversionAccommodationTypePage extends Page {
   accommodationTypeRadioItem = (value: string): PageElement =>
     cy.get(`input[name="accommodationType"][type="radio"][value="${value}"]`)
 
+  submit = ({ accommodationType }: { accommodationType?: string }) => {
+    if (accommodationType !== undefined) {
+      this.accommodationTypeRadioItem(accommodationType).click()
+    }
+
+    this.continueButton().click()
+  }
+
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 
   backLink = (): PageElement => cy.get('.govuk-back-link')

@@ -1,5 +1,6 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import { uniq } from 'lodash'
 import FormInitialStep from '../../controllers/base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
@@ -33,9 +34,11 @@ async function locationToCertificationLocation(
   let certifiedNormalAccommodation = 0
   let workingCapacity = 0
   let maxCapacity = 0
-  let cellMark
+  let cellMark: string
   let inCellSanitation = false
   let specialistCellTypes: string[] = []
+  let convertedCellType: string
+  let otherConvertedCellType: string
   let subLocations: CertificateLocation[] = []
   if (location.status.includes('DRAFT')) {
     const locationAttributes = getLocationAttributesIncludePending(location)
@@ -46,7 +49,11 @@ async function locationToCertificationLocation(
     cellMark = locationAttributes.cellMark
     inCellSanitation = locationAttributes.inCellSanitation
     specialistCellTypes = location.specialistCellTypes
+    convertedCellType = location.convertedCellType
+    otherConvertedCellType = location.otherConvertedCellType
   }
+  // TODO: temp, remove this line
+  otherConvertedCellType = location.otherConvertedCellType
 
   let locationWithCertification: Location
   if (!location.leafLevel) {
@@ -80,6 +87,8 @@ async function locationToCertificationLocation(
     cellMark = locationWithCertification.currentCellCertificate.cellMark
     inCellSanitation = locationWithCertification.currentCellCertificate.inCellSanitation
     specialistCellTypes = locationWithCertification.currentCellCertificate.specialistCellTypes
+    convertedCellType = locationWithCertification.currentCellCertificate.convertedCellType
+    // otherConvertedCellType = locationWithCertification.currentCellCertificate.otherConvertedCellType
   }
 
   let certificationLocation: CertificateLocation = {
@@ -87,19 +96,24 @@ async function locationToCertificationLocation(
     locationCode: location.code,
     pathHierarchy: location.pathHierarchy,
     level: location.level,
-    certifiedNormalAccommodation,
-    workingCapacity,
-    maxCapacity,
     currentCertifiedNormalAccommodation: certifiedNormalAccommodation,
+    certifiedNormalAccommodation,
     currentWorkingCapacity: workingCapacity,
+    workingCapacity,
     currentMaxCapacity: maxCapacity,
+    maxCapacity,
     locationType: location.locationType,
     subLocations,
+    currentInCellSanitation: inCellSanitation,
     inCellSanitation,
-    cellMark,
     currentCellMark: cellMark,
+    cellMark,
     currentSpecialistCellTypes: specialistCellTypes,
     specialistCellTypes,
+    currentConvertedCellType: convertedCellType,
+    convertedCellType,
+    currentOtherConvertedCellType: otherConvertedCellType,
+    otherConvertedCellType,
     accommodationTypes: location.accommodationTypes,
     usedFor: location.usedFor,
   }
@@ -122,6 +136,7 @@ export default class Confirm extends FormInitialStep {
         'deactivatedReasons',
         'locationTypes',
         'specialistCellTypes',
+        'convertedCellTypes',
         'usedForTypes',
       ]),
     )
@@ -132,8 +147,13 @@ export default class Confirm extends FormInitialStep {
   async conditionalPopulateLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
     const locationId = req.params?.locationId || res.locals.locationId
     if (locationId) {
-      return populateLocation({ includeCurrentCertificate: true })(req, res, next)
+      await populateLocation({ includeCurrentCertificate: true })(req, res)
     }
+
+    if (req.form.options.name === 'cell-conversion') {
+      await addLocationsToLocationMap([res.locals.location.topLevelId])(req, res)
+    }
+
     return next()
   }
 
@@ -407,6 +427,52 @@ export default class Confirm extends FormInitialStep {
       locals.changeLinks = {
         reasonForChange: changeLink,
       }
+    } else if (req.form.options.name === 'cell-conversion') {
+      const { location } = res.locals
+
+      const cellMark = req.sessionModel.get<string>('doorNumber')
+      const certifiedNormalAccommodation = Number(req.sessionModel.get<string>('CERT_baselineCna'))
+      const workingCapacity = Number(req.sessionModel.get<string>('CERT_workingCapacity'))
+      const maxCapacity = Number(req.sessionModel.get<string>('CERT_maximumCapacity'))
+      const cellTypesRemoved = sessionModel.get<boolean>(`saved-cellTypes-removed`)
+      const savedCellTypes = sessionModel.get<string[]>(`saved-cellTypes`)
+      const inCellSanitation = sessionModel.get<string>(`inCellSanitation`) === 'YES'
+      const accommodationType = sessionModel.get<string>('accommodationType')
+      const usedFor = sessionModel.get<string[]>('usedFor') || []
+      const specialistCellTypes = cellTypesRemoved ? [] : savedCellTypes || res.locals.location.specialistCellTypes
+      const topLevelLocation = res.locals.locationMap[location.topLevelId]
+      const topLevelAccommodationTypes = topLevelLocation.accommodationTypes
+      const topLevelUsedFor = topLevelLocation.usedFor
+
+      const certLocation = await locationToCertificationLocation(req, location)
+      certLocation.accommodationTypes = [accommodationType]
+      certLocation.usedFor = usedFor
+      const workingCapacityChange = certLocation.workingCapacity - certLocation.currentWorkingCapacity
+      const request: (typeof proposedCertificationApprovalRequests)[0] = {
+        approvalType: 'CONVERT_ROOM_TO_CELL',
+        prisonId: location.prisonId,
+        locationId: location.id,
+        locationKey: location.key,
+        workingCapacityChange,
+        currentCellMark: certLocation.currentCellMark,
+        cellMark,
+        currentInCellSanitation: certLocation.currentInCellSanitation,
+        inCellSanitation,
+        workingCapacity,
+        maxCapacity,
+        certifiedNormalAccommodation,
+        specialistCellTypes,
+        currentConvertedCellType: certLocation.currentConvertedCellType,
+        currentOtherConvertedCellType: certLocation.currentOtherConvertedCellType,
+        locations: [certLocation],
+      }
+
+      if (!topLevelAccommodationTypes.includes(accommodationType)) {
+        request.topLevelAccommodationTypes = [...topLevelAccommodationTypes, accommodationType].sort()
+        request.topLevelUsedFor = uniq([...topLevelUsedFor, ...usedFor]).sort()
+      }
+
+      proposedCertificationApprovalRequests.push(request)
     }
 
     if (proposedSignedOpCapChange) {
@@ -430,7 +496,9 @@ export default class Confirm extends FormInitialStep {
   async submitApprovalRequest(
     locationsService: LocationsService,
     systemToken: string,
-    {
+    request: Partial<CertificationApprovalRequest>,
+  ) {
+    const {
       approvalType,
       cellMark,
       currentSignedOperationCapacity,
@@ -444,8 +512,7 @@ export default class Confirm extends FormInitialStep {
       proposedReactivationDate,
       reasonForChange,
       signedOperationCapacityChange,
-    }: Partial<CertificationApprovalRequest>,
-  ) {
+    } = request
     if (approvalType === 'REACTIVATION') {
       return (
         await locationsService.requestReactivation(systemToken, {
@@ -541,6 +608,24 @@ export default class Confirm extends FormInitialStep {
           certifiedNormalAccommodation,
         })
       ).id
+    }
+
+    if (approvalType === 'CONVERT_ROOM_TO_CELL') {
+      const { accommodationTypes, usedFor } = locations[0]
+      const { specialistCellTypes, certifiedNormalAccommodation, maxCapacity, workingCapacity } = request
+
+      return (
+        await locationsService.convertToCell(systemToken, locationId, {
+          accommodationType: accommodationTypes[0],
+          specialistCellTypes,
+          certifiedNormalAccommodation,
+          maxCapacity,
+          workingCapacity,
+          usedForTypes: usedFor,
+          cellMark,
+          inCellSanitation,
+        })
+      ).pendingApprovalRequestId
     }
 
     throw new Error(`Unsupported approval request type: ${approvalType}`)

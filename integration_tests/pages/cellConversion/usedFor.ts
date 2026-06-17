@@ -15,6 +15,16 @@ export default class CellConversionUsedForPage extends Page {
   usedForCheckboxItem = (value: string): PageElement =>
     cy.get(`input[name="usedForTypes"][type="checkbox"][value="${value}"]`)
 
+  submit = ({ usedForTypes }: { usedForTypes?: string[] }) => {
+    if (usedForTypes !== undefined) {
+      usedForTypes.forEach(value => {
+        this.usedForCheckboxItem(value).click()
+      })
+    }
+
+    this.continueButton().click()
+  }
+
   continueButton = (): PageElement => cy.get('button:contains("Continue")')
 
   backLink = (): PageElement => cy.get('.govuk-back-link')

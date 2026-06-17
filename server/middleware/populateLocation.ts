@@ -26,7 +26,7 @@ export default function populateLocation({
   includeHistory,
   localName,
 }: PopulateLocationParams = {}) {
-  return async (req: Request | FormWizard.Request, res: Response, next: NextFunction): Promise<void> => {
+  return async (req: Request | FormWizard.Request, res: Response, next?: NextFunction): Promise<void> => {
     const { locationsService, manageUsersService } = req.services
     let location =
       res.locals[localName || 'location'] || res.locals[decoratedLocationLocalsMap[localName || 'location']]?.raw
@@ -46,7 +46,10 @@ export default function populateLocation({
 
       res.locals[localName || 'location'] = location
       if (!decorate) {
-        return next()
+        if (next) {
+          next()
+        }
+        return
       }
 
       res.locals[decoratedLocationLocalsMap[localName || 'location']] = await decorateLocation({
@@ -62,9 +65,14 @@ export default function populateLocation({
         error,
         `Failed to populate location for: prisonId: ${location?.prisonId}, locationId: ${location?.id}`,
       )
-      next(error)
+      if (next) {
+        next(error)
+      }
+      return
     }
 
-    return next()
+    if (next) {
+      next()
+    }
   }
 }

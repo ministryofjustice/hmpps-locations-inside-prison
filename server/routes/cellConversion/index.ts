@@ -4,12 +4,16 @@ import steps from './steps'
 import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
+import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
+import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
 
 const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('convert_non_residential'),
   populateLocation({ decorate: true }),
+  populatePrisonConfiguration(),
+  populateTitleCaptionFromLocation,
   wizard(steps, fields, {
     name: 'cell-conversion',
     templatePath: 'pages/cellConversion',

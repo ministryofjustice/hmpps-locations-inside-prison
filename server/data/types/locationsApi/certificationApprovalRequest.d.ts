@@ -11,6 +11,7 @@ export declare interface CertificationApprovalRequest {
     | 'CAPACITY_CHANGE'
     | 'PRISON_BASELINE'
     | 'SPECIALIST_CELL_TYPE'
+    | 'CONVERT_ROOM_TO_CELL'
   prisonId: string
   locationKey: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'
@@ -35,5 +36,14 @@ export declare interface CertificationApprovalRequest {
   deactivationReasonDescription: string
   proposedReactivationDate: string
   planetFmReference: string
+  maxCapacity?: number
+  workingCapacity?: number
+  certifiedNormalAccommodation?: number
   specialistCellTypes?: string[]
+  currentConvertedCellType?: string
+  convertedCellType?: string
+  currentOtherConvertedCellType?: string
+  otherConvertedCellType?: string
+  topLevelAccommodationTypes?: string[]
+  topLevelUsedFor?: string[]
 }
