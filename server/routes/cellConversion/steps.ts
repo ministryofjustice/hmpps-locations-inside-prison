@@ -139,7 +139,7 @@ const steps: FormWizard.Steps = {
   },
   ...CertChangeDisclaimer.getSteps({
     next: 'accommodation-type',
-    title: (_req, _res) => `Cell conversion`,
+    title: (_req, _res) => `Converting a non-residential room to a cell`,
     caption: (_req, res) => capFirst(res.locals.decoratedLocation.displayName),
   }),
   '/accommodation-type': {

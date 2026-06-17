@@ -34,6 +34,7 @@ export default async function populateCertificationRequestDetails(
 
   if (approvalRequest.approvalType === 'CONVERT_ROOM_TO_CELL') {
     promises.push(addConstantToLocals('convertedCellTypes')(req, res))
+    promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res))
   }
 
   let locationPromise: Promise<Location>
@@ -43,6 +44,10 @@ export default async function populateCertificationRequestDetails(
   }
 
   await Promise.all(promises)
+
+  if (approvalRequest.approvalType === 'CONVERT_ROOM_TO_CELL') {
+    await addLocationsToLocationMap([res.locals.locationMap[approvalRequest.locationId].topLevelId])(req, res)
+  }
 
   // set title caption
   if (approvalRequest.locationId) {

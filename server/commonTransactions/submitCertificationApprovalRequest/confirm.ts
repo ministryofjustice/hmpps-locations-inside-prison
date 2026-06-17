@@ -445,6 +445,8 @@ export default class Confirm extends FormInitialStep {
       const topLevelUsedFor = topLevelLocation.usedFor
 
       const certLocation = await locationToCertificationLocation(req, location)
+      certLocation.accommodationTypes = [accommodationType]
+      certLocation.usedFor = usedFor
       const workingCapacityChange = certLocation.workingCapacity - certLocation.currentWorkingCapacity
       const request: (typeof proposedCertificationApprovalRequests)[0] = {
         approvalType: 'CONVERT_ROOM_TO_CELL',
@@ -466,8 +468,8 @@ export default class Confirm extends FormInitialStep {
       }
 
       if (!topLevelAccommodationTypes.includes(accommodationType)) {
-        request.topLevelAccommodationTypes = [...topLevelAccommodationTypes, accommodationType]
-        request.topLevelUsedFor = uniq([...topLevelUsedFor, ...usedFor])
+        request.topLevelAccommodationTypes = [...topLevelAccommodationTypes, accommodationType].sort()
+        request.topLevelUsedFor = uniq([...topLevelUsedFor, ...usedFor]).sort()
       }
 
       proposedCertificationApprovalRequests.push(request)

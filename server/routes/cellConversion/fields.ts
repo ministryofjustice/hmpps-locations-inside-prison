@@ -85,9 +85,6 @@ const fields = {
     ...capacityFields.workingCapacity,
   },
   CERT_baselineCna: {
-    // removed only when field is not dynamically added (in editCapacity.ts)
-    remove: () => true,
-    hideWhenRemoved: true,
     validate: ['required', 'numeric', lessThanOrEqualTo(99)],
     errorMessages: {
       nonZeroForNormalCell: 'Baseline CNA cannot be 0 for a normal accommodation cell',
@@ -109,9 +106,6 @@ const fields = {
     },
   },
   CERT_workingCapacity: {
-    // removed only when field is not dynamically added (in editCapacity.ts)
-    remove: () => true,
-    hideWhenRemoved: true,
     validate: ['required', 'numeric', lessThanOrEqualTo(99)],
     errorMessages: {
       nonZeroForNormalCell: 'Working capacity cannot be 0 for a normal accommodation cell',
@@ -157,6 +151,11 @@ const fields = {
     errorMessages: {
       notUnique: 'A cell with this door number already exists',
       taken: 'A cell with this door number already exists',
+    },
+    label: {
+      text: 'Door number',
+      classes: 'govuk-visually-hidden',
+      for: 'doorNumber',
     },
     validate: ['required'],
     component: 'govukInput',
