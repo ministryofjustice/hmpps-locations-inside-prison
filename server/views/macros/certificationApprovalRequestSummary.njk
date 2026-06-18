@@ -48,7 +48,10 @@
           items: [{
             href: changeLinks.deactivatedReason,
             text: 'Change',
-            classes: 'govuk-link--no-visited-state'
+            classes: 'govuk-link--no-visited-state',
+            attributes: {
+              'data-qa': 'changeLink-' + request.approvalType + '-deactivatedReason'
+            }
           }] if changeLinks.deactivatedReason
         }
       } if formattedDeactivationReason,
@@ -59,7 +62,10 @@
         items: [{
           href: changeLinks.proposedReactivationDate,
           text: 'Change',
-          classes: 'govuk-link--no-visited-state'
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-proposedReactivationDate'
+          }
         }] if changeLinks.proposedReactivationDate
       }
       } if request.proposedReactivationDate,
@@ -70,7 +76,10 @@
         items: [{
           href: changeLinks.planetFmReference,
           text: 'Change',
-          classes: 'govuk-link--no-visited-state'
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-planetFmReference'
+          }
         }] if changeLinks.planetFmReference
       }
       } if request.planetFmReference,
@@ -81,7 +90,10 @@
         items: [{
           href: changeLinks.nonResidentialRoom,
           text: 'Change',
-          classes: 'govuk-link--no-visited-state'
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-nonResidentialRoom'
+          }
         }] if changeLinks.nonResidentialRoom
       }
       } if nonResidentialRoom,
@@ -92,7 +104,10 @@
         items: [{
           href: changeLinks.reasonForChange,
           text: 'Change',
-          classes: 'govuk-link--no-visited-state'
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-reasonForChange'
+          }
         }] if changeLinks.reasonForChange
       }
       } if request.reasonForChange,
