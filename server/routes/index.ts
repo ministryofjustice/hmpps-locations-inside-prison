@@ -21,6 +21,7 @@ import nonResidentialConversionRouter from './nonResidentialConversion'
 import reactivateRouter from './reactivate'
 import removeCellTypeRouter from './removeCellType'
 import setCellTypeRouter from './setCellType'
+import changeCellTypeRouter from './changeCellType'
 import changeNonResidentialTypeRouter from './changeNonResidentialType'
 import changeUsedForRouter from './changeUsedFor'
 import changeDoorNumberRouter from './changeDoorNumber'
@@ -103,6 +104,7 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/remove-cell-type', removeCellTypeRouter)
   router.use('/location/:locationId/remove-local-name', removeLocalNameRouter)
   router.use('/location/:locationId/set-cell-type', setCellTypeRouter)
+  router.use('/location/:locationId/change-cell-type', changeCellTypeRouter)
   router.use('/location/:locationId/working-capacity-mismatch', workingCapacityMismatch)
 
   router.use('/change-signed-operational-capacity/:prisonId', changeSignedOperationalCapacityRouter)
