@@ -60,6 +60,12 @@ context('Cell conversion - Cert flow - Capacity', () => {
         Page.checkForError('CERT_baselineCna', 'Baseline CNA cannot be more than 99')
       })
 
+      it('shows a validation error when baseline CNA is greater than maximum capacity', () => {
+        page.submit({ baselineCna: '4', workingCapacity: '1', maximumCapacity: '3' })
+
+        Page.checkForError('CERT_baselineCna', 'Baseline CNA cannot be more than the maximum capacity')
+      })
+
       it('shows a validation error when baseline CNA is 0 for a normal accommodation cell', () => {
         page.submit({ baselineCna: '0', workingCapacity: '1', maximumCapacity: '2' })
 
@@ -82,6 +88,12 @@ context('Cell conversion - Cert flow - Capacity', () => {
         page.submit({ baselineCna: '1', workingCapacity: '100', maximumCapacity: '2' })
 
         Page.checkForError('CERT_workingCapacity', 'Working capacity cannot be more than 99')
+      })
+
+      it('shows a validation error when working capacity is greater than maximum capacity', () => {
+        page.submit({ baselineCna: '1', workingCapacity: '4', maximumCapacity: '3' })
+
+        Page.checkForError('CERT_workingCapacity', 'Working capacity cannot be more than the maximum capacity')
       })
 
       it('shows a validation error when working capacity is 0 for a normal accommodation cell', () => {
