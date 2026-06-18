@@ -143,8 +143,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
       expect(locationsService.convertCellToNonResCell).toHaveBeenCalledWith(
         'token',
         'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-        'TREATMENT_ROOM',
-        undefined,
+        { convertedCellType: 'TREATMENT_ROOM' },
       )
     })
 

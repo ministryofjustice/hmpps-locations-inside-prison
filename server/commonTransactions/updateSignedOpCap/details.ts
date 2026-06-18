@@ -23,6 +23,28 @@ export default class Details extends BaseController {
     )
   }
 
+  override locals(req: FormWizard.Request, res: Response) {
+    const locals = super.locals(req, res)
+
+    // TODO: find a blanket solution to correctly redirect common transactions that are being edited
+    if (req.isEditing) {
+      const journeyHistory = req.journeyModel.get('history') as FormWizard.HistoryStep[]
+      locals.backLink = journeyHistory[journeyHistory.length - 1].next
+    }
+
+    return locals
+  }
+
+  override getNextStep(req: FormWizard.Request, res: Response): string {
+    // TODO: find a blanket solution to correctly redirect common transactions that are being edited
+    if (req.isEditing) {
+      const journeyHistory = req.journeyModel.get('history') as FormWizard.HistoryStep[]
+      return journeyHistory[journeyHistory.length - 1].next
+    }
+
+    return super.getNextStep(req, res)
+  }
+
   override getValues(
     req: FormWizard.Request,
     res: Response,

@@ -63,12 +63,10 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
         otherConvertedCellType = undefined
       }
 
-      await locationsService.convertCellToNonResCell(
-        req.session.systemToken,
-        decoratedLocation.id,
+      await locationsService.convertCellToNonResCell(req.session.systemToken, decoratedLocation.id, {
         convertedCellType,
         otherConvertedCellType,
-      )
+      })
 
       analyticsService.sendEvent(req, 'convert_to_non_res', {
         prison_id: decoratedLocation.prisonId,

@@ -136,7 +136,7 @@
       {% if request.approvalType == 'SIGNED_OP_CAP' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -162,7 +162,7 @@
       {% elseif request.approvalType == 'DRAFT' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -219,7 +219,7 @@
       {% elseif request.approvalType == 'CELL_MARK' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -248,7 +248,7 @@
         {% set inCellSanitation = request.inCellSanitation | yesNo %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
@@ -269,7 +269,7 @@
       {% elseif request.approvalType == 'DEACTIVATION' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -310,7 +310,7 @@
       {% elseif request.approvalType == 'REACTIVATION' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
         </div>
 
@@ -380,7 +380,7 @@
       {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -411,7 +411,7 @@
       {% elseif request.approvalType == 'SPECIALIST_CELL_TYPE' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -450,56 +450,53 @@
             ] | stripEmpty]
           }) }}
         </div>
-      {% elseif request.approvalType == 'TEMP_NON_RESIDENTIAL_CONVERSION' %}
+      {% elseif request.approvalType == 'CONVERT_CELL_TO_ROOM' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
-        </div>
 
-        {% set currentConvertedCellType = formatConstants(constants.convertedCellTypes, request.locations[0].currentConvertedCellType, '<br>', 'None') %}
-        {% if request.locations[0].currentOtherConvertedCellType %}
-          {% set currentConvertedCellType = currentConvertedCellType + ' - ' + request.locations[0].currentOtherConvertedCellType %}
-        {% endif %}
-        {% set convertedCellType = formatConstants(constants.convertedCellTypes, request.locations[0].convertedCellType, '<br>', 'None') %}
-        {% if request.locations[0].otherConvertedCellType %}
-          {% set convertedCellType = convertedCellType + ' - ' + request.locations[0].otherConvertedCellType %}
-        {% endif %}
-
-        <div class="govuk-grid-column-full">
           {% if multiple %}
             <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
           {% else %}
             <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
           {% endif %}
-
-          {{ govukTable({
-            attributes: {
-              'data-qa': 'capacity-change-table'
-            },
-            head: [
-              { text: "Location" },
-              { text: "Baseline CNA" },
-              { text: "Certified working capacity" },
-              { text: "Maximum capacity" },
-              { text: "Cell type" },
-              { text: "Sanitation" }
-            ],
-            rows:[[
-              { text: request.locations[0].pathHierarchy },
-              { text: request.locations[0].currentCertifiedNormalAccommodation + " → None" },
-              { text: request.locations[0].currentWorkingCapacity+ " → None" },
-              { text: request.locations[0].currentMaxCapacity + " → None" },
-              { text: currentConvertedCellType + " → " + convertedCellType },
-              { text: request.locations[0].currentInCellSanitation | yesNo + " → None" }
-            ]],
-            firstCellIsHeader: true
-          }) }}
         </div>
+
+        {% set convertedCellType = formatConstants(constants.convertedCellTypes, request.locations[0].convertedCellType, '<br>', 'None') %}
+        {% if request.locations[0].otherConvertedCellType %}
+          {% set convertedCellType = convertedCellType + ' - ' + request.locations[0].otherConvertedCellType %}
+        {% endif %}
+
+        {{ comparisonTable({
+          attributes: {
+            'data-qa': 'non-res-conversion-change-table'
+          },
+          firstCellIsHeader: true,
+          head: [
+            { text: "Location" },
+            { text: "Baseline CNA" },
+            { text: "Certified working capacity" },
+            { text: "Maximum capacity" },
+            { text: "Cell type" },
+            { text: "Sanitation" }
+          ],
+          rows: [[
+            { new: request.locations[0].pathHierarchy },
+            { old: request.locations[0].currentCertifiedNormalAccommodation, new: 'None' },
+            { old: request.locations[0].currentWorkingCapacity, new: 'None' },
+            { old: request.locations[0].currentMaxCapacity, new: 'None' },
+            {
+              old: formatConstants(constants.specialistCellTypes, request.locations[0].specialistCellTypes, ', '),
+              new: convertedCellType
+            },
+            { old: request.locations[0].currentInCellSanitation | yesNo, new: 'None' }
+          ]]
+        }) }}
         {% elseif request.approvalType == 'CONVERT_ROOM_TO_CELL' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}

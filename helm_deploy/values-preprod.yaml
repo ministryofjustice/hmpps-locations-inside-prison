@@ -23,4 +23,3 @@ generic-service:
     ENVIRONMENT_NAME: PRE-PRODUCTION
     AUDIT_ENABLED: "false"
     FLAG_NON_RESI: enabled
-    FLAG_NON_RESI_CONVERSION_CERTIFIED: disabled

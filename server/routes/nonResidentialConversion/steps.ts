@@ -15,7 +15,7 @@ function isCellOccupied(_req: FormWizard.Request, res: Response) {
 }
 
 function hasCertApprovalSteps(req: FormWizard.Request, res: Response) {
-  return req.featureFlags.nonResiConversionCertified && isCertActiveAndNotDraft(res.locals)
+  return isCertActiveAndNotDraft(res.locals)
 }
 
 const steps: FormWizard.Steps = {
@@ -71,10 +71,10 @@ const steps: FormWizard.Steps = {
     editBackStep: 'submit-certification-approval-request',
   },
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
-  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
   '/confirm': {
     controller: NonResidentialConversionConfirm,
   },
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 
 export default steps
