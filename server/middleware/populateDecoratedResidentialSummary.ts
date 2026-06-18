@@ -95,6 +95,7 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
   const { specialistCellTypes } = location
   const setCellTypeUrl = `/location/${location.id}/set-cell-type`
   const removeCellTypeUrl = `/location/${location.id}/remove-cell-type`
+  const changeCellTypeUrl = `/location/${location.id}/change-cell-type`
   const row: SummaryListRow = { key: { text: 'Cell type' } }
   if (specialistCellTypes.length) {
     row.value = {
@@ -107,6 +108,16 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
           {
             href: removeCellTypeUrl,
             text: 'Remove',
+            attributes: {
+              'data-qa': 'remove-cell-type',
+            },
+          },
+          {
+            href: changeCellTypeUrl,
+            text: 'Change',
+            attributes: {
+              'data-qa': 'change-cell-type',
+            },
           },
         ],
       }
