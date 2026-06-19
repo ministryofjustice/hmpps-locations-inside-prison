@@ -69,7 +69,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
         get: jest.fn(
           (fieldName?: string) =>
             ({
-              convertedCellType: { text: 'office', value: 'OFFICE' },
+              convertedCellType: 'OFFICE',
               otherConvertedCellType: '',
             })[fieldName],
         ) as FormWizard.Request['sessionModel']['get'],
@@ -92,10 +92,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
           username: 'JTIMPSON',
         },
         values: {
-          convertedCellType: {
-            text: 'office',
-            value: 'OFFICE',
-          },
+          convertedCellType: 'OFFICE',
           otherConvertedCellType: '',
         },
       },
@@ -184,6 +181,125 @@ describe('ChangeNonResidentialTypeDetails', () => {
             name: 'otherConvertedCellType',
             validate: ['required', maxLength(30)],
             value: '',
+          },
+          'submit-certification-approval-request_confirmation': {
+            component: 'govukCheckboxes',
+            errorMessages: {
+              required: 'Confirm that changes have been agreed',
+            },
+            fieldset: {
+              legend: {
+                classes: 'govuk-fieldset__legend--m',
+                text: 'Confirm changes have been agreed',
+              },
+            },
+            hint: {
+              text: 'By submitting this request, you confirm that this change has been agreed by the PGD.',
+            },
+            id: 'submit-certification-approval-request_confirmation',
+            items: [
+              {
+                text: 'I understand and agree with the above statement.',
+                value: 'yes',
+              },
+            ],
+            label: {
+              text: 'Confirm changes have been agreed',
+            },
+            multiple: false,
+            name: 'submit-certification-approval-request_confirmation',
+            validate: ['required'],
+            value: undefined,
+          },
+          'update-signed-op-cap_currentSignedOpCap': {
+            autocomplete: 'off',
+            component: 'govukInput',
+            hideWhenRemoved: false,
+            id: 'update-signed-op-cap_currentSignedOpCap',
+            label: {
+              classes: 'govuk-label--m',
+              for: 'update-signed-op-cap_currentSignedOpCap',
+              text: 'Current signed operational capacity',
+            },
+            name: 'update-signed-op-cap_currentSignedOpCap',
+            remove: expect.any(Function),
+            value: undefined,
+          },
+          'update-signed-op-cap_explanation': {
+            autocomplete: 'off',
+            component: 'govukTextarea',
+            errorMessages: {
+              required: 'Explain why you need to update the signed operational capacity',
+            },
+            hint: {
+              text: 'This will help the authorising director understand the need for the change to capacity.',
+            },
+            id: 'update-signed-op-cap_explanation',
+            'ignore-defaults': true,
+            label: {
+              classes: 'govuk-label--m',
+              for: 'update-signed-op-cap_explanation',
+              text: 'Explain why you need to update the signed operational capacity',
+            },
+            name: 'update-signed-op-cap_explanation',
+            rows: 5,
+            validate: ['required'],
+            value: undefined,
+          },
+          'update-signed-op-cap_isUpdateNeeded': {
+            autocomplete: 'off',
+            component: 'govukRadios',
+            errorMessages: {
+              required: 'Select if you need to update the operational capacity',
+            },
+            fieldset: {
+              legend: {
+                classes: 'govuk-fieldset__legend--m',
+                text: 'Do you need to update the operational capacity as part of this change?',
+              },
+            },
+            id: 'update-signed-op-cap_isUpdateNeeded',
+            items: [
+              {
+                text: 'Yes, I need to update it',
+                value: 'YES',
+              },
+              {
+                text: 'No',
+                value: 'NO',
+              },
+            ],
+            name: 'update-signed-op-cap_isUpdateNeeded',
+            validate: ['required'],
+            value: undefined,
+          },
+          'update-signed-op-cap_newSignedOpCap': {
+            autocomplete: 'off',
+            classes: 'govuk-input--width-3',
+            component: 'govukInput',
+            errorMessages: {
+              notEqual: 'Enter a different signed operational capacity',
+            },
+            id: 'update-signed-op-cap_newSignedOpCap',
+            label: {
+              classes: 'govuk-label--m',
+              for: 'update-signed-op-cap_newSignedOpCap',
+              text: 'New signed operational capacity',
+            },
+            name: 'update-signed-op-cap_newSignedOpCap',
+            validate: [
+              'required',
+              'numeric',
+              {
+                arguments: [
+                  {
+                    field: 'update-signed-op-cap_currentSignedOpCap',
+                  },
+                ],
+                fn: expect.any(Function),
+              },
+            ],
+            value: undefined,
           },
           explanation: {
             remove: expect.any(Function),

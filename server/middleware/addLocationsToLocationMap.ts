@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { Location } from '../data/types/locationsApi'
 
 export default function addLocationsToLocationMap(locationsOrIds: string[] | Location[]) {
-  return async (req: Request | FormWizard.Request, res: Response, next: NextFunction) => {
+  return async (req: Request | FormWizard.Request, res: Response, next?: NextFunction) => {
     const { locals } = res
     const { session, services } = req
     const { systemToken } = session

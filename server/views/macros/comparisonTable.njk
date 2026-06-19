@@ -1,0 +1,65 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% macro comparisonTable(data) %}
+  {% set columnsWithChanges = [] %}
+  {% for column in data.head %}
+    {% set columnsWithChanges = (columnsWithChanges.push(false), columnsWithChanges) %}
+  {% endfor %}
+
+  {% set changeCount = 0 %}
+  {% set rows = [] %}
+  {% for row in data.rows %}
+    {% if changeCount != columnsWithChanges.length %}
+      {% set cellIndex = 0 %}
+      {% for cell in row %}
+        {% if not columnsWithChanges[cellIndex] %}
+          {% if not cell.old or cell.old != cell.new %}
+            {% set columnsWithChanges = columnsWithChanges | setAttribute(cellIndex, true) %}
+            {% set changeCount = changeCount + 1 %}
+          {% endif %}
+        {% endif %}
+
+        {% set cellIndex = cellIndex + 1 %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+
+  {% set head = [] %}
+  {% set index = 0 %}
+  {% for cell in data.head %}
+    {% if columnsWithChanges[index] %}
+      {% set head = (head.push(cell), head) %}
+    {% endif %}
+
+    {% set index = index + 1 %}
+  {% endfor %}
+
+  {% set rows = [] %}
+  {% for dataRow in data.rows %}
+    {% set row = [] %}
+    {% set index = 0 %}
+    {% for cell in dataRow %}
+      {% if columnsWithChanges[index] %}
+        {% set rowText = cell.new %}
+        {% if cell.old and cell.old != cell.new %}
+          {% set rowText = cell.old + ' → ' + cell.new %}
+        {% endif %}
+
+        {% set row = (row.push({text: rowText}), row) %}
+      {% endif %}
+
+      {% set index = index + 1 %}
+    {% endfor %}
+
+    {% set rows = (rows.push(row), rows) %}
+  {% endfor %}
+
+  <div class="govuk-grid-column-{{ 'full' if changeCount >= 4 else 'two-thirds' }}">
+    {{ govukTable({
+      attributes: data.attributes,
+      firstCellIsHeader: data.firstCellIsHeader,
+      head: head,
+      rows: rows
+    }) }}
+  </div>
+{% endmacro %}

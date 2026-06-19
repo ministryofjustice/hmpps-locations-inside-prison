@@ -5,7 +5,10 @@ export default class SubmitCertificationApprovalRequestPage extends Page {
     super(/You are requesting (a change|2 changes) to the cell certificate/)
   }
 
-  request = (approvalType: string): PageElement => cy.get(`[data-qa=approval-request-${approvalType}]`)
+  request = (approvalType: string): PageElement => cy.get(`[data-qa="approval-request-${approvalType}"]`)
+
+  changeLink = (approvalType: string, field: string): PageElement =>
+    cy.get(`[data-qa="changeLink-${approvalType}-${field}"]`)
 
   checkbox = (): PageElement => cy.get(`input[name$="confirmation"]`)
 

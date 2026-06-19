@@ -21,6 +21,13 @@
     {% set statusText = 'Withdrawn' %}
   {% endif %}
 
+  {% if request.locations[0] and request.locations[0].convertedCellType %}
+    {% set nonResidentialRoom = formatConstants(constants.convertedCellTypes, request.locations[0].convertedCellType, '<br>', 'None') %}
+    {% if request.locations[0].otherConvertedCellType %}
+      {% set nonResidentialRoom = nonResidentialRoom + ' - ' + request.locations[0].otherConvertedCellType %}
+    {% endif %}
+  {% endif %}
+
   {{ govukSummaryList({
     attributes: {
       'data-qa': 'overview-list-' + request.approvalType
@@ -41,7 +48,10 @@
           items: [{
             href: changeLinks.deactivatedReason,
             text: 'Change',
-            classes: 'govuk-link--no-visited-state'
+            classes: 'govuk-link--no-visited-state',
+            attributes: {
+              'data-qa': 'changeLink-' + request.approvalType + '-deactivatedReason'
+            }
           }] if changeLinks.deactivatedReason
         }
       } if formattedDeactivationReason,
@@ -52,7 +62,10 @@
         items: [{
           href: changeLinks.proposedReactivationDate,
           text: 'Change',
-          classes: 'govuk-link--no-visited-state'
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-proposedReactivationDate'
+          }
         }] if changeLinks.proposedReactivationDate
       }
       } if request.proposedReactivationDate,
@@ -63,10 +76,27 @@
         items: [{
           href: changeLinks.planetFmReference,
           text: 'Change',
-          classes: 'govuk-link--no-visited-state'
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-planetFmReference'
+          }
         }] if changeLinks.planetFmReference
       }
       } if request.planetFmReference,
+      {
+        key: { text: 'Non-residential room' },
+        value: { text: nonResidentialRoom },
+        actions: {
+        items: [{
+          href: changeLinks.nonResidentialRoom,
+          text: 'Change',
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-nonResidentialRoom'
+          }
+        }] if changeLinks.nonResidentialRoom
+      }
+      } if nonResidentialRoom,
       {
         key: { text: 'Explanation' },
         value: { html: request.reasonForChange.replaceAll('<', '&lt;').replaceAll('\n', '<br>') },
@@ -74,7 +104,10 @@
         items: [{
           href: changeLinks.reasonForChange,
           text: 'Change',
-          classes: 'govuk-link--no-visited-state'
+          classes: 'govuk-link--no-visited-state',
+          attributes: {
+            'data-qa': 'changeLink-' + request.approvalType + '-reasonForChange'
+          }
         }] if changeLinks.reasonForChange
       }
       } if request.reasonForChange,

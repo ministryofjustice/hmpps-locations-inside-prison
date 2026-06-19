@@ -16,6 +16,7 @@ const CertificateLocationFactory = Factory.define<CertificateLocation>(() => {
     currentMaxCapacity: 2,
     locationType: 'CELL',
     subLocations: [],
+    currentInCellSanitation: true,
     inCellSanitation: true,
     currentCellMark: 'A1-1',
     cellMark: 'A1-1',

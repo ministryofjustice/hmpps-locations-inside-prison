@@ -21,15 +21,20 @@ export default async function populateCertificationRequestDetails(
   const promises: Promise<unknown>[] = []
 
   // set userMap with requestedBy details
-  promises.push(addUsersToUserMap([approvalRequest.requestedBy])(req, res, null))
+  promises.push(addUsersToUserMap([approvalRequest.requestedBy])(req, res))
 
   if (approvalRequest.approvalType === 'DEACTIVATION') {
-    promises.push(addConstantToLocals('deactivatedReasons')(req, res, null))
+    promises.push(addConstantToLocals('deactivatedReasons')(req, res))
   }
 
   if (['DEACTIVATION', 'REACTIVATION'].includes(approvalRequest.approvalType)) {
-    promises.push(addConstantToLocals('locationTypes')(req, res, null))
-    promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res, null))
+    promises.push(addConstantToLocals('locationTypes')(req, res))
+    promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res))
+  }
+
+  if (approvalRequest.approvalType === 'CONVERT_ROOM_TO_CELL') {
+    promises.push(addConstantToLocals('convertedCellTypes')(req, res))
+    promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res))
   }
 
   let locationPromise: Promise<Location>
@@ -39,6 +44,10 @@ export default async function populateCertificationRequestDetails(
   }
 
   await Promise.all(promises)
+
+  if (approvalRequest.approvalType === 'CONVERT_ROOM_TO_CELL') {
+    await addLocationsToLocationMap([res.locals.locationMap[approvalRequest.locationId].topLevelId])(req, res)
+  }
 
   // set title caption
   if (approvalRequest.locationId) {
