@@ -17,7 +17,11 @@ const fields = {
         classes: 'govuk-fieldset__legend--m',
       },
     },
-    items: [{ text: 'set at runtime', value: '' }],
+    items: [
+      { text: 'Normal accommodation', value: 'NORMAL_ACCOMMODATION' },
+      { text: 'Care and separation', value: 'CARE_AND_SEPARATION' },
+      { text: 'Healthcare inpatients', value: 'HEALTHCARE_INPATIENTS' },
+    ],
   },
   hasSpecificCellType: {
     component: 'govukRadios',
@@ -85,7 +89,7 @@ const fields = {
     ...capacityFields.workingCapacity,
   },
   CERT_baselineCna: {
-    validate: ['required', 'numeric', lessThanOrEqualTo(99)],
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'CERT_maximumCapacity' })],
     errorMessages: {
       nonZeroForNormalCell: 'Baseline CNA cannot be 0 for a normal accommodation cell',
     },
@@ -106,7 +110,7 @@ const fields = {
     },
   },
   CERT_workingCapacity: {
-    validate: ['required', 'numeric', lessThanOrEqualTo(99)],
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'CERT_maximumCapacity' })],
     errorMessages: {
       nonZeroForNormalCell: 'Working capacity cannot be 0 for a normal accommodation cell',
     },

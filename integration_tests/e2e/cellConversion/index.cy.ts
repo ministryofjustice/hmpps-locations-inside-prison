@@ -106,9 +106,9 @@ context('Cell conversion', () => {
       it('shows the correct radio buttons', () => {
         const accommodationTypePage = Page.verifyOnPage(CellConversionAccommodationTypePage)
 
-        accommodationTypePage.accommodationTypeRadioLabels().eq(0).contains('Care and separation')
-        accommodationTypePage.accommodationTypeRadioLabels().eq(1).contains('Healthcare inpatients')
-        accommodationTypePage.accommodationTypeRadioLabels().eq(2).contains('Normal accommodation')
+        accommodationTypePage.accommodationTypeRadioLabels().eq(0).contains('Normal accommodation')
+        accommodationTypePage.accommodationTypeRadioLabels().eq(1).contains('Care and separation')
+        accommodationTypePage.accommodationTypeRadioLabels().eq(2).contains('Healthcare inpatients')
       })
 
       it('shows the correct validation error when nothing is selected', () => {
