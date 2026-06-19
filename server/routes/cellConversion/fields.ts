@@ -1,4 +1,8 @@
 import capacityFields from '../changeCellCapacity/fields'
+import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
+import greaterThan from '../../validators/greaterThan'
+import SetCellType from '../../commonTransactions/setCellType'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 const fields = {
   accommodationType: {
@@ -13,7 +17,11 @@ const fields = {
         classes: 'govuk-fieldset__legend--m',
       },
     },
-    items: [{ text: 'set at runtime', value: '' }],
+    items: [
+      { text: 'Normal accommodation', value: 'NORMAL_ACCOMMODATION' },
+      { text: 'Care and separation', value: 'CARE_AND_SEPARATION' },
+      { text: 'Healthcare inpatients', value: 'HEALTHCARE_INPATIENTS' },
+    ],
   },
   hasSpecificCellType: {
     component: 'govukRadios',
@@ -80,6 +88,109 @@ const fields = {
   workingCapacity: {
     ...capacityFields.workingCapacity,
   },
+  CERT_baselineCna: {
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'CERT_maximumCapacity' })],
+    errorMessages: {
+      nonZeroForNormalCell: 'Baseline CNA cannot be 0 for a normal accommodation cell',
+    },
+    component: 'govukInput',
+    id: 'CERT_baselineCna',
+    name: 'CERT_baselineCna',
+    label: {
+      text: 'Baseline CNA',
+      classes: 'govuk-visually-hidden',
+      for: 'CERT_baselineCna',
+    },
+    classes: 'govuk-input--width-3',
+    rows: 1,
+    autocomplete: 'off',
+    nameForErrors: 'Baseline CNA',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  CERT_workingCapacity: {
+    validate: ['required', 'numeric', lessThanOrEqualTo(99), lessThanOrEqualTo({ field: 'CERT_maximumCapacity' })],
+    errorMessages: {
+      nonZeroForNormalCell: 'Working capacity cannot be 0 for a normal accommodation cell',
+    },
+    component: 'govukInput',
+    id: 'CERT_workingCapacity',
+    name: 'CERT_workingCapacity',
+    label: {
+      text: 'Working capacity',
+      classes: 'govuk-visually-hidden',
+      for: 'CERT_workingCapacity',
+    },
+    classes: 'govuk-input--width-3',
+    rows: 1,
+    autocomplete: 'off',
+    nameForErrors: 'Working capacity',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  CERT_maximumCapacity: {
+    validate: ['required', 'numeric', greaterThan(0), lessThanOrEqualTo(99)],
+    component: 'govukInput',
+    id: 'CERT_maximumCapacity',
+    name: 'CERT_maximumCapacity',
+    errorMessages: {
+      greaterThan: 'Maximum capacity cannot be 0',
+    },
+    label: {
+      text: 'Maximum capacity',
+      classes: 'govuk-visually-hidden',
+      for: 'CERT_maximumCapacity',
+    },
+    classes: 'govuk-input--width-3',
+    rows: 1,
+    autocomplete: 'off',
+    nameForErrors: 'Maximum capacity',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  doorNumber: {
+    errorMessages: {
+      notUnique: 'A cell with this door number already exists',
+      taken: 'A cell with this door number already exists',
+    },
+    label: {
+      text: 'Door number',
+      classes: 'govuk-visually-hidden',
+      for: 'doorNumber',
+    },
+    validate: ['required'],
+    component: 'govukInput',
+    id: 'doorNumber',
+    name: 'doorNumber',
+    classes: 'govuk-input--width-5',
+    rows: 1,
+    autocomplete: 'off',
+    formGroup: {
+      classes: 'govuk-!-margin-bottom-0',
+    },
+  },
+  inCellSanitation: {
+    component: 'govukRadios',
+    validate: ['required'],
+    id: 'inCellSanitation',
+    name: 'inCellSanitation',
+    errorMessages: {
+      required: 'Select yes if the cell has in-cell sanitation',
+    },
+    items: [
+      { text: 'Yes', value: 'YES' },
+      { text: 'No', value: 'NO' },
+    ],
+    autocomplete: 'off',
+    hint: {
+      text: 'This means a cell includes both a toilet and wash basin.',
+    },
+  },
+  ...new SetCellType().getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
 }
 
 export default fields

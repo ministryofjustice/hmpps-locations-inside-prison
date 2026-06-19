@@ -88,6 +88,8 @@ export default class ViewLocationsShowPage extends Page {
 
   setCellTypeLink = (): PageElement => this.locationDetails().find('a:contains("Set cell type")')
 
+  changeCellTypeLink = (): PageElement => this.locationDetails().find('[data-qa="change-cell-type"]')
+
   removeCellTypeLink = (): PageElement =>
     this.locationDetails().find('.govuk-summary-list__row:contains("Cell type")').find('a:contains("Remove")')
 

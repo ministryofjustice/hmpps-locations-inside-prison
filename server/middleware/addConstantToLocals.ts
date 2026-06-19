@@ -36,7 +36,7 @@ async function getConstant(
 export default function addConstantToLocals(
   constantName: keyof typeof response.locals.constants | (keyof typeof response.locals.constants)[],
 ) {
-  return async (req: Request | FormWizard.Request, res: Response, next: NextFunction) => {
+  return async (req: Request | FormWizard.Request, res: Response, next?: NextFunction) => {
     if (!res.locals.constants) {
       res.locals.constants = {}
     }

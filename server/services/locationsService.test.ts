@@ -206,12 +206,10 @@ describe('Locations service', () => {
 
   describe('convertCellToNonResCell', () => {
     it('calls the correct client function', async () => {
-      await locationsService.convertCellToNonResCell(
-        'token',
-        '481fc587-60f8-402b-804d-64462babddcc',
-        'OTHER',
-        'tuck shop',
-      )
+      await locationsService.convertCellToNonResCell('token', '481fc587-60f8-402b-804d-64462babddcc', {
+        convertedCellType: 'OTHER',
+        otherConvertedCellType: 'tuck shop',
+      })
 
       expect(locationsApiClient.locations.convertCellToNonResCell).toHaveBeenCalledWith(
         'token',
@@ -225,7 +223,10 @@ describe('Locations service', () => {
       locationsApiClient.locations.convertCellToNonResCell.mockRejectedValue(error)
 
       await expect(
-        locationsService.convertCellToNonResCell('token', '481fc587-60f8-402b-804d-64462babddcc', 'OTHER', 'tuck shop'),
+        locationsService.convertCellToNonResCell('token', '481fc587-60f8-402b-804d-64462babddcc', {
+          convertedCellType: 'OTHER',
+          otherConvertedCellType: 'tuck shop',
+        }),
       ).rejects.toThrow('API error: Location is occupied')
     })
   })
@@ -262,15 +263,13 @@ describe('Locations service', () => {
 
   describe('convertToCell', () => {
     it('calls the correct client function', async () => {
-      await locationsService.convertToCell(
-        'token',
-        '481fc587-60f8-402b-804d-64462babddcc',
-        'NORMAL_ACCOMMODATION',
-        ['ACCESSIBLE_CELL'],
-        2,
-        1,
-        ['CLOSE_SUPERVISION_CENTRE'],
-      )
+      await locationsService.convertToCell('token', '481fc587-60f8-402b-804d-64462babddcc', {
+        accommodationType: 'NORMAL_ACCOMMODATION',
+        specialistCellTypes: ['ACCESSIBLE_CELL'],
+        maxCapacity: 2,
+        workingCapacity: 1,
+        usedForTypes: ['CLOSE_SUPERVISION_CENTRE'],
+      })
 
       expect(locationsApiClient.locations.convertToCell).toHaveBeenCalledWith(
         'token',

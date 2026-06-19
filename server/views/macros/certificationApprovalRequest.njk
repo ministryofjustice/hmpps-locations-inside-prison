@@ -1,6 +1,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
+{% from "./comparisonTable.njk" import comparisonTable %}
 {% from './certificationApprovalRequestSummary.njk' import certificationApprovalRequestSummary %}
 
 {% macro recurseLocationTable(rows, location, specialistCellTypes) %}
@@ -135,7 +136,7 @@
       {% if request.approvalType == 'SIGNED_OP_CAP' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -161,7 +162,7 @@
       {% elseif request.approvalType == 'DRAFT' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -218,7 +219,7 @@
       {% elseif request.approvalType == 'CELL_MARK' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -247,7 +248,7 @@
         {% set inCellSanitation = request.inCellSanitation | yesNo %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
@@ -268,7 +269,7 @@
       {% elseif request.approvalType == 'DEACTIVATION' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -309,7 +310,7 @@
       {% elseif request.approvalType == 'REACTIVATION' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
         </div>
 
@@ -379,7 +380,7 @@
       {% elseif request.approvalType == 'CAPACITY_CHANGE' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -387,37 +388,30 @@
           {% else %}
             <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
           {% endif %}
-
-          {% set hasCnaChange = request.locations[0].currentCertifiedNormalAccommodation
-            != request.locations[0].certifiedNormalAccommodation %}
-          {% set hasWcChange = request.locations[0].currentWorkingCapacity != request.locations[0].workingCapacity %}
-          {% set hasMcChange = request.locations[0].currentMaxCapacity != request.locations[0].maxCapacity %}
-
-          {{ govukTable({
-            attributes: {
-              'data-qa': 'capacity-change-table'
-            },
-            head: [
-              { text: "Location" },
-              { text: "Baseline CNA" } if hasCnaChange,
-              { text: "Certified working capacity" } if hasWcChange,
-              { text: "Maximum capacity" } if hasMcChange
-            ] | stripEmpty,
-            rows:[[
-              { text: request.locations[0].pathHierarchy },
-              { text: request.locations[0].currentCertifiedNormalAccommodation + " → "
-                + request.locations[0].certifiedNormalAccommodation } if hasCnaChange,
-              { text: request.locations[0].currentWorkingCapacity+ " → " + request.locations[0].workingCapacity}
-                if hasWcChange,
-              { text: request.locations[0].currentMaxCapacity + " → " + request.locations[0].maxCapacity }
-                if hasMcChange
-            ] | stripEmpty]
-          }) }}
         </div>
+
+        {{ comparisonTable({
+          attributes: {
+            'data-qa': 'capacity-change-table'
+          },
+          head: [
+            { text: "Location" },
+            { text: "Baseline CNA" },
+            { text: "Certified working capacity" },
+            { text: "Maximum capacity" }
+          ],
+          rows:[[
+            { new: request.locations[0].pathHierarchy },
+            { old: request.locations[0].currentCertifiedNormalAccommodation,
+              new: request.locations[0].certifiedNormalAccommodation },
+            { old: request.locations[0].currentWorkingCapacity, new: request.locations[0].workingCapacity},
+            { old: request.locations[0].currentMaxCapacity, new: request.locations[0].maxCapacity }
+          ]]
+        }) }}
       {% elseif request.approvalType == 'SPECIALIST_CELL_TYPE' %}
         <div class="govuk-grid-column-two-thirds">
           {% if includeChangeSummary %}
-            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks) }}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
           {% endif %}
 
           {% if multiple %}
@@ -456,6 +450,115 @@
             ] | stripEmpty]
           }) }}
         </div>
+      {% elseif request.approvalType == 'CONVERT_CELL_TO_ROOM' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
+          {% endif %}
+
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+        </div>
+
+        {% set convertedCellType = formatConstants(constants.convertedCellTypes, request.locations[0].convertedCellType, '<br>', 'None') %}
+        {% if request.locations[0].otherConvertedCellType %}
+          {% set convertedCellType = convertedCellType + ' - ' + request.locations[0].otherConvertedCellType %}
+        {% endif %}
+
+        {{ comparisonTable({
+          attributes: {
+            'data-qa': 'non-res-conversion-change-table'
+          },
+          firstCellIsHeader: true,
+          head: [
+            { text: "Location" },
+            { text: "Baseline CNA" },
+            { text: "Certified working capacity" },
+            { text: "Maximum capacity" },
+            { text: "Cell type" },
+            { text: "Sanitation" }
+          ],
+          rows: [[
+            { new: request.locations[0].pathHierarchy },
+            { old: request.locations[0].currentCertifiedNormalAccommodation, new: 'None' },
+            { old: request.locations[0].currentWorkingCapacity, new: 'None' },
+            { old: request.locations[0].currentMaxCapacity, new: 'None' },
+            {
+              old: formatConstants(constants.specialistCellTypes, request.locations[0].specialistCellTypes, ', '),
+              new: convertedCellType
+            },
+            { old: request.locations[0].currentInCellSanitation | yesNo, new: 'None' }
+          ]]
+        }) }}
+        {% elseif request.approvalType == 'CONVERT_ROOM_TO_CELL' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
+          {% endif %}
+
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+        </div>
+
+        {% if request.topLevelAccommodationTypes %}
+          {% set topLevelLocation = locationMap[locationMap[request.locationId].topLevelId] %}
+          <div class="govuk-grid-column-two-thirds">
+            {{ govukTable({
+              attributes: {
+                'data-qa': 'cell-usage-change-table'
+              },
+              head: [
+                { text: "Location" },
+                { text: "Accommodation type" },
+                { text: "Used for" }
+              ],
+              rows: [[
+                { text: topLevelLocation.localName or topLevelLocation.pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
+                { html: formatConstants(constants.accommodationTypes, request.topLevelAccommodationTypes) },
+                { html: formatConstants(constants.usedForTypes, request.topLevelUsedFor) }
+              ]],
+              firstCellIsHeader: true
+            }) }}
+          </div>
+        {% endif %}
+
+        {% set convertedCellType = formatConstants(constants.convertedCellTypes, request.currentConvertedCellType, ', ') %}
+        {% if request.currentOtherConvertedCellType %}
+          {% set convertedCellType = convertedCellType + ' - ' + request.currentOtherConvertedCellType %}
+        {% endif %}
+
+        {{ comparisonTable({
+          attributes: {
+            'data-qa': 'cell-conversion-change-table'
+          },
+          head: [
+            { text: "Location" },
+            { text: "Door number" },
+            { text: "Baseline CNA" },
+            { text: "Certified working capacity" },
+            { text: "Maximum capacity" },
+            { text: "Cell type" },
+            { text: "Sanitation" }
+          ],
+          rows: [[
+            { new: request.locations[0].pathHierarchy },
+            { old: request.currentCellMark or 'None', new: request.cellMark },
+            { old: 'None', new: request.certifiedNormalAccommodation },
+            { old: 'None', new: request.workingCapacity },
+            { old: 'None', new: request.maxCapacity },
+            {
+              old: convertedCellType,
+              new: formatConstants(constants.specialistCellTypes, request.specialistCellTypes, ', ')
+            },
+            { old: 'None', new: request.inCellSanitation | yesNo }
+          ]]
+        }) }}
       {% endif %}
     </div>
   </div>

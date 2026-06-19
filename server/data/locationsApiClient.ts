@@ -351,9 +351,12 @@ export default class LocationsApiClient extends BaseApiClient {
       {
         accommodationType: string
         specialistCellTypes: string[]
+        certifiedNormalAccommodation?: number
         maxCapacity: number
         workingCapacity: number
         usedForTypes: string[]
+        inCellSanitation?: boolean
+        cellMark?: string
       }
     >({
       path: '/locations/:locationId/convert-to-cell',
