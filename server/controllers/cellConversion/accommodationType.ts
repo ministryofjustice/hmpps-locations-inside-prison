@@ -6,19 +6,6 @@ import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
 export default class CellConversionAccommodationType extends FormInitialStep {
-  override async configure(req: FormWizard.Request, _res: Response, next: NextFunction) {
-    const accommodationTypes = (
-      await req.services.locationsService.getAccommodationTypes(req.session.systemToken)
-    ).filter(type => type.key !== 'OTHER_NON_RESIDENTIAL')
-
-    req.form.options.fields.accommodationType.items = Object.values(accommodationTypes).map(({ key, description }) => ({
-      text: description,
-      value: key,
-    }))
-
-    next()
-  }
-
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { sessionModel } = req
 

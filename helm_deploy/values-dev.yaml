@@ -24,7 +24,6 @@ generic-service:
     ENVIRONMENT_NAME: DEV
     AUDIT_ENABLED: "false"
     FLAG_NON_RESI: enabled
-    FLAG_NON_RESI_CONVERSION_CERTIFIED: enabled
 
   allowlist:
     accessibility-audit: 5.181.59.114/32

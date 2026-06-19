@@ -347,7 +347,6 @@ context('Non-residential conversion', () => {
 
     describe('confirmation page when certification active', () => {
       beforeEach(() => {
-        cy.task('setFeatureFlag', { nonResiConversionCertified: true })
         cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
       })
 

@@ -147,26 +147,6 @@ describe('CellConversionAccommodationType', () => {
     locationsService.getAccommodationTypes = jest.fn().mockResolvedValue(allAccommodationTypes)
   })
 
-  describe('configure', () => {
-    it('adds the options to the field', async () => {
-      await controller.configure(deepReq as FormWizard.Request, deepRes as Response, next)
-      expect(deepReq.form.options.fields.accommodationType.items).toEqual([
-        {
-          text: 'Care and separation',
-          value: 'CARE_AND_SEPARATION',
-        },
-        {
-          text: 'Healthcare inpatients',
-          value: 'HEALTHCARE_INPATIENTS',
-        },
-        {
-          text: 'Normal accommodation',
-          value: 'NORMAL_ACCOMMODATION',
-        },
-      ])
-    })
-  })
-
   describe('locals', () => {
     beforeEach(() => {
       deepRes.locals.errorlist = [

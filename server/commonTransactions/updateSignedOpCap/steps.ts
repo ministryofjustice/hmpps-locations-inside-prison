@@ -49,6 +49,7 @@ const steps: FormWizard.Steps = {
     pageTitle: 'Update the signed operational capacity',
     fields: ['currentSignedOpCap', 'newSignedOpCap', 'explanation'],
     controller: Details,
+    editable: true,
   },
 }
 

@@ -17,7 +17,10 @@ import { LocationTree } from '../../controllers/reactivate/parent/middleware/pop
 import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import { CellCertificateUpload } from '../../data/types/locationsApi/cellCertificateUpload'
-import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
+import {
+  CertificationApprovalRequest,
+  CertificationApprovalRequestType,
+} from '../../data/types/locationsApi/certificationApprovalRequest'
 import { NotificationDetails } from '../../data/types/locationsApi/notificationDetails'
 
 export declare module 'express-session' {
@@ -66,7 +69,7 @@ interface AllLocals {
   canAccess: (permission: string) => boolean
   cancelClasses: string
   cancelLink: string
-  changeLinks: { [field: string]: string }
+  changeLinks: Partial<Record<CertificationApprovalRequestType, Record<string, string>>>
   resiCards: card[]
   nonResiCards: card[]
   resiPermissionMessage: string
