@@ -56,9 +56,10 @@
 
   <div class="govuk-grid-column-{{ 'full' if changeCount >= 4 else 'two-thirds' }}">
     {{ govukTable({
+      attributes: data.attributes,
+      firstCellIsHeader: data.firstCellIsHeader,
       head: head,
-      rows: rows,
-      attributes: data.attributes
+      rows: rows
     }) }}
   </div>
 {% endmacro %}

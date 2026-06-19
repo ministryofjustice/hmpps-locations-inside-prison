@@ -2,8 +2,9 @@ import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
+import FormInitialStep from '../base/formInitialStep'
 
-export default class NonResidentialConversionOccupied extends FormWizard.Controller {
+export default class NonResidentialConversionOccupied extends FormInitialStep {
   override locals(_req: FormWizard.Request, res: Response): TypedLocals {
     const { decoratedLocation } = res.locals
     const { id: locationId, prisonId } = decoratedLocation

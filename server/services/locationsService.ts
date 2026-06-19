@@ -37,14 +37,17 @@ export default class LocationsService {
   async convertCellToNonResCell(
     token: string,
     locationId: string,
-    convertedCellType: string,
-    otherConvertedCellType?: string,
-  ) {
-    const params = pickBy({ convertedCellType, otherConvertedCellType }) as {
+    params: {
       convertedCellType: string
       otherConvertedCellType?: string
-    }
-    return this.locationsApiClient.locations.convertCellToNonResCell(token, { locationId }, params)
+      reasonForChange?: string
+    },
+  ) {
+    return this.locationsApiClient.locations.convertCellToNonResCell(
+      token,
+      { locationId },
+      pickBy(params) as typeof params,
+    )
   }
 
   async convertToCell(

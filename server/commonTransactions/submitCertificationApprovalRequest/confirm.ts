@@ -14,7 +14,10 @@ import addConstantToLocals from '../../middleware/addConstantToLocals'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMap'
 import LocationsService from '../../services/locationsService'
-import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
+import {
+  CertificationApprovalRequest,
+  CertificationApprovalRequestType,
+} from '../../data/types/locationsApi/certificationApprovalRequest'
 import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
 import logger from '../../../logger'
 
@@ -24,6 +27,18 @@ function findCells(location: CertificateLocation): CertificateLocation[] {
   }
 
   return location.subLocations.flatMap(findCells)
+}
+
+function addChangeLinksToLocals(
+  locals: TypedLocals,
+  requestType: CertificationApprovalRequestType,
+  changeLinks: Record<string, string>,
+) {
+  // eslint-disable-next-line no-param-reassign
+  locals.changeLinks = locals.changeLinks || {}
+
+  // eslint-disable-next-line no-param-reassign
+  locals.changeLinks[requestType] = changeLinks
 }
 
 async function locationToCertificationLocation(
@@ -88,7 +103,7 @@ async function locationToCertificationLocation(
     inCellSanitation = locationWithCertification.currentCellCertificate.inCellSanitation
     specialistCellTypes = locationWithCertification.currentCellCertificate.specialistCellTypes
     convertedCellType = locationWithCertification.currentCellCertificate.convertedCellType
-    // otherConvertedCellType = locationWithCertification.currentCellCertificate.otherConvertedCellType
+    otherConvertedCellType = locationWithCertification.currentCellCertificate.otherConvertedCellType
   }
 
   let certificationLocation: CertificateLocation = {
@@ -133,10 +148,10 @@ export default class Confirm extends FormInitialStep {
     this.use(
       addConstantToLocals([
         'accommodationTypes',
+        'convertedCellTypes',
         'deactivatedReasons',
         'locationTypes',
         'specialistCellTypes',
-        'convertedCellTypes',
         'usedForTypes',
       ]),
     )
@@ -212,12 +227,12 @@ export default class Confirm extends FormInitialStep {
       })
 
       const changeLink = `/location/${locals.location.id}/deactivate/temporary/details/edit`
-      locals.changeLinks = {
+      addChangeLinksToLocals(locals, 'DEACTIVATION', {
         deactivatedReason: changeLink,
         proposedReactivationDate: changeLink,
         planetFmReference: changeLink,
         reasonForChange: changeLink,
-      }
+      })
     } else if (req.form.options.name === 'reactivate') {
       let certifiedNormalAccommodationChange = 0
       let workingCapacityChange = 0
@@ -320,9 +335,9 @@ export default class Confirm extends FormInitialStep {
       })
 
       const changeLink = `/location/${locals.location.id}/change-door-number/details/edit`
-      locals.changeLinks = {
+      addChangeLinksToLocals(locals, 'CELL_MARK', {
         reasonForChange: changeLink,
-      }
+      })
     } else if (req.form.options.name === 'change-sanitation') {
       const inCellSanitation = sessionModel.get<string>('inCellSanitation')
       const explanation = sessionModel.get<string>('explanation')
@@ -338,9 +353,7 @@ export default class Confirm extends FormInitialStep {
       })
 
       const changeLink = `/location/${locals.location.id}/change-sanitation/details/edit`
-      locals.changeLinks = {
-        reasonForChange: changeLink,
-      }
+      addChangeLinksToLocals(locals, 'CELL_SANITATION', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'change-cell-capacity') {
       const newBaselineCna = Number(sessionModel.get<string>('baselineCna'))
       const newWorkingCapacity = Number(sessionModel.get<string>('workingCapacity'))
@@ -370,9 +383,7 @@ export default class Confirm extends FormInitialStep {
       })
 
       const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
-      locals.changeLinks = {
-        reasonForChange: changeLink,
-      }
+      addChangeLinksToLocals(locals, 'CAPACITY_CHANGE', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'working-capacity-mismatch') {
       const { location } = res.locals
       const certLocation = await locationToCertificationLocation(
@@ -391,6 +402,37 @@ export default class Confirm extends FormInitialStep {
         locationKey: location.key,
         workingCapacityChange,
         locations: [certLocation],
+      })
+    } else if (req.form.options.name === 'non-residential-conversion') {
+      const { location } = res.locals
+      const certLocation = await locationToCertificationLocation(
+        req,
+        location,
+        (_originalLocation, certificateLocation) => ({
+          ...certificateLocation,
+          workingCapacity: 0,
+          maxCapacity: 0,
+          certifiedNormalAccommodation: 0,
+          convertedCellType: req.sessionModel.get<string>('convertedCellType'),
+          otherConvertedCellType: req.sessionModel.get<string>('otherConvertedCellType'),
+          inCellSanitation: false,
+        }),
+      )
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'CONVERT_CELL_TO_ROOM',
+        prisonId: location.prisonId,
+        locationId: location.id,
+        locationKey: location.key,
+        locations: [certLocation],
+        reasonForChange: req.sessionModel.get<string>('explanation'),
+      })
+      const changeLink = `/location/${locals.location.id}/non-residential-conversion/details/edit`
+      addChangeLinksToLocals(locals, 'CONVERT_CELL_TO_ROOM', {
+        nonResidentialRoom: changeLink,
+        reasonForChange: changeLink,
+      })
+      addChangeLinksToLocals(locals, 'SIGNED_OP_CAP', {
+        reasonForChange: `/location/${locals.location.id}/non-residential-conversion/update-signed-op-cap/details/edit`,
       })
     } else if (req.form.options.name === 'set-cell-type') {
       const newSpecialistCellType = sessionModel.get<string>('set-cell-type_specialistCellTypes')
@@ -424,9 +466,7 @@ export default class Confirm extends FormInitialStep {
       })
 
       const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
-      locals.changeLinks = {
-        reasonForChange: changeLink,
-      }
+      addChangeLinksToLocals(locals, 'SPECIALIST_CELL_TYPE', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'cell-conversion') {
       const { location } = res.locals
 
@@ -624,6 +664,18 @@ export default class Confirm extends FormInitialStep {
           usedForTypes: usedFor,
           cellMark,
           inCellSanitation,
+        })
+      ).pendingApprovalRequestId
+    }
+
+    if (approvalType === 'CONVERT_CELL_TO_ROOM') {
+      const { convertedCellType, otherConvertedCellType } = locations[0]
+
+      return (
+        await locationsService.convertCellToNonResCell(systemToken, locationId, {
+          convertedCellType,
+          otherConvertedCellType,
+          reasonForChange,
         })
       ).pendingApprovalRequestId
     }
