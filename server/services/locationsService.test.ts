@@ -23,9 +23,22 @@ describe('Locations service', () => {
     locationsApiClient.constants = deepMock(locationsApiClient.constants, {
       a: [{ key: 'KEY', description: 'description' }],
     }) as typeof locationsApiClient.constants
-    ;['locations', 'prisonerLocations', 'signedOperationalCapacity', 'prisonConfiguration', 'certification'].forEach(
+    ;[
+      'locations',
+      'prisonerLocations',
+      'signedOperationalCapacity',
+      'prisonConfiguration',
+      'certification',
+      'cellCertificates',
+    ].forEach(
       (
-        k: 'locations' | 'prisonerLocations' | 'signedOperationalCapacity' | 'prisonConfiguration' | 'certification',
+        k:
+          | 'locations'
+          | 'prisonerLocations'
+          | 'signedOperationalCapacity'
+          | 'prisonConfiguration'
+          | 'certification'
+          | 'cellCertificates',
       ) => {
         locationsApiClient[k] = deepMock(locationsApiClient[k]) as any
       },
@@ -119,6 +132,14 @@ describe('Locations service', () => {
       expect(locationsApiClient.locations.prison.getArchivedLocations).toHaveBeenCalledWith('token', {
         prisonId: 'TST',
       })
+    })
+  })
+
+  describe('getCellCertificateDashboard', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getCellCertificateDashboard('token')
+
+      expect(locationsApiClient.cellCertificates.dashboard).toHaveBeenCalledWith('token')
     })
   })
 

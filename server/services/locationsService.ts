@@ -158,6 +158,10 @@ export default class LocationsService {
     return this.locationsApiClient.cellCertificates.prison.getAllForPrisonId(token, { prisonId })
   }
 
+  async getCellCertificateDashboard(token: string) {
+    return this.locationsApiClient.cellCertificates.dashboard(token)
+  }
+
   async getCertificateApprovalRequest(token: string, id: string) {
     return this.locationsApiClient.certification.requestApprovals.getById(token, { id })
   }
