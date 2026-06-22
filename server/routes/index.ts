@@ -44,6 +44,8 @@ import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
 import changeNomisScreenStatusRouter from './admin/nomisScreen'
 import ingestRouter from './admin/ingest'
 import cellCertificateRouter from './cellCertificate'
+import capacityManagementDashboard from '../controllers/capacityManagementDashboard'
+import protectRoute from '../middleware/protectRoute'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
 import config from '../config'
@@ -81,6 +83,14 @@ export default function routes(services: Services): Router {
   router.use('/create-cells/:locationId', createCellsRouter)
   router.use('/delete-draft/:prisonOrLocationId', deleteDraftLocationRouter)
   router.use('/edit-cells/:locationId', editCellsRouter)
+
+  router.get(
+    '/capacity-management-dashboard',
+    protectRoute('certificate_view_management'),
+    addBreadcrumb({ title: '', href: '/' }),
+    logPageView(services.auditService, Page.CAPACITY_MANAGEMENT_DASHBOARD),
+    asyncMiddleware(capacityManagementDashboard),
+  )
 
   router.use('/view-and-update-locations/:prisonId?', viewLocationsRouter(services))
 
