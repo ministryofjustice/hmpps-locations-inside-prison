@@ -26,13 +26,23 @@ const createToken = (userToken: UserToken) => {
   return jwt.sign(payload, 'secret', { expiresIn: '1h' })
 }
 
-const getSignInUrl = (): Promise<string> =>
+const getSignInUrl = (attempts = 20): Promise<string> =>
   getMatchingRequests({
     method: 'GET',
     urlPath: '/auth/oauth/authorize',
   }).then(data => {
     const { requests } = data.body
-    const stateValue = requests[requests.length - 1].queryParams.state.values[0]
+    const lastRequest = requests[requests.length - 1]
+    if (!lastRequest) {
+      // The authorize request may not be journalled by WireMock yet; retry briefly before giving up.
+      if (attempts <= 1) {
+        throw new Error('No matching /auth/oauth/authorize request found when building the sign-in URL')
+      }
+      return new Promise<void>(resolve => {
+        setTimeout(resolve, 100)
+      }).then(() => getSignInUrl(attempts - 1))
+    }
+    const stateValue = lastRequest.queryParams.state.values[0]
     return `/sign-in/callback?code=codexxxx&state=${stateValue}`
   })
 
