@@ -6,6 +6,7 @@ import CheckRemoveCellTypePage from '../../pages/removeCellType/check'
 import RemoveCellTypePage from '../../pages/removeCellType/remove'
 import ReviewCellCapacityPage from '../../pages/removeCellType/review'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
+import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 
 context('Remove cell type', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -1086,6 +1087,71 @@ context('Remove cell type', () => {
             })
           })
         })
+      })
+    })
+
+    context('when certificationApprovalRequired is ACTIVE and location is ACTIVE', () => {
+      beforeEach(() => {
+        cy.task('reset')
+        cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+        cy.task('stubManageUsers')
+        cy.task('stubManageUsersMe')
+        cy.task('stubManageUsersMeCaseloads')
+        cy.task('stubLocationsConstantsAccommodationType')
+        cy.task('stubLocationsConstantsConvertedCellType')
+        cy.task('stubLocationsConstantsDeactivatedReason')
+        cy.task('stubLocationsConstantsLocationType')
+        cy.task('stubLocationsConstantsSpecialistCellType')
+        cy.task('stubLocationsConstantsUsedForType')
+        cy.task('stubUpdateCapacity')
+        cy.task('stubUpdateSpecialistCellTypes')
+        cy.task('stubPrisonerLocationsId', prisonerLocations)
+        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+        const location = LocationFactory.build({
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
+          capacity: {
+            maxCapacity: 2,
+            workingCapacity: 1,
+          },
+          leafLevel: true,
+          localName: '1-1-001',
+          specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
+          status: 'ACTIVE',
+        })
+        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+        cy.task('stubLocations', location)
+        cy.signIn()
+      })
+
+      it('can be accessed by clicking the remove link on the show location page', () => {
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.removeCellTypeLink().click()
+
+        // eslint-disable-next-line no-new
+        new CertChangeDisclaimerPage('Removing a special cell type')
+      })
+
+      it('has a back link to the show location page', () => {
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.removeCellTypeLink().click()
+
+        const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
+        disclaimerPage.backLink().click()
+
+        Page.verifyOnPage(ViewLocationsShowPage)
+      })
+
+      it('has a cancel link', () => {
+        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.removeCellTypeLink().click()
+
+        const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
+        disclaimerPage.cancelLink().click()
+
+        Page.verifyOnPage(ViewLocationsShowPage)
       })
     })
   })

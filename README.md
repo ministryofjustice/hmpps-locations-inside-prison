@@ -32,7 +32,7 @@ When running locally or in the dev environment, emails will only be sent to team
 ```
 NOTIFY_API_KEY=<example-dev-key>
 ```
-
+Information on the notification rules can be found here https://dsdmoj.atlassian.net/wiki/spaces/MAP/pages/6176768315/Email+notifications+-+who+receives+what+and+when
 
 ### Using services in `dev` environment
 
