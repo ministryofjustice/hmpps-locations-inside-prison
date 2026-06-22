@@ -89,10 +89,38 @@ describe('GET /', () => {
     expect(res.text).toContain('Archived locations')
     expect(res.text).toContain('Cell certificate')
 
+    // MANAGE_RESIDENTIAL_LOCATIONS does not grant certificate_view_management
+    expect(res.text).not.toContain('Capacity management dashboard')
+
     expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
       who: user.username,
       correlationId: expect.any(String),
     })
+  })
+
+  it('should render the "Capacity management dashboard" tile for a certificate viewer', async () => {
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
+    })
+
+    app = appWithAllRoutes({
+      services: {
+        auditService,
+        locationsService,
+      },
+      userSupplier: () => ({ ...user, userRoles: ['RESI__CERT_VIEWER'] }),
+    })
+
+    auditService.logPageView.mockResolvedValue(null)
+    const res = await request(app).get('/')
+
+    expect(res.text).toContain('Capacity management dashboard')
+    expect(res.text).toContain('View a summary of cell certificates and change requests for every establishment.')
+    expect(res.text).toContain('/capacity-management-dashboard')
   })
 
   it('should render permission message when resi service is active but user has no residential role', async () => {
