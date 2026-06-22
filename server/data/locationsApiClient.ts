@@ -18,6 +18,7 @@ import { ResidentialHierarchy } from './types/locationsApi/residentialHierarchy'
 import { BulkCapacityUpdate, BulkCapacityUpdateChanges } from './types/locationsApi/bulkCapacityChanges'
 import { CertificationApprovalRequest } from './types/locationsApi/certificationApprovalRequest'
 import { CellCertificate } from './types/locationsApi/cellCertificate'
+import { CellCertificateDashboardEntry } from './types/locationsApi/cellCertificateDashboard'
 import { CellCertificateUpload } from './types/locationsApi/cellCertificateUpload'
 
 export default class LocationsApiClient extends BaseApiClient {
@@ -26,6 +27,10 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   cellCertificates = {
+    dashboard: this.apiCall<CellCertificateDashboardEntry[], Record<string, never>>({
+      path: '/cell-certificates/dashboard',
+      requestType: 'get',
+    }),
     getById: this.apiCall<CellCertificate, { id: string }>({
       path: '/cell-certificates/:id',
       requestType: 'get',

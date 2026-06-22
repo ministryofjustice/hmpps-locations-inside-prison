@@ -1,0 +1,47 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set minLayout = 'full' %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <h2 class="govuk-heading-m" data-qa="dashboard-caption">Cell certificates for all establishments</h2>
+
+    {% if dashboard.length %}
+      {% set rows = [] %}
+      {% for entry in dashboard %}
+        {% set rows = (rows.push([
+          { text: entry.prisonName },
+          { text: entry.certifiedWorkingCapacity },
+          { text: entry.signedOperationCapacity },
+          { text: entry.pendingChangeRequests },
+          {
+            text: entry.certificateLastUpdated | formatDate,
+            attributes: { "data-sort-value": entry.certificateLastUpdated }
+          },
+          { html: '<a class="govuk-link" href="/' + entry.prisonId + '/cell-certificate/current">View</a>' }
+        ]), rows) %}
+      {% endfor %}
+
+      {{ govukTable({
+        attributes: {
+          "data-module": "moj-sortable-table",
+          "data-qa": "capacity-management-dashboard-table",
+          "id": "capacity-management-dashboard-table"
+        },
+        head: [
+          { text: "Prison", attributes: { "aria-sort": "ascending" } },
+          { text: "Certified working capacity", attributes: { "aria-sort": "none" } },
+          { text: "Signed operational capacity", attributes: { "aria-sort": "none" } },
+          { text: "Pending change requests", attributes: { "aria-sort": "none" } },
+          { text: "Certificate last updated", attributes: { "aria-sort": "none" } },
+          { text: "Action" }
+        ],
+        rows: rows
+      }) }}
+    {% else %}
+      <p class="govuk-body" data-qa="no-establishments">There are no establishments to show.</p>
+    {% endif %}
+  </div>
+{% endblock %}

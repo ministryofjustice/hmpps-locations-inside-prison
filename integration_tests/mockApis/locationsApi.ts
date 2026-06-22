@@ -11,6 +11,7 @@ import LocationFactory from '../../server/testutils/factories/location'
 import TypedStubber from './typedStubber'
 import { CertificationApprovalRequest } from '../../server/data/types/locationsApi/certificationApprovalRequest'
 import { CellCertificateUpload } from '../../server/data/types/locationsApi/cellCertificateUpload'
+import { CellCertificateDashboardEntry } from '../../server/data/types/locationsApi/cellCertificateDashboard'
 
 const stubLocationsCertificationPrisonSignedOpCapChange = () =>
   stubFor({
@@ -393,6 +394,21 @@ const stubLocationsCellCertificatesPrisonCurrent = (certificate: CellCertificate
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: certificate,
+    },
+  })
+
+const stubLocationsCellCertificateDashboard = (entries: CellCertificateDashboardEntry[]) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/cell-certificates/dashboard`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: entries,
     },
   })
 
@@ -1476,6 +1492,7 @@ const allStubs = {
   stubLocationsCellCertificatesPrison,
   stubLocationsCellCertificatesPrisonCurrent,
   stubLocationsCellCertificatesPrisonCurrent404,
+  stubLocationsCellCertificateDashboard,
   stubLocationsCertificationPrisonSignedOpCapChange,
   stubLocationsCertificationLocationApprove,
   stubLocationsCertificationLocationReject,
