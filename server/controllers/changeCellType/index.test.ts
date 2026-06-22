@@ -205,7 +205,7 @@ describe('SetCellType', () => {
         const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
         expect(locals.title).toBe('Select special cell type')
         expect(locals.titleCaption).toBe('Cell A-1-001')
-        expect(locals.buttonText).toBe('Save cell types')
+        expect(locals.buttonText).toBe('Save cell type')
         expect(deepReq.form.options.fields.specialistCellTypes.component).toBe('govukRadios')
         expect(deepReq.form.options.fields.specialistCellTypes.multiple).toBe(false)
         expect(locals.fields).toEqual({
