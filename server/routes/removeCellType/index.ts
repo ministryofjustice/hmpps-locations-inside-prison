@@ -10,7 +10,7 @@ const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('set_cell_type'),
-  populateLocation(),
+  populateLocation({ decorate: true, includeCurrentCertificate: true }),
   populatePrisonConfiguration(),
   wizard(steps, fields, {
     name: 'remove-cell-type',

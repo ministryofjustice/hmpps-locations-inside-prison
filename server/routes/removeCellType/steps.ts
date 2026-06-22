@@ -6,6 +6,9 @@ import ReviewCellCapacity from '../../controllers/removeCellType/review'
 import ConfirmRemoveCellType from '../../controllers/removeCellType/confirm'
 import canEditCna from '../../utils/canEditCna'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
+import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
+import capFirst from '../../formatters/capFirst'
+import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 
 function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
   const { accommodationTypes, active, status } = res.locals.location
@@ -19,6 +22,10 @@ function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
   )
 }
 
+function hasCertApprovalSteps(_req: FormWizard.Request, res: Response) {
+  return isCertActiveAndNotDraft(res.locals)
+}
+
 const steps: FormWizard.Steps = {
   '/': {
     backLink: (_req, res) =>
@@ -28,6 +35,10 @@ const steps: FormWizard.Steps = {
     resetJourney: true,
     skip: true,
     next: [
+      {
+        fn: hasCertApprovalSteps,
+        next: 'cert-change-disclaimer',
+      },
       {
         fn: mustReviewCapacity,
         next: 'check',
@@ -62,6 +73,11 @@ const steps: FormWizard.Steps = {
     controller: ConfirmRemoveCellType,
     skip: true,
   },
+  ...CertChangeDisclaimer.getSteps({
+    next: 'review',
+    title: (_req, _res) => 'Removing a special cell type',
+    caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
+  }),
 }
 
 export default steps
