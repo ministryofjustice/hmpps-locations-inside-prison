@@ -84,6 +84,33 @@ context('Index', () => {
     })
   })
 
+  context('With RESI__CERT_VIEWER role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      AuthStubber.stub.stubSignIn({ roles: ['RESI__CERT_VIEWER'] })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    })
+
+    it('Displays the capacity management dashboard tile linking to the dashboard', () => {
+      cy.signIn()
+      const indexPage = Page.verifyOnPage(IndexPage)
+
+      indexPage.cards.cellCertificate().contains('Cell certificate')
+      indexPage.cards.capacityManagementDashboard().contains('Capacity management dashboard')
+      indexPage.cards
+        .capacityManagementDashboard()
+        .contains('View a summary of cell certificates and change requests for every establishment.')
+      indexPage.cards
+        .capacityManagementDashboard()
+        .find('a')
+        .should('have.attr', 'href', '/capacity-management-dashboard')
+
+      cy.screenshot('capacity-management-dashboard-tile', { capture: 'viewport' })
+    })
+  })
+
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
