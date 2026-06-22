@@ -74,6 +74,14 @@ export default function populateCards(locationsService: LocationsService) {
       },
       {
         clickable: true,
+        visible: req.canAccess('certificate_view_management'),
+        heading: 'Capacity management dashboard',
+        href: '/capacity-management-dashboard',
+        description: 'View a summary of cell certificates and change requests for every establishment.',
+        'data-qa': 'capacity-management-dashboard-card',
+      },
+      {
+        clickable: true,
         visible: req.canAccess('administer_residential'),
         heading: 'Admin',
         href: '/admin',
