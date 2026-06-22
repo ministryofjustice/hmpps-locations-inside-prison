@@ -54,7 +54,7 @@ const stubManageUsersMeRoles = () =>
     },
   })
 
-const stubManageUsersMeCaseloads = () =>
+const stubManageUsersMeCaseloads = (caseloads: { id: string; name: string }[] = [{ id: 'TST', name: 'TEST (HMP)' }]) =>
   stubFor({
     request: {
       method: 'GET',
@@ -69,16 +69,8 @@ const stubManageUsersMeCaseloads = () =>
         username: 'USER1',
         active: true,
         accountType: 'GENERAL',
-        activeCaseload: {
-          id: 'TST',
-          name: 'TEST (HMP)',
-        },
-        caseloads: [
-          {
-            id: 'TST',
-            name: 'TEST (HMP)',
-          },
-        ],
+        activeCaseload: caseloads[0],
+        caseloads,
       },
     },
   })

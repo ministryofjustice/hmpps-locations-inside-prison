@@ -1,20 +1,77 @@
 services:
 
+  locations-inside-prison-db:
+    image: postgres
+    networks:
+      - hmpps
+    container_name: locations-inside-prison-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=locations_inside_prison
+      - POSTGRES_USER=locations_inside_prison
+      - POSTGRES_DB=locations_inside_prison
+
+  prison-register-db:
+    image: postgres:18
+    networks:
+      - hmpps
+    container_name: prison-register-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=prison-register
+      - POSTGRES_USER=prison-register
+      - POSTGRES_DB=prison-register
+
+  auth-db:
+    image: postgres:18
+    container_name: auth-db
+    restart: always
+    networks:
+      - hmpps
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_PASSWORD=admin_password
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=auth-db
+
+  manage-users-db:
+    image: postgres:18
+    container_name: manage-users-db
+    restart: always
+    networks:
+      - hmpps
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_PASSWORD=admin_password
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=manage-users-db
+
   hmpps-auth:
     image: ghcr.io/ministryofjustice/hmpps-auth:latest
     networks:
       - hmpps
     container_name: hmpps-auth
+    depends_on:
+      - auth-db
     ports:
       - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
-      - DELIUS_ENABLED=false
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres,manage-users-api,nomis
+      - DELIUS_ENDPOINT_URL=http://wiremock:8080/delius
+      - MANAGE_USERS_API_ENDPOINT_URL=http://hmpps-manage-users-api:8080
       - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
-      - NOMIS_ENABLED=true
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
+      - HOSTNAME=hmpps-auth
+      - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
 
   nomis-user-roles-api:
     image: ghcr.io/ministryofjustice/nomis-user-roles-api:latest
@@ -36,8 +93,10 @@ services:
     networks:
       - hmpps
     depends_on:
-      - nomis-user-roles-api
       - hmpps-auth
+      - hmpps-external-users-api
+      - nomis-user-roles-api
+      - manage-users-db
     ports:
       - "8082:8080"
     healthcheck:
@@ -49,6 +108,27 @@ services:
       - HMPPS_AUTH_EXTERNAL_ENDPOINT_URL=http://localhost:8080/auth
       - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
       - AUTHORIZATION_SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:8080/auth/oauth/token
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://manage-users-db:5432/manage-users-db
+      - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
+
+  hmpps-external-users-api:
+    image: ghcr.io/ministryofjustice/hmpps-external-users-api:latest
+    container_name: hmpps-external-users-api
+    networks:
+      - hmpps
+    depends_on:
+      - hmpps-auth
+    ports:
+      - "8088:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres
+      - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
+      - SPRING_R2DBC_URL=r2dbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
+      - SPRING_FLYWAY_URL=jdbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
+      - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
 
   locations-inside-prison-api:
     image: ghcr.io/ministryofjustice/hmpps-locations-inside-prison-api:latest
@@ -90,19 +170,6 @@ services:
     volumes:
       - "${TMPDIR:-/tmp/localstack}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-
-  locations-inside-prison-db:
-    image: postgres
-    networks:
-      - hmpps
-    container_name: locations-inside-prison-db
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_PASSWORD=locations_inside_prison
-      - POSTGRES_USER=locations_inside_prison
-      - POSTGRES_DB=locations_inside_prison
 
   prison-api:
     image: wiremock/wiremock:latest
@@ -152,19 +219,6 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
       - SPRING_DATASOURCE_URL=jdbc:postgresql://prison-register-db:5432/prison-register?sslmode=prefer
       - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
-
-  prison-register-db:
-    image: postgres:18
-    networks:
-      - hmpps
-    container_name: prison-register-db
-    restart: always
-    ports:
-      - "5433:5432"
-    environment:
-      - POSTGRES_PASSWORD=prison-register
-      - POSTGRES_USER=prison-register
-      - POSTGRES_DB=prison-register
 
   app:
     build:
