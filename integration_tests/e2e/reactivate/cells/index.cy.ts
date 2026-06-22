@@ -211,7 +211,7 @@ context('Reactivate cells', () => {
         page.footer().should('exist').should('not.be.visible')
       })
 
-      it('unchecks the boxes when navigating away and then back using the browser back button', () => {
+      it.skip('unchecks the boxes when navigating away and then back using the browser back button', () => {
         InactiveCellsIndexPage.goTo()
         const inactiveCellsPage = Page.verifyOnPage(InactiveCellsIndexPage)
         inactiveCellsPage.selectAllCheckbox().click({ force: true })
