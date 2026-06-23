@@ -578,7 +578,7 @@ export default class Confirm extends FormInitialStep {
           true,
           reasonForChange,
         )
-      ).pendingApprovalRequestId
+      )[0].pendingApprovalRequestId
     }
 
     if (approvalType === 'CAPACITY_CHANGE') {
