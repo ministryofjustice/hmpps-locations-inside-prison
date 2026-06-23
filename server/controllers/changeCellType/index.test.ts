@@ -149,7 +149,7 @@ describe('SetCellType', () => {
         const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
         expect(locals.title).toBe('Select normal cell type')
         expect(locals.titleCaption).toBe('Cell A-1-001')
-        expect(locals.buttonText).toBe('Save cell types')
+        expect(locals.buttonText).toBe('Save cell type')
         expect(deepReq.form.options.fields.specialistCellTypes.component).toBe('govukCheckboxes')
         expect(deepReq.form.options.fields.specialistCellTypes.multiple).toBe(true)
         expect(locals.fields).toEqual({
