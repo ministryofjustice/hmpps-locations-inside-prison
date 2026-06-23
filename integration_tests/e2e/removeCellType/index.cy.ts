@@ -1,3 +1,4 @@
+import { DeepPartialObject } from 'fishery'
 import LocationFactory from '../../../server/testutils/factories/location'
 import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
@@ -7,6 +8,11 @@ import RemoveCellTypePage from '../../pages/removeCellType/remove'
 import ReviewCellCapacityPage from '../../pages/removeCellType/review'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
+import { Location } from '../../../server/data/types/locationsApi'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import LocationsApiStubber from '../../mockApis/locationsApi'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
 
 context('Remove cell type', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -1091,67 +1097,200 @@ context('Remove cell type', () => {
     })
 
     context('when certificationApprovalRequired is ACTIVE and location is ACTIVE', () => {
-      beforeEach(() => {
-        cy.task('reset')
-        cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-        cy.task('stubManageUsers')
-        cy.task('stubManageUsersMe')
-        cy.task('stubManageUsersMeCaseloads')
-        cy.task('stubLocationsConstantsAccommodationType')
-        cy.task('stubLocationsConstantsConvertedCellType')
-        cy.task('stubLocationsConstantsDeactivatedReason')
-        cy.task('stubLocationsConstantsLocationType')
-        cy.task('stubLocationsConstantsSpecialistCellType')
-        cy.task('stubLocationsConstantsUsedForType')
-        cy.task('stubUpdateCapacity')
-        cy.task('stubUpdateSpecialistCellTypes')
-        cy.task('stubPrisonerLocationsId', prisonerLocations)
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
-        const location = LocationFactory.build({
-          accommodationTypes: ['NORMAL_ACCOMMODATION'],
-          capacity: {
-            maxCapacity: 2,
-            workingCapacity: 1,
-          },
-          leafLevel: true,
-          localName: '1-1-001',
-          specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
-          status: 'ACTIVE',
+      context('with normal cell type', () => {
+        beforeEach(() => {
+          cy.task('reset')
+          AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+          ManageUsersApiStubber.stub.stubManageUsers()
+          ManageUsersApiStubber.stub.stubManageUsersMe()
+          ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+          LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+          LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+          LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+          LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+          LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+          LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+          LocationsApiStubber.stub.stubUpdateCapacity()
+          LocationsApiStubber.stub.stubUpdateSpecialistCellTypes()
+          LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+          LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+          const location = LocationFactory.build({
+            accommodationTypes: ['NORMAL_ACCOMMODATION'],
+            capacity: {
+              maxCapacity: 2,
+              workingCapacity: 1,
+            },
+            leafLevel: true,
+            localName: '1-1-001',
+            specialistCellTypes: ['ACCESSIBLE_CELL'],
+            status: 'ACTIVE',
+          })
+          LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+          LocationsApiStubber.stub.stubLocations(location)
+          cy.signIn()
         })
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubLocations', location)
-        cy.signIn()
+
+        it('does not show cert approval steps', () => {
+          ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+          const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+          viewLocationsShowPage.removeCellTypeLink().click()
+
+          Page.verifyOnPage(RemoveCellTypePage)
+        })
       })
 
-      it('can be accessed by clicking the remove link on the show location page', () => {
-        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
-        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-        viewLocationsShowPage.removeCellTypeLink().click()
+      context('with special cell type', () => {
+        const stubLocation = (locationData: DeepPartialObject<Location> = {}) => {
+          const location = LocationFactory.build({
+            accommodationTypes: ['NORMAL_ACCOMMODATION'],
+            active: true,
+            capacity: {
+              maxCapacity: 2,
+              workingCapacity: 1,
+            },
+            leafLevel: true,
+            localName: '1-1-001',
+            specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+            status: 'ACTIVE',
+            ...locationData,
+          })
+          LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary({
+            prisonSummary: {
+              workingCapacity: 8,
+              signedOperationalCapacity: 10,
+              maxCapacity: 11,
+              prisonName: 'Test (HMP)',
+              numberOfCellLocations: 100,
+            },
+            topLevelLocationType: 'Wings',
+            subLocationName: 'Wings',
+            subLocations: [],
+            locationHierarchy: [],
+          })
+          LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
+          LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+          LocationsApiStubber.stub.stubLocations(location)
+        }
 
-        // eslint-disable-next-line no-new
-        new CertChangeDisclaimerPage('Removing a special cell type')
-      })
+        beforeEach(() => {
+          cy.task('reset')
+          AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+          ManageUsersApiStubber.stub.stubManageUsers()
+          ManageUsersApiStubber.stub.stubManageUsersMe()
+          ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+          LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+          LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+          LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+          LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+          LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+          LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+          LocationsApiStubber.stub.stubUpdateCapacity()
+          LocationsApiStubber.stub.stubUpdateSpecialistCellTypes()
+          LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+          LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+          cy.signIn()
+        })
 
-      it('has a back link to the show location page', () => {
-        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
-        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-        viewLocationsShowPage.removeCellTypeLink().click()
+        it('can be accessed by clicking the remove link on the show location page', () => {
+          stubLocation()
+          ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+          const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+          viewLocationsShowPage.removeCellTypeLink().click()
 
-        const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
-        disclaimerPage.backLink().click()
+          // eslint-disable-next-line no-new
+          new CertChangeDisclaimerPage('Removing a special cell type')
+        })
 
-        Page.verifyOnPage(ViewLocationsShowPage)
-      })
+        it('has a back link to the show location page', () => {
+          stubLocation()
+          ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+          const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+          viewLocationsShowPage.removeCellTypeLink().click()
 
-      it('has a cancel link', () => {
-        ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
-        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
-        viewLocationsShowPage.removeCellTypeLink().click()
+          const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
+          disclaimerPage.backLink().click()
 
-        const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
-        disclaimerPage.cancelLink().click()
+          Page.verifyOnPage(ViewLocationsShowPage)
+        })
 
-        Page.verifyOnPage(ViewLocationsShowPage)
+        it('has a cancel link', () => {
+          stubLocation()
+          ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+          const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+          viewLocationsShowPage.removeCellTypeLink().click()
+
+          const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
+          disclaimerPage.cancelLink().click()
+
+          Page.verifyOnPage(ViewLocationsShowPage)
+        })
+
+        context('when working cap >= 1', () => {
+          beforeEach(() => {
+            stubLocation({
+              capacity: {
+                maxCapacity: 2,
+                workingCapacity: 1,
+              },
+            })
+          })
+
+          it('progresses to the signed op cap change needed page', () => {
+            ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+            const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+            viewLocationsShowPage.removeCellTypeLink().click()
+
+            const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
+            disclaimerPage.continueButton().click()
+
+            Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+          })
+        })
+
+        context('when not NORMAL_ACCOMMODATION and working cap == 0', () => {
+          beforeEach(() => {
+            stubLocation({
+              accommodationTypes: ['HEALTHCARE_INPATIENTS'],
+              capacity: {
+                maxCapacity: 2,
+                workingCapacity: 0,
+              },
+            })
+          })
+
+          it('progresses to the review capacity page', () => {
+            ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+            const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+            viewLocationsShowPage.removeCellTypeLink().click()
+
+            const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
+            disclaimerPage.continueButton().click()
+
+            Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+          })
+        })
+
+        context('when NORMAL_ACCOMMODATION and working cap == 0', () => {
+          beforeEach(() => {
+            stubLocation({
+              capacity: {
+                maxCapacity: 2,
+                workingCapacity: 0,
+              },
+            })
+          })
+
+          it('progresses to the review capacity page', () => {
+            ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
+            const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+            viewLocationsShowPage.removeCellTypeLink().click()
+
+            const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
+            disclaimerPage.continueButton().click()
+
+            Page.verifyOnPage(ReviewCellCapacityPage)
+          })
+        })
       })
     })
   })
