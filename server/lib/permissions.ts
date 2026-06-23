@@ -6,7 +6,6 @@ const certificateViewerPermissions: string[] = ['certificate_view_management']
 
 const certificateAdministratorPermissions: string[] = [
   ...cellStatusManagerPermissions,
-  ...certificateViewerPermissions,
   'change_cell_capacity',
   'change_door_number',
   'change_local_name',
@@ -24,7 +23,7 @@ const certificateAdministratorPermissions: string[] = [
   'set_cell_type',
 ]
 
-const certificateReviewerPermissions: string[] = [...certificateViewerPermissions, 'certificate_change_request_review']
+const certificateReviewerPermissions: string[] = ['certificate_change_request_review']
 
 const administerResLocationsPermissions: string[] = ['administer_residential']
 

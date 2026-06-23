@@ -19,6 +19,16 @@ const certificateViewer: HmppsUser = {
   userRoles: ['RESI__CERT_VIEWER'],
 }
 
+const certificateReviewer: HmppsUser = {
+  ...user,
+  userRoles: ['RESI__CERT_REVIEWER'],
+}
+
+const certificateAdministrator: HmppsUser = {
+  ...user,
+  userRoles: ['MANAGE_RES_LOCATIONS_OP_CAP'],
+}
+
 let app: Express
 
 const buildApp = (userSupplier: () => HmppsUser) =>
@@ -75,6 +85,18 @@ describe('GET /capacity-management-dashboard', () => {
     app = buildApp(() => user)
 
     // protectRoute raises a "Missing permission" 403, which the error handler turns into a sign-out redirect
+    return request(app).get('/capacity-management-dashboard').expect(302).expect('Location', '/sign-out')
+  })
+
+  it('denies access to a certificate reviewer', () => {
+    app = buildApp(() => certificateReviewer)
+
+    return request(app).get('/capacity-management-dashboard').expect(302).expect('Location', '/sign-out')
+  })
+
+  it('denies access to a certificate administrator', () => {
+    app = buildApp(() => certificateAdministrator)
+
     return request(app).get('/capacity-management-dashboard').expect(302).expect('Location', '/sign-out')
   })
 })

@@ -13,7 +13,6 @@ describe('rolesToPermissions', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP']).sort()).toEqual([
       'certificate_change_request_create',
       'certificate_change_request_withdraw',
-      'certificate_view_management',
       'change_cell_capacity',
       'change_door_number',
       'change_local_name',
@@ -34,10 +33,7 @@ describe('rolesToPermissions', () => {
   })
 
   it('returns the correct permissions for RESI__CERT_REVIEWER', () => {
-    expect(rolesToPermissions(['RESI__CERT_REVIEWER']).sort()).toEqual([
-      'certificate_change_request_review',
-      'certificate_view_management',
-    ])
+    expect(rolesToPermissions(['RESI__CERT_REVIEWER']).sort()).toEqual(['certificate_change_request_review'])
   })
 
   it('returns the correct permissions for RESI__CERT_VIEWER', () => {

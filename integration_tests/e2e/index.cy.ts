@@ -129,6 +129,25 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
+      indexPage.cards.capacityManagementDashboard().should('not.exist')
+    })
+  })
+
+  context('With RESI__CERT_REVIEWER role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      AuthStubber.stub.stubSignIn({ roles: ['RESI__CERT_REVIEWER'] })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    })
+
+    it('does not display the capacity management dashboard tile', () => {
+      cy.signIn()
+      const indexPage = Page.verifyOnPage(IndexPage)
+
+      indexPage.cards.cellCertificate().contains('Cell certificate')
+      indexPage.cards.capacityManagementDashboard().should('not.exist')
     })
   })
 })
