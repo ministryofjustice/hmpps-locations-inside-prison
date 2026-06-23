@@ -1290,7 +1290,7 @@ const stubLocationsDeactivateTemporary = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: {},
+      jsonBody: [{ pendingApprovalRequestId: 'pendingApprovalRequestId' }],
     },
   })
 
