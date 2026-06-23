@@ -373,7 +373,7 @@ export default class LocationsApiClient extends BaseApiClient {
         requestType: 'put',
       }),
       temporary: this.apiCall<
-        Location[],
+        Location,
         { locationId: string },
         {
           deactivationReason: string
