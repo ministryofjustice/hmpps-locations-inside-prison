@@ -33,7 +33,7 @@ export default class ChangeCellType extends FormInitialStep {
 
     locals.title = `Select ${affectsCapacity ? 'special' : 'normal'} cell type`
     locals.titleCaption = `Cell ${res.locals.decoratedLocation.pathHierarchy}`
-    locals.buttonText = affectsCapacity ? 'Save cell type' : 'Save cell types'
+    locals.buttonText = 'Save cell type'
     req.form.options.fields.specialistCellTypes.component = affectsCapacity ? 'govukRadios' : 'govukCheckboxes'
     req.form.options.fields.specialistCellTypes.multiple = !affectsCapacity
 
