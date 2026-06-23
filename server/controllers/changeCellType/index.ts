@@ -4,21 +4,13 @@ import FormInitialStep from '../base/formInitialStep'
 import { TypedLocals } from '../../@types/express'
 import configureSpecialistCellTypeOptions from '../../middleware/configureSpecialistCellTypeOptions'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import isSpecialCell from '../../utils/isSpecialCell'
 
 export default class ChangeCellType extends FormInitialStep {
   override middlewareSetup(): void {
     super.middlewareSetup()
     this.use(addConstantToLocals('specialistCellTypes'))
-    this.use(configureSpecialistCellTypeOptions(this.affectsCapacity))
-  }
-
-  private affectsCapacity(_req: FormWizard.Request, res: Response) {
-    const { decoratedLocation } = res.locals
-    const { specialistCellTypes } = decoratedLocation.raw
-    return specialistCellTypes.some(
-      typeKey =>
-        res.locals.constants.specialistCellTypes.find(fullType => fullType.key === typeKey).attributes?.affectsCapacity,
-    )
+    this.use(configureSpecialistCellTypeOptions(isSpecialCell))
   }
 
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
@@ -29,7 +21,7 @@ export default class ChangeCellType extends FormInitialStep {
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
-    const affectsCapacity = this.affectsCapacity(req, res)
+    const affectsCapacity = isSpecialCell(req, res)
 
     locals.title = `Select ${affectsCapacity ? 'special' : 'normal'} cell type`
     locals.titleCaption = `Cell ${res.locals.decoratedLocation.pathHierarchy}`
@@ -71,7 +63,7 @@ export default class ChangeCellType extends FormInitialStep {
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { id: locationId, prisonId } = res.locals.decoratedLocation
-    const affectsCapacity = this.affectsCapacity(req, res)
+    const affectsCapacity = isSpecialCell(req, res)
 
     req.journeyModel.reset()
     req.sessionModel.reset()
