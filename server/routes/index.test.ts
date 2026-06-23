@@ -123,6 +123,32 @@ describe('GET /', () => {
     expect(res.text).toContain('/capacity-management-dashboard')
   })
 
+  it.each([['RESI__CERT_REVIEWER'], ['MANAGE_RES_LOCATIONS_OP_CAP']])(
+    'should not render the "Capacity management dashboard" tile for the %s role',
+    async role => {
+      locationsService.getPrisonConfiguration.mockResolvedValue({
+        prisonId: 'TST',
+        resiLocationServiceActive: 'ACTIVE',
+        nonResiServiceActive: 'INACTIVE',
+        includeSegregationInRollCount: 'INACTIVE',
+        certificationApprovalRequired: 'ACTIVE',
+      })
+
+      app = appWithAllRoutes({
+        services: {
+          auditService,
+          locationsService,
+        },
+        userSupplier: () => ({ ...user, userRoles: [role] }),
+      })
+
+      auditService.logPageView.mockResolvedValue(null)
+      const res = await request(app).get('/')
+
+      expect(res.text).not.toContain('Capacity management dashboard')
+    },
+  )
+
   it('should render permission message when resi service is active but user has no residential role', async () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
