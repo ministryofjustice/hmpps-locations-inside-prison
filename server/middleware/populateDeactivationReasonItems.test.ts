@@ -128,4 +128,37 @@ describe('populateDeactivationReasonItems', () => {
       },
     })
   })
+
+  it('filters out reasons in the deny list', async () => {
+    deepReq.services = {
+      locationsService: {
+        getDeactivatedReasons: () =>
+          Promise.resolve({
+            TEST1: 'Test 1',
+            CONVERT_CELL_TO_ROOM: 'Convert cell to room',
+            NEW_BUILD: 'New build',
+            OTHER: 'Other',
+          }),
+      },
+    }
+
+    const callback = jest.fn()
+    await populateDeactivationReasonItems(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+    const { items } = deepReq.form.options.fields.deactivationReason
+    expect(items).toEqual([
+      {
+        conditional: 'deactivationReasonDescription-TEST1',
+        text: 'Test 1',
+        value: 'TEST1',
+      },
+      {
+        conditional: 'deactivationReasonOther',
+        text: 'Other',
+        value: 'OTHER',
+      },
+    ])
+    expect(items.some(item => item.value === 'CONVERT_CELL_TO_ROOM')).toBe(false)
+    expect(items.some(item => item.value === 'NEW_BUILD')).toBe(false)
+  })
 })
