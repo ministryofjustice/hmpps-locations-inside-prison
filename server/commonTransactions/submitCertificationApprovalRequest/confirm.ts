@@ -405,19 +405,7 @@ export default class Confirm extends FormInitialStep {
       })
     } else if (req.form.options.name === 'non-residential-conversion') {
       const { location } = res.locals
-      const certLocation = await locationToCertificationLocation(
-        req,
-        location,
-        (_originalLocation, certificateLocation) => ({
-          ...certificateLocation,
-          workingCapacity: 0,
-          maxCapacity: 0,
-          certifiedNormalAccommodation: 0,
-          convertedCellType: req.sessionModel.get<string>('convertedCellType'),
-          otherConvertedCellType: req.sessionModel.get<string>('otherConvertedCellType'),
-          inCellSanitation: false,
-        }),
-      )
+      const certLocation = await locationToCertificationLocation(req, location)
       proposedCertificationApprovalRequests.push({
         approvalType: 'CONVERT_CELL_TO_ROOM',
         prisonId: location.prisonId,
@@ -425,6 +413,8 @@ export default class Confirm extends FormInitialStep {
         locationKey: location.key,
         locations: [certLocation],
         reasonForChange: req.sessionModel.get<string>('explanation'),
+        convertedCellType: req.sessionModel.get<string>('convertedCellType'),
+        otherConvertedCellType: req.sessionModel.get<string>('otherConvertedCellType'),
       })
       const changeLink = `/location/${locals.location.id}/non-residential-conversion/details/edit`
       addChangeLinksToLocals(locals, 'CONVERT_CELL_TO_ROOM', {

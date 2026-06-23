@@ -3,37 +3,69 @@
 {% from "./collapsibleTable.njk" import collapsibleTable %}
 {% from "./miniSummary.njk" import miniSummary %}
 
-{% macro recurseLocationTable(rows, location, specialistCellTypes) %}
-  {% if location.inCellSanitation != undefined %}
-    {% set rows = (rows.push([
-      {
-        classes: 'govuk-table__cell',
-        text: location.pathHierarchy
-      },
-      {
-        text: location.cellMark | dashIfUndefined
-      },
-      {
-        text: location.certifiedNormalAccommodation | dashIfUndefined
-      },
-      {
-        text: location.workingCapacity | dashIfUndefined
-      },
-      {
-        text: location.maxCapacity | dashIfUndefined
-      },
-      {
-        html: formatConstants(specialistCellTypes, location.specialistCellTypes) | dashIfUndefined
-      },
-      {
-        text: 'Yes' if location.inCellSanitation == true else ('No' if location.inCellSanitation == false else '-')
-      }
-    ]), rows) %}
-  {% endif %}
+{% macro recurseLocationTable(rows, location, constants) %}
+  {% if location.subLocations | length %}
+    {% for subLocation in location.subLocations %}
+      {{ recurseLocationTable(rows, subLocation, constants) }}
+    {% endfor %}
+  {% else %}
+    {% if location.locationType === 'CELL' %}
+      {% set rows = (rows.push([
+        {
+          classes: 'govuk-table__cell',
+          text: location.pathHierarchy
+        },
+        {
+          text: location.cellMark | dashIfUndefined
+        },
+        {
+          text: location.certifiedNormalAccommodation | dashIfUndefined
+        },
+        {
+          text: location.workingCapacity | dashIfUndefined
+        },
+        {
+          text: location.maxCapacity | dashIfUndefined
+        },
+        {
+          html: formatConstants(constants.specialistCellTypes, location.specialistCellTypes) | dashIfUndefined
+        },
+        {
+          text: 'Yes' if location.inCellSanitation else ('No' if location.inCellSanitation === false else '-')
+        }
+      ]), rows) %}
+    {% elseif location.locationType === 'ROOM' %}
+      {% set convertedCellType = formatConstants(constants.convertedCellTypes, location.convertedCellType, '<br>', 'None') %}
+      {% if location.otherConvertedCellType %}
+        {% set convertedCellType = convertedCellType + ' - ' + location.otherConvertedCellType %}
+      {% endif %}
 
-  {% for subLocation in location.subLocations %}
-    {{ recurseLocationTable(rows, subLocation, specialistCellTypes) }}
-  {% endfor %}
+      {% set rows = (rows.push([
+        {
+          classes: 'govuk-table__cell',
+          text: location.pathHierarchy
+        },
+        {
+          text: '-'
+        },
+        {
+          text: '-'
+        },
+        {
+          text: '-'
+        },
+        {
+          text: '-'
+        },
+        {
+          html: convertedCellType | dashIfUndefined
+        },
+        {
+          text: '-'
+        }
+      ]), rows) %}
+    {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro cellCertificate(certificate, constants) %}
@@ -53,7 +85,7 @@
     ]), wingUsageRows) %}
 
     {% set cellRows = [] %}
-    {{ recurseLocationTable(cellRows, location, constants.specialistCellTypes) }}
+    {{ recurseLocationTable(cellRows, location, constants) }}
 
     {% set cellRowGroups = (cellRowGroups.push({
       parentRow: [
