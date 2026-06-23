@@ -695,17 +695,31 @@ export default class Confirm extends FormInitialStep {
           const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${approvalRequestId}`
 
           // Send notifications to both sets of relevant cert roles
-          const [requestReceivedAddresses, requestSubmittedEmails] = await Promise.all([
-            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
-            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers),
-          ])
+          const [requestReceivedAddresses, requestSubmittedAddresses, requestSubmittedWithActiveCaseloadAddresses] =
+            await Promise.all([
+              getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
+              getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers, false),
+              getUserEmails(
+                manageUsersService,
+                systemToken,
+                prisonId,
+                notificationGroups.requestSubmittedUsersWithActiveCaseload,
+              ),
+            ])
 
           logger.debug(`Found ${requestReceivedAddresses.length} cert reviewer email addresses`)
-          logger.debug(`Found ${requestSubmittedEmails.length} admin email addresses`)
+          logger.debug(`Found ${requestSubmittedAddresses.length} cert viewer email addresses`)
+          logger.debug(`Found ${requestSubmittedWithActiveCaseloadAddresses.length} admin email addresses`)
 
           const notifications = [
             { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },
-            { emailAddresses: requestSubmittedEmails, type: NotificationType.REQUEST_SUBMITTED, url },
+            {
+              emailAddresses: [
+                ...new Set([...requestSubmittedAddresses, ...requestSubmittedWithActiveCaseloadAddresses]),
+              ],
+              type: NotificationType.REQUEST_SUBMITTED,
+              url,
+            },
           ]
 
           await Promise.all(

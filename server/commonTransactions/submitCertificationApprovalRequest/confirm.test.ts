@@ -551,7 +551,13 @@ describe('Confirm', () => {
     next = jest.fn()
     jest.clearAllMocks()
     ;(notificationHelpers.getUserEmails as jest.Mock).mockImplementation(
-      (_manageUsersService: any, _systemToken: string, _prisonId: string, roles: string[]) => {
+      (
+        _manageUsersService: any,
+        _systemToken: string,
+        prisonId: string,
+        roles: string[],
+        onlyActiveCaseload = true,
+      ) => {
         const emails = []
 
         if (roles.includes('RESI__CERT_REVIEWER')) {
@@ -559,7 +565,12 @@ describe('Confirm', () => {
         }
 
         if (roles.includes('MANAGE_RES_LOCATIONS_OP_CAP')) {
-          emails.push('certificate_administrator@test.com')
+          if (!onlyActiveCaseload || prisonId === 'TST') {
+            emails.push('certificate_administrator_tst@test.com')
+          }
+          if (!onlyActiveCaseload || prisonId === 'TST2') {
+            emails.push('certificate_administrator_tst2@test.com')
+          }
         }
 
         if (roles.includes('RESI__CERT_VIEWER')) {
@@ -624,7 +635,7 @@ describe('Confirm', () => {
         const approvalRequest = deepRes.locals.proposedCertificationApprovalRequests[i]
 
         expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
-          i * 2 + 1,
+          i * 3 + 1,
           manageUsersService,
           'token',
           'TST',
@@ -632,11 +643,19 @@ describe('Confirm', () => {
           false,
         )
         expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
-          i * 2 + 2,
+          i * 3 + 2,
           manageUsersService,
           'token',
           'TST',
           notificationGroups.requestSubmittedUsers,
+          false,
+        )
+        expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
+          i * 3 + 3,
+          manageUsersService,
+          'token',
+          'TST',
+          notificationGroups.requestSubmittedUsersWithActiveCaseload,
         )
 
         expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
@@ -654,7 +673,7 @@ describe('Confirm', () => {
         expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
           i * 2 + 2,
           notifyService,
-          ['certificate_administrator@test.com', 'certificate_viewer@test.com'],
+          ['certificate_viewer@test.com', 'certificate_administrator_tst@test.com'],
           'Moorland (HMP & YOI)',
           expect.stringContaining(`/TST/cell-certificate/change-requests/${approvalRequest.approvalType}-id`),
           NotificationType.REQUEST_SUBMITTED,
