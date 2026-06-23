@@ -37,6 +37,10 @@ export default async function populateCertificationRequestDetails(
     promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res))
   }
 
+  if (approvalRequest.approvalType === 'CONVERT_CELL_TO_ROOM') {
+    promises.push(addConstantToLocals('convertedCellTypes')(req, res))
+  }
+
   let locationPromise: Promise<Location>
   if (approvalRequest.locationId) {
     locationPromise = locationsService.getLocation(systemToken, approvalRequest.locationId)

@@ -463,9 +463,9 @@
           {% endif %}
         </div>
 
-        {% set convertedCellType = formatConstants(constants.convertedCellTypes, request.locations[0].convertedCellType, '<br>', 'None') %}
-        {% if request.locations[0].otherConvertedCellType %}
-          {% set convertedCellType = convertedCellType + ' - ' + request.locations[0].otherConvertedCellType %}
+        {% set convertedCellType = formatConstants(constants.convertedCellTypes, request.convertedCellType, '<br>', 'None') %}
+        {% if request.otherConvertedCellType %}
+          {% set convertedCellType = convertedCellType + ' - ' + request.otherConvertedCellType %}
         {% endif %}
 
         {{ comparisonTable({

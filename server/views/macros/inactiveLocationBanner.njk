@@ -61,7 +61,7 @@
                 classes: "govuk-link--no-visited-state"} if canAccess('deactivate') and isTemporaryDeactivation
             ]
           }
-        },
+        } if location.raw.deactivatedReason != 'CONVERT_CELL_TO_ROOM',
         {
           key: {
             text: 'Facilities reference number'
@@ -79,7 +79,7 @@
               } if canAccess('deactivate') and isTemporaryDeactivation
             ]
           }
-        },
+        } if location.raw.deactivatedReason != 'CONVERT_CELL_TO_ROOM',
         {
           key: {
             text: 'Certified working capacity'
@@ -87,7 +87,7 @@
           value: {
             text: location.currentCellCertificate.workingCapacity | dashIfUndefined
           }
-        } if isCertActive,
+        } if isCertActive and location.raw.deactivatedReason != 'CONVERT_CELL_TO_ROOM',
         {
           key: {
             text: 'Explanation'
@@ -95,8 +95,8 @@
           value: {
             text: location.lastDeactivationReasonForChange
           }
-        } if isCertActive and location.lastDeactivationReasonForChange
-      ],
+        } if isCertActive and location.lastDeactivationReasonForChange and location.raw.deactivatedReason != 'CONVERT_CELL_TO_ROOM'
+      ] | stripEmpty,
       classes: 'hmpps-inactive-location-banner-summary-list' }) }}
     </span>
 

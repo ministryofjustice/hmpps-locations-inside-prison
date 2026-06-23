@@ -24,7 +24,7 @@ router.use(getPrisonResidentialSummary)
 router.use(
   '/current',
   addBreadcrumb({ title: '', href: '/' }),
-  addConstantToLocals(['accommodationTypes', 'specialistCellTypes', 'usedForTypes']),
+  addConstantToLocals(['accommodationTypes', 'convertedCellTypes', 'specialistCellTypes', 'usedForTypes']),
   current,
 )
 router.use('/history', history)
@@ -52,7 +52,7 @@ router.use('/change-requests', addBreadcrumb({ title: '', href: '/' }), changeRe
 router.use(
   '/:certificateId',
   redirectCurrentCertificate,
-  addConstantToLocals(['accommodationTypes', 'specialistCellTypes', 'usedForTypes']),
+  addConstantToLocals(['accommodationTypes', 'convertedCellTypes', 'specialistCellTypes', 'usedForTypes']),
   certificateShow,
 )
 
