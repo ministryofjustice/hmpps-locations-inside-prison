@@ -508,12 +508,7 @@ describe('Confirm', () => {
       updateCellSanitation: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_SANITATION-id' } as any),
       updateCellMark: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_MARK-id' } as any),
       requestReactivation: jest.fn().mockResolvedValue({ id: 'REACTIVATION-id' } as any),
-      // Deactivation cascades: the API returns the deactivated location plus its sub-locations,
-      // each carrying the same pendingApprovalRequestId.
-      deactivateTemporary: jest.fn().mockResolvedValue([
-        { id: 'deactivationLocationId', pendingApprovalRequestId: 'DEACTIVATION-id' },
-        { id: 'deactivationLocationId-cell-1', pendingApprovalRequestId: 'DEACTIVATION-id' },
-      ] as any),
+      deactivateTemporary: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'DEACTIVATION-id' } as any),
     } as unknown as jest.Mocked<LocationsService>
     deepReq = {
       form: {

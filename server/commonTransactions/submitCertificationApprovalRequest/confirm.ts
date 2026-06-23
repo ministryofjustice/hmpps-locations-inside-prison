@@ -567,21 +567,18 @@ export default class Confirm extends FormInitialStep {
     }
 
     if (approvalType === 'DEACTIVATION') {
-      // Deactivation cascades, so the API returns the deactivated location plus every
-      // sub-location. Each carries the same pendingApprovalRequestId, so read it from the
-      // requested location (falling back to the first entry if ordering ever changes).
-      const deactivatedLocations = await locationsService.deactivateTemporary(
-        systemToken,
-        locationId,
-        deactivatedReason,
-        deactivationReasonDescription,
-        proposedReactivationDate,
-        planetFmReference,
-        true,
-        reasonForChange,
-      )
-
-      return (deactivatedLocations.find(l => l.id === locationId) ?? deactivatedLocations[0])?.pendingApprovalRequestId
+      return (
+        await locationsService.deactivateTemporary(
+          systemToken,
+          locationId,
+          deactivatedReason,
+          deactivationReasonDescription,
+          proposedReactivationDate,
+          planetFmReference,
+          true,
+          reasonForChange,
+        )
+      ).pendingApprovalRequestId
     }
 
     if (approvalType === 'CAPACITY_CHANGE') {
