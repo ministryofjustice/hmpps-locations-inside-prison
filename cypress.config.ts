@@ -42,7 +42,7 @@ export default defineConfig({
   // Prevent headless Chrome from accumulating memory and hanging the runner in CI,
   // which intermittently stalls a single Cypress split container until the job timeout.
   experimentalMemoryManagement: true,
-  numTestsKeptInMemory: 0,
+  ...(process.env.CI && { numTestsKeptInMemory: 0 }),
   // Re-run flaky specs in CI (e.g. WireMock sign-in races) instead of failing the build.
   retries: { runMode: 2, openMode: 0 },
   fixturesFolder: 'integration_tests/fixtures',

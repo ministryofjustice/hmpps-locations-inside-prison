@@ -9,6 +9,8 @@ import getLocationAttributesIncludePending from '../../utils/getLocationAttribut
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
+import isSpecialCell from '../../utils/isSpecialCell'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
   const { accommodationTypes, active, status } = res.locals.location
@@ -22,8 +24,8 @@ function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
   )
 }
 
-function hasCertApprovalSteps(_req: FormWizard.Request, res: Response) {
-  return isCertActiveAndNotDraft(res.locals)
+function hasCertApprovalSteps(req: FormWizard.Request, res: Response) {
+  return isSpecialCell(req, res) && isCertActiveAndNotDraft(res.locals)
 }
 
 const steps: FormWizard.Steps = {
@@ -60,6 +62,10 @@ const steps: FormWizard.Steps = {
     controller: ReviewCellCapacity,
     next: [
       {
+        fn: hasCertApprovalSteps,
+        next: 'update-signed-op-cap',
+      },
+      {
         fn: (_req, res) => canEditCna(res.locals.prisonConfiguration),
         next: 'confirm-skip',
       },
@@ -74,10 +80,17 @@ const steps: FormWizard.Steps = {
     skip: true,
   },
   ...CertChangeDisclaimer.getSteps({
-    next: 'review',
+    next: [
+      {
+        fn: mustReviewCapacity,
+        next: 'review',
+      },
+      'update-signed-op-cap',
+    ],
     title: (_req, _res) => 'Removing a special cell type',
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
+  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
 }
 
 export default steps
