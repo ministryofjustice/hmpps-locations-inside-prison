@@ -24,10 +24,9 @@ export default async (req: Request, res: Response) => {
     }
   }
   if (!pendingApproval && req.canAccess('create_location')) {
-    if (!leafLevel && summary.subLocationName !== 'Cells') {
+    if (!leafLevel) {
       const singularizedLocationType = singularizeString(summary.subLocationName).toLowerCase()
-
-      locals.createButton = {
+      let createButton = {
         text: `Create new ${singularizedLocationType}`,
         href: `/create-new/${location.id}`,
         classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
@@ -35,26 +34,20 @@ export default async (req: Request, res: Response) => {
           'data-qa': 'create-button',
         },
       }
-    } else if (summary.subLocationName === 'Cells') {
-      if (summary.subLocations.length === 0) {
-        locals.createButton = {
-          text: 'Create new cells',
-          href: `/create-cells/${location.id}`,
-          classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
-          attributes: {
-            'data-qa': 'create-button',
-          },
-        }
-      } else if (location.status === 'DRAFT' && !summary.subLocations.find(l => l.status !== 'DRAFT')) {
-        locals.createButton = {
-          text: 'Edit cells',
-          href: `/edit-cells/${location.id}`,
-          classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
-          attributes: {
-            'data-qa': 'create-button',
-          },
+
+      if (summary.subLocationName === 'Cells') {
+        if (summary.subLocations.find(l => l.status === 'DRAFT')) {
+          createButton = {
+            ...createButton,
+            text: 'Edit cells',
+            href: `/edit-cells/${location.id}`,
+          }
+        } else {
+          createButton = { ...createButton, text: 'Create new cells', href: `/create-cells/${location.id}` }
         }
       }
+
+      locals.createButton = createButton
     }
   }
 
