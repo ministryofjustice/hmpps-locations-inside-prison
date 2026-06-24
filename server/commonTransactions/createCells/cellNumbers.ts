@@ -3,11 +3,13 @@ import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import capFirst from '../../formatters/capFirst'
 import getCellPath from './getCellPath'
+import populateExistingCells from './populateExistingCells'
 
 export default class CellDoorNumbers extends BaseController {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.setupDynamicFields)
+    this.use(populateExistingCells)
   }
 
   setupDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -70,26 +72,35 @@ export default class CellDoorNumbers extends BaseController {
     super.validateFields(req, res, async errors => {
       const cellsToCreate = req.sessionModel.get<number>('create-cells_cellsToCreate')
       const { values } = req.form
+      const { cells } = res.locals
       const validationErrors: FormWizard.Errors = {}
+
+      const existingCodes = Object.fromEntries(cells.map(l => [Number(l.code), true]))
+      const newCodes: { [key: number]: number } = {}
 
       for (let i = 0; i < cellsToCreate; i += 1) {
         const fieldKey = `create-cells_cellNumber${i}`
-        const cellNumber = values[fieldKey]
+        const code = Number(values[fieldKey])
 
-        if (cellNumber !== '' && !errors[fieldKey]) {
-          for (let oi = 0; oi < cellsToCreate; oi += 1) {
-            if (i !== oi) {
-              const otherCellNumber = values[`create-cells_cellNumber${oi}`]
+        if (!newCodes[code]) {
+          newCodes[code] = 0
+        }
+        newCodes[code] += 1
+      }
 
-              if (cellNumber === otherCellNumber) {
-                validationErrors[fieldKey] = this.formError(fieldKey, 'notUnique')
+      for (let i = 0; i < cellsToCreate; i += 1) {
+        const fieldKey = `create-cells_cellNumber${i}`
+        const code = Number(values[fieldKey])
 
-                break
-              }
-            }
+        if (!errors[fieldKey]) {
+          if (existingCodes[code]) {
+            validationErrors[fieldKey] = this.formError(fieldKey, 'taken')
+          } else if (newCodes[code] > 1) {
+            validationErrors[fieldKey] = this.formError(fieldKey, 'notUnique')
           }
         }
       }
+
       return callback({ ...errors, ...validationErrors })
     })
   }

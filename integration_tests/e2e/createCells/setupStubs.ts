@@ -22,7 +22,26 @@ const existingLandingLocation = LocationFactory.build({
 const residentialSummary: LocationResidentialSummary = {
   parentLocation: existingLandingLocation,
   subLocationName: 'Cells',
-  subLocations: [],
+  subLocations: [
+    LocationFactory.build({
+      id: '7e570000-0000-1000-8000-000000000004',
+      pathHierarchy: 'A-2-009',
+      code: '009',
+      cellMark: 'A2-9',
+      parentId: existingLandingLocation.id,
+      locationType: 'CELL',
+      status: 'ACTIVE',
+    }),
+    LocationFactory.build({
+      id: '7e570000-0000-1000-8000-000000000005',
+      pathHierarchy: 'A-2-010',
+      code: '010',
+      cellMark: 'A2-10',
+      parentId: existingLandingLocation.id,
+      locationType: 'CELL',
+      status: 'LOCKED_DRAFT',
+    }),
+  ],
   topLevelLocationType: 'Wings',
   locationHierarchy: [],
   wingStructure: ['WING', 'LANDING', 'CELL'],
