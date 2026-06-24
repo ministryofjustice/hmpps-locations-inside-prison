@@ -34,6 +34,15 @@ context('Create landing - Create cells - Door numbers', () => {
       Page.checkForError('create-cells_doorNumber1', 'Enter a cell door number for A-2-101')
     })
 
+    it('shows the correct error when a door number is already in use by an existing cell', () => {
+      page.submit({
+        doorNumbers: ['A2-9', 'A2-10', '2', '3'],
+      })
+
+      Page.checkForError('create-cells_doorNumber0', 'A cell with this door number already exists')
+      Page.checkForError('create-cells_doorNumber1', 'A cell with this door number already exists')
+    })
+
     it('navigates to the next step when validation passes', () => {
       page.submit({
         doorNumbers: ['0', '1', '2', '3'],

@@ -153,6 +153,7 @@ const getPersonalisation = (notificationDetails: NotificationDetails): Record<st
 
 export const notificationGroups = {
   requestReceivedUsers: ['RESI__CERT_REVIEWER'],
-  requestSubmittedUsers: ['MANAGE_RES_LOCATIONS_OP_CAP', 'RESI__CERT_VIEWER'],
+  requestSubmittedUsersWithActiveCaseload: ['MANAGE_RES_LOCATIONS_OP_CAP'],
+  requestSubmittedUsers: ['RESI__CERT_VIEWER'],
   allCertUsers: ['MANAGE_RES_LOCATIONS_OP_CAP', 'RESI__CERT_REVIEWER', 'RESI__CERT_VIEWER'],
 }

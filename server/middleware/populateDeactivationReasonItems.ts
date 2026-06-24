@@ -1,6 +1,8 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 
+const REASON_DENY_LIST = ['CONVERT_CELL_TO_ROOM', 'NEW_BUILD']
+
 export default async function populateDeactivationReasonItems(
   req: FormWizard.Request,
   _res: Response,
@@ -11,6 +13,7 @@ export default async function populateDeactivationReasonItems(
   const { deactivationReason } = req.form.options.fields
   const deactivationReasons = await locationsService.getDeactivatedReasons(systemToken)
   deactivationReason.items = Object.entries(deactivationReasons)
+    .filter(([key]) => !REASON_DENY_LIST.includes(key))
     .sort(([a, _], [b, __]) => {
       if ([a, b].includes('OTHER')) {
         return a === 'OTHER' ? 1 : -1

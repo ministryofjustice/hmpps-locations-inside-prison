@@ -34,6 +34,15 @@ context('Create landing - Create cells - Cell numbers', () => {
       Page.checkForError('create-cells_cellNumber1', 'Enter a cell number for cell 2')
     })
 
+    it('shows the correct error when a cell number is already in use by an existing cell', () => {
+      page.submit({
+        cellNumbers: ['9', '10', '2', '3'],
+      })
+
+      Page.checkForError('create-cells_cellNumber0', 'A cell with this number already exists')
+      Page.checkForError('create-cells_cellNumber1', 'A cell with this number already exists')
+    })
+
     it('shows the correct error when start numbering value is not a number', () => {
       page.startCreateCellInput().type('x')
       page.applyLink().click()

@@ -214,7 +214,7 @@ export default class Confirm extends FormInitialStep {
         locationId: locals.location.id,
         locationKey: locals.location.key,
         planetFmReference: req.sessionModel.get<string>('planetFmReference'),
-        prisonId: locals.prisonId,
+        prisonId: locals.location.prisonId,
         proposedReactivationDate: req.sessionModel.get<string>('mandatoryEstimatedReactivationDate'),
         reasonForChange: req.sessionModel.get<string>('workingCapacityExplanation'),
         workingCapacityChange: -locals.location.capacity.workingCapacity,
@@ -307,7 +307,7 @@ export default class Confirm extends FormInitialStep {
         approvalType: 'REACTIVATION',
         locationId: locals.location.id,
         locationKey: locals.location.key,
-        prisonId: locals.prisonId,
+        prisonId: locals.location.prisonId,
         certifiedNormalAccommodationChange,
         workingCapacityChange,
         maxCapacityChange,
@@ -317,7 +317,7 @@ export default class Confirm extends FormInitialStep {
       proposedCertificationApprovalRequests.push({
         approvalType: 'DRAFT',
         locationId: locals.location.id,
-        prisonId: locals.prisonId,
+        prisonId: locals.location.prisonId,
         locations: [await locationToCertificationLocation(req, locals.location)],
       })
     } else if (req.form.options.name === 'change-door-number') {
@@ -367,7 +367,7 @@ export default class Confirm extends FormInitialStep {
         approvalType: 'CAPACITY_CHANGE',
         locationId: locals.location.id,
         locationKey: locals.location.key,
-        prisonId: locals.prisonId,
+        prisonId: locals.location.prisonId,
         reasonForChange: explanation,
         certifiedNormalAccommodationChange: newBaselineCna - certifiedNormalAccommodation,
         workingCapacityChange: newWorkingCapacity - workingCapacity,
@@ -440,7 +440,7 @@ export default class Confirm extends FormInitialStep {
         approvalType: 'SPECIALIST_CELL_TYPE',
         locationId: locals.location.id,
         locationKey: locals.location.key,
-        prisonId: locals.prisonId,
+        prisonId: locals.location.prisonId,
         certifiedNormalAccommodationChange,
         workingCapacityChange,
         maxCapacityChange,
@@ -659,7 +659,7 @@ export default class Confirm extends FormInitialStep {
     }
 
     if (approvalType === 'CONVERT_CELL_TO_ROOM') {
-      const { convertedCellType, otherConvertedCellType } = locations[0]
+      const { convertedCellType, otherConvertedCellType } = request
 
       return (
         await locationsService.convertCellToNonResCell(systemToken, locationId, {
@@ -679,7 +679,8 @@ export default class Confirm extends FormInitialStep {
     const { locationsService, manageUsersService, notifyService } = req.services
     const { prisonResidentialSummary, proposedCertificationApprovalRequests, user, location } = res.locals
     const { prisonName } = prisonResidentialSummary.prisonSummary
-    const prisonId = res.locals.prisonId || req.sessionModel.get('prisonId') || location?.prisonId
+    const prisonId =
+      proposedCertificationApprovalRequests[0].prisonId || req.sessionModel.get('prisonId') || location?.prisonId
     const submittedBy = user.name
 
     const approvalRequestIds = await Promise.all(
@@ -695,17 +696,31 @@ export default class Confirm extends FormInitialStep {
           const url = `${ingressUrl}/${prisonId}/cell-certificate/change-requests/${approvalRequestId}`
 
           // Send notifications to both sets of relevant cert roles
-          const [requestReceivedAddresses, requestSubmittedEmails] = await Promise.all([
-            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
-            getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers),
-          ])
+          const [requestReceivedAddresses, requestSubmittedAddresses, requestSubmittedWithActiveCaseloadAddresses] =
+            await Promise.all([
+              getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
+              getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers, false),
+              getUserEmails(
+                manageUsersService,
+                systemToken,
+                prisonId,
+                notificationGroups.requestSubmittedUsersWithActiveCaseload,
+              ),
+            ])
 
           logger.debug(`Found ${requestReceivedAddresses.length} cert reviewer email addresses`)
-          logger.debug(`Found ${requestSubmittedEmails.length} admin email addresses`)
+          logger.debug(`Found ${requestSubmittedAddresses.length} cert viewer email addresses`)
+          logger.debug(`Found ${requestSubmittedWithActiveCaseloadAddresses.length} admin email addresses`)
 
           const notifications = [
             { emailAddresses: requestReceivedAddresses, type: NotificationType.REQUEST_RECEIVED, url: `${url}/review` },
-            { emailAddresses: requestSubmittedEmails, type: NotificationType.REQUEST_SUBMITTED, url },
+            {
+              emailAddresses: [
+                ...new Set([...requestSubmittedAddresses, ...requestSubmittedWithActiveCaseloadAddresses]),
+              ],
+              type: NotificationType.REQUEST_SUBMITTED,
+              url,
+            },
           ]
 
           await Promise.all(

@@ -51,6 +51,7 @@ const fields: FormWizard.Fields = {
     name: 'cellNumber',
     errorMessages: {
       notUnique: 'Two cells have the same number',
+      taken: 'A cell with this number already exists',
     },
     classes: 'govuk-input--width-5',
     rows: 1,

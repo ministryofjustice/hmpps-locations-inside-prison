@@ -3,11 +3,13 @@ import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import capFirst from '../../formatters/capFirst'
 import getCellPath from './getCellPath'
+import populateExistingCells from './populateExistingCells'
 
 export default class CellDoorNumbers extends BaseController {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.setupDynamicFields)
+    this.use(populateExistingCells)
   }
 
   setupDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -63,27 +65,34 @@ export default class CellDoorNumbers extends BaseController {
   }
 
   override validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
-    const { values } = req.form
-    const cellsToCreate = req.sessionModel.get<number>('create-cells_cellsToCreate')
-
-    const validationErrors: FormWizard.Errors = {}
-
     super.validateFields(req, res, errors => {
+      const cellsToCreate = req.sessionModel.get<number>('create-cells_cellsToCreate')
+      const { values } = req.form
+      const { cells } = res.locals
+      const validationErrors: FormWizard.Errors = {}
+
+      const existingDoorNumbers = Object.fromEntries(cells.map(l => [l.cellMark, true]))
+      const newDoorNumbers: { [key: string]: number } = {}
+
       for (let i = 0; i < cellsToCreate; i += 1) {
         const fieldKey = `create-cells_doorNumber${i}`
-        const doorNumber = values[fieldKey]
+        const doorNumber = values[fieldKey] as string
 
-        if (doorNumber !== '' && !errors[fieldKey]) {
-          for (let oi = 0; oi < cellsToCreate; oi += 1) {
-            if (i !== oi) {
-              const otherDoorNumber = values[`create-cells_doorNumber${oi}`]
+        if (!newDoorNumbers[doorNumber]) {
+          newDoorNumbers[doorNumber] = 0
+        }
+        newDoorNumbers[doorNumber] += 1
+      }
 
-              if (doorNumber === otherDoorNumber) {
-                validationErrors[fieldKey] = this.formError(fieldKey, 'notUnique')
+      for (let i = 0; i < cellsToCreate; i += 1) {
+        const fieldKey = `create-cells_doorNumber${i}`
+        const doorNumber = values[fieldKey] as string
 
-                break
-              }
-            }
+        if (!errors[fieldKey]) {
+          if (existingDoorNumbers[doorNumber]) {
+            validationErrors[fieldKey] = this.formError(fieldKey, 'taken')
+          } else if (newDoorNumbers[doorNumber] > 1) {
+            validationErrors[fieldKey] = this.formError(fieldKey, 'notUnique')
           }
         }
       }
