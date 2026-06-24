@@ -49,7 +49,7 @@ export default async (req: Request, res: Response) => {
     locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
   }
 
-  locals.title = `${approvalTypeDescription(approvalRequest.approvalType, constants, location)} request details`
+  locals.title = `${approvalTypeDescription(approvalRequest, constants, location)} request details`
 
   if (location) {
     if (!res.locals.locationMap) {

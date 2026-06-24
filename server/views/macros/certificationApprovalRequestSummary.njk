@@ -2,7 +2,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% macro certificationApprovalRequestSummary(request, userMap, locationMap, constants, showWithdraw, showStatus, changeLinks) %}
-  {% set changeType = approvalTypeDescription(request.approvalType, constants, locationMap[request.locationId]) %}
+  {% set changeType = approvalTypeDescription(request, constants, locationMap[request.locationId]) %}
 
   {% if request.approvalType == 'DEACTIVATION' %}
     {% set formattedDeactivationReason = formatConstants(constants.deactivatedReasons, request.deactivatedReason) %}

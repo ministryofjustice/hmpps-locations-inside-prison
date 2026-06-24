@@ -425,7 +425,10 @@ export default class Confirm extends FormInitialStep {
         reasonForChange: `/location/${locals.location.id}/non-residential-conversion/update-signed-op-cap/details/edit`,
       })
     } else if (req.form.options.name === 'set-cell-type') {
-      const newSpecialistCellType = sessionModel.get<string>('set-cell-type_specialistCellTypes')
+      const specialistCellTypesValue = sessionModel.get<string | string[]>('set-cell-type_specialistCellTypes')
+      const newSpecialistCellTypes = Array.isArray(specialistCellTypesValue)
+        ? specialistCellTypesValue
+        : [specialistCellTypesValue]
       const newBaselineCna = Number(sessionModel.get<string>('set-cell-type_baselineCna'))
       const newWorkingCapacity = Number(sessionModel.get<string>('set-cell-type_workingCapacity'))
       const newMaxCapacity = Number(sessionModel.get<string>('set-cell-type_maxCapacity'))
@@ -444,13 +447,14 @@ export default class Confirm extends FormInitialStep {
         certifiedNormalAccommodationChange,
         workingCapacityChange,
         maxCapacityChange,
+        specialistCellTypes: newSpecialistCellTypes,
         locations: [
           await locationToCertificationLocation(req, locals.location, (_originalLocation, certificateLocation) => ({
             ...certificateLocation,
             certifiedNormalAccommodation: newBaselineCna,
             workingCapacity: newWorkingCapacity,
             maxCapacity: newMaxCapacity,
-            specialistCellTypes: [newSpecialistCellType],
+            specialistCellTypes: newSpecialistCellTypes,
           })),
         ],
       })
@@ -503,6 +507,40 @@ export default class Confirm extends FormInitialStep {
       }
 
       proposedCertificationApprovalRequests.push(request)
+    } else if (req.form.options.name === 'remove-cell-type') {
+      const newBaselineCna = Number(sessionModel.get<string>('baselineCna'))
+      const newWorkingCapacity = Number(sessionModel.get<string>('workingCapacity'))
+      const newMaxCapacity = Number(sessionModel.get<string>('maxCapacity'))
+      const { certifiedNormalAccommodation, workingCapacity, maxCapacity } = getLocationAttributesIncludePending(
+        locals.location,
+      )
+      const certifiedNormalAccommodationChange = newBaselineCna ? newBaselineCna - certifiedNormalAccommodation : 0
+      const workingCapacityChange = newWorkingCapacity ? newWorkingCapacity - workingCapacity : 0
+      const maxCapacityChange = newMaxCapacity ? newMaxCapacity - maxCapacity : 0
+
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'SPECIALIST_CELL_TYPE',
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        prisonId: locals.prisonId,
+        certifiedNormalAccommodationChange,
+        workingCapacityChange,
+        maxCapacityChange,
+        specialistCellTypes: [],
+        locations: [
+          await locationToCertificationLocation(req, locals.location, (_originalLocation, certificateLocation) => ({
+            ...certificateLocation,
+            ...(newBaselineCna && { certifiedNormalAccommodation: newBaselineCna }),
+            ...(newWorkingCapacity && { workingCapacity: newWorkingCapacity }),
+            ...(newMaxCapacity && { maxCapacity: newMaxCapacity }),
+            specialistCellTypes: [],
+            currentSpecialistCellTypes: locals.location.specialistCellTypes,
+          })),
+        ],
+      })
+
+      const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
+      addChangeLinksToLocals(locals, 'SPECIALIST_CELL_TYPE', { reasonForChange: changeLink })
     }
 
     if (proposedSignedOpCapChange) {

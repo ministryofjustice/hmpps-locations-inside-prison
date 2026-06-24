@@ -70,7 +70,7 @@ export default async function populateCertificationRequestDetails(
     requestedDate: approvalRequest.requestedDate,
     locationKey: approvalRequest.locationKey,
     locationName: approvalRequest.locationKey ? approvalRequest.locationKey.replace(`${prisonId}-`, '') : prisonId,
-    changeType: approvalTypeDescription(approvalRequest.approvalType, res.locals.constants, res.locals.location),
+    changeType: approvalTypeDescription(approvalRequest, res.locals.constants, res.locals.location),
   }
 
   return next()

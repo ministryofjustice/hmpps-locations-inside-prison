@@ -29,7 +29,7 @@ export default class Review extends FormInitialStep {
       res.locals.titleCaption = prisonResidentialSummary.prisonSummary.prisonName
     }
 
-    res.locals.title = `Review ${approvalTypeDescription(approvalRequest.approvalType, constants, location).toLowerCase()} request`
+    res.locals.title = `Review ${approvalTypeDescription(approvalRequest, constants, location).toLowerCase()} request`
 
     await addUsersToUserMap([approvalRequest.requestedBy])(req, res, null)
 

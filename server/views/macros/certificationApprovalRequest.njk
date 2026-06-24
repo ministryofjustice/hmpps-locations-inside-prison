@@ -123,7 +123,7 @@
 {% endmacro %}
 
 {% macro certificationApprovalRequest(request, multiple, index, prisonResidentialSummary, includeChangeSummary, constants, locationMap, changeLinks) %}
-  {% set changeType = approvalTypeDescription(request.approvalType, constants, locationMap[request.locationId]) %}
+  {% set changeType = approvalTypeDescription(request, constants, locationMap[request.locationId]) %}
 
   <div class="govuk-width-container">
     <div class="govuk-grid-row govuk-!-margin-bottom-0" data-qa="approval-request-{{ request.approvalType }}">
@@ -424,7 +424,6 @@
             != request.locations[0].certifiedNormalAccommodation %}
           {% set hasWcChange = request.locations[0].currentWorkingCapacity != request.locations[0].workingCapacity %}
           {% set hasMcChange = request.locations[0].currentMaxCapacity != request.locations[0].maxCapacity %}
-          {% set hasStChange = request.locations[0].specialistCellTypes[0] and request.locations[0].specialistCellTypes[0] != request.locations[0].currentSpecialistCellTypes[0] %}
 
           {{ govukTable({
             attributes: {
@@ -435,7 +434,7 @@
               { text: "Baseline CNA" } if hasCnaChange,
               { text: "Certified working capacity" } if hasWcChange,
               { text: "Maximum capacity" } if hasMcChange,
-              { text: "Cell type" } if hasStChange
+              { text: "Cell type" }
             ] | stripEmpty,
             rows:[[
               { text: request.locations[0].pathHierarchy },
@@ -446,7 +445,6 @@
               { text: request.locations[0].currentMaxCapacity + " → " + request.locations[0].maxCapacity }
                 if hasMcChange,
               { text: formatConstants(constants.specialistCellTypes, request.locations[0].currentSpecialistCellTypes[0], "<br>", "None") + " → " + formatConstants(constants.specialistCellTypes, request.locations[0].specialistCellTypes[0], "<br>", "None") }
-                if hasStChange
             ] | stripEmpty]
           }) }}
         </div>

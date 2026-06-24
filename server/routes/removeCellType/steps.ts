@@ -11,6 +11,7 @@ import capFirst from '../../formatters/capFirst'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 import isSpecialCell from '../../utils/isSpecialCell'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
   const { accommodationTypes, active, status } = res.locals.location
@@ -91,6 +92,7 @@ const steps: FormWizard.Steps = {
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 
 export default steps
