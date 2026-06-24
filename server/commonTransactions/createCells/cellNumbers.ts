@@ -3,11 +3,13 @@ import FormWizard from 'hmpo-form-wizard'
 import BaseController from './baseController'
 import capFirst from '../../formatters/capFirst'
 import getCellPath from './getCellPath'
+import populateExistingCells from './populateExistingCells'
 
 export default class CellDoorNumbers extends BaseController {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.setupDynamicFields)
+    this.use(populateExistingCells)
   }
 
   setupDynamicFields(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -70,12 +72,10 @@ export default class CellDoorNumbers extends BaseController {
     super.validateFields(req, res, async errors => {
       const cellsToCreate = req.sessionModel.get<number>('create-cells_cellsToCreate')
       const { values } = req.form
-      const { decoratedResidentialSummary } = res.locals
+      const { cells } = res.locals
       const validationErrors: FormWizard.Errors = {}
 
-      const existingCodes = Object.fromEntries(
-        decoratedResidentialSummary.subLocations.map(l => [Number(l.code), true]),
-      )
+      const existingCodes = Object.fromEntries(cells.map(l => [Number(l.code), true]))
       const newCodes: { [key: number]: number } = {}
 
       for (let i = 0; i < cellsToCreate; i += 1) {
