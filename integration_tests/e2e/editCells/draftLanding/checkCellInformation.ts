@@ -1,4 +1,4 @@
-import EditCellsConfirmPage from '../../pages/editCells/confirm'
+import EditCellsConfirmPage from '../../../pages/editCells/confirm'
 
 export default function checkCellInformation(
   page: EditCellsConfirmPage,

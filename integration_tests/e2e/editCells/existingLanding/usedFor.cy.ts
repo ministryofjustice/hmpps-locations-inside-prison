@@ -1,10 +1,10 @@
-import Page from '../../pages/page'
+import Page from '../../../pages/page'
 import setupStubs from './setupStubs'
 import goToEditCellsConfirmPage from './goToEditCellsConfirmPage'
-import CreateCellsUsedForPage from '../../pages/commonTransactions/createCells/usedFor'
-import EditCellsConfirmPage from '../../pages/editCells/confirm'
+import CreateCellsUsedForPage from '../../../pages/commonTransactions/createCells/usedFor'
+import EditCellsConfirmPage from '../../../pages/editCells/confirm'
 
-context('Create Landing - Create cells - Edit - Used for', () => {
+context('Edit cells - Existing landing - Edit - Used for', () => {
   let page: EditCellsConfirmPage
 
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -13,7 +13,7 @@ context('Create Landing - Create cells - Edit - Used for', () => {
       page = goToEditCellsConfirmPage()
     })
 
-    it('allows editing', () => {
+    it('allows editing for draft transaction cells', () => {
       page.cellDetailsKey(2).contains('Used for')
       page.cellDetailsValue(2).contains('First night centre / Induction').should('not.exist')
       page.cellDetailsValue(2).contains('Close Supervision Centre (CSC)')
@@ -26,6 +26,7 @@ context('Create Landing - Create cells - Edit - Used for', () => {
       page.cellDetailsKey(2).contains('Used for')
       page.cellDetailsValue(2).contains('First night centre / Induction')
       page.cellDetailsValue(2).contains('Close Supervision Centre (CSC)').should('not.exist')
+      page.cellDetailsValue(0).contains('3')
     })
   })
 })

@@ -17,13 +17,13 @@
 
   {% if locations | length %}
     {% if locationType == 'Cells' %}
-      {% if decoratedResidentialSummary.location.status == 'DRAFT' %}
+      {% if decoratedResidentialSummary.location.status.includes('DRAFT') %}
         {{ draftCells(locations) }}
       {% else %}
         {{ cells(locations) }}
       {% endif %}
     {% else %}
-      {% if decoratedResidentialSummary.location.status == 'DRAFT' %}
+      {% if decoratedResidentialSummary.location.status.includes('DRAFT') %}
         {{ draftOther(locations) }}
       {% else %}
         {{ other(locations) }}

@@ -1,11 +1,11 @@
-import Page from '../../pages/page'
+import Page from '../../../pages/page'
 import setupStubs from './setupStubs'
 import goToEditCellsConfirmPage from './goToEditCellsConfirmPage'
-import CreateCellsDetailsPage from '../../pages/commonTransactions/createCells/details'
-import CreateCellsCellNumbersPage from '../../pages/commonTransactions/createCells/cellNumbers'
-import EditCellsConfirmPage from '../../pages/editCells/confirm'
+import CreateCellsDetailsPage from '../../../pages/commonTransactions/createCells/details'
+import CreateCellsCellNumbersPage from '../../../pages/commonTransactions/createCells/cellNumbers'
+import EditCellsConfirmPage from '../../../pages/editCells/confirm'
 
-context('Create Landing - Create cells - Edit - Cell details', () => {
+context('Edit cells - Existing landing - Edit - Cell details', () => {
   let page: EditCellsConfirmPage
 
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -19,7 +19,7 @@ context('Create Landing - Create cells - Edit - Cell details', () => {
         page.editCellDetailsLink().click()
 
         const cellDetailsPage = Page.verifyOnPage(CreateCellsDetailsPage)
-        cellDetailsPage.submit({ cellsToCreate: 3, accommodationType: 'NORMAL_ACCOMMODATION' })
+        cellDetailsPage.submit({ cellsToCreate: 4, accommodationType: 'NORMAL_ACCOMMODATION' })
 
         Page.verifyOnPage(CreateCellsCellNumbersPage)
       })
@@ -30,7 +30,7 @@ context('Create Landing - Create cells - Edit - Cell details', () => {
         page.editCellDetailsLink().click()
 
         const cellDetailsPage = Page.verifyOnPage(CreateCellsDetailsPage)
-        cellDetailsPage.submit({ cellsToCreate: 2, accommodationType: 'NORMAL_ACCOMMODATION' })
+        cellDetailsPage.submit({ cellsToCreate: 3, accommodationType: 'NORMAL_ACCOMMODATION' })
 
         Page.verifyOnPage(EditCellsConfirmPage)
       })

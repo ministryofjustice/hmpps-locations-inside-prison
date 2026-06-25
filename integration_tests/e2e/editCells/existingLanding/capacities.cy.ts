@@ -1,13 +1,13 @@
-import Page from '../../pages/page'
+import Page from '../../../pages/page'
 import setupStubs from './setupStubs'
 import goToEditCellsConfirmPage from './goToEditCellsConfirmPage'
 import checkCellInformation from './checkCellInformation'
-import CreateCellsCapacitiesPage from '../../pages/commonTransactions/createCells/capacities'
-import CreateCellsTypesPage from '../../pages/commonTransactions/createCells/cellTypes'
-import CreateCellsTypesSpecialPage from '../../pages/commonTransactions/createCells/specialCellTypes'
-import EditCellsConfirmPage from '../../pages/editCells/confirm'
+import CreateCellsCapacitiesPage from '../../../pages/commonTransactions/createCells/capacities'
+import CreateCellsTypesPage from '../../../pages/commonTransactions/createCells/cellTypes'
+import CreateCellsTypesSpecialPage from '../../../pages/commonTransactions/createCells/specialCellTypes'
+import EditCellsConfirmPage from '../../../pages/editCells/confirm'
 
-context('Create Landing - Create cells - Edit - Sanitation', () => {
+context('Edit cells - Existing landing - Edit - Capacities', () => {
   let page: EditCellsConfirmPage
 
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -16,18 +16,20 @@ context('Create Landing - Create cells - Edit - Sanitation', () => {
       page = goToEditCellsConfirmPage()
     })
 
-    it('allows editing', () => {
+    it('allows editing only for DRAFT cells', () => {
       checkCellInformation(page, [
-        ['A-2-001', '1', '1', '2', '3', 'Biohazard / dirty protest cell', 'No'],
-        ['A-2-002', '2', '2', '3', '4', '-', 'Yes'],
+        ['A-2-003', '3', '3', '4', '5', 'Biohazard / dirty protest cell', 'No'],
+        ['A-2-004', '4', '4', '5', '6', '-', 'Yes'],
+        ['A-2-005', '5', '5', '6', '7', '-', 'No'],
       ])
       page.editCapacitiesLink().click()
 
       let capacitiesPage = Page.verifyOnPage(CreateCellsCapacitiesPage)
       capacitiesPage.inputValues({
         capacities: [
-          ['1', '1', '1'],
-          ['2', '2', '2'],
+          ['3', '3', '3'],
+          ['4', '4', '4'],
+          ['5', '5', '5'],
         ],
       })
       capacitiesPage.removeCellType(0).click()
@@ -47,9 +49,12 @@ context('Create Landing - Create cells - Edit - Sanitation', () => {
 
       page = Page.verifyOnPage(EditCellsConfirmPage)
       checkCellInformation(page, [
-        ['A-2-001', '1', '1', '1', '1', '-', 'No'],
-        ['A-2-002', '2', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-2-003', '3', '3', '3', '3', '-', 'No'],
+        ['A-2-004', '4', '4', '4', '4', 'Biohazard / dirty protest cell', 'Yes'],
+        ['A-2-005', '5', '5', '5', '5', '-', 'No'],
       ])
+      page.cellInformationTable().should('not.contain', 'A-2-001')
+      page.cellInformationTable().should('not.contain', 'A-2-002')
     })
   })
 })
