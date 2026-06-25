@@ -229,6 +229,12 @@ describe('Upload file csv', () => {
       )
     })
 
+    it('allows a dotted cell mark such as 1.04', () => {
+      const input = ['HB1,DNI-H1-A1-004,1.04,1,2,2,VP Unit ,']
+
+      expect(() => parseCsvRow(input)).not.toThrow()
+    })
+
     it('separates multiple date-like cell mark errors with new lines', () => {
       const input = [
         'HB1,DNI-HB1-1-001,01-Jan,2,2,1,Normal Accommodation,TRUE',
