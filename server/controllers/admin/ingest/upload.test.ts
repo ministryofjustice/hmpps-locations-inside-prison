@@ -106,6 +106,25 @@ describe('Upload file csv', () => {
       )
     })
 
+    it('validation failure for a cell mark that looks like a date', async () => {
+      deepReq.file = {
+        path: 'uploads/testdata/date-like-cell-mark.csv',
+      } as unknown as Express.Multer.File
+
+      const callback = jest.fn()
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: controller.formError(
+            'file',
+            'ingest',
+            'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-H1-A1-001',
+          ),
+        }),
+      )
+    })
+
     it('validation failure as prison does not match', async () => {
       deepReq.file = {
         path: 'uploads/testdata/correct-format.csv',
@@ -200,6 +219,32 @@ describe('Upload file csv', () => {
           inCellSanitation: true,
         },
       })
+    })
+
+    it('rejects a cell mark that can be parsed as a date', () => {
+      const input = ['HB1,DNI-HB1-1-001,01-Jan,2,2,1,Normal Accommodation,TRUE']
+
+      expect(() => parseCsvRow(input)).toThrow(
+        'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-HB1-1-001',
+      )
+    })
+
+    it('allows a dotted cell mark such as 1.04', () => {
+      const input = ['HB1,DNI-H1-A1-004,1.04,1,2,2,VP Unit ,']
+
+      expect(() => parseCsvRow(input)).not.toThrow()
+    })
+
+    it('separates multiple date-like cell mark errors with new lines', () => {
+      const input = [
+        'HB1,DNI-HB1-1-001,01-Jan,2,2,1,Normal Accommodation,TRUE',
+        'HB1,DNI-HB1-1-002,01-Feb,2,2,1,Normal Accommodation,TRUE',
+      ]
+
+      expect(() => parseCsvRow(input)).toThrow(
+        'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-HB1-1-001\n' +
+          'Row 3: the Number or cell mark value "01-Feb" looks like a date for cell DNI-HB1-1-002',
+      )
     })
 
     it('defaults maxCapacity to 1 if 0 is provided', () => {

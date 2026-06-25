@@ -46,9 +46,10 @@ export default class IngestUpload extends FormInitialStep {
             validationErrors.file = this.formError('file', 'invalidPrison')
           }
         } catch (error) {
-          validationErrors.file = error.message.includes('numeric')
-            ? this.formError('file', 'ingest', error.message)
-            : this.formError('file', 'parseFailure')
+          validationErrors.file =
+            error instanceof Error && isCsvValidationError(error.message)
+              ? this.formError('file', 'ingest', error.message)
+              : this.formError('file', 'parseFailure')
         }
       }
       callback({ ...errors, ...validationErrors })
@@ -84,46 +85,89 @@ export function readCsvFile(path: string): string[] {
 }
 
 export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
-  return Object.fromEntries(
-    rows.map(row => {
-      const [
-        ,
-        // wing (ignored)
-        cellNumber,
-        cellMark,
-        certifiedNormalAccommodation,
-        maxCapacity,
-        workingCapacity,
-        ,
-        // usedFor (ignored)
-        inCellSanitation,
-      ] = row.split(',')
+  const validationErrors: string[] = []
+  const capacityData = rows.reduce<BulkCapacityUpdate>((acc, row, index) => {
+    const [
+      ,
+      // wing (ignored)
+      cellNumber,
+      cellMark,
+      certifiedNormalAccommodation,
+      maxCapacity,
+      workingCapacity,
+      ,
+      // usedFor (ignored)
+      inCellSanitation,
+    ] = row.split(',')
 
-      const sanitation = ['true', 'false'].includes(inCellSanitation?.toLowerCase())
-        ? inCellSanitation.toLowerCase() === 'true'
-        : undefined
+    const rowNumber = index + 2 // account for the CSV header row
+    const cellNumberValue = cellNumber ?? ''
+    const sanitation = ['true', 'false'].includes(inCellSanitation?.toLowerCase())
+      ? inCellSanitation.toLowerCase() === 'true'
+      : undefined
 
-      assertIsValidNumber(maxCapacity, 'Max Cap', cellNumber)
-      assertIsValidNumber(certifiedNormalAccommodation, 'CNA', cellNumber)
+    const maxCapacityError = getNumericValidationError(maxCapacity, 'Max Cap', cellNumberValue)
+    const cnaError = getNumericValidationError(certifiedNormalAccommodation, 'CNA', cellNumberValue)
+    const cellMarkError = getCellMarkValidationError(cellMark, cellNumberValue, rowNumber)
 
-      return [
-        cellNumber,
-        {
-          maxCapacity: parseInt(maxCapacity, 10) === 0 ? 1 : parseInt(maxCapacity, 10),
-          workingCapacity: parseInt(workingCapacity, 10) ? parseInt(workingCapacity, 10) : 0,
-          certifiedNormalAccommodation: parseInt(certifiedNormalAccommodation, 10),
-          cellMark,
-          inCellSanitation: sanitation,
-        },
-      ]
-    }),
-  )
+    if (maxCapacityError) validationErrors.push(maxCapacityError)
+    if (cnaError) validationErrors.push(cnaError)
+    if (cellMarkError) validationErrors.push(cellMarkError)
+
+    if (maxCapacityError || cnaError || cellMarkError) {
+      return acc
+    }
+
+    acc[cellNumberValue] = {
+      maxCapacity: parseInt(maxCapacity, 10) === 0 ? 1 : parseInt(maxCapacity, 10),
+      workingCapacity: parseInt(workingCapacity, 10) ? parseInt(workingCapacity, 10) : 0,
+      certifiedNormalAccommodation: parseInt(certifiedNormalAccommodation, 10),
+      cellMark,
+      inCellSanitation: sanitation,
+    }
+
+    return acc
+  }, {})
+
+  if (validationErrors.length) {
+    throw new Error(validationErrors.join('\n'))
+  }
+
+  return capacityData
 }
 
-function assertIsValidNumber(value: string, type: string, cellNumber: string) {
+function getNumericValidationError(value: string | undefined, type: string, cellNumber: string) {
   if (value === undefined || value.trim() === '' || Number.isNaN(Number(value))) {
-    throw new Error(`The ${type} value is not numeric for cell ${cellNumber}`)
+    return `The ${type} value is not numeric for cell ${cellNumber}`
   }
+
+  return undefined
+}
+
+function getCellMarkValidationError(value: string | undefined, cellNumber: string, rowNumber: number) {
+  const cellMark = value?.trim()
+
+  if (!cellMark) {
+    return undefined
+  }
+
+  if (looksLikeDate(cellMark)) {
+    return `Row ${rowNumber}: the Number or cell mark value "${cellMark}" looks like a date for cell ${cellNumber}`
+  }
+
+  return undefined
+}
+
+function looksLikeDate(value: string) {
+  const monthNames = '(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)'
+  const monthNameDate = new RegExp(`^\\d{1,2}[-/ ]${monthNames}$|^${monthNames}[-/ ]\\d{1,2}$`, 'i')
+  const numericDate = /^\d{1,2}[-/]\d{1,2}([-/]\d{2,4})?$/
+
+  return monthNameDate.test(value) || numericDate.test(value)
+}
+
+function isCsvValidationError(message: string) {
+  return message.startsWith('The ') || message.startsWith('Row ')
 }
 
 export function invalidDataForPrison(prisonId: string, data: BulkCapacityUpdate): boolean {
