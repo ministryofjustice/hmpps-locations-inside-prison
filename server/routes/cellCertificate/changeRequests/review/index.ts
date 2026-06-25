@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import wizard from 'hmpo-form-wizard'
+import { isUndefined } from 'lodash'
 import steps from './steps'
 import fields from './fields'
 import protectRoute from '../../../../middleware/protectRoute'
@@ -7,7 +8,11 @@ import populateCertificationRequestDetails from '../../../../middleware/populate
 
 async function populatePrisonersForCapacityChange(req: Request, res: Response, next: NextFunction) {
   const { approvalRequest } = res.locals
-  if (approvalRequest?.approvalType === 'CAPACITY_CHANGE' && approvalRequest.locationId) {
+  const proposedLocation = approvalRequest.locations?.[0]
+  if (
+    (approvalRequest.locationId && !isUndefined(proposedLocation?.maxCapacity)) ||
+    !isUndefined(proposedLocation?.workingCapacity)
+  ) {
     const [prisonerLocation] = await req.services.locationsService.getPrisonersInLocation(
       req.session.systemToken,
       approvalRequest.locationId,
