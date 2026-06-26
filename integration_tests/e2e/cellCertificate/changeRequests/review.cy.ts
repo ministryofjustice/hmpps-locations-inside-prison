@@ -506,5 +506,156 @@ context('Cell Certificate - Change Requests - Review', () => {
         ])
       })
     })
+
+    context('When the approvalType is SPECIALIST_CELL_TYPE and we are adding a cell type', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'SPECIALIST_CELL_TYPE',
+            locationId: '7e570000-0000-1000-8000-000000000001',
+            locationKey: 'TST-A-1-001',
+            reasonForChange: 'Needed to change it',
+            specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+            currentSpecialistCellTypes: [],
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000001',
+                locationType: 'CELL',
+                accommodationTypes: ['NORMAL_ACCOMMODATION'],
+                pathHierarchy: 'A-1-001',
+                certifiedNormalAccommodation: 0,
+                currentCertifiedNormalAccommodation: 1,
+                workingCapacity: 0,
+                currentWorkingCapacity: 1,
+                specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+                currentSpecialistCellTypes: [],
+              }),
+            ],
+          }),
+        )
+        LocationsApiStubber.stub.stubPrisonerLocationsId([{ cellLocation: 'A-1-001', prisoners: [] }])
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info and approve/reject options', () => {
+        cy.get('h1').should('contain', 'Review set special cell type request')
+
+        testGovukSummaryList('overview-list-SPECIALIST_CELL_TYPE', [
+          ['Location', 'A-1-001'],
+          ['Change type', 'Set special cell type'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('specialist-cell-type-table', [
+          ['A-1-001', '1 → 0', '1 → 0', 'None → Biohazard / dirty protest cell'],
+        ])
+
+        cy.get('input[name="approveOrReject"][type="radio"][value="APPROVE"]').should('exist')
+        cy.get('input[name="approveOrReject"][type="radio"][value="REJECT"]').should('exist')
+      })
+
+      it('Displays an error when no option is checked', () => {
+        reviewPage.submit({})
+        Page.checkForError('approveOrReject', 'Select if you want to approve or reject this change')
+      })
+
+      context('When approving the request would make the cell be overcrowded', () => {
+        beforeEach(() => {
+          LocationsApiStubber.stub.stubPrisonerLocationsId([
+            {
+              cellLocation: 'A-1-001',
+              prisoners: [PrisonerFactory.build(), PrisonerFactory.build(), PrisonerFactory.build()],
+            },
+          ])
+          LocationsApiStubber.stub.stubLocationsCertificationLocationApprove()
+        })
+
+        it('displays the too many occupants page on approve', () => {
+          reviewPage.submit({ approve: true })
+
+          Page.verifyOnPage(TooManyOccupantsPage)
+        })
+      })
+
+      // This tests changes to occupancy during the transaction
+      context('When the occupancy changes while approving', () => {
+        it('displays the too many occupants page when submitting the approve page', () => {
+          reviewPage.submit({ approve: true })
+
+          LocationsApiStubber.stub.stubPrisonerLocationsId([
+            {
+              cellLocation: 'A-1-001',
+              prisoners: [PrisonerFactory.build(), PrisonerFactory.build(), PrisonerFactory.build()],
+            },
+          ])
+          LocationsApiStubber.stub.stubLocationsCertificationLocationApprove()
+
+          Page.verifyOnPage(CellCertificateChangeRequestsApprovePage).submit({ confirm: true })
+
+          Page.verifyOnPage(TooManyOccupantsPage)
+        })
+      })
+    })
+
+    context('When the approvalType is SPECIALIST_CELL_TYPE and we are removing the cell type', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'SPECIALIST_CELL_TYPE',
+            locationId: '7e570000-0000-1000-8000-000000000001',
+            locationKey: 'TST-A-1-001',
+            reasonForChange: 'Needed to change it',
+            specialistCellTypes: [],
+            currentSpecialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000001',
+                locationType: 'CELL',
+                accommodationTypes: ['NORMAL_ACCOMMODATION'],
+                pathHierarchy: 'A-1-001',
+                certifiedNormalAccommodation: 0,
+                currentCertifiedNormalAccommodation: 1,
+                workingCapacity: 0,
+                currentWorkingCapacity: 1,
+                specialistCellTypes: [],
+                currentSpecialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+              }),
+            ],
+          }),
+        )
+        LocationsApiStubber.stub.stubPrisonerLocationsId([{ cellLocation: 'A-1-001', prisoners: [] }])
+
+        CellCertificateChangeRequestsReviewPage.goTo('id1')
+        reviewPage = Page.verifyOnPage(CellCertificateChangeRequestsReviewPage)
+      })
+
+      it('Correctly displays the change request info and approve/reject options', () => {
+        cy.get('h1').should('contain', 'Review remove special cell type request')
+
+        testGovukSummaryList('overview-list-SPECIALIST_CELL_TYPE', [
+          ['Location', 'A-1-001'],
+          ['Change type', 'Remove special cell type'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('specialist-cell-type-table', [
+          ['A-1-001', '1 → 0', '1 → 0', 'Biohazard / dirty protest cell → None'],
+        ])
+
+        cy.get('input[name="approveOrReject"][type="radio"][value="APPROVE"]').should('exist')
+        cy.get('input[name="approveOrReject"][type="radio"][value="REJECT"]').should('exist')
+      })
+
+      it('Displays an error when no option is checked', () => {
+        reviewPage.submit({})
+        Page.checkForError('approveOrReject', 'Select if you want to approve or reject this change')
+      })
+    })
   })
 })
