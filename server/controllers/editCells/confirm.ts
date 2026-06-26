@@ -47,15 +47,16 @@ function changesMade(
   res: Response,
   cells: Parameters<LocationsApiClient['locations']['editCells']>[2]['cells'],
 ) {
-  const { location, subLocations } = res.locals.decoratedResidentialSummary
+  const { subLocations } = res.locals.decoratedResidentialSummary
+  const existingDraftCells = subLocations.filter(l => l.status === 'DRAFT')
   const { sessionModel } = req
   const newUsedFor = sessionModel.get<string[]>('create-cells_usedFor')
 
   return (
-    sessionModel.get<string>('create-cells_accommodationType') !== location.raw.accommodationTypes[0] ||
-    newUsedFor.length !== location.raw.usedFor.length ||
-    uniq([...newUsedFor, ...location.raw.usedFor]).length !== newUsedFor.length ||
-    changesMadeToCells(subLocations, cells)
+    sessionModel.get<string>('create-cells_accommodationType') !== existingDraftCells[0].raw.accommodationTypes[0] ||
+    newUsedFor.length !== existingDraftCells[0].raw.usedFor.length ||
+    uniq([...newUsedFor, ...existingDraftCells[0].raw.usedFor]).length !== newUsedFor.length ||
+    changesMadeToCells(existingDraftCells, cells)
   )
 }
 
@@ -148,6 +149,7 @@ export default class EditCellsConfirm extends FormInitialStep {
     const { sessionModel } = req
     const { locationId, prisonId } = res.locals
     const { subLocations } = res.locals.decoratedResidentialSummary
+    const existingDraftCells = subLocations.filter(l => l.status === 'DRAFT')
 
     const cells: Parameters<LocationsApiClient['locations']['editCells']>[2]['cells'] = []
 
@@ -168,8 +170,8 @@ export default class EditCellsConfirm extends FormInitialStep {
         inCellSanitation: bulkSanitation === 'YES' || !withoutSanitation.includes(i.toString()),
       }
 
-      if (i < subLocations.length) {
-        cell.id = subLocations[i].id
+      if (i < existingDraftCells.length) {
+        cell.id = existingDraftCells[i].id
       }
 
       cells.push(cell)

@@ -1,35 +1,44 @@
-import AuthStubber from '../../mockApis/auth'
-import LocationsApiStubber from '../../mockApis/locationsApi'
-import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
-import LocationFactory from '../../../server/testutils/factories/location'
-import { LocationResidentialSummary } from '../../../server/data/types/locationsApi'
+import AuthStubber from '../../../mockApis/auth'
+import LocationsApiStubber from '../../../mockApis/locationsApi'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import LocationFactory from '../../../../server/testutils/factories/location'
+import { LocationResidentialSummary } from '../../../../server/data/types/locationsApi'
 
 const prisonId = 'TST'
-const existingWingLocation = LocationFactory.build({
-  id: '7e570000-0000-1000-8000-000000000002',
+
+const wing = LocationFactory.build({
+  id: '7e570000-0000-1000-8000-000000000100',
   pathHierarchy: 'A',
   parentId: undefined,
   locationType: 'WING',
   localName: undefined,
 })
-const existingLandingLocation = LocationFactory.build({
-  id: '7e570000-0000-1000-8000-000000000003',
+
+const landing = LocationFactory.build({
+  id: '7e570000-0000-1000-8000-000000000110',
   pathHierarchy: 'A-2',
-  parentId: '7e570000-0000-1000-8000-000000000002',
+  parentId: wing.id,
   locationType: 'LANDING',
   status: 'DRAFT',
   localName: undefined,
+  numberOfCellLocations: 4,
+  pendingChanges: {
+    certifiedNormalAccommodation: 4,
+    workingCapacity: 8,
+    maxCapacity: 12,
+  },
+  currentCellCertificate: undefined,
 })
 const residentialSummary: LocationResidentialSummary = {
-  parentLocation: existingLandingLocation,
+  parentLocation: landing,
   subLocationName: 'Cells',
   subLocations: [
     LocationFactory.build({
-      id: '7e570000-0000-1000-8000-000000000004',
+      id: '7e570000-0000-1000-8000-000000000111',
       pathHierarchy: 'A-2-001',
       code: '001',
       cellMark: '1',
-      parentId: '7e570000-0000-1000-8000-000000000003',
+      parentId: landing.id,
       locationType: 'CELL',
       status: 'DRAFT',
       localName: undefined,
@@ -42,11 +51,11 @@ const residentialSummary: LocationResidentialSummary = {
       inCellSanitation: false,
     }),
     LocationFactory.build({
-      id: '7e570000-0000-1000-8000-000000000005',
+      id: '7e570000-0000-1000-8000-000000000112',
       pathHierarchy: 'A-2-002',
       code: '002',
       cellMark: '2',
-      parentId: '7e570000-0000-1000-8000-000000000003',
+      parentId: landing.id,
       locationType: 'CELL',
       status: 'DRAFT',
       localName: undefined,
@@ -69,19 +78,19 @@ export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) {
   cy.task('reset')
   AuthStubber.stub.stubSignIn({ roles })
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
-  LocationsApiStubber.stub.stubLocations(existingLandingLocation)
-  LocationsApiStubber.stub.stubLocations(existingWingLocation)
+  LocationsApiStubber.stub.stubLocations(wing)
+  LocationsApiStubber.stub.stubLocations(landing)
   LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
   LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
   LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
   LocationsApiStubber.stub.stubLocationsConstantsLocationType()
   LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
   LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+  LocationsApiStubber.stub.stubLocationsEditCells(landing)
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(residentialSummary)
-  LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false, name: 'testL', prisonId })
   ManageUsersApiStubber.stub.stubManageUsers()
   ManageUsersApiStubber.stub.stubManageUsersMe()
   ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
 }
 
-export { prisonId, existingWingLocation, existingLandingLocation, residentialSummary }
+export { prisonId, wing, landing, residentialSummary }

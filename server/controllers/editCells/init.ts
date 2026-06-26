@@ -18,16 +18,17 @@ export default class EditCellsInit extends FormInitialStep {
 
     // Set values for create-cells transaction
 
-    const cellsWithoutSanitation = subLocations
+    const draftCells = subLocations.filter(l => l.status === 'DRAFT')
+    const cellsWithoutSanitation = draftCells
       .filter(l => !getLocationAttributesIncludePending(l).inCellSanitation)
-      .map(l => subLocations.indexOf(l).toString())
+      .map(l => draftCells.indexOf(l).toString())
 
-    req.sessionModel.set('create-cells_cellsToCreate', subLocations.length.toString())
-    req.sessionModel.set('create-cells_accommodationType', location.raw.accommodationTypes[0])
-    req.sessionModel.set('create-cells_usedFor', location.raw.usedFor)
+    req.sessionModel.set('create-cells_cellsToCreate', draftCells.length.toString())
+    req.sessionModel.set('create-cells_accommodationType', draftCells[0].raw.accommodationTypes[0])
+    req.sessionModel.set('create-cells_usedFor', draftCells[0].raw.usedFor)
     req.sessionModel.set('create-cells_bulkSanitation', !cellsWithoutSanitation.length ? 'YES' : 'NO')
     req.sessionModel.set('create-cells_withoutSanitation', cellsWithoutSanitation)
-    subLocations.forEach((subLocation, i) => {
+    draftCells.forEach((subLocation, i) => {
       const { certifiedNormalAccommodation, maxCapacity, workingCapacity, cellMark } =
         getLocationAttributesIncludePending(subLocation)
 

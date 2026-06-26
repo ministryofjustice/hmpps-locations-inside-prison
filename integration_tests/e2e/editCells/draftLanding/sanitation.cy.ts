@@ -1,12 +1,12 @@
-import Page from '../../pages/page'
+import Page from '../../../pages/page'
 import setupStubs from './setupStubs'
 import goToEditCellsConfirmPage from './goToEditCellsConfirmPage'
-import CreateCellsWithoutSanitationPage from '../../pages/commonTransactions/createCells/withoutSanitation'
-import CreateCellsBulkSanitationPage from '../../pages/commonTransactions/createCells/bulkSanitation'
+import CreateCellsWithoutSanitationPage from '../../../pages/commonTransactions/createCells/withoutSanitation'
+import CreateCellsBulkSanitationPage from '../../../pages/commonTransactions/createCells/bulkSanitation'
 import checkCellInformation from './checkCellInformation'
-import EditCellsConfirmPage from '../../pages/editCells/confirm'
+import EditCellsConfirmPage from '../../../pages/editCells/confirm'
 
-context('Create Landing - Create cells - Edit - Sanitation', () => {
+context('Edit cells - Draft landing - Edit - Sanitation', () => {
   let page: EditCellsConfirmPage
 
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
