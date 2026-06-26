@@ -34,7 +34,7 @@ export default async (req: Request, res: Response) => {
     await Promise.all([
       addUsersToUserMap(approvalRequests.map(r => r.requestedBy))(req, res, null),
       addLocationsToLocationMap(approvalRequests.map(r => r.locationId))(req, res, null),
-      addConstantToLocals('locationTypes')(req, res, null),
+      addConstantToLocals(['approvalTypes', 'locationTypes'])(req, res, null),
     ])
   }
 

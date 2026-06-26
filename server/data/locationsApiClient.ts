@@ -185,6 +185,11 @@ export default class LocationsApiClient extends BaseApiClient {
       requestType: 'get',
       options: { cacheDuration: 86_400 },
     }),
+    getApprovalTypes: this.apiCall<{ approvalTypes: { key: string; description: string }[] }, null>({
+      path: '/constants/approval-type',
+      requestType: 'get',
+      options: { cacheDuration: 86_400 },
+    }),
     getConvertedCellTypes: this.apiCall<{ convertedCellTypes: { key: string; description: string }[] }, null>({
       path: '/constants/converted-cell-type',
       requestType: 'get',

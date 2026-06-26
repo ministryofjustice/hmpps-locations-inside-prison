@@ -23,6 +23,9 @@ export default async function populateCertificationRequestDetails(
   // set userMap with requestedBy details
   promises.push(addUsersToUserMap([approvalRequest.requestedBy])(req, res))
 
+  // approval type descriptions are sourced from the backend constants
+  promises.push(addConstantToLocals('approvalTypes')(req, res))
+
   if (approvalRequest.approvalType === 'DEACTIVATION') {
     promises.push(addConstantToLocals('deactivatedReasons')(req, res))
   }

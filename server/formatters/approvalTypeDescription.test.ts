@@ -8,6 +8,15 @@ const mockConstants = {
     { key: 'WING', description: 'Wing' },
     { key: 'LANDING', description: 'Landing' },
   ] as LocationsApiConstant[],
+  approvalTypes: [
+    { key: 'DRAFT', description: 'Add new locations to certificate' },
+    { key: 'SIGNED_OP_CAP', description: 'Change signed operational capacity' },
+    { key: 'CELL_MARK', description: 'Change cell door number' },
+    { key: 'CAPACITY_CHANGE', description: 'Cell capacity' },
+    { key: 'PRISON_BASELINE', description: 'Initial certificate generation' },
+    { key: 'PERMANENT_DEACTIVATION', description: 'Archived' },
+    { key: 'CELL_CERTIFICATE_UPLOAD', description: 'Initial cell certificate import' },
+  ] as LocationsApiConstant[],
 } as any
 
 const baseLocation = {
@@ -103,8 +112,44 @@ describe('approvalTypeDescription', () => {
     ).toBe('Remove special cell type')
   })
 
+  it('returns correct description for PRISON_BASELINE', () => {
+    expect(
+      approvalTypeDescription(
+        CertificationApprovalRequestFactory.build({ approvalType: 'PRISON_BASELINE' }),
+        mockConstants,
+        baseLocation,
+      ),
+    ).toBe('Initial certificate generation')
+  })
+
+  it('returns correct description for PERMANENT_DEACTIVATION', () => {
+    expect(
+      approvalTypeDescription(
+        CertificationApprovalRequestFactory.build({ approvalType: 'PERMANENT_DEACTIVATION' }),
+        mockConstants,
+        baseLocation,
+      ),
+    ).toBe('Archived')
+  })
+
+  it('returns correct description for CELL_CERTIFICATE_UPLOAD', () => {
+    expect(
+      approvalTypeDescription(
+        CertificationApprovalRequestFactory.build({ approvalType: 'CELL_CERTIFICATE_UPLOAD' }),
+        mockConstants,
+        baseLocation,
+      ),
+    ).toBe('Initial cell certificate import')
+  })
+
   it('returns approvalType for unknown type', () => {
     expect(approvalTypeDescription({ approvalType: 'UNKNOWN' } as any, mockConstants, baseLocation)).toBe('UNKNOWN')
+  })
+
+  it('falls back to the raw approvalType when constants are not loaded', () => {
+    expect(approvalTypeDescription({ approvalType: 'CAPACITY_CHANGE' } as any, {} as any, baseLocation)).toBe(
+      'CAPACITY_CHANGE',
+    )
   })
 
   it('handles missing locationType in constants gracefully', () => {

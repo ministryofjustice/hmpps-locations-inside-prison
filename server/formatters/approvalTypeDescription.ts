@@ -4,17 +4,6 @@ import { Location } from '../data/types/locationsApi'
 import capFirst from './capFirst'
 import { CertificationApprovalRequest } from '../data/types/locationsApi/certificationApprovalRequest'
 
-const approvalTypeMap: { [key: string]: string } = {
-  CAPACITY_CHANGE: 'Cell capacity',
-  CELL_MARK: 'Change cell door number',
-  CELL_SANITATION: 'Change cell sanitation',
-  DRAFT: 'Add new locations to certificate',
-  SIGNED_OP_CAP: 'Change signed operational capacity',
-  CONVERT_CELL_TO_ROOM: 'Convert cell to non-residential room',
-  SPECIALIST_CELL_TYPE: 'Set special cell type',
-  CONVERT_ROOM_TO_CELL: 'Convert to cell',
-}
-
 export default function approvalTypeDescription(
   approval: CertificationApprovalRequest,
   constants: Response['locals']['constants'],
@@ -41,9 +30,5 @@ export default function approvalTypeDescription(
     return `${prefix} special cell type`
   }
 
-  if (approvalType in approvalTypeMap) {
-    return approvalTypeMap[approvalType]
-  }
-
-  return approvalType
+  return formatConstants(constants.approvalTypes ?? [], approvalType, '<br>', approvalType)
 }

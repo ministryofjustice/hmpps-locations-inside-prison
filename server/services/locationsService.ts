@@ -190,6 +190,10 @@ export default class LocationsService {
     return this.locationsApiClient.cellCertificateUploads.getUpload(token, { uploadId })
   }
 
+  async getApprovalTypes(token: string) {
+    return (await this.locationsApiClient.constants.getApprovalTypes(token)).approvalTypes
+  }
+
   async getConvertedCellType(token: string, key: string) {
     return (await this.getConstantDataMap(token, 'getConvertedCellTypes'))[key] || 'Unknown'
   }

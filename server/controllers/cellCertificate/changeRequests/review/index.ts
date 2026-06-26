@@ -12,7 +12,7 @@ import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
 export default class Review extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
-    this.use(addConstantToLocals('locationTypes'))
+    this.use(addConstantToLocals(['approvalTypes', 'locationTypes']))
     this.use(conditionallyPopulatePrisoners)
   }
 

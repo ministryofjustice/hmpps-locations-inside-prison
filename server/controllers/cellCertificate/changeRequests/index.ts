@@ -5,7 +5,7 @@ import addLocationsToLocationMap from '../../../middleware/addLocationsToLocatio
 import addUsersToUserMap from '../../../middleware/addUsersToUserMap'
 
 export default async (req: Request, res: Response) => {
-  await addConstantToLocals('locationTypes')(req, res, null)
+  await addConstantToLocals(['approvalTypes', 'locationTypes'])(req, res, null)
   const locals: TypedLocals = {
     ...res.locals,
     title: 'Cell certificate',

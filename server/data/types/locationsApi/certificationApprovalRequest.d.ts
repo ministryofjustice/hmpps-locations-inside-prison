@@ -2,6 +2,7 @@ export declare type CertificationApprovalRequestType =
   | 'SIGNED_OP_CAP'
   | 'DRAFT'
   | 'DEACTIVATION'
+  | 'PERMANENT_DEACTIVATION'
   | 'CELL_MARK'
   | 'CELL_SANITATION'
   | 'REACTIVATION'
@@ -11,6 +12,7 @@ export declare type CertificationApprovalRequestType =
   | 'SPECIALIST_CELL_TYPE'
   | 'CONVERT_ROOM_TO_CELL'
   | 'CONVERT_CELL_TO_ROOM'
+  | 'CELL_CERTIFICATE_UPLOAD'
 
 export declare interface CertificationApprovalRequest {
   id: string

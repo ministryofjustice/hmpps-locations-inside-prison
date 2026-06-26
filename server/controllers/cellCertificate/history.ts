@@ -29,7 +29,7 @@ export default async (req: Request, res: Response) => {
       .filter(r => ['DEACTIVATION', 'REACTIVATION'].includes(r.approvedRequest.approvalType))
       .map(r => r.approvedRequest.locationId),
   )(req, res, null)
-  await addConstantToLocals(['locationTypes'])(req, res, null)
+  await addConstantToLocals(['approvalTypes', 'locationTypes'])(req, res, null)
 
   return res.render('pages/cellCertificate/history', locals)
 }
