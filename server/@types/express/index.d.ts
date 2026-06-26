@@ -83,6 +83,7 @@ interface AllLocals {
   convertedCellTypeDetails: string
   constants: {
     accommodationTypes?: LocationsApiConstant[]
+    approvalTypes?: LocationsApiConstant[]
     convertedCellTypes?: LocationsApiConstant[]
     deactivatedReasons?: LocationsApiConstant[]
     locationTypes?: LocationsApiConstant[]

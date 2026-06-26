@@ -64,6 +64,7 @@ context('Change signed operational capacity', () => {
       cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsApprovalType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)

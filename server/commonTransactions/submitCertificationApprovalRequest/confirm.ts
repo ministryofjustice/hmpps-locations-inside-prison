@@ -148,6 +148,7 @@ export default class Confirm extends FormInitialStep {
     this.use(
       addConstantToLocals([
         'accommodationTypes',
+        'approvalTypes',
         'convertedCellTypes',
         'deactivatedReasons',
         'locationTypes',

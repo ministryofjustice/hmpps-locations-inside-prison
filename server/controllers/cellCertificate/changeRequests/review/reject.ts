@@ -13,7 +13,7 @@ export default class Reject extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
-    this.use(addConstantToLocals('locationTypes'))
+    this.use(addConstantToLocals(['approvalTypes', 'locationTypes']))
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {

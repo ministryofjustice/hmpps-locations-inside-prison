@@ -16,7 +16,7 @@ export default class Approve extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
-    this.use(addConstantToLocals('locationTypes'))
+    this.use(addConstantToLocals(['approvalTypes', 'locationTypes']))
     this.use(conditionallyPopulatePrisoners)
   }
 

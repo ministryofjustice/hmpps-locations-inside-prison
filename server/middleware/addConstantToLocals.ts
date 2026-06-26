@@ -12,6 +12,8 @@ async function getConstant(
   switch (constantName) {
     case 'accommodationTypes':
       return locationsService.getAccommodationTypes(systemToken)
+    case 'approvalTypes':
+      return locationsService.getApprovalTypes(systemToken)
     case 'convertedCellTypes':
       return locationsService.getConvertedCellTypes(systemToken)
     case 'deactivatedReasons':

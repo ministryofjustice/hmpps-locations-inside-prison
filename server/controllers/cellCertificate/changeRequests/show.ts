@@ -11,6 +11,7 @@ import approvalTypeDescription from '../../../formatters/approvalTypeDescription
 export default async (req: Request, res: Response) => {
   await addConstantToLocals([
     'accommodationTypes',
+    'approvalTypes',
     'convertedCellTypes',
     'deactivatedReasons',
     'locationTypes',

@@ -34,6 +34,7 @@ context('Deactivate permanent', () => {
       cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsApprovalType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary', {
@@ -68,6 +69,7 @@ context('Deactivate permanent', () => {
       cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsApprovalType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary', {
