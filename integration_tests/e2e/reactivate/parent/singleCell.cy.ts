@@ -82,6 +82,7 @@ context('Reactivate cell (from reactivate parent)', () => {
       cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsApprovalType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
@@ -114,6 +115,7 @@ context('Reactivate cell (from reactivate parent)', () => {
       cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsApprovalType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       locations.forEach(location => cy.task('stubLocations', location))

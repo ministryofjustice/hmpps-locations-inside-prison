@@ -65,6 +65,7 @@ context('View Locations Show', () => {
     LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
     LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
     LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
     LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
     LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
     LocationsApiStubber.stub.stubGetPrisonConfiguration({

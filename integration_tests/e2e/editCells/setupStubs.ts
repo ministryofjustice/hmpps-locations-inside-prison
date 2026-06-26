@@ -75,6 +75,7 @@ export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) {
   LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
   LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
   LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+  LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
   LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
   LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(residentialSummary)

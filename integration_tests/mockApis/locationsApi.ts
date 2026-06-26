@@ -184,6 +184,37 @@ const stubLocationsConstantsAccommodationType = (
     },
   })
 
+const stubLocationsConstantsApprovalType = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/constants/approval-type',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        approvalTypes: [
+          { key: 'SIGNED_OP_CAP', description: 'Change signed operational capacity' },
+          { key: 'DRAFT', description: 'Add new locations to certificate' },
+          { key: 'DEACTIVATION', description: 'Deactivation' },
+          { key: 'PERMANENT_DEACTIVATION', description: 'Archived' },
+          { key: 'CELL_MARK', description: 'Change cell door number' },
+          { key: 'CELL_SANITATION', description: 'Change cell sanitation' },
+          { key: 'REACTIVATION', description: 'Activation' },
+          { key: 'CAPACITY_CHANGE', description: 'Cell capacity' },
+          { key: 'SPECIALIST_CELL_TYPE', description: 'Set special cell type' },
+          { key: 'CONVERT_ROOM_TO_CELL', description: 'Convert to cell' },
+          { key: 'CONVERT_CELL_TO_ROOM', description: 'Convert cell to non-residential room' },
+          { key: 'PRISON_BASELINE', description: 'Initial certificate generation' },
+          { key: 'CELL_CERTIFICATE_UPLOAD', description: 'Initial cell certificate import' },
+        ],
+      },
+    },
+  })
+
 const stubLocationsConstantsConvertedCellType = () =>
   stubFor({
     request: {
@@ -1503,6 +1534,7 @@ const allStubs = {
   stubLocationsCertificationRequestApprovalsPrison,
   stubLocationsChangeTemporaryDeactivationDetails,
   stubLocationsConstantsAccommodationType,
+  stubLocationsConstantsApprovalType,
   stubLocationsConstantsConvertedCellType,
   stubLocationsConstantsDeactivatedReason,
   stubLocationsConstantsLocationType,

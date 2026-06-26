@@ -33,6 +33,7 @@ context('Set cell type', () => {
     cy.task('stubLocationsConstantsConvertedCellType')
     cy.task('stubLocationsConstantsDeactivatedReason')
     cy.task('stubLocationsConstantsLocationType')
+    cy.task('stubLocationsConstantsApprovalType')
     cy.task('stubLocationsConstantsSpecialistCellType')
     cy.task('stubLocationsConstantsUsedForType')
     cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsWing })

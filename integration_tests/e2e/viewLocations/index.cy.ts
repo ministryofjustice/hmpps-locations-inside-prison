@@ -57,6 +57,7 @@ context('View Locations Index', () => {
       cy.task('stubLocationsConstantsConvertedCellType')
       cy.task('stubLocationsConstantsDeactivatedReason')
       cy.task('stubLocationsConstantsLocationType')
+      cy.task('stubLocationsConstantsApprovalType')
       cy.task('stubLocationsConstantsSpecialistCellType')
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)

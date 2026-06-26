@@ -28,6 +28,7 @@ export function setupStubs(role: string) {
   LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
   LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
   LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+  LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
   LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
   LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(
