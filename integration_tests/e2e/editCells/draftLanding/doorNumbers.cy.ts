@@ -1,11 +1,11 @@
-import Page from '../../pages/page'
+import Page from '../../../pages/page'
 import setupStubs from './setupStubs'
 import goToEditCellsConfirmPage from './goToEditCellsConfirmPage'
 import checkCellInformation from './checkCellInformation'
-import CreateCellsDoorNumbersPage from '../../pages/commonTransactions/createCells/doorNumbers'
-import EditCellsConfirmPage from '../../pages/editCells/confirm'
+import CreateCellsDoorNumbersPage from '../../../pages/commonTransactions/createCells/doorNumbers'
+import EditCellsConfirmPage from '../../../pages/editCells/confirm'
 
-context('Create Landing - Create cells - Edit - Sanitation', () => {
+context('Edit cells - Draft landing - Edit - Door numbers', () => {
   let page: EditCellsConfirmPage
 
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
