@@ -357,6 +357,60 @@ context('Cell Certificate - Change Requests - Show', () => {
         ])
       })
     })
+
+    context('When the approvalType is SPECIALIST_CELL_TYPE', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'SPECIALIST_CELL_TYPE',
+            locationId: '7e570000-0000-1000-8000-000000000001',
+            locationKey: 'TST-A-1-001',
+            reasonForChange: 'Needed to change it',
+            certifiedNormalAccommodationChange: -1,
+            workingCapacityChange: -1,
+            maxCapacityChange: -1,
+            specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+            currentSpecialistCellTypes: [],
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000001',
+                pathHierarchy: 'A-1-001',
+                certifiedNormalAccommodation: 0,
+                currentCertifiedNormalAccommodation: 1,
+                workingCapacity: 0,
+                currentWorkingCapacity: 1,
+                maxCapacity: 1,
+                currentMaxCapacity: 2,
+                specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+                currentSpecialistCellTypes: [],
+              }),
+            ],
+          }),
+        )
+
+        CellCertificateChangeRequestsShowPage.goTo('id1')
+        Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('[data-qa="title-caption"]').should('contain', 'Cell A-1-001')
+        cy.get('h1').should('contain', 'Set special cell type request details')
+
+        testGovukSummaryList('overview-list-SPECIALIST_CELL_TYPE', [
+          ['Location', 'A-1-001'],
+          ['Change type', 'Set special cell type'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+          ['Status', 'Awaiting review'],
+        ])
+
+        testGovukTable('specialist-cell-type-table', [
+          ['A-1-001', '1 → 0', '1 → 0', '2 → 1', 'None → Biohazard / dirty protest cell'],
+        ])
+      })
+    })
   })
 
   context('Review copy and withdraw button by status', () => {

@@ -61,6 +61,8 @@ export default function setupStubs(roles = ['MANAGE_RES_LOCATIONS_OP_CAP']) {
     }),
   )
 
+  LocationsApiStubber.stub.stubPrisonerLocationsId([{ cellLocation: 'A-1-001', prisoners: [] }])
+
   LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison(approvalRequests)
   approvalRequests.forEach(requestApproval => {
     LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(requestApproval)

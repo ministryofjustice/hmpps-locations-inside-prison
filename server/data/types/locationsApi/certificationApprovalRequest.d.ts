@@ -44,6 +44,7 @@ export declare interface CertificationApprovalRequest {
   workingCapacity?: number
   certifiedNormalAccommodation?: number
   specialistCellTypes?: string[]
+  currentSpecialistCellTypes?: string[]
   currentConvertedCellType?: string
   convertedCellType?: string
   currentOtherConvertedCellType?: string
