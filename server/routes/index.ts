@@ -52,6 +52,7 @@ import config from '../config'
 import FormInitialStep from '../controllers/base/formInitialStep'
 import { permissionNameMap } from '../lib/permissions'
 import workingCapacityMismatch from './workingCapacityMismatch'
+import archiveLocationRouter from './archiveLocation'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -100,6 +101,7 @@ export default function routes(services: Services): Router {
 
   router.use('/location/:locationId/add-local-name', setLocalNameRouter)
   router.use('/location/:locationId/add-to-certificate', addToCertificateRouter)
+  router.use('/location/:locationId/archive', archiveLocationRouter)
   router.use('/location/:locationId/cell-conversion', cellConversionRouter)
   router.use('/location/:locationId/change-cell-capacity', changeCellCapacityRouter)
   router.use('/location/:locationId/change-door-number', changeDoorNumberRouter)
