@@ -36,11 +36,17 @@ export default async (req: Request, res: Response) => {
       }
 
       if (summary.subLocationName === 'Cells') {
-        if (summary.subLocations.find(l => l.status === 'DRAFT')) {
+        const hasAnyDraftCells = summary.subLocations.some(l => l.status === 'DRAFT')
+        if (hasAnyDraftCells) {
           createButton = {
             ...createButton,
             text: 'Edit cells',
             href: `/edit-cells/${location.id}`,
+          }
+
+          const hasAnyNonDraftCells = summary.subLocations.some(l => l.status !== 'DRAFT')
+          if (hasAnyNonDraftCells) {
+            createButton.text = 'Edit draft cells'
           }
         } else {
           createButton = { ...createButton, text: 'Create new cells', href: `/create-cells/${location.id}` }

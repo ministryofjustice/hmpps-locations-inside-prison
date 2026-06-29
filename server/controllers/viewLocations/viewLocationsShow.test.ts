@@ -470,6 +470,58 @@ describe('view locations show', () => {
               title: 'Manage residential locations',
             })
           })
+
+          describe('when sub-location is Cells', () => {
+            beforeEach(() => {
+              deepRes.locals.decoratedResidentialSummary.subLocationName = 'Cells'
+            })
+
+            it('renders Edit cells when all cells are DRAFT', async () => {
+              deepRes.locals.decoratedResidentialSummary.subLocations = [
+                buildDecoratedLocation({ status: 'DRAFT' }),
+                buildDecoratedLocation({ status: 'DRAFT' }),
+              ]
+
+              await controller(deepReq as Request, deepRes as Response)
+
+              expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+                banner: undefined,
+                createButton: {
+                  attributes: {
+                    'data-qa': 'create-button',
+                  },
+                  classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
+                  href: '/edit-cells/7e570000-0000-0000-0000-000000000001',
+                  text: 'Edit cells',
+                },
+                minLayout: 'three-quarters',
+                title: 'Manage residential locations',
+              })
+            })
+
+            it('renders Edit draft cells when there are DRAFT and non-DRAFT cells', async () => {
+              deepRes.locals.decoratedResidentialSummary.subLocations = [
+                buildDecoratedLocation({ status: 'DRAFT' }),
+                buildDecoratedLocation({ status: 'ACTIVE' }),
+              ]
+
+              await controller(deepReq as Request, deepRes as Response)
+
+              expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
+                banner: undefined,
+                createButton: {
+                  attributes: {
+                    'data-qa': 'create-button',
+                  },
+                  classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
+                  href: '/edit-cells/7e570000-0000-0000-0000-000000000001',
+                  text: 'Edit draft cells',
+                },
+                minLayout: 'three-quarters',
+                title: 'Manage residential locations',
+              })
+            })
+          })
         })
       })
     })
