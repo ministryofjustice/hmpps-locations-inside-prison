@@ -22,12 +22,6 @@ body {
   padding-top: 0;
 }
 
-h1.govuk-heading-l .govuk-tag {
-  vertical-align: middle;
-  margin-bottom: 5px;
-  margin-left: 2px;
-}
-
 div.govuk-grid-row {
   margin-bottom: 24px;
 }
@@ -333,4 +327,35 @@ button.govuk-back-link {
   border: 0;
   background: none;
   cursor: pointer;
+}
+
+.header-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 29px;
+
+  .header-left {
+    display: flex;
+    align-items: flex-end;
+    column-gap: 7px;
+  }
+
+  .govuk-heading-l {
+    margin-bottom: 0;
+  }
+
+  .govuk-tag {
+    vertical-align: middle;
+    margin-bottom: 6px;
+    margin-left: 2px;
+  }
+
+  .actions {
+    margin-left: auto;
+    align-self: flex-start;
+
+    .govuk-button {
+      margin-bottom: 0;
+    }
+  }
 }

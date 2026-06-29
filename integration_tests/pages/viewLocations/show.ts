@@ -65,6 +65,10 @@ export default class ViewLocationsShowPage extends Page {
 
   deactivateAction = (): PageElement => cy.get('.moj-button-menu__wrapper a:contains("Deactivate cell")')
 
+  archiveCellButton = (): PageElement => cy.get(`a:contains("Archive cell")`)
+
+  archiveLandingButton = (): PageElement => cy.get(`a:contains("Archive landing")`)
+
   summaryCards = {
     all: (): PageElement => cy.get('.hmpps-summary-card'),
     cnaText: (): PageElement => cy.get('[data-qa=cna-card]').find('[data-qa=bottom-content-line-1]'),

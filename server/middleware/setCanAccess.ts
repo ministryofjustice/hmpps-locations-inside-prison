@@ -27,7 +27,12 @@ export default function setCanAccess(locationService: LocationsService) {
       )
       if (prisonConfiguration.certificationApprovalRequired === 'INACTIVE') {
         permissionOverrides.create_location = false
+        permissionOverrides.archive_location = false
       }
+    }
+
+    if (req.featureFlags.archiveLocation === false) {
+      permissionOverrides.archive_location = false
     }
 
     req.canAccess = permission => {
