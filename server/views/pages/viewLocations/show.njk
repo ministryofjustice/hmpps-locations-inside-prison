@@ -19,21 +19,23 @@
 
 {% block heading %}
   <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
-  <h1 class="govuk-heading-l">
-    {{ locationName }}
-    {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certifiedCell %}
-      {{ govukTag({
-        text: 'Certified',
-        classes: "govuk-tag--hollow",
-        attributes: {
-          "data-qa": "certified-tag"
-        }
-      }) }}
-    {% endif %}
-    {{ locationStatusTag(decoratedResidentialSummary.location) }}
+  <div class="header-row">
+    <div class="header-left">
+    <h1 class="govuk-heading-l">{{ locationName }}</h1>
+      {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certifiedCell %}
+        {{ govukTag({
+          text: 'Certified',
+          classes: "govuk-tag--hollow",
+          attributes: {
+            "data-qa": "certified-tag"
+          }
+        }) }}
+      {% endif %}
+      {{ locationStatusTag(decoratedResidentialSummary.location) }}
+    </div>
 
     {% if actions | length %}
-      <div class="govuk-!-float-right">
+      <div class="actions">
         {% if actions | length > 1 %}
           {{ mojButtonMenu({
             button: { text: "Actions" },
@@ -47,7 +49,7 @@
         {% endif %}
       </div>
     {% endif %}
-  </h1>
+  </div>
 {% endblock %}
 
 {% block content %}

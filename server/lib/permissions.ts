@@ -21,6 +21,7 @@ const certificateAdministratorPermissions: string[] = [
   'deactivate:permanent',
   'deactivate:parent_location',
   'set_cell_type',
+  'archive_location',
 ]
 
 const certificateReviewerPermissions: string[] = ['certificate_change_request_review']

@@ -19,7 +19,7 @@ const router = express.Router({ mergeParams: true })
 
 export const addActions = asyncMiddleware(async (req, res, next) => {
   const { location } = res.locals.decoratedResidentialSummary
-  const { active, isResidential, leafLevel, raw, status } = location
+  const { active, inactiveStatus, isResidential, leafLevel, raw, status } = location
   const { locationType } = raw
   const requiredPermission = locationType === 'CELL' ? 'deactivate' : 'deactivate:parent_location'
 
@@ -46,6 +46,17 @@ export const addActions = asyncMiddleware(async (req, res, next) => {
     addAction({
       text: `Convert cell to non-residential room`,
       href: `/location/${location.id}/non-residential-conversion`,
+    })(req, res, null)
+  }
+
+  if (
+    !active &&
+    ['INACTIVE_TEMP', 'INACTIVE_MATCHING_CELL_CERT'].includes(inactiveStatus) &&
+    req.canAccess('archive_location')
+  ) {
+    addAction({
+      text: `Archive ${location.locationType.toLowerCase()}`,
+      href: `/location/${location.id}/archive`,
     })(req, res, null)
   }
 

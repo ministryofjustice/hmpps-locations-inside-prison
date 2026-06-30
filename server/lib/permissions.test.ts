@@ -11,6 +11,7 @@ describe('rolesToPermissions', () => {
 
   it('returns the correct permissions for MANAGE_RES_LOCATIONS_OP_CAP', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_OP_CAP']).sort()).toEqual([
+      'archive_location',
       'certificate_change_request_create',
       'certificate_change_request_withdraw',
       'change_cell_capacity',
@@ -55,6 +56,7 @@ describe('rolesToPermissions', () => {
       ]).sort(),
     ).toEqual([
       'administer_residential',
+      'archive_location',
       'certificate_change_request_create',
       'certificate_change_request_review',
       'certificate_change_request_withdraw',
