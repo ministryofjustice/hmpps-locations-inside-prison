@@ -22,6 +22,7 @@ import {
   CertificationApprovalRequestType,
 } from '../../data/types/locationsApi/certificationApprovalRequest'
 import { NotificationDetails } from '../../data/types/locationsApi/notificationDetails'
+import { PendingApprovalsBelow } from '../../data/types/locationsApi/pendingApprovalsBelow'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -215,6 +216,8 @@ interface AllLocals {
     workingCapacityText: string
     certifiedNormalAccommodationText: string
   }[]
+  pendingApprovalsBelow: PendingApprovalsBelow
+  changeRequestsLink: string
 }
 
 type TypedLocals = Partial<AllLocals>

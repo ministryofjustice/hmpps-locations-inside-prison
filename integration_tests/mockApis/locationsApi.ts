@@ -12,6 +12,7 @@ import TypedStubber from './typedStubber'
 import { CertificationApprovalRequest } from '../../server/data/types/locationsApi/certificationApprovalRequest'
 import { CellCertificateUpload } from '../../server/data/types/locationsApi/cellCertificateUpload'
 import { CellCertificateDashboardEntry } from '../../server/data/types/locationsApi/cellCertificateDashboard'
+import { PendingApprovalsBelow } from '../../server/data/types/locationsApi/pendingApprovalsBelow'
 
 const stubLocationsCertificationPrisonSignedOpCapChange = () =>
   stubFor({
@@ -1511,6 +1512,21 @@ const stubRequestCellCertificateUpload = (upload: CellCertificateUpload) =>
     },
   })
 
+const stubPendingApprovalsBelow = (pendingApprovalsBelow: PendingApprovalsBelow) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/locations-api/certification/location/[\\w-]+/pending-approvals-below',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: pendingApprovalsBelow,
+    },
+  })
+
 const allStubs = {
   stubCellCertificateUploadsList,
   stubCellCertificateUpload,
@@ -1568,6 +1584,7 @@ const allStubs = {
   stubLocationsResidentialSummaryForCreateWing,
   stubLocationsUpdateNonResCell,
   stubPatchLocation,
+  stubPendingApprovalsBelow,
   stubPrisonConfiguration,
   stubPrisonConfigurationActivateNonResi,
   stubPrisonConfigurationActivateResi,

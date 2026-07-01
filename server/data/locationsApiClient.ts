@@ -20,6 +20,7 @@ import { CertificationApprovalRequest } from './types/locationsApi/certification
 import { CellCertificate } from './types/locationsApi/cellCertificate'
 import { CellCertificateDashboardEntry } from './types/locationsApi/cellCertificateDashboard'
 import { CellCertificateUpload } from './types/locationsApi/cellCertificateUpload'
+import { PendingApprovalsBelow } from './types/locationsApi/pendingApprovalsBelow'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
@@ -148,6 +149,10 @@ export default class LocationsApiClient extends BaseApiClient {
       >({
         path: '/certification/location/specialist-cell-type-change',
         requestType: 'put',
+      }),
+      pendingApprovalsBelow: this.apiCall<PendingApprovalsBelow, { id: string }>({
+        path: '/certification/location/:id/pending-approvals-below',
+        requestType: 'get',
       }),
     },
     prison: {

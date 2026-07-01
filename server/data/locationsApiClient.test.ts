@@ -323,6 +323,13 @@ describe('locationsApiClient', () => {
           reasonForChange: 'because of reasons',
         },
       )
+      testCall(
+        'pendingApprovalsBelow',
+        '/certification/location/cc639c0e-02c4-4d34-a134-a15a40ae17b6/pending-approvals-below',
+        false,
+        () => apiClient.certification.location.pendingApprovalsBelow,
+        { id: 'cc639c0e-02c4-4d34-a134-a15a40ae17b6' },
+      )
     })
   })
 })

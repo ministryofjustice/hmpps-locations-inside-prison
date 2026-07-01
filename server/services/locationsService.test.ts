@@ -483,4 +483,14 @@ describe('Locations service', () => {
       })
     })
   })
+
+  describe('getPendingApprovalsBelow', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.getPendingApprovalsBelow('token', '481fc587-60f8-402b-804d-64462babddcc')
+
+      expect(locationsApiClient.certification.location.pendingApprovalsBelow).toHaveBeenCalledWith('token', {
+        id: '481fc587-60f8-402b-804d-64462babddcc',
+      })
+    })
+  })
 })
