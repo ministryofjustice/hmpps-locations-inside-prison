@@ -6,6 +6,7 @@ import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
 import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
+import getPendingApprovalsBelow from '../../middleware/getPendingApprovalsBelow'
 
 const router = express.Router({ mergeParams: true })
 
@@ -14,6 +15,7 @@ router.use(
   populateLocation({ decorate: true, includeCurrentCertificate: true }),
   populateTitleCaptionFromLocation,
   populatePrisonConfiguration(),
+  getPendingApprovalsBelow,
   wizard(steps, fields, {
     name: 'archive',
     templatePath: 'pages/archive',

@@ -489,4 +489,8 @@ export default class LocationsService {
   async editCells(token: string, data: Parameters<LocationsApiClient['locations']['editCells']>[2]) {
     return this.locationsApiClient.locations.editCells(token, undefined, data)
   }
+
+  async getPendingApprovalsBelow(token: string, locationId: string) {
+    return this.locationsApiClient.certification.location.pendingApprovalsBelow(token, { id: locationId })
+  }
 }

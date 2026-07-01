@@ -2,8 +2,10 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import AuthStubber from '../../mockApis/auth'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 import Page from '../../pages/page'
+import RequestsPendingPage from '../../pages/requestsPending'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 
@@ -36,6 +38,7 @@ context('Archive location', () => {
       LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
       LocationsApiStubber.stub.stubLocations(location)
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
       cy.task('setFeatureFlag', { archiveLocation: true })
       cy.signIn()
     })
@@ -49,7 +52,7 @@ context('Archive location', () => {
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
     })
 
     context('when feature flag is disabled', () => {
@@ -63,6 +66,7 @@ context('Archive location', () => {
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
         LocationsApiStubber.stub.stubLocations(location)
         LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
         cy.task('setFeatureFlag', { archiveLocation: false })
         cy.signIn()
       })
@@ -85,6 +89,7 @@ context('Archive location', () => {
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
         LocationsApiStubber.stub.stubLocations(location)
         LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
         cy.task('setFeatureFlag', { archiveLocation: true })
         cy.signIn()
       })
@@ -103,17 +108,11 @@ context('Archive location', () => {
           inactiveStatus: undefined,
           locationType: 'CELL',
         })
-        cy.task('stubLocationsLocationsResidentialSummary', {
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
-        })
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
         LocationsApiStubber.stub.stubLocations(location)
         LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
         cy.task('setFeatureFlag', { archiveLocation: true })
         cy.signIn()
       })
@@ -132,17 +131,11 @@ context('Archive location', () => {
           inactiveStatus: 'INACTIVE_TEMP',
           locationType: 'CELL',
         })
-        cy.task('stubLocationsLocationsResidentialSummary', {
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
-        })
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
         LocationsApiStubber.stub.stubLocations(location)
         LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
         cy.task('setFeatureFlag', { archiveLocation: true })
         cy.signIn()
       })
@@ -163,17 +156,11 @@ context('Archive location', () => {
           inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
           locationType: 'CELL',
         })
-        cy.task('stubLocationsLocationsResidentialSummary', {
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
-        })
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
         LocationsApiStubber.stub.stubLocations(location)
         LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
         cy.task('setFeatureFlag', { archiveLocation: true })
         cy.signIn()
       })
@@ -194,17 +181,11 @@ context('Archive location', () => {
           inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
           locationType: 'LANDING',
         })
-        cy.task('stubLocationsLocationsResidentialSummary', {
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
-        })
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
         LocationsApiStubber.stub.stubLocations(location)
         LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
         cy.task('setFeatureFlag', { archiveLocation: true })
         cy.signIn()
       })
@@ -218,6 +199,57 @@ context('Archive location', () => {
       })
     })
 
+    describe('requests pending page', () => {
+      beforeEach(() => {
+        location = LocationFactory.build({
+          active: false,
+          inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
+          locationType: 'CELL',
+        })
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
+        LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({
+          hasPendingBelow: true,
+          pendingLocations: [
+            {
+              id: '6bcfab2c-df86-467b-89ca-e1eb1bb84249',
+              key: 'LEI-A-1-016',
+              locationType: 'CELL',
+              parentId: 'd8ddb0a7-1e39-425c-a32f-d128e80ca05b',
+              parentKey: 'LEI-A-1',
+              parentLocationType: 'LANDING',
+            },
+          ],
+        })
+        cy.task('setFeatureFlag', { archiveLocation: true })
+        cy.signIn()
+
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.archiveCellButton().click()
+      })
+
+      it('has a back link to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.backLink().click()
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a cancel link that leads to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.returnLink().click()
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a link to the cert approvals page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.certApprovalsLink().click()
+        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
+      })
+    })
+
     describe('cert disclaimer page', () => {
       beforeEach(() => {
         location = LocationFactory.build({
@@ -225,17 +257,11 @@ context('Archive location', () => {
           inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
           locationType: 'CELL',
         })
-        cy.task('stubLocationsLocationsResidentialSummary', {
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
-        })
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
         LocationsApiStubber.stub.stubLocations(location)
         LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
         cy.task('setFeatureFlag', { archiveLocation: true })
         cy.signIn()
 
