@@ -122,7 +122,7 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro certificationApprovalRequest(request, multiple, index, prisonResidentialSummary, includeChangeSummary, constants, locationMap, changeLinks) %}
+{% macro certificationApprovalRequest(request, multiple, index, includeChangeSummary, constants, locationMap, changeLinks) %}
   {% set changeType = approvalTypeDescription(request, constants, locationMap[request.locationId]) %}
 
   <div class="govuk-width-container">
@@ -169,29 +169,33 @@
             <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
           {% else %}
             <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
-            <h3 class="govuk-heading-s">New wing usage</h3>
-          {% endif %}
-
-          {{ govukTable({
-            attributes: {
-              'data-qa': 'wing-table'
-            },
-            head: [
-              { classes: 'govuk-table__cell', text: "Location" },
-              { text: "Accommodation type" },
-              { text: "Used for" }
-            ],
-            rows: [[
-              { text: request.locations[0].pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
-              { html: formatConstants(constants.accommodationTypes, request.locations[0].accommodationTypes) },
-              { html: formatConstants(constants.usedForTypes, request.locations[0].usedFor) }
-            ]]
-          }) }}
-
-          {% if not multiple %}
-            <h3 class="govuk-heading-s">New locations</h3>
+            {% if request.topLevelAccommodationTypes %}
+              <h3 class="govuk-heading-s">New wing usage</h3>
+            {% endif %}
           {% endif %}
         </div>
+
+        {% if request.topLevelAccommodationTypes %}
+          {% set topLevelLocation = locationMap[locationMap[request.locationId].topLevelId] %}
+          <div class="govuk-grid-column-two-thirds">
+            {{ govukTable({
+              attributes: {
+                'data-qa': 'wing-usage-table'
+              },
+              head: [
+                { text: "Location" },
+                { text: "Accommodation type" },
+                { text: "Used for" }
+              ],
+              rows: [[
+                { text: topLevelLocation.localName or topLevelLocation.pathHierarchy, classes: 'govuk-table__header govuk-table__cell' },
+                { html: formatConstants(constants.accommodationTypes, request.topLevelAccommodationTypes) },
+                { html: formatConstants(constants.usedForTypes, request.topLevelUsedFor) }
+              ]],
+              firstCellIsHeader: true
+            }) }}
+          </div>
+        {% endif %}
 
         {% set locationTableRows = [] %}
         {% for location in request.locations %}
@@ -199,6 +203,10 @@
         {% endfor %}
 
         <div class="govuk-grid-column-full">
+          {% if not multiple %}
+            <h3 class="govuk-heading-s">New locations</h3>
+          {% endif %}
+
           {{ govukTable({
             attributes: {
               'data-qa': 'locations-table'
@@ -501,6 +509,9 @@
             <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
           {% else %}
             <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+            {% if request.topLevelAccommodationTypes %}
+              <h3 class="govuk-heading-s">New wing usage</h3>
+            {% endif %}
           {% endif %}
         </div>
 
@@ -509,7 +520,7 @@
           <div class="govuk-grid-column-two-thirds">
             {{ govukTable({
               attributes: {
-                'data-qa': 'cell-usage-change-table'
+                'data-qa': 'wing-usage-table'
               },
               head: [
                 { text: "Location" },

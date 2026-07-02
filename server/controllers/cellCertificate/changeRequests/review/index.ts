@@ -1,45 +1,21 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../../base/formInitialStep'
-import capFirst from '../../../../formatters/capFirst'
-import displayName from '../../../../formatters/displayName'
-import addConstantToLocals from '../../../../middleware/addConstantToLocals'
-import addUsersToUserMap from '../../../../middleware/addUsersToUserMap'
-import { Location } from '../../../../data/types/locationsApi'
 import approvalTypeDescription from '../../../../formatters/approvalTypeDescription'
 import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
+import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 
 export default class Review extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
-    this.use(addConstantToLocals(['approvalTypes', 'locationTypes']))
+    this.use(populateCertificationRequestDetails)
     this.use(conditionallyPopulatePrisoners)
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { locationsService } = req.services
-    const { systemToken } = req.session
-    const { approvalRequest, constants, prisonResidentialSummary } = res.locals
-
-    let location: Location
-    if (approvalRequest.locationId) {
-      location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
-      res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
-    } else {
-      res.locals.titleCaption = prisonResidentialSummary.prisonSummary.prisonName
-    }
+    const { approvalRequest, constants, location } = res.locals
 
     res.locals.title = `Review ${approvalTypeDescription(approvalRequest, constants, location).toLowerCase()} request`
-
-    await addUsersToUserMap([approvalRequest.requestedBy])(req, res, null)
-
-    if (location) {
-      if (!res.locals.locationMap) {
-        res.locals.locationMap = {}
-      }
-
-      res.locals.locationMap[location.id] = location
-    }
 
     await super._locals(req, res, next)
   }

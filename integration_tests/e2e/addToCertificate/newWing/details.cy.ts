@@ -1,9 +1,9 @@
 import setupStubs from './setupStubs'
-import Page from '../../pages/page'
-import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
-import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
+import Page from '../../../pages/page'
+import ViewLocationsShowPage from '../../../pages/viewLocations/show'
+import SubmitCertificationApprovalRequestPage from '../../../pages/commonTransactions/submitCertificationApprovalRequest'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import UpdateSignedOpCapDetailsPage from '../../../pages/commonTransactions/updateSignedOpCap/details'
 import goToUpdateSignedOpCapDetails from './goToUpdateSignedOpCapDetails'
 
 context('Add To Certificate - Update Signed Operational Capacity - Details', () => {

@@ -1,5 +1,5 @@
-import Page from '../../pages/page'
-import UpdateSignedOpCapAlreadyRequestedPage from '../../pages/commonTransactions/updateSignedOpCap/alreadyRequested'
+import Page from '../../../pages/page'
+import UpdateSignedOpCapAlreadyRequestedPage from '../../../pages/commonTransactions/updateSignedOpCap/alreadyRequested'
 import goToUpdateSignedOpCapIsUpdateNeeded from './goToUpdateSignedOpCapIsUpdateNeeded'
 
 const goToUpdateSignedOpCapAlreadyRequested = (locationId: string) => {

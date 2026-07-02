@@ -1,8 +1,8 @@
-import Page from '../../pages/page'
+import Page from '../../../pages/page'
 import goToUpdateSignedOpCapIsUpdateNeeded from './goToUpdateSignedOpCapIsUpdateNeeded'
 import goToUpdateSignedOpCapAlreadyRequested from './goToUpdateSignedOpCapAlreadyRequested'
 import goToUpdateSignedOpCapDetails from './goToUpdateSignedOpCapDetails'
-import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
+import SubmitCertificationApprovalRequestPage from '../../../pages/commonTransactions/submitCertificationApprovalRequest'
 
 const goToSubmitCertificationApprovalRequest = (
   locationId: string,

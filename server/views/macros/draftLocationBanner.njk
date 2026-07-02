@@ -25,7 +25,7 @@
       {% endif %}
     </p>
 
-    {% if topLevelDraftLocation.numberOfCellLocations > 0 and canAccess('certificate_change_request_create') and not topLevelDraftLocation.locked %}
+    {% if (topLevelDraftLocation.numberOfCellLocations > 0 or topLevelDraftLocation.leafLevel) and canAccess('certificate_change_request_create') and not topLevelDraftLocation.locked %}
       {{ govukButton({
         text: "Add " + (topLevelDraftLocation.locationType | lower) + " to cell certificate",
         preventDoubleClick: true,

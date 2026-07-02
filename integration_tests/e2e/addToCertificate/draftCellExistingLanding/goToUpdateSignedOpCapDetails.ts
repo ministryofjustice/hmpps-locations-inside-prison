@@ -1,6 +1,6 @@
-import Page from '../../pages/page'
+import Page from '../../../pages/page'
 import goToUpdateSignedOpCapIsUpdateNeeded from './goToUpdateSignedOpCapIsUpdateNeeded'
-import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
+import UpdateSignedOpCapDetailsPage from '../../../pages/commonTransactions/updateSignedOpCap/details'
 
 const goToUpdateSignedOpCapDetails = (locationId: string) => {
   goToUpdateSignedOpCapIsUpdateNeeded(locationId).submit({ updateNeeded: true })
