@@ -2,6 +2,8 @@ import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import RequestsPending from '../../controllers/requestsPending'
+import FormInitialStep from '../../controllers/base/formInitialStep'
+import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 const hasPendingApprovalsBelow = (_req: FormWizard.Request, res: Response) =>
   res.locals.pendingApprovalsBelow.hasPendingBelow
@@ -29,6 +31,14 @@ const steps: FormWizard.Steps = {
     next: 'reason',
     title: (_req, _res) => 'Archiving a location',
   }),
+  '/reason': {
+    pageTitle: 'Why is this location is being archived?',
+    editable: true,
+    fields: ['reason'],
+    controller: FormInitialStep,
+    next: 'update-signed-op-cap',
+  },
+  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
 }
 
 export default steps

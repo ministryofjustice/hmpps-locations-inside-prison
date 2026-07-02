@@ -1,0 +1,13 @@
+{% extends "../../partials/formStep.njk" %}
+
+{% block outerHeading %}
+  <div class="govuk-grid-row govuk-!-margin-bottom-0">
+    <div class="govuk-grid-column-two-thirds">
+      {% block heading %}
+        {% if titleCaption %}
+          <span class="govuk-caption-m" data-qa="title-caption">{{ titleCaption }}</span>
+        {% endif %}
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}

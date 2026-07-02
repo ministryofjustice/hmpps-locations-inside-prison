@@ -18,7 +18,7 @@ router.use(
   getPendingApprovalsBelow,
   wizard(steps, fields, {
     name: 'archive',
-    templatePath: 'pages/archive',
+    templatePath: 'pages/archiveLocation',
     csrf: false,
   }),
 )

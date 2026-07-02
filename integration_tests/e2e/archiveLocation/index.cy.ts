@@ -2,8 +2,10 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import AuthStubber from '../../mockApis/auth'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import ArchiveReasonPage from '../../pages/archiveLocation/archiveReason'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
 import Page from '../../pages/page'
 import RequestsPendingPage from '../../pages/requestsPending'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
@@ -282,10 +284,74 @@ context('Archive location', () => {
         Page.verifyOnPage(ViewLocationsIndexPage)
       })
 
-      it('has a continue button leads to the reason page', () => {
+      it('has a continue button that leads to the reason page', () => {
         const disclaimerPage = new CertChangeDisclaimerPage('Archiving a location')
         disclaimerPage.continueButton().click()
         cy.location('pathname').should('contain', '/archive/reason')
+      })
+    })
+
+    describe('reason for archiving page', () => {
+      const multilineText = 'This is a line of text\n\nThis is another line of text'
+
+      beforeEach(() => {
+        location = LocationFactory.build({
+          active: false,
+          inactiveStatus: 'INACTIVE_MATCHING_CELL_CERT',
+          locationType: 'CELL',
+        })
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
+        LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
+        cy.task('setFeatureFlag', { archiveLocation: true })
+        cy.signIn()
+
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.archiveCellButton().click()
+        const disclaimerPage = new CertChangeDisclaimerPage('Archiving a location')
+        disclaimerPage.continueButton().click()
+      })
+
+      it('has a back link to the cert disclaimer page', () => {
+        const reasonPage = Page.verifyOnPage(ArchiveReasonPage)
+        reasonPage.backLink().click()
+        const disclaimerPage = new CertChangeDisclaimerPage('Archiving a location')
+        disclaimerPage.checkOnPage()
+      })
+
+      it('has a cancel link that leads to the view location page', () => {
+        const reasonPage = Page.verifyOnPage(ArchiveReasonPage)
+        reasonPage.cancelLink().click()
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('shows a validation error if the reason is blank', () => {
+        const reasonPage = Page.verifyOnPage(ArchiveReasonPage)
+        reasonPage.submit('')
+        Page.checkForError('reason', 'Explain why this location is being archived')
+      })
+
+      it('continues to the check op cap page when submitting', () => {
+        const reasonPage = Page.verifyOnPage(ArchiveReasonPage)
+        reasonPage.submit(multilineText)
+        Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+      })
+
+      it('preserves line breaks', () => {
+        const reasonPage = Page.verifyOnPage(ArchiveReasonPage)
+        reasonPage.submit(multilineText)
+        const opCapCheckPage = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+        opCapCheckPage.backLink().click()
+        reasonPage
+          .reasonInput()
+          .invoke('val')
+          .then(value => {
+            expect(value).to.equal(multilineText)
+          })
       })
     })
   })
