@@ -318,6 +318,7 @@ declare module 'hmpo-form-wizard' {
         text: string
         classes?: string
         for?: string
+        isPageHeading?: boolean
       }
       formGroup?: {
         classes?: string
