@@ -1,6 +1,6 @@
-import Page from '../../pages/page'
-import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
+import Page from '../../../pages/page'
+import ViewLocationsShowPage from '../../../pages/viewLocations/show'
+import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
 
 const goToCertChangeDisclaimer = (locationId: string) => {
   cy.signIn()

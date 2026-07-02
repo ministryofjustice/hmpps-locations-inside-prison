@@ -1,15 +1,15 @@
 import setupStubs, { draftCell1, draftCell2, draftLanding, draftWing } from './setupStubs'
-import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
+import SubmitCertificationApprovalRequestPage from '../../../pages/commonTransactions/submitCertificationApprovalRequest'
 import goToSubmitCertificationApprovalRequest from './goToSubmitCertificationApprovalRequest'
-import { Location } from '../../../server/data/types/locationsApi'
-import formatConstants from '../../../server/formatters/formatConstants'
-import Page from '../../pages/page'
-import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
-import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
-import testGovukTable from '../../support/testGovukTable'
-import testGovukSummaryList from '../../support/testGovukSummaryList'
-import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
+import { Location } from '../../../../server/data/types/locationsApi'
+import formatConstants from '../../../../server/formatters/formatConstants'
+import Page from '../../../pages/page'
+import ViewLocationsShowPage from '../../../pages/viewLocations/show'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import UpdateSignedOpCapDetailsPage from '../../../pages/commonTransactions/updateSignedOpCap/details'
+import testGovukTable from '../../../support/testGovukTable'
+import testGovukSummaryList from '../../../support/testGovukSummaryList'
+import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertificate/changeRequests'
 
 function testRequests(
   page: SubmitCertificationApprovalRequestPage,
@@ -29,7 +29,7 @@ function testRequests(
     page.request('DRAFT').find('h3').should('contain', 'New locations')
   }
 
-  testGovukTable('wing-table', [
+  testGovukTable('wing-usage-table', [
     [draftRequest.wing.pathHierarchy, 'Normal accommodation', 'Close Supervision Centre (CSC)'],
   ])
 

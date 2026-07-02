@@ -1,83 +1,83 @@
-import AuthStubber from '../../mockApis/auth'
-import LocationsApiStubber from '../../mockApis/locationsApi'
-import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
-import LocationFactory from '../../../server/testutils/factories/location'
-import { LocationResidentialSummary, PrisonResidentialSummary } from '../../../server/data/types/locationsApi'
-import { CertificationApprovalRequest } from '../../../server/data/types/locationsApi/certificationApprovalRequest'
-import CertificationApprovalRequestFactory from '../../../server/testutils/factories/certificationApprovalRequest'
+import AuthStubber from '../../../mockApis/auth'
+import LocationsApiStubber from '../../../mockApis/locationsApi'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import LocationFactory from '../../../../server/testutils/factories/location'
+import { LocationResidentialSummary, PrisonResidentialSummary } from '../../../../server/data/types/locationsApi'
+import { CertificationApprovalRequest } from '../../../../server/data/types/locationsApi/certificationApprovalRequest'
+import CertificationApprovalRequestFactory from '../../../../server/testutils/factories/certificationApprovalRequest'
 
 const prisonId = 'TST'
-const otherDraftWing = LocationFactory.build({
+const otherActiveWing = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000100',
   pathHierarchy: 'A',
   parentId: undefined,
   locationType: 'WING',
   localName: undefined,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   capacity: {
-    maxCapacity: 0,
-    workingCapacity: 0,
-  },
-  pendingChanges: {
-    certifiedNormalAccommodation: 20,
-    workingCapacity: 20,
     maxCapacity: 40,
+    workingCapacity: 40,
   },
-  currentCellCertificate: undefined,
+  currentCellCertificate: {
+    maxCapacity: 40,
+    workingCapacity: 40,
+    certifiedNormalAccommodation: 40,
+  },
   numberOfCellLocations: 10,
   level: 1,
   leafLevel: false,
 })
-const draftWing = LocationFactory.build({
+const existingWing = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000200',
+  topLevelId: '7e570000-0000-1000-8000-000000000200',
   pathHierarchy: 'B',
   parentId: undefined,
   locationType: 'WING',
   localName: undefined,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   capacity: {
-    maxCapacity: 0,
-    workingCapacity: 0,
+    maxCapacity: 60,
+    workingCapacity: 60,
   },
-  pendingChanges: {
-    certifiedNormalAccommodation: 20,
-    workingCapacity: 20,
-    maxCapacity: 40,
+  currentCellCertificate: {
+    maxCapacity: 60,
+    workingCapacity: 60,
+    certifiedNormalAccommodation: 60,
   },
-  currentCellCertificate: undefined,
   numberOfCellLocations: 10,
   specialistCellTypes: [],
   inCellSanitation: undefined,
   level: 1,
   leafLevel: false,
 })
-const draftLanding = LocationFactory.build({
+const existingLanding = LocationFactory.build({
   id: '7e570000-0000-1000-8000-000000000210',
+  topLevelId: '7e570000-0000-1000-8000-000000000200',
   pathHierarchy: 'B-1',
-  parentId: draftWing.id,
+  parentId: existingWing.id,
   locationType: 'LANDING',
   localName: undefined,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   capacity: {
-    maxCapacity: 0,
-    workingCapacity: 0,
-  },
-  pendingChanges: {
-    certifiedNormalAccommodation: 10,
-    workingCapacity: 10,
     maxCapacity: 20,
+    workingCapacity: 20,
   },
-  currentCellCertificate: undefined,
+  currentCellCertificate: {
+    maxCapacity: 20,
+    workingCapacity: 20,
+    certifiedNormalAccommodation: 20,
+  },
   numberOfCellLocations: 5,
   specialistCellTypes: [],
   inCellSanitation: undefined,
   level: 2,
   leafLevel: false,
 })
-const draftCell1 = LocationFactory.build({
-  id: '7e570000-0000-1000-8000-000000000211',
+const draftCell = LocationFactory.build({
+  id: '7e570000-0000-1000-8000-000000000221',
+  topLevelId: '7e570000-0000-1000-8000-000000000200',
   pathHierarchy: 'B-1-001',
-  parentId: draftLanding.id,
+  parentId: existingLanding.id,
   locationType: 'CELL',
   localName: undefined,
   status: 'DRAFT',
@@ -86,38 +86,39 @@ const draftCell1 = LocationFactory.build({
     workingCapacity: 0,
   },
   pendingChanges: {
-    certifiedNormalAccommodation: 5,
-    workingCapacity: 5,
-    maxCapacity: 10,
+    certifiedNormalAccommodation: 1,
+    workingCapacity: 1,
+    maxCapacity: 1,
   },
   currentCellCertificate: undefined,
   leafLevel: true,
   cellMark: 'B1 001',
-  specialistCellTypes: ['NORMAL_ACCOMMODATION'],
+  specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+  accommodationTypes: ['CARE_AND_SEPARATION'],
 })
-const draftCell2 = LocationFactory.build({
-  id: '7e570000-0000-1000-8000-000000000212',
+const activeCell = LocationFactory.build({
+  id: '7e570000-0000-1000-8000-000000000222',
+  topLevelId: '7e570000-0000-1000-8000-000000000200',
   pathHierarchy: 'B-1-002',
-  parentId: draftLanding.id,
+  parentId: existingLanding.id,
   locationType: 'CELL',
   localName: undefined,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   capacity: {
-    maxCapacity: 0,
-    workingCapacity: 0,
+    maxCapacity: 2,
+    workingCapacity: 2,
   },
-  pendingChanges: {
-    certifiedNormalAccommodation: 5,
-    workingCapacity: 5,
-    maxCapacity: 10,
+  currentCellCertificate: {
+    certifiedNormalAccommodation: 2,
+    workingCapacity: 2,
+    maxCapacity: 2,
   },
-  currentCellCertificate: undefined,
   leafLevel: true,
   cellMark: 'B1 002',
-  specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+  specialistCellTypes: ['NORMAL_ACCOMMODATION'],
 })
 const otherWingResidentialSummary: LocationResidentialSummary = {
-  parentLocation: otherDraftWing,
+  parentLocation: otherActiveWing,
   subLocationName: 'Landings',
   subLocations: [],
   topLevelLocationType: 'Wings',
@@ -125,17 +126,25 @@ const otherWingResidentialSummary: LocationResidentialSummary = {
   wingStructure: ['WING', 'LANDING', 'CELL'],
 }
 const wingResidentialSummary: LocationResidentialSummary = {
-  parentLocation: draftWing,
+  parentLocation: existingWing,
   subLocationName: 'Landings',
-  subLocations: [draftLanding],
+  subLocations: [existingLanding],
   topLevelLocationType: 'Wings',
   locationHierarchy: [],
   wingStructure: ['WING', 'LANDING', 'CELL'],
 }
 const landingResidentialSummary: LocationResidentialSummary = {
-  parentLocation: draftLanding,
+  parentLocation: existingLanding,
   subLocationName: 'Cells',
-  subLocations: [draftCell1, draftCell2],
+  subLocations: [draftCell, activeCell],
+  topLevelLocationType: 'Wings',
+  locationHierarchy: [],
+  wingStructure: ['WING', 'LANDING', 'CELL'],
+}
+const draftCellResidentialSummary: LocationResidentialSummary = {
+  parentLocation: draftCell,
+  subLocationName: 'Cells',
+  subLocations: [],
   topLevelLocationType: 'Wings',
   locationHierarchy: [],
   wingStructure: ['WING', 'LANDING', 'CELL'],
@@ -145,12 +154,12 @@ const prisonResidentialSummary: PrisonResidentialSummary = {
     prisonName: 'Test (HMP)',
     workingCapacity: 100,
     signedOperationalCapacity: 100,
-    maxCapacity: 200,
+    maxCapacity: 210,
     numberOfCellLocations: 100,
   },
   topLevelLocationType: 'Wings',
   subLocationName: 'Wings',
-  subLocations: [otherDraftWing, draftWing],
+  subLocations: [otherActiveWing, existingWing],
   locationHierarchy: [],
 }
 const opCapRequest = CertificationApprovalRequestFactory.build({
@@ -162,7 +171,7 @@ const opCapRequest = CertificationApprovalRequestFactory.build({
 const otherNewLocationsRequest = CertificationApprovalRequestFactory.build({
   id: 'otherNewLocationsRequest',
   approvalType: 'DRAFT',
-  maxCapacityChange: 40,
+  maxCapacityChange: 1,
   prisonId,
 })
 
@@ -170,11 +179,11 @@ export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS'], opt
   cy.task('reset')
   AuthStubber.stub.stubSignIn({ roles })
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId, certificationActive: 'ACTIVE' })
-  LocationsApiStubber.stub.stubLocations(otherDraftWing)
-  LocationsApiStubber.stub.stubLocations(draftWing)
-  LocationsApiStubber.stub.stubLocations(draftLanding)
-  LocationsApiStubber.stub.stubLocations(draftCell1)
-  LocationsApiStubber.stub.stubLocations(draftCell2)
+  LocationsApiStubber.stub.stubLocations(otherActiveWing)
+  LocationsApiStubber.stub.stubLocations(existingWing)
+  LocationsApiStubber.stub.stubLocations(existingLanding)
+  LocationsApiStubber.stub.stubLocations(draftCell)
+  LocationsApiStubber.stub.stubLocations(activeCell)
   LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
   LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
   LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
@@ -185,6 +194,7 @@ export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS'], opt
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(otherWingResidentialSummary)
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(wingResidentialSummary)
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(landingResidentialSummary)
+  LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation(draftCellResidentialSummary)
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(prisonResidentialSummary)
   LocationsApiStubber.stub.stubLocationsCertificationPrisonSignedOpCapChange()
   LocationsApiStubber.stub.stubLocationsCertificationLocationRequestApproval()
@@ -207,4 +217,4 @@ export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS'], opt
   })
 }
 
-export { draftWing, draftLanding, draftCell1, draftCell2 }
+export { existingWing, existingLanding, draftCell, activeCell }

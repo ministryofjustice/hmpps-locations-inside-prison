@@ -1,11 +1,11 @@
 import setupStubs from './setupStubs'
-import Page from '../../pages/page'
-import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
-import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
+import Page from '../../../pages/page'
+import ViewLocationsShowPage from '../../../pages/viewLocations/show'
+import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
+import SubmitCertificationApprovalRequestPage from '../../../pages/commonTransactions/submitCertificationApprovalRequest'
 import goToUpdateSignedOpCapIsUpdateNeeded from './goToUpdateSignedOpCapIsUpdateNeeded'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
-import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import UpdateSignedOpCapDetailsPage from '../../../pages/commonTransactions/updateSignedOpCap/details'
 
 context('Add To Certificate - Update Signed Operational Capacity - Is Update Needed', () => {
   let page: UpdateSignedOpCapIsUpdateNeededPage

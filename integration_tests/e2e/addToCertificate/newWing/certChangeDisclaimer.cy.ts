@@ -1,10 +1,10 @@
 import setupStubs from './setupStubs'
-import Page from '../../pages/page'
-import ViewLocationsIndexPage from '../../pages/viewLocations'
-import ViewLocationsShowPage from '../../pages/viewLocations/show'
-import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
+import Page from '../../../pages/page'
+import ViewLocationsIndexPage from '../../../pages/viewLocations'
+import ViewLocationsShowPage from '../../../pages/viewLocations/show'
+import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
 import goToCertChangeDisclaimer from './goToCertChangeDisclaimer'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import UpdateSignedOpCapIsUpdateNeededPage from '../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
 
 context('Add To Certificate - Cert Change Disclaimer', () => {
   let page: CertChangeDisclaimerPage

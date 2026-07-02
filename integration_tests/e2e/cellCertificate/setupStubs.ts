@@ -33,9 +33,14 @@ export default function setupStubs(roles = ['MANAGE_RES_LOCATIONS_OP_CAP']) {
   LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
   LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(prisonResidentialSummary)
-  LocationsApiStubber.stub.stubLocations(LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000001' }))
   LocationsApiStubber.stub.stubLocations(
-    LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000002', locationType: 'WING' }),
+    LocationFactory.build({
+      id: '7e570000-0000-1000-8000-000000000001',
+      topLevelId: '7e570000-0000-1000-8000-000000000002',
+    }),
+  )
+  LocationsApiStubber.stub.stubLocations(
+    LocationFactory.build({ id: '7e570000-0000-1000-8000-000000000002', locationType: 'WING', pathHierarchy: 'A' }),
   )
   ManageUsersApiStubber.stub.stubManageUsers()
   ManageUsersApiStubber.stub.stubManageUsersMe()

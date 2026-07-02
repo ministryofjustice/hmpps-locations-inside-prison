@@ -170,6 +170,16 @@ export default class Confirm extends FormInitialStep {
       await addLocationsToLocationMap([res.locals.location.topLevelId])(req, res)
     }
 
+    if (req.form.options.name === 'add-to-certificate') {
+      const topLevelLocationWithCertification = await req.services.locationsService.getLocation(
+        req.session.systemToken,
+        res.locals.location.topLevelId,
+        false,
+        true,
+      )
+      await addLocationsToLocationMap([topLevelLocationWithCertification])(req, res)
+    }
+
     return next()
   }
 
@@ -315,12 +325,30 @@ export default class Confirm extends FormInitialStep {
         locations,
       })
     } else if (req.form.options.name === 'add-to-certificate') {
-      proposedCertificationApprovalRequests.push({
+      const { location } = res.locals
+
+      const topLevelLocation = res.locals.locationMap[location.topLevelId]
+      const topLevelAccommodationTypes = topLevelLocation.currentCellCertificate?.accommodationTypes || []
+      const topLevelUsedFor = topLevelLocation.currentCellCertificate?.usedFor || []
+
+      const request: (typeof proposedCertificationApprovalRequests)[0] = {
         approvalType: 'DRAFT',
-        locationId: locals.location.id,
-        prisonId: locals.location.prisonId,
-        locations: [await locationToCertificationLocation(req, locals.location)],
-      })
+        prisonId: location.prisonId,
+        locationId: location.id,
+        locationKey: location.key,
+        locations: [await locationToCertificationLocation(req, location)],
+      }
+
+      // If location.accommodationTypes includes a type that topLevelAccommodationTypes doesn't
+      if (location.accommodationTypes.some(type => !topLevelAccommodationTypes.includes(type))) {
+        request.topLevelAccommodationTypes = uniq([
+          ...topLevelAccommodationTypes,
+          ...location.accommodationTypes,
+        ]).sort()
+        request.topLevelUsedFor = uniq([...topLevelUsedFor, ...location.usedFor]).sort()
+      }
+
+      proposedCertificationApprovalRequests.push(request)
     } else if (req.form.options.name === 'change-door-number') {
       const doorNumber = sessionModel.get<string>('doorNumber')
       const explanation = sessionModel.get<string>('explanation')

@@ -56,10 +56,12 @@ describe('Confirm', () => {
           approvalRequestData.reasonForChange,
         ),
     },
+    // New draft location
     {
       approvalRequestData: {
         approvalType: 'DRAFT',
         locationId: 'draftLocationId',
+        locationKey: 'TST-A',
         prisonId: 'TST',
         locations: [
           CertificateLocationFactory.build({
@@ -111,10 +113,12 @@ describe('Confirm', () => {
         deepReq.form.options.name = 'add-to-certificate'
         const wing = LocationFactory.build({
           id: 'draftLocationId',
+          topLevelId: 'draftLocationId',
           locationType: 'WING',
           pathHierarchy: 'A',
           code: 'A',
           status: 'DRAFT',
+          key: 'TST-A',
           cellMark: undefined,
           level: 1,
           leafLevel: false,
@@ -151,6 +155,124 @@ describe('Confirm', () => {
           otherConvertedCellType: undefined,
         })
         deepRes.locals.location = wing
+        deepRes.locals.locationMap = {
+          [wing.id]: LocationFactory.build({
+            id: wing.id,
+            currentCellCertificate: {
+              accommodationTypes: wing.accommodationTypes,
+              usedFor: wing.usedFor,
+            },
+          }),
+        }
+        locationsService.getResidentialSummary.mockImplementation((_token, _prisonId, id) =>
+          Promise.resolve(
+            {
+              [wing.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: wing,
+                subLocations: [landing],
+              }),
+              [landing.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: landing,
+                subLocations: [cell],
+              }),
+              [cell.id]: LocationResidentialSummaryFactory.build({
+                parentLocation: cell,
+                subLocations: [],
+              }),
+            }[id],
+          ),
+        )
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.createCertificationRequestForLocation).toHaveBeenCalledWith(
+          'token',
+          'DRAFT',
+          approvalRequestData.locationId,
+        ),
+    },
+    // New draft cell on existing landing
+    {
+      approvalRequestData: {
+        approvalType: 'DRAFT',
+        locationId: 'newCell',
+        locationKey: 'TST-A-1-001',
+        prisonId: 'TST',
+        topLevelAccommodationTypes: ['CARE_AND_SEPARATION', 'NORMAL_ACCOMMODATION'],
+        topLevelUsedFor: ['CLOSE_SUPERVISION_CENTRE', 'FIRST_NIGHT_CENTRE'],
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'newCell',
+            locationType: 'CELL',
+            convertedCellType: undefined,
+            currentConvertedCellType: undefined,
+            currentInCellSanitation: true,
+            otherConvertedCellType: undefined,
+            currentOtherConvertedCellType: undefined,
+            accommodationTypes: ['CARE_AND_SEPARATION'],
+            usedFor: ['FIRST_NIGHT_CENTRE'],
+          }),
+        ],
+      },
+      beforeGenerateRequests: _approvalRequestData => {
+        deepReq.form.options.name = 'add-to-certificate'
+        const wing = LocationFactory.build({
+          id: 'wing',
+          topLevelId: 'wing',
+          locationType: 'WING',
+          pathHierarchy: 'A',
+          code: 'A',
+          status: 'ACTIVE',
+          cellMark: undefined,
+          level: 1,
+          leafLevel: false,
+          inCellSanitation: false,
+          currentCellCertificate: undefined,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
+          accommodationTypes: ['NORMAL_ACCOMMODATION'],
+          usedFor: ['CLOSE_SUPERVISION_CENTRE'],
+        })
+        const landing = LocationFactory.build({
+          parentId: wing.id,
+          id: 'landing',
+          locationType: 'LANDING',
+          pathHierarchy: 'A-1',
+          code: '1',
+          status: 'ACTIVE',
+          cellMark: undefined,
+          level: 2,
+          leafLevel: false,
+          inCellSanitation: false,
+          currentCellCertificate: undefined,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
+        })
+        const cell = LocationFactory.build({
+          parentId: landing.id,
+          id: 'newCell',
+          topLevelId: wing.id,
+          locationType: 'CELL',
+          status: 'DRAFT',
+          cellMark: 'A1-1',
+          level: 3,
+          inCellSanitation: true,
+          currentCellCertificate: undefined,
+          convertedCellType: undefined,
+          otherConvertedCellType: undefined,
+          accommodationTypes: ['CARE_AND_SEPARATION'],
+          usedFor: ['FIRST_NIGHT_CENTRE'],
+        })
+        deepRes.locals.location = cell
+        deepRes.locals.locationMap = {
+          [wing.id]: LocationFactory.build({
+            id: wing.id,
+            currentCellCertificate: {
+              accommodationTypes: wing.accommodationTypes,
+              usedFor: wing.usedFor,
+            },
+          }),
+          [cell.id]: cell,
+        }
         locationsService.getResidentialSummary.mockImplementation((_token, _prisonId, id) =>
           Promise.resolve(
             {

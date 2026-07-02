@@ -16,7 +16,12 @@ context('Cell Certificate - Change Requests - Show', () => {
 
     context('When the approvalType is DRAFT', () => {
       beforeEach(() => {
-        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(CertificationApprovalRequestFactory.build())
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            topLevelAccommodationTypes: ['NORMAL_ACCOMMODATION', 'HEALTHCARE_INPATIENTS'],
+            topLevelUsedFor: ['CLOSE_SUPERVISION_CENTRE', 'TEST_TYPE'],
+          }),
+        )
 
         CellCertificateChangeRequestsShowPage.goTo('id1')
         Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
@@ -33,7 +38,7 @@ context('Cell Certificate - Change Requests - Show', () => {
           ['Status', 'Awaiting review'],
         ])
 
-        testGovukTable('wing-table', [
+        testGovukTable('wing-usage-table', [
           ['A', ['Normal accommodation', 'Healthcare inpatients'], ['Close Supervision Centre (CSC)', 'Test type']],
         ])
 

@@ -11,7 +11,7 @@ import approvalTypeDescription from '../formatters/approvalTypeDescription'
 export default async function populateCertificationRequestDetails(
   req: Request | FormWizard.Request,
   res: Response,
-  next: NextFunction,
+  next?: NextFunction,
 ): Promise<void> {
   const { locationsService } = req.services
   const { systemToken } = req.session
@@ -21,10 +21,16 @@ export default async function populateCertificationRequestDetails(
   const promises: Promise<unknown>[] = []
 
   // set userMap with requestedBy details
-  promises.push(addUsersToUserMap([approvalRequest.requestedBy])(req, res))
+  promises.push(
+    addUsersToUserMap([approvalRequest.requestedBy, approvalRequest.approvedOrRejectedBy].filter(u => u))(req, res),
+  )
 
   // approval type descriptions are sourced from the backend constants
   promises.push(addConstantToLocals('approvalTypes')(req, res))
+
+  if (['CONVERT_ROOM_TO_CELL', 'CONVERT_CELL_TO_ROOM'].includes(approvalRequest.approvalType)) {
+    promises.push(addConstantToLocals('convertedCellTypes')(req, res))
+  }
 
   if (approvalRequest.approvalType === 'DEACTIVATION') {
     promises.push(addConstantToLocals('deactivatedReasons')(req, res))
@@ -32,16 +38,6 @@ export default async function populateCertificationRequestDetails(
 
   if (['DEACTIVATION', 'REACTIVATION'].includes(approvalRequest.approvalType)) {
     promises.push(addConstantToLocals('locationTypes')(req, res))
-    promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res))
-  }
-
-  if (approvalRequest.approvalType === 'CONVERT_ROOM_TO_CELL') {
-    promises.push(addConstantToLocals('convertedCellTypes')(req, res))
-    promises.push(addLocationsToLocationMap([approvalRequest.locationId])(req, res))
-  }
-
-  if (approvalRequest.approvalType === 'CONVERT_CELL_TO_ROOM') {
-    promises.push(addConstantToLocals('convertedCellTypes')(req, res))
   }
 
   let locationPromise: Promise<Location>
@@ -52,18 +48,19 @@ export default async function populateCertificationRequestDetails(
 
   await Promise.all(promises)
 
-  if (approvalRequest.approvalType === 'CONVERT_ROOM_TO_CELL') {
-    await addLocationsToLocationMap([res.locals.locationMap[approvalRequest.locationId].topLevelId])(req, res)
-  }
-
   // set title caption
   if (approvalRequest.locationId) {
     res.locals.location = await locationPromise
+    await addLocationsToLocationMap([res.locals.location])(req, res)
     res.locals.titleCaption = capFirst(
       await displayName({ location: res.locals.location, locationsService, systemToken }),
     )
   } else {
     res.locals.titleCaption = prisonResidentialSummary.prisonSummary.prisonName
+  }
+
+  if (['CONVERT_ROOM_TO_CELL', 'DRAFT'].includes(approvalRequest.approvalType)) {
+    await addLocationsToLocationMap([res.locals.location.topLevelId])(req, res)
   }
 
   // set notification details
@@ -76,5 +73,7 @@ export default async function populateCertificationRequestDetails(
     changeType: approvalTypeDescription(approvalRequest, res.locals.constants, res.locals.location),
   }
 
-  return next()
+  if (next) {
+    next()
+  }
 }

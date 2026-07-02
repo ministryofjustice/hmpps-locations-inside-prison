@@ -1,14 +1,10 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../../base/formInitialStep'
-import capFirst from '../../../../formatters/capFirst'
-import displayName from '../../../../formatters/displayName'
 import { getUserEmails, sendNotification } from '../../../../utils/notificationHelpers'
 import { NotificationType, notificationGroups } from '../../../../services/notificationService'
 import config from '../../../../config'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
-import addConstantToLocals from '../../../../middleware/addConstantToLocals'
-import addLocationsToLocationMap from '../../../../middleware/addLocationsToLocationMap'
 import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
 import approvalCellWouldBeOvercrowded from '../../../../routes/cellCertificate/changeRequests/review/approvalCellWouldBeOvercrowded'
 
@@ -16,26 +12,13 @@ export default class Approve extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
-    this.use(addConstantToLocals(['approvalTypes', 'locationTypes']))
     this.use(conditionallyPopulatePrisoners)
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { locationsService } = req.services
-    const { systemToken } = req.session
     const { approvalRequest } = res.locals
 
-    if (approvalRequest.locationId) {
-      const location = await locationsService.getLocation(systemToken, approvalRequest.locationId)
-      res.locals.titleCaption = capFirst(await displayName({ location, locationsService, systemToken }))
-    } else {
-      res.locals.titleCaption = res.locals.prisonResidentialSummary.prisonSummary.prisonName
-    }
-
     res.locals.buttonText = 'Update cell certificate'
-    if (approvalRequest.approvalType === 'DEACTIVATION') {
-      await addLocationsToLocationMap([approvalRequest.locationId])(req, res, null)
-    }
 
     if (approvalRequest.approvalType === 'SIGNED_OP_CAP') {
       const confirmationField = req.form.options.fields.confirmation

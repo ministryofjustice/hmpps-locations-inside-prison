@@ -5,23 +5,16 @@ import { getUserEmails, sendNotification } from '../../../../utils/notificationH
 import { NotificationType, notificationGroups } from '../../../../services/notificationService'
 import formatDateWithTime from '../../../../formatters/formatDateWithTime'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
-import addConstantToLocals from '../../../../middleware/addConstantToLocals'
-import addLocationsToLocationMap from '../../../../middleware/addLocationsToLocationMap'
 import config from '../../../../config'
 
 export default class Reject extends FormInitialStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
-    this.use(addConstantToLocals(['approvalTypes', 'locationTypes']))
   }
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     res.locals.buttonText = 'Reject request'
-    const { approvalRequest } = res.locals
-    if (approvalRequest.approvalType === 'DEACTIVATION') {
-      await addLocationsToLocationMap([approvalRequest.locationId])(req, res, null)
-    }
 
     await super._locals(req, res, next)
   }
