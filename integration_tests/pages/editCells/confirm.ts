@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class EditCellsConfirmPage extends Page {
   constructor() {
-    super('Edit cells')
+    super(/Edit (draft )?cells/)
   }
 
   detailsTitle = (): PageElement => cy.get('.govuk-summary-card__title')
@@ -17,7 +17,9 @@ export default class EditCellsConfirmPage extends Page {
   cellInformationTableCell = (row: number, cell: number) =>
     this.cellInformationTable().get(`.govuk-table__body .govuk-table__row:nth(${row}) .govuk-table__cell:nth(${cell})`)
 
-  createButton = (): PageElement => cy.get('button:contains("Update cells")')
+  updateCellsButton = (): PageElement => cy.get('button:contains("Update cells")')
+
+  updateDraftCellsButton = (): PageElement => cy.get('button:contains("Update draft cells")')
 
   editCapacitiesLink = (): PageElement => cy.get('a[href$="/capacities/edit"]').first()
 
