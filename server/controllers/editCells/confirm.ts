@@ -133,13 +133,20 @@ export default class EditCellsConfirm extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
 
-    const { localName, locationType, pathHierarchy, id, prisonId } = res.locals.decoratedResidentialSummary.location
+    const { location, subLocations } = res.locals.decoratedResidentialSummary
+    const { localName, locationType, pathHierarchy, id, prisonId } = location
     locals.locationPathPrefix = pathHierarchy
 
     locals.title = 'Edit cells'
     locals.titleCaption = `${locationType} ${localName || pathHierarchy}`
     locals.buttonText = 'Update cells'
     locals.backLink = `/view-and-update-locations/${[prisonId, id].join('/')}`
+
+    const hasAnyNonDraftCells = subLocations.some(l => l.status !== 'DRAFT')
+    if (hasAnyNonDraftCells) {
+      locals.title = 'Edit draft cells'
+      locals.buttonText = 'Update draft cells'
+    }
 
     return locals
   }
