@@ -31,7 +31,7 @@ context('Edit cells - Draft landing - Confirm', () => {
           ['A-2-002', '2', '2', '3', '4', '-', 'Yes'],
         ])
 
-        page.createButton().click()
+        page.updateCellsButton().click()
 
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.successBannerHeading().should('not.exist')
@@ -62,7 +62,7 @@ context('Edit cells - Draft landing - Confirm', () => {
           ['A-2-002', 'A2-02', '2', '3', '4', '-', 'Yes'],
         ])
 
-        page.createButton().click()
+        page.updateCellsButton().click()
 
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.successBannerHeading().contains('Cells updated')

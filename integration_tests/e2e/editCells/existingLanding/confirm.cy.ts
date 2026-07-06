@@ -35,7 +35,7 @@ context('Edit cells - Existing landing - Confirm', () => {
         page.cellInformationTable().should('not.contain', 'A-2-001')
         page.cellInformationTable().should('not.contain', 'A-2-002')
 
-        page.createButton().click()
+        page.updateDraftCellsButton().click()
 
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.successBannerHeading().should('not.exist')
@@ -70,7 +70,7 @@ context('Edit cells - Existing landing - Confirm', () => {
         page.cellInformationTable().should('not.contain', 'A-2-001')
         page.cellInformationTable().should('not.contain', 'A-2-002')
 
-        page.createButton().click()
+        page.updateDraftCellsButton().click()
 
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.successBannerHeading().contains('Cells updated')

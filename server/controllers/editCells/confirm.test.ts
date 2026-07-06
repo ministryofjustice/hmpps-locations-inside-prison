@@ -102,16 +102,23 @@ describe('Confirm edit cells', () => {
     }
   }
 
-  function runCommonTests(expectedCellsPayload: Record<string, any>[], noChangeSessionData: Record<string, any>) {
+  function runCommonTests(
+    expectedCellsPayload: Record<string, any>[],
+    noChangeSessionData: Record<string, any>,
+    expectedLocals?: { title: string; buttonText: string },
+  ) {
+    const title = expectedLocals?.title || 'Edit cells'
+    const buttonText = expectedLocals?.buttonText || 'Update cells'
+
     describe('locals', () => {
       it('returns correct locals', () => {
         const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
         expect(result).toEqual(
           expect.objectContaining({
             locationPathPrefix: 'A-1',
-            title: 'Edit cells',
+            title,
             titleCaption: 'Landing A-1',
-            buttonText: 'Update cells',
+            buttonText,
             backLink: `/view-and-update-locations/${prisonId}/${locationId}`,
           }),
         )
@@ -446,6 +453,10 @@ describe('Confirm edit cells', () => {
         'create-cells_maximumCapacity2': '3',
         'create-cells_accommodationType': 'NORMAL_ACCOMMODATION',
         'create-cells_usedFor': ['CLOSE_SUPERVISION_CENTRE'],
+      },
+      {
+        title: 'Edit draft cells',
+        buttonText: 'Update draft cells',
       },
     )
   })
