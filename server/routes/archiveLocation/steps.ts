@@ -4,6 +4,7 @@ import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import RequestsPending from '../../controllers/requestsPending'
 import FormInitialStep from '../../controllers/base/formInitialStep'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 const hasPendingApprovalsBelow = (_req: FormWizard.Request, res: Response) =>
   res.locals.pendingApprovalsBelow.hasPendingBelow
@@ -39,6 +40,7 @@ const steps: FormWizard.Steps = {
     next: 'update-signed-op-cap',
   },
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
+  ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 
 export default steps

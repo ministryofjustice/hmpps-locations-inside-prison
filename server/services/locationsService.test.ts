@@ -484,6 +484,21 @@ describe('Locations service', () => {
     })
   })
 
+  describe('requestPermanentDeactivation', () => {
+    it('calls the correct client function', async () => {
+      await locationsService.requestPermanentDeactivation('token', 'location-id', 'reason')
+
+      expect(locationsApiClient.certification.location.permanentDeactivationRequestApproval).toHaveBeenCalledWith(
+        'token',
+        null,
+        {
+          locationId: 'location-id',
+          reason: 'reason',
+        },
+      )
+    })
+  })
+
   describe('getPendingApprovalsBelow', () => {
     it('calls the correct client function', async () => {
       await locationsService.getPendingApprovalsBelow('token', '481fc587-60f8-402b-804d-64462babddcc')

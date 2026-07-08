@@ -150,6 +150,17 @@ export default class LocationsApiClient extends BaseApiClient {
         path: '/certification/location/specialist-cell-type-change',
         requestType: 'put',
       }),
+      permanentDeactivationRequestApproval: this.apiCall<
+        CertificationApprovalRequest,
+        null,
+        {
+          locationId: string
+          reason: string
+        }
+      >({
+        path: '/certification/location/permanent-deactivation-request-approval',
+        requestType: 'put',
+      }),
       pendingApprovalsBelow: this.apiCall<PendingApprovalsBelow, { id: string }>({
         path: '/certification/location/:id/pending-approvals-below',
         requestType: 'get',

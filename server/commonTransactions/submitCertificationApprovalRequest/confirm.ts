@@ -570,6 +570,21 @@ export default class Confirm extends FormInitialStep {
 
       const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
       addChangeLinksToLocals(locals, 'SPECIALIST_CELL_TYPE', { reasonForChange: changeLink })
+    } else if (req.form.options.name === 'archive') {
+      const reason = sessionModel.get<string>('reason')
+      proposedCertificationApprovalRequests.push({
+        approvalType: 'PERMANENT_DEACTIVATION',
+        prisonId: locals.location.prisonId,
+        locationId: locals.location.id,
+        locationKey: locals.location.key,
+        locations: [await locationToCertificationLocation(req, locals.location)],
+        reasonForChange: reason,
+      })
+
+      const changeLink = `/location/${locals.location.id}/archive/reason/edit`
+      addChangeLinksToLocals(locals, 'PERMANENT_DEACTIVATION', {
+        reason: changeLink,
+      })
     }
 
     if (proposedSignedOpCapChange) {
@@ -735,6 +750,10 @@ export default class Confirm extends FormInitialStep {
           reasonForChange,
         })
       ).pendingApprovalRequestId
+    }
+
+    if (approvalType === 'PERMANENT_DEACTIVATION') {
+      return (await locationsService.requestPermanentDeactivation(systemToken, locationId, reasonForChange)).id
     }
 
     throw new Error(`Unsupported approval request type: ${approvalType}`)

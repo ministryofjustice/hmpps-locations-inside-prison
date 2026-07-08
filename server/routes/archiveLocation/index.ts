@@ -7,6 +7,7 @@ import protectRoute from '../../middleware/protectRoute'
 import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
 import getPendingApprovalsBelow from '../../middleware/getPendingApprovalsBelow'
+import addConstantToLocals from '../../middleware/addConstantToLocals'
 
 const router = express.Router({ mergeParams: true })
 
@@ -15,6 +16,7 @@ router.use(
   populateLocation({ decorate: true, includeCurrentCertificate: true }),
   populateTitleCaptionFromLocation,
   populatePrisonConfiguration(),
+  addConstantToLocals('specialistCellTypes'),
   getPendingApprovalsBelow,
   wizard(steps, fields, {
     name: 'archive',
