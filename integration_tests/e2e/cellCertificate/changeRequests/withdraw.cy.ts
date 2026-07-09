@@ -4,6 +4,7 @@ import LocationsApiStubber from '../../../mockApis/locationsApi'
 import CertificationApprovalRequestFactory from '../../../../server/testutils/factories/certificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertificate/changeRequests'
 import CellCertificateChangeRequestsWithdrawPage from '../../../pages/cellCertificate/changeRequests/withdraw'
+import { CertificationApprovalRequestType } from '../../../../server/data/types/locationsApi/certificationApprovalRequest'
 
 context('Cell Certificate - Change Requests - Withdraw', () => {
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -40,123 +41,42 @@ context('Cell Certificate - Change Requests - Withdraw', () => {
       })
     })
 
-    context('When the approvalType is CELL_MARK', () => {
-      beforeEach(() => {
-        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
-          CertificationApprovalRequestFactory.build({
-            approvalType: 'CELL_MARK',
-          }),
-        )
-        LocationsApiStubber.stub.stubLocationsCertificationLocationWithdraw()
+    const approvalTypes: CertificationApprovalRequestType[] = [
+      'CELL_MARK',
+      'CAPACITY_CHANGE',
+      'CELL_SANITATION',
+      'SPECIALIST_CELL_TYPE',
+      'PERMANENT_DEACTIVATION',
+    ]
+    approvalTypes.forEach(approvalType => {
+      context(`When the approvalType is ${approvalType}`, () => {
+        beforeEach(() => {
+          LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+            CertificationApprovalRequestFactory.build({
+              approvalType,
+            }),
+          )
+          LocationsApiStubber.stub.stubLocationsCertificationLocationWithdraw()
 
-        CellCertificateChangeRequestsWithdrawPage.goTo('id1')
-        withdrawPage = Page.verifyOnPage(CellCertificateChangeRequestsWithdrawPage)
-      })
+          CellCertificateChangeRequestsWithdrawPage.goTo('id1')
+          withdrawPage = Page.verifyOnPage(CellCertificateChangeRequestsWithdrawPage)
+        })
 
-      it('Displays an error when no explanation is entered', () => {
-        withdrawPage.submit({})
-        Page.checkForError('explanation', 'Explain why you are withdrawing this request')
-      })
+        it('Displays an error when no explanation is entered', () => {
+          withdrawPage.submit({})
+          Page.checkForError('explanation', 'Explain why you are withdrawing this request')
+        })
 
-      it('Redirects to change requests and displays a banner', () => {
-        withdrawPage.submit({ explanation: 'Not good enough' })
+        it('Redirects to change requests and displays a banner', () => {
+          withdrawPage.submit({ explanation: 'Not good enough' })
 
-        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Change request withdrawn')
-        cy.get('.govuk-notification-banner__content p').contains(
-          'You have withdrawn the change request for cell A-1-001.',
-        )
-      })
-    })
-
-    context('When the approvalType is CAPACITY_CHANGE', () => {
-      beforeEach(() => {
-        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
-          CertificationApprovalRequestFactory.build({
-            approvalType: 'CAPACITY_CHANGE',
-          }),
-        )
-        LocationsApiStubber.stub.stubLocationsCertificationLocationWithdraw()
-
-        CellCertificateChangeRequestsWithdrawPage.goTo('id1')
-        withdrawPage = Page.verifyOnPage(CellCertificateChangeRequestsWithdrawPage)
-      })
-
-      it('Displays an error when no explanation is entered', () => {
-        withdrawPage.submit({})
-        Page.checkForError('explanation', 'Explain why you are withdrawing this request')
-      })
-
-      it('Redirects to change requests and displays a banner', () => {
-        withdrawPage.submit({ explanation: 'Not good enough' })
-
-        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Change request withdrawn')
-        cy.get('.govuk-notification-banner__content p').contains(
-          'You have withdrawn the change request for cell A-1-001.',
-        )
-      })
-    })
-
-    context('When the approvalType is CELL_SANITATION', () => {
-      beforeEach(() => {
-        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
-          CertificationApprovalRequestFactory.build({
-            approvalType: 'CELL_SANITATION',
-          }),
-        )
-        LocationsApiStubber.stub.stubLocationsCertificationLocationWithdraw()
-
-        CellCertificateChangeRequestsWithdrawPage.goTo('id1')
-        withdrawPage = Page.verifyOnPage(CellCertificateChangeRequestsWithdrawPage)
-      })
-
-      it('Displays an error when no explanation is entered', () => {
-        withdrawPage.submit({})
-        Page.checkForError('explanation', 'Explain why you are withdrawing this request')
-      })
-
-      it('Redirects to change requests and displays a banner', () => {
-        withdrawPage.submit({ explanation: 'Not good enough' })
-
-        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Change request withdrawn')
-        cy.get('.govuk-notification-banner__content p').contains(
-          'You have withdrawn the change request for cell A-1-001.',
-        )
-      })
-    })
-
-    context('When the approvalType is SPECIALIST_CELL_TYPE', () => {
-      beforeEach(() => {
-        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
-          CertificationApprovalRequestFactory.build({
-            approvalType: 'SPECIALIST_CELL_TYPE',
-          }),
-        )
-        LocationsApiStubber.stub.stubLocationsCertificationLocationWithdraw()
-
-        CellCertificateChangeRequestsWithdrawPage.goTo('id1')
-        withdrawPage = Page.verifyOnPage(CellCertificateChangeRequestsWithdrawPage)
-      })
-
-      it('Displays an error when no explanation is entered', () => {
-        withdrawPage.submit({})
-        Page.checkForError('explanation', 'Explain why you are withdrawing this request')
-      })
-
-      it('Redirects to change requests and displays a banner', () => {
-        withdrawPage.submit({ explanation: 'Not good enough' })
-
-        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Change request withdrawn')
-        cy.get('.govuk-notification-banner__content p').contains(
-          'You have withdrawn the change request for cell A-1-001.',
-        )
+          Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
+          cy.get('#govuk-notification-banner-title').contains('Success')
+          cy.get('.govuk-notification-banner__content h3').contains('Change request withdrawn')
+          cy.get('.govuk-notification-banner__content p').contains(
+            'You have withdrawn the change request for cell A-1-001.',
+          )
+        })
       })
     })
   })
