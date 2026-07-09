@@ -59,6 +59,21 @@ const stubLocationsCertificationLocationReactivationRequestApproval = () =>
     },
   })
 
+const stubLocationsRequestPermanentDeactivation = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPattern: '/locations-api/certification/location/permanent-deactivation-request-approval',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
 const stubLocationsRequestSpecialistCellTypeChange = () =>
   stubFor({
     request: {
@@ -201,7 +216,7 @@ const stubLocationsConstantsApprovalType = () =>
           { key: 'SIGNED_OP_CAP', description: 'Change signed operational capacity' },
           { key: 'DRAFT', description: 'Add new locations to certificate' },
           { key: 'DEACTIVATION', description: 'Deactivation' },
-          { key: 'PERMANENT_DEACTIVATION', description: 'Archived' },
+          { key: 'PERMANENT_DEACTIVATION', description: 'Archive location' },
           { key: 'CELL_MARK', description: 'Change cell door number' },
           { key: 'CELL_SANITATION', description: 'Change cell sanitation' },
           { key: 'REACTIVATION', description: 'Activation' },
@@ -1579,6 +1594,7 @@ const allStubs = {
   stubLocationsPrisonInactiveCells,
   stubLocationsPrisonInactiveCellsForLocation,
   stubLocationsPrisonLocalName,
+  stubLocationsRequestPermanentDeactivation,
   stubLocationsRequestSpecialistCellTypeChange,
   stubLocationsResidentialHierarchy,
   stubLocationsResidentialSummaryForCreateWing,

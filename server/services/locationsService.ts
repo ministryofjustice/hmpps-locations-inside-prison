@@ -108,6 +108,13 @@ export default class LocationsService {
     })
   }
 
+  async requestPermanentDeactivation(token: string, locationId: string, reason: string) {
+    return this.locationsApiClient.certification.location.permanentDeactivationRequestApproval(token, null, {
+      locationId,
+      reason,
+    })
+  }
+
   async deactivatePermanent(token: string, locationId: string, reason: string) {
     return this.locationsApiClient.locations.deactivate.permanent(token, { locationId }, { reason })
   }

@@ -1,5 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
+import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 const fields: FormWizard.Fields = {
   reason: {
@@ -25,6 +26,7 @@ const fields: FormWizard.Fields = {
     'ignore-defaults': true,
   },
   ...UpdateSignedOpCap.getFields(),
+  ...SubmitCertificationApprovalRequest.getFields(),
 }
 
 export default fields

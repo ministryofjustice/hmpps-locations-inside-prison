@@ -611,7 +611,42 @@ describe('Confirm', () => {
           maxCapacity: 2,
           workingCapacity: 2,
           reasonForChange: null,
+          convertedCellType: undefined,
+          currentConvertedCellType: undefined,
+          currentOtherConvertedCellType: undefined,
+          otherConvertedCellType: undefined,
         }),
+    },
+    {
+      approvalRequestData: {
+        approvalType: 'PERMANENT_DEACTIVATION',
+        prisonId: 'TST',
+        locationId: 'permanentDeactivationLocationId',
+        locationKey: 'TST-A-1-001',
+        reasonForChange: 'Wing was hit by comet',
+        locations: [
+          CertificateLocationFactory.build({
+            id: 'permanentDeactivationLocationId',
+          }),
+        ],
+      },
+      beforeGenerateRequests: approvalRequestData => {
+        deepReq.form.options.name = 'archive'
+        deepReq.sessionModel.set('reason', approvalRequestData.reasonForChange)
+        const certLocation = approvalRequestData.locations[0]
+        const location = LocationFactory.build({
+          id: 'permanentDeactivationLocationId',
+          currentCellCertificate: certLocation,
+        })
+        deepRes.locals.location = location
+        locationsService.getLocation.mockResolvedValueOnce(location)
+      },
+      checkSaveValues: approvalRequestData =>
+        expect(locationsService.requestPermanentDeactivation).toHaveBeenCalledWith(
+          'token',
+          approvalRequestData.locationId,
+          approvalRequestData.reasonForChange,
+        ),
     },
   ]
 
@@ -631,6 +666,7 @@ describe('Confirm', () => {
       updateCellMark: jest.fn().mockResolvedValue({ pendingApprovalRequestId: 'CELL_MARK-id' } as any),
       requestReactivation: jest.fn().mockResolvedValue({ id: 'REACTIVATION-id' } as any),
       deactivateTemporary: jest.fn().mockResolvedValue([{ pendingApprovalRequestId: 'DEACTIVATION-id' }] as any),
+      requestPermanentDeactivation: jest.fn().mockResolvedValue({ id: 'PERMANENT_DEACTIVATION-id' } as any),
     } as unknown as jest.Mocked<LocationsService>
     deepReq = {
       form: {
@@ -750,10 +786,11 @@ describe('Confirm', () => {
       )
     })
 
-    it('sends out emails for all of the individual requests, sets flash message and redirects', async () => {
-      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+    for (let i = 0; i < approvalTypesData.length; i += 1) {
+      // eslint-disable-next-line no-loop-func
+      it(`sends out emails for the ${approvalTypesData[i].approvalRequestData.approvalType} request`, async () => {
+        await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      for (let i = 0; i < deepRes.locals.proposedCertificationApprovalRequests.length; i += 1) {
         const approvalRequest = deepRes.locals.proposedCertificationApprovalRequests[i]
 
         expect(notificationHelpers.getUserEmails).toHaveBeenNthCalledWith(
@@ -804,7 +841,11 @@ describe('Confirm', () => {
           undefined,
           'Joe Submitter',
         )
-      }
+      })
+    }
+
+    it('sets flash message and redirects', async () => {
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepReq.flash).toHaveBeenCalledWith('success', {
         title: 'Change requests sent',

@@ -122,6 +122,45 @@
   {% endfor %}
 {% endmacro %}
 
+{% macro recurseArchiveLocationTable(rows, location, specialistCellTypes) %}
+  {% if location.locationType === 'CELL' %}
+    {% set rows = (rows.push([
+      {
+        classes: 'govuk-table__cell',
+        text: location.pathHierarchy
+      },
+      {
+        classes: 'govuk-table__cell',
+        text: location.cellMark
+      },
+      {
+        classes: 'govuk-table__cell',
+        text: location.certifiedNormalAccommodation
+      },
+      {
+        classes: 'govuk-table__cell',
+        text: location.workingCapacity
+      },
+      {
+        classes: 'govuk-table__cell',
+        text: location.maxCapacity
+      },
+      {
+        classes: 'govuk-table__cell',
+        text: (formatConstants(specialistCellTypes, location.specialistCellTypes) or '-') if location.locationType == 'CELL' else '-'
+      },
+      {
+        classes: 'govuk-table__cell',
+        text: 'Yes' if location.inCellSanitation else 'No'
+      }
+    ]), rows) %}
+  {% endif %}
+
+  {% for subLocation in location.subLocations %}
+    {{ recurseArchiveLocationTable(rows, subLocation, specialistCellTypes) }}
+  {% endfor %}
+{% endmacro %}
+
 {% macro certificationApprovalRequest(request, multiple, index, includeChangeSummary, constants, locationMap, changeLinks) %}
   {% set changeType = approvalTypeDescription(request, constants, locationMap[request.locationId]) %}
 
@@ -568,6 +607,39 @@
             { old: 'None', new: request.inCellSanitation | yesNo }
           ]]
         }) }}
+     {% elseif request.approvalType == 'PERMANENT_DEACTIVATION' %}
+        <div class="govuk-grid-column-two-thirds">
+          {% if includeChangeSummary %}
+            {{ certificationApprovalRequestSummary(request, null, locationMap, constants, false, false, changeLinks[request.approvalType]) }}
+          {% endif %}
+
+          {% if multiple %}
+            <h3 class="govuk-heading-s">Proposed changes to the certificate</h3>
+          {% else %}
+            <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
+          {% endif %}
+
+          {% set locationTableRows = [] %}
+          {% for location in request.locations %}
+            {{ recurseArchiveLocationTable(locationTableRows, location, constants.specialistCellTypes) }}
+          {% endfor %}
+
+          {{ govukTable({
+            attributes: {
+              'data-qa': 'locations-table'
+            },
+            head: [
+              { text: "Location" },
+              { text: "Door number" },
+              { text: "Baseline CNA" },
+              { text: "Certified working capacity" },
+              { text: "Maximum capacity" },
+              { text: "Cell type" },
+              { text: "Sanitation" }
+            ] | stripEmpty,
+            rows: locationTableRows
+          }) }}
+        </div>
       {% endif %}
     </div>
   </div>
