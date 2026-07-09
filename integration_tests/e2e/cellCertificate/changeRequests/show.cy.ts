@@ -416,6 +416,101 @@ context('Cell Certificate - Change Requests - Show', () => {
         ])
       })
     })
+
+    context('When the approvalType is PERMANENT_DEACTIVATION', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({
+            approvalType: 'PERMANENT_DEACTIVATION',
+            locationId: '7e570000-0000-1000-8000-000000000002',
+            locationKey: 'TST-A',
+            reasonForChange: 'Needed to change it',
+            locations: [
+              CertificateLocationFactory.build({
+                id: '7e570000-0000-1000-8000-000000000002',
+                locationType: 'WING',
+                certifiedNormalAccommodation: 6,
+                currentCertifiedNormalAccommodation: 2,
+                workingCapacity: 4,
+                currentWorkingCapacity: 0,
+                maxCapacity: 6,
+                currentMaxCapacity: 2,
+                specialistCellTypes: [],
+                currentCellMark: undefined,
+                cellMark: undefined,
+                inCellSanitation: false,
+                level: 1,
+                subLocations: [
+                  CertificateLocationFactory.build({
+                    id: '7e570000-0000-1000-8000-000000000003',
+                    locationType: 'LANDING',
+                    certifiedNormalAccommodation: 6,
+                    currentCertifiedNormalAccommodation: 2,
+                    workingCapacity: 4,
+                    currentWorkingCapacity: 0,
+                    maxCapacity: 6,
+                    currentMaxCapacity: 2,
+                    specialistCellTypes: [],
+                    currentCellMark: undefined,
+                    cellMark: undefined,
+                    inCellSanitation: false,
+                    level: 2,
+                    subLocations: [
+                      CertificateLocationFactory.build({
+                        id: '7e570000-0000-1000-8000-000000000004',
+                        specialistCellTypes: [],
+                        certifiedNormalAccommodation: 4,
+                        currentCertifiedNormalAccommodation: 1,
+                        workingCapacity: 2,
+                        currentWorkingCapacity: 0,
+                        maxCapacity: 4,
+                        currentMaxCapacity: 1,
+                        cellMark: 'A1-01',
+                        inCellSanitation: false,
+                      }),
+                      CertificateLocationFactory.build({
+                        id: '7e570000-0000-1000-8000-000000000005',
+                        specialistCellTypes: ['BIOHAZARD_DIRTY_PROTEST'],
+                        certifiedNormalAccommodation: 2,
+                        currentCertifiedNormalAccommodation: 1,
+                        workingCapacity: 2,
+                        currentWorkingCapacity: 0,
+                        maxCapacity: 2,
+                        currentMaxCapacity: 1,
+                        pathHierarchy: 'A-1-002',
+                        cellMark: 'A1-02',
+                        inCellSanitation: true,
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+            prisonId: 'MDI',
+          }),
+        )
+
+        CellCertificateChangeRequestsShowPage.goTo('id1')
+        Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+      })
+
+      it('Correctly displays the change request info', () => {
+        cy.get('h1').should('contain', 'Archive location request details')
+
+        testGovukSummaryList('overview-list-PERMANENT_DEACTIVATION', [
+          ['Location', 'A'],
+          ['Change type', 'Archive location'],
+          ['Explanation', 'Needed to change it'],
+          ['Submitted on', '3 October 2024'],
+          ['Submitted by', 'john smith'],
+        ])
+
+        testGovukTable('locations-table', [
+          ['A-1-001', 'A1-01', '4', '2', '4', '-', 'No'],
+          ['A-1-002', 'A1-02', '2', '2', '2', 'Biohazard / dirty protest cell', 'Yes'],
+        ])
+      })
+    })
   })
 
   context('Review copy and withdraw button by status', () => {
