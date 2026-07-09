@@ -30,6 +30,8 @@ const steps: FormWizard.Steps = {
     controller: Details,
     template: '../../partials/formStep',
     pageTitle: 'Change door number',
+    editable: true,
+    editBackStep: 'submit-certification-approval-request',
     next: [
       {
         fn: (_req, res) => res.locals.decoratedResidentialSummary.location.status !== 'DRAFT',

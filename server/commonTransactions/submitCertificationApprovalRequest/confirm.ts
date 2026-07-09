@@ -583,7 +583,7 @@ export default class Confirm extends FormInitialStep {
 
       const changeLink = `/location/${locals.location.id}/archive/reason/edit`
       addChangeLinksToLocals(locals, 'PERMANENT_DEACTIVATION', {
-        reason: changeLink,
+        reasonForChange: changeLink,
       })
     }
 

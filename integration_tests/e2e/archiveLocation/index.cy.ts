@@ -513,6 +513,9 @@ context('Archive location', () => {
           const rowsSelector = '[data-qa="overview-list-PERMANENT_DEACTIVATION"] .govuk-summary-list__value'
           cy.get(rowsSelector).eq(0).contains('A-1-001')
           cy.get(rowsSelector).eq(1).contains('Archive location')
+          cy.get(rowsSelector)
+            .eq(2)
+            .contains(/This is a line of text\s*This is another line of text/)
 
           const cellTypeTableSelector = '[data-qa="locations-table"]'
           const cellTypeHeaderSelector = `${cellTypeTableSelector} .govuk-table__header`
@@ -541,6 +544,23 @@ context('Archive location', () => {
           cy.get(cellTypeRowsSelector).eq(1).find('.govuk-table__cell').eq(4).contains('3')
           cy.get(cellTypeRowsSelector).eq(1).find('.govuk-table__cell').eq(5).contains('-')
           cy.get(cellTypeRowsSelector).eq(1).find('.govuk-table__cell').eq(6).contains('Yes')
+        })
+
+        it('can edit the reason via the change link', () => {
+          cy.get('[data-qa="changeLink-PERMANENT_DEACTIVATION-reasonForChange"]').click()
+
+          const reasonPage = Page.verifyOnPage(ArchiveReasonPage)
+          reasonPage
+            .reasonInput()
+            .invoke('val')
+            .then(value => {
+              expect(value).to.equal(multilineText)
+            })
+          reasonPage.submit('New reason for change')
+          Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
+          cy.get('[data-qa="overview-list-PERMANENT_DEACTIVATION"] .govuk-summary-list__value')
+            .eq(2)
+            .contains('New reason for change')
         })
       })
 
