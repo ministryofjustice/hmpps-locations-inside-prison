@@ -35,6 +35,7 @@ const steps: FormWizard.Steps = {
   '/reason': {
     pageTitle: 'Why is this location is being archived?',
     editable: true,
+    editBackStep: 'submit-certification-approval-request',
     fields: ['reason'],
     controller: FormInitialStep,
     next: 'update-signed-op-cap',
