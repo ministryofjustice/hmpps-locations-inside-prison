@@ -4,6 +4,7 @@ import { DeepPartial } from 'fishery'
 import ManageUsersService from '../../services/manageUsersService'
 import NotificationService, { NotificationType, notificationGroups } from '../../services/notificationService'
 import LocationsService from '../../services/locationsService'
+import config from '../../config'
 import Confirm from './confirm'
 import * as notificationHelpers from '../../utils/notificationHelpers'
 import LocationFactory from '../../testutils/factories/location'
@@ -651,6 +652,7 @@ describe('Confirm', () => {
   ]
 
   beforeEach(() => {
+    config.email.functionalMailboxCertViewers = undefined
     locationsService = {
       getAccommodationTypes: jest.fn().mockResolvedValue([]),
       getLocation: jest.fn(),
@@ -853,6 +855,33 @@ describe('Confirm', () => {
       })
 
       expect(deepRes.redirect).toHaveBeenCalledWith('/TST/cell-certificate/change-requests')
+    })
+
+    it('uses FUNCTIONAL_MAILBOX_CERT_VIEWERS when configured', async () => {
+      config.email.functionalMailboxCertViewers = 'functional-mailbox@test.com'
+
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(notificationHelpers.getUserEmails).not.toHaveBeenCalledWith(
+        manageUsersService,
+        'token',
+        'TST',
+        notificationGroups.requestSubmittedUsers,
+        false,
+      )
+
+      expect(notificationHelpers.sendNotification).toHaveBeenNthCalledWith(
+        2,
+        notifyService,
+        ['functional-mailbox@test.com', 'certificate_administrator_tst@test.com'],
+        'Moorland (HMP & YOI)',
+        expect.stringContaining('/TST/cell-certificate/change-requests/SIGNED_OP_CAP-id'),
+        NotificationType.REQUEST_SUBMITTED,
+        undefined,
+        undefined,
+        undefined,
+        'Joe Submitter',
+      )
     })
   })
 
