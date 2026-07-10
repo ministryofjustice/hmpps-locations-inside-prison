@@ -785,7 +785,15 @@ export default class Confirm extends FormInitialStep {
           const [requestReceivedAddresses, requestSubmittedAddresses, requestSubmittedWithActiveCaseloadAddresses] =
             await Promise.all([
               getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
-              getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestSubmittedUsers, false),
+              config.email.functionalMailboxCertViewers
+                ? Promise.resolve([config.email.functionalMailboxCertViewers])
+                : getUserEmails(
+                    manageUsersService,
+                    systemToken,
+                    prisonId,
+                    notificationGroups.requestSubmittedUsers,
+                    false,
+                  ),
               getUserEmails(
                 manageUsersService,
                 systemToken,
