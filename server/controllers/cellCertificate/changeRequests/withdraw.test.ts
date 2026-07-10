@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import ManageUsersService from '../../../services/manageUsersService'
-import NotificationService, { notificationGroups, NotificationType } from '../../../services/notificationService'
+import NotificationService, { NotificationType } from '../../../services/notificationService'
 import LocationsService from '../../../services/locationsService'
 import Withdraw from './withdraw'
 import * as notificationHelpers from '../../../utils/notificationHelpers'
@@ -66,7 +66,7 @@ describe('Withdraw', () => {
     next = jest.fn()
 
     jest.clearAllMocks()
-    ;(notificationHelpers.getUserEmails as jest.Mock).mockResolvedValue([
+    ;(notificationHelpers.getAllCertUserEmails as jest.Mock).mockResolvedValue([
       'certificate_administrator@test.com',
       'certificate_reviewer@test.com',
       'certificate_viewer@test.com',
@@ -83,12 +83,7 @@ describe('Withdraw', () => {
     it('gets user emails for withdrawn request notification group', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(notificationHelpers.getUserEmails).toHaveBeenCalledWith(
-        manageUsersService,
-        'token',
-        'MDI',
-        notificationGroups.allCertUsers,
-      )
+      expect(notificationHelpers.getAllCertUserEmails).toHaveBeenCalledWith(manageUsersService, 'token', 'MDI')
     })
 
     it('sends REQUEST_WITHDRAW notification to all cert users', async () => {

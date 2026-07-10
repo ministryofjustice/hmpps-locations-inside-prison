@@ -1,6 +1,8 @@
-import { getUserEmails } from './notificationHelpers'
+import { getUserEmails, getAllCertUserEmails } from './notificationHelpers'
 import ManageUsersService from '../services/manageUsersService'
 import ManageUsersApiClient from '../data/manageUsersApiClient'
+import config from '../config'
+import { notificationGroups } from '../services/notificationService'
 
 describe('getUserEmails', () => {
   const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
@@ -60,5 +62,56 @@ describe('getUserEmails', () => {
       expect(result).toEqual(['joe3@test.com'])
       expect(getUsersByCaseload).toHaveBeenCalled()
     })
+  })
+})
+
+describe('getAllCertUserEmails', () => {
+  const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
+  const originalFunctionalMailboxCertViewers = config.email.functionalMailboxCertViewers
+
+  beforeEach(() => {
+    config.email.functionalMailboxCertViewers = originalFunctionalMailboxCertViewers
+    manageUsersService.getAllUsersByActiveCaseload = jest
+      .fn()
+      .mockImplementation((_token: string, _prisonId: string, roles: string[]) =>
+        Promise.resolve({
+          content:
+            roles.length === 3
+              ? [
+                  { username: 'reviewer', email: 'reviewer@test.com' },
+                  { username: 'admin', email: 'admin@test.com' },
+                  { username: 'viewer', email: 'viewer@test.com' },
+                ]
+              : [
+                  { username: 'reviewer', email: 'reviewer@test.com' },
+                  { username: 'admin', email: 'admin@test.com' },
+                ],
+          totalPages: 1,
+        }),
+      )
+  })
+
+  it('combines non-viewer role emails and viewer role emails', async () => {
+    const result = await getAllCertUserEmails(manageUsersService, 'token', 'TST')
+
+    expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledWith(
+      'token',
+      'TST',
+      notificationGroups.allCertUsers,
+    )
+    expect(result).toEqual(['reviewer@test.com', 'admin@test.com', 'viewer@test.com'])
+  })
+
+  it('uses the functional mailbox instead of fetching viewer role emails when configured', async () => {
+    config.email.functionalMailboxCertViewers = 'functional-mailbox@test.com'
+
+    const result = await getAllCertUserEmails(manageUsersService, 'token', 'TST')
+
+    expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledTimes(1)
+    expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledWith('token', 'TST', [
+      'MANAGE_RES_LOCATIONS_OP_CAP',
+      'RESI__CERT_REVIEWER',
+    ])
+    expect(result).toEqual(['reviewer@test.com', 'admin@test.com', 'functional-mailbox@test.com'])
   })
 })
