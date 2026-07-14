@@ -31,10 +31,6 @@ export default function setCanAccess(locationService: LocationsService) {
       }
     }
 
-    if (req.featureFlags.archiveLocation === false) {
-      permissionOverrides.archive_location = false
-    }
-
     req.canAccess = permission => {
       if (permission in permissionOverrides) {
         const override = permissionOverrides[permission]

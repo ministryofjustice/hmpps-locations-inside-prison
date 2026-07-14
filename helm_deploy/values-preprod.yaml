@@ -22,5 +22,3 @@ generic-service:
     PRISON_API_URL: "https://prison-api-preprod.prison.service.justice.gov.uk"
     ENVIRONMENT_NAME: PRE-PRODUCTION
     AUDIT_ENABLED: "false"
-    FLAG_NON_RESI: enabled
-    FLAG_ARCHIVE_LOCATION: enabled

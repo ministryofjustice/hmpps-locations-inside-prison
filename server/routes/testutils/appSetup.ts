@@ -70,10 +70,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use((req, res, next) => {
-    req.featureFlags = {
-      nonResi: false,
-      archiveLocation: false,
-    }
+    req.featureFlags = {}
     next()
   })
   app.use(setCanAccess(services.locationsService))
