@@ -270,8 +270,7 @@ declare module 'hmpo-form-wizard' {
     type FormatterFn = (val: AnswerValue) => AnswerValue
 
     type Formatter =
-      | { type: FormatterType; arguments?: (string | number)[] }
-      | { fn: FormatterFn; arguments?: (string | number)[] }
+      { type: FormatterType; arguments?: (string | number)[] } | { fn: FormatterFn; arguments?: (string | number)[] }
 
     type ValidatorFn = (val: AnswerValue, ...args: unknown) => boolean
 
