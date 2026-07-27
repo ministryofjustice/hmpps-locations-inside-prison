@@ -1,59 +1,18 @@
-import FormWizard from 'hmpo-form-wizard'
-import { NextFunction, Response } from 'express'
-import { TypedLocals } from '../../../@types/express'
-import backUrl from '../../../utils/backUrl'
-import FormInitialStep from '../../base/formInitialStep'
 import { StatusType } from '../../../data/types/locationsApi'
+import adminController from '../adminController'
 
-export default class SegInRollCountStatusChangeConfirm extends FormInitialStep {
-  override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-    const { prisonConfiguration } = res.locals
-    const { prisonId } = prisonConfiguration
-
-    const backLink = backUrl(req, {
-      fallbackUrl: `/admin/${prisonId}`,
-    })
-
-    return {
-      ...locals,
-      backLink,
-      cancelLink: backLink,
-      title: 'Update include seg in roll count status',
-      buttonText: `${prisonConfiguration.includeSegregationInRollCount === 'INACTIVE' ? 'Activate' : 'Inactivate'} include seg in roll count`,
-    }
-  }
-
-  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
+const SegInRollCountStatusChangeConfirm = adminController({
+  name: 'include seg in roll count',
+  attribute: 'includeSegregationInRollCount',
+  analyticsEvent: 'seg_in_roll_count_status',
+  apiCalls: async (req, res) => {
     const { prisonId } = res.locals.prisonConfiguration
-    const { analyticsService, locationsService } = req.services
+    const { locationsService } = req.services
     const { activation } = req.form.values
     const status = activation as StatusType
 
-    try {
-      await locationsService.updateIncludeSegInRollCount(req.session.systemToken, prisonId, status)
+    await locationsService.updateIncludeSegInRollCount(req.session.systemToken, prisonId, status)
+  },
+})
 
-      analyticsService.sendEvent(req, 'seg_in_roll_count_status', {
-        prison_id: prisonId,
-        status,
-      })
-      return next()
-    } catch (error) {
-      return next(error)
-    }
-  }
-
-  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { prisonId } = res.locals.prisonConfiguration
-
-    req.journeyModel.reset()
-    req.sessionModel.reset()
-
-    req.flash('success', {
-      title: 'Include seg in roll count',
-      content: `You have changed the include seg in roll count status.`,
-    })
-
-    res.redirect(`/admin/${prisonId}`)
-  }
-}
+export default SegInRollCountStatusChangeConfirm

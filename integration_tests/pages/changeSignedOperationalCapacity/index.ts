@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class ChangeSignedOperationalCapacity extends Page {
   constructor() {
     super('Change signed operational capacity')
   }
 
-  static goTo = (prisonId: string) => cy.visit(`/change-signed-operational-capacity/${prisonId}/`)
+  static goTo = (prisonId: string) => cy.visit(paths.prison.changeSignedOperationalCapacity(prisonId))
 
   newSignedOperationalCapacityInput = (): PageElement => cy.get('#newSignedOperationalCapacity')
 

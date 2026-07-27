@@ -6,6 +6,7 @@ import SubmitCertificationApprovalRequest from '../../commonTransactions/submitC
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import ShouldUpdateCert from '../../controllers/changeCellCapacity/shouldUpdateCert'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
+import paths from '../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -13,8 +14,7 @@ const steps: FormWizard.Steps = {
     reset: true,
     resetJourney: true,
     skip: true,
-    backLink: (_req, res) =>
-      `/view-and-update-locations/${res.locals.decoratedLocation.prisonId}/${res.locals.decoratedLocation.id}`,
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
     next: 'change',
   },
   '/change': {

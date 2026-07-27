@@ -6,6 +6,7 @@ import AuthSignInPage from '../../../../pages/authSignIn'
 import LocationsApiStubber from '../../../../mockApis/locationsApi'
 import { setupStubs, location } from './setupStubs'
 import DeactivateTemporaryDetailsPage from '../../../../pages/deactivate/temporary/details'
+import paths from '../../../../../server/utils/paths'
 
 context('Certification Deactivation - Cell - Init', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -22,7 +23,7 @@ context('Certification Deactivation - Cell - Init', () => {
     })
 
     it('redirects user to sign in page when visited directly', () => {
-      cy.visit(`/location/${location.id}/deactivate`)
+      cy.visit(paths.location.deactivate(location))
       Page.verifyOnPage(AuthSignInPage)
     })
   })
@@ -64,7 +65,7 @@ context('Certification Deactivation - Cell - Init', () => {
       })
 
       it('displays the occupied page', () => {
-        cy.visit(`/location/${location.id}/deactivate`)
+        cy.visit(paths.location.deactivate(location))
         Page.verifyOnPage(DeactivateOccupiedPage)
       })
     })
@@ -81,7 +82,7 @@ context('Certification Deactivation - Cell - Init', () => {
         })
 
         it('navigates to the temporary/details page', () => {
-          cy.visit(`/location/${location.id}/deactivate`)
+          cy.visit(paths.location.deactivate(location))
           Page.verifyOnPage(DeactivateTemporaryDetailsPage)
         })
       })
@@ -94,7 +95,7 @@ context('Certification Deactivation - Cell - Init', () => {
         })
 
         it('navigates to the cell-cert-change page', () => {
-          cy.visit(`/location/${location.id}/deactivate`)
+          cy.visit(paths.location.deactivate(location))
           Page.verifyOnPage(CellCertChangePage)
         })
       })
@@ -111,7 +112,7 @@ context('Certification Deactivation - Cell - Init', () => {
         })
 
         it('navigates straight to the deactivation details page', () => {
-          cy.visit(`/location/${location.id}/deactivate`)
+          cy.visit(paths.location.deactivate(location))
           Page.verifyOnPage(DeactivateTemporaryDetailsPage)
         })
       })

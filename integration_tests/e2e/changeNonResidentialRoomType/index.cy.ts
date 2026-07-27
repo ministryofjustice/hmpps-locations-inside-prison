@@ -3,6 +3,7 @@ import Page from '../../pages/page'
 import LocationFactory from '../../../server/testutils/factories/location'
 import NonResidentialRoomPage from '../../pages/nonResidentialRoom'
 import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoom/setNonResidentialChangeType'
+import paths from '../../../server/utils/paths'
 
 context('Change non-residential rooms', () => {
   context('When user does not have the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -12,7 +13,7 @@ context('Change non-residential rooms', () => {
     })
 
     it('Unauthenticated user directed to auth', () => {
-      cy.visit(`/view-and-update-locations/TST/123456`)
+      cy.visit(paths.location.view('TST', '123456'))
       Page.verifyOnPage(AuthSignInPage)
     })
   })

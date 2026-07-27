@@ -7,6 +7,7 @@ import AnalyticsService from '../../services/analyticsService'
 import fields from '../../routes/changeLocationCode/fields'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 import LocationFactory from '../../testutils/factories/location'
+import paths from '../../utils/paths'
 
 describe('Change Location Code', () => {
   const controller = new Details({ route: '/' })
@@ -79,7 +80,6 @@ describe('Change Location Code', () => {
     it('returns the correct locals for wing', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result.locationType).toBe('wing')
-      expect(result.titleCaption).toBe('A-Wing')
       expect(result.title).toBe('Change wing code')
       expect((deepReq.form.options.fields.locationCode.hint as { text: string }).text).toBe(
         'The letter or number used to identify the location, for example Wing A.',
@@ -103,9 +103,7 @@ describe('Change Location Code', () => {
     it('redirects if the location code has not changed', async () => {
       deepReq.form.values.locationCode = decoratedResidentialSummaryMock.location.code
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'))
     })
 
     it('calls back with error if locationCode is missing', async () => {
@@ -277,7 +275,7 @@ describe('Change Location Code', () => {
 
       it('redirects to the view location page', () => {
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+          paths.location.view('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'),
         )
       })
     })
@@ -312,7 +310,7 @@ describe('Change Location Code', () => {
 
       it('redirects to the view location page', () => {
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+          paths.location.view('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'),
         )
       })
     })

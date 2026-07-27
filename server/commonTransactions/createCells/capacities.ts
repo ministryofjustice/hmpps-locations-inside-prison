@@ -5,6 +5,7 @@ import modifyFieldName from '../../helpers/field/modifyFieldName'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 import getCellPath from './getCellPath'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import paths from '../../utils/paths'
 
 export default class Capacities extends BaseController {
   override middlewareSetup() {
@@ -18,20 +19,23 @@ export default class Capacities extends BaseController {
 
   override validateFields(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { backLink, cellTypeAction } = req.body
+    const { location } = res.locals.decoratedResidentialSummary
     if (cellTypeAction) {
       const [action, cellId] = cellTypeAction.split('/')
 
       req.sessionModel.set('temp-capacitiesValues', req.body)
 
-      let prefix = 'create-cells'
+      let prefix: string
       if (req.form.options.name === 'create-location') {
-        prefix = 'create-new'
+        prefix = paths.location.create(location)
       } else if (req.form.options.name === 'edit-cells') {
-        prefix = 'edit-cells'
+        prefix = paths.location.editCells(location)
+      } else {
+        prefix = paths.location.createCells(location)
       }
       const suffix = `${action === 'set' ? '/init' : ''}${req.isEditing ? '/edit' : ''}`
 
-      res.redirect(`/${prefix}/${res.locals.locationId}/create-cells/${cellId}/${action}-cell-type${suffix}`)
+      res.redirect(`${prefix}/create-cells/${cellId}/${action}-cell-type${suffix}`)
 
       return
     }

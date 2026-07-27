@@ -11,6 +11,7 @@ import UpdateSignedOpCapAlreadyRequestedPage from '../../pages/commonTransaction
 import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
 import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
+import paths from '../../../server/utils/paths'
 
 const prisonId = 'TST'
 
@@ -62,7 +63,7 @@ context('Change signed operational capacity - certification flow', () => {
       setupCommonStubs()
       LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
       cy.signIn()
-      cy.visit(`/change-signed-operational-capacity/${prisonId}/`)
+      cy.visit(paths.prison.changeSignedOperationalCapacity(prisonId))
       page = new CertChangeDisclaimerPage('Changing the signed operational capacity')
     })
 
@@ -178,7 +179,7 @@ context('Change signed operational capacity - certification flow', () => {
       LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([opCapRequest])
       LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(opCapRequest)
       cy.signIn()
-      cy.visit(`/change-signed-operational-capacity/${prisonId}/`)
+      cy.visit(paths.prison.changeSignedOperationalCapacity('TST'))
       page = Page.verifyOnPage(UpdateSignedOpCapAlreadyRequestedPage)
     })
 

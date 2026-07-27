@@ -2,7 +2,7 @@ import Page, { PageElement } from '../../page'
 
 export default class NomisScreenStatusConfirmPage extends Page {
   constructor() {
-    super('Update Maintain internal locations (OIMILOCA) status')
+    super('Update maintain internal locations (OIMILOCA) status')
   }
 
   checkOnPage() {

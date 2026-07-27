@@ -4,13 +4,15 @@ import { Page } from '../services/auditService'
 import type { Services } from '../services'
 import locationHistoryShow from '../controllers/locationHistoryShow'
 import populateLocation from '../middleware/populateLocation'
+import populateTitleCaptionFromLocationOrPrison from '../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
 const controller = (services: Services) => {
   router.get(
-    '/:locationId',
+    '/',
     populateLocation({ includeHistory: true }),
+    populateTitleCaptionFromLocationOrPrison,
     logPageView(services.auditService, Page.LOCATION_HISTORY),
     locationHistoryShow(services),
   )

@@ -2,6 +2,7 @@ import Page from '../../../pages/page'
 import CellCertificateUploadsListPage from '../../../pages/admin/ingest/list'
 import CellCertificateUploadDetailPage from '../../../pages/admin/ingest/detail'
 import { CellCertificateUpload } from '../../../../server/data/types/locationsApi/cellCertificateUpload'
+import paths from '../../../../server/utils/paths'
 
 const completedUpload: CellCertificateUpload = {
   id: 'upload-1',
@@ -80,7 +81,7 @@ context('Cell certificate uploads', () => {
     detailPage.locationsTable().should('contain', 'TST-A-1-001')
     detailPage.locationsTable().should('contain', '2 → 1')
     detailPage.locationsTable().should('contain', 'No changes required')
-    detailPage.cellCertificateLink().should('have.attr', 'href', '/TST/cell-certificate/cert-1')
+    detailPage.cellCertificateLink().should('have.attr', 'href', paths.cellCertificate.view('TST', 'cert-1'))
   })
 
   it('hides the upload button and shows a message while an upload is in progress', () => {
@@ -96,7 +97,7 @@ context('Cell certificate uploads', () => {
   it('shows the in-progress message on the detail page for an unfinished upload', () => {
     cy.task('stubCellCertificateUpload', inProgressUpload)
 
-    cy.visit('/admin/TST/ingest-cert/upload/upload-2')
+    cy.visit(`${paths.admin.ingestCert('TST')}/upload/upload-2`)
     const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
     detailPage.inProgressMessage().should('exist')
     detailPage.cellCertificateLink().should('not.exist')

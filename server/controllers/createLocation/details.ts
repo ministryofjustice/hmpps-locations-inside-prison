@@ -1,11 +1,11 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 
-export default class Details extends FormInitialStep {
+export default class Details extends FormStep {
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const formLocationCode = req.form.options.fields.locationCode
     const formCreateCellsNow = req.form.options.fields.createCellsNow

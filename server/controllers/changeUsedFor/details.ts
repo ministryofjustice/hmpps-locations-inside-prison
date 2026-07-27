@@ -1,12 +1,11 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { isEqual, sortBy } from 'lodash'
-import FormInitialStep from '../base/formInitialStep'
-import backUrl from '../../utils/backUrl'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class ChangeUsedForDetails extends FormInitialStep {
+export default class ChangeUsedForDetails extends FormStep {
   override middlewareSetup() {
     this.use(this.setOptions)
     super.middlewareSetup()
@@ -25,7 +24,7 @@ export default class ChangeUsedForDetails extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId, leafLevel } = decoratedLocation
+    const { leafLevel } = decoratedLocation
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
     if (!req.form.values?.usedFor) {
@@ -37,18 +36,10 @@ export default class ChangeUsedForDetails extends FormInitialStep {
       }
     }
 
-    const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-    })
-
     return {
       ...locals,
       leafLevel,
-      backLink,
       removeHeadingSpacing: true,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-      title: 'Change what the location is used for',
-      titleCaption: capFirst(decoratedLocation.displayName),
       buttonText: 'Save used for',
     }
   }
@@ -70,15 +61,18 @@ export default class ChangeUsedForDetails extends FormInitialStep {
 
   override async validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     if (isEqual(sortBy(req.form.values.usedFor as string[]), sortBy(decoratedLocation.raw.usedFor))) {
-      return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+      return res.redirect(paths.location.view(decoratedLocation))
     }
+
     return next()
   }
 
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId, localName, pathHierarchy } = res.locals.decoratedLocation
+    const {
+      decoratedLocation,
+      decoratedLocation: { localName, pathHierarchy },
+    } = res.locals
     const locationName = localName || pathHierarchy
 
     req.journeyModel.reset()
@@ -89,6 +83,6 @@ export default class ChangeUsedForDetails extends FormInitialStep {
       content: `You have changed what ${locationName} is used for.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

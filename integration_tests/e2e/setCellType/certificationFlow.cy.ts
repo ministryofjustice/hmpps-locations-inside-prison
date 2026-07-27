@@ -11,6 +11,9 @@ import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/
 import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
 import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
+import AuthStubber from '../../mockApis/auth'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 const prisonerLocations = [
   {
@@ -73,19 +76,20 @@ context('Set cell type', () => {
       })
       location.currentCellCertificate.specialistCellTypes = []
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: [] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubLocations(location)
     })
 
     it('does not show the remove link on the show location page', () => {
@@ -116,25 +120,25 @@ context('Set cell type', () => {
       })
       location.currentCellCertificate.specialistCellTypes = []
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubUpdateSpecialistCellTypes')
-      cy.task('stubLocationsLocationsResidentialSummary')
-      cy.task('stubLocations', location)
-      cy.task('stubLocationsCertificationRequestApprovalsPrison', [])
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
-      cy.task('stubPrisonerLocationsId', prisonerLocations)
-      cy.task('stubLocationsRequestSpecialistCellTypeChange')
-      cy.task('stubLocationsCertificationPrisonSignedOpCapChange')
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubUpdateSpecialistCellTypes()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+      LocationsApiStubber.stub.stubLocationsRequestSpecialistCellTypeChange()
+      LocationsApiStubber.stub.stubLocationsCertificationPrisonSignedOpCapChange()
     })
 
     context('when the location does not yet have a specific type', () => {
@@ -146,8 +150,8 @@ context('Set cell type', () => {
           localName: null,
         })
         location.currentCellCertificate.specialistCellTypes = []
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
         cy.signIn()
       })
 
@@ -159,8 +163,8 @@ context('Set cell type', () => {
           specialistCellTypes: [],
           localName: null,
         })
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
         ViewLocationsShowPage.goTo(location.prisonId, location.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.setCellTypeLink().should('not.exist')

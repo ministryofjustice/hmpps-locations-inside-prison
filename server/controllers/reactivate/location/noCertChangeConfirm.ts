@@ -7,11 +7,11 @@ import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import populateLocationTree from '../parent/middleware/populateLocationTree'
 import getResidentialSummaries from '../parent/middleware/getResidentialSummaries'
 import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
-import capFirst from '../../../formatters/capFirst'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { TypedLocals } from '../../../@types/express'
+import paths from '../../../utils/paths'
 
-export default class NoCertChangeConfirm extends FormInitialStep {
+export default class NoCertChangeConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getResidentialSummaries)
@@ -71,7 +71,6 @@ export default class NoCertChangeConfirm extends FormInitialStep {
       locals.title = `You are about to reactivate ${decoratedLocation.pathHierarchy}`
     } else {
       locals.title = `You are about to reactivate ${cells.length} cell${cells.length > 1 ? 's' : ''}`
-      locals.titleCaption = capFirst(decoratedLocation.displayName)
     }
 
     return locals
@@ -124,7 +123,6 @@ export default class NoCertChangeConfirm extends FormInitialStep {
 
   override async successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
-    const redirectUrl = `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -134,6 +132,6 @@ export default class NoCertChangeConfirm extends FormInitialStep {
       content: `You have activated ${decoratedLocation.displayName}.`,
     })
 
-    res.redirect(redirectUrl)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

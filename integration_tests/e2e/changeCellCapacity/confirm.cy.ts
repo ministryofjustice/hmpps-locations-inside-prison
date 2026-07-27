@@ -18,18 +18,17 @@ context('Change cell capacity - confirm', () => {
       },
       leafLevel: true,
       specialistCellTypes: [],
-      localName: '1-1-001',
     })
 
     const prisonerLocations = [
       {
-        cellLocation: '1-1-001',
+        cellLocation: 'A-1-001',
         prisoners: [
           {
             prisonerNumber: 'A1234AA',
             prisonId: 'TST',
             prisonName: 'HMP Leeds',
-            cellLocation: '1-1-001',
+            cellLocation: 'A-1-001',
             firstName: 'Dave',
             lastName: 'Jones',
             gender: 'Male',
@@ -48,7 +47,7 @@ context('Change cell capacity - confirm', () => {
             prisonerNumber: 'B1234BB',
             prisonId: 'TST',
             prisonName: 'HMP Leeds',
-            cellLocation: '1-1-001',
+            cellLocation: 'A-1-001',
             firstName: 'Horatio',
             lastName: 'McBubblesworth',
             gender: 'Male',
@@ -188,7 +187,7 @@ context('Change cell capacity - confirm', () => {
       Page.verifyOnPage(ViewLocationsShowPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Capacity updated')
-      cy.get('.govuk-notification-banner__content p').contains('You have updated the capacity of 1-1-001.')
+      cy.get('.govuk-notification-banner__content p').contains('You have updated the capacity of A-1-001.')
     })
 
     it('does not show the cert mismatch warning when cert is inactive', () => {
@@ -212,7 +211,6 @@ context('Change cell capacity - confirm', () => {
       },
       leafLevel: true,
       specialistCellTypes: [],
-      localName: '1-1-001',
     })
 
     beforeEach(() => {

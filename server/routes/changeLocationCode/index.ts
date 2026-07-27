@@ -4,8 +4,8 @@ import steps from './steps'
 import fields from './fields'
 import protectRoute from '../../middleware/protectRoute'
 import populateDecoratedResidentialSummary from '../../middleware/populateDecoratedResidentialSummary'
-import populatePrisonAndLocationId from '../../middleware/populatePrisonAndLocationId'
 import asyncMiddleware from '../../middleware/asyncMiddleware'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
@@ -19,8 +19,8 @@ const checkLocationIsDraft = asyncMiddleware(async (req, res, next) => {
 
 router.use(
   protectRoute('change_location_code'),
-  populatePrisonAndLocationId,
   populateDecoratedResidentialSummary,
+  populateTitleCaptionFromLocationOrPrison,
   checkLocationIsDraft,
   wizard(steps, fields, {
     name: 'change-location-code',

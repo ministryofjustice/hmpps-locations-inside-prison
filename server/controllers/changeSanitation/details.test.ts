@@ -6,6 +6,7 @@ import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import fields from '../../routes/changeSanitation/fields'
 import LocationFactory from '../../testutils/factories/location'
+import paths from '../../utils/paths'
 
 describe('Change sanitation', () => {
   const controller = new Details({ route: '/' })
@@ -77,7 +78,6 @@ describe('Change sanitation', () => {
       expect(result).toEqual({
         removeHeadingSpacing: true,
         buttonText: 'Save sanitation',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })
@@ -88,9 +88,7 @@ describe('Change sanitation', () => {
       deepReq.form.values.inCellSanitation = 'NO'
       const callback = jest.fn()
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'))
     })
   })
 
@@ -158,9 +156,7 @@ describe('Change sanitation', () => {
     })
 
     it('redirects to the view location page', () => {
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'))
     })
   })
 })

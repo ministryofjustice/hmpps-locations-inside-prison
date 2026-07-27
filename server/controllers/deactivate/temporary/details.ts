@@ -1,11 +1,9 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
-import { TypedLocals } from '../../../@types/express'
+import FormStep from '../../base/formStep'
 import populateDeactivationReasonItems from '../../../middleware/populateDeactivationReasonItems'
-import capFirst from '../../../formatters/capFirst'
 
-export default class DeactivateTemporaryDetails extends FormInitialStep {
+export default class DeactivateTemporaryDetails extends FormStep {
   override middlewareSetup() {
     this.use(populateDeactivationReasonItems)
     super.middlewareSetup()
@@ -35,21 +33,5 @@ export default class DeactivateTemporaryDetails extends FormInitialStep {
     req.form.values.deactivationReasonDescription =
       req.body[`deactivationReasonDescription-${req.form.values.deactivationReason}`]
     super.validateFields(req, res, callback)
-  }
-
-  override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-
-    const { id: locationId, prisonId, displayName } = res.locals.decoratedLocation
-
-    const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
-
-    return {
-      ...locals,
-      backLink: res.locals.backLink || cancelLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-      title: 'Deactivation details',
-      titleCaption: capFirst(displayName),
-    }
   }
 }

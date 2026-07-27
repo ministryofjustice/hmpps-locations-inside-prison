@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../utils/backUrl'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { PrisonResidentialSummary } from '../../data/types/locationsApi'
 import { TypedLocals } from '../../@types/express'
+import paths from '../../utils/paths'
 
-export default class ChangeSignedOperationalCapacity extends FormInitialStep {
+export default class ChangeSignedOperationalCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.getSignedOperationalCapacity)
@@ -78,11 +78,7 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
     const { newSignedOperationalCapacity } = req.form.values
     const { currentSignedOperationalCapacity } = res.locals
     if (Number(newSignedOperationalCapacity) === Number(currentSignedOperationalCapacity)) {
-      return res.redirect(
-        backUrl(req, {
-          fallbackUrl: `/view-and-update-locations/${prisonId}`,
-        }),
-      )
+      return res.redirect(paths.location.view(prisonId))
     }
 
     return next()
@@ -90,17 +86,9 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
-    const { prisonId } = res.locals
-
-    const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}`,
-    })
 
     return {
       ...locals,
-      backLink,
-      cancelLink: backLink,
-      title: 'Change signed operational capacity',
       insetText:
         'Signed operational capacity is the number of people the prison governor has approved that the establishment can currently safely hold.',
       buttonText: 'Update signed operational capacity',
@@ -138,6 +126,6 @@ export default class ChangeSignedOperationalCapacity extends FormInitialStep {
       content: `You have updated the establishment's signed operational capacity.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}`)
+    res.redirect(paths.location.view(prisonId))
   }
 }

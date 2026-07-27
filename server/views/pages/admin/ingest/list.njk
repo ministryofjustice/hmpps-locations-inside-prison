@@ -37,7 +37,7 @@
           {% set rows = [] %}
           {% for upload in uploads %}
             {% set rows = (rows.push([
-              { html: "<a class='govuk-link' href='/admin/" + prisonId + "/ingest-cert/upload/" + upload.id + "'>" + (upload.requestedDate | formatDateWithTime) + "</a>" },
+              { html: "<a class='govuk-link' href='" + paths.admin.ingestCert(prisonId) + "/upload/" + upload.id + "'>" + (upload.requestedDate | formatDateWithTime) + "</a>" },
               { html: uploadStatusTag(upload.status) },
               { text: (upload.startTime | formatDateWithTime) if upload.startTime else "-" },
               { text: (upload.endTime | formatDateWithTime) if upload.endTime else "-" },

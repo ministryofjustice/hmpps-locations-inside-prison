@@ -1,4 +1,5 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class ChangeLocationCodePage extends Page {
   locationType: string
@@ -9,7 +10,7 @@ export default class ChangeLocationCodePage extends Page {
     this.checkOnPage()
   }
 
-  static goTo = (locationId?: string) => cy.visit(`/location/${locationId}/change-location-code/details`)
+  static goTo = (locationId?: string) => cy.visit(`${paths.location.changeLocationCode('TST', locationId)}/details`)
 
   locationCodeInputPrefix = (): PageElement => cy.get('.govuk-input-prefix--plain')
 

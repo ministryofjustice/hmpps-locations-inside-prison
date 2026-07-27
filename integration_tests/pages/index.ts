@@ -11,7 +11,6 @@ export default class IndexPage extends Page {
 
   cards = {
     viewLocations: (): PageElement => cy.get('[data-qa=view-locations-card]'),
-    manageLocations: (): PageElement => cy.get('[data-qa=manage-locations-card]'),
     inactiveCells: (): PageElement => cy.get('[data-qa=inactive-cells-card]'),
     cellCertificate: (): PageElement => cy.get('[data-qa=cell-certificate-card]'),
     capacityManagementDashboard: (): PageElement => cy.get('[data-qa=capacity-management-dashboard-card]'),

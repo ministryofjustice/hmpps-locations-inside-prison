@@ -1,13 +1,14 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../../base/formInitialStep'
+import FormStep from '../../../base/formStep'
 import { getAllCertUserEmails, sendNotification } from '../../../../utils/notificationHelpers'
 import { NotificationType } from '../../../../services/notificationService'
 import formatDateWithTime from '../../../../formatters/formatDateWithTime'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 import config from '../../../../config'
+import paths from '../../../../utils/paths'
 
-export default class Reject extends FormInitialStep {
+export default class Reject extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
@@ -62,6 +63,6 @@ export default class Reject extends FormInitialStep {
       content: `The establishment has been notified that the requested change has been rejected.`,
     })
 
-    res.redirect(`/${res.locals.prisonId}/cell-certificate/change-requests`)
+    res.redirect(paths.cellCertificate.changeRequest.view(prisonId))
   }
 }

@@ -4,12 +4,14 @@ import steps from './steps'
 import fields from './fields'
 import protectRoute from '../../middleware/protectRoute'
 import populateLocation from '../../middleware/populateLocation'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('change_local_name'),
   populateLocation({ decorate: true }),
+  populateTitleCaptionFromLocationOrPrison,
   wizard(steps, fields, {
     name: 'set-local-name',
     templatePath: 'pages/setLocalName',

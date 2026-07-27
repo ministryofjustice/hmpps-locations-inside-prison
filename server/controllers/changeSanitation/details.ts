@@ -1,10 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class Details extends FormInitialStep {
+export default class Details extends FormStep {
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     return {
       inCellSanitation: res.locals.decoratedResidentialSummary.location.inCellSanitation ? 'YES' : 'NO',
@@ -18,7 +18,6 @@ export default class Details extends FormInitialStep {
     return {
       ...locals,
       removeHeadingSpacing: true,
-      titleCaption: `Cell ${capFirst(decoratedResidentialSummary.location.pathHierarchy)}`,
       buttonText: decoratedResidentialSummary.location.status === 'DRAFT' ? 'Save sanitation' : '',
     }
   }
@@ -26,11 +25,11 @@ export default class Details extends FormInitialStep {
   override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { values } = req.form
-      const { decoratedResidentialSummary, prisonId, locationId } = res.locals
+      const { location } = res.locals.decoratedResidentialSummary
       const validationErrors: FormWizard.Errors = {}
 
-      if (values.inCellSanitation === (decoratedResidentialSummary.location.inCellSanitation ? 'YES' : 'NO')) {
-        return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+      if (values.inCellSanitation === (location.inCellSanitation ? 'YES' : 'NO')) {
+        return res.redirect(paths.location.view(location))
       }
 
       return callback({ ...errors, ...validationErrors })
@@ -66,14 +65,15 @@ export default class Details extends FormInitialStep {
       super.successHandler(req, res, next)
       return
     }
-    const { id: locationId, prisonId, pathHierarchy } = res.locals.decoratedResidentialSummary.location
+
+    const { location } = res.locals.decoratedResidentialSummary
 
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('success', {
       title: 'Sanitation changed',
-      content: `You have changed sanitation for ${pathHierarchy}.`,
+      content: `You have changed sanitation for ${location.pathHierarchy}.`,
     })
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(location))
   }
 }

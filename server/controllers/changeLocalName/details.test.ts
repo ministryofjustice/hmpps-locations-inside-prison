@@ -6,6 +6,7 @@ import LocationsService from '../../services/locationsService'
 import fields from '../../routes/changeLocalName/fields'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('Change Local Name', () => {
   const controller = new Details({ route: '/' })
@@ -85,9 +86,7 @@ describe('Change Local Name', () => {
       deepRes.locals.decoratedLocation.localName = 'Wing A'
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         buttonText: 'Save name',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           localName: {
             component: 'govukCharacterCount',
@@ -117,24 +116,9 @@ describe('Change Local Name', () => {
         },
         insetText:
           'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
-        title: 'Change local name',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })
-  })
-
-  it('sets the correct backLink and cancelLink in locals', () => {
-    const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-    expect(result.backLink).toBe('/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
-    expect(result.cancelLink).toBe('/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2')
-  })
-
-  it('sets the localName value from res if not in req', () => {
-    delete deepReq.form.values.localName
-    deepRes.locals.decoratedLocation.localName = 'Local Name from response'
-    const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-    expect((result.fields as FormWizard.Fields).localName.value).toBe('Local Name from response')
   })
 
   describe('validateFields', () => {
@@ -288,9 +272,7 @@ describe('Change Local Name', () => {
     })
 
     it('redirects to the view location page', () => {
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'))
     })
   })
 })

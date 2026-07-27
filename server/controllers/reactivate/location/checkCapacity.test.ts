@@ -66,7 +66,6 @@ describe('CheckCapacity', () => {
         expect(result).toEqual({
           fields,
           title: 'Check capacity of cell',
-          titleCaption: 'Cell A-1-001',
           minLayout: 'three-quarters',
           validationErrors: [],
         })
@@ -89,7 +88,6 @@ describe('CheckCapacity', () => {
         expect(result).toEqual({
           fields,
           title: 'Check capacity of cells',
-          titleCaption: 'Landing A-1',
           minLayout: 'three-quarters',
           validationErrors: [],
         })

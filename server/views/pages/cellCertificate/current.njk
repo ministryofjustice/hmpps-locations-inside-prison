@@ -14,11 +14,11 @@
     label: "Sub navigation",
     items: [{
       text: "Current cell certificate",
-      href: "/" + prisonId + "/cell-certificate/current",
+      href: paths.cellCertificate.view(prisonId),
       active: true
     }, {
       text: "Change requests (" + approvalRequests | length + ")",
-      href: "/" + prisonId + "/cell-certificate/change-requests"
+      href: paths.cellCertificate.changeRequest.view(prisonId)
     }]
   }) }}
 {% endblock %}
@@ -33,7 +33,7 @@
       </p>
 
       <p>
-        <a href="/{{ prisonId }}/cell-certificate/history" class="govuk-link">View history of certificate changes</a>
+        <a href="{{ paths.cellCertificate.history(prisonId) }}" class="govuk-link">View history of certificate changes</a>
       </p>
 
       {{ cellCertificate(certificate, constants) }}

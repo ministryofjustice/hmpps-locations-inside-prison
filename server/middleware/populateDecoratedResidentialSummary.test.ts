@@ -8,6 +8,7 @@ import {
   showEditLocalNameLink,
   showSanitationChangeLink,
 } from './populateDecoratedResidentialSummary'
+import paths from '../utils/paths'
 
 describe('populateDecoratedResidentialSummary - Link Visibility Functions', () => {
   const createMockRequest = (canAccessValue: boolean = true): Request =>
@@ -587,7 +588,7 @@ describe('populateDecoratedResidentialSummary - Link Visibility Functions', () =
             title: 'Signed operational capacity',
             type: 'signed-operational-capacity',
             text: '130',
-            linkHref: '/change-signed-operational-capacity/TST',
+            linkHref: paths.prison.changeSignedOperationalCapacity('TST'),
             linkLabel: 'Change',
             linkAriaLabel: 'Change signed operational capacity',
           },

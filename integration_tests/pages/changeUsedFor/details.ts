@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class ChangeUsedForPage extends Page {
   constructor() {
     super('Change what the location is used for')
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/change-used-for`)
+  static goTo = (locationId: string) => cy.visit(paths.location.changeUsedFor('TST', locationId))
 
   usedForWarningText = (): PageElement => cy.get('.govuk-warning-text__text')
 

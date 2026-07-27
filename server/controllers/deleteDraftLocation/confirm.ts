@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { TypedLocals } from '../../@types/express'
-import FormInitialStep from '../base/formInitialStep'
-import capFirst from '../../formatters/capFirst'
+import FormStep from '../base/formStep'
+import paths from '../../utils/paths'
 
-export default class ConfirmDeleteDraftLocation extends FormInitialStep {
+export default class ConfirmDeleteDraftLocation extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals
@@ -17,7 +17,6 @@ export default class ConfirmDeleteDraftLocation extends FormInitialStep {
       ...locals,
       locationType,
       bodyText,
-      titleCaption: capFirst(decoratedResidentialSummary.location.displayName),
       title: `Are you sure you want to delete this ${locationType}?`,
       buttonText: `Delete ${locationType}`,
     }
@@ -54,6 +53,6 @@ export default class ConfirmDeleteDraftLocation extends FormInitialStep {
       content: `You have deleted ${displayName}.`,
     })
 
-    res.redirect(`/view-and-update-locations/${[prisonId, parentId].filter(i => i).join('/')}`)
+    res.redirect(paths.location.view(prisonId, parentId))
   }
 }

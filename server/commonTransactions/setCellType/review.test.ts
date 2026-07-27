@@ -1,13 +1,13 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
-import ReviewCellCapacity from './review'
+import Review from './review'
 import fields from '../../routes/changeCellCapacity/fields'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 import PrisonerFactory from '../../testutils/factories/prisoner'
 
 describe('ReviewCellCapacity', () => {
-  const controller = new ReviewCellCapacity({ route: '/' })
+  const controller = new Review({ route: '/' })
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
 
@@ -130,8 +130,6 @@ describe('ReviewCellCapacity', () => {
 
       expect(result).toEqual({
         fields,
-        title: 'Review cell capacity',
-        titleCaption: 'Cell A-1-001',
         insetText:
           'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
         validationErrors: [

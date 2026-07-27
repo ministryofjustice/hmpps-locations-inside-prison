@@ -1,9 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import { TypedLocals } from '../../@types/express'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 
-export default class BaseController extends FormInitialStep {
+export default class BaseController extends FormStep {
   getCellPath(_req: FormWizard.Request, res: Response) {
     return res.locals.decoratedLocation.pathHierarchy
   }

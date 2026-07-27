@@ -1,8 +1,8 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class InactiveCellsIndexPage extends Page {
-  static goTo = (prisonId?: string, locationId?: string) =>
-    cy.visit(`/inactive-cells${prisonId ? `/${prisonId}${locationId ? `/${locationId}` : ''}` : ''}`)
+  static goTo = (prisonId = 'TST', locationId?: string) => cy.visit(paths.location.inactiveCells(prisonId, locationId))
 
   constructor() {
     super('')

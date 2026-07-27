@@ -6,6 +6,7 @@ import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 import LocationFactory from '../../testutils/factories/location'
+import paths from '../../utils/paths'
 
 describe('ConfirmRemoveCellType', () => {
   const controller = new ConfirmRemoveCellType({ route: '/' })
@@ -83,8 +84,6 @@ describe('ConfirmRemoveCellType', () => {
         changeSummary: `This will decrease the establishment’s working capacity from 20 to 19.
 <br/><br/>
 This will increase the establishment’s maximum capacity from 30 to 31.`,
-        title: 'Confirm cell type removal and capacity changes',
-        titleCaption: 'Cell A-1-001',
       })
     })
   })
@@ -196,9 +195,7 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
     })
 
     it('redirects to the view location page', () => {
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'))
     })
   })
 })

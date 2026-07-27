@@ -164,8 +164,6 @@ describe('CellConversionAccommodationType', () => {
 
       expect(result).toEqual({
         fields,
-        title: 'Convert to cell',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#accommodationType',
@@ -185,8 +183,6 @@ describe('CellConversionAccommodationType', () => {
 
         expect(result).toEqual({
           fields,
-          title: 'Convert to cell',
-          titleCaption: 'Cell A-1-001',
           validationErrors: [
             {
               href: '#accommodationType',

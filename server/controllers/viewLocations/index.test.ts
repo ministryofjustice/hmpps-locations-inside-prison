@@ -1,50 +1,78 @@
 import { Request, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import controller from './viewLocationsShow'
-import { addActions } from '../../routes/viewLocationsRouter'
+import controller, { addActions } from './index'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
+import LocationResidentialSummaryFactory from '../../testutils/factories/locationResidentialSummary'
+import { LocationResidentialSummary } from '../../data/types/locationsApi'
+import LocationFactory from '../../testutils/factories/location'
 
 describe('view locations show', () => {
   let deepReq: DeepPartial<Request>
   let deepRes: DeepPartial<Response>
+  let locationResidentialSummary: LocationResidentialSummary
+
+  const convertToCellAction = {
+    text: 'Convert to cell',
+    href: paths.location.cellConversion('TST', '7e570000-0000-1000-8001-000000000001'),
+    class: 'govuk-button--secondary',
+  }
 
   const convertToNonResAction = {
     text: 'Convert cell to non-residential room',
-    href: '/location/7e570000-0000-0000-0000-000000000001/non-residential-conversion',
+    href: paths.location.nonResidentialConversion('TST', '7e570000-0000-1000-8001-000000000001'),
     class: 'govuk-button--secondary',
   }
 
   const deactivateCellAction = {
     text: 'Deactivate cell',
-    href: '/location/7e570000-0000-0000-0000-000000000001/deactivate',
+    href: paths.location.deactivate('TST', '7e570000-0000-1000-8001-000000000001'),
     class: 'govuk-button--secondary',
   }
 
   const deleteWingAction = {
     text: 'Delete wing',
-    href: '/delete-draft/7e570000-0000-0000-0000-000000000001',
+    href: paths.location.delete('TST', '7e570000-0000-1000-8001-000000000001'),
     class: 'govuk-button--warning',
   }
 
   beforeEach(() => {
+    locationResidentialSummary = LocationResidentialSummaryFactory.build()
     deepReq = {
       canAccess: jest.fn().mockReturnValue(false),
       flash: jest.fn(),
       featureFlags: {},
+      id: 'test-correlation-id',
       session: {
         systemToken: 'token',
       },
       services: {
+        auditService: {
+          logPageView: jest.fn().mockResolvedValue(undefined),
+        },
         locationsService: {
           getPrisonConfiguration: jest.fn().mockResolvedValue({}),
+          getResidentialSummary: jest.fn().mockResolvedValue(locationResidentialSummary),
+          getLocationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getAccommodationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getConvertedCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getSpecialistCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getUsedForType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getDeactivatedReason: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+        },
+        manageUsersService: {
+          getUser: (_token: string, username: string) => {
+            return Promise.resolve({ name: `Resolved ${username}`, username })
+          },
         },
       },
     }
     deepRes = {
       locals: {
-        decoratedResidentialSummary: {
-          location: buildDecoratedLocation({ isResidential: true, leafLevel: true }),
-          subLocationName: 'Landings',
+        prisonId: 'TST',
+        locationId: '7e570000-0000-1000-8001-000000000001',
+        user: {
+          username: 'test-user',
         },
       },
       render: jest.fn(),
@@ -80,6 +108,13 @@ describe('view locations show', () => {
   })
 
   describe('addActions', () => {
+    beforeEach(() => {
+      deepRes.locals.decoratedResidentialSummary = {
+        location: buildDecoratedLocation(locationResidentialSummary.parentLocation),
+        subLocationName: 'Landings',
+      }
+    })
+
     describe('convert to non-res', () => {
       describe('without the correct permissions', () => {
         beforeEach(() => {
@@ -106,6 +141,7 @@ describe('view locations show', () => {
 
         it('does not add the action for non-res cell', async () => {
           deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            ...locationResidentialSummary.parentLocation,
             isResidential: false,
             leafLevel: true,
           })
@@ -117,6 +153,7 @@ describe('view locations show', () => {
 
         it('does not add the action when not leaf level', async () => {
           deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            ...locationResidentialSummary.parentLocation,
             isResidential: true,
             leafLevel: false,
           })
@@ -128,6 +165,7 @@ describe('view locations show', () => {
 
         it('does not add the action when location is inactive', async () => {
           deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            ...locationResidentialSummary.parentLocation,
             active: false,
             isResidential: true,
             leafLevel: true,
@@ -140,6 +178,7 @@ describe('view locations show', () => {
 
         it('does not add the action when location status is LOCKED_ACTIVE', async () => {
           deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+            ...locationResidentialSummary.parentLocation,
             active: true,
             isResidential: true,
             leafLevel: true,
@@ -156,6 +195,7 @@ describe('view locations show', () => {
     describe('deactivate cell', () => {
       beforeEach(() => {
         deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+          ...locationResidentialSummary.parentLocation,
           active: true,
           locationType: 'CELL',
         })
@@ -213,6 +253,7 @@ describe('view locations show', () => {
     describe('delete wing', () => {
       beforeEach(() => {
         deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
+          ...locationResidentialSummary.parentLocation,
           active: false,
           status: 'DRAFT',
           locationType: 'WING',
@@ -257,23 +298,14 @@ describe('view locations show', () => {
   describe('actionButton', () => {
     beforeEach(() => {
       deepReq.canAccess = jest.fn().mockImplementation(permission => permission === 'convert_non_residential')
-      deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
-        active: true,
-        isResidential: false,
-        leafLevel: true,
-      })
+
+      locationResidentialSummary.parentLocation.isResidential = false
     })
 
     it('renders the page with the action button', async () => {
       await controller(deepReq as Request, deepRes as Response)
 
-      expect(deepRes.locals.actions).toEqual([
-        {
-          class: 'govuk-button--secondary',
-          text: 'Convert to cell',
-          href: `/location/7e570000-0000-0000-0000-000000000001/cell-conversion`,
-        },
-      ])
+      expect(deepRes.locals.actions).toEqual([convertToCellAction])
       expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
         banner: undefined,
         minLayout: 'three-quarters',
@@ -300,11 +332,7 @@ describe('view locations show', () => {
 
     describe('when inactive', () => {
       beforeEach(() => {
-        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
-          active: false,
-          isResidential: false,
-          leafLevel: true,
-        })
+        locationResidentialSummary.parentLocation.active = false
       })
 
       it('renders the page without the action button', async () => {
@@ -321,17 +349,13 @@ describe('view locations show', () => {
 
     describe('when already residential', () => {
       beforeEach(() => {
-        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
-          active: true,
-          isResidential: true,
-          leafLevel: true,
-        })
+        locationResidentialSummary.parentLocation.isResidential = true
       })
 
-      it('renders the page without the action button', async () => {
+      it('renders the page with the action button', async () => {
         await controller(deepReq as Request, deepRes as Response)
 
-        expect(deepRes.locals.actions).toEqual(undefined)
+        expect(deepRes.locals.actions).toEqual([convertToNonResAction])
         expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
           banner: undefined,
           minLayout: 'three-quarters',
@@ -342,11 +366,7 @@ describe('view locations show', () => {
 
     describe('when not leaf level', () => {
       beforeEach(() => {
-        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
-          active: true,
-          isResidential: false,
-          leafLevel: false,
-        })
+        locationResidentialSummary.parentLocation.leafLevel = false
       })
 
       it('renders the page without the action button', async () => {
@@ -363,12 +383,7 @@ describe('view locations show', () => {
 
     describe('when location status is LOCKED', () => {
       beforeEach(() => {
-        deepRes.locals.decoratedResidentialSummary.location = buildDecoratedLocation({
-          active: true,
-          isResidential: false,
-          leafLevel: true,
-          status: 'LOCKED_ACTIVE',
-        })
+        locationResidentialSummary.parentLocation.status = 'LOCKED_ACTIVE'
       })
 
       it('renders the page without the action button', async () => {
@@ -407,7 +422,7 @@ describe('view locations show', () => {
 
     describe('when the location is not leafLevel', () => {
       beforeEach(() => {
-        deepRes.locals.decoratedResidentialSummary.location.leafLevel = false
+        locationResidentialSummary.parentLocation.leafLevel = false
       })
 
       describe('when canAccess("create_location") is false', () => {
@@ -431,7 +446,7 @@ describe('view locations show', () => {
 
         describe('when location has a pending approval request', () => {
           beforeEach(() => {
-            deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId = 'REQUEST-ID-0000-1000-8'
+            locationResidentialSummary.parentLocation.pendingApprovalRequestId = 'REQUEST-ID-0000-1000-8'
           })
 
           it('does not render the create button', async () => {
@@ -449,7 +464,7 @@ describe('view locations show', () => {
 
         describe('when location does not have a pending approval request', () => {
           beforeEach(() => {
-            delete deepRes.locals.decoratedResidentialSummary.location.pendingApprovalRequestId
+            delete locationResidentialSummary.parentLocation.pendingApprovalRequestId
           })
 
           it('renders the create button', async () => {
@@ -457,13 +472,12 @@ describe('view locations show', () => {
 
             expect(deepRes.locals.actions).toEqual(undefined)
             expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-              banner: undefined,
               createButton: {
                 attributes: {
                   'data-qa': 'create-button',
                 },
                 classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
-                href: '/create-new/7e570000-0000-0000-0000-000000000001',
+                href: paths.location.create('TST', '7e570000-0000-1000-8001-000000000001'),
                 text: 'Create new landing',
               },
               minLayout: 'three-quarters',
@@ -473,25 +487,24 @@ describe('view locations show', () => {
 
           describe('when sub-location is Cells', () => {
             beforeEach(() => {
-              deepRes.locals.decoratedResidentialSummary.subLocationName = 'Cells'
+              locationResidentialSummary.subLocationName = 'Cells'
             })
 
             it('renders Edit cells when all cells are DRAFT', async () => {
-              deepRes.locals.decoratedResidentialSummary.subLocations = [
-                buildDecoratedLocation({ status: 'DRAFT' }),
-                buildDecoratedLocation({ status: 'DRAFT' }),
+              locationResidentialSummary.subLocations = [
+                LocationFactory.build({ status: 'DRAFT' }),
+                LocationFactory.build({ status: 'DRAFT' }),
               ]
 
               await controller(deepReq as Request, deepRes as Response)
 
               expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-                banner: undefined,
                 createButton: {
                   attributes: {
                     'data-qa': 'create-button',
                   },
                   classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
-                  href: '/edit-cells/7e570000-0000-0000-0000-000000000001',
+                  href: paths.location.editCells('TST', '7e570000-0000-1000-8001-000000000001'),
                   text: 'Edit cells',
                 },
                 minLayout: 'three-quarters',
@@ -500,21 +513,20 @@ describe('view locations show', () => {
             })
 
             it('renders Edit draft cells when there are DRAFT and non-DRAFT cells', async () => {
-              deepRes.locals.decoratedResidentialSummary.subLocations = [
-                buildDecoratedLocation({ status: 'DRAFT' }),
-                buildDecoratedLocation({ status: 'ACTIVE' }),
+              locationResidentialSummary.subLocations = [
+                LocationFactory.build({ status: 'DRAFT' }),
+                LocationFactory.build({ status: 'ACTIVE' }),
               ]
 
               await controller(deepReq as Request, deepRes as Response)
 
               expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
-                banner: undefined,
                 createButton: {
                   attributes: {
                     'data-qa': 'create-button',
                   },
                   classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
-                  href: '/edit-cells/7e570000-0000-0000-0000-000000000001',
+                  href: paths.location.editCells('TST', '7e570000-0000-1000-8001-000000000001'),
                   text: 'Edit draft cells',
                 },
                 minLayout: 'three-quarters',
@@ -524,6 +536,82 @@ describe('view locations show', () => {
           })
         })
       })
+    })
+  })
+})
+
+describe('view locations index', () => {
+  let deepReq: DeepPartial<Request>
+  let deepRes: DeepPartial<Response>
+
+  beforeEach(() => {
+    deepReq = {
+      canAccess: jest.fn().mockReturnValue(false),
+      flash: jest.fn(),
+      featureFlags: {},
+      id: 'test-correlation-id',
+      session: {
+        systemToken: 'token',
+      },
+      services: {
+        auditService: {
+          logPageView: jest.fn().mockResolvedValue(undefined),
+        },
+        locationsService: {
+          getPrisonConfiguration: jest.fn().mockResolvedValue({}),
+          getResidentialSummary: jest.fn().mockResolvedValue(LocationResidentialSummaryFactory.build()),
+          getLocationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getAccommodationType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getConvertedCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getSpecialistCellType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getUsedForType: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+          getDeactivatedReason: jest.fn((_token: string, str: string) => Promise.resolve(`resolved.${str}`)),
+        },
+        manageUsersService: {
+          getUser: (_token: string, username: string) => {
+            return Promise.resolve({ name: `Resolved ${username}`, username })
+          },
+        },
+      },
+    }
+    deepRes = {
+      locals: {
+        prisonId: 'TST',
+        user: {
+          username: 'test-user',
+        },
+      },
+      render: jest.fn(),
+    }
+  })
+
+  it('renders the index page without create button when cannot create locations', async () => {
+    deepReq.canAccess = jest.fn().mockReturnValue(false)
+
+    await controller(deepReq as Request, deepRes as Response)
+
+    expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
+      title: 'Manage residential locations',
+      minLayout: 'three-quarters',
+    })
+  })
+
+  it('renders the index page with create button when can create locations', async () => {
+    deepReq.canAccess = jest.fn().mockImplementation(permission => permission === 'create_location')
+
+    await controller(deepReq as Request, deepRes as Response)
+
+    expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
+      title: 'Manage residential locations',
+      minLayout: 'three-quarters',
+      createButton: {
+        text: 'Create new landing',
+        href: paths.location.create('TST'),
+        classes: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-3',
+        attributes: {
+          'data-qa': 'create-button',
+        },
+      },
     })
   })
 })

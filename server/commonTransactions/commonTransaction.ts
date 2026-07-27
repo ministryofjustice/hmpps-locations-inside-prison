@@ -1,5 +1,5 @@
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../controllers/base/formInitialStep'
+import FormStep from '../controllers/base/formStep'
 import modifyFieldName from '../helpers/field/modifyFieldName'
 
 function convertNext(
@@ -62,7 +62,7 @@ export default class CommonTransaction {
         const modifiedStep: FormWizard.Step = {
           templatePath: 'commonTransactions',
           template: '../partials/formStep',
-          controller: FormInitialStep,
+          controller: FormStep,
           ...step,
         }
 
@@ -103,7 +103,7 @@ export default class CommonTransaction {
         }),
       ),
       [`${extraPrefix}${lastStepKey}`]: { ...this.steps[lastStepKey], next },
-    } as unknown as { [key: string]: Omit<FormWizard.Step, 'controller'> & { controller: typeof FormInitialStep } }
+    } as unknown as { [key: string]: Omit<FormWizard.Step, 'controller'> & { controller: typeof FormStep } }
   }
 
   getFields() {

@@ -138,7 +138,7 @@ context('Deactivate permanent', () => {
           },
         ]
         cy.task('stubPrisonerLocationsId', prisonerLocations)
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       itDisplaysTheCellOccupiedPage()
@@ -219,7 +219,7 @@ context('Deactivate permanent', () => {
 
     describe('warning page', () => {
       beforeEach(() => {
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       it('has the correct panel text', () => {
@@ -244,7 +244,7 @@ context('Deactivate permanent', () => {
 
     describe('details page', () => {
       beforeEach(() => {
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const warningPage = Page.verifyOnPage(DeactivatePermanentWarningPage)
         warningPage.continueButton().click()
       })
@@ -294,7 +294,7 @@ context('Deactivate permanent', () => {
 
     describe('confirmation page', () => {
       beforeEach(() => {
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const warningPage = Page.verifyOnPage(DeactivatePermanentWarningPage)
         warningPage.continueButton().click()
         const detailsPage = Page.verifyOnPage(DeactivatePermanentDetailsPage)

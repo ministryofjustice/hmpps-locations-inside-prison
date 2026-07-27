@@ -1,11 +1,13 @@
-import asyncMiddleware from './asyncMiddleware'
+import middleware from './middleware'
 
 export default function addBreadcrumb(breadcrumb: { title: string; href: string }) {
-  return asyncMiddleware((req, res, next) => {
+  return middleware((req, res, next?) => {
     res.locals.breadcrumbs = res.locals.breadcrumbs || []
 
     res.locals.breadcrumbs.push(breadcrumb)
 
-    next()
+    if (next) {
+      next()
+    }
   })
 }

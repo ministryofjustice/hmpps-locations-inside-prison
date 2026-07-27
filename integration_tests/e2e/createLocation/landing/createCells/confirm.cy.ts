@@ -7,6 +7,7 @@ import goToCreateCellsConfirmPage from './goToCreateCellsConfirmPage'
 import CreateLocationConfirmPage from '../../../../pages/createLocation/confirm'
 import CreateCellsWithoutSanitationPage from '../../../../pages/commonTransactions/createCells/withoutSanitation'
 import checkCellInformation from './checkCellInformation'
+import paths from '../../../../../server/utils/paths'
 
 context('Create Landing - Create cells - Confirm', () => {
   const newLandingLocation = LocationFactory.build({
@@ -68,7 +69,7 @@ context('Create Landing - Create cells - Confirm', () => {
       page
         .changeDetailsLink(0)
         .should('have.attr', 'href')
-        .and('include', `/create-new/${existingWingLocation.id}/details`)
+        .and('include', `${paths.location.create(existingWingLocation)}/details`)
 
       page.changeDetailsKey(0).contains('Landing code')
       page.changeDetailsValue(0).contains('A-2')

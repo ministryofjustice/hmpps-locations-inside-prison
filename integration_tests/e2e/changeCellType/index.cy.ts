@@ -31,6 +31,7 @@ context('Change cell type', () => {
       cy.task('stubLocationsConstantsUsedForType')
       cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      cy.task('stubLocations', location)
     })
 
     it('does not show the remove link on the show location page', () => {

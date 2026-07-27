@@ -9,6 +9,16 @@ import AuthStubber from '../../mockApis/auth'
 
 context('Change cell capacity', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+    const location = LocationFactory.build({
+      accommodationTypes: ['NORMAL_ACCOMMODATION'],
+      capacity: {
+        maxCapacity: 3,
+        workingCapacity: 3,
+      },
+      leafLevel: true,
+      specialistCellTypes: [],
+    })
+
     beforeEach(() => {
       cy.task('reset')
       AuthStubber.stub.stubSignIn()
@@ -16,6 +26,7 @@ context('Change cell capacity', () => {
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubLocations(location)
     })
 
     it('redirects user to sign in page', () => {
@@ -34,18 +45,17 @@ context('Change cell capacity', () => {
       },
       leafLevel: true,
       specialistCellTypes: [],
-      localName: '1-1-001',
     })
 
     const prisonerLocations = [
       {
-        cellLocation: '1-1-001',
+        cellLocation: 'A-1-001',
         prisoners: [
           {
             prisonerNumber: 'A1234AA',
             prisonId: 'TST',
             prisonName: 'HMP Leeds',
-            cellLocation: '1-1-001',
+            cellLocation: 'A-1-001',
             firstName: 'Dave',
             lastName: 'Jones',
             gender: 'Male',
@@ -64,7 +74,7 @@ context('Change cell capacity', () => {
             prisonerNumber: 'B1234BB',
             prisonId: 'TST',
             prisonName: 'HMP Leeds',
-            cellLocation: '1-1-001',
+            cellLocation: 'A-1-001',
             firstName: 'Horatio',
             lastName: 'McBubblesworth',
             gender: 'Male',
@@ -134,7 +144,7 @@ context('Change cell capacity', () => {
         ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
 
         cy.get('h1').contains('Change cell capacity')
-        cy.get('.govuk-caption-m').contains('1-1-001')
+        cy.get('.govuk-caption-m').contains('A-1-001')
       })
 
       it('has a cancel link', () => {
@@ -261,7 +271,6 @@ context('Change cell capacity', () => {
               },
               leafLevel: true,
               specialistCellTypes: ['ACCESSIBLE_CELL'],
-              localName: '1-1-001',
             }),
           )
           cy.task('stubPrisonerLocationsId', [])
@@ -289,7 +298,6 @@ context('Change cell capacity', () => {
               },
               leafLevel: true,
               specialistCellTypes: ['ACCESSIBLE_CELL'],
-              localName: '1-1-001',
             }),
           )
 
@@ -462,7 +470,7 @@ context('Change cell capacity', () => {
         Page.verifyOnPage(ViewLocationsShowPage)
         cy.get('#govuk-notification-banner-title').contains('Success')
         cy.get('.govuk-notification-banner__content h3').contains('Capacity updated')
-        cy.get('.govuk-notification-banner__content p').contains('You have updated the capacity of 1-1-001.')
+        cy.get('.govuk-notification-banner__content p').contains('You have updated the capacity of A-1-001.')
       })
     })
   })

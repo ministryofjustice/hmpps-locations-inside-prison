@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../../../page'
+import paths from '../../../../../server/utils/paths'
 
 export default class CellCertificateChangeRequestsReviewPage extends Page {
   constructor() {
     super('')
   }
 
-  static goTo = (id: string) => cy.visit(`/TST/cell-certificate/change-requests/${id}/review`)
+  static goTo = (id: string) => cy.visit(paths.cellCertificate.changeRequest.review('TST', id))
 
   reviewRadio = (value: string): PageElement => cy.get(`input[name="approveOrReject"][type="radio"][value="${value}"]`)
 

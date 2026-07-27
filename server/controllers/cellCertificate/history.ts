@@ -3,10 +3,11 @@ import { TypedLocals } from '../../@types/express'
 import addUsersToUserMap from '../../middleware/addUsersToUserMap'
 import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMap'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import paths from '../../utils/paths'
 
 export default async (req: Request, res: Response) => {
   const locals: TypedLocals = {
-    backLink: `/${res.locals.prisonId}/cell-certificate/current`,
+    backLink: paths.cellCertificate.view(res.locals.prisonId),
     title: 'History of certificate changes',
     titleCaption: res.locals.prisonResidentialSummary.prisonSummary.prisonName,
   }

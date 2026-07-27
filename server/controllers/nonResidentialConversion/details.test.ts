@@ -116,7 +116,6 @@ describe('NonResidentialConversionDetails', () => {
   describe('locals', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           convertedCellType: {
             component: 'govukRadios',
@@ -302,8 +301,6 @@ describe('NonResidentialConversionDetails', () => {
             'ignore-defaults': true,
           },
         },
-        title: 'Convert cell to non-residential room',
-        titleCaption: 'A-1-001',
         validationErrors: [],
       })
     })

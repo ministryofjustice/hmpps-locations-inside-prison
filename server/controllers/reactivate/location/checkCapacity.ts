@@ -1,15 +1,14 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { TypedLocals } from '../../../@types/express'
 import getLocationResidentialSummary from '../parent/middleware/getLocationResidentialSummary'
 import populateLocationTree from '../parent/middleware/populateLocationTree'
 import addConstantToLocals from '../../../middleware/addConstantToLocals'
-import capFirst from '../../../formatters/capFirst'
 import unsetTempValues from '../../../middleware/unsetTempValues'
 import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
 
-export default class CheckCapacity extends FormInitialStep {
+export default class CheckCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(unsetTempValues)
@@ -41,13 +40,11 @@ export default class CheckCapacity extends FormInitialStep {
   }
 
   override locals(_req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(_req, res)
     const { decoratedLocation } = res.locals
 
     return {
-      ...locals,
+      ...super.locals(_req, res),
       title: `Check capacity of cell${decoratedLocation.leafLevel ? '' : 's'}`,
-      titleCaption: capFirst(decoratedLocation.displayName),
       minLayout: 'three-quarters',
     }
   }

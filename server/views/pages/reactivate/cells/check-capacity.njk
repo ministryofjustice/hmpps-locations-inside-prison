@@ -21,7 +21,7 @@
         { text: cell.pathHierarchy },
         { html: workingCapacity },
         { html: maxCapacity },
-        { html: '<a href="/reactivate/cells/change-capacity/' + cell.id  + '" id="' + cell.id + '">Change</a>' }
+        { html: '<a href="' + paths.location.reactivate.cells(prisonId, locationId) + '/change-capacity/' + cell.id + '" id="' + cell.id + '">Change</a>' }
       ]
     ), rows) %}
   {% endfor %}

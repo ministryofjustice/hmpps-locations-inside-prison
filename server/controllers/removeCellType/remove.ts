@@ -1,15 +1,9 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import populateLocation from '../../middleware/populateLocation'
-import capFirst from '../../formatters/capFirst'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
+import paths from '../../utils/paths'
 
-export default class RemoveCellType extends FormInitialStep {
-  override middlewareSetup() {
-    this.use(populateLocation({ decorate: true }))
-    super.middlewareSetup()
-  }
-
+export default class RemoveCellType extends FormStep {
   override locals(req: FormWizard.Request, res: Response) {
     const { decoratedLocation } = res.locals
     const { specialistCellTypes } = decoratedLocation
@@ -32,7 +26,6 @@ export default class RemoveCellType extends FormInitialStep {
       cellTypesLabel,
       cellTypesText,
       title,
-      titleCaption: capFirst(decoratedLocation.displayName),
     }
   }
 
@@ -52,7 +45,7 @@ export default class RemoveCellType extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.decoratedLocation
+    const { decoratedLocation } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -62,6 +55,6 @@ export default class RemoveCellType extends FormInitialStep {
       content: 'You have removed the cell type for this location.',
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

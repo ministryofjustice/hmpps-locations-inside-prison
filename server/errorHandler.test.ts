@@ -6,6 +6,7 @@ import { appWithAllRoutes } from './routes/testutils/appSetup'
 import createErrorHandler from './errorHandler'
 import AnalyticsService from './services/analyticsService'
 import LocationsService from './services/locationsService'
+import paths from './utils/paths'
 
 jest.mock('./services/locationsService')
 
@@ -67,7 +68,7 @@ describe('error handler', () => {
   describe('GET 404', () => {
     it('should render content with stack in dev mode', () => {
       return request(app)
-        .get('/unknown')
+        .get(`${paths.admin.index('TST')}/unknown`)
         .expect(404)
         .expect('Content-Type', /html/)
         .expect(r => {
@@ -85,7 +86,7 @@ describe('error handler', () => {
           },
         }),
       )
-        .get('/unknown')
+        .get(`${paths.admin.index('TST')}/unknown`)
         .expect(404)
         .expect('Content-Type', /html/)
         .expect(r => {

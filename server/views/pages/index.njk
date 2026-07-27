@@ -50,8 +50,12 @@
 {% endblock %}
 
 {% block content %}
-  {{ cardBlock('Residential locations', resiCards, resiPermissionMessage) }}
-  {% if nonResiCards or nonResiPermissionMessage %}
-    {{ cardBlock('Non-residential locations', nonResiCards, nonResiPermissionMessage) }}
-  {% endif %}
+  <div class="body-tiles">
+    <div class="govuk-width-container">
+      {{ cardBlock('Residential locations', resiCards, resiPermissionMessage) }}
+      {% if nonResiCards or nonResiPermissionMessage %}
+        {{ cardBlock('Non-residential locations', nonResiCards, nonResiPermissionMessage) }}
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}

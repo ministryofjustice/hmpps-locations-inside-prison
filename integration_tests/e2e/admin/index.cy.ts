@@ -72,8 +72,8 @@ context('Admin Index', () => {
 
       Page.verifyOnPage(PrisonConfigurationIndexPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
-      cy.get('.govuk-notification-banner__content h3').contains('Residential location status')
-      cy.get('.govuk-notification-banner__content p').contains('You have changed the residential location status.')
+      cy.get('.govuk-notification-banner__content h3').contains('Residential locations status')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed the residential locations status.')
     })
 
     it('Can enable non-resi locations', () => {
@@ -157,12 +157,12 @@ context('Admin Index', () => {
 
       const resiStatusIndexPage = Page.verifyOnPage(ResiStatusConfirmPage)
       resiStatusIndexPage.checkOnPage()
-      resiStatusIndexPage.confirmButton('Inactivate').click()
+      resiStatusIndexPage.confirmButton('Deactivate').click()
 
       Page.verifyOnPage(PrisonConfigurationIndexPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
-      cy.get('.govuk-notification-banner__content h3').contains('Residential location status')
-      cy.get('.govuk-notification-banner__content p').contains('You have changed the residential location status.')
+      cy.get('.govuk-notification-banner__content h3').contains('Residential locations status')
+      cy.get('.govuk-notification-banner__content p').contains('You have changed the residential locations status.')
     })
   })
 
@@ -196,7 +196,7 @@ context('Admin Index', () => {
       cy.get('#govuk-notification-banner-title').contains('Success')
       cy.get('.govuk-notification-banner__content h3').contains('Maintain internal locations (OIMILOCA) status')
       cy.get('.govuk-notification-banner__content p').contains(
-        'You have changed the Maintain internal locations (OIMILOCA) status.',
+        'You have changed the maintain internal locations (OIMILOCA) status.',
       )
     })
   })

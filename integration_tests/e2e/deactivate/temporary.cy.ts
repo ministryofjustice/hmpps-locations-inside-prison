@@ -210,7 +210,7 @@ context('Deactivate temporary', () => {
           },
         ]
         cy.task('stubPrisonerLocationsId', prisonerLocations)
-        DeactivateTemporaryDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivateTemporaryDetailsPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       itDisplaysTheCellOccupiedPage()
@@ -245,7 +245,7 @@ context('Deactivate temporary', () => {
 
     describe('details page', () => {
       beforeEach(() => {
-        DeactivateTemporaryDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivateTemporaryDetailsPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       it('has a back link to the view location page', () => {
@@ -389,7 +389,7 @@ context('Deactivate temporary', () => {
 
     describe('confirmation page', () => {
       beforeEach(() => {
-        DeactivateTemporaryDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivateTemporaryDetailsPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const detailsPage = Page.verifyOnPage(DeactivateTemporaryDetailsPage)
         detailsPage.reasonRadioItem('TEST2').click()
         detailsPage.descriptionFreeText('TEST2').clear().type('Test description')

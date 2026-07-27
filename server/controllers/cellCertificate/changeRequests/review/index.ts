@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../../base/formInitialStep'
+import FormStep from '../../../base/formStep'
 import approvalTypeDescription from '../../../../formatters/approvalTypeDescription'
 import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 
-export default class Review extends FormInitialStep {
+export default class Review extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)

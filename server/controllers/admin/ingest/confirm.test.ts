@@ -4,6 +4,7 @@ import { DeepPartial } from 'fishery'
 import IngestConfirm from './confirm'
 import fields from '../../../routes/changeLocalName/fields'
 import LocationsService from '../../../services/locationsService'
+import paths from '../../../utils/paths'
 
 describe('Ingest the cell cert data - confirm', () => {
   const controller = new IngestConfirm({ route: '/' })
@@ -66,10 +67,7 @@ describe('Ingest the cell cert data - confirm', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual(
         expect.objectContaining({
-          backLink: '/admin/TST/ingest-cert',
-          cancelLink: '/admin/TST/ingest-cert',
           buttonText: 'Confirm ingestion',
-          title: 'Confirm cell certification ingest',
         }),
       )
     })
@@ -115,7 +113,7 @@ describe('Ingest the cell cert data - confirm', () => {
         'success',
         expect.objectContaining({ title: 'Cell certificate upload started' }),
       )
-      expect(deepRes.redirect).toHaveBeenCalledWith('/admin/TST/ingest-cert/upload/upload-1')
+      expect(deepRes.redirect).toHaveBeenCalledWith(`${paths.admin.ingestCert('TST')}/upload/upload-1`)
     })
 
     it('redirects to the list with an error when the upload failed to start', () => {
@@ -129,7 +127,7 @@ describe('Ingest the cell cert data - confirm', () => {
         title: 'There is a problem',
         content: 'Something went wrong',
       })
-      expect(deepRes.redirect).toHaveBeenCalledWith('/admin/TST/ingest-cert')
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.admin.ingestCert('TST'))
     })
   })
 })

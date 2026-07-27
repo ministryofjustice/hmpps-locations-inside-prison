@@ -13,7 +13,6 @@ context('Cell conversion', () => {
   const location = LocationFactory.build({
     isResidential: false,
     leafLevel: true,
-    localName: '1-1-001',
   })
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -88,7 +87,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionAccommodationTypePage)
-        cy.get('.govuk-caption-m').contains('1-1-001')
+        cy.get('.govuk-caption-m').contains('A-1-001')
       })
 
       it('has a back link', () => {
@@ -150,7 +149,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionUsedForPage)
-        cy.get('.govuk-caption-m').contains('1-1-001')
+        cy.get('.govuk-caption-m').contains('A-1-001')
       })
 
       it('has a back link', () => {
@@ -231,7 +230,7 @@ context('Cell conversion', () => {
 
         it('has a caption showing the cell description', () => {
           Page.verifyOnPage(CellConversionSpecificCellTypePage)
-          cy.get('.govuk-caption-m').contains('1-1-001')
+          cy.get('.govuk-caption-m').contains('A-1-001')
         })
 
         it('has a back link to the accommodation type page', () => {
@@ -289,7 +288,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionSetCellTypePage)
-        cy.get('.govuk-caption-m').contains('1-1-001')
+        cy.get('.govuk-caption-m').contains('A-1-001')
       })
 
       it('has a back link', () => {
@@ -408,7 +407,7 @@ context('Cell conversion', () => {
         it('has a caption showing the cell description', () => {
           Page.verifyOnPage(CellConversionSetCellCapacityPage)
 
-          cy.get('.govuk-caption-m').contains('1-1-001')
+          cy.get('.govuk-caption-m').contains('A-1-001')
         })
 
         describe('validations', () => {
@@ -629,7 +628,7 @@ context('Cell conversion', () => {
           Page.verifyOnPage(ViewLocationsShowPage)
           cy.get('#govuk-notification-banner-title').contains('Success')
           cy.get('.govuk-notification-banner__content h3').contains('Non-residential room converted to a cell')
-          cy.get('.govuk-notification-banner__content p').contains('You have converted 1-1-001 into a cell.')
+          cy.get('.govuk-notification-banner__content p').contains('You have converted A-1-001 into a cell.')
         })
       })
 

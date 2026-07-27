@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { uniq } from 'lodash'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import populateLocation from '../../middleware/populateLocation'
@@ -18,8 +18,9 @@ import {
   CertificationApprovalRequest,
   CertificationApprovalRequestType,
 } from '../../data/types/locationsApi/certificationApprovalRequest'
-import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 import logger from '../../../logger'
+import paths from '../../utils/paths'
 
 function findCells(location: CertificateLocation): CertificateLocation[] {
   if (location.locationType === 'CELL') {
@@ -140,7 +141,7 @@ async function locationToCertificationLocation(
   return certificationLocation
 }
 
-export default class Confirm extends FormInitialStep {
+export default class Confirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
@@ -157,7 +158,7 @@ export default class Confirm extends FormInitialStep {
       ]),
     )
     this.use(this.generateRequests)
-    this.use(populateTitleCaptionFromLocation)
+    this.use(populateTitleCaptionFromLocationOrPrison)
   }
 
   async conditionalPopulateLocation(req: FormWizard.Request, res: Response, next: NextFunction) {
@@ -237,7 +238,7 @@ export default class Confirm extends FormInitialStep {
         ],
       })
 
-      const changeLink = `/location/${locals.location.id}/deactivate/temporary/details/edit`
+      const changeLink = `${paths.location.deactivateTemporary(locals.location)}/details/edit`
       addChangeLinksToLocals(locals, 'DEACTIVATION', {
         deactivatedReason: changeLink,
         proposedReactivationDate: changeLink,
@@ -363,7 +364,7 @@ export default class Confirm extends FormInitialStep {
         cellMark: doorNumber,
       })
 
-      const changeLink = `/location/${locals.location.id}/change-door-number/details/edit`
+      const changeLink = `${paths.location.changeDoorNumber(locals.location)}/details/edit`
       addChangeLinksToLocals(locals, 'CELL_MARK', {
         reasonForChange: changeLink,
       })
@@ -381,7 +382,7 @@ export default class Confirm extends FormInitialStep {
         inCellSanitation: inCellSanitation === 'YES',
       })
 
-      const changeLink = `/location/${locals.location.id}/change-sanitation/details/edit`
+      const changeLink = `${paths.location.changeSanitation(locals.location)}/details/edit`
       addChangeLinksToLocals(locals, 'CELL_SANITATION', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'change-cell-capacity') {
       const newBaselineCna = Number(sessionModel.get<string>('baselineCna'))
@@ -411,7 +412,7 @@ export default class Confirm extends FormInitialStep {
         ],
       })
 
-      const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
+      const changeLink = `${paths.location.changeCellCapacity(locals.location)}/details/edit`
       addChangeLinksToLocals(locals, 'CAPACITY_CHANGE', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'working-capacity-mismatch') {
       const { location } = res.locals
@@ -445,13 +446,13 @@ export default class Confirm extends FormInitialStep {
         convertedCellType: req.sessionModel.get<string>('convertedCellType'),
         otherConvertedCellType: req.sessionModel.get<string>('otherConvertedCellType'),
       })
-      const changeLink = `/location/${locals.location.id}/non-residential-conversion/details/edit`
+      const changeLink = `${paths.location.nonResidentialConversion(locals.location)}/details/edit`
       addChangeLinksToLocals(locals, 'CONVERT_CELL_TO_ROOM', {
         nonResidentialRoom: changeLink,
         reasonForChange: changeLink,
       })
       addChangeLinksToLocals(locals, 'SIGNED_OP_CAP', {
-        reasonForChange: `/location/${locals.location.id}/non-residential-conversion/update-signed-op-cap/details/edit`,
+        reasonForChange: `${paths.location.nonResidentialConversion(locals.location)}/update-signed-op-cap/details/edit`,
       })
     } else if (req.form.options.name === 'set-cell-type') {
       const specialistCellTypesValue = sessionModel.get<string | string[]>('set-cell-type_specialistCellTypes')
@@ -488,7 +489,7 @@ export default class Confirm extends FormInitialStep {
         ],
       })
 
-      const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
+      const changeLink = `${paths.location.changeCellCapacity(locals.location)}/details/edit`
       addChangeLinksToLocals(locals, 'SPECIALIST_CELL_TYPE', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'cell-conversion') {
       const { location } = res.locals
@@ -568,7 +569,7 @@ export default class Confirm extends FormInitialStep {
         ],
       })
 
-      const changeLink = `/location/${locals.location.id}/change-cell-capacity/details/edit`
+      const changeLink = `${paths.location.changeCellCapacity(locals.location)}/details/edit`
       addChangeLinksToLocals(locals, 'SPECIALIST_CELL_TYPE', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'archive') {
       const reason = sessionModel.get<string>('reason')
@@ -844,6 +845,6 @@ export default class Confirm extends FormInitialStep {
       content: `You have submitted ${approvalRequestIds.length > 1 ? `${approvalRequestIds.length} requests` : 'a request'} to update the cell certificate.`,
     })
 
-    res.redirect(`/${prisonId}/cell-certificate/change-requests`)
+    res.redirect(paths.cellCertificate.changeRequest.view(prisonId))
   }
 }

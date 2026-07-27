@@ -1,4 +1,5 @@
 import Page, { PageElement } from '../../page'
+import paths from '../../../../server/utils/paths'
 
 export default class CellCertificateChangeRequestsIndexPage extends Page {
   constructor() {
@@ -6,7 +7,7 @@ export default class CellCertificateChangeRequestsIndexPage extends Page {
     this.checkOnPage()
   }
 
-  static goTo = () => cy.visit('/TST/cell-certificate/change-requests')
+  static goTo = () => cy.visit(paths.cellCertificate.changeRequest.view('TST'))
 
   checkOnPage() {
     cy.location('pathname').should('contain', '/cell-certificate/change-requests')

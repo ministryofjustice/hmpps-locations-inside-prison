@@ -2,6 +2,7 @@ import AuthStubber from '../../mockApis/auth'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import { CellCertificateDashboardEntry } from '../../../server/data/types/locationsApi/cellCertificateDashboard'
+import paths from '../../../server/utils/paths'
 
 // TST is first so it is the active caseload (its prison configuration is stubbed below)
 const caseloads = [
@@ -79,7 +80,7 @@ context('Capacity management dashboard', () => {
     cy.get('[data-qa="dashboard-caption"]').should('contain', 'Cell certificates for all establishments')
 
     // Breadcrumb links back to the Locations home page
-    cy.get('.govuk-breadcrumbs').contains('a', 'Locations').should('have.attr', 'href', '/')
+    cy.get('.govuk-breadcrumbs').contains('a', 'Residential locations').should('have.attr', 'href', '/')
 
     // 5 caseload prisons render; Wymott (not in caseload) is filtered out
     cy.get('[data-qa="capacity-management-dashboard-table"] tbody tr').should('have.length', 5)
@@ -90,7 +91,7 @@ context('Capacity management dashboard', () => {
     cy.get('[data-qa="capacity-management-dashboard-table"]')
       .contains('a', 'View')
       .should('have.attr', 'href')
-      .and('match', /\/cell-certificate\/current$/)
+      .and('equal', paths.cellCertificate.view('ALI'))
 
     cy.screenshot('capacity-management-dashboard', { capture: 'fullPage' })
   })

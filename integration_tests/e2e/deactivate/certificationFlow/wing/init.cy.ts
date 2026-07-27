@@ -3,6 +3,7 @@ import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import AuthSignInPage from '../../../../pages/authSignIn'
 import { setupStubs, location } from './setupStubs'
 import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certChangeDisclaimer'
+import paths from '../../../../../server/utils/paths'
 
 context('Certification Deactivation - Wing - Init', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -19,7 +20,7 @@ context('Certification Deactivation - Wing - Init', () => {
     })
 
     it('redirects user to sign in page when visited directly', () => {
-      cy.visit(`/location/${location.id}/deactivate`)
+      cy.visit(paths.location.deactivate(location))
       Page.verifyOnPage(AuthSignInPage)
     })
   })
@@ -33,7 +34,7 @@ context('Certification Deactivation - Wing - Init', () => {
 
     context('when no cells are occupied', () => {
       it('displays the cert-change-disclaimer page', () => {
-        cy.visit(`/location/${location.id}/deactivate`)
+        cy.visit(paths.location.deactivate(location))
         Page.verifyOnPage(CertChangeDisclaimerPage, 'Deactivating a wing')
       })
     })

@@ -43,6 +43,7 @@ const permissionNameMap: { [p: string]: string } = {
   RESI__CERT_VIEWER: 'Certificate viewer',
   REPORTING_LOCATION_INFORMATION: 'Reporting location information',
   MANAGE_RES_LOCATIONS_ADMIN: 'Residential locations administrator',
+  NONRESI__MAINTAIN_LOCATION: 'Non-residential maintainer',
 }
 
 const rolesToPermissions = (roles: string[], mapping = permissionsByRole) =>

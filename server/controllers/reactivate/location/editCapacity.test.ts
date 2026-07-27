@@ -4,6 +4,7 @@ import { Response } from 'express'
 import EditCapacity from './editCapacity'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 import mockModel from '../../../testutils/mockModel'
+import paths from '../../../utils/paths'
 
 describe('EditCapacity', () => {
   let req: DeepPartial<FormWizard.Request>
@@ -73,8 +74,8 @@ describe('EditCapacity', () => {
           {
             continueOnEdit: undefined,
             editing: undefined,
-            next: '/reactivate/location/parent1/edit-capacity/parent1',
-            path: '/reactivate/location/parent1/check-capacity',
+            next: `${paths.location.reactivate.location('TST', 'parent1')}/edit-capacity/parent1`,
+            path: `${paths.location.reactivate.location('TST', 'parent1')}/check-capacity`,
             revalidate: false,
             skip: false,
             wizard: 'wizard',
@@ -90,13 +91,13 @@ describe('EditCapacity', () => {
           req.journeyModel = mockModel({
             history: [
               {
-                path: '/reactivate/location/parent1/check-capacity',
-                next: '/reactivate/location/parent1/edit-capacity/parent1',
+                next: `${paths.location.reactivate.location('TST', 'parent1')}/edit-capacity/parent1`,
+                path: `${paths.location.reactivate.location('TST', 'parent1')}/check-capacity`,
               },
             ],
           })
           editCapacity.fixHistory(req as FormWizard.Request, res as Response, next)
-          expect(req.journeyModel.set).not.toHaveBeenCalled()
+          expect(req.journeyModel.set).toHaveBeenCalledWith('history', req.journeyModel.get('history'))
           expect(next).toHaveBeenCalled()
         })
       })
@@ -106,16 +107,16 @@ describe('EditCapacity', () => {
           req.journeyModel = mockModel({
             history: [
               {
-                path: '/reactivate/location/parent1/check-capacity',
                 next: '/something-else',
+                path: `${paths.location.reactivate.location('TST', 'parent1')}/check-capacity`,
               },
             ],
           })
           editCapacity.fixHistory(req as FormWizard.Request, res as Response, next)
           expect(req.journeyModel.set).toHaveBeenCalledWith('history', [
             {
-              path: '/reactivate/location/parent1/check-capacity',
-              next: '/reactivate/location/parent1/edit-capacity/parent1',
+              next: `${paths.location.reactivate.location('TST', 'parent1')}/edit-capacity/parent1`,
+              path: `${paths.location.reactivate.location('TST', 'parent1')}/check-capacity`,
             },
           ])
           expect(next).toHaveBeenCalled()
@@ -180,7 +181,9 @@ describe('EditCapacity', () => {
 
       it('should redirect to remove cell type', () => {
         editCapacity.validateFields(req as FormWizard.Request, res as Response, next)
-        expect(res.redirect).toHaveBeenCalledWith('/reactivate/location/parent1/cell1/remove-cell-type')
+        expect(res.redirect).toHaveBeenCalledWith(
+          `${paths.location.reactivate.location('TST', 'parent1')}/cell1/remove-cell-type`,
+        )
         expect(next).not.toHaveBeenCalled()
       })
     })
@@ -192,7 +195,9 @@ describe('EditCapacity', () => {
 
       it('should redirect to set cell type', () => {
         editCapacity.validateFields(req as FormWizard.Request, res as Response, next)
-        expect(res.redirect).toHaveBeenCalledWith('/reactivate/location/parent1/cell1/set-cell-type/init')
+        expect(res.redirect).toHaveBeenCalledWith(
+          `${paths.location.reactivate.location('TST', 'parent1')}/cell1/set-cell-type/init`,
+        )
         expect(next).not.toHaveBeenCalled()
       })
     })

@@ -2,6 +2,7 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
+import paths from '../../../server/utils/paths'
 
 context('show location history', () => {
   context('Unauthenticated user', () => {
@@ -11,7 +12,7 @@ context('show location history', () => {
     })
 
     it('Unauthenticated user directed to auth', () => {
-      cy.visit('/location-history/7e570000-0000-0000-0000-000000000001')
+      cy.visit(paths.location.history('TST', '7e570000-0000-0000-0000-000000000001'))
       Page.verifyOnPage(AuthSignInPage)
     })
   })
@@ -69,12 +70,12 @@ context('show location history', () => {
     })
 
     it('has a caption showing the cell description', () => {
-      cy.visit('/location-history/7e570000-0000-0000-0000-000000000001')
+      cy.visit(paths.location.history('TST', '7e570000-0000-0000-0000-000000000001'))
       cy.get('.govuk-caption-m').contains('Cell 1-1-001')
     })
 
     it('has the correct table headings', () => {
-      cy.visit('/location-history/7e570000-0000-0000-0000-000000000001')
+      cy.visit(paths.location.history('TST', '7e570000-0000-0000-0000-000000000001'))
       cy.get('th.govuk-table__header').eq(0).contains('Type of change')
       cy.get('th.govuk-table__header').eq(1).contains('Changed from')
       cy.get('th.govuk-table__header').eq(2).contains('Changed to')
@@ -83,7 +84,7 @@ context('show location history', () => {
     })
 
     it('has the correct table rows', () => {
-      cy.visit('/location-history/7e570000-0000-0000-0000-000000000001')
+      cy.visit(paths.location.history('TST', '7e570000-0000-0000-0000-000000000001'))
       cy.get('td.govuk-table__cell').eq(0).contains('Location Type')
       cy.get('td.govuk-table__cell').eq(1).contains('CELL')
       cy.get('td.govuk-table__cell').eq(2).contains('WING')
@@ -99,7 +100,7 @@ context('show location history', () => {
     })
 
     it('has a back link to the view location page', () => {
-      cy.visit('/location-history/7e570000-0000-0000-0000-000000000001')
+      cy.visit(paths.location.history('TST', '7e570000-0000-0000-0000-000000000001'))
       cy.get('.govuk-back-link').click()
       Page.verifyOnPage(ViewLocationsShowPage)
     })

@@ -4,6 +4,7 @@ import { Response } from 'express'
 import NoCertChangeConfirm from './noCertChangeConfirm'
 import LocationFactory from '../../../testutils/factories/location'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
+import paths from '../../../utils/paths'
 
 describe('NoCertChangeConfirm', () => {
   let req: DeepPartial<FormWizard.Request>
@@ -86,7 +87,6 @@ describe('NoCertChangeConfirm', () => {
     it('returns correct summary and title', () => {
       const result = controller.locals(req as FormWizard.Request, res as Response)
       expect(result.title).toContain('You are about to reactivate 2 cells')
-      expect(result.titleCaption).toBe('Wing 1')
       expect(result.changeSummary).toContain('increase')
       expect(result.changeSummary).toContain('decrease')
       expect(result.buttonText).toBe('Confirm activation')
@@ -117,7 +117,7 @@ describe('NoCertChangeConfirm', () => {
         content: 'You have activated Wing 1.',
         title: 'Wing activated',
       })
-      expect(res.redirect).toHaveBeenCalledWith('/view-and-update-locations/P1/wing1')
+      expect(res.redirect).toHaveBeenCalledWith(paths.location.view('P1', 'wing1'))
     })
   })
 })

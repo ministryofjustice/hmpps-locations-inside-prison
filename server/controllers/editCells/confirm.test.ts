@@ -6,6 +6,7 @@ import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import ConfirmEditCells from './confirm'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('Confirm edit cells', () => {
   const controller = new ConfirmEditCells({ route: '/' })
@@ -76,7 +77,7 @@ describe('Confirm edit cells', () => {
 
     deepRes = {
       locals: {
-        cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+        cancelLink: paths.location.view(prisonId, locationId),
         errorlist: [],
         prisonId,
         locationId,
@@ -107,7 +108,6 @@ describe('Confirm edit cells', () => {
     noChangeSessionData: Record<string, any>,
     expectedLocals?: { title: string; buttonText: string },
   ) {
-    const title = expectedLocals?.title || 'Edit cells'
     const buttonText = expectedLocals?.buttonText || 'Update cells'
 
     describe('locals', () => {
@@ -116,10 +116,7 @@ describe('Confirm edit cells', () => {
         expect(result).toEqual(
           expect.objectContaining({
             locationPathPrefix: 'A-1',
-            title,
-            titleCaption: 'Landing A-1',
             buttonText,
-            backLink: `/view-and-update-locations/${prisonId}/${locationId}`,
           }),
         )
       })
@@ -161,7 +158,7 @@ describe('Confirm edit cells', () => {
 
         await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/${prisonId}/${locationId}`)
+        expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view(prisonId, locationId))
       })
     })
 
@@ -174,7 +171,7 @@ describe('Confirm edit cells', () => {
           content: 'You have updated cells on A-1.',
         })
 
-        expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/${prisonId}/${locationId}`)
+        expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view(prisonId, locationId))
       })
 
       it('flashes success with localName if available', async () => {

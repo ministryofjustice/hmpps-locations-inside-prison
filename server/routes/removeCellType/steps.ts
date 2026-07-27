@@ -12,6 +12,7 @@ import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 import isSpecialCell from '../../utils/isSpecialCell'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import paths from '../../utils/paths'
 
 function mustReviewCapacity(_req: FormWizard.Request, res: Response) {
   const { accommodationTypes, active, status } = res.locals.location
@@ -31,8 +32,7 @@ function hasCertApprovalSteps(req: FormWizard.Request, res: Response) {
 
 const steps: FormWizard.Steps = {
   '/': {
-    backLink: (_req, res) =>
-      `/view-and-update-locations/${[res.locals.decoratedLocation.prisonId, res.locals.decoratedLocation.id].filter(i => i).join('/')}`,
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
     entryPoint: true,
     reset: true,
     resetJourney: true,
@@ -61,6 +61,7 @@ const steps: FormWizard.Steps = {
   '/review': {
     fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
     controller: ReviewCellCapacity,
+    pageTitle: 'Review cell capacity',
     next: [
       {
         fn: hasCertApprovalSteps,
@@ -75,6 +76,7 @@ const steps: FormWizard.Steps = {
   },
   '/confirm': {
     controller: ConfirmRemoveCellType,
+    pageTitle: 'Confirm cell type removal and capacity changes',
   },
   '/confirm-skip': {
     controller: ConfirmRemoveCellType,

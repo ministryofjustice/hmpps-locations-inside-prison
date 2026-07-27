@@ -3,6 +3,7 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
 import LocationFactory from '../../../server/testutils/factories/location'
+import paths from '../../../server/utils/paths'
 
 const residentialSummary = {
   prisonSummary: {
@@ -68,7 +69,7 @@ context('View Locations Index', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.manageLocations().find('a').click()
+      indexPage.cards.viewLocations().find('a').click()
       const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsIndexPage)
 
       viewLocationsIndexPage.capacity.working().contains('8')
@@ -81,7 +82,7 @@ context('View Locations Index', () => {
         {
           location: {
             text: 'A-1-001',
-            href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+            href: paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
           },
           status: {
             text: 'Active',
@@ -105,7 +106,7 @@ context('View Locations Index', () => {
         {
           location: {
             text: 'A-1-002',
-            href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000002',
+            href: paths.location.view('TST', '7e570000-0000-0000-0000-000000000002'),
           },
           status: {
             text: 'Inactive',
@@ -118,7 +119,7 @@ context('View Locations Index', () => {
           },
           inactiveCells: {
             text: '1',
-            href: '/inactive-cells/TST/7e570000-0000-0000-0000-000000000002',
+            href: paths.location.inactiveCells('TST', '7e570000-0000-0000-0000-000000000002'),
           },
           accommodationType: {
             text: 'Normal accommodation',

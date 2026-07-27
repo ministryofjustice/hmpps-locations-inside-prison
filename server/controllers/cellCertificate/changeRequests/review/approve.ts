@@ -1,14 +1,15 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../../base/formInitialStep'
+import FormStep from '../../../base/formStep'
 import { getAllCertUserEmails, sendNotification } from '../../../../utils/notificationHelpers'
 import { NotificationType } from '../../../../services/notificationService'
 import config from '../../../../config'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
 import approvalCellWouldBeOvercrowded from '../../../../routes/cellCertificate/changeRequests/review/approvalCellWouldBeOvercrowded'
+import paths from '../../../../utils/paths'
 
-export default class Approve extends FormInitialStep {
+export default class Approve extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
@@ -70,6 +71,6 @@ export default class Approve extends FormInitialStep {
       content: `The establishment has been notified that the change request has been approved.`,
     })
 
-    res.redirect(`/${prisonId}/cell-certificate/change-requests`)
+    res.redirect(paths.cellCertificate.changeRequest.view(prisonId))
   }
 }

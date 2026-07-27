@@ -3,7 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import CommonTransaction from '../commonTransaction'
 import steps from './steps'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 import { TypedLocals } from '../../@types/express'
 
 class ExtendedTransaction extends CommonTransaction {
@@ -21,7 +21,7 @@ class ExtendedTransaction extends CommonTransaction {
     // Avoid modifying the original step object, to protect against unintended changes occurring
     modifiedSteps[`${this.pathPrefix}/`] = {
       ...modifiedSteps[`${this.pathPrefix}/`],
-      controller: class extends FormInitialStep {
+      controller: class extends FormStep {
         override locals(req: FormWizard.Request, res: Response): TypedLocals {
           const locals = super.locals(req, res)
 

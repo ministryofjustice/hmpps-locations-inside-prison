@@ -16,6 +16,7 @@ import AuthStubber from '../../mockApis/auth'
 import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
 import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
+import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 
 context('Remove cell type', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -31,19 +32,20 @@ context('Remove cell type', () => {
         specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
       })
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: [] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubLocations(location)
     })
 
     it('does not show the remove link on the show location page', () => {
@@ -110,21 +112,21 @@ context('Remove cell type', () => {
     context('when certificationApprovalRequired is INACTIVE', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-        cy.task('stubManageUsers')
-        cy.task('stubManageUsersMe')
-        cy.task('stubManageUsersMeCaseloads')
-        cy.task('stubLocationsConstantsAccommodationType')
-        cy.task('stubLocationsConstantsConvertedCellType')
-        cy.task('stubLocationsConstantsDeactivatedReason')
-        cy.task('stubLocationsConstantsLocationType')
-        cy.task('stubLocationsConstantsApprovalType')
-        cy.task('stubLocationsConstantsSpecialistCellType')
-        cy.task('stubLocationsConstantsUsedForType')
-        cy.task('stubUpdateCapacity')
-        cy.task('stubUpdateSpecialistCellTypes')
-        cy.task('stubPrisonerLocationsId', prisonerLocations)
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+        AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+        ManageUsersApiStubber.stub.stubManageUsers()
+        ManageUsersApiStubber.stub.stubManageUsersMe()
+        ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+        LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+        LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+        LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+        LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+        LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+        LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+        LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+        LocationsApiStubber.stub.stubUpdateCapacity()
+        LocationsApiStubber.stub.stubUpdateSpecialistCellTypes()
+        LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+        LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       })
 
       it('does not show the remove cell type link when the cell is inactive', () => {
@@ -139,8 +141,8 @@ context('Remove cell type', () => {
           localName: '1-1-001',
           specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
         })
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
         cy.signIn()
         ViewLocationsShowPage.goTo(location.prisonId, location.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
@@ -160,8 +162,8 @@ context('Remove cell type', () => {
             localName: '1-1-001',
             specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
           })
-          cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-          cy.task('stubLocations', location)
+          LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+          LocationsApiStubber.stub.stubLocations(location)
           cy.signIn()
         })
 
@@ -209,7 +211,7 @@ context('Remove cell type', () => {
             localName: '1-1-001',
             specialistCellTypes: ['ACCESSIBLE_CELL'],
           })
-          cy.task('stubLocations', location)
+          LocationsApiStubber.stub.stubLocations(location)
 
           RemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
           Page.verifyOnPage(RemoveCellTypePage)
@@ -248,14 +250,16 @@ context('Remove cell type', () => {
             localName: '1-1-001',
             specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
           })
-          cy.task('stubLocationsLocationsResidentialSummary', {
-            prisonSummary: {
-              workingCapacity: 8,
-              signedOperationalCapacity: 10,
-              maxCapacity: 11,
-            },
-          })
-          cy.task('stubLocations', location)
+          LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(
+            PrisonResidentialSummaryFactory.build({
+              prisonSummary: {
+                workingCapacity: 8,
+                signedOperationalCapacity: 10,
+                maxCapacity: 11,
+              },
+            }),
+          )
+          LocationsApiStubber.stub.stubLocations(location)
           cy.signIn()
         })
 
@@ -271,7 +275,7 @@ context('Remove cell type', () => {
               localName: '1-1-001',
               specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
             })
-            cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+            LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
             ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
             const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
             viewLocationsShowPage.removeCellTypeLink().click()
@@ -315,7 +319,7 @@ context('Remove cell type', () => {
               localName: '1-1-001',
               specialistCellTypes: ['ACCESSIBLE_CELL'],
             })
-            cy.task('stubLocations', location)
+            LocationsApiStubber.stub.stubLocations(location)
 
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             Page.verifyOnPage(CheckRemoveCellTypePage)
@@ -343,7 +347,7 @@ context('Remove cell type', () => {
               localName: '1-1-001',
               specialistCellTypes: ['ACCESSIBLE_CELL'],
             })
-            cy.task('stubLocations', location)
+            LocationsApiStubber.stub.stubLocations(location)
 
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             const checkRemoveCellTypePage = Page.verifyOnPage(CheckRemoveCellTypePage)
@@ -482,8 +486,8 @@ context('Remove cell type', () => {
                 specialistCellTypes: ['ACCESSIBLE_CELL'],
                 localName: '1-1-001',
               })
-              cy.task('stubLocations', location)
-              cy.task('stubPrisonerLocationsId', [])
+              LocationsApiStubber.stub.stubLocations(location)
+              LocationsApiStubber.stub.stubPrisonerLocationsId([])
 
               const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 
@@ -505,7 +509,7 @@ context('Remove cell type', () => {
                 specialistCellTypes: ['ACCESSIBLE_CELL'],
                 localName: '1-1-001',
               })
-              cy.task('stubLocations', location)
+              LocationsApiStubber.stub.stubLocations(location)
 
               const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 
@@ -611,7 +615,7 @@ context('Remove cell type', () => {
                 localName: '1-1-001',
                 specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
               })
-              cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+              LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
               const confirmRemoveCellTypePage = Page.verifyOnPage(ConfirmRemoveCellTypePage)
               confirmRemoveCellTypePage.updateCellButton().click()
 
@@ -658,21 +662,21 @@ context('Remove cell type', () => {
     context('when certificationApprovalRequired is ACTIVE and location is DRAFT', () => {
       beforeEach(() => {
         cy.task('reset')
-        cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-        cy.task('stubManageUsers')
-        cy.task('stubManageUsersMe')
-        cy.task('stubManageUsersMeCaseloads')
-        cy.task('stubLocationsConstantsAccommodationType')
-        cy.task('stubLocationsConstantsConvertedCellType')
-        cy.task('stubLocationsConstantsDeactivatedReason')
-        cy.task('stubLocationsConstantsLocationType')
-        cy.task('stubLocationsConstantsApprovalType')
-        cy.task('stubLocationsConstantsSpecialistCellType')
-        cy.task('stubLocationsConstantsUsedForType')
-        cy.task('stubUpdateCapacity')
-        cy.task('stubUpdateSpecialistCellTypes')
-        cy.task('stubPrisonerLocationsId', prisonerLocations)
-        cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+        AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+        ManageUsersApiStubber.stub.stubManageUsers()
+        ManageUsersApiStubber.stub.stubManageUsersMe()
+        ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+        LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+        LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+        LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+        LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+        LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+        LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+        LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+        LocationsApiStubber.stub.stubUpdateCapacity()
+        LocationsApiStubber.stub.stubUpdateSpecialistCellTypes()
+        LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+        LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       })
 
       context('when the working capacity is >= 1', () => {
@@ -688,8 +692,8 @@ context('Remove cell type', () => {
             specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
             status: 'DRAFT',
           })
-          cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-          cy.task('stubLocations', location)
+          LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+          LocationsApiStubber.stub.stubLocations(location)
           cy.signIn()
         })
 
@@ -738,7 +742,7 @@ context('Remove cell type', () => {
             specialistCellTypes: ['ACCESSIBLE_CELL'],
             status: 'DRAFT',
           })
-          cy.task('stubLocations', location)
+          LocationsApiStubber.stub.stubLocations(location)
 
           RemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
           Page.verifyOnPage(RemoveCellTypePage)
@@ -778,14 +782,16 @@ context('Remove cell type', () => {
             specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
             status: 'DRAFT',
           })
-          cy.task('stubLocationsLocationsResidentialSummary', {
-            prisonSummary: {
-              workingCapacity: 8,
-              signedOperationalCapacity: 10,
-              maxCapacity: 11,
-            },
-          })
-          cy.task('stubLocations', location)
+          LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(
+            PrisonResidentialSummaryFactory.build({
+              prisonSummary: {
+                workingCapacity: 8,
+                signedOperationalCapacity: 10,
+                maxCapacity: 11,
+              },
+            }),
+          )
+          LocationsApiStubber.stub.stubLocations(location)
           cy.signIn()
         })
 
@@ -802,7 +808,7 @@ context('Remove cell type', () => {
               specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
               status: 'DRAFT',
             })
-            cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
+            LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
             ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
             const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
             viewLocationsShowPage.removeCellTypeLink().click()
@@ -847,7 +853,7 @@ context('Remove cell type', () => {
               specialistCellTypes: ['ACCESSIBLE_CELL'],
               status: 'DRAFT',
             })
-            cy.task('stubLocations', location)
+            LocationsApiStubber.stub.stubLocations(location)
 
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             Page.verifyOnPage(CheckRemoveCellTypePage)
@@ -876,7 +882,7 @@ context('Remove cell type', () => {
               specialistCellTypes: ['ACCESSIBLE_CELL'],
               status: 'DRAFT',
             })
-            cy.task('stubLocations', location)
+            LocationsApiStubber.stub.stubLocations(location)
 
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             const checkRemoveCellTypePage = Page.verifyOnPage(CheckRemoveCellTypePage)
@@ -1022,8 +1028,8 @@ context('Remove cell type', () => {
                 localName: '1-1-001',
                 status: 'DRAFT',
               })
-              cy.task('stubLocations', location)
-              cy.task('stubPrisonerLocationsId', [])
+              LocationsApiStubber.stub.stubLocations(location)
+              LocationsApiStubber.stub.stubPrisonerLocationsId([])
 
               const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 
@@ -1047,7 +1053,7 @@ context('Remove cell type', () => {
                 localName: '1-1-001',
                 status: 'DRAFT',
               })
-              cy.task('stubLocations', location)
+              LocationsApiStubber.stub.stubLocations(location)
 
               const reviewCellCapacityPage = Page.verifyOnPage(ReviewCellCapacityPage)
 

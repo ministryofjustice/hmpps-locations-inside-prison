@@ -8,6 +8,7 @@ import AuthStubber from '../../mockApis/auth'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import CertificationApprovalRequestFactory from '../../../server/testutils/factories/certificationApprovalRequest'
+import paths from '../../../server/utils/paths'
 
 function testInactiveCellsTable(
   inactiveCellsIndexPage: InactiveCellsIndexPage,
@@ -21,9 +22,7 @@ function testInactiveCellsTable(
       const cells = inactiveCellsIndexPage.locationsTableCells(row as unknown as PageElement)
 
       cy.wrap(cells.location).contains(location.pathHierarchy)
-      cy.wrap(cells.location.find('a'))
-        .should('have.attr', 'href')
-        .and('equal', `/view-and-update-locations/${location.prisonId}/${location.id}`)
+      cy.wrap(cells.location.find('a')).should('have.attr', 'href').and('equal', paths.location.view(location))
 
       if (location.inactiveStatus === 'INACTIVE_PEND_CHANGE_REQ') {
         cy.wrap(cells.changeType).contains('Cell deactivation (decrease certified working capacity)')
@@ -31,7 +30,7 @@ function testInactiveCellsTable(
         cy.wrap(cells.action).contains('View request details')
         cy.wrap(cells.action.find('a'))
           .should('have.attr', 'href')
-          .and('equal', `/${location.prisonId}/cell-certificate/change-requests/${location.pendingApprovalRequestId}`)
+          .and('equal', paths.cellCertificate.changeRequest.view(location.prisonId, location.pendingApprovalRequestId))
       } else {
         cy.wrap(cells.reason).contains('Test type 1')
         cy.wrap(cells.estimatedReactivationDate).contains(
@@ -229,7 +228,7 @@ context('Inactive Cells Index', () => {
           cy.signIn()
           Page.verifyOnPage(IndexPage)
 
-          cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
+          cy.visit(paths.location.inactiveCells(parentLocation))
           const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
           cy.title().should('eq', 'Wing B - Inactive cells - Residential locations')
@@ -259,7 +258,7 @@ context('Inactive Cells Index', () => {
         it('Correctly presents message there are no inactive locations when there is no any inactive cell', () => {
           cy.signIn()
           Page.verifyOnPage(IndexPage)
-          cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
+          cy.visit(paths.location.inactiveCells(parentLocation))
           const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
           cy.title().should('eq', 'Wing B - Inactive cells - Residential locations')
           cy.get('h1').contains('Inactive cells (0)')
@@ -461,7 +460,7 @@ context('Inactive Cells Index', () => {
           cy.signIn()
           Page.verifyOnPage(IndexPage)
 
-          cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
+          cy.visit(paths.location.inactiveCells(parentLocation))
           const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
           cy.title().should('eq', 'Wing B - Inactive cells - Residential locations')
@@ -495,7 +494,7 @@ context('Inactive Cells Index', () => {
         it('Correctly presents message there are no inactive locations when there is no any inactive cell', () => {
           cy.signIn()
           Page.verifyOnPage(IndexPage)
-          cy.visit(`/inactive-cells/${parentLocation.prisonId}/${parentLocation.id}`)
+          cy.visit(paths.location.inactiveCells(parentLocation))
           const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
           cy.title().should('eq', 'Wing B - Inactive cells - Residential locations')
           cy.get('h1').contains('Inactive cells (0)')

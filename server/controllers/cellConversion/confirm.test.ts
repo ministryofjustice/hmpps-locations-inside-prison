@@ -6,6 +6,8 @@ import CellConversionConfirm from './confirm'
 import fields from '../../routes/cellConversion/fields'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
 
 describe('CellConversionConfirm', () => {
   const controller = new CellConversionConfirm({ route: '/' })
@@ -58,7 +60,7 @@ describe('CellConversionConfirm', () => {
     deepRes = {
       locals: {
         errorlist: [],
-        decoratedLocation: buildDecoratedLocation({ localName: 'Executive washroom' }),
+        decoratedLocation: buildDecoratedLocation(),
         options: {
           fields,
         },
@@ -135,7 +137,7 @@ describe('CellConversionConfirm', () => {
             actions: {
               items: [
                 {
-                  href: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/accommodation-type/edit',
+                  href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/accommodation-type/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
                 },
@@ -148,7 +150,7 @@ describe('CellConversionConfirm', () => {
             actions: {
               items: [
                 {
-                  href: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/used-for/edit',
+                  href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/used-for/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
                 },
@@ -161,7 +163,7 @@ describe('CellConversionConfirm', () => {
             actions: {
               items: [
                 {
-                  href: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/specific-cell-type/edit',
+                  href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/specific-cell-type/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
                 },
@@ -174,7 +176,7 @@ describe('CellConversionConfirm', () => {
             actions: {
               items: [
                 {
-                  href: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/set-cell-capacity/edit',
+                  href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/set-cell-capacity/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
                 },
@@ -187,7 +189,7 @@ describe('CellConversionConfirm', () => {
             actions: {
               items: [
                 {
-                  href: '/location/7e570000-0000-0000-0000-000000000001/cell-conversion/set-cell-capacity/edit',
+                  href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/set-cell-capacity/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
                 },
@@ -196,7 +198,7 @@ describe('CellConversionConfirm', () => {
           },
         ],
         title: 'Confirm conversion to cell',
-        titleCaption: 'Executive washroom',
+        titleCaption: 'Cell A-1-001',
       })
     })
 
@@ -268,13 +270,13 @@ describe('CellConversionConfirm', () => {
     it('sets the flash correctly', () => {
       expect(deepReq.flash).toHaveBeenCalledWith('success', {
         title: 'Non-residential room converted to a cell',
-        content: 'You have converted Executive washroom into a cell.',
+        content: 'You have converted A-1-001 into a cell.',
       })
     })
 
     it('redirects to the view location page', () => {
       expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        paths.location.view(deepRes.locals.decoratedLocation as DecoratedLocation),
       )
     })
   })

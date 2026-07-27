@@ -5,8 +5,6 @@ export default class CreateLocationStructurePage extends Page {
     super(/Set \w+ structure/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/structure`)
-
   level2Select = (): PageElement => cy.get('#level-2')
 
   level3Select = (): PageElement => cy.get('#level-3')

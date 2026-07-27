@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { capitalize } from 'lodash'
 import { TypedLocals } from '../../@types/express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { Location, LocationType } from '../../data/types/locationsApi'
 import pluralize from '../../formatters/pluralize'
 import decorateLocation from '../../decorators/location'
@@ -10,8 +10,9 @@ import nonOxfordJoin from '../../formatters/nonOxfordJoin'
 import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import paths from '../../utils/paths'
 
-export default class ConfirmCreateLocation extends FormInitialStep {
+export default class ConfirmCreateLocation extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(unsetTempValues)
@@ -21,7 +22,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { services, session, sessionModel } = req
     const createCellsNow = sessionModel.get<string>('createCellsNow')
-    const { locationId } = res.locals
+    const { prisonId, locationId } = res.locals
 
     if (createCellsNow === 'YES') {
       const { locationsService } = services
@@ -31,8 +32,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
       const accommodationType = sessionModel.get<string>('create-cells_accommodationType')
       const usedFor = sessionModel.get<string[]>('create-cells_usedFor')
 
-      res.locals.createRootLink = `/create-new/${locationId}`
-
+      res.locals.createRootLink = paths.location.create(prisonId, locationId)
       res.locals.summaryListRows = [
         {
           key: { text: 'Number of cells' },
@@ -86,12 +86,13 @@ export default class ConfirmCreateLocation extends FormInitialStep {
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
-    const { prisonId, locationId, values } = res.locals
+    const { values, prisonId, locationId } = res.locals
     const { locationType, structureLevels } = values
 
     locals.locationType = req.sessionModel.get<LocationType>('locationType')
 
-    locals.createDetailsLink = `/create-new/${locationId || prisonId}/details/edit`
+    const createRootLink = paths.location.create(prisonId, locationId)
+    locals.createDetailsLink = `${createRootLink}/details/edit`
 
     if (structureLevels?.length) {
       const fullStructure = [locationType, ...structureLevels]
@@ -99,7 +100,7 @@ export default class ConfirmCreateLocation extends FormInitialStep {
       locals.decoratedLocationStructure = fullStructure
         .map((level, i) => (i === 0 ? capitalize(level) : pluralize(level)))
         .join(' → ')
-      locals.createStructureLink = `/create-new/${locationId || prisonId}/structure`
+      locals.createStructureLink = `${createRootLink}/structure`
 
       const pluralLevels = structureLevels.map((level: string) => pluralize(level))
 
@@ -230,6 +231,6 @@ export default class ConfirmCreateLocation extends FormInitialStep {
       content,
     })
 
-    res.redirect(`/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

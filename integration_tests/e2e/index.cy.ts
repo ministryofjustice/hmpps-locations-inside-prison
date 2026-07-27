@@ -4,6 +4,7 @@ import Page from '../pages/page'
 import AuthStubber from '../mockApis/auth'
 import LocationsApiStubber from '../mockApis/locationsApi'
 import ManageUsersApiStubber from '../mockApis/manageUsersApi'
+import paths from '../../server/utils/paths'
 
 context('Index', () => {
   context('Unauthenticated user', () => {
@@ -38,7 +39,6 @@ context('Index', () => {
       const indexPage = Page.verifyOnPage(IndexPage)
 
       indexPage.cards.viewLocations().contains('Manage residential locations')
-      indexPage.cards.manageLocations().should('not.exist')
       indexPage.cards.cellCertificate().should('not.exist')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
@@ -67,8 +67,7 @@ context('Index', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.viewLocations().should('not.exist')
-      indexPage.cards.manageLocations().contains('Manage residential locations')
+      indexPage.cards.viewLocations().contains('Manage residential locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
@@ -105,7 +104,7 @@ context('Index', () => {
       indexPage.cards
         .capacityManagementDashboard()
         .find('a')
-        .should('have.attr', 'href', '/capacity-management-dashboard')
+        .should('have.attr', 'href', paths.capacityManagementDashboard)
 
       cy.screenshot('capacity-management-dashboard-tile', { capture: 'viewport' })
     })
@@ -124,8 +123,7 @@ context('Index', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.viewLocations().should('not.exist')
-      indexPage.cards.manageLocations().contains('Manage residential locations')
+      indexPage.cards.viewLocations().contains('Manage residential locations')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')

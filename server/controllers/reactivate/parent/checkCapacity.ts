@@ -1,13 +1,12 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { Location } from '../../../data/types/locationsApi'
 import populateLocationTree from './middleware/populateLocationTree'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
 import { TypedLocals } from '../../../@types/express'
-import capFirst from '../../../formatters/capFirst'
 
-export default class ReactivateParentCheckCapacity extends FormInitialStep {
+export default class ReactivateParentCheckCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.resetCapacity)
@@ -31,11 +30,6 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const { decoratedLocation } = res.locals
-    const isSelect = !!req.sessionModel.get('selectLocations')
-    const backLink = isSelect
-      ? `/reactivate/parent/${decoratedLocation.id}/select`
-      : `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
     const { decoratedCells, errorlist } = res.locals
 
     res.locals.options.fields = Object.fromEntries(
@@ -57,10 +51,6 @@ export default class ReactivateParentCheckCapacity extends FormInitialStep {
 
     return {
       ...super.locals(req, res),
-      backLink,
-      cancelLink: backLink,
-      title: 'Check capacity of cells',
-      titleCaption: capFirst(decoratedLocation.displayName),
       minLayout: 'one-half',
     }
   }

@@ -1,12 +1,11 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../utils/backUrl'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
 import populateDeactivationReasonItems from '../../middleware/populateDeactivationReasonItems'
-import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class ChangeTemporaryDeactivationDetails extends FormInitialStep {
+export default class ChangeTemporaryDeactivationDetails extends FormStep {
   override middlewareSetup() {
     this.use(populateDeactivationReasonItems)
     super.middlewareSetup()
@@ -38,21 +37,8 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-
-    const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
-
-    const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-      nextStepUrl: `/location/${locationId}/deactivate/temporary/confirm`,
-    })
     return {
-      ...locals,
-      backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-      title: 'Deactivation details',
-      titleCaption: capFirst(decoratedLocation.displayName),
+      ...super.locals(req, res),
       buttonText: 'Update deactivation details',
     }
   }
@@ -69,7 +55,6 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
 
   override validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
 
     const valuesHaveChanged = this.compareInitialAndSubmittedValues({
       initialValues: this.getInitialValues(req, res),
@@ -77,7 +62,7 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
     })
 
     if (!valuesHaveChanged) {
-      return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+      return res.redirect(paths.location.view(decoratedLocation))
     }
 
     return next()
@@ -132,7 +117,6 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -142,6 +126,6 @@ export default class ChangeTemporaryDeactivationDetails extends FormInitialStep 
       content: `You have updated the deactivation details for this location.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }
