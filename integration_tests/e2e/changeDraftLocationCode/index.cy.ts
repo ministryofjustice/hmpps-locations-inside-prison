@@ -3,6 +3,9 @@ import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeLocationCodePage from '../../pages/changeDraftLocationCode/confirm'
 import buildLocationHierarchy from '../../../server/testutils/buildLocationHierarchy'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Change draft location code', () => {
   const draftWing = LocationFactory.build({
@@ -62,23 +65,24 @@ context('Change draft location code', () => {
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: draftWing,
       })
-      cy.task('stubLocations', draftWing)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubLocations(draftWing)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 
@@ -92,34 +96,35 @@ context('Change draft location code', () => {
   context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsDeleteLocation')
-      cy.task('stubLocationsLocationsResidentialSummary')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsDeleteLocation()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: draftWing,
       })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: activeWing,
       })
-      cy.task('stubLocations', activeWing)
-      cy.task('stubLocations', draftWing)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubLocations(activeWing)
+      LocationsApiStubber.stub.stubLocations(draftWing)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 
     context('Change draft WING location code', () => {
       beforeEach(() => {
-        cy.task('stubPatchLocation', { ...draftWing, pathHierarchy: 'WINGB' })
+        LocationsApiStubber.stub.stubPatchLocation({ ...draftWing, pathHierarchy: 'WINGB' })
       })
 
       context('Validation checks', () => {
@@ -167,7 +172,7 @@ context('Change draft location code', () => {
       })
 
       it('shows the correct error if the landing code already exists on a DRAFT wing', () => {
-        cy.task('stubLocationsLocationsResidentialSummaryByKey')
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryByKey()
         ViewLocationsShowPage.goTo(draftWing.prisonId, draftWing.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeLocationCodeLink().click()
@@ -197,12 +202,12 @@ context('Change draft location code', () => {
 
     context('Change draft LANDING location code', () => {
       beforeEach(() => {
-        cy.task('stubPatchLocation', { ...draftLanding, pathHierarchy: 'WINGB-LANDB' })
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        LocationsApiStubber.stub.stubPatchLocation({ ...draftLanding, pathHierarchy: 'WINGB-LANDB' })
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
           parentLocation: draftLanding,
           locationHierarchy: buildLocationHierarchy([draftWing, draftLanding]),
         })
-        cy.task('stubLocations', draftLanding)
+        LocationsApiStubber.stub.stubLocations(draftLanding)
         ViewLocationsShowPage.goTo(draftLanding.prisonId, draftLanding.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeLocationCodeLink().click()
@@ -221,13 +226,13 @@ context('Change draft location code', () => {
 
     context('Change draft CELL location code', () => {
       beforeEach(() => {
-        cy.task('stubPatchLocation', { ...draftCell, pathHierarchy: 'WINGB-LANDB-003' })
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        LocationsApiStubber.stub.stubPatchLocation({ ...draftCell, pathHierarchy: 'WINGB-LANDB-003' })
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
           parentLocation: draftCell,
           locationHierarchy: buildLocationHierarchy([draftWing, draftLanding, draftCell]),
         })
-        cy.task('stubLocations', draftLanding)
-        cy.task('stubLocations', draftCell)
+        LocationsApiStubber.stub.stubLocations(draftLanding)
+        LocationsApiStubber.stub.stubLocations(draftCell)
         ViewLocationsShowPage.goTo(draftCell.prisonId, draftCell.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeLocationCodeLink().click()

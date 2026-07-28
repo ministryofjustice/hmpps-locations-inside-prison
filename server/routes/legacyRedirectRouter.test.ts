@@ -26,6 +26,10 @@ describe('legacyRedirectRouter', () => {
         activeCaseload: { id: PRISON_ID },
       } as any
 
+      req.user = {
+        caseloads: [{ id: PRISON_ID }],
+      } as any
+
       next()
     })
 
@@ -126,6 +130,33 @@ describe('legacyRedirectRouter', () => {
     ])('redirects %s to %s', async (legacyPath, newPath) => {
       await request(app).get(legacyPath).expect(302).expect('Location', newPath)
       expect(locationsService.getLocation).toHaveBeenLastCalledWith('system-token', UUID)
+    })
+
+    it('returns 404 when user does not have access to the prison for the location', async () => {
+      locationsService.getLocation.mockResolvedValue({ prisonId: 'MDI' })
+
+      const newApp = express()
+      newApp.use((req: Request, res: Response, next) => {
+        Object.assign(req, {
+          services: { locationsService },
+          session: { systemToken: 'system-token' },
+        })
+
+        res.locals.user = {
+          activeCaseload: { id: PRISON_ID },
+        } as any
+
+        req.user = {
+          caseloads: [{ id: 'OTHER' }],
+        } as any
+
+        next()
+      })
+      newApp.use(legacyRedirectRouter)
+
+      await request(newApp).get(`/create-new/${UUID}`).expect(404)
+
+      expect(locationsService.getLocation).toHaveBeenCalledWith('system-token', UUID)
     })
   })
 })

@@ -138,7 +138,7 @@ export default async (req: Request, res: Response) => {
     }
   } else {
     addBreadcrumb({ title: '', href: '/' })(req, res)
-    logPageView(req.services.auditService, Page.LOCATIONS_INDEX)
+    await logPageView(req.services.auditService, Page.LOCATIONS_INDEX)(req, res)
 
     if (req.canAccess('create_location')) {
       const { decoratedResidentialSummary: summary, prisonId } = res.locals

@@ -8,6 +8,9 @@ import CellConversionSpecificCellTypePage from '../../pages/cellConversion/speci
 import CellConversionUsedForPage from '../../pages/cellConversion/usedFor'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Cell conversion', () => {
   const location = LocationFactory.build({
@@ -18,21 +21,22 @@ context('Cell conversion', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsConstantsUsedForTypeForPrison')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForTypeForPrison()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -51,24 +55,25 @@ context('Cell conversion', () => {
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsConstantsUsedForTypeForPrison')
-      cy.task('stubLocationsLocationsResidentialSummary')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubLocations', location)
-      cy.task('stubPrisonerLocationsId', [])
-      cy.task('stubLocationsConvertToCell')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForTypeForPrison()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubPrisonerLocationsId([])
+      LocationsApiStubber.stub.stubLocationsConvertToCell()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 

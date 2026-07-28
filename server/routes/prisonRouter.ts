@@ -18,9 +18,9 @@ import locationRouter from './locationRouter'
 import optionalLocationRouter from './optionalLocationRouter'
 import archivedLocationsRouter from './archivedLocationsRouter'
 
-const router = express.Router({ mergeParams: true })
-
 const controller = (services: Services) => {
+  const router = express.Router({ mergeParams: true })
+
   router.use(
     populatePrisonAndLocationId,
     redirectToAddPrisonId,

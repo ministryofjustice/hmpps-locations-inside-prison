@@ -8,16 +8,19 @@ import AuthService from '../services/authService'
 import LocationsService from '../services/locationsService'
 import PrisonService from '../services/prisonService'
 import paths from '../utils/paths'
+import ManageUsersService from '../services/manageUsersService'
 
 jest.mock('../services/auditService')
 jest.mock('../services/authService')
 jest.mock('../services/locationsService')
 jest.mock('../services/prisonService')
+jest.mock('../services/manageUsersService')
 
 const auditService = new AuditService(null) as jest.Mocked<AuditService>
 const authService = new AuthService(null) as jest.Mocked<AuthService>
 const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 const prisonService = new PrisonService(null) as jest.Mocked<PrisonService>
+const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
 
 let app: Express
 
@@ -33,10 +36,12 @@ beforeEach(() => {
       authService,
       locationsService,
       prisonService,
+      manageUsersService,
     },
     userSupplier: () => adminUser,
   })
   authService.getSystemClientToken.mockResolvedValue('token')
+  manageUsersService.getCaseloads.mockResolvedValue([{ id: 'TST', name: 'Test' }])
 })
 
 afterEach(() => {

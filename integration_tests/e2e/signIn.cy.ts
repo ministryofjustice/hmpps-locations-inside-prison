@@ -2,15 +2,19 @@ import IndexPage from '../pages/index'
 import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
 import AuthManageDetailsPage from '../pages/authManageDetails'
+import ManageUsersApiStubber from '../mockApis/manageUsersApi'
+import AuthStubber from '../mockApis/auth'
+import LocationsApiStubber from '../mockApis/locationsApi'
 
 context('Sign In', () => {
   context('With the default role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -49,7 +53,7 @@ context('Sign In', () => {
 
     it('User can manage their details', () => {
       cy.signIn()
-      cy.task('stubAuthManageDetails')
+      AuthStubber.stub.stubAuthManageDetails()
       const indexPage = Page.verifyOnPage(IndexPage)
 
       indexPage.manageDetails().get('a').invoke('removeAttr', 'target')
@@ -75,7 +79,7 @@ context('Sign In', () => {
       cy.request('/').its('body').should('contain', 'Sign in')
 
       cy.task('stubVerifyToken', true)
-      cy.task('stubSignIn', { name: 'bobby brown' })
+      AuthStubber.stub.stubSignIn({ name: 'bobby brown' })
 
       cy.signIn()
 

@@ -6,9 +6,9 @@ import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocation
 import reactivateCellsRouter from './reactivate/cells'
 import viewLocations from '../controllers/viewLocations'
 
-const router = express.Router({ mergeParams: true })
-
 const optionalLocationRouter = (services: Services) => {
+  const router = express.Router({ mergeParams: true })
+
   router.use(populatePrisonAndLocationId)
 
   router.use('/create', createLocationRouter)

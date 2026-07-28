@@ -1,5 +1,6 @@
 import express from 'express'
 
+import { NotFound } from 'http-errors'
 import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
 import paths from '../utils/paths'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -9,7 +10,7 @@ import { isValidUUID } from '../utils/isValidUUID'
 const router = express.Router({ mergeParams: true })
 
 const redirect = (redirectPathGetter: (req: Parameters<Parameters<typeof asyncMiddleware>[0]>[0]) => string) =>
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req, res, next) => {
     const { params, services } = req
     const { locationsService } = services
 
@@ -22,9 +23,14 @@ const redirect = (redirectPathGetter: (req: Parameters<Parameters<typeof asyncMi
     }
 
     if (params.locationId && !params.prisonId) {
-      params.prisonId = (
-        await locationsService.getLocation(req.session.systemToken, params.locationId as string)
-      ).prisonId
+      const location = await locationsService.getLocation(req.session.systemToken, params.locationId as string)
+
+      if (!req.user.caseloads.some(c => c.id === location.prisonId)) {
+        next(NotFound())
+        return
+      }
+
+      params.prisonId = location.prisonId
     }
 
     res.redirect(redirectPathGetter(req))

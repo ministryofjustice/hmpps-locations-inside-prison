@@ -10,9 +10,9 @@ import populateDecoratedResidentialSummary from '../middleware/populateDecorated
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import paths from '../utils/paths'
 
-const router = express.Router({ mergeParams: true })
-
 const controller = (services: Services) => {
+  const router = express.Router({ mergeParams: true })
+
   router.get(
     '/',
     asyncMiddleware(async (req, res, next) => {

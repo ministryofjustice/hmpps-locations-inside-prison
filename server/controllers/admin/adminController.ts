@@ -25,7 +25,7 @@ export default function adminController({
       const { prisonId } = prisonConfiguration
 
       const backLink = backUrl(req, {
-        fallbackUrl: `/${prisonId}/admin`,
+        fallbackUrl: paths.admin.index(prisonId),
       })
 
       return {

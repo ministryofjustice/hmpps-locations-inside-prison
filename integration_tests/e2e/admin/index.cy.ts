@@ -7,12 +7,17 @@ import NonResiStatusConfirmPage from '../../pages/admin/nonResi/confirm'
 import CertApprovalConfirmPage from '../../pages/admin/certApproval/confirm'
 import SegInRollCountConfirmPage from '../../pages/admin/segInRollCount/confirm'
 import NomisScreenStatusConfirmPage from '../../pages/admin/nomisScreen/confirm'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
+import PrisonApiStubber from '../../mockApis/prisonApi'
 
 context('Admin Index', () => {
   context('Without the MANAGE_RES_LOCATIONS_ADMIN role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
+      AuthStubber.stub.stubSignIn({ roles: [] })
+      ManageUsersApiStubber.stub.stubManageCaseloads()
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -34,20 +39,21 @@ context('Admin Index', () => {
   context('With the MANAGE_RES_LOCATIONS_ADMIN role and NOMIS screen disabled', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubPrisonConfiguration')
-      cy.task('stubPrisonConfigurationActivateResi')
-      cy.task('stubPrisonConfigurationActivateNonResi')
-      cy.task('stubPrisonConfigurationCertApproval')
-      cy.task('stubPrisonConfigurationIncludeSegInRollCount')
-      cy.task('stubDisplayHousingCheckboxesDisabled')
-      cy.task('stubDisplayHousingCheckboxesPost')
-      cy.task('stubGetSplashScreenCondition')
-      cy.task('stubCreateSplashScreenCondition')
-      cy.task('stubUpdateSplashScreenCondition')
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubPrisonConfiguration()
+      LocationsApiStubber.stub.stubPrisonConfigurationActivateResi()
+      LocationsApiStubber.stub.stubPrisonConfigurationActivateNonResi()
+      LocationsApiStubber.stub.stubPrisonConfigurationCertApproval()
+      LocationsApiStubber.stub.stubPrisonConfigurationIncludeSegInRollCount()
+      PrisonApiStubber.stub.stubDisplayHousingCheckboxesDisabled()
+      PrisonApiStubber.stub.stubDisplayHousingCheckboxesPost()
+      PrisonApiStubber.stub.stubGetSplashScreenCondition()
+      PrisonApiStubber.stub.stubCreateSplashScreenCondition()
+      PrisonApiStubber.stub.stubUpdateSplashScreenCondition()
       cy.signIn()
     })
 
@@ -132,17 +138,18 @@ context('Admin Index', () => {
   context('With the MANAGE_RES_LOCATIONS_ADMIN role and NOMIS checkboxes enabled', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubPrisonConfigurationResiActive')
-      cy.task('stubPrisonConfigurationDeactivateResi')
-      cy.task('stubDisplayHousingCheckboxesEnabled')
-      cy.task('stubDisplayHousingCheckboxesDelete')
-      cy.task('stubGetSplashScreenCondition')
-      cy.task('stubCreateSplashScreenCondition')
-      cy.task('stubUpdateSplashScreenCondition')
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubPrisonConfigurationResiActive()
+      LocationsApiStubber.stub.stubPrisonConfigurationDeactivateResi()
+      PrisonApiStubber.stub.stubDisplayHousingCheckboxesEnabled()
+      PrisonApiStubber.stub.stubDisplayHousingCheckboxesDelete()
+      PrisonApiStubber.stub.stubGetSplashScreenCondition()
+      PrisonApiStubber.stub.stubCreateSplashScreenCondition()
+      PrisonApiStubber.stub.stubUpdateSplashScreenCondition()
       cy.signIn()
     })
 
@@ -169,13 +176,14 @@ context('Admin Index', () => {
   context('With the MANAGE_RES_LOCATIONS_ADMIN role - NOMIS screen toggle', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubPrisonConfiguration')
-      cy.task('stubGetSplashScreenCondition')
-      cy.task('stubCreateSplashScreenCondition', { moduleName: 'OIMILOCA' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubPrisonConfiguration()
+      PrisonApiStubber.stub.stubGetSplashScreenCondition()
+      PrisonApiStubber.stub.stubCreateSplashScreenCondition({ moduleName: 'OIMILOCA' })
       cy.signIn()
     })
 

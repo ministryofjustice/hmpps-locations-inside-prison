@@ -3,6 +3,9 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeCellTypePage from '../../pages/changeCellType'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Change cell type', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -18,20 +21,21 @@ context('Change cell type', () => {
         specialistCellTypes: ['ACCESSIBLE_CELL', 'CONSTANT_SUPERVISION'],
       })
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
-      cy.task('stubLocations', location)
+      AuthStubber.stub.stubSignIn({ roles: [] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubLocations(location)
     })
 
     it('does not show the remove link on the show location page', () => {
@@ -51,19 +55,20 @@ context('Change cell type', () => {
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubUpdateSpecialistCellTypes')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubUpdateSpecialistCellTypes()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -77,8 +82,8 @@ context('Change cell type', () => {
       })
 
       beforeEach(() => {
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
       })
 
       it('does not show the change cell type link when the cell is inactive', () => {
@@ -98,8 +103,8 @@ context('Change cell type', () => {
       })
 
       beforeEach(() => {
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
       })
 
       it('can be accessed by clicking the change cell type link on the show location page', () => {
@@ -148,8 +153,8 @@ context('Change cell type', () => {
       })
 
       beforeEach(() => {
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
       })
 
       it('can be accessed by clicking the change cell type link on the show location page', () => {

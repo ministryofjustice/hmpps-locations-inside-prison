@@ -6,38 +6,44 @@ import paths from '../../utils/paths'
 import LocationResidentialSummaryFactory from '../../testutils/factories/locationResidentialSummary'
 import { LocationResidentialSummary } from '../../data/types/locationsApi'
 import LocationFactory from '../../testutils/factories/location'
+import { Page } from '../../services/auditService'
 
 describe('view locations show', () => {
   let deepReq: DeepPartial<Request>
   let deepRes: DeepPartial<Response>
   let locationResidentialSummary: LocationResidentialSummary
-
-  const convertToCellAction = {
-    text: 'Convert to cell',
-    href: paths.location.cellConversion('TST', '7e570000-0000-1000-8001-000000000001'),
-    class: 'govuk-button--secondary',
-  }
-
-  const convertToNonResAction = {
-    text: 'Convert cell to non-residential room',
-    href: paths.location.nonResidentialConversion('TST', '7e570000-0000-1000-8001-000000000001'),
-    class: 'govuk-button--secondary',
-  }
-
-  const deactivateCellAction = {
-    text: 'Deactivate cell',
-    href: paths.location.deactivate('TST', '7e570000-0000-1000-8001-000000000001'),
-    class: 'govuk-button--secondary',
-  }
-
-  const deleteWingAction = {
-    text: 'Delete wing',
-    href: paths.location.delete('TST', '7e570000-0000-1000-8001-000000000001'),
-    class: 'govuk-button--warning',
-  }
+  let convertToCellAction: any
+  let convertToNonResAction: any
+  let deactivateCellAction: any
+  let deleteWingAction: any
 
   beforeEach(() => {
     locationResidentialSummary = LocationResidentialSummaryFactory.build()
+
+    convertToCellAction = {
+      text: 'Convert to cell',
+      href: paths.location.cellConversion(buildDecoratedLocation(locationResidentialSummary.parentLocation)),
+      class: 'govuk-button--secondary',
+    }
+
+    convertToNonResAction = {
+      text: 'Convert cell to non-residential room',
+      href: paths.location.nonResidentialConversion(buildDecoratedLocation(locationResidentialSummary.parentLocation)),
+      class: 'govuk-button--secondary',
+    }
+
+    deactivateCellAction = {
+      text: 'Deactivate cell',
+      href: paths.location.deactivate(buildDecoratedLocation(locationResidentialSummary.parentLocation)),
+      class: 'govuk-button--secondary',
+    }
+
+    deleteWingAction = {
+      text: 'Delete wing',
+      href: paths.location.delete(buildDecoratedLocation(locationResidentialSummary.parentLocation)),
+      class: 'govuk-button--warning',
+    }
+
     deepReq = {
       canAccess: jest.fn().mockReturnValue(false),
       flash: jest.fn(),
@@ -82,6 +88,10 @@ describe('view locations show', () => {
   it('renders the page', async () => {
     await controller(deepReq as Request, deepRes as Response)
 
+    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_SHOW, {
+      who: 'test-user',
+      correlationId: 'test-correlation-id',
+    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
       minLayout: 'three-quarters',
@@ -98,6 +108,10 @@ describe('view locations show', () => {
     deepReq.flash = jest.fn(_param => [success])
     await controller(deepReq as Request, deepRes as Response)
 
+    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_SHOW, {
+      who: 'test-user',
+      correlationId: 'test-correlation-id',
+    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: {
         success,
@@ -215,7 +229,7 @@ describe('view locations show', () => {
 
       describe('with the correct permissions', () => {
         beforeEach(() => {
-          deepReq.canAccess = jest.fn().mockReturnValue(true)
+          deepReq.canAccess = jest.fn().mockImplementation(permission => permission === 'deactivate')
         })
 
         it('adds the action', async () => {
@@ -274,7 +288,7 @@ describe('view locations show', () => {
 
       describe('with the correct permissions', () => {
         beforeEach(() => {
-          deepReq.canAccess = jest.fn().mockReturnValue(true)
+          deepReq.canAccess = jest.fn().mockImplementation(permission => permission === 'create_location')
         })
 
         it('adds the action', async () => {
@@ -590,6 +604,10 @@ describe('view locations index', () => {
 
     await controller(deepReq as Request, deepRes as Response)
 
+    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_INDEX, {
+      who: 'test-user',
+      correlationId: 'test-correlation-id',
+    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
       title: 'Manage residential locations',
       minLayout: 'three-quarters',
@@ -601,6 +619,10 @@ describe('view locations index', () => {
 
     await controller(deepReq as Request, deepRes as Response)
 
+    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_INDEX, {
+      who: 'test-user',
+      correlationId: 'test-correlation-id',
+    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
       title: 'Manage residential locations',
       minLayout: 'three-quarters',

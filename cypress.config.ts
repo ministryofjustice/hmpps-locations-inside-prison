@@ -85,9 +85,9 @@ export default defineConfig({
         ...components,
         ...locationsApi.allStubs,
         ...manageUsersApi.allStubs,
+        ...prisonApi.allStubs,
         ...tokenVerification,
         ...logAccessibilityViolations,
-        ...prisonApi,
         setFeatureFlag,
       })
       cypressSplit(on, config)

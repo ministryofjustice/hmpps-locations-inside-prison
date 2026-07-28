@@ -7,7 +7,11 @@ const addRootBreadcrumb = middleware((req, res, next) => {
 
   if (prisonId) {
     if (req.canAccess('certificate_view_management') || user.activeCaseload.id !== prisonId) {
-      title += ` - ${user.caseloads.find(c => c.id === prisonId).name}`
+      const caseload = user.caseloads.find(c => c.id === prisonId)
+
+      if (caseload) {
+        title += ` - ${caseload.name}`
+      }
     }
   }
 

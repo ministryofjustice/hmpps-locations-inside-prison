@@ -3,6 +3,8 @@ import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeLocalNamePage from '../../pages/changeLocalName'
 import LocationsApiStubber from '../../mockApis/locationsApi'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
 
 context('Change local name', () => {
   const locationAsWing = LocationFactory.build({
@@ -25,20 +27,21 @@ context('Change local name', () => {
 
   const setupStubs = (roles = []) => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
-    cy.task('stubLocationsConstantsAccommodationType')
-    cy.task('stubLocationsConstantsConvertedCellType')
-    cy.task('stubLocationsConstantsDeactivatedReason')
-    cy.task('stubLocationsConstantsLocationType')
-    cy.task('stubLocationsConstantsApprovalType')
-    cy.task('stubLocationsConstantsSpecialistCellType')
-    cy.task('stubLocationsConstantsUsedForType')
-    cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsWing })
-    cy.task('stubLocations', locationAsWing)
-    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+    AuthStubber.stub.stubSignIn({ roles })
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+    LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationAsWing })
+    LocationsApiStubber.stub.stubLocations(locationAsWing)
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
   describe('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -68,8 +71,8 @@ context('Change local name', () => {
     })
 
     it('does not show the change local name link on a cell level', () => {
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsCell })
-      cy.task('stubLocations', locationAsCell)
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationAsCell })
+      LocationsApiStubber.stub.stubLocations(locationAsCell)
       ViewLocationsShowPage.goTo(locationAsCell.prisonId, locationAsCell.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.localNameRow().should('not.exist')
@@ -137,16 +140,15 @@ context('Change local name', () => {
 
     it('shows the correct validation error when there is a matching local name', () => {
       LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: true, locationId: '.*' })
-      cy.task('stubUpdateLocalName', {
-        localName: 'changed local name',
-        updatedBy: 'TEST_USER',
-      })
+      LocationsApiStubber.stub.stubUpdateLocalName()
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.changeLocalNameLink().click()
       const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: updatedLocationAsWing })
-      cy.task('stubLocations', updatedLocationAsWing)
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
+        parentLocation: updatedLocationAsWing,
+      })
+      LocationsApiStubber.stub.stubLocations(updatedLocationAsWing)
       changeLocalNamePage.localNameTextInput().clear()
       changeLocalNamePage.localNameTextInput().click().type('changed local name')
       changeLocalNamePage.saveLocalNameButton().click()
@@ -161,10 +163,7 @@ context('Change local name', () => {
       cy.get('.govuk-heading-l').contains('Local Name')
       viewLocationsShowPage.changeLocalNameLink().click()
       LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
-      cy.task('stubUpdateLocalName', {
-        localName: 'new local name',
-        updatedBy: 'TEST_USER',
-      })
+      LocationsApiStubber.stub.stubUpdateLocalName()
       const changeLocalNamePage = Page.verifyOnPage(ChangeLocalNamePage)
       changeLocalNamePage.localNameTextInput().clear()
       changeLocalNamePage.localNameTextInput().click().type('new local name')

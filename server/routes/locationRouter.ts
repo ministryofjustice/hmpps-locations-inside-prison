@@ -29,9 +29,9 @@ import reactivateCellRouter from './reactivate/cell'
 import reactivateLocationRouter from './reactivate/location'
 import reactivateParentRouter from './reactivate/parent'
 
-const router = express.Router({ mergeParams: true })
-
 const locationRouter = (services: Services) => {
+  const router = express.Router({ mergeParams: true })
+
   router.use(populatePrisonAndLocationId)
 
   router.use('/add-local-name', setLocalNameRouter)

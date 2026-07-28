@@ -15,9 +15,9 @@ import changeCertApprovalStatusRouter from './admin/certApproval'
 import changeNomisScreenStatusRouter from './admin/nomisScreen'
 import ingestRouter from './admin/ingest'
 
-const router = express.Router({ mergeParams: true })
-
 const controller = (services: Services) => {
+  const router = express.Router({ mergeParams: true })
+
   router.get(
     '/',
     protectRoute('administer_residential'),

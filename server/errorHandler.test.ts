@@ -2,22 +2,29 @@ import type { Express, Request, Response } from 'express'
 import request from 'supertest'
 import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { DeepPartial } from 'fishery'
+import { jest } from '@jest/globals'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
 import createErrorHandler from './errorHandler'
 import AnalyticsService from './services/analyticsService'
 import LocationsService from './services/locationsService'
 import paths from './utils/paths'
+import ManageUsersService from './services/manageUsersService'
 
 jest.mock('./services/locationsService')
+jest.mock('./services/manageUsersService')
 
 let app: Express
 
 const MockedLocationsService = LocationsService as jest.MockedClass<typeof LocationsService>
 let locationsService: jest.Mocked<LocationsService>
+const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
 
 beforeEach(() => {
   locationsService = new MockedLocationsService(null) as unknown as jest.Mocked<LocationsService>
-  app = appWithAllRoutes({ services: { locationsService: locationsService as unknown as LocationsService } })
+  app = appWithAllRoutes({
+    services: { locationsService, manageUsersService },
+  })
+  manageUsersService.getCaseloads.mockResolvedValue([{ id: 'TST', name: 'Test' }])
 })
 
 afterEach(() => {
@@ -31,6 +38,7 @@ describe('error handler', () => {
     originalUrl: '/location/7e570000-0000-0000-0000-000000000001/change-cell-capacity/confirm',
     services: {
       analyticsService,
+      manageUsersService,
     },
   }
   const req = deepReq as Request
@@ -60,7 +68,7 @@ describe('error handler', () => {
 
     analyticsService.sendEvent = jest.fn()
     res.render = jest.fn()
-    res.status = jest.fn()
+    res.status = jest.fn() as any
     error = new Error('API error')
     error.responseStatus = 500
   })
@@ -82,7 +90,8 @@ describe('error handler', () => {
         appWithAllRoutes({
           production: true,
           services: {
-            locationsService: locationsService as unknown as LocationsService,
+            locationsService,
+            manageUsersService,
           },
         }),
       )

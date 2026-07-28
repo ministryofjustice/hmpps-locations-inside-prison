@@ -3,6 +3,9 @@ import CellCertificateUploadsListPage from '../../../pages/admin/ingest/list'
 import CellCertificateUploadDetailPage from '../../../pages/admin/ingest/detail'
 import { CellCertificateUpload } from '../../../../server/data/types/locationsApi/cellCertificateUpload'
 import paths from '../../../../server/utils/paths'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import AuthStubber from '../../../mockApis/auth'
+import LocationsApiStubber from '../../../mockApis/locationsApi'
 
 const completedUpload: CellCertificateUpload = {
   id: 'upload-1',
@@ -56,18 +59,18 @@ const inProgressUpload: CellCertificateUpload = {
 context('Cell certificate uploads', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
-    cy.task('stubPrisonConfiguration')
+    AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubPrisonConfiguration()
     cy.signIn()
   })
 
   it('lists completed uploads and drills into the detail with a cell certificate link', () => {
-    cy.task('stubCellCertificateUploadsList', [completedUpload])
-    cy.task('stubCellCertificateUpload', completedUpload)
-
+    LocationsApiStubber.stub.stubCellCertificateUploadsList([completedUpload])
+    LocationsApiStubber.stub.stubCellCertificateUpload(completedUpload)
     CellCertificateUploadsListPage.goTo('TST')
     const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)
     listPage.uploadNewButton().should('exist')
@@ -85,7 +88,7 @@ context('Cell certificate uploads', () => {
   })
 
   it('hides the upload button and shows a message while an upload is in progress', () => {
-    cy.task('stubCellCertificateUploadsList', [inProgressUpload])
+    LocationsApiStubber.stub.stubCellCertificateUploadsList([inProgressUpload])
 
     CellCertificateUploadsListPage.goTo('TST')
     const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)
@@ -95,7 +98,7 @@ context('Cell certificate uploads', () => {
   })
 
   it('shows the in-progress message on the detail page for an unfinished upload', () => {
-    cy.task('stubCellCertificateUpload', inProgressUpload)
+    LocationsApiStubber.stub.stubCellCertificateUpload(inProgressUpload)
 
     cy.visit(`${paths.admin.ingestCert('TST')}/upload/upload-2`)
     const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
@@ -105,7 +108,7 @@ context('Cell certificate uploads', () => {
   })
 
   it('shows a message when there are no uploads', () => {
-    cy.task('stubCellCertificateUploadsList', [])
+    LocationsApiStubber.stub.stubCellCertificateUploadsList([])
 
     CellCertificateUploadsListPage.goTo('TST')
     const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)

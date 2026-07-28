@@ -6,9 +6,9 @@ import addBreadcrumb from '../middleware/addBreadcrumb'
 import archivedLocationsIndex from '../controllers/archivedLocationsIndex'
 import populateArchivedLocations from '../middleware/populateArchivedLocations'
 
-const router = express.Router({ mergeParams: true })
-
 const controller = (services: Services) => {
+  const router = express.Router({ mergeParams: true })
+
   router.get(
     '/',
     addBreadcrumb({ title: '', href: '/' }),

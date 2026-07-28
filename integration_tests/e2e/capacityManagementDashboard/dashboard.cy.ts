@@ -68,6 +68,7 @@ context('Capacity management dashboard', () => {
     cy.task('reset')
     AuthStubber.stub.stubSignIn({ roles: ['RESI__CERT_VIEWER'] })
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads(caseloads)
+    ManageUsersApiStubber.stub.stubManageCaseloads()
     LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
     LocationsApiStubber.stub.stubLocationsCellCertificateDashboard(dashboard)
     cy.signIn()

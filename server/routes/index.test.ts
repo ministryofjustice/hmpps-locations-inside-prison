@@ -3,12 +3,15 @@ import request from 'supertest'
 import { appWithAllRoutes, user } from './testutils/appSetup'
 import AuditService, { Page } from '../services/auditService'
 import LocationsService from '../services/locationsService'
+import ManageUsersService from '../services/manageUsersService'
 
 jest.mock('../services/auditService')
 jest.mock('../services/locationsService')
+jest.mock('../services/manageUsersService')
 
 const auditService = new AuditService(null) as jest.Mocked<AuditService>
 const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
 
 let app: Express
 
@@ -17,9 +20,12 @@ beforeEach(() => {
     services: {
       auditService,
       locationsService,
+      manageUsersService,
     },
     userSupplier: () => user,
   })
+
+  manageUsersService.getCaseloads.mockResolvedValue([{ id: 'TST', name: 'Test' }])
 })
 
 afterEach(() => {
@@ -40,6 +46,7 @@ describe('GET /', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => user,
     })
@@ -64,6 +71,7 @@ describe('GET /TST', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => user,
     })
@@ -99,6 +107,7 @@ describe('GET /TST', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => ({ ...user, userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'] }),
     })
@@ -135,6 +144,7 @@ describe('GET /TST', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => ({ ...user, userRoles: ['RESI__CERT_VIEWER'] }),
     })
@@ -162,6 +172,7 @@ describe('GET /TST', () => {
         services: {
           auditService,
           locationsService,
+          manageUsersService,
         },
         userSupplier: () => ({ ...user, userRoles: [role] }),
       })
@@ -186,6 +197,7 @@ describe('GET /TST', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => user,
     })

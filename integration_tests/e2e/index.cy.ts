@@ -32,6 +32,7 @@ context('Index', () => {
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
     })
 
     it('Displays the tiles', () => {
@@ -60,6 +61,7 @@ context('Index', () => {
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
       AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
     })
 
@@ -90,6 +92,7 @@ context('Index', () => {
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
     })
 
     it('Displays the capacity management dashboard tile linking to the dashboard', () => {
@@ -117,6 +120,7 @@ context('Index', () => {
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
     })
 
     it('Displays the tiles', () => {
@@ -138,6 +142,7 @@ context('Index', () => {
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
     })
 
     it('does not display the capacity management dashboard tile', () => {

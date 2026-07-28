@@ -5,6 +5,9 @@ import ChangeDoorNumberPage from '../../pages/changeDoorNumber/details'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Change door number', () => {
   const draftWing = LocationFactory.build({
@@ -93,28 +96,29 @@ context('Change door number', () => {
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationByCellMark')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationByCellMark()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: draftWing,
       })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: draftCell,
       })
-      cy.task('stubLocations', draftWing)
-      cy.task('stubLocations', draftCell)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubLocations(draftWing)
+      LocationsApiStubber.stub.stubLocations(draftCell)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 
@@ -128,41 +132,42 @@ context('Change door number', () => {
   context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubManageUsersByCaseload')
-      cy.task('stubLocationByCellMark')
-      cy.task('stubLocationsCertificationRequestApprovalsPrison', [])
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsDeleteLocation')
-      cy.task('stubPatchLocation')
-      cy.task('stubPutLocationForCellMark')
-      cy.task('stubLocationsLocationsResidentialSummary')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageUsersByCaseload()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationByCellMark()
+      LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsDeleteLocation()
+      LocationsApiStubber.stub.stubPatchLocation()
+      LocationsApiStubber.stub.stubPutLocationForCellMark()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: draftWing,
       })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: draftCell,
       })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: activeWing,
       })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: activeCell,
       })
-      cy.task('stubLocations', draftWing)
-      cy.task('stubLocations', draftCell)
-      cy.task('stubLocations', activeWing)
-      cy.task('stubLocations', activeCell)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      LocationsApiStubber.stub.stubLocations(draftWing)
+      LocationsApiStubber.stub.stubLocations(draftCell)
+      LocationsApiStubber.stub.stubLocations(activeWing)
+      LocationsApiStubber.stub.stubLocations(activeCell)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
       cy.signIn()
     })
 

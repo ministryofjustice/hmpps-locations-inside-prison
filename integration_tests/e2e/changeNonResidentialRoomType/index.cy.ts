@@ -4,12 +4,15 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import NonResidentialRoomPage from '../../pages/nonResidentialRoom'
 import NonResidentialRoomTypeChangePage from '../../pages/nonResidentialRoom/setNonResidentialChangeType'
 import paths from '../../../server/utils/paths'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Change non-residential rooms', () => {
   context('When user does not have the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
+      AuthStubber.stub.stubSignIn({ roles: [] })
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -45,23 +48,23 @@ context('Change non-residential rooms', () => {
     })
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubLocations', location)
-      cy.task('stubPrisonerLocationsId', [])
-      cy.task('stubLocationsUpdateNonResCell')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubPrisonerLocationsId([])
+      LocationsApiStubber.stub.stubLocationsUpdateNonResCell()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
 
       cy.signIn()
       NonResidentialRoomPage.goTo(location.prisonId, location.id)
@@ -91,7 +94,7 @@ context('Change non-residential rooms', () => {
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('OFFICE').should('be.checked')
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').should('not.be.checked')
       nonResidentialRoomTypeChangePage.cellTypeRadioItem('KITCHEN_SERVERY').click()
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationChanged })
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationChanged })
 
       nonResidentialRoomTypeChangePage.continueButton().click()
       Page.verifyOnPage(NonResidentialRoomPage)
@@ -112,7 +115,7 @@ context('Change non-residential rooms', () => {
       nonResidentialRoomTypeChangePage.otherFreeText().should('exist')
       nonResidentialRoomTypeChangePage.otherFreeText().type('Some other type')
 
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationOther })
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationOther })
       nonResidentialRoomTypeChangePage.continueButton().click()
       Page.verifyOnPage(NonResidentialRoomPage)
       cy.get('#govuk-notification-banner-title').contains('Success')
@@ -152,8 +155,8 @@ context('Change non-residential rooms', () => {
     })
 
     it('Enables navigation to update other description then Success details updated Banner for non-residential room type', () => {
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationOther })
-      cy.task('stubLocations', locationOther)
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationOther })
+      LocationsApiStubber.stub.stubLocations(locationOther)
       NonResidentialRoomPage.goTo(location.prisonId, location.id)
       const nonResidentialRoomPage = Page.verifyOnPage(NonResidentialRoomPage)
 

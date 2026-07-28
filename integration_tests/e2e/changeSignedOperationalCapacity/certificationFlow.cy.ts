@@ -42,6 +42,7 @@ function setupCommonStubs() {
   ManageUsersApiStubber.stub.stubManageUsers()
   ManageUsersApiStubber.stub.stubManageUsersMe()
   ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+  ManageUsersApiStubber.stub.stubManageCaseloads()
   ManageUsersApiStubber.stub.stubManageUsersByCaseload()
   LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
   LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()

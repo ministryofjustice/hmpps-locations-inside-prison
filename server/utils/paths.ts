@@ -18,7 +18,7 @@ import { Location } from '../data/types/locationsApi'
  * // => '/TST/view'
  */
 function p(...pathSegments: unknown[]) {
-  return `/${pathSegments.filter(s => s !== undefined && s !== 'undefined' && s !== '' && s !== null).join('/')}`
+  return `/${pathSegments.filter(s => s !== undefined && s !== '' && s !== null).join('/')}`
 }
 
 function optionalLocation(...pathSegments: unknown[]) {
@@ -35,18 +35,9 @@ function optionalLocation(...pathSegments: unknown[]) {
   return path
 }
 
-function withLocation(...pathSegments: unknown[]) {
-  function path(location: Pick<Location, 'prisonId' | 'id'>): string
-  function path(prisonId: string, locationId: string): string
-  function path(prisonIdOrLocation: string | Pick<Location, 'prisonId' | 'id'>, locationId?: string): string {
-    if (prisonIdOrLocation && typeof prisonIdOrLocation !== 'string') {
-      return path(prisonIdOrLocation.prisonId, prisonIdOrLocation.id)
-    }
-
-    return p(prisonIdOrLocation, locationId, ...pathSegments)
-  }
-
-  return path
+const withLocation = optionalLocation as (...pathSegments: unknown[]) => {
+  (location: Pick<Location, 'prisonId' | 'id'>): string
+  (prisonId: string, locationId: string): string
 }
 
 function withPrison(...pathSegments: unknown[]) {

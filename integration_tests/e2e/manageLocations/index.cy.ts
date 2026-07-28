@@ -3,8 +3,12 @@ import Page, { PageElement } from '../../pages/page'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
 import LocationFactory from '../../../server/testutils/factories/location'
 import paths from '../../../server/utils/paths'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
+import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 
-const residentialSummary = {
+const residentialSummary = PrisonResidentialSummaryFactory.build({
   prisonSummary: {
     workingCapacity: 8,
     signedOperationalCapacity: 10,
@@ -26,13 +30,13 @@ const residentialSummary = {
   ],
   topLevelLocationType: 'Wings',
   locationHierarchy: [],
-}
+})
 
 context('View Locations Index', () => {
   context('Without the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
+      AuthStubber.stub.stubSignIn({ roles: [] })
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -49,19 +53,20 @@ context('View Locations Index', () => {
   context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('Correctly presents the API data', () => {
