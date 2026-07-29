@@ -149,8 +149,5 @@ export default {
   productionUrl: get('PRODUCTION_URL', '#'),
   sandbox: environmentName === 'Training',
   feedbackFormUrl: get('FEEDBACK_FORM_URL', ''),
-  featureFlags: {
-    nonResi: get('FLAG_NON_RESI', 'disabled') === 'enabled',
-    archiveLocation: get('FLAG_ARCHIVE_LOCATION', 'disabled') === 'enabled',
-  },
+  featureFlags: {} as Record<string, boolean>,
 }

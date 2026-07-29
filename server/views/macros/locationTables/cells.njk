@@ -7,13 +7,18 @@
     <div class="govuk-grid-column-three-quarters">
       {% set rows = [] %}
       {% for item in locations %}
+        {% set types = [item.convertedCellType] if item.raw.locationType == 'ROOM' else item.specialistCellTypes %}
+        {% set cellTypeDisplay = (types | join('<br>')) or '-' %}
+        {% if item.raw.convertedCellType == 'OTHER' and item.otherConvertedCellType %}
+          {% set cellTypeDisplay = cellTypeDisplay + ' - ' + item.otherConvertedCellType %}
+        {% endif %}
         {% set rows = (rows.push(
           [
             { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
             { html: "<p class='govuk-tag__wrapper'>" + locationStatusTag(item) + "</p>" },
             { text: (item | includePending).workingCapacity },
             { text: (item | includePending).maxCapacity },
-            { html: (item.specialistCellTypes | join('<br>')) or '-' }
+            { html: cellTypeDisplay }
           ]
         ), rows) %}
       {% endfor %}

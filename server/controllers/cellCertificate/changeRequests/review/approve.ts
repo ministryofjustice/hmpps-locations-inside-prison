@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import FormInitialStep from '../../../base/formInitialStep'
-import { getUserEmails, sendNotification } from '../../../../utils/notificationHelpers'
-import { NotificationType, notificationGroups } from '../../../../services/notificationService'
+import { getAllCertUserEmails, sendNotification } from '../../../../utils/notificationHelpers'
+import { NotificationType } from '../../../../services/notificationService'
 import config from '../../../../config'
 import populateCertificationRequestDetails from '../../../../middleware/populateCertificationRequestDetails'
 import conditionallyPopulatePrisoners from './conditionallyPopulatePrisoners'
@@ -51,12 +51,7 @@ export default class Approve extends FormInitialStep {
     // Don't send emails in local dev (every deployed env counts as production)
     if (config.production || process.env.NODE_ENV === 'test') {
       // Send notifications to all cert roles
-      const emailAddresses = await getUserEmails(
-        manageUsersService,
-        systemToken,
-        prisonId,
-        notificationGroups.allCertUsers,
-      )
+      const emailAddresses = await getAllCertUserEmails(manageUsersService, systemToken, prisonId)
 
       await sendNotification(
         notifyService,

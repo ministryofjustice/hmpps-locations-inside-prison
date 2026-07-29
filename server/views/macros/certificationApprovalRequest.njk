@@ -619,6 +619,8 @@
             <h2 class="govuk-heading-m">Proposed changes to the certificate</h2>
           {% endif %}
 
+          <p class="govuk-body">The following locations will be permanently removed from the cell certificate:</p>
+
           {% set locationTableRows = [] %}
           {% for location in request.locations %}
             {{ recurseArchiveLocationTable(locationTableRows, location, constants.specialistCellTypes) }}

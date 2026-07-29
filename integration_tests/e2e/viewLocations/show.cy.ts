@@ -2,11 +2,33 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import { Location, LocationSummary } from '../../../server/data/types/locationsApi'
+import locationStatusMap from '../../../server/data/types/locationsApi/locationStatusMap'
 import LocationFactory from '../../../server/testutils/factories/location'
 import formatDate from '../../../server/formatters/formatDate'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import AuthStubber from '../../mockApis/auth'
+
+const specialistCellTypeLabels: Record<string, string> = {
+  ACCESSIBLE_CELL: 'Accessible cell',
+  NORMAL_ACCOMMODATION: 'Normal accommodation',
+  BIOHAZARD_DIRTY_PROTEST: 'Biohazard / dirty protest cell',
+  CONSTANT_SUPERVISION: 'Constant Supervision Cell',
+}
+
+const getConvertCellTypeLabel = (convertedCellType: string, otherConvertedCellType?: string) => {
+  const key = convertedCellType
+  const labels: Record<string, string> = {
+    OFFICE: 'Office',
+    KITCHEN_SERVERY: 'Kitchen / Servery',
+    OTHER: 'Other',
+  }
+  if (key === 'OTHER' && otherConvertedCellType) {
+    return `${labels[key]} - ${otherConvertedCellType}`
+  }
+
+  return labels[key]
+}
 
 context('View Locations Show', () => {
   context('Unauthenticated user', () => {
@@ -379,6 +401,30 @@ context('View Locations Show', () => {
 
     if (subLocations.length) {
       viewLocationsShowPage.locationsTable().should('exist')
+
+      viewLocationsShowPage.locationsTable().find('tbody tr').should('have.length', subLocations.length)
+      viewLocationsShowPage
+        .locationsTable()
+        .find('tbody tr')
+        .each(($row, index) => {
+          const subLocation = subLocations[index]
+          const expectedTypes =
+            subLocation.locationType === 'ROOM'
+              ? [getConvertCellTypeLabel(subLocation.convertedCellType, subLocation.otherConvertedCellType)].filter(
+                  Boolean,
+                )
+              : subLocation.specialistCellTypes.map(type => specialistCellTypeLabels[type] || type)
+          const expectedStatus = locationStatusMap[subLocation.status]?.label || subLocation.status
+          cy.wrap($row)
+            .find('th')
+            .eq(0)
+            .find('a')
+            .contains(subLocation.localName || subLocation.pathHierarchy)
+          cy.wrap($row).find('td').eq(0).contains(expectedStatus)
+          expectedTypes.forEach(type => {
+            cy.wrap($row).find('td').eq(3).contains(type)
+          })
+        })
     } else {
       viewLocationsShowPage.locationsTable().should('not.exist')
     }
@@ -1145,6 +1191,37 @@ context('View Locations Show', () => {
         ]
 
         context('When the location is Active', () => {
+          const subLocations = [
+            LocationFactory.build({
+              id: 'sub-location-1',
+              prisonId: 'TST',
+              pathHierarchy: 'A-1-001',
+              key: 'TST-A-1-001',
+              locationType: 'CELL',
+              specialistCellTypes: ['ACCESSIBLE_CELL'],
+              status: 'ACTIVE',
+            }),
+            LocationFactory.build({
+              id: 'sub-location-2',
+              prisonId: 'TST',
+              pathHierarchy: 'A-1-002',
+              key: 'TST-A-1-002',
+              locationType: 'ROOM',
+              convertedCellType: 'OFFICE',
+              status: 'NON_RESIDENTIAL',
+            }),
+            LocationFactory.build({
+              id: 'sub-location-3',
+              prisonId: 'TST',
+              pathHierarchy: 'A-1-003',
+              key: 'TST-A-1-003',
+              locationType: 'ROOM',
+              convertedCellType: 'OTHER',
+              otherConvertedCellType: 'Billiards room',
+              status: 'NON_RESIDENTIAL',
+            }),
+          ]
+
           beforeEach(() => {
             location = LocationFactory.build({
               ...locationDetails,
@@ -1154,11 +1231,17 @@ context('View Locations Show', () => {
             cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
               parentLocation: location,
               locationHierarchy,
+              subLocations,
+              subLocationName: 'Cells',
             })
+            cy.task(
+              'stubLocations',
+              subLocations.map(subLocation => ({ ...subLocation, parentId: location.id })),
+            )
           })
 
           it('Correctly presents the API data', () => {
-            testShow({ location, locationHierarchy })
+            testShow({ location, locationHierarchy, subLocations })
           })
 
           describe('Deactivate button', () => {

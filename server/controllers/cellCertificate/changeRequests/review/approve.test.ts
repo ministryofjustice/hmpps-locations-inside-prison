@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import ManageUsersService from '../../../../services/manageUsersService'
-import NotificationService, { notificationGroups, NotificationType } from '../../../../services/notificationService'
+import NotificationService, { NotificationType } from '../../../../services/notificationService'
 import LocationsService from '../../../../services/locationsService'
 import Approve from './approve'
 import * as notificationHelpers from '../../../../utils/notificationHelpers'
@@ -56,7 +56,7 @@ describe('Approve', () => {
     next = jest.fn()
 
     jest.clearAllMocks()
-    ;(notificationHelpers.getUserEmails as jest.Mock).mockResolvedValue([
+    ;(notificationHelpers.getAllCertUserEmails as jest.Mock).mockResolvedValue([
       'certificate_administrator@test.com',
       'certificate_reviewer@test.com',
       'certificate_viewer@test.com',
@@ -68,12 +68,7 @@ describe('Approve', () => {
     it('gets user emails for approved request notification group', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(notificationHelpers.getUserEmails).toHaveBeenCalledWith(
-        manageUsersService,
-        'token',
-        'MDI',
-        notificationGroups.allCertUsers,
-      )
+      expect(notificationHelpers.getAllCertUserEmails).toHaveBeenCalledWith(manageUsersService, 'token', 'MDI')
     })
 
     it('sends REQUEST_APPROVED notification to all cert users', async () => {

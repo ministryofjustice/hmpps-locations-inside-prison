@@ -21,17 +21,19 @@
   <span class="govuk-caption-m" data-qa="location-type">{{ locationType }}</span>
   <div class="header-row">
     <div class="header-left">
-    <h1 class="govuk-heading-l">{{ locationName }}</h1>
-      {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certifiedCell %}
-        {{ govukTag({
-          text: 'Certified',
-          classes: "govuk-tag--hollow",
-          attributes: {
-            "data-qa": "certified-tag"
-          }
-        }) }}
-      {% endif %}
-      {{ locationStatusTag(decoratedResidentialSummary.location) }}
+      <h1 class="govuk-heading-l">
+        {{ locationName }}
+        {% if decoratedResidentialSummary.location.leafLevel and decoratedResidentialSummary.location.certifiedCell %}
+          {{ govukTag({
+            text: 'Certified',
+            classes: "govuk-tag--hollow",
+            attributes: {
+              "data-qa": "certified-tag"
+            }
+          }) }}
+        {% endif %}
+        {{ locationStatusTag(decoratedResidentialSummary.location) }}
+      </h1>
     </div>
 
     {% if actions | length %}

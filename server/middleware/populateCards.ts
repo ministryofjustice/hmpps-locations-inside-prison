@@ -115,7 +115,7 @@ export default function populateCards(locationsService: LocationsService) {
     }
 
     // Non-residential locations cards and permission message
-    if (req.featureFlags.nonResi && nonResiActive) {
+    if (nonResiActive) {
       // Check for non-resi specific roles (these are used by the non-resi app)
       const hasEditRole = userRoles.includes('NONRESI__MAINTAIN_LOCATION')
 
@@ -139,12 +139,9 @@ export default function populateCards(locationsService: LocationsService) {
             },
       ]
       res.locals.nonResiPermissionMessage = null
-    } else if (req.featureFlags.nonResi) {
-      res.locals.nonResiCards = null
-      res.locals.nonResiPermissionMessage = 'You do not have permission to view non-residential locations.'
     } else {
       res.locals.nonResiCards = null
-      res.locals.nonResiPermissionMessage = null
+      res.locals.nonResiPermissionMessage = 'You do not have permission to view non-residential locations.'
     }
 
     next()

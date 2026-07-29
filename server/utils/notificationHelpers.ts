@@ -1,6 +1,7 @@
 import { PaginatedUsers } from '../data/manageUsersApiClient'
-import { NotificationDetails, NotificationType } from '../services/notificationService'
+import { NotificationDetails, NotificationType, notificationGroups } from '../services/notificationService'
 import ManageUsersService from '../services/manageUsersService'
+import config from '../config'
 
 // Get distinct email addresses from manageUsersService, passing in caseload and roles.
 export async function getUserEmails(
@@ -14,6 +15,24 @@ export async function getUserEmails(
   const users: PaginatedUsers = await manageUsersService[getterFunction](systemToken, prisonId, roles)
   const emails = users.content.map(user => user.email).filter(email => email)
   return [...new Set(emails)]
+}
+
+// Get all cert user email addresses, using the functional mailbox for viewers if configured.
+export async function getAllCertUserEmails(
+  manageUsersService: ManageUsersService,
+  systemToken: string,
+  prisonId: string,
+): Promise<string[]> {
+  const certViewerMailbox = config.email.functionalMailboxCertViewers
+  if (!certViewerMailbox) {
+    return getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.allCertUsers)
+  }
+
+  const otherRoles = notificationGroups.allCertUsers.filter(
+    role => !notificationGroups.requestSubmittedUsers.includes(role),
+  )
+  const userEmailAddresses = await getUserEmails(manageUsersService, systemToken, prisonId, otherRoles)
+  return [...new Set([...userEmailAddresses, certViewerMailbox])]
 }
 
 export async function sendNotification(
