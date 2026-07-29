@@ -4,16 +4,14 @@ import steps from './steps'
 import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
-import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
-import populateTitleCaptionFromLocation from '../../middleware/populateTitleCaptionFromLocation'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('change_cell_capacity'),
   populateLocation({ decorate: true, includeCurrentCertificate: true }),
-  populateTitleCaptionFromLocation,
-  populatePrisonConfiguration(),
+  populateTitleCaptionFromLocationOrPrison,
   wizard(steps, fields, {
     name: 'change-cell-capacity',
     templatePath: 'pages/changeCellCapacity',

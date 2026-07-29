@@ -2,34 +2,37 @@ import express from 'express'
 import logPageView from '../middleware/logPageView'
 import { Page } from '../services/auditService'
 import type { Services } from '../services'
-import validateCaseload from '../middleware/validateCaseload'
 import addBreadcrumb from '../middleware/addBreadcrumb'
-import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 import adminIndex from '../controllers/adminIndex'
 import getServicePrisonsNonHousingDisplay, {
   getSplashScreenStatus,
 } from '../middleware/getServicePrisonsNonHousingDisplay'
-import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
-import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
 import protectRoute from '../middleware/protectRoute'
-
-const router = express.Router({ mergeParams: true })
+import changeResiStatusRouter from './admin/resi'
+import changeNonResiStatusRouter from './admin/nonResi'
+import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
+import changeCertApprovalStatusRouter from './admin/certApproval'
+import changeNomisScreenStatusRouter from './admin/nomisScreen'
+import ingestRouter from './admin/ingest'
 
 const controller = (services: Services) => {
-  router.use(populatePrisonAndLocationId)
-  router.use(redirectToAddPrisonId)
-  router.use(validateCaseload())
+  const router = express.Router({ mergeParams: true })
 
   router.get(
     '/',
     protectRoute('administer_residential'),
     addBreadcrumb({ title: '', href: '/' }),
-    populatePrisonConfiguration(),
     getServicePrisonsNonHousingDisplay(),
     getSplashScreenStatus(),
     logPageView(services.auditService, Page.LOCATION_ADMIN),
     adminIndex,
   )
+  router.use('/change-resi-status', changeResiStatusRouter)
+  router.use('/change-non-resi-status', changeNonResiStatusRouter)
+  router.use('/change-include-seg-in-roll-count', changeIncludeSegInRollCountStatusRouter)
+  router.use('/change-certification-status', changeCertApprovalStatusRouter)
+  router.use('/change-nomis-screen-status/:moduleName', changeNomisScreenStatusRouter)
+  router.use('/ingest-cert', ingestRouter)
 
   return router
 }

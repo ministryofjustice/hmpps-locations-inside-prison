@@ -6,8 +6,10 @@ import populateCells from './populateCells'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import { TypedLocals } from '../../../@types/express'
+import paths from '../../../utils/paths'
+import FormStep from '../../base/formStep'
 
-export default class ReactivateCellsConfirm extends FormWizard.Controller {
+export default class ReactivateCellsConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.getPrisonResidentialSummary)
@@ -39,9 +41,6 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { cells, prisonResidentialSummary } = res.locals
-    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
-    const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
     const { maxCapacity, workingCapacity } = prisonResidentialSummary.prisonSummary
     let newMaxCapacity = maxCapacity
     let newWorkingCapacity = workingCapacity
@@ -67,7 +66,6 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     return {
-      cancelLink,
       changeSummary,
       title: `You are about to reactivate ${cells.length} cells`,
       buttonText: 'Confirm activation',
@@ -106,18 +104,16 @@ export default class ReactivateCellsConfirm extends FormWizard.Controller {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
-    const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const redirectUrl = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
+    const { prisonId, locationId, cells } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
     req.flash('success', {
       title: `Cells activated`,
-      content: `You have activated ${res.locals.cells.length} cells.`,
+      content: `You have activated ${cells.length} cells.`,
     })
 
-    res.redirect(redirectUrl)
+    res.redirect(paths.location.inactiveCells(prisonId, locationId))
   }
 }

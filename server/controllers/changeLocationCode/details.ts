@@ -1,11 +1,12 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 import { Location } from '../../data/types/locationsApi'
+import paths from '../../utils/paths'
 
-export default class Details extends FormInitialStep {
+export default class Details extends FormStep {
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     return {
       locationCode: res.locals.decoratedResidentialSummary.location.code,
@@ -60,7 +61,6 @@ export default class Details extends FormInitialStep {
       ...locals,
       locationType,
       removeHeadingSpacing: true,
-      titleCaption: capFirst(decoratedResidentialSummary.location?.displayName),
     }
   }
 
@@ -68,17 +68,19 @@ export default class Details extends FormInitialStep {
     super.validateFields(req, res, async errors => {
       const { values } = req.form
       const { systemToken } = req.session
-      const { decoratedResidentialSummary, prisonId, locationId } = res.locals
+      const {
+        decoratedResidentialSummary: { location },
+      } = res.locals
       const { locationsService } = req.services
       const validationErrors: FormWizard.Errors = {}
       let code = values.locationCode as string
 
-      if (code && decoratedResidentialSummary.location.raw.locationType === 'CELL') {
+      if (code && location.raw.locationType === 'CELL') {
         code = code.padStart(3, '0')
       }
 
-      if (code === decoratedResidentialSummary.location.code) {
-        return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+      if (code === location.code) {
+        return res.redirect(paths.location.view(location))
       }
 
       // Replace last suffix in the location key with new location code, to see if it exists when calling getLocationByKey
@@ -87,7 +89,7 @@ export default class Details extends FormInitialStep {
         return existingLocationCode.substring(0, lastDashInString + 1) + newLocationCode
       }
 
-      const newKey = createNewKey(decoratedResidentialSummary.location.key, code.toString())
+      const newKey = createNewKey(location.key, code.toString())
 
       try {
         if (!validationErrors.locationCode) {
@@ -130,8 +132,10 @@ export default class Details extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, prisonId, locationType } = res.locals.decoratedResidentialSummary.location.raw
-    const { locationType: decoratedLocationType } = res.locals.decoratedResidentialSummary.location
+    const {
+      locationType: decoratedLocationType,
+      raw: { locationType },
+    } = res.locals.decoratedResidentialSummary.location
     const { sessionModel } = req
     const location = sessionModel.get<Location>('newLocation')
 
@@ -144,6 +148,6 @@ export default class Details extends FormInitialStep {
       title: `${fieldName} changed`,
       content: `You have changed the ${fieldName.toLowerCase()} for ${location.pathHierarchy}.`,
     })
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(location))
   }
 }

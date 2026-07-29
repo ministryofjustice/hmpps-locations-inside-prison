@@ -3,16 +3,14 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
-import populateLocation from '../../middleware/populateLocation'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import LocationsService from '../../services/locationsService'
 import canEditCna from '../../utils/canEditCna'
+import paths from '../../utils/paths'
 
-export default class ConfirmRemoveCellType extends FormInitialStep {
+export default class ConfirmRemoveCellType extends FormStep {
   override middlewareSetup() {
-    this.use(populateLocation({ decorate: true }))
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
   }
@@ -44,8 +42,6 @@ export default class ConfirmRemoveCellType extends FormInitialStep {
 
     return {
       changeSummary,
-      title: 'Confirm cell type removal and capacity changes',
-      titleCaption: capFirst(decoratedLocation.displayName),
       buttonText: 'Update cell',
     }
   }
@@ -77,7 +73,7 @@ export default class ConfirmRemoveCellType extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.location
+    const { location } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -87,6 +83,6 @@ export default class ConfirmRemoveCellType extends FormInitialStep {
       content: 'You have removed the cell type and updated the capacity for this location.',
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(location))
   }
 }

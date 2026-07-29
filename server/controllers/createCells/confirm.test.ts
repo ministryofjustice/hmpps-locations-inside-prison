@@ -5,6 +5,7 @@ import fields from '../../routes/createLocation/fields'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import ConfirmCreateCells from './confirm'
+import paths from '../../utils/paths'
 
 describe('Confirm create cells', () => {
   const controller = new ConfirmCreateCells({ route: '/' })
@@ -111,7 +112,6 @@ describe('Confirm create cells', () => {
       expect(result).toEqual(
         expect.objectContaining({
           locationPathPrefix: 'A-1',
-          title: 'Check and confirm the cell details',
           titleCaption: 'Create cells on landing A-1',
           buttonText: 'Create cells',
         }),
@@ -184,9 +184,7 @@ describe('Confirm create cells', () => {
         content: 'You have created 2 cells on landing A-1.',
       })
 
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        `/view-and-update-locations/TST/7e570000-0000-1000-8000-000000000001`,
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', '7e570000-0000-1000-8000-000000000001'))
     })
 
     it('flashes success with localName if available', async () => {

@@ -1,9 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 import { TypedLocals } from '../../@types/express'
 
-export default class BaseController extends FormInitialStep {
+export default class BaseController extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedResidentialSummary } = res.locals

@@ -1,9 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import Withdraw from '../../../../controllers/cellCertificate/changeRequests/withdraw'
+import paths from '../../../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
-    backLink: (_req, res) => `/${res.locals.approvalRequest.prisonId}/cell-certificate/change-requests`,
+    backLink: (_req, res) => paths.cellCertificate.changeRequest.view(res.locals.approvalRequest.prisonId),
     entryPoint: true,
     reset: true,
     resetJourney: true,

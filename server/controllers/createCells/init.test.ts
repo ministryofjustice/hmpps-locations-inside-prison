@@ -2,6 +2,7 @@ import { DeepPartial } from 'fishery'
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import CreateCellsInit from './init'
+import paths from '../../utils/paths'
 
 describe('CreateCellsInit', () => {
   const controller = new CreateCellsInit({ route: '/' })
@@ -46,9 +47,7 @@ describe('CreateCellsInit', () => {
 
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'))
     })
 
     it('sets values on the sessionModel', () => {

@@ -1,14 +1,15 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
+import paths from '../../utils/paths'
 
-export default class EditCellsInit extends FormInitialStep {
+export default class EditCellsInit extends FormStep {
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { location, subLocations } = res.locals.decoratedResidentialSummary
 
     if (location.pendingApprovalRequestId) {
-      res.redirect(`/view-and-update-locations/${location.prisonId}/${location.id}`)
+      res.redirect(paths.location.view(location))
       return
     }
 

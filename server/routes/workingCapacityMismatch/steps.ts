@@ -4,12 +4,12 @@ import ConfirmController from '../../controllers/workingCapacityMismatch/confirm
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import paths from '../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
-    backLink: (_req, res) =>
-      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
+    backLink: (_req, res) => paths.location.view(res.locals.location),
     reset: true,
     resetJourney: true,
     skip: true,

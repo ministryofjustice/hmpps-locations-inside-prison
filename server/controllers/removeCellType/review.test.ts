@@ -129,8 +129,6 @@ describe('ReviewCellCapacity', () => {
 
       expect(result).toEqual({
         fields,
-        title: 'Review cell capacity',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#workingCapacity',

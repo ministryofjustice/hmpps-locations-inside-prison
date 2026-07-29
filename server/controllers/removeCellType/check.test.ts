@@ -4,6 +4,8 @@ import { DeepPartial } from 'fishery'
 import CheckRemoveCellType from './check'
 import fields from '../../routes/removeCellType/fields'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
 
 describe('CheckRemoveCellType', () => {
   const controller = new CheckRemoveCellType({ route: '/' })
@@ -66,7 +68,6 @@ describe('CheckRemoveCellType', () => {
         cellTypesText: 'Accessible cell',
         fields,
         title: 'Are you sure you want to remove the cell type?',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             text: 'Select yes if you want to remove the cell type',
@@ -85,7 +86,6 @@ describe('CheckRemoveCellType', () => {
         cellTypesText: 'Dry cell, Escape list cell',
         fields,
         title: 'Are you sure you want to remove all of the cell types?',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             text: 'Select yes if you want to remove the cell types',
@@ -103,7 +103,7 @@ describe('CheckRemoveCellType', () => {
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        paths.location.view(deepRes.locals.decoratedLocation as DecoratedLocation),
       )
     })
 

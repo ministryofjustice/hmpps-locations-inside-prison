@@ -7,7 +7,7 @@ export default class ViewLocationsIndexPage extends Page {
   }
 
   checkOnPage() {
-    cy.location('pathname').should('contain', '/view-and-update-locations/')
+    cy.location('pathname').should('contain', '/view')
   }
 
   capacity = {

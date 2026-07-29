@@ -5,8 +5,6 @@ export default class CreateLocationConfirmPage extends Page {
     super(/Check and confirm the \w+ details/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/confirm`)
-
   detailsTitle = (): PageElement => cy.get('.govuk-summary-card__title')
 
   detailsAdditionalText = (): PageElement =>

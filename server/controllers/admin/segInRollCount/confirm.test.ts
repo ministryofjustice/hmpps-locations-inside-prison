@@ -59,9 +59,13 @@ describe('adminIncludeSegInRollCountSwitch', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/admin/MDI',
+        adminSubject: {
+          attribute: 'includeSegregationInRollCount',
+          name: 'include seg in roll count',
+        },
+        backLink: '/MDI/admin',
         buttonText: 'Activate include seg in roll count',
-        cancelLink: '/admin/MDI',
+        cancelLink: '/MDI/admin',
         title: 'Update include seg in roll count status',
         validationErrors: [],
       })

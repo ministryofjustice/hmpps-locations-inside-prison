@@ -4,12 +4,12 @@ import CreateLocationInit from '../../controllers/createLocation/init'
 import Structure from '../../controllers/createLocation/structure'
 import ConfirmCreateLocation from '../../controllers/createLocation/confirm'
 import CreateCells from '../../commonTransactions/createCells'
+import paths from '../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
-    backLink: (_req, res) =>
-      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedResidentialSummary.location),
     reset: true,
     resetJourney: true,
     skip: true,

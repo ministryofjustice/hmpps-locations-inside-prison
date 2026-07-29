@@ -5,6 +5,7 @@ import ChangeSignedOperationalCapacity from './index'
 import fields from '../../routes/changeSignedOperationalCapacity/fields'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
+import paths from '../../utils/paths'
 
 describe('ChangeSignedOperationalCapacity', () => {
   const controller = new ChangeSignedOperationalCapacity({ route: '/' })
@@ -83,7 +84,7 @@ describe('ChangeSignedOperationalCapacity', () => {
       deepRes.redirect = jest.fn()
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(deepRes.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST')
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST'))
     })
   })
 

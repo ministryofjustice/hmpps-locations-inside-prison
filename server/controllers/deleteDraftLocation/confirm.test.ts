@@ -6,6 +6,7 @@ import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 import { TypedLocals } from '../../@types/express'
+import paths from '../../utils/paths'
 
 describe('ConfirmDeleteDraftLocation', () => {
   const controller = new ConfirmDeleteDraftLocation({ route: '/' })
@@ -69,7 +70,6 @@ describe('ConfirmDeleteDraftLocation', () => {
     it('sets the correct locals', () => {
       const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response) as TypedLocals
       expect(locals.locationType).toEqual('wing')
-      expect(locals.titleCaption).toEqual('Wing A-1-001')
       expect(locals.title).toEqual('Are you sure you want to delete this wing?')
     })
   })
@@ -115,7 +115,7 @@ describe('ConfirmDeleteDraftLocation', () => {
         title: 'Wing deleted',
         content: 'You have deleted wing A-1-001.',
       })
-      expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/${prisonId}/${parentId}`)
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view(prisonId, parentId))
     })
 
     it('redirects to the view locations screen if no draft parent exists', () => {
@@ -130,7 +130,7 @@ describe('ConfirmDeleteDraftLocation', () => {
         title: 'Wing deleted',
         content: 'You have deleted Wing A.',
       })
-      expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/${prisonId}`)
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view(prisonId))
     })
   })
 })

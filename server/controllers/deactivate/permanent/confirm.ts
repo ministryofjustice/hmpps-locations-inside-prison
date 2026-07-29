@@ -3,14 +3,13 @@ import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
 import getCellCount from '../../../middleware/getCellCount'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
-import protectRoute from '../../../middleware/protectRoute'
 import { TypedLocals } from '../../../@types/express'
-import capFirst from '../../../formatters/capFirst'
+import paths from '../../../utils/paths'
+import DeactivatePermanentBase from './base'
 
-export default class DeactivatePermanentConfirm extends FormWizard.Controller {
+export default class DeactivatePermanentConfirm extends DeactivatePermanentBase {
   override middlewareSetup() {
     super.middlewareSetup()
-    this.use(protectRoute('deactivate:permanent'))
     this.use(getPrisonResidentialSummary)
     this.use(getCellCount)
   }
@@ -42,11 +41,8 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
     const deactivationReason = req.sessionModel.get<string>('permanentDeactivationReason')
 
     return {
-      cancelLink: `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`,
       changeSummary,
       deactivationReason,
-      title: 'You are permanently deactivating this location',
-      titleCaption: capFirst(decoratedLocation.displayName),
       buttonText: 'Confirm deactivation',
     }
   }
@@ -72,7 +68,7 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
           error_code: 109,
         })
 
-        return res.redirect(`/location/${decoratedLocation.id}/deactivate/occupied`)
+        return res.redirect(`${paths.location.deactivate(decoratedLocation)}/occupied`)
       }
       return next(error)
     }
@@ -89,6 +85,7 @@ export default class DeactivatePermanentConfirm extends FormWizard.Controller {
       title: 'Location archived',
       content: `You have permanently deactivated ${displayName}.`,
     })
-    res.redirect(`/archived-locations/${prisonId}`)
+
+    res.redirect(paths.prison.archivedLocations(prisonId))
   }
 }

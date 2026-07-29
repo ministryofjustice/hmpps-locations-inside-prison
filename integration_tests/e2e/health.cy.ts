@@ -1,6 +1,9 @@
+import ManageUsersApiStubber from '../mockApis/manageUsersApi'
+
 context('Healthcheck', () => {
   context('All healthy', () => {
     beforeEach(() => {
+      ManageUsersApiStubber.stub.stubManageCaseloads()
       cy.task('reset')
       cy.task('stubAuthPing')
       cy.task('stubManageHealthPing')

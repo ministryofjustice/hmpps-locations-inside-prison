@@ -1,12 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class NonResidentialRoomPage extends Page {
   constructor() {
     super('')
   }
 
-  static goTo = (prisonId?: string, locationId?: string) =>
-    cy.visit(`/view-and-update-locations/${[prisonId, locationId].join('/')}`)
+  static goTo = (prisonId?: string, locationId?: string) => cy.visit(paths.location.view(prisonId, locationId))
 
   changeLink = (): PageElement =>
     cy.get(

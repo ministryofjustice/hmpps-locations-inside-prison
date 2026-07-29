@@ -2,6 +2,7 @@ import Page from '../../../../../pages/page'
 import ViewLocationsShowPage from '../../../../../pages/viewLocations/show'
 import { setupStubs, location } from './setupStubs'
 import CertChangeDisclaimerPage from '../../../../../pages/commonTransactions/certChangeDisclaimer'
+import paths from '../../../../../../server/utils/paths'
 
 context('Certification Deactivation - Cell - Temporary to certified - Init', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -43,7 +44,7 @@ context('with only the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
   })
 
   it('navigates back to the location show page', () => {
-    cy.visit(`/location/${location.id}/deactivate`)
+    cy.visit(paths.location.deactivate(location))
     Page.verifyOnPage(ViewLocationsShowPage)
   })
 })

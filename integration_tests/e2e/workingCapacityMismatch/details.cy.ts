@@ -5,6 +5,7 @@ import AuthSignInPage from '../../pages/authSignIn'
 import goToDetails from './goToDetails'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 import WorkingCapacityMismatchConfirm from '../../pages/workingCapacityMismatch/confirm'
+import paths from '../../../server/utils/paths'
 
 context('Working Capacity Mismatch - Details', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -21,7 +22,7 @@ context('Working Capacity Mismatch - Details', () => {
     })
 
     it('redirects user to sign in page when visited directly', () => {
-      cy.visit(`/location/${cell.id}/working-capacity-mismatch`)
+      cy.visit(paths.location.workingCapacityMismatch(cell))
       Page.verifyOnPage(AuthSignInPage)
     })
   })

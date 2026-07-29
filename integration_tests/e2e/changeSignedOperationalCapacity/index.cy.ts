@@ -4,16 +4,21 @@ import Page from '../../pages/page'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
 import ChangeSignedOperationalCapacityPage from '../../pages/changeSignedOperationalCapacity'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
+import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 
 context('Change signed operational capacity', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
     })
 
     it('redirects user to sign in page', () => {
@@ -24,7 +29,7 @@ context('Change signed operational capacity', () => {
   })
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
-    const residentialSummary = {
+    const residentialSummary = PrisonResidentialSummaryFactory.build({
       prisonSummary: {
         workingCapacity: 8,
         signedOperationalCapacity: 12,
@@ -45,7 +50,7 @@ context('Change signed operational capacity', () => {
       ],
       topLevelLocationType: 'Wings',
       locationHierarchy: [],
-    }
+    })
 
     const signedOperationalCapacity = {
       signedOperationCapacity: 12,
@@ -56,21 +61,22 @@ context('Change signed operational capacity', () => {
 
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
-      cy.task('stubSignedOperationalCapacityGet', signedOperationalCapacity)
-      cy.task('stubSignedOperationalCapacityUpdate')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
+      LocationsApiStubber.stub.stubSignedOperationalCapacityGet(signedOperationalCapacity)
+      LocationsApiStubber.stub.stubSignedOperationalCapacityUpdate()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -107,7 +113,7 @@ context('Change signed operational capacity', () => {
     })
 
     it('shows 0 and no last update row when sign op cap not found', () => {
-      cy.task('stubSignedOperationalCapacityGetNotFound')
+      LocationsApiStubber.stub.stubSignedOperationalCapacityGetNotFound()
 
       ChangeSignedOperationalCapacityPage.goTo('TST')
 

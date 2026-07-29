@@ -1,16 +1,13 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
-import populateLocation from '../../middleware/populateLocation'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 import { TypedLocals } from '../../@types/express'
 import canEditCna from '../../utils/canEditCna'
-import capFirst from '../../formatters/capFirst'
 
-export default class ReviewCellCapacity extends FormInitialStep {
+export default class Review extends FormStep {
   override middlewareSetup() {
-    this.use(populateLocation({ decorate: true }))
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
   }
@@ -57,8 +54,6 @@ export default class ReviewCellCapacity extends FormInitialStep {
 
     return {
       ...locals,
-      title: 'Review cell capacity',
-      titleCaption: capFirst(decoratedLocation.displayName),
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
     }

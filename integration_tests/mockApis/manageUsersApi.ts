@@ -104,6 +104,24 @@ const stubManageHealthPing = () =>
     },
   })
 
+const stubManageCaseloads = () =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/manage-users-api/prisonusers/reference-data/caseloads`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: [
+        { id: 'TST', name: 'Test (HMP)' },
+        { id: 'MDI', name: 'Moorland (HMP & YOI)' },
+      ],
+    },
+  })
+
 const allStubs = {
   stubManageHealthPing,
   stubManageUsers,
@@ -111,6 +129,7 @@ const allStubs = {
   stubManageUsersMeCaseloads,
   stubManageUsersByCaseload,
   stubManageUsersMeRoles,
+  stubManageCaseloads,
 }
 
 const ManageUsersApiStubber = new TypedStubber<typeof allStubs>(allStubs)

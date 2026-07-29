@@ -3,14 +3,14 @@ import wizard from 'hmpo-form-wizard'
 import steps from './steps'
 import protectRoute from '../../middleware/protectRoute'
 import populateDecoratedResidentialSummary from '../../middleware/populateDecoratedResidentialSummary'
-import populatePrisonAndLocationId from '../../middleware/populatePrisonAndLocationId'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('create_location'),
-  populatePrisonAndLocationId,
   populateDecoratedResidentialSummary,
+  populateTitleCaptionFromLocationOrPrison,
   wizard(steps, null, {
     name: 'delete-draft-location',
     templatePath: 'pages/deleteDraftLocation',

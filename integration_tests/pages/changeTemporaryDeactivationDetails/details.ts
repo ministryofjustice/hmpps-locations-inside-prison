@@ -5,9 +5,6 @@ export default class ChangeTemporaryDeactivationsDetailsPage extends Page {
     super('Deactivation details')
   }
 
-  static goTo = (locationId: string) =>
-    cy.visit(`/location/${locationId}/change-temporary-deactivation-details/details`)
-
   reasonRadioLabels = (): PageElement => cy.get('body').find('label.govuk-radios__label')
 
   reasonRadioItem = (value: string): PageElement =>

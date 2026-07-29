@@ -1,9 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import populateLocation from '../../../middleware/populateLocation'
+import paths from '../../../utils/paths'
 
-export default class RemoveCellType extends FormInitialStep {
+export default class RemoveCellType extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.populateCell)
@@ -22,7 +23,7 @@ export default class RemoveCellType extends FormInitialStep {
 
     const { parentId } = res.locals.cell
     res.redirect(
-      `/reactivate/location/${res.locals.decoratedLocation.id}/edit-capacity/${res.locals.decoratedLocation.id === cellId ? cellId : parentId}`,
+      `${paths.location.reactivate.location(res.locals.decoratedLocation)}/edit-capacity/${res.locals.decoratedLocation.id === cellId ? cellId : parentId}`,
     )
   }
 }

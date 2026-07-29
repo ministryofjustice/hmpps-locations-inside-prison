@@ -4,6 +4,7 @@ import { DeepPartial } from 'fishery'
 import LocationsService from '../../../services/locationsService'
 import AnalyticsService from '../../../services/analyticsService'
 import CertApprovalStatusChangeConfirm from './confirm'
+import paths from '../../../utils/paths'
 
 describe('adminCertificationSwitch', () => {
   const controller = new CertApprovalStatusChangeConfirm({ route: '/' })
@@ -59,9 +60,13 @@ describe('adminCertificationSwitch', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/admin/MDI',
+        adminSubject: {
+          attribute: 'certificationApprovalRequired',
+          name: 'certification approval',
+        },
+        backLink: paths.admin.index('MDI'),
         buttonText: 'Activate certification approval',
-        cancelLink: '/admin/MDI',
+        cancelLink: paths.admin.index('MDI'),
         title: 'Update certification approval status',
         validationErrors: [],
       })

@@ -1,5 +1,6 @@
 import { stubFor } from './wiremock'
 import { SplashCondition, SplashScreen } from '../../server/data/prisonApiClient'
+import TypedStubber from './typedStubber'
 
 const stubPrisonHealthPing = () =>
   stubFor({
@@ -12,11 +13,13 @@ const stubPrisonHealthPing = () =>
     },
   })
 
-const stubDisplayHousingCheckboxesEnabled = (returnData: {
-  status: 404
-  userMessage: 'Service DISPLAY_HOUSING_CHECKBOX not turned on for prison TST'
-  developerMessage: 'Service DISPLAY_HOUSING_CHECKBOX not turned on for prison TST'
-}) =>
+const stubDisplayHousingCheckboxesEnabled = (
+  returnData = {
+    status: 404,
+    userMessage: 'Service DISPLAY_HOUSING_CHECKBOX not turned on for prison TST',
+    developerMessage: 'Service DISPLAY_HOUSING_CHECKBOX not turned on for prison TST',
+  },
+) =>
   stubFor({
     request: {
       method: 'GET',
@@ -59,7 +62,7 @@ const stubDisplayHousingCheckboxesDelete = () =>
     },
   })
 
-const stubDisplayHousingCheckboxesPost = (returnData: { prisonid: 'TST'; prison: 'Test prison' }) =>
+const stubDisplayHousingCheckboxesPost = (returnData?: { prisonid: 'TST'; prison: 'Test prison' }) =>
   stubFor({
     request: {
       method: 'POST',
@@ -138,7 +141,7 @@ const stubUpdateSplashScreenCondition = ({
     },
   })
 
-export default {
+const allStubs = {
   stubPrisonHealthPing,
   stubDisplayHousingCheckboxesDisabled,
   stubDisplayHousingCheckboxesEnabled,
@@ -148,3 +151,6 @@ export default {
   stubCreateSplashScreenCondition,
   stubUpdateSplashScreenCondition,
 }
+
+const PrisonApiStubber = new TypedStubber<typeof allStubs>(allStubs)
+export default PrisonApiStubber

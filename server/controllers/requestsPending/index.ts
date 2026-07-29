@@ -1,20 +1,13 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class RequestsPending extends FormInitialStep {
+export default class RequestsPending extends FormStep {
   override locals(_req: FormWizard.Request, res: Response): TypedLocals {
-    const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
-
     return {
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-      changeRequestsLink: `/${prisonId}/cell-certificate/change-requests`,
-      decoratedLocation,
-      title: 'You can’t request a change to the certificate for this location currently',
-      titleCaption: capFirst(decoratedLocation.displayName),
+      changeRequestsLink: paths.cellCertificate.changeRequest.view(res.locals.prisonId),
     }
   }
 }

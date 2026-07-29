@@ -1,9 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import getLocationResidentialSummary from '../reactivate/parent/middleware/getLocationResidentialSummary'
 
-export default class DetailsController extends FormInitialStep {
+export default class DetailsController extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getLocationResidentialSummary)

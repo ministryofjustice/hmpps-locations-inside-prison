@@ -133,8 +133,6 @@ describe('CellConversionSetCellType', () => {
       expect(result).toEqual({
         buttonText: 'Continue',
         fields,
-        title: 'Convert to cell',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#specialistCellTypes',

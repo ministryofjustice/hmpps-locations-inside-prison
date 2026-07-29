@@ -4,6 +4,8 @@ import { Response } from 'express'
 import RemoveCellType from './removeCellType'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
 import LocationFactory from '../../../testutils/factories/location'
+import paths from '../../../utils/paths'
+import { DecoratedLocation } from '../../../decorators/decoratedLocation'
 
 describe('RemoveCellType', () => {
   let req: DeepPartial<FormWizard.Request>
@@ -38,7 +40,11 @@ describe('RemoveCellType', () => {
         removeCellType.successHandler(req as FormWizard.Request, res as Response, next)
         expect(req.sessionModel.unset).toHaveBeenCalledWith('temp-cellTypescell1')
         expect(req.sessionModel.set).toHaveBeenCalledWith('temp-cellTypescell1-removed', true)
-        expect(res.redirect).toHaveBeenCalledWith('/reactivate/location/wing1/edit-capacity/landing1')
+        expect(res.redirect).toHaveBeenCalledWith(
+          `${paths.location.reactivate.location(
+            res.locals.decoratedLocation as DecoratedLocation,
+          )}/edit-capacity/landing1`,
+        )
       })
     })
 
@@ -52,7 +58,11 @@ describe('RemoveCellType', () => {
         removeCellType.successHandler(req as FormWizard.Request, res as Response, next)
         expect(req.sessionModel.unset).toHaveBeenCalledWith('temp-cellTypescell1')
         expect(req.sessionModel.set).toHaveBeenCalledWith('temp-cellTypescell1-removed', true)
-        expect(res.redirect).toHaveBeenCalledWith('/reactivate/location/landing1/edit-capacity/landing1')
+        expect(res.redirect).toHaveBeenCalledWith(
+          `${paths.location.reactivate.location(
+            res.locals.decoratedLocation as DecoratedLocation,
+          )}/edit-capacity/landing1`,
+        )
       })
     })
   })

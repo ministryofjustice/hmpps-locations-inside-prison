@@ -85,5 +85,10 @@ export default class ManageUsersApiClient extends BaseApiClient {
       path: '/prisonusers/search?inclusiveRoles=true&status=ACTIVE&activeCaseload=:caseload&accessRoles=:accessRoles&page=:page&size=:size',
       requestType: 'get',
     }),
+    getCaseloads: this.apiCall<Caseload[], null>({
+      path: '/prisonusers/reference-data/caseloads',
+      requestType: 'get',
+      options: { cacheDuration: 300 },
+    }),
   }
 }

@@ -1,10 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class Details extends FormInitialStep {
+export default class Details extends FormStep {
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     return {
       doorNumber: res.locals.decoratedResidentialSummary.location.cellMark,
@@ -18,7 +18,6 @@ export default class Details extends FormInitialStep {
     return {
       ...locals,
       removeHeadingSpacing: true,
-      titleCaption: `Cell ${capFirst(decoratedResidentialSummary.location.pathHierarchy)}`,
       buttonText: decoratedResidentialSummary.location.status === 'DRAFT' ? 'Save door number' : '',
     }
   }
@@ -27,13 +26,13 @@ export default class Details extends FormInitialStep {
     super.validateFields(req, res, async errors => {
       const { values } = req.form
       const { systemToken } = req.session
-      const { decoratedResidentialSummary, prisonId, locationId } = res.locals
+      const { decoratedResidentialSummary, prisonId } = res.locals
       const { locationsService } = req.services
       const validationErrors: FormWizard.Errors = {}
       const doorNumber = values.doorNumber as string
 
       if (doorNumber === decoratedResidentialSummary.location.cellMark) {
-        return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+        return res.redirect(paths.location.view(decoratedResidentialSummary.location))
       }
 
       try {
@@ -81,18 +80,19 @@ export default class Details extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
-    if (res.locals.decoratedResidentialSummary.location.status !== 'DRAFT') {
+    const { decoratedResidentialSummary } = res.locals
+    const { location } = decoratedResidentialSummary
+    if (location.status !== 'DRAFT') {
       super.successHandler(req, res, next)
       return
     }
-    const { id: locationId, prisonId, pathHierarchy } = res.locals.decoratedResidentialSummary.location
 
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('success', {
       title: 'Cell door number changed',
-      content: `You have changed the door number for cell ${pathHierarchy}.`,
+      content: `You have changed the door number for cell ${location.pathHierarchy}.`,
     })
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(location))
   }
 }

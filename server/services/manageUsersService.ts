@@ -83,4 +83,8 @@ export default class ManageUsersService {
       size: size.toString(),
     })
   }
+
+  async getCaseloads(token: string) {
+    return this.manageUsersApiClient.users.getCaseloads(token)
+  }
 }

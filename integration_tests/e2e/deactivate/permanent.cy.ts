@@ -7,6 +7,10 @@ import DeactivatePermanentDetailsPage from '../../pages/deactivate/permanent/det
 import DeactivatePermanentWarningPage from '../../pages/deactivate/permanent/warning'
 import DeactivateTypePage from '../../pages/deactivate/type'
 import ArchivedLocationsIndexPage from '../../pages/archivedLocations'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
+import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 
 context('Deactivate permanent', () => {
   const location = LocationFactory.build({
@@ -22,33 +26,36 @@ context('Deactivate permanent', () => {
 
   beforeEach(() => {
     cy.task('reset')
-  })
-
-  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
-    beforeEach(() => {
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+    LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(
+      PrisonResidentialSummaryFactory.build({
         prisonSummary: {
           workingCapacity: 9,
           signedOperationalCapacity: 11,
           maxCapacity: 10,
         },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
-      })
-      cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      }),
+    )
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
+      parentLocation: location,
+    })
+    LocationsApiStubber.stub.stubLocations(location)
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+  })
+
+  context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
+    beforeEach(() => {
+      AuthStubber.stub.stubSignIn()
       cy.signIn()
     })
 
@@ -61,31 +68,9 @@ context('Deactivate permanent', () => {
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
-      })
-      cy.task('stubLocations', location)
-      cy.task('stubPrisonerLocationsId', [])
-      cy.task('stubLocationsDeactivatePermanent')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      LocationsApiStubber.stub.stubPrisonerLocationsId([])
+      LocationsApiStubber.stub.stubLocationsDeactivatePermanent()
 
       cy.signIn()
     })
@@ -137,8 +122,8 @@ context('Deactivate permanent', () => {
             ],
           },
         ]
-        cy.task('stubPrisonerLocationsId', prisonerLocations)
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       itDisplaysTheCellOccupiedPage()
@@ -202,13 +187,8 @@ context('Deactivate permanent', () => {
     })
 
     it('can be accessed directly via the button on a temp inactive location', () => {
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: { ...location, status: 'INACTIVE' },
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
       })
 
       ViewLocationsShowPage.goTo(location.prisonId, location.id)
@@ -219,7 +199,7 @@ context('Deactivate permanent', () => {
 
     describe('warning page', () => {
       beforeEach(() => {
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       it('has the correct panel text', () => {
@@ -244,7 +224,7 @@ context('Deactivate permanent', () => {
 
     describe('details page', () => {
       beforeEach(() => {
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const warningPage = Page.verifyOnPage(DeactivatePermanentWarningPage)
         warningPage.continueButton().click()
       })
@@ -294,7 +274,7 @@ context('Deactivate permanent', () => {
 
     describe('confirmation page', () => {
       beforeEach(() => {
-        DeactivatePermanentWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivatePermanentWarningPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const warningPage = Page.verifyOnPage(DeactivatePermanentWarningPage)
         warningPage.continueButton().click()
         const detailsPage = Page.verifyOnPage(DeactivatePermanentDetailsPage)
@@ -342,7 +322,10 @@ context('Deactivate permanent', () => {
       })
 
       it('shows the correct change summary when working cap is zero', () => {
-        cy.task('stubLocations', { ...location, capacity: { maxCapacity: 2, workingCapacity: 0 } })
+        LocationsApiStubber.stub.stubLocations({
+          ...location,
+          capacity: { ...location.capacity, maxCapacity: 2, workingCapacity: 0 },
+        })
 
         Page.verifyOnPage(DeactivatePermanentConfirmPage)
 
@@ -401,7 +384,7 @@ context('Deactivate permanent', () => {
               planetFmReference: 'FM-1133',
             }),
           ]
-          cy.task('stubLocationsPrisonArchivedLocations', locations)
+          LocationsApiStubber.stub.stubLocationsPrisonArchivedLocations(locations)
         })
 
         it('shows the success banner on completion', () => {
@@ -416,7 +399,7 @@ context('Deactivate permanent', () => {
 
       context('when the cell becomes occupied during the process', () => {
         beforeEach(() => {
-          cy.task('stubLocationsDeactivatePermanentOccupied')
+          LocationsApiStubber.stub.stubLocationsDeactivatePermanentOccupied()
 
           const confirmationPage = Page.verifyOnPage(DeactivatePermanentConfirmPage)
           confirmationPage.confirmButton().click()

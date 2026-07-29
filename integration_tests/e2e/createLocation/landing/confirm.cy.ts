@@ -8,6 +8,7 @@ import LocationsApiStubber from '../../../mockApis/locationsApi'
 import setupStubs, { existingWingLocation } from './setupStubs'
 import goToCreateLocationConfirmPage from './goToCreateLocationConfirmPage'
 import CreateCellsDetailsPage from '../../../pages/commonTransactions/createCells/details'
+import paths from '../../../../server/utils/paths'
 
 context('Create Landing Confirm', () => {
   const newLandingLocation = LocationFactory.build({
@@ -62,7 +63,7 @@ context('Create Landing Confirm', () => {
       page
         .changeDetailsLink(0)
         .should('have.attr', 'href')
-        .and('include', `/create-new/${existingWingLocation.id}/details`)
+        .and('include', `${paths.location.create(existingWingLocation)}/details`)
 
       page.changeDetailsKey(0).contains('Landing code')
       page.changeDetailsValue(0).contains('2')

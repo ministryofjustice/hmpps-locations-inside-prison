@@ -5,12 +5,16 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import { Location } from '../../../server/data/types/locationsApi'
 import formatDate from '../../../server/formatters/formatDate'
 import ArchivedLocationsIndexPage from '../../pages/archivedLocations'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Archived Locations Index', () => {
   context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -27,18 +31,19 @@ context('Archived Locations Index', () => {
   context('With location in caseload', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['VIEW_INTERNAL_LOCATION'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
     })
     let locations: Location[]
 
@@ -83,7 +88,7 @@ context('Archived Locations Index', () => {
           }),
         ]
 
-        cy.task('stubLocationsPrisonArchivedLocations', locations)
+        LocationsApiStubber.stub.stubLocationsPrisonArchivedLocations(locations)
       })
 
       it('Correctly presents the API data', () => {
@@ -111,7 +116,7 @@ context('Archived Locations Index', () => {
 
     context('When there are no archived locations', () => {
       beforeEach(() => {
-        cy.task('stubLocationsPrisonArchivedLocations', [])
+        LocationsApiStubber.stub.stubLocationsPrisonArchivedLocations([])
       })
 
       it('Displays an empty state page', () => {
@@ -146,7 +151,7 @@ context('Archived Locations Index', () => {
           }),
         ]
 
-        cy.task('stubLocationsPrisonArchivedLocations', locations)
+        LocationsApiStubber.stub.stubLocationsPrisonArchivedLocations(locations)
       })
 
       it('Correctly presents the API data', () => {

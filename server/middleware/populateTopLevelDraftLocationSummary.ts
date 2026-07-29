@@ -15,16 +15,16 @@ const getTopLevelDraftLocation = async (
   return location
 }
 
-export default async function populateTopLevelDraftLocationSummary(
-  req: Request,
-  res: Response,
-  next: NextFunction | null,
-) {
+export default async function populateTopLevelDraftLocationSummary(req: Request, res: Response, next?: NextFunction) {
   const { locationsService } = req.services
   const { location } = res.locals.decoratedResidentialSummary
 
   if (!location.status.includes('DRAFT')) {
-    return next()
+    if (next) {
+      next()
+    }
+
+    return
   }
 
   try {
@@ -41,8 +41,14 @@ export default async function populateTopLevelDraftLocationSummary(
       error,
       `Failed to populate top level draft location summary for: prisonId: ${location?.prisonId}, locationId: ${location?.id}`,
     )
-    next(error)
+    if (next) {
+      next(error)
+    } else {
+      throw error
+    }
   }
 
-  return next()
+  if (next) {
+    next()
+  }
 }

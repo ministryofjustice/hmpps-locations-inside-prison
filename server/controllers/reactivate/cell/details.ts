@@ -1,16 +1,16 @@
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../../utils/backUrl'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { Location } from '../../../data/types/locationsApi'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 import { TypedLocals } from '../../../@types/express'
-import capFirst from '../../../formatters/capFirst'
+import populateTitleCaptionFromLocationOrPrison from '../../../middleware/populateTitleCaptionFromLocationOrPrison'
 
-export default class ReactivateCellDetails extends FormInitialStep {
+export default class ReactivateCellDetails extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getReferrerRootUrl)
+    this.use(populateTitleCaptionFromLocationOrPrison)
   }
 
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
@@ -44,21 +44,12 @@ export default class ReactivateCellDetails extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-    const { decoratedLocation, referrerRootUrl } = res.locals
-    const { id: locationId } = decoratedLocation
-
-    const backLink = backUrl(req, {
-      fallbackUrl: referrerRootUrl,
-      nextStepUrl: `/reactivate/cell/${locationId}/confirm`,
-    })
+    const { referrerRootUrl } = res.locals
 
     return {
-      ...locals,
-      backLink,
+      ...super.locals(req, res),
+      backLink: referrerRootUrl,
       cancelLink: referrerRootUrl,
-      title: `Check cell capacity`,
-      titleCaption: capFirst(decoratedLocation.displayName),
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
     }

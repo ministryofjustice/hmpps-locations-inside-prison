@@ -1,14 +1,15 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import backUrl from '../../../utils/backUrl'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 import { isValidUUID } from '../../../utils/isValidUUID'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 import { TypedLocals } from '../../../@types/express'
+import paths from '../../../utils/paths'
+import FormStep from '../../base/formStep'
 
-export default class ReactivateCellConfirm extends FormWizard.Controller {
+export default class ReactivateCellConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
@@ -52,10 +53,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
 
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
-    const backLink = backUrl(req, { fallbackUrl: `/reactivate/cell/${decoratedLocation.id}/details` })
-
     return {
-      backLink,
       cancelLink: referrerRootUrl,
       changeSummary,
       title: `You are about to reactivate ${decoratedLocation.displayName}`,
@@ -85,7 +83,7 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { displayName, id: locationId, locationType, prisonId } = res.locals.decoratedLocation
+    const { displayName, locationType } = res.locals.decoratedLocation
     const referrerFlow = req.sessionModel.get<string>('referrerFlow')
     const referrerPrisonId = req.sessionModel.get<string>('referrerPrisonId')
     const referrerLocationId = req.sessionModel.get<string>('referrerLocationId')
@@ -99,20 +97,20 @@ export default class ReactivateCellConfirm extends FormWizard.Controller {
     })
 
     if (referrerFlow === 'parent' && isValidUUID(referrerLocationId)) {
-      res.redirect(`/view-and-update-locations/${encodeURIComponent(referrerPrisonId)}/${referrerLocationId}`)
+      res.redirect(paths.location.view(referrerPrisonId, referrerLocationId))
       return
     }
 
     if (referrerFlow === 'inactive-cells') {
       if (isValidUUID(referrerLocationId)) {
-        res.redirect(`/inactive-cells/${encodeURIComponent(referrerPrisonId)}/${referrerLocationId}`)
+        res.redirect(paths.location.inactiveCells(referrerPrisonId, referrerLocationId))
         return
       }
 
-      res.redirect(`/inactive-cells/${encodeURIComponent(referrerPrisonId)}`)
+      res.redirect(paths.location.inactiveCells(referrerPrisonId))
       return
     }
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(res.locals.decoratedLocation))
   }
 }

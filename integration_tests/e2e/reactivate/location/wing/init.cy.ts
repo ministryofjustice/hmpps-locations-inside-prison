@@ -3,6 +3,7 @@ import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import AuthSignInPage from '../../../../pages/authSignIn'
 import { setupStubs, location } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
+import paths from '../../../../../server/utils/paths'
 
 context('Certification Reactivation - Wing - Init', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -19,7 +20,7 @@ context('Certification Reactivation - Wing - Init', () => {
     })
 
     it('redirects user to sign in page when visited directly', () => {
-      cy.visit(`/reactivate/location/${location.id}`)
+      cy.visit(paths.location.reactivate.location(location))
       Page.verifyOnPage(AuthSignInPage)
     })
   })
@@ -32,7 +33,7 @@ context('Certification Reactivation - Wing - Init', () => {
     })
 
     it('displays the check-capacity page', () => {
-      cy.visit(`/reactivate/location/${location.id}/`)
+      cy.visit(paths.location.reactivate.location(location))
 
       Page.verifyOnPage(CheckCapacityPage)
     })

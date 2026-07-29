@@ -2,6 +2,9 @@ import LocationFactory from '../../../server/testutils/factories/location'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeUsedForPage from '../../pages/changeUsedFor/details'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Set cell type', () => {
   const locationAsWing = LocationFactory.build({
@@ -25,20 +28,21 @@ context('Set cell type', () => {
 
   const setupStubs = (roles = []) => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
-    cy.task('stubLocationsConstantsAccommodationType')
-    cy.task('stubLocationsConstantsConvertedCellType')
-    cy.task('stubLocationsConstantsDeactivatedReason')
-    cy.task('stubLocationsConstantsLocationType')
-    cy.task('stubLocationsConstantsApprovalType')
-    cy.task('stubLocationsConstantsSpecialistCellType')
-    cy.task('stubLocationsConstantsUsedForType')
-    cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsWing })
-    cy.task('stubLocations', locationAsWing)
-    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+    AuthStubber.stub.stubSignIn({ roles })
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+    LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationAsWing })
+    LocationsApiStubber.stub.stubLocations(locationAsWing)
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -88,7 +92,7 @@ context('Set cell type', () => {
       })
 
       it('does not display a warning on a cell level about applying change', () => {
-        cy.task('stubLocations', locationAsCell)
+        LocationsApiStubber.stub.stubLocations(locationAsCell)
         ChangeUsedForPage.goTo(locationAsCell.id)
         const changeUsedForPage = Page.verifyOnPage(ChangeUsedForPage)
         changeUsedForPage.usedForWarningText().should('not.exist')
@@ -115,7 +119,7 @@ context('Set cell type', () => {
       })
 
       it('does show a checked checkbox list on a cell level when multiple are checked', () => {
-        cy.task('stubLocations', locationAsCell)
+        LocationsApiStubber.stub.stubLocations(locationAsCell)
         ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsCell.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
         viewLocationsShowPage.changeCellUsedForLink().click()
@@ -138,7 +142,7 @@ context('Set cell type', () => {
 
       it('shows the correct checked checkbox list when one option is checked', () => {
         const updatedLocation = LocationFactory.build({ usedFor: ['TEST_TYPE'] })
-        cy.task('stubLocations', updatedLocation)
+        LocationsApiStubber.stub.stubLocations(updatedLocation)
 
         ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
@@ -152,7 +156,7 @@ context('Set cell type', () => {
       })
 
       it('shows success banner when the change is complete', () => {
-        cy.task('stubUpdateLocationsConstantsUsedForType')
+        LocationsApiStubber.stub.stubUpdateLocationsConstantsUsedForType()
         ChangeUsedForPage.goTo(locationAsWing.id)
         const changeUsedForPage = Page.verifyOnPage(ChangeUsedForPage)
 

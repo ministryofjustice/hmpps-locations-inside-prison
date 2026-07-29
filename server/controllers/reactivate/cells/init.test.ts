@@ -2,6 +2,7 @@ import { DeepPartial } from 'fishery'
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import ReactivateCellsInit from './init'
+import paths from '../../../utils/paths'
 
 describe('ReactivateCellsInit', () => {
   const controller = new ReactivateCellsInit({ route: '/' })
@@ -22,6 +23,10 @@ describe('ReactivateCellsInit', () => {
     }
     deepRes = {
       redirect: jest.fn(),
+      locals: {
+        prisonId: 'TST',
+        locationId: 'l0',
+      },
     }
   })
 
@@ -34,8 +39,6 @@ describe('ReactivateCellsInit', () => {
       it('sets values on the sessionModel', async () => {
         await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(deepReq.sessionModel.set).toHaveBeenCalledWith('referrerLocationId', deepReq.query.locationId)
-        expect(deepReq.sessionModel.set).toHaveBeenCalledWith('referrerPrisonId', deepReq.query.prisonId)
         expect(deepReq.sessionModel.set).toHaveBeenCalledWith('selectedLocations', deepReq.query.selectedLocations)
       })
     })
@@ -49,7 +52,7 @@ describe('ReactivateCellsInit', () => {
         await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          `/reactivate/cell/${deepReq.query.selectedLocations}?ref=inactive-cells&refPrisonId=TST&refLocationId=l0`,
+          `${paths.location.reactivate.cell('TST', deepReq.query.selectedLocations as string)}?ref=inactive-cells&refPrisonId=TST&refLocationId=l0`,
         )
       })
     })
@@ -59,7 +62,7 @@ describe('ReactivateCellsInit', () => {
         await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          `/inactive-cells/${deepReq.query.prisonId}/${deepReq.query.locationId}`,
+          paths.location.inactiveCells(deepReq.query.prisonId as string, deepReq.query.locationId as string),
         )
       })
     })

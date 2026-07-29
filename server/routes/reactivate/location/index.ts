@@ -5,7 +5,7 @@ import fields from './fields'
 import populateLocation from '../../../middleware/populateLocation'
 import protectRoute from '../../../middleware/protectRoute'
 import asyncMiddleware from '../../../middleware/asyncMiddleware'
-import populatePrisonConfiguration from '../../../middleware/populatePrisonConfiguration'
+import populateTitleCaptionFromLocationOrPrison from '../../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
@@ -21,7 +21,7 @@ const checkIsInactive = asyncMiddleware(async (_req, res, next) => {
 router.use(
   protectRoute('reactivate'),
   populateLocation({ decorate: true, includeCurrentCertificate: true }),
-  populatePrisonConfiguration(),
+  populateTitleCaptionFromLocationOrPrison,
   checkIsInactive,
   wizard(steps, fields, {
     name: 'reactivate',

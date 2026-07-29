@@ -6,6 +6,8 @@ import LocationsService from '../../services/locationsService'
 import fields from '../../routes/nonResidentialConversion/fields'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
 
 describe('NonResidentialConversionConfirm', () => {
   const controller = new NonResidentialConversionConfirm({ route: '/' })
@@ -97,13 +99,10 @@ describe('NonResidentialConversionConfirm', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual({
         buttonText: 'Confirm conversion',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeSummary: `This will decrease the establishment’s working capacity from 20 to 19.
 <br/><br/>
 This will decrease the establishment’s maximum capacity from 30 to 28.`,
         convertedCellTypeDetails: 'Treatment room',
-        title: 'Confirm conversion to non-residential room',
-        titleCaption: 'A-1-001',
       })
     })
 
@@ -127,11 +126,8 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
 
       expect(result).toEqual({
         buttonText: 'Confirm conversion',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeSummary: 'This will decrease the establishment’s maximum capacity from 30 to 28.',
         convertedCellTypeDetails: 'Other - Server room',
-        title: 'Confirm conversion to non-residential room',
-        titleCaption: 'Cell A-1-001',
       })
     })
   })
@@ -172,7 +168,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
 
       it('redirects to the cell occupied page', () => {
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/non-residential-conversion/occupied',
+          `${paths.location.nonResidentialConversion(deepRes.locals.decoratedLocation as DecoratedLocation)}/occupied`,
         )
       })
 
@@ -215,7 +211,7 @@ This will decrease the establishment’s maximum capacity from 30 to 28.`,
 
     it('redirects to the view location page', () => {
       expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        paths.location.view(deepRes.locals.decoratedLocation as DecoratedLocation),
       )
     })
   })

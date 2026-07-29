@@ -7,6 +7,7 @@ import steps from '../../routes/createLocation/steps'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import LocationFactory from '../../testutils/factories/location'
+import paths from '../../utils/paths'
 
 describe('Confirm create location (WING)', () => {
   const controller = new ConfirmCreateLocation({ route: '/' })
@@ -110,8 +111,8 @@ describe('Confirm create location (WING)', () => {
         expect.objectContaining({
           createYouCanAddText: 'Landings and Cells',
           decoratedLocationStructure: 'Wing → Landings → Cells',
-          createStructureLink: '/create-new/TST/structure',
-          createDetailsLink: '/create-new/TST/details/edit',
+          createStructureLink: '/TST/create/structure',
+          createDetailsLink: '/TST/create/details/edit',
         }),
       )
     })
@@ -191,7 +192,7 @@ describe('Confirm create location (WING)', () => {
         content: 'You have created resolved.wing WW.',
       })
 
-      expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/TST/${newLocation.id}`)
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view(newLocation))
     })
 
     it('flashes success with localName if available', async () => {
@@ -329,7 +330,7 @@ describe('Confirm create location (LANDING)', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect(result).toEqual(
         expect.objectContaining({
-          createDetailsLink: '/create-new/7e570000-0000-1000-8000-000000000001/details/edit',
+          createDetailsLink: `${paths.location.create('TST', '7e570000-0000-1000-8000-000000000001')}/details/edit`,
         }),
       )
     })
@@ -409,7 +410,7 @@ describe('Confirm create location (LANDING)', () => {
         content: 'You have created resolved.landing WW-NL with 2 cells.',
       })
 
-      expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/TST/${newLocation.id}`)
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view(newLocation))
     })
 
     it('flashes success with localName if available', async () => {

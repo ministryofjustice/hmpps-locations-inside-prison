@@ -1,13 +1,14 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 import { TypedLocals } from '../../@types/express'
 import canEditCna from '../../utils/canEditCna'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import paths from '../../utils/paths'
 
-export default class ChangeCellCapacity extends FormInitialStep {
+export default class ChangeCellCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
@@ -77,7 +78,6 @@ export default class ChangeCellCapacity extends FormInitialStep {
 
   override validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation, prisonConfiguration } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap, baselineCna: newBaselineCna } = req.form.values
     const { maxCapacity, workingCapacity, baselineCna } = this.getInitialValues(req, res)
 
@@ -88,7 +88,7 @@ export default class ChangeCellCapacity extends FormInitialStep {
     const onlyWorkingCapChanged = !cnaChanged && !maxCapChanged && workingCapChanged
 
     if (!cnaChanged && !maxCapChanged && !workingCapChanged) {
-      return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+      return res.redirect(paths.location.view(decoratedLocation))
     }
 
     req.sessionModel.set('onlyWorkingCapChanged', onlyWorkingCapChanged)

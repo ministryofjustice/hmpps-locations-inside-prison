@@ -1,10 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
+export default class ChangeNonResidentialTypeDetails extends FormStep {
   override middlewareSetup() {
     this.use(this.setOptions)
     super.middlewareSetup()
@@ -25,8 +25,6 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { decoratedLocation } = res.locals
-    const { displayName, id: locationId, prisonId } = decoratedLocation
-    const cancelLink = `/view-and-update-locations/${prisonId}/${locationId}`
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
     const convertedCellType =
@@ -46,23 +44,17 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     return {
       ...locals,
       fields,
-      backLink: cancelLink,
       buttonText: 'Save',
-      cancelLink,
-      title: 'Change non-residential room type',
-      titleCaption: capFirst(displayName),
     }
   }
 
   override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     super.validateFields(req, res, async errors => {
       const { decoratedLocation } = res.locals
-      const { prisonId, id: locationId } = decoratedLocation
+      const { convertedCellType: currentConvertedCellType, otherConvertedCellType: currentOtherConvertedCellType } =
+        decoratedLocation.raw
 
-      const { convertedCellType } = req.form.values
-      const { otherConvertedCellType } = req.form.values
-      const currentConvertedCellType = decoratedLocation.raw.convertedCellType
-      const currentOtherConvertedCellType = decoratedLocation.raw.otherConvertedCellType
+      const { convertedCellType, otherConvertedCellType } = req.form.values
 
       const convertedCellTypeUnchanged = convertedCellType === currentConvertedCellType
       const otherConvertedCellTypeUnchanged = otherConvertedCellType === currentOtherConvertedCellType
@@ -71,8 +63,9 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
         (convertedCellTypeUnchanged && convertedCellType !== 'OTHER') ||
         (convertedCellType === 'OTHER' && convertedCellTypeUnchanged && otherConvertedCellTypeUnchanged)
       ) {
-        return res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+        return res.redirect(paths.location.view(decoratedLocation))
       }
+
       return callback({ ...errors })
     })
   }
@@ -113,7 +106,10 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, prisonId, localName, pathHierarchy } = res.locals.decoratedLocation
+    const {
+      decoratedLocation,
+      decoratedLocation: { localName, pathHierarchy },
+    } = res.locals
     const locationName = localName || pathHierarchy
 
     const roomTypeChanged = req.sessionModel.get('convertedCellTypeChanged')
@@ -136,6 +132,6 @@ export default class ChangeNonResidentialTypeDetails extends FormInitialStep {
     req.journeyModel.reset()
     req.sessionModel.reset()
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

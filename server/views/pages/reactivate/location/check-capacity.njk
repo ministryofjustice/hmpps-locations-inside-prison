@@ -2,12 +2,12 @@
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
-{% macro capacityTable(decoratedLocationTree, parentLocation) %}
+{% macro capacityTable(decoratedLocationTree, parentLocation, paths) %}
   {{ govukButton({
     text: "Edit cell " + ("capacity" if decoratedLocation.leafLevel else "capacities") + " and " + ("type" if decoratedLocation.leafLevel else "types"),
     classes: "govuk-button--secondary",
     preventDoubleClick: true,
-    href: "/reactivate/location/" + decoratedLocation.id + "/edit-capacity/" + parentLocation.id
+    href: paths.location.reactivate.location(decoratedLocation) + "/edit-capacity/" + parentLocation.id
   }) }}
 
   {% set cells = decoratedLocationTree.filter(propEquals.bind(null, 'decoratedLocation.raw.locationType', 'CELL')) %}
@@ -53,17 +53,17 @@
   {% endif %}
 {% endmacro %}
 
-{% macro explodeLocation(data) %}
+{% macro explodeLocation(data, paths) %}
   {% if data.decoratedSubLocations.length %}
     {% if data.decoratedSubLocations[0].decoratedLocation.leafLevel %}
       <h2 class="govuk-heading-m">
         {{ data.decoratedLocation.displayName | capFirst }}
       </h2>
 
-      {{ capacityTable(data.decoratedSubLocations, data.decoratedLocation) }}
+      {{ capacityTable(data.decoratedSubLocations, data.decoratedLocation, paths) }}
     {% else %}
       {% for subLocation in data.decoratedSubLocations %}
-        {{ explodeLocation(subLocation) }}
+        {{ explodeLocation(subLocation, paths) }}
       {% endfor %}
     {% endif %}
   {% endif %}
@@ -71,10 +71,10 @@
 
 {% block fields %}
   {% if decoratedLocationTree[0].decoratedLocation.leafLevel %}
-    {{ capacityTable(decoratedLocationTree, decoratedLocation) }}
+    {{ capacityTable(decoratedLocationTree, decoratedLocation, paths) }}
   {% else %}
     {% for data in decoratedLocationTree %}
-      {{ explodeLocation(data) }}
+      {{ explodeLocation(data, paths) }}
     {% endfor %}
   {% endif %}
 {% endblock %}

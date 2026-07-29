@@ -1,16 +1,15 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import generateChangeSummary from '../../lib/generateChangeSummary'
-import getLocationResidentialSummary from '../reactivate/parent/middleware/getLocationResidentialSummary'
+import paths from '../../utils/paths'
+import getResidentialSummaries from '../reactivate/parent/middleware/getResidentialSummaries'
 
-export default class ConfirmController extends FormInitialStep {
+export default class ConfirmController extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
-    this.use(getLocationResidentialSummary)
-    this.use(getPrisonResidentialSummary)
+    this.use(getResidentialSummaries)
   }
 
   generateChangeSummary(oldVal: number, newVal: number, overallVal: number): string | null {
@@ -66,7 +65,10 @@ export default class ConfirmController extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, prisonId, pathHierarchy } = res.locals.location
+    const {
+      location,
+      location: { pathHierarchy },
+    } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -75,6 +77,7 @@ export default class ConfirmController extends FormInitialStep {
       title: 'Capacity updated',
       content: `You have updated the capacity for ${pathHierarchy}.`,
     })
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+
+    res.redirect(paths.location.view(location))
   }
 }

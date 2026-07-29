@@ -6,6 +6,7 @@ import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
 import setupStubs, { existingWingLocation } from './setupStubs'
 import goToCreateLocationConfirmPage from './goToCreateLocationConfirmPage'
+import paths from '../../../../server/utils/paths'
 
 context('Create Wing Confirm', () => {
   const newWingLocation = LocationFactory.build({
@@ -53,15 +54,24 @@ context('Create Wing Confirm', () => {
 
       page.changeDetailsKey(0).contains('Wing code')
       page.changeDetailsValue(0).contains('B')
-      page.changeDetailsLink(0).should('have.attr', 'href').and('include', '/create-new/TST/details')
+      page
+        .changeDetailsLink(0)
+        .should('have.attr', 'href')
+        .and('include', `${paths.location.create('TST')}/details`)
 
       page.changeDetailsKey(1).contains('Local name')
       page.changeDetailsValue(1).contains('testW')
-      page.changeDetailsLink(1).should('have.attr', 'href').and('include', '/create-new/TST/details')
+      page
+        .changeDetailsLink(1)
+        .should('have.attr', 'href')
+        .and('include', `${paths.location.create('TST')}/details`)
 
       page.changeDetailsKey(2).contains('Wing structure')
       page.changeDetailsValue(2).contains('Wing → Landings → Cells')
-      page.changeDetailsLink(2).should('have.attr', 'href').and('include', '/create-new/TST/structure')
+      page
+        .changeDetailsLink(2)
+        .should('have.attr', 'href')
+        .and('include', `${paths.location.create('TST')}/structure`)
 
       page.createButton().click()
 

@@ -2,7 +2,7 @@ import Page, { PageElement } from '../../page'
 
 export default class CellCertificateUploadDetailPage extends Page {
   constructor() {
-    super('Cell certificate upload')
+    super(/^Cell certificate upload$/)
   }
 
   summary = (): PageElement => cy.get('[data-qa=upload-summary]')

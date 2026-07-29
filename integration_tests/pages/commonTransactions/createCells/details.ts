@@ -1,8 +1,6 @@
 import Page, { PageElement } from '../../page'
 
 export default class CreateCellsDetailsPage extends Page {
-  static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/create-cells`)
-
   constructor() {
     super(/Enter cell details/)
   }

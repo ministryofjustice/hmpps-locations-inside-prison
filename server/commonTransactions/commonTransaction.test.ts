@@ -1,6 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import CommonTransaction from './commonTransaction'
-import FormInitialStep from '../controllers/base/formInitialStep'
+import FormStep from '../controllers/base/formStep'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -39,7 +39,7 @@ describe('CommonTransaction', () => {
     it('returns a modified steps object', () => {
       expect(transaction.getSteps({ next: 'next-step' })).toEqual({
         '/test-prefix/': {
-          controller: FormInitialStep,
+          controller: FormStep,
           fields: ['test-prefix_field1'],
           next: 'test-prefix/step2',
           pageTitle: 'Step 1',
@@ -47,7 +47,7 @@ describe('CommonTransaction', () => {
           template: '../partials/formStep',
         },
         '/test-prefix/step2': {
-          controller: FormInitialStep,
+          controller: FormStep,
           fields: ['test-prefix_field2'],
           next: 'next-step',
           pageTitle: 'Step 2',

@@ -1,21 +1,14 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
 
-export default class CellConversionSetCellCapacity extends FormInitialStep {
+export default class CellConversionSetCellCapacity extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-    const { decoratedLocation } = res.locals
-    const { displayName } = decoratedLocation
-
     return {
-      ...locals,
-      title: 'Set cell capacity',
+      ...super.locals(req, res),
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
-      titleCaption: capFirst(displayName),
     }
   }
 

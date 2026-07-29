@@ -14,7 +14,8 @@ import CellConversionCapacity from '../../controllers/cellConversion/capacity'
 import SetCellType from '../../commonTransactions/setCellType'
 import RemoveCellType from '../../controllers/cellConversion/removeCellType'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
+import paths from '../../utils/paths'
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/set-cell-type/init') {
@@ -121,9 +122,11 @@ const setCellTypeSteps = Object.fromEntries(
 const steps: FormWizard.Steps = {
   '/': {
     backLink: (req, res) => {
-      const { id, prisonId } = res.locals.decoratedLocation
-
-      return req.isEditing ? `/location/${id}/cell-conversion/confirm` : `/view-and-update-locations/${prisonId}/${id}`
+      const { decoratedLocation } = res.locals
+      // TODO: remove this weird behaviour when cert is released fully
+      return req.isEditing
+        ? `${paths.location.cellConversion(decoratedLocation)}/confirm`
+        : paths.location.view(decoratedLocation)
     },
     entryPoint: true,
     reset: true,
@@ -144,6 +147,7 @@ const steps: FormWizard.Steps = {
   }),
   '/accommodation-type': {
     controller: CellConversionAccommodationType,
+    pageTitle: 'Convert to cell',
     editable: true,
     fields: ['accommodationType'],
     next: [
@@ -158,6 +162,7 @@ const steps: FormWizard.Steps = {
   '/used-for': {
     editable: true,
     controller: CellConversionUsedFor,
+    pageTitle: 'Convert to cell',
     fields: ['usedForTypes'],
     next: [
       {
@@ -170,6 +175,7 @@ const steps: FormWizard.Steps = {
   '/specific-cell-type': {
     editable: true,
     controller: CellConversionSpecificCellType,
+    pageTitle: 'Convert to cell',
     fields: ['hasSpecificCellType'],
     next: [{ field: 'hasSpecificCellType', value: 'yes', next: 'set-cell-type' }, 'set-cell-capacity'],
   },
@@ -177,6 +183,7 @@ const steps: FormWizard.Steps = {
     editable: true,
     fields: ['specialistCellTypes'],
     controller: CellConversionSetCellType,
+    pageTitle: 'Convert to cell',
     next: [
       {
         fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
@@ -189,6 +196,7 @@ const steps: FormWizard.Steps = {
     editable: true,
     fields: ['workingCapacity', 'maxCapacity'],
     controller: CellConversionSetCellCapacity,
+    pageTitle: 'Set cell capacity',
     next: 'confirm',
   },
   '/confirm': {
@@ -217,7 +225,7 @@ const steps: FormWizard.Steps = {
   },
   '/sanitation': {
     fields: ['inCellSanitation'],
-    controller: FormInitialStep,
+    controller: FormStep,
     pageTitle: 'Convert to cell',
     next: 'submit-certification-approval-request',
   },

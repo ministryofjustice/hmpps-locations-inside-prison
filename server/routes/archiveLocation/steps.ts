@@ -2,15 +2,15 @@ import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import RequestsPending from '../../controllers/requestsPending'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
+import paths from '../../utils/paths'
 
 const hasPendingApprovalsBelow = (_req: FormWizard.Request, res: Response) =>
   res.locals.pendingApprovalsBelow.hasPendingBelow
 
-const locationPage = (_req: FormWizard.Request, res: Response) =>
-  `/view-and-update-locations/${res.locals.decoratedLocation.prisonId}/${res.locals.decoratedLocation.id}`
+const locationPage = (_req: FormWizard.Request, res: Response) => paths.location.view(res.locals.decoratedLocation)
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -25,6 +25,7 @@ const steps: FormWizard.Steps = {
     backLink: locationPage,
     checkJourney: false,
     controller: RequestsPending,
+    pageTitle: 'You can’t request a change to the certificate for this location currently',
     templatePath: 'pages/requestsPending',
     template: 'index',
   },
@@ -37,7 +38,7 @@ const steps: FormWizard.Steps = {
     editable: true,
     editBackStep: 'submit-certification-approval-request',
     fields: ['reason'],
-    controller: FormInitialStep,
+    controller: FormStep,
     next: 'update-signed-op-cap',
   },
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
