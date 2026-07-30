@@ -5,12 +5,15 @@ import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ChangeTemporaryDeactivationDetailsPage from '../../pages/changeTemporaryDeactivationDetails/details'
 import AuthSignInPage from '../../pages/authSignIn'
 import IndexPage from '../../pages/index'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Change temporary deactivations details', () => {
   context('Without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
+      AuthStubber.stub.stubSignIn({ roles: [] })
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -27,18 +30,19 @@ context('Change temporary deactivations details', () => {
   context('With the MANAGE_RESIDENTIAL_LOCATIONS role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
     })
     let location: ReturnType<typeof LocationFactory.build>
 
@@ -79,29 +83,24 @@ context('Change temporary deactivations details', () => {
           isResidential: true,
         })
 
-        cy.task('stubLocationsPrisonInactiveCells', [location])
+        LocationsApiStubber.stub.stubLocationsPrisonInactiveCells([location])
 
         cy.signIn()
         const indexPage = Page.verifyOnPage(IndexPage)
         indexPage.cards.inactiveCells().click()
         const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
           parentLocation: location,
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
         })
 
         inactiveCellsIndexPage.getFirstRow().click()
 
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
 
-        cy.task('stubLocationsChangeTemporaryDeactivationDetails')
-        cy.task('stubPrisonerLocationsId', [])
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsChangeTemporaryDeactivationDetails()
+        LocationsApiStubber.stub.stubPrisonerLocationsId([])
+        LocationsApiStubber.stub.stubLocations(location)
 
         viewLocationsShowPage.inactiveBannerChangeLink().click()
       })
@@ -180,18 +179,19 @@ context('Change temporary deactivations details', () => {
   context('With the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
     })
     let location: ReturnType<typeof LocationFactory.build>
 
@@ -232,29 +232,22 @@ context('Change temporary deactivations details', () => {
           isResidential: true,
         })
 
-        cy.task('stubLocationsPrisonInactiveCells', [location])
+        LocationsApiStubber.stub.stubLocationsPrisonInactiveCells([location])
 
         cy.signIn()
         const indexPage = Page.verifyOnPage(IndexPage)
         indexPage.cards.inactiveCells().click()
         const inactiveCellsIndexPage = Page.verifyOnPage(InactiveCellsIndexPage)
 
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-          parentLocation: location,
-          prisonSummary: {
-            workingCapacity: 9,
-            signedOperationalCapacity: 11,
-            maxCapacity: 10,
-          },
-        })
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
 
         inactiveCellsIndexPage.getFirstRow().click()
 
         const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
 
-        cy.task('stubLocationsChangeTemporaryDeactivationDetails')
-        cy.task('stubPrisonerLocationsId', [])
-        cy.task('stubLocations', location)
+        LocationsApiStubber.stub.stubLocationsChangeTemporaryDeactivationDetails()
+        LocationsApiStubber.stub.stubPrisonerLocationsId([])
+        LocationsApiStubber.stub.stubLocations(location)
 
         viewLocationsShowPage.inactiveBannerChangeLink().click()
       })

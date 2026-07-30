@@ -6,7 +6,7 @@ import { FieldEntry } from '../../helpers/field/renderConditionalFields'
 import { TypedLocals } from '../../@types/express'
 import unCapFirst from '../../formatters/unCapFirst'
 
-export default class FormInitialStep extends FormWizard.Controller {
+export default class FormStep extends FormWizard.Controller {
   override middlewareSetup() {
     this.use(this.setCancelLink)
     super.middlewareSetup()

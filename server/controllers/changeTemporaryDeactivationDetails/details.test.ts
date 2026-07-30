@@ -6,6 +6,7 @@ import ChangeTemporaryDeactivationDetails from './details'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('ChangeTemporaryDeactivationDetails', () => {
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
@@ -124,12 +125,8 @@ describe('ChangeTemporaryDeactivationDetails', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/referrer-url',
         buttonText: 'Update deactivation details',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields,
-        title: 'Deactivation details',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#deactivationReasonOther',
@@ -180,9 +177,7 @@ describe('ChangeTemporaryDeactivationDetails', () => {
 
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'))
     })
   })
 

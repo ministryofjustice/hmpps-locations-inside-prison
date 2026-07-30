@@ -1,6 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 import { TypedLocals } from '../../@types/express'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 
@@ -16,7 +16,7 @@ async function getSignedOpCapChangeRequest(req: FormWizard.Request, res: Respons
   next()
 }
 
-export default class BaseController extends FormInitialStep {
+export default class BaseController extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)

@@ -1,16 +1,13 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
-import populateLocation from '../../middleware/populateLocation'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
 import canEditCna from '../../utils/canEditCna'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 
-export default class ReviewCellCapacity extends FormInitialStep {
+export default class ReviewCellCapacity extends FormStep {
   override middlewareSetup() {
-    this.use(populateLocation({ decorate: true }))
     super.middlewareSetup()
     this.use(populatePrisonersInLocation())
   }
@@ -50,8 +47,6 @@ export default class ReviewCellCapacity extends FormInitialStep {
 
     return {
       ...locals,
-      title: 'Review cell capacity',
-      titleCaption: capFirst(decoratedLocation.displayName),
     }
   }
 }

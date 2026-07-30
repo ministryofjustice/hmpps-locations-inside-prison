@@ -1,6 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { TypedLocals } from '../../../@types/express'
 import getLocationResidentialSummary from '../parent/middleware/getLocationResidentialSummary'
 import populateLocationTree, { DecoratedLocationTree } from '../parent/middleware/populateLocationTree'
@@ -11,6 +11,7 @@ import lessThanOrEqualTo from '../../../validators/lessThanOrEqualTo'
 import { DecoratedLocation } from '../../../decorators/decoratedLocation'
 import { getValues } from './util/getValues'
 import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
+import paths from '../../../utils/paths'
 
 const CELL_TYPE_REGEX = /^temp-cellTypes(.+?)(?:-removed)?$/
 
@@ -29,7 +30,7 @@ const findLocationInLocationTrees = (locationTrees: DecoratedLocationTree[], id:
   return null
 }
 
-export default class EditCapacity extends FormInitialStep {
+export default class EditCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getLocationResidentialSummary)
@@ -66,17 +67,17 @@ export default class EditCapacity extends FormInitialStep {
     const checkCapacitiesStep = history.find(s => s.path.endsWith('/check-capacity'))
     if (checkCapacitiesStep) {
       if (!checkCapacitiesStep.next.includes('/edit-capacity/')) {
-        checkCapacitiesStep.next = `/reactivate/location/${res.locals.decoratedLocation.id}/edit-capacity/${req.params.parentLocationId}`
-        req.journeyModel.set('history', history)
+        checkCapacitiesStep.next = `${paths.location.reactivate.location(res.locals.decoratedLocation)}/edit-capacity/${req.params.parentLocationId}`
       }
+      req.journeyModel.set('history', history)
 
       next()
       return
     }
 
     this.addJourneyHistoryStep(req, res, {
-      path: `/reactivate/location/${res.locals.decoratedLocation.id}/check-capacity`,
-      next: `/reactivate/location/${res.locals.decoratedLocation.id}/edit-capacity/${req.params.parentLocationId}`,
+      path: `${paths.location.reactivate.location(res.locals.decoratedLocation)}/check-capacity`,
+      next: `${paths.location.reactivate.location(res.locals.decoratedLocation)}/edit-capacity/${req.params.parentLocationId}`,
       wizard: req.form.options.name,
       revalidate: false,
       skip: false,
@@ -98,15 +99,13 @@ export default class EditCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
     const { decoratedCells } = res.locals
 
     return {
-      ...locals,
+      ...super.locals(req, res),
       title: `Edit capacity of cell${decoratedCells.length > 1 ? 's' : ''}`,
       titleCaption: capFirst(this.getParent(req, res).displayName),
       minLayout: 'three-quarters',
-      backLink: `/reactivate/location/${res.locals.decoratedLocation.id}/check-capacity`,
     }
   }
 
@@ -154,7 +153,9 @@ export default class EditCapacity extends FormInitialStep {
 
       const suffix = `${action === 'set' ? '/init' : ''}${req.isEditing ? '/edit' : ''}`
 
-      res.redirect(`/reactivate/location/${res.locals.decoratedLocation.id}/${cellId}/${action}-cell-type${suffix}`)
+      res.redirect(
+        `${paths.location.reactivate.location(res.locals.decoratedLocation)}/${cellId}/${action}-cell-type${suffix}`,
+      )
 
       return
     }

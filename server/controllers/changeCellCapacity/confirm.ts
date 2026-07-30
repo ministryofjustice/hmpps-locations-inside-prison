@@ -5,10 +5,11 @@ import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSu
 import { TypedLocals } from '../../@types/express'
 import canEditCna from '../../utils/canEditCna'
 import LocationsService from '../../services/locationsService'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
+import paths from '../../utils/paths'
 
-export default class ConfirmCellCapacity extends FormInitialStep {
+export default class ConfirmCellCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
@@ -95,17 +96,16 @@ export default class ConfirmCellCapacity extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
-    const locationName = localName || pathHierarchy
+    const { decoratedLocation } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
     req.flash('success', {
       title: 'Capacity updated',
-      content: `You have updated the capacity of ${locationName}.`,
+      content: `You have updated the capacity of ${decoratedLocation.pathHierarchy}.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

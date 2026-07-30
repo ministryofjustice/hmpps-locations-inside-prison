@@ -21,7 +21,6 @@ import setUpWebSession from './middleware/setUpWebSession'
 
 import routes from './routes'
 import type { Services } from './services'
-import setCanAccess from './middleware/setCanAccess'
 import config from './config'
 import setUpFeatureFlags from './middleware/setUpFeatureFlags'
 import refreshSystemToken from './middleware/refreshSystemToken'
@@ -49,7 +48,6 @@ export default function createApp(services: Services): express.Application {
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
   app.use(refreshSystemToken(services))
-  app.use(setCanAccess(services.locationsService))
 
   if (config.environmentName !== 'Training') {
     app.use(addBreadcrumb({ title: 'Digital Prison Services', href: app.locals.dpsUrl }))
@@ -57,7 +55,7 @@ export default function createApp(services: Services): express.Application {
 
   app.use(routes(services))
 
-  app.use((req, res, next) => next(createError(404, 'Not found')))
+  app.use((_req, _res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
 
   return app

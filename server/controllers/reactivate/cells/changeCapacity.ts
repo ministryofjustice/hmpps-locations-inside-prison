@@ -1,13 +1,14 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import populateLocation from '../../../middleware/populateLocation'
 import { Location } from '../../../data/types/locationsApi'
-import capFirst from '../../../formatters/capFirst'
+import populateTitleCaptionFromLocationOrPrison from '../../../middleware/populateTitleCaptionFromLocationOrPrison'
 
-export default class ReactivateCellsChangeCapacity extends FormInitialStep {
+export default class ReactivateCellsChangeCapacity extends FormStep {
   override middlewareSetup() {
     this.use(populateLocation())
+    this.use(populateTitleCaptionFromLocationOrPrison)
     super.middlewareSetup()
     this.use(this.resetErrors)
   }
@@ -59,17 +60,8 @@ export default class ReactivateCellsChangeCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response) {
-    const locals = super.locals(req, res)
-    const { location } = res.locals
-    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
-    const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
-
     return {
-      ...locals,
-      cancelLink,
-      title: 'Change cell capacity',
-      titleCaption: `${capFirst(location.locationType.toLowerCase())} ${location.localName || location.pathHierarchy}`,
+      ...super.locals(req, res),
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
     }

@@ -3,6 +3,7 @@ import ReactivateParentSelect from '../../../controllers/reactivate/parent/selec
 import ReactivateParentCheckCapacity from '../../../controllers/reactivate/parent/checkCapacity'
 import ReactivateParentConfirm from '../../../controllers/reactivate/parent/confirm'
 import ReactivateParentChangeCapacity from '../../../controllers/reactivate/parent/changeCapacity'
+import paths from '../../../utils/paths'
 
 const isSelect = (req: FormWizard.Request) => {
   return !!req.query.select
@@ -15,6 +16,7 @@ const steps: FormWizard.Steps = {
     resetJourney: true,
     skip: true,
     next: [{ fn: isSelect, next: 'select' }, 'check-capacity'],
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
   },
   '/select': {
     controller: ReactivateParentSelect,
@@ -24,11 +26,13 @@ const steps: FormWizard.Steps = {
   },
   '/check-capacity': {
     controller: ReactivateParentCheckCapacity,
+    pageTitle: 'Check capacity of cells',
     next: 'confirm',
   },
   '/change-capacity/:cellId': {
     checkJourney: false,
     controller: ReactivateParentChangeCapacity,
+    pageTitle: 'Change cell capacity',
     fields: ['workingCapacity', 'maxCapacity'],
     next: 'check-capacity',
     template: '../../../partials/formStep',

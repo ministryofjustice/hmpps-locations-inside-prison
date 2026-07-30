@@ -1,11 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import setStepValidity from '../../lib/setStepValidity'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
 
-export default class CellConversionAccommodationType extends FormInitialStep {
+export default class CellConversionAccommodationType extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { sessionModel } = req
 
@@ -48,8 +47,6 @@ export default class CellConversionAccommodationType extends FormInitialStep {
 
     return {
       ...super.locals(req, res),
-      title: 'Convert to cell',
-      titleCaption: capFirst(res.locals.decoratedLocation.displayName),
     }
   }
 

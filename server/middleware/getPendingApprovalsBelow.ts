@@ -16,7 +16,7 @@ export default async function getPendingApprovalsBelow(
 
   res.locals.pendingApprovalsBelow = await req.services.locationsService.getPendingApprovalsBelow(
     req.session.systemToken,
-    (res.locals.location || res.locals.decoratedLocation)?.id,
+    res.locals.decoratedLocation.id,
   )
 
   if (next) {

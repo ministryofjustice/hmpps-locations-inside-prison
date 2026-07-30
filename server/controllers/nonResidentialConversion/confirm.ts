@@ -4,11 +4,12 @@ import { compact } from 'lodash'
 import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import formatConstants from '../../formatters/formatConstants'
+import paths from '../../utils/paths'
+import FormStep from '../base/formStep'
 
-export default class NonResidentialConversionConfirm extends FormWizard.Controller {
+export default class NonResidentialConversionConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
@@ -26,7 +27,6 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
     }
 
     const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
     const { maxCapacity, workingCapacity } = decoratedLocation.capacity
     const { prisonResidentialSummary } = res.locals
 
@@ -43,11 +43,8 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     return {
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
       changeSummary,
       convertedCellTypeDetails,
-      title: 'Confirm conversion to non-residential room',
-      titleCaption: capFirst(decoratedLocation.displayName),
       buttonText: 'Confirm conversion',
     }
   }
@@ -81,14 +78,18 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
           error_code: 109,
         })
 
-        return res.redirect(`/location/${decoratedLocation.id}/non-residential-conversion/occupied`)
+        return res.redirect(`${paths.location.nonResidentialConversion(decoratedLocation)}/occupied`)
       }
+
       return next(error)
     }
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
+    const {
+      decoratedLocation,
+      decoratedLocation: { localName, pathHierarchy },
+    } = res.locals
     const locationName = localName || pathHierarchy
 
     req.journeyModel.reset()
@@ -99,6 +100,6 @@ export default class NonResidentialConversionConfirm extends FormWizard.Controll
       content: `You have converted ${locationName} into a non-residential room.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

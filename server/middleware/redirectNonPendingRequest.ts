@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
+import paths from '../utils/paths'
 
 export default async function redirectNonPendingRequest(
   req: Request | FormWizard.Request,
@@ -13,7 +14,8 @@ export default async function redirectNonPendingRequest(
   const certificate = await locationsService.getCertificateApprovalRequest(systemToken, approvalRequestId as string)
 
   if (certificate.status !== 'PENDING') {
-    return res.redirect(`/${certificate.prisonId}/cell-certificate/change-requests/${approvalRequestId}`)
+    return res.redirect(paths.cellCertificate.changeRequest.view(certificate.prisonId, approvalRequestId as string))
   }
+
   return next()
 }

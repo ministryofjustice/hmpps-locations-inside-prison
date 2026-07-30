@@ -6,8 +6,7 @@ import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
 import asyncMiddleware from '../../middleware/asyncMiddleware'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
-import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
-import populatePrisonAndLocationId from '../../middleware/populatePrisonAndLocationId'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
@@ -22,10 +21,9 @@ const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
 
 router.use(
   protectRoute('deactivate'),
-  populatePrisonAndLocationId,
   populateLocation({ decorate: true, includeCurrentCertificate: true }),
+  populateTitleCaptionFromLocationOrPrison,
   populatePrisonersInLocation(),
-  populatePrisonConfiguration(),
   checkSupportedLocationType,
   wizard(steps, fields, {
     name: 'deactivate',

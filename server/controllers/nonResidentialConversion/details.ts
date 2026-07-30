@@ -1,10 +1,8 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
-import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
+import FormStep from '../base/formStep'
 
-export default class NonResidentialConversionDetails extends FormInitialStep {
+export default class NonResidentialConversionDetails extends FormStep {
   override middlewareSetup() {
     this.use(this.setOptions)
     super.middlewareSetup()
@@ -20,20 +18,6 @@ export default class NonResidentialConversionDetails extends FormInitialStep {
     }))
 
     next()
-  }
-
-  override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-
-    const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
-
-    return {
-      ...locals,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-      title: 'Convert cell to non-residential room',
-      titleCaption: capFirst(decoratedLocation.displayName),
-    }
   }
 
   override async saveValues(req: FormWizard.Request, _res: Response, next: NextFunction) {

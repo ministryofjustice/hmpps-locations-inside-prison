@@ -1,8 +1,8 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 
-export default class RemoveCellType extends FormInitialStep {
+export default class RemoveCellType extends FormStep {
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { sessionModel } = req
     const { cellId } = req.params

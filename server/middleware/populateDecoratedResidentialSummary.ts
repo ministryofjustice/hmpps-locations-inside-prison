@@ -8,6 +8,7 @@ import canEditCna from '../utils/canEditCna'
 import getLocationAttributesIncludePending from '../utils/getLocationAttributesIncludePending'
 import { PrisonConfiguration } from '../data/types/locationsApi'
 import config from '../config'
+import paths from '../utils/paths'
 
 export function showChangeCapacityLink(location: DecoratedLocation, req: Request) {
   const { active, capacity, leafLevel, status } = location
@@ -66,8 +67,7 @@ export function showChangeUsedForLink(location: DecoratedLocation, req: Request)
 }
 
 function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow {
-  const { id, localName } = location
-  const baseUrl = `/location/${id}/`
+  const { localName } = location
 
   const row: SummaryListRow = { key: { text: 'Local name' } }
 
@@ -77,14 +77,14 @@ function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow
     if (showEditLocalNameLink(location, req)) {
       row.actions = {
         items: [
-          { href: `${baseUrl}remove-local-name`, text: 'Remove' },
-          { href: `${baseUrl}change-local-name`, text: 'Change' },
+          { href: paths.location.removeLocalName(location), text: 'Remove' },
+          { href: paths.location.changeLocalName(location), text: 'Change' },
         ],
       }
     }
   } else if (showEditLocalNameLink(location, req)) {
     row.value = {
-      html: `<a href="${baseUrl}add-local-name" class="govuk-link">Add local name</a>`,
+      html: `<a href="${paths.location.addLocalName(location)}" class="govuk-link">Add local name</a>`,
     }
   }
 
@@ -93,9 +93,6 @@ function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow
 
 function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { specialistCellTypes } = location
-  const setCellTypeUrl = `/location/${location.id}/set-cell-type`
-  const removeCellTypeUrl = `/location/${location.id}/remove-cell-type`
-  const changeCellTypeUrl = `/location/${location.id}/change-cell-type`
   const row: SummaryListRow = { key: { text: 'Cell type' } }
   if (specialistCellTypes.length) {
     row.value = {
@@ -106,14 +103,14 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
       row.actions = {
         items: [
           {
-            href: removeCellTypeUrl,
+            href: paths.location.removeCellType(location),
             text: 'Remove',
             attributes: {
               'data-qa': 'remove-cell-type',
             },
           },
           {
-            href: changeCellTypeUrl,
+            href: paths.location.changeCellType(location),
             text: 'Change',
             attributes: {
               'data-qa': 'change-cell-type',
@@ -124,7 +121,7 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
     }
   } else if (showEditCellTypeLinks(location, req)) {
     row.value = {
-      html: `<a href="${setCellTypeUrl}" class="govuk-link">Set cell type</a>`,
+      html: `<a href="${paths.location.setCellType(location)}" class="govuk-link">Set cell type</a>`,
     }
   }
   return row
@@ -132,7 +129,6 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
 
 function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { usedFor } = location
-  const changeUsedForUrl = `/location/${location.id}/change-used-for`
   const row: SummaryListRow = {
     key: { text: 'Used for' },
     value: {
@@ -143,7 +139,7 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
     row.actions = {
       items: [
         {
-          href: changeUsedForUrl,
+          href: paths.location.changeUsedFor(location),
           text: 'Change',
         },
       ],
@@ -154,7 +150,6 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
 
 function locationCodeRow(location: DecoratedLocation, req: Request): SummaryListRow {
   const { pathHierarchy } = location
-  const changeLocationCodeUrl = `/location/${location.id}/change-location-code`
   const row: SummaryListRow = {
     key: { text: 'Location' },
     value: {
@@ -165,7 +160,7 @@ function locationCodeRow(location: DecoratedLocation, req: Request): SummaryList
     row.actions = {
       items: [
         {
-          href: changeLocationCodeUrl,
+          href: paths.location.changeLocationCode(location),
           text: 'Change',
         },
       ],
@@ -185,7 +180,7 @@ function doorNumberRow(location: DecoratedLocation, req: Request): SummaryListRo
     row.actions = {
       items: [
         {
-          href: `/location/${location.id}/change-door-number`,
+          href: paths.location.changeDoorNumber(location),
           text: 'Change',
         },
       ],
@@ -205,7 +200,7 @@ function sanitationRow(location: DecoratedLocation, req: Request): SummaryListRo
     row.actions = {
       items: [
         {
-          href: `/location/${location.id}/change-sanitation`,
+          href: paths.location.changeSanitation(location),
           text: 'Change',
         },
       ],
@@ -219,7 +214,6 @@ function showChangeNonResLink(location: DecoratedLocation, req: Request) {
 }
 
 function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
-  const changeNonResTypeUrl = `/location/${location.id}/change-non-residential-type`
   const { convertedCellType, otherConvertedCellType } = location
   const text = otherConvertedCellType?.length ? `${convertedCellType} - ${otherConvertedCellType}` : convertedCellType
   const row: SummaryListRow = { key: { text: 'Non-residential room' }, value: { text } }
@@ -228,7 +222,7 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
     row.actions = {
       items: [
         {
-          href: changeNonResTypeUrl,
+          href: paths.location.changeNonResidentialType(location),
           text: 'Change',
         },
       ],
@@ -279,7 +273,7 @@ function getLocationDetails(location: DecoratedLocation, prisonConfiguration: Pr
       items: [
         {
           text: 'View history',
-          href: `/location-history/${location.id}`,
+          href: paths.location.history(location.prisonId, location.id),
         },
       ],
     },
@@ -288,11 +282,10 @@ function getLocationDetails(location: DecoratedLocation, prisonConfiguration: Pr
   return details
 }
 
-export default async function populateDecoratedResidentialSummary(req: Request, res: Response, next: NextFunction) {
+export default async function populateDecoratedResidentialSummary(req: Request, res: Response, next?: NextFunction) {
   const { locationsService, manageUsersService } = req.services
   const { systemToken } = req.session
-  const { prisonId, user } = res.locals
-  const locationId = (req.params.locationId as string) || res.locals.locationId
+  const { locationId, prisonId, user } = res.locals
 
   try {
     const apiData = await locationsService.getResidentialSummary(systemToken, prisonId, locationId)
@@ -350,7 +343,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
         const maxCapLink: { linkAriaLabel?: string } = {}
 
         if (showChangeCapacityLink(residentialSummary.location, req)) {
-          changeLink.linkHref = `/location/${req.params.locationId}/change-cell-capacity`
+          changeLink.linkHref = paths.location.changeCellCapacity(residentialSummary.location)
           changeLink.linkLabel = 'Change'
           workingCapLink.linkAriaLabel = 'Change working capacity'
           maxCapLink.linkAriaLabel = 'Change maximum capacity'
@@ -402,7 +395,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
             text: apiData.parentLocation.inactiveCells.toString(),
             ...(apiData.parentLocation.inactiveCells > 0
               ? {
-                  linkHref: `/inactive-cells/${prisonId}/${apiData.parentLocation.id}`,
+                  linkHref: paths.location.inactiveCells(prisonId, apiData.parentLocation.id),
                   linkLabel: 'View',
                 }
               : {}),
@@ -427,7 +420,7 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
     } else if ('prisonSummary' in apiData) {
       const changeLink: { linkHref?: string; linkLabel?: string; linkAriaLabel?: string } = {}
       if (req.canAccess('change_signed_operational_capacity')) {
-        changeLink.linkHref = `/change-signed-operational-capacity/${prisonId}`
+        changeLink.linkHref = paths.prison.changeSignedOperationalCapacity(prisonId)
         changeLink.linkLabel = 'Change'
         changeLink.linkAriaLabel = 'Change signed operational capacity'
       }
@@ -448,12 +441,17 @@ export default async function populateDecoratedResidentialSummary(req: Request, 
     }
     res.locals.decoratedResidentialSummary = residentialSummary
 
-    next()
+    if (next) {
+      next()
+    }
   } catch (error) {
-    logger.error(
-      error,
-      `Failed to populate residential summary for: prisonId: ${prisonId}, locationId: ${req.params.locationId}`,
-    )
-    next(error)
+    logger.error(error, `Failed to populate residential summary for: prisonId: ${prisonId}, locationId: ${locationId}`)
+
+    if (next) {
+      next(error)
+      return
+    }
+
+    throw error
   }
 }

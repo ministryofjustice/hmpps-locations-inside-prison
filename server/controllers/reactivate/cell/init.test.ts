@@ -22,13 +22,14 @@ describe('ReactivateCellInit', () => {
       },
     }
     deepRes = {
+      locals: {},
       redirect: jest.fn(),
     }
   })
 
-  describe('render', () => {
+  describe('successHandler', () => {
     it('sets the referrer values in the sessionModel', async () => {
-      await controller.render(deepReq as FormWizard.Request, deepRes as Response, next)
+      await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepReq.sessionModel.set).toHaveBeenCalledWith('referrerFlow', deepReq.query.ref)
       expect(deepReq.sessionModel.set).toHaveBeenCalledWith('referrerPrisonId', deepReq.query.refPrisonId)

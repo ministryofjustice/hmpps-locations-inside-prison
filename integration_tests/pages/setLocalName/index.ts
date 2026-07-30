@@ -5,8 +5,6 @@ export default class SetLocalNamePage extends Page {
     super(/Add local name/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/set-cell-type`)
-
   localNameTextInput = (): PageElement => cy.get('#localName')
 
   saveLocalNameButton = (): PageElement => cy.get('button:contains("Save name")')

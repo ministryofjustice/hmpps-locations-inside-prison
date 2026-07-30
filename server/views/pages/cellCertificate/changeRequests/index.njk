@@ -13,10 +13,10 @@
     label: "Sub navigation",
     items: [{
       text: "Current cell certificate",
-      href: "/" + prisonId + "/cell-certificate/current"
+      href: paths.cellCertificate.view(prisonId)
     }, {
       text: "Change requests (" + approvalRequests | length + ")",
-      href: "/" + prisonId + "/cell-certificate/change-requests",
+      href: paths.cellCertificate.changeRequest.view(prisonId),
       active: true
     }]
   }) }}
@@ -53,9 +53,12 @@
               text: userMap[request.requestedBy]
             },
             {
-              html: ('<a class="govuk-link" href="change-requests/' + request.id + '/review">Review</a>') if canAccess('certificate_change_request_review') else ('<a class="govuk-link" href="change-requests/' + request.id + '">View details</a>')
-            }
-          ]
+              html: '<a class="govuk-link" href="' + paths.cellCertificate.changeRequest.review(prisonId, request.id) + '">Review</a>'
+            } if canAccess('certificate_change_request_review'),
+            {
+              html: '<a class="govuk-link" href="' + paths.cellCertificate.changeRequest.view(prisonId, request.id) + '">View details</a>'
+            } if not canAccess('certificate_change_request_review')
+          ] | stripEmpty
         ), rows) %}
       {% endfor %}
 

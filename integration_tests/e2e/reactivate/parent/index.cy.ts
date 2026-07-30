@@ -6,6 +6,7 @@ import ReactivateParentCheckCapacityPage from '../../../pages/reactivate/parent/
 import ReactivateParentConfirmPage from '../../../pages/reactivate/parent/confirm'
 import ReactivateParentSelectPage from '../../../pages/reactivate/parent/select'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
 
 const createLanding = (id: number) => {
   return LocationFactory.build({
@@ -148,6 +149,7 @@ context('Reactivate parent', () => {
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
+      ManageUsersApiStubber.stub.stubManageCaseloads()
       createLocations()
       cy.task('stubSignIn')
       cy.task('stubManageUsers')

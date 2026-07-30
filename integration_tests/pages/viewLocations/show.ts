@@ -1,4 +1,5 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class ViewLocationsShowPage extends Page {
   constructor() {
@@ -6,11 +7,10 @@ export default class ViewLocationsShowPage extends Page {
     this.checkOnPage()
   }
 
-  static goTo = (prisonId?: string, locationId?: string) =>
-    cy.visit(`/view-and-update-locations/${[prisonId, locationId].join('/')}`)
+  static goTo = (prisonId?: string, locationId?: string) => cy.visit(paths.location.view(prisonId, locationId))
 
   checkOnPage() {
-    cy.location('pathname').should('contain', '/view-and-update-locations/')
+    cy.location('pathname').should('contain', '/view')
   }
 
   locationsCreateButton = (): PageElement => cy.get('[data-qa=create-button]')

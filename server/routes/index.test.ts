@@ -3,12 +3,15 @@ import request from 'supertest'
 import { appWithAllRoutes, user } from './testutils/appSetup'
 import AuditService, { Page } from '../services/auditService'
 import LocationsService from '../services/locationsService'
+import ManageUsersService from '../services/manageUsersService'
 
 jest.mock('../services/auditService')
 jest.mock('../services/locationsService')
+jest.mock('../services/manageUsersService')
 
 const auditService = new AuditService(null) as jest.Mocked<AuditService>
 const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
 
 let app: Express
 
@@ -17,9 +20,12 @@ beforeEach(() => {
     services: {
       auditService,
       locationsService,
+      manageUsersService,
     },
     userSupplier: () => user,
   })
+
+  manageUsersService.getCaseloads.mockResolvedValue([{ id: 'TST', name: 'Test' }])
 })
 
 afterEach(() => {
@@ -27,6 +33,31 @@ afterEach(() => {
 })
 
 describe('GET /', () => {
+  it('should redirect to add prison id', async () => {
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
+    })
+
+    app = appWithAllRoutes({
+      services: {
+        auditService,
+        locationsService,
+        manageUsersService,
+      },
+      userSupplier: () => user,
+    })
+
+    auditService.logPageView.mockResolvedValue(null)
+
+    await request(app).get('/').expect(302).expect('Location', '/TST')
+  })
+})
+
+describe('GET /TST', () => {
   it('should render index page with permission message when resiLocationServiceActive is INACTIVE', async () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
@@ -40,12 +71,13 @@ describe('GET /', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => user,
     })
 
     auditService.logPageView.mockResolvedValue(null)
-    const res = await request(app).get('/')
+    const res = await request(app).get('/TST')
 
     expect(res.text).toContain('govuk-breadcrumbs')
     expect(res.text).toContain('Residential locations')
@@ -75,12 +107,13 @@ describe('GET /', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => ({ ...user, userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'] }),
     })
 
     auditService.logPageView.mockResolvedValue(null)
-    const res = await request(app).get('/')
+    const res = await request(app).get('/TST')
 
     expect(res.text).toContain('govuk-breadcrumbs')
     expect(res.text).toContain('Residential locations')
@@ -111,12 +144,13 @@ describe('GET /', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => ({ ...user, userRoles: ['RESI__CERT_VIEWER'] }),
     })
 
     auditService.logPageView.mockResolvedValue(null)
-    const res = await request(app).get('/')
+    const res = await request(app).get('/TST')
 
     expect(res.text).toContain('Capacity management dashboard')
     expect(res.text).toContain('View a summary of cell certificates and change requests for every establishment.')
@@ -138,12 +172,13 @@ describe('GET /', () => {
         services: {
           auditService,
           locationsService,
+          manageUsersService,
         },
         userSupplier: () => ({ ...user, userRoles: [role] }),
       })
 
       auditService.logPageView.mockResolvedValue(null)
-      const res = await request(app).get('/')
+      const res = await request(app).get('/TST')
 
       expect(res.text).not.toContain('Capacity management dashboard')
     },
@@ -162,12 +197,13 @@ describe('GET /', () => {
       services: {
         auditService,
         locationsService,
+        manageUsersService,
       },
       userSupplier: () => user,
     })
 
     auditService.logPageView.mockResolvedValue(null)
-    const res = await request(app).get('/')
+    const res = await request(app).get('/TST')
 
     expect(res.text).toContain('Residential locations')
     expect(res.text).toContain('You do not have permission to manage Residential locations.')

@@ -1,17 +1,18 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { TypedLocals } from '../../../@types/express'
-import backUrl from '../../../utils/backUrl'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { ModuleName } from '../../../data/types/locationsApi/moduleName'
 import PrisonService from '../../../services/prisonService'
+import paths from '../../../utils/paths'
+import capFirst from '../../../formatters/capFirst'
 
 type ScreenStatus = 'ACCESSIBLE' | 'WARNING' | 'BLOCKED'
 type NomisModuleName = Exclude<ModuleName, 'OIMMHOLO'>
 
 const SCREEN_LABELS: Record<NomisModuleName, string> = {
-  OIMILOCA: 'Maintain internal locations (OIMILOCA)',
-  OIMULOCA: 'Maintain internal usage (OIMULOCA)',
+  OIMILOCA: 'maintain internal locations (OIMILOCA)',
+  OIMULOCA: 'maintain internal usage (OIMULOCA)',
 }
 
 const STATUS_DESCRIPTIONS: Record<ScreenStatus, string> = {
@@ -44,7 +45,7 @@ async function fetchStatus(
   }
 }
 
-export default class NomisScreenStatusChangeConfirm extends FormInitialStep {
+export default class NomisScreenStatusChangeConfirm extends FormStep {
   override middlewareSetup() {
     this.use(this.loadCurrentStatus.bind(this))
     super.middlewareSetup()
@@ -68,13 +69,8 @@ export default class NomisScreenStatusChangeConfirm extends FormInitialStep {
 
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
-    const { prisonConfiguration, moduleName, currentScreenStatus } = res.locals
-    const { prisonId } = prisonConfiguration
+    const { moduleName, currentScreenStatus } = res.locals
     const screenLabel = SCREEN_LABELS[moduleName as NomisModuleName]
-
-    const backLink = backUrl(req, {
-      fallbackUrl: `/admin/${prisonId}`,
-    })
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
     const selected = (req.form.values.screenStatus as ScreenStatus) || (currentScreenStatus as ScreenStatus)
@@ -89,8 +85,6 @@ export default class NomisScreenStatusChangeConfirm extends FormInitialStep {
     return {
       ...locals,
       fields,
-      backLink,
-      cancelLink: backLink,
       title: `Update ${screenLabel} status`,
       screenLabel,
       currentStatusDescription: STATUS_DESCRIPTIONS[currentScreenStatus as ScreenStatus],
@@ -140,10 +134,10 @@ export default class NomisScreenStatusChangeConfirm extends FormInitialStep {
     req.sessionModel.reset()
 
     req.flash('success', {
-      title: `${SCREEN_LABELS[moduleName]} status`,
+      title: `${capFirst(SCREEN_LABELS[moduleName])} status`,
       content: `You have changed the ${SCREEN_LABELS[moduleName]} status.`,
     })
 
-    res.redirect(`/admin/${prisonId}`)
+    res.redirect(paths.admin.index(prisonId))
   }
 }

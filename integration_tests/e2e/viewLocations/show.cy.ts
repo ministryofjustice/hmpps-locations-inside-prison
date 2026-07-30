@@ -8,6 +8,7 @@ import formatDate from '../../../server/formatters/formatDate'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import AuthStubber from '../../mockApis/auth'
+import paths from '../../../server/utils/paths'
 
 const specialistCellTypeLabels: Record<string, string> = {
   ACCESSIBLE_CELL: 'Accessible cell',
@@ -58,14 +59,19 @@ context('View Locations Show', () => {
       .should('have.attr', 'href')
       .and('equal', 'http://localhost:3100')
 
-    viewLocationsShowPage.breadcrumbs().eq(1).contains('Locations').should('have.attr', 'href').and('equal', '/')
+    viewLocationsShowPage
+      .breadcrumbs()
+      .eq(1)
+      .contains('Residential locations')
+      .should('have.attr', 'href')
+      .and('equal', '/TST')
 
     viewLocationsShowPage
       .breadcrumbs()
       .eq(2)
       .contains('Wings')
       .should('have.attr', 'href')
-      .and('equal', '/view-and-update-locations/TST')
+      .and('equal', paths.location.view('TST'))
 
     locationHierarchy.slice(0, locationHierarchy.length - 1).forEach((breadcrumb, i) => {
       viewLocationsShowPage
@@ -73,7 +79,7 @@ context('View Locations Show', () => {
         .eq(i + 3)
         .contains(new RegExp(`^\\s*${breadcrumb.localName || breadcrumb.code}\\s*$`, 'g'))
         .should('have.attr', 'href')
-        .and('equal', `/view-and-update-locations/${breadcrumb.prisonId}/${breadcrumb.id}`)
+        .and('equal', paths.location.view(breadcrumb))
     })
   }
 
@@ -83,6 +89,7 @@ context('View Locations Show', () => {
     ManageUsersApiStubber.stub.stubManageUsers()
     ManageUsersApiStubber.stub.stubManageUsersMe()
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
     LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
     LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
     LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
@@ -269,7 +276,7 @@ context('View Locations Show', () => {
             viewLocationsShowPage.summaryCards
               .inactiveCellsViewLink()
               .should('have.attr', 'href')
-              .and('equal', `/inactive-cells/${location.prisonId}/${location.id}`)
+              .and('equal', paths.location.inactiveCells(location))
           }
         }
       }

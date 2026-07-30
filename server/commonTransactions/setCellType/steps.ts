@@ -1,10 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import SetCellType from './setCellType'
 import SetCellTypeWithCertChange from './setCellTypeWithCertChange'
-import FormInitialStep from '../../controllers/base/formInitialStep'
+import FormStep from '../../controllers/base/formStep'
 import BaseController from './baseController'
 import CertChangeDisclaimer from '../certChangeDisclaimer'
-import ReviewCellCapacity from '../../controllers/setCellType/review'
+import Review from './review'
 import SubmitCertificationApprovalRequest from '../submitCertificationApprovalRequest'
 import UpdateSignedOpCap from '../updateSignedOpCap'
 import isCellTypeCertChange from './isCellTypeCertChange'
@@ -13,7 +13,7 @@ const commonSteps = {
   '/init': {
     entryPoint: true,
     skip: true,
-    controller: FormInitialStep,
+    controller: FormStep,
     next: 'type',
   },
   '/normal': {
@@ -77,7 +77,8 @@ const stepsWithCertChange: FormWizard.Steps = {
   },
   '/review': {
     fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
-    controller: ReviewCellCapacity,
+    controller: Review,
+    pageTitle: 'Review cell capacity',
     next: 'update-signed-op-cap',
   },
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),

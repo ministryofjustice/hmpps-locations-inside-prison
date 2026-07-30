@@ -2,9 +2,9 @@ import type { Router } from 'express'
 import express from 'express'
 import config from '../config'
 
-const router = express.Router()
-
 export default function setUpFeatureFlags(): Router {
+  const router = express.Router()
+
   const flags = { ...config.featureFlags }
 
   router.use((req, _res, next) => {

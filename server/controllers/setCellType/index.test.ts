@@ -6,6 +6,7 @@ import fields from '../../routes/setCellType/fields'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('SetCellType', () => {
   const controller = new SetCellType({ route: '/' })
@@ -159,9 +160,7 @@ describe('SetCellType', () => {
     })
 
     it('redirects to the view location page', () => {
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'))
     })
   })
 })

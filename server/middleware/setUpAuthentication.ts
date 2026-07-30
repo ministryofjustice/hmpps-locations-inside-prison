@@ -7,6 +7,7 @@ import config from '../config'
 import { HmppsUser } from '../interfaces/hmppsUser'
 import generateOauthClientToken from '../utils/clientCredentials'
 import logger from '../../logger'
+import paths from '../utils/paths'
 
 passport.serializeUser((user, done) => {
   // Not used but required for Passport
@@ -79,7 +80,7 @@ export default function setupAuthentication() {
       return next()
     }
     req.session.returnTo = req.originalUrl
-    return res.redirect('/sign-in')
+    return res.redirect(paths.auth.signIn)
   })
 
   router.use((req, res, next) => {

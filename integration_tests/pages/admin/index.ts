@@ -1,18 +1,19 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class PrisonConfigurationIndexPage extends Page {
   constructor() {
     super('Prison configuration')
   }
 
-  static goTo = (prisonId: string) => cy.visit(`/admin/${prisonId}`)
+  static goTo = (prisonId: string) => cy.visit(paths.admin.index(prisonId))
 
   checkOnPage(): void {
     super.checkOnPage()
     cy.get('.govuk-heading-l').contains('Prison configuration')
     cy.get('.govuk-summary-list__key').eq(0).contains('Prison')
     cy.get('.govuk-summary-list__value').eq(0).contains('TST')
-    cy.get('.govuk-summary-list__key').eq(1).contains('Residential location')
+    cy.get('.govuk-summary-list__key').eq(1).contains('Residential locations')
     cy.get('.govuk-summary-list__key').eq(2).contains('Non-residential locations')
     cy.get('.govuk-summary-list__value').eq(2).contains('INACTIVE')
     cy.get('.govuk-summary-list__key').eq(3).contains('Include seg in roll count')

@@ -1,12 +1,12 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import backUrl from '../../../utils/backUrl'
 import getCellCount from '../../../middleware/getCellCount'
 import getPrisonResidentialSummary from '../../../middleware/getPrisonResidentialSummary'
 import { TypedLocals } from '../../../@types/express'
-import capFirst from '../../../formatters/capFirst'
+import paths from '../../../utils/paths'
+import FormStep from '../../base/formStep'
 
-export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
+export default class DeactivateTemporaryConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
@@ -47,17 +47,12 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const { cellCount, decoratedLocation, prisonResidentialSummary } = res.locals
     const { workingCapacity } = decoratedLocation.capacity
-    const backLink = backUrl(req, { fallbackUrl: `/location/${decoratedLocation.id}/deactivate/temporary/details` })
     const changeSummary =
       this.generateChangeSummary(cellCount, workingCapacity, prisonResidentialSummary.prisonSummary.workingCapacity) ||
       "There will be no change to the establishment's capacity."
 
     return {
-      backLink,
-      cancelLink: `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`,
       changeSummary,
-      title: 'Check your answers before deactivating this location',
-      titleCaption: capFirst(decoratedLocation.displayName),
       buttonText: 'Confirm deactivation',
     }
   }
@@ -92,15 +87,16 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
           error_code: 109,
         })
 
-        return res.redirect(`/location/${decoratedLocation.id}/deactivate/occupied`)
+        return res.redirect(`${paths.location.deactivate(decoratedLocation)}/occupied`)
       }
+
       return next(error)
     }
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { decoratedLocation } = res.locals
-    const { displayName, id: locationId, locationType, prisonId } = decoratedLocation
+    const { displayName, locationType } = decoratedLocation
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -110,6 +106,6 @@ export default class DeactivateTemporaryConfirm extends FormWizard.Controller {
       content: `You have deactivated ${displayName}.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

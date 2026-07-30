@@ -1,15 +1,16 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import backUrl from '../../../utils/backUrl'
 import { Location, LocationType } from '../../../data/types/locationsApi'
 import LocationsService from '../../../services/locationsService'
 import populateInactiveParentLocations from '../populateInactiveParentLocations'
 import getResidentialSummaries from './middleware/getResidentialSummaries'
 import populateLocationTree from './middleware/populateLocationTree'
 import nonOxfordJoin from '../../../formatters/nonOxfordJoin'
+import FormStep from '../../base/formStep'
+import paths from '../../../utils/paths'
 
-export default class ReactivateParentConfirm extends FormWizard.Controller {
+export default class ReactivateParentConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getResidentialSummaries)
@@ -38,11 +39,7 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
   }
 
   override locals(req: FormWizard.Request, res: Response) {
-    const { cells, decoratedLocation, prisonResidentialSummary } = res.locals
-    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
-    const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${decoratedLocation.id}/check-capacity` })
-    const cancelLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
+    const { cells, prisonResidentialSummary } = res.locals
     const { maxCapacity, workingCapacity } = prisonResidentialSummary.prisonSummary
     let newMaxCapacity = maxCapacity
     let newWorkingCapacity = workingCapacity
@@ -68,8 +65,6 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     return {
-      backLink,
-      cancelLink,
       changeSummary,
       title: `You are about to reactivate ${cells.length} cell${cells.length > 1 ? 's' : ''}`,
       buttonText: 'Confirm activation',
@@ -127,7 +122,6 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
   override async successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { systemToken } = req.session
     const { decoratedLocation, locationResidentialSummary, locationTree } = res.locals
-    const redirectUrl = `/view-and-update-locations/${decoratedLocation.prisonId}/${decoratedLocation.id}`
 
     const selectLocations = req.sessionModel.get<string[]>('selectLocations') || []
 
@@ -157,6 +151,6 @@ export default class ReactivateParentConfirm extends FormWizard.Controller {
       content: `You have activated ${locationNames}.`,
     })
 
-    res.redirect(redirectUrl)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

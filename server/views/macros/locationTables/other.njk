@@ -2,14 +2,14 @@
 
 {% from "../locationStatusTag.njk" import locationStatusTag %}
 
-{% macro other(locations) %}
+{% macro other(locations, paths) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% set rows = [] %}
       {% for item in locations %}
         {% set inactiveCellsHtml %}
           {% if item.inactiveCells > 0 %}
-            <a href="/inactive-cells/{{ item.prisonId }}/{{ item.id }}">{{ item.inactiveCells }}</a>
+            <a href="{{ paths.location.inactiveCells(item.prisonId, item.id) }}">{{ item.inactiveCells }}</a>
           {% else %}
             0
           {% endif %}
@@ -17,7 +17,7 @@
 
         {% set rows = (rows.push(
           [
-            { html: "<a href='/view-and-update-locations/" + item.prisonId + "/" + item.id + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
+            { html: "<a href='" + paths.location.view(item) + "'>" + (item.localName or item.pathHierarchy) + "</a>" },
             { html: "<p class='govuk-tag__wrapper'>" + locationStatusTag(item) + "</p>" },
             { text: '-' if item.numberOfCellLocations == 0 else (item | includePending).workingCapacity },
             { text: '-' if item.numberOfCellLocations == 0 else (item | includePending).maxCapacity },

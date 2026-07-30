@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class ChangeCellTypePage extends Page {
   constructor() {
     super(/Select (normal|special) cell type/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/change-cell-type`)
+  static goTo = (locationId: string) => cy.visit(paths.location.changeCellType('TST', locationId))
 
   cellTypeCheckbox = (value: string): PageElement =>
     cy.get(`input[name="specialistCellTypes"][type="checkbox"][value="${value}"]`)

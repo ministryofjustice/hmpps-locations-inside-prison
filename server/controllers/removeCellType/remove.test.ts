@@ -6,6 +6,7 @@ import RemoveCellType from './remove'
 import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('RemoveCellType', () => {
   const controller = new RemoveCellType({ route: '/' })
@@ -72,7 +73,6 @@ describe('RemoveCellType', () => {
         cellTypesLabel: 'Cell type:',
         cellTypesText: 'Accessible cell',
         title: 'Are you sure you want to remove the cell type?',
-        titleCaption: 'Cell A-1-001',
       })
     })
 
@@ -85,7 +85,6 @@ describe('RemoveCellType', () => {
         cellTypesLabel: 'Cell types:',
         cellTypesText: 'Dry cell, Escape list cell',
         title: 'Are you sure you want to remove all of the cell types?',
-        titleCaption: 'Cell A-1-001',
       })
     })
   })
@@ -140,9 +139,7 @@ describe('RemoveCellType', () => {
     })
 
     it('redirects to the view location page', () => {
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('MDI', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'))
     })
   })
 })

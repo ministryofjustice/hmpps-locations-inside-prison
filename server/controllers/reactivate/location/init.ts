@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import getCells from './util/getCells'
 import populateLocationTree from '../parent/middleware/populateLocationTree'
 import getLocationResidentialSummary from '../parent/middleware/getLocationResidentialSummary'
 
-export default class ReactivateLocationInit extends FormInitialStep {
+export default class ReactivateLocationInit extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getLocationResidentialSummary)

@@ -48,6 +48,9 @@ describe('Manage users service', () => {
           ) => Promise<PaginatedUsers>
         >,
       ),
+      getCaseloads: Object.assign(jest.fn(), {
+        clearCache: jest.fn(),
+      }),
     }
 
     service = new ManageUsersService(apiClient)
@@ -72,18 +75,18 @@ describe('Manage users service', () => {
   })
 
   describe('getUserCaseloads', () => {
-    describe('when a username is specified', () => {
-      it('calls the correct client function', async () => {
-        await service.getUser('token', 'USERNAME')
-
-        expect(apiClient.users.get).toHaveBeenCalledWith('token', { username: 'USERNAME' })
-      })
-    })
-
     it('calls the correct client function', async () => {
       await service.getUserCaseloads('token')
 
       expect(apiClient.users.me.getCaseloads).toHaveBeenCalledWith('token')
+    })
+  })
+
+  describe('getCaseloads', () => {
+    it('calls the correct client function', async () => {
+      await service.getCaseloads('token')
+
+      expect(apiClient.users.getCaseloads).toHaveBeenCalledWith('token')
     })
   })
 

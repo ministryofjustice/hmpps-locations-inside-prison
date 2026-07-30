@@ -1,12 +1,12 @@
 import { Response, NextFunction } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
+import paths from '../../utils/paths'
 
-export default class TemporaryInactiveInit extends FormInitialStep {
+export default class TemporaryInactiveInit extends FormStep {
   override successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
     if (!req.canAccess('certificate_change_request_create')) {
-      const { prisonId, id } = res.locals.decoratedLocation
-      res.redirect(`/view-and-update-locations/${prisonId}/${id}`)
+      res.redirect(paths.location.view(res.locals.decoratedLocation))
       return null
     }
 

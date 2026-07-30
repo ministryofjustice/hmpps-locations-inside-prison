@@ -58,7 +58,7 @@
         },
         {
           key: {
-            text: 'Residential location'
+            text: 'Residential locations'
           },
           value: {
             text: prisonConfiguration.resiLocationServiceActive
@@ -66,7 +66,7 @@
           actions: {
             items: [
               {
-                href: '/admin/' + prisonConfiguration.prisonId + '/change-resi-status',
+                href: paths.admin.changeResidentialStatus(prisonConfiguration.prisonId),
                 text: "Change",
                 visuallyHiddenText: "resi",
                 classes: "govuk-link--no-visited-state"}
@@ -83,7 +83,7 @@
           actions: {
             items: [
               {
-                href: '/admin/' + prisonConfiguration.prisonId + '/change-non-resi-status',
+                href: paths.admin.changeNonResidentialStatus(prisonConfiguration.prisonId),
                 text: "Change",
                 visuallyHiddenText: "non-resi",
                 classes: "govuk-link--no-visited-state"}
@@ -100,7 +100,7 @@
           actions: {
           items: [
             {
-              href: '/admin/' + prisonConfiguration.prisonId + '/change-include-seg-in-roll-count',
+              href: paths.admin.changeIncludeSegInRollCount(prisonConfiguration.prisonId),
               text: "Change",
               visuallyHiddenText: "resi",
               classes: "govuk-link--no-visited-state"}
@@ -117,7 +117,7 @@
           actions: {
             items: [
               {
-                href: '/admin/' + prisonConfiguration.prisonId + '/change-certification-status',
+                href: paths.admin.changeCertificationStatus(prisonConfiguration.prisonId),
                 text: "Change",
                 visuallyHiddenText: "resi",
                 classes: "govuk-link--no-visited-state"}
@@ -150,7 +150,7 @@
           actions: {
             items: [
               {
-                href: '/admin/' + prisonConfiguration.prisonId + '/change-nomis-screen-status/OIMILOCA',
+                href: paths.admin.changeNomisScreenStatus(prisonConfiguration.prisonId, 'OIMILOCA'),
                 text: "Change",
                 visuallyHiddenText: "OIMILOCA NOMIS screen",
                 classes: "govuk-link--no-visited-state"}
@@ -167,7 +167,7 @@
           actions: {
             items: [
               {
-                href: '/admin/' + prisonConfiguration.prisonId + '/change-nomis-screen-status/OIMULOCA',
+                href: paths.admin.changeNomisScreenStatus(prisonConfiguration.prisonId, 'OIMULOCA'),
                 text: "Change",
                 visuallyHiddenText: "OIMULOCA NOMIS screen",
                 classes: "govuk-link--no-visited-state"}
@@ -184,7 +184,7 @@
           actions: {
           items: [
             {
-              href: '/admin/' + prisonConfiguration.prisonId + '/ingest-cert',
+              href: paths.admin.ingestCert(prisonConfiguration.prisonId),
               text: "Ingest",
               visuallyHiddenText: "ingest",
               classes: "govuk-link--no-visited-state"}

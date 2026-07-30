@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import populateCells from './populateCells'
 import { Location } from '../../../data/types/locationsApi'
 
-export default class ReactivateCellsCheckCapacity extends FormInitialStep {
+export default class ReactivateCellsCheckCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCells)
@@ -27,15 +27,12 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response) {
-    const referrerPrisonId = req.sessionModel.get('referrerPrisonId')
-    const referrerLocationId = req.sessionModel.get('referrerLocationId')
-    const backLink = `/inactive-cells/${[referrerPrisonId, referrerLocationId].filter(i => i).join('/')}`
     const { cells, errorlist } = res.locals
 
     res.locals.options.fields = Object.fromEntries(
       errorlist.map(error => {
-        const [locationId, fieldName] = error.key.split('_')
-        const location = cells.find(c => c.id === locationId)
+        const [cellId, fieldName] = error.key.split('_')
+        const location = cells.find(c => c.id === cellId)
 
         return [
           error.key,
@@ -43,7 +40,7 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
             errorMessages: {
               error: `Change the ${fieldName} capacity of ${location?.pathHierarchy}`,
             },
-            id: locationId,
+            id: cellId,
           },
         ]
       }),
@@ -51,9 +48,6 @@ export default class ReactivateCellsCheckCapacity extends FormInitialStep {
 
     return {
       ...super.locals(req, res),
-      backLink,
-      cancelLink: backLink,
-      title: 'Check capacity of cells',
       minLayout: 'one-half',
     }
   }

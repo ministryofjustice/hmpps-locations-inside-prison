@@ -56,10 +56,7 @@ describe('Upload file csv', () => {
     it('returns the correct locals', () => {
       deepRes.locals.prisonConfiguration.prisonId = 'TST'
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        backLink: '/admin/TST/ingest-cert',
         buttonText: 'Upload',
-        cancelLink: '/admin/TST/ingest-cert',
-        title: 'Upload cell cert data',
       })
     })
   })

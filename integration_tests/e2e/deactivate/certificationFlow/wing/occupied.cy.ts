@@ -4,6 +4,7 @@ import DeactivateOccupiedPage from '../../../../pages/deactivate/occupied'
 import { setupStubs, location } from './setupStubs'
 import PrisonerFactory from '../../../../../server/testutils/factories/prisoner'
 import LocationsApiStubber from '../../../../mockApis/locationsApi'
+import paths from '../../../../../server/utils/paths'
 
 context('Certification Deactivation - Wing - Occupied', () => {
   let cellOccupiedPage: DeactivateOccupiedPage
@@ -19,7 +20,7 @@ context('Certification Deactivation - Wing - Occupied', () => {
     LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
 
     cy.signIn()
-    cy.visit(`/location/${location.id}/deactivate`)
+    cy.visit(paths.location.deactivate(location))
     cellOccupiedPage = Page.verifyOnPage(DeactivateOccupiedPage)
   })
 

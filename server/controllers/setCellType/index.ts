@@ -1,8 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
+import paths from '../../utils/paths'
 
-export default class Index extends FormInitialStep {
+export default class Index extends FormStep {
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
     try {
       const { decoratedLocation } = res.locals
@@ -24,7 +25,10 @@ export default class Index extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, prisonId, pathHierarchy } = res.locals.decoratedLocation
+    const {
+      decoratedLocation,
+      decoratedLocation: { pathHierarchy },
+    } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -34,6 +38,6 @@ export default class Index extends FormInitialStep {
       content: `You have set a cell type for ${pathHierarchy}.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

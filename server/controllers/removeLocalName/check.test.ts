@@ -6,6 +6,8 @@ import LocationsService from '../../services/locationsService'
 import fields from '../../routes/changeLocalName/fields'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
+import { DecoratedLocation } from '../../decorators/decoratedLocation'
 
 describe('RemoveLocalName', () => {
   const controller = new Check({ route: '/' })
@@ -84,9 +86,7 @@ describe('RemoveLocalName', () => {
       deepRes.locals.decoratedLocation.localName = 'Wing A'
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         buttonText: 'Remove name',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           localName: {
             component: 'govukCharacterCount',
@@ -114,8 +114,6 @@ describe('RemoveLocalName', () => {
             value: null,
           },
         },
-        title: 'Are you sure you want to remove the local name?',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })
@@ -176,7 +174,7 @@ describe('RemoveLocalName', () => {
 
     it('redirects to the view location page', () => {
       expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
+        paths.location.view(deepRes.locals.decoratedLocation as DecoratedLocation),
       )
     })
   })

@@ -1,22 +1,24 @@
-import asyncMiddleware from './asyncMiddleware'
+import paths from '../utils/paths'
+import middleware from './middleware'
+import addBreadcrumb from './addBreadcrumb'
 
-const populateBreadcrumbsForLocation = asyncMiddleware((req, res, next) => {
-  const { breadcrumbs, topLevelLocationType, locationHierarchy, prisonId } = res.locals
+const populateBreadcrumbsForLocation = middleware((req, res, next?) => {
+  const { topLevelLocationType, locationHierarchy, prisonId } = res.locals
 
-  if (topLevelLocationType && locationHierarchy && prisonId) {
-    breadcrumbs.push({
+  if (topLevelLocationType && locationHierarchy) {
+    addBreadcrumb({
       title: topLevelLocationType,
-      href: `/view-and-update-locations/${prisonId}`,
-    })
+      href: paths.location.view(prisonId),
+    })(req, res)
 
-    breadcrumbs.push(
-      ...locationHierarchy.map(l => {
-        return { title: l.localName || l.code, href: `/view-and-update-locations/${l.prisonId}/${l.id}` }
-      }),
-    )
+    locationHierarchy.forEach(l => {
+      addBreadcrumb({ title: l.localName || l.code, href: paths.location.view(prisonId, l.id) })(req, res)
+    })
   }
 
-  next()
+  if (next) {
+    next()
+  }
 })
 
 export default populateBreadcrumbsForLocation

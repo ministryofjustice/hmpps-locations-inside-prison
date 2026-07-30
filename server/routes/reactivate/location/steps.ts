@@ -14,6 +14,7 @@ import UpdateSignedOpCap from '../../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../../commonTransactions/submitCertificationApprovalRequest'
 import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
 import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
+import paths from '../../../utils/paths'
 
 export function isTemporaryDeactivation(_req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
@@ -152,7 +153,9 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
 
         const { parentId } = res.locals.cell
         res.redirect(
-          `/reactivate/location/${res.locals.decoratedLocation.id}/edit-capacity/${res.locals.decoratedLocation.id === cellId ? cellId : parentId}`,
+          `${paths.location.reactivate.location(
+            res.locals.decoratedLocation,
+          )}/edit-capacity/${res.locals.decoratedLocation.id === cellId ? cellId : parentId}`,
         )
       }
     }
@@ -184,11 +187,7 @@ const steps: FormWizard.Steps = {
     reset: true,
     resetJourney: true,
     skip: true,
-    backLink: (_req, res) => {
-      const { prisonId, id } = res.locals.decoratedLocation
-
-      return `/view-and-update-locations/${prisonId}/${id}`
-    },
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
     next: [
       {
         fn: isTemporaryDeactivation,

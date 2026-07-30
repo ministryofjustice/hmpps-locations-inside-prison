@@ -1,29 +1,21 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { TypedLocals } from '../../../@types/express'
-import backUrl from '../../../utils/backUrl'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { BulkCapacityUpdate, CapacitySummary } from '../../../data/types/locationsApi/bulkCapacityChanges'
+import paths from '../../../utils/paths'
 
-export default class IngestConfirm extends FormInitialStep {
+export default class IngestConfirm extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
-    const { prisonId } = res.locals.prisonConfiguration
 
     const capacityData: BulkCapacityUpdate = req.sessionModel.get('capacityData')
     const capacitySummary: CapacitySummary = req.sessionModel.get('capacitySummary')
 
-    const backLink = backUrl(req, {
-      fallbackUrl: `/admin/${prisonId}/ingest-cert`,
-    })
-
     return {
       ...locals,
-      backLink,
-      cancelLink: backLink,
       capacityData,
       capacitySummary,
-      title: 'Confirm cell certification ingest',
       buttonText: 'Confirm ingestion',
     }
   }
@@ -60,7 +52,7 @@ export default class IngestConfirm extends FormInitialStep {
 
     if (ingestError) {
       req.flash('error', { title: 'There is a problem', content: ingestError })
-      return res.redirect(`/admin/${prisonId}/ingest-cert`)
+      return res.redirect(paths.admin.ingestCert(prisonId))
     }
 
     req.flash('success', {
@@ -68,6 +60,6 @@ export default class IngestConfirm extends FormInitialStep {
       content: 'The cell certificate is being processed. This page shows its progress.',
     })
 
-    return res.redirect(`/admin/${prisonId}/ingest-cert/upload/${uploadId}`)
+    return res.redirect(`${paths.admin.ingestCert(prisonId)}/upload/${uploadId}`)
   }
 }

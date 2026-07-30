@@ -5,14 +5,19 @@ import _ from 'lodash'
 import { Location } from '../data/types/locationsApi'
 import { Services } from '../services'
 import renderMacro from '../utils/renderMacro'
-import capFirst from '../formatters/capFirst'
+import paths from '../utils/paths'
 
 function formatValue(attribute: string, values: string[]) {
   if (values?.length) {
     if (attribute === 'Status') {
+      let convertedStatus = values[0].toUpperCase().replace('-', '_')
+      if (convertedStatus.includes('CHANGE REQUESTED')) {
+        convertedStatus = `LOCKED_${convertedStatus.split(' (')[0]}`
+      }
+
       return {
         html: renderMacro('macros/locationStatusTag', 'locationStatusTag', {
-          status: values[0].toUpperCase().replace('-', '_'),
+          status: convertedStatus,
         }),
       }
     }
@@ -43,7 +48,7 @@ export default ({ manageUsersService }: Services) =>
   async (req: Request, res: Response) => {
     const { systemToken } = req.session
     const { location } = res.locals
-    const { changeHistory, id: locationId, prisonId }: Location = location
+    const { changeHistory }: Location = location
 
     const tableRows = await Promise.all(
       changeHistory.map(async ({ amendedBy, amendedDate, attribute, newValues, oldValues }) => {
@@ -61,10 +66,9 @@ export default ({ manageUsersService }: Services) =>
     )
 
     return res.render('pages/locationHistory/show', {
-      backLink: `/view-and-update-locations/${prisonId}/${locationId}`,
+      backLink: paths.location.view(location),
       tableRows,
       title: 'Location history',
-      titleCaption: `${capFirst(location.locationType.toLowerCase())} ${location.localName || location.pathHierarchy}`,
       minLayout: 'three-quarters',
     })
   }

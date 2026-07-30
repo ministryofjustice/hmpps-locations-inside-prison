@@ -6,6 +6,7 @@ import LocationsService from '../../services/locationsService'
 import fields from '../../routes/setLocalName/fields'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('SetLocalName', () => {
   const controller = new Details({ route: '/' })
@@ -84,9 +85,7 @@ describe('SetLocalName', () => {
       deepRes.locals.decoratedLocation.localName = 'Wing A'
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         buttonText: 'Save name',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           localName: {
             component: 'govukCharacterCount',
@@ -117,8 +116,6 @@ describe('SetLocalName', () => {
         },
         insetText:
           'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
-        title: 'Add local name',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [],
       })
     })
@@ -193,9 +190,7 @@ describe('SetLocalName', () => {
     })
 
     it('redirects to the view location page', () => {
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'))
     })
   })
 })

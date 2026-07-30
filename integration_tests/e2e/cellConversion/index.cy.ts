@@ -8,32 +8,35 @@ import CellConversionSpecificCellTypePage from '../../pages/cellConversion/speci
 import CellConversionUsedForPage from '../../pages/cellConversion/usedFor'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 context('Cell conversion', () => {
   const location = LocationFactory.build({
     isResidential: false,
     leafLevel: true,
-    localName: '1-1-001',
   })
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsConstantsUsedForTypeForPrison')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForTypeForPrison()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -52,24 +55,25 @@ context('Cell conversion', () => {
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsConstantsUsedForTypeForPrison')
-      cy.task('stubLocationsLocationsResidentialSummary')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: location })
-      cy.task('stubLocations', location)
-      cy.task('stubPrisonerLocationsId', [])
-      cy.task('stubLocationsConvertToCell')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForTypeForPrison()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubPrisonerLocationsId([])
+      LocationsApiStubber.stub.stubLocationsConvertToCell()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
     })
 
@@ -88,7 +92,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionAccommodationTypePage)
-        cy.get('.govuk-caption-m').contains('1-1-001')
+        cy.get('.govuk-caption-m').contains('A-1-001')
       })
 
       it('has a back link', () => {
@@ -150,7 +154,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionUsedForPage)
-        cy.get('.govuk-caption-m').contains('1-1-001')
+        cy.get('.govuk-caption-m').contains('A-1-001')
       })
 
       it('has a back link', () => {
@@ -231,7 +235,7 @@ context('Cell conversion', () => {
 
         it('has a caption showing the cell description', () => {
           Page.verifyOnPage(CellConversionSpecificCellTypePage)
-          cy.get('.govuk-caption-m').contains('1-1-001')
+          cy.get('.govuk-caption-m').contains('A-1-001')
         })
 
         it('has a back link to the accommodation type page', () => {
@@ -289,7 +293,7 @@ context('Cell conversion', () => {
 
       it('has a caption showing the cell description', () => {
         Page.verifyOnPage(CellConversionSetCellTypePage)
-        cy.get('.govuk-caption-m').contains('1-1-001')
+        cy.get('.govuk-caption-m').contains('A-1-001')
       })
 
       it('has a back link', () => {
@@ -408,7 +412,7 @@ context('Cell conversion', () => {
         it('has a caption showing the cell description', () => {
           Page.verifyOnPage(CellConversionSetCellCapacityPage)
 
-          cy.get('.govuk-caption-m').contains('1-1-001')
+          cy.get('.govuk-caption-m').contains('A-1-001')
         })
 
         describe('validations', () => {
@@ -629,7 +633,7 @@ context('Cell conversion', () => {
           Page.verifyOnPage(ViewLocationsShowPage)
           cy.get('#govuk-notification-banner-title').contains('Success')
           cy.get('.govuk-notification-banner__content h3').contains('Non-residential room converted to a cell')
-          cy.get('.govuk-notification-banner__content p').contains('You have converted 1-1-001 into a cell.')
+          cy.get('.govuk-notification-banner__content p').contains('You have converted A-1-001 into a cell.')
         })
       })
 

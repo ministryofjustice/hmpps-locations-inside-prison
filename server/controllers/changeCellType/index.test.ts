@@ -6,6 +6,7 @@ import LocationsService from '../../services/locationsService'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 import ChangeCellType from '.'
+import paths from '../../utils/paths'
 
 describe('SetCellType', () => {
   const controller = new ChangeCellType({ route: '/' })
@@ -148,7 +149,6 @@ describe('SetCellType', () => {
         }
         const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
         expect(locals.title).toBe('Select normal cell type')
-        expect(locals.titleCaption).toBe('Cell A-1-001')
         expect(locals.buttonText).toBe('Save cell type')
         expect(deepReq.form.options.fields.specialistCellTypes.component).toBe('govukCheckboxes')
         expect(deepReq.form.options.fields.specialistCellTypes.multiple).toBe(true)
@@ -204,7 +204,6 @@ describe('SetCellType', () => {
         }
         const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
         expect(locals.title).toBe('Select special cell type')
-        expect(locals.titleCaption).toBe('Cell A-1-001')
         expect(locals.buttonText).toBe('Save cell type')
         expect(deepReq.form.options.fields.specialistCellTypes.component).toBe('govukRadios')
         expect(deepReq.form.options.fields.specialistCellTypes.multiple).toBe(false)
@@ -283,7 +282,7 @@ describe('SetCellType', () => {
 
       it('redirects to the view location page', () => {
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+          paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
         )
       })
     })
@@ -369,7 +368,6 @@ describe('SetCellType', () => {
       it('returns the correct local variables', () => {
         const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
         expect(locals.title).toBe('Select special cell type')
-        expect(locals.titleCaption).toBe('Cell A-1-001')
       })
     })
 
@@ -422,7 +420,7 @@ describe('SetCellType', () => {
 
       it('redirects to the view location page', () => {
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+          paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
         )
       })
     })

@@ -3,6 +3,8 @@ import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import RemoveLocalNamePage from '../../pages/removeLocalName'
 import LocationsApiStubber from '../../mockApis/locationsApi'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
 
 context('Remove Local Name', () => {
   const locationAsWing = LocationFactory.build({
@@ -25,20 +27,21 @@ context('Remove Local Name', () => {
 
   const setupStubs = (roles = []) => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles })
-    cy.task('stubManageUsers')
-    cy.task('stubManageUsersMe')
-    cy.task('stubManageUsersMeCaseloads')
-    cy.task('stubLocationsConstantsAccommodationType')
-    cy.task('stubLocationsConstantsConvertedCellType')
-    cy.task('stubLocationsConstantsDeactivatedReason')
-    cy.task('stubLocationsConstantsLocationType')
-    cy.task('stubLocationsConstantsApprovalType')
-    cy.task('stubLocationsConstantsSpecialistCellType')
-    cy.task('stubLocationsConstantsUsedForType')
-    cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsWing })
-    cy.task('stubLocations', locationAsWing)
-    cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+    AuthStubber.stub.stubSignIn({ roles })
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+    LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationAsWing })
+    LocationsApiStubber.stub.stubLocations(locationAsWing)
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
   }
 
   context('Without MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -66,8 +69,8 @@ context('Remove Local Name', () => {
     })
 
     it('does not show the remove local name link on a cell-level page', () => {
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: locationAsCell })
-      cy.task('stubLocations', locationAsCell)
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: locationAsCell })
+      LocationsApiStubber.stub.stubLocations(locationAsCell)
       ViewLocationsShowPage.goTo(locationAsCell.prisonId, locationAsCell.id)
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.localNameRow().should('not.exist')
@@ -91,13 +94,12 @@ context('Remove Local Name', () => {
 
     it('displays a success banner after removing the local name', () => {
       LocationsApiStubber.stub.stubLocationsPrisonLocalName({ exists: false })
-      cy.task('stubUpdateLocalName', {
-        localName: 'new local name',
-        updatedBy: 'TEST_USER',
-      })
+      LocationsApiStubber.stub.stubUpdateLocalName()
       ViewLocationsShowPage.goTo(locationAsWing.prisonId, locationAsWing.id)
-      cy.task('stubLocations', updatedLocationAsWing)
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', { parentLocation: updatedLocationAsWing })
+      LocationsApiStubber.stub.stubLocations(updatedLocationAsWing)
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
+        parentLocation: updatedLocationAsWing,
+      })
 
       const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
       viewLocationsShowPage.removeLocalNameLink().click()

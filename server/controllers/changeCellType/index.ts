@@ -1,16 +1,19 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
 import configureSpecialistCellTypeOptions from '../../middleware/configureSpecialistCellTypeOptions'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import isSpecialCell from '../../utils/isSpecialCell'
+import paths from '../../utils/paths'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
-export default class ChangeCellType extends FormInitialStep {
+export default class ChangeCellType extends FormStep {
   override middlewareSetup(): void {
     super.middlewareSetup()
     this.use(addConstantToLocals('specialistCellTypes'))
     this.use(configureSpecialistCellTypeOptions(isSpecialCell))
+    this.use(populateTitleCaptionFromLocationOrPrison)
   }
 
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
@@ -24,7 +27,6 @@ export default class ChangeCellType extends FormInitialStep {
     const affectsCapacity = isSpecialCell(req, res)
 
     locals.title = `Select ${affectsCapacity ? 'special' : 'normal'} cell type`
-    locals.titleCaption = `Cell ${res.locals.decoratedLocation.pathHierarchy}`
     locals.buttonText = 'Save cell type'
     req.form.options.fields.specialistCellTypes.component = affectsCapacity ? 'govukRadios' : 'govukCheckboxes'
     req.form.options.fields.specialistCellTypes.multiple = !affectsCapacity
@@ -62,7 +64,7 @@ export default class ChangeCellType extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.decoratedLocation
+    const { decoratedLocation } = res.locals
     const affectsCapacity = isSpecialCell(req, res)
 
     req.journeyModel.reset()
@@ -73,6 +75,6 @@ export default class ChangeCellType extends FormInitialStep {
       content: `You have changed the ${affectsCapacity ? 'special' : 'normal'} cell type for this location.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

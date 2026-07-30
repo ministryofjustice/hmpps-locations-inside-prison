@@ -63,9 +63,9 @@
         {% endif %}
 
         {% if decoratedResidentialSummary.location.status.includes('INACTIVE') %}
-          {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess, prisonConfiguration.certificationApprovalRequired === 'ACTIVE') }}
+          {{ inactiveLocationBanner(decoratedResidentialSummary, canAccess, prisonConfiguration.certificationApprovalRequired === 'ACTIVE', paths) }}
         {% elseif decoratedResidentialSummary.location.status === 'DRAFT' %}
-          {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) }}
+          {{ draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary, paths) }}
         {% elseif prisonConfiguration.certificationApprovalRequired === 'ACTIVE' and
           decoratedResidentialSummary.location.status === 'ACTIVE' and
           decoratedResidentialSummary.location.raw.locationType === 'CELL' and
@@ -73,7 +73,7 @@
           decoratedResidentialSummary.location.capacity.workingCapacity !== decoratedResidentialSummary.location.currentCellCertificate.workingCapacity and
           canAccess('change_cell_capacity')
         %}
-          {{ workingCapacityMismatchBanner(decoratedResidentialSummary) }}
+          {{ workingCapacityMismatchBanner(decoratedResidentialSummary, paths) }}
         {% endif %}
 
         {% if decoratedResidentialSummary.summaryCards | length %}
@@ -102,7 +102,7 @@
     </div>
 
     {% if not decoratedResidentialSummary.location.leafLevel %}
-      {{ locationsTable(createButton, decoratedResidentialSummary) }}
+      {{ locationsTable(createButton, decoratedResidentialSummary, paths) }}
     {% endif %}
   </div>
 {% endblock %}

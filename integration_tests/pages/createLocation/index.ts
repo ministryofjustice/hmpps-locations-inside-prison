@@ -5,8 +5,6 @@ export default class CreateLocationDetailsPage extends Page {
     super(/Enter \w+ details/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/create-new/${locationId}/details`)
-
   localNameTextInput = (): PageElement => cy.get('#localName')
 
   locationCodeInput = (): PageElement => cy.get('#locationCode')

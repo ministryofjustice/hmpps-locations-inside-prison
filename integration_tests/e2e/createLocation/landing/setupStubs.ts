@@ -50,6 +50,7 @@ export default function setupStubs(roles = ['MANAGE_RESIDENTIAL_LOCATIONS']) {
   ManageUsersApiStubber.stub.stubManageUsers()
   ManageUsersApiStubber.stub.stubManageUsersMe()
   ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+  ManageUsersApiStubber.stub.stubManageCaseloads()
 }
 
 export { prisonId, existingWingLocation, existingLandingLocation, residentialSummary }
