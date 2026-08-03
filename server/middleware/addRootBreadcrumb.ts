@@ -3,7 +3,7 @@ import addBreadcrumb from './addBreadcrumb'
 
 const addRootBreadcrumb = middleware((req, res, next) => {
   const { user, prisonId } = res.locals
-  let title = 'Residential locations'
+  let title = 'Locations'
 
   if (prisonId) {
     if (req.canAccess('certificate_view_management') || user.activeCaseload.id !== prisonId) {

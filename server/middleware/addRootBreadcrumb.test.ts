@@ -50,7 +50,7 @@ describe('addRootBreadcrumb', () => {
     addRootBreadcrumb(deepReq as Request, deepRes as Response, next)
 
     expect(deepRes.locals.breadcrumbs).toContainEqual({
-      title: 'Residential locations',
+      title: 'Locations',
       href: '/',
     })
     expect(next).toHaveBeenCalledWith()
@@ -63,7 +63,7 @@ describe('addRootBreadcrumb', () => {
     addRootBreadcrumb(deepReq as Request, deepRes as Response, next)
 
     expect(deepRes.locals.breadcrumbs).toContainEqual({
-      title: 'Residential locations - Test Prison',
+      title: 'Locations - Test Prison',
       href: '/TST',
     })
     expect(deepReq.canAccess).toHaveBeenCalledWith('certificate_view_management')
@@ -78,7 +78,7 @@ describe('addRootBreadcrumb', () => {
     addRootBreadcrumb(deepReq as Request, deepRes as Response, next)
 
     expect(deepRes.locals.breadcrumbs).toContainEqual({
-      title: 'Residential locations - Moorland',
+      title: 'Locations - Moorland',
       href: '/MDI',
     })
     expect(next).toHaveBeenCalledWith()
@@ -91,7 +91,7 @@ describe('addRootBreadcrumb', () => {
     addRootBreadcrumb(deepReq as Request, deepRes as Response, next)
 
     expect(deepRes.locals.breadcrumbs).toContainEqual({
-      title: 'Residential locations',
+      title: 'Locations',
       href: '/UNKNOWN',
     })
     expect(next).toHaveBeenCalledWith()
@@ -105,7 +105,7 @@ describe('addRootBreadcrumb', () => {
     addRootBreadcrumb(deepReq as Request, deepRes as Response, next)
 
     expect(deepRes.locals.breadcrumbs).toContainEqual({
-      title: 'Residential locations',
+      title: 'Locations',
       href: '/TST',
     })
     expect(next).toHaveBeenCalledWith()
