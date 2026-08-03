@@ -59,12 +59,7 @@ context('View Locations Show', () => {
       .should('have.attr', 'href')
       .and('equal', 'http://localhost:3100')
 
-    viewLocationsShowPage
-      .breadcrumbs()
-      .eq(1)
-      .contains('Residential locations')
-      .should('have.attr', 'href')
-      .and('equal', '/TST')
+    viewLocationsShowPage.breadcrumbs().eq(1).contains('Locations').should('have.attr', 'href').and('equal', '/TST')
 
     viewLocationsShowPage
       .breadcrumbs()

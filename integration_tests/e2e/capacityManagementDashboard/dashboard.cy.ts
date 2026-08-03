@@ -81,7 +81,7 @@ context('Capacity management dashboard', () => {
     cy.get('[data-qa="dashboard-caption"]').should('contain', 'Cell certificates for all establishments')
 
     // Breadcrumb links back to the Locations home page
-    cy.get('.govuk-breadcrumbs').contains('a', 'Residential locations').should('have.attr', 'href', '/')
+    cy.get('.govuk-breadcrumbs').contains('a', 'Locations').should('have.attr', 'href', '/')
 
     // 5 caseload prisons render; Wymott (not in caseload) is filtered out
     cy.get('[data-qa="capacity-management-dashboard-table"] tbody tr').should('have.length', 5)
