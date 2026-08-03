@@ -1,6 +1,6 @@
 import nock, { RequestBodyMatcher } from 'nock'
 
-import { createClient } from 'redis'
+import { type RedisClientType } from 'redis'
 import config from '../config'
 import LocationsApiClient from './locationsApiClient'
 
@@ -22,7 +22,7 @@ describe('locationsApiClient', () => {
 
   beforeEach(() => {
     fakeApiClient = nock(config.apis.locationsApi.url)
-    apiClient = new LocationsApiClient(redisClient as unknown as ReturnType<typeof createClient>, null)
+    apiClient = new LocationsApiClient(redisClient as unknown as RedisClientType, null)
 
     redisClient.cache = {}
   })

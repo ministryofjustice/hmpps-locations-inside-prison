@@ -1,6 +1,6 @@
 import nock from 'nock'
 
-import { createClient } from 'redis'
+import { type RedisClientType } from 'redis'
 import config from '../config'
 import ManageUsersApiClient from './manageUsersApiClient'
 
@@ -22,7 +22,7 @@ describe('manageUsersApiClient', () => {
 
   beforeEach(() => {
     fakeApiClient = nock(config.apis.manageUsersApi.url)
-    apiClient = new ManageUsersApiClient(redisClient as unknown as ReturnType<typeof createClient>, null)
+    apiClient = new ManageUsersApiClient(redisClient as unknown as RedisClientType, null)
 
     redisClient.cache = {}
   })
