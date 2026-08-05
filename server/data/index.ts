@@ -13,7 +13,7 @@ initialiseAppInsights()
 buildAppInsightsClient(applicationInfo)
 
 import ManageUsersApiClient from './manageUsersApiClient'
-import { createRedisClient } from './redisClient'
+import { redisClient } from './redisClient'
 import config from '../config'
 import FeComponentsClient from './feComponentsClient'
 import HmppsAuditClient from './hmppsAuditClient'
@@ -22,13 +22,11 @@ import GoogleAnalyticsClient from './googleAnalyticsClient'
 import logger from '../../logger'
 import { PrisonApiClient } from './prisonApiClient'
 
-const redisClient = config.redis.enabled ? createRedisClient() : null
-
 export const dataAccess = () => {
   const hmppsAuthClient = new AuthenticationClient(
     config.apis.hmppsAuth,
     logger,
-    config.redis.enabled ? new RedisTokenStore(redisClient!) : new InMemoryTokenStore(),
+    config.redis.enabled ? new RedisTokenStore(redisClient) : new InMemoryTokenStore(),
   )
   const notificationClient = new NotifyClient(config.email.notifyKey)
 
