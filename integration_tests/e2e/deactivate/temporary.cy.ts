@@ -9,6 +9,9 @@ import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 import AuthStubber from '../../mockApis/auth'
+import RequestsPendingPage from '../../pages/requestsPending'
+import ViewLocationsIndexPage from '../../pages/viewLocations'
+import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
 
 context('Deactivate temporary', () => {
   const location = LocationFactory.build({
@@ -45,6 +48,7 @@ context('Deactivate temporary', () => {
       }),
     )
     LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+    LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
   })
 
   context('without any roles', () => {
@@ -129,6 +133,51 @@ context('Deactivate temporary', () => {
         Page.verifyOnPage(ViewLocationsShowPage)
       })
     }
+
+    describe('requests pending page', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({
+          hasPendingBelow: true,
+          pendingLocations: [
+            {
+              id: '6bcfab2c-df86-467b-89ca-e1eb1bb84249',
+              key: 'LEI-A-1-016',
+              locationType: 'CELL',
+              parentId: 'd8ddb0a7-1e39-425c-a32f-d128e80ca05b',
+              parentKey: 'LEI-A-1',
+              parentLocationType: 'LANDING',
+            },
+          ],
+        })
+
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.actionsMenu().click()
+        viewLocationsShowPage.deactivateAction().click()
+      })
+
+      it('has a back link to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.backLink().click()
+
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a cancel link that leads to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.returnLink().click()
+
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a link to the cert approvals page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.certApprovalsLink().click()
+
+        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
+      })
+    })
 
     context('when the cell is occupied', () => {
       beforeEach(() => {

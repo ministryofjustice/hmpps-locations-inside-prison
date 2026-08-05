@@ -51,6 +51,7 @@ context('Deactivate permanent', () => {
     })
     LocationsApiStubber.stub.stubLocations(location)
     LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+    LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
   })
 
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {

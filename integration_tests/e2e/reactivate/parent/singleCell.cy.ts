@@ -95,6 +95,7 @@ context('Reactivate cell (from reactivate parent)', () => {
         subLocations: [inactiveCell1, inactiveCell2, inactiveCell3],
       })
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
       cy.signIn()
     })
 
@@ -125,6 +126,7 @@ context('Reactivate cell (from reactivate parent)', () => {
       LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
       LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
       LocationsApiStubber.stub.stubLocationsBulkReactivate()
       LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
       locations.forEach(location => {
