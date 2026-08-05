@@ -1,9 +1,9 @@
-import { createClient } from 'redis'
+import { createClient, type RedisClientType } from 'redis'
 
 import logger from '../../logger'
 import config from '../config'
 
-export type RedisClient = ReturnType<typeof createClient>
+export type RedisClient = RedisClientType
 
 const url =
   config.redis.tls_enabled === 'true'
@@ -28,5 +28,3 @@ export const createRedisClient = (): RedisClient => {
 
   return client
 }
-
-export const redisClient = config.redis.enabled ? createRedisClient() : null
