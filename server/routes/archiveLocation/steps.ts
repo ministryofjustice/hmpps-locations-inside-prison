@@ -1,7 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
-import RequestsPending from '../../controllers/requestsPending'
+import RequestsPending from '../../commonTransactions/requestsPending'
 import FormStep from '../../controllers/base/formStep'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
@@ -21,14 +21,7 @@ const steps: FormWizard.Steps = {
     backLink: locationPage,
     next: [{ fn: hasPendingApprovalsBelow, next: 'requests-pending' }, 'cert-change-disclaimer'],
   },
-  '/requests-pending': {
-    backLink: locationPage,
-    checkJourney: false,
-    controller: RequestsPending,
-    pageTitle: 'You can’t request a change to the certificate for this location currently',
-    templatePath: 'pages/requestsPending',
-    template: 'index',
-  },
+  ...RequestsPending.getSteps(),
   ...CertChangeDisclaimer.getSteps({
     next: 'reason',
     title: (_req, _res) => 'Archiving a location',

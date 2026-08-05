@@ -7,6 +7,7 @@ import protectRoute from '../../middleware/protectRoute'
 import asyncMiddleware from '../../middleware/asyncMiddleware'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
 import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
+import getPendingApprovalsBelow from '../../middleware/getPendingApprovalsBelow'
 
 const router = express.Router({ mergeParams: true })
 
@@ -24,6 +25,7 @@ router.use(
   populateLocation({ decorate: true, includeCurrentCertificate: true }),
   populateTitleCaptionFromLocationOrPrison,
   populatePrisonersInLocation(),
+  getPendingApprovalsBelow,
   checkSupportedLocationType,
   wizard(steps, fields, {
     name: 'deactivate',

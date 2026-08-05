@@ -41,5 +41,6 @@ export default function setupStubs(role: string, location: Location) {
   LocationsApiStubber.stub.stubLocationsBulkReactivate()
   LocationsApiStubber.stub.stubLocationsCertificationLocationReactivationRequestApproval()
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+  LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
   LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
 }

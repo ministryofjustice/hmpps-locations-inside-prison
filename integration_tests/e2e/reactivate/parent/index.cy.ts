@@ -7,6 +7,9 @@ import ReactivateParentConfirmPage from '../../../pages/reactivate/parent/confir
 import ReactivateParentSelectPage from '../../../pages/reactivate/parent/select'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import RequestsPendingPage from '../../../pages/requestsPending'
+import ViewLocationsIndexPage from '../../../pages/viewLocations'
+import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertificate/changeRequests'
 
 const createLanding = (id: number) => {
   return LocationFactory.build({
@@ -205,6 +208,7 @@ context('Reactivate parent', () => {
         }),
       )
       cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      cy.task('stubPendingApprovalsBelow', { hasPendingBelow: false, pendingLocations: [] })
       cy.signIn()
       ViewLocationsShowPage.goTo(inactiveWing.prisonId, inactiveWing.id)
       viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
@@ -213,6 +217,44 @@ context('Reactivate parent', () => {
     it('shows the reactivate buttons in the inactive location banner', () => {
       viewLocationsShowPage.inactiveBannerActivateEntireButton().should('exist')
       viewLocationsShowPage.inactiveBannerActivateIndividualButton().should('exist')
+    })
+
+    describe('requests pending page', () => {
+      beforeEach(() => {
+        cy.task('stubPendingApprovalsBelow', {
+          hasPendingBelow: true,
+          pendingLocations: [
+            {
+              id: '6bcfab2c-df86-467b-89ca-e1eb1bb84249',
+              key: 'LEI-A-1-016',
+              locationType: 'CELL',
+              parentId: 'd8ddb0a7-1e39-425c-a32f-d128e80ca05b',
+              parentKey: 'LEI-A-1',
+              parentLocationType: 'LANDING',
+            },
+          ],
+        })
+
+        viewLocationsShowPage.inactiveBannerActivateEntireButton().click()
+      })
+
+      it('has a back link to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.backLink().click()
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a cancel link that leads to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.returnLink().click()
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a link to the cert approvals page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.certApprovalsLink().click()
+        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
+      })
     })
 
     context('after clicking "Activate entire"', () => {

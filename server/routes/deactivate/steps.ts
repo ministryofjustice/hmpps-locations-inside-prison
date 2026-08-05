@@ -11,6 +11,7 @@ import TemporaryInactiveInit from '../../controllers/deactivate/temporaryInactiv
 import paths from '../../utils/paths'
 import FormStep from '../../controllers/base/formStep'
 import DeactivatePermanentBase from '../../controllers/deactivate/permanent/base'
+import RequestsPending from '../../commonTransactions/requestsPending'
 
 function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
@@ -51,6 +52,9 @@ function permanentDeactivationForbidden(req: FormWizard.Request, _res: Response)
   return !req.canAccess('deactivate:permanent')
 }
 
+const hasPendingApprovalsBelow = (_req: FormWizard.Request, res: Response) =>
+  res.locals.pendingApprovalsBelow.hasPendingBelow
+
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
@@ -59,6 +63,7 @@ const steps: FormWizard.Steps = {
     skip: true,
     backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
     next: [
+      { fn: hasPendingApprovalsBelow, next: 'requests-pending' },
       { fn: isCellOccupied, next: 'occupied' },
       {
         fn: (_req, res) =>
@@ -77,6 +82,7 @@ const steps: FormWizard.Steps = {
       'type',
     ],
   },
+  ...RequestsPending.getSteps(),
   '/cell-cert-change': {
     fields: ['reduceWorkingCapacity'],
     next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: 'cert-change-disclaimer' }, 'temporary/details'],
