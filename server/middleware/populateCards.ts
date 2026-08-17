@@ -20,13 +20,15 @@ export default middleware((req, res, next) => {
   const hasResiRole = userRoles.some(role => RESI_ROLES.includes(role))
   const showResiCards = resiActive && hasResiRole
 
+  const manageResiDescription = `View and update information about existing locations${certificationEnabled ? ' or create new residential locations' : ''}.`
+
   res.locals.resiCards = [
     {
       clickable: true,
       visible: showResiCards,
       heading: `Manage residential locations`,
       href: paths.location.view(prisonId),
-      description: 'View and update information about existing locations or create new residential locations.',
+      description: manageResiDescription,
       'data-qa': 'view-locations-card',
     },
     {
