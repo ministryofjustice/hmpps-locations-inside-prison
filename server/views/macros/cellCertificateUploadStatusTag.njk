@@ -10,6 +10,10 @@
   {% endif %}
 {% endmacro %}
 
+{% macro uploadLocationNeedsReviewTag() %}
+  {{ govukTag({ text: "Needs review", classes: "govuk-tag--blue", attributes: { "data-qa": "location-needs-review-tag" } }) }}
+{% endmacro %}
+
 {% macro uploadLocationStatusTag(status) %}
   {% if status == 'PROCESSED' %}
     {{ govukTag({ text: "Processed", classes: "govuk-tag--green", attributes: { "data-qa": "location-status-tag" } }) }}

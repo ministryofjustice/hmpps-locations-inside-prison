@@ -17,6 +17,9 @@ export declare interface CellCertificateUploadLocation {
   previousCertifiedNormalAccommodation?: number
   previousCellMark?: string
   previousInCellSanitation?: boolean
+  workingCapacityMismatch?: boolean
+  maxCapacityMismatch?: boolean
+  certifiedNormalAccommodationMismatch?: boolean
 }
 
 export declare interface CellCertificateUpload {
@@ -27,6 +30,7 @@ export declare interface CellCertificateUpload {
   processedRecords: number
   skippedRecords: number
   failedRecords: number
+  discrepancyRecords?: number
   requestedBy: string
   requestedDate: string
   startTime?: string

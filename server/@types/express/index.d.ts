@@ -43,6 +43,13 @@ interface card {
   visible: boolean
 }
 
+// A capacity as shown on the cell certificate ingestion report: what the location now holds, plus the
+// certified value where the two differ.
+export declare interface CapacityCell {
+  text: string
+  certifiedText?: string
+}
+
 interface AllLocals {
   accommodationType: string
   actions: { text: string; href: string; class: string }[]
@@ -212,9 +219,10 @@ interface AllLocals {
     locationKey: string
     status: string
     message?: string
-    maxCapacityText: string
-    workingCapacityText: string
-    certifiedNormalAccommodationText: string
+    needsReview: boolean
+    maxCapacity: CapacityCell
+    workingCapacity: CapacityCell
+    certifiedNormalAccommodation: CapacityCell
   }[]
   pendingApprovalsBelow: PendingApprovalsBelow
   changeRequestsLink: string

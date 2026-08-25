@@ -11,6 +11,7 @@ const completedUpload: CellCertificateUpload = {
   processedRecords: 1,
   skippedRecords: 1,
   failedRecords: 0,
+  discrepancyRecords: 1,
   requestedBy: 'USER1',
   requestedDate: '2024-01-01T10:00:00',
   startTime: '2024-01-01T10:00:05',
@@ -20,12 +21,14 @@ const completedUpload: CellCertificateUpload = {
     {
       locationKey: 'TST-A-1-001',
       status: 'PROCESSED',
-      maxCapacity: 2,
+      message: 'Working capacity and certified working capacity do not match',
+      maxCapacity: 3,
       workingCapacity: 1,
       certifiedNormalAccommodation: 2,
       previousMaxCapacity: 2,
       previousWorkingCapacity: 2,
       previousCertifiedNormalAccommodation: 2,
+      workingCapacityMismatch: true,
     },
     {
       locationKey: 'TST-A-1-002',
@@ -78,9 +81,23 @@ context('Cell certificate uploads', () => {
     detailPage.summary().should('contain', 'Complete')
     detailPage.summary().should('contain', 'USER1')
     detailPage.locationsTable().should('contain', 'TST-A-1-001')
-    detailPage.locationsTable().should('contain', '2 → 1')
+    detailPage.locationsTable().should('contain', '2 → 3')
     detailPage.locationsTable().should('contain', 'No changes required')
     detailPage.cellCertificateLink().should('have.attr', 'href', '/TST/cell-certificate/cert-1')
+  })
+
+  it('flags the cells whose working capacity does not match the certificate', () => {
+    cy.task('stubCellCertificateUpload', completedUpload)
+
+    cy.visit('/admin/TST/ingest-cert/upload/upload-1')
+    const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
+
+    detailPage.summary().should('contain', 'Cells needing review')
+    detailPage.needsReviewAlert().should('contain', 'Check these cells’ working capacities')
+    detailPage.needsReviewTags().should('have.length', 1)
+    // the location kept its working capacity of 2 while the certificate records 1
+    detailPage.locationsTable().should('contain', 'Certified 1')
+    detailPage.locationsTable().should('contain', 'Working capacity and certified working capacity do not match')
   })
 
   it('hides the upload button and shows a message while an upload is in progress', () => {
