@@ -11,6 +11,7 @@ export default function setupStubs(role: string, location: Location) {
   ManageUsersApiStubber.stub.stubManageUsers()
   ManageUsersApiStubber.stub.stubManageUsersMe()
   ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+  ManageUsersApiStubber.stub.stubManageCaseloads()
   LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
   LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
   LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
@@ -40,5 +41,6 @@ export default function setupStubs(role: string, location: Location) {
   LocationsApiStubber.stub.stubLocationsBulkReactivate()
   LocationsApiStubber.stub.stubLocationsCertificationLocationReactivationRequestApproval()
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+  LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
   LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
 }

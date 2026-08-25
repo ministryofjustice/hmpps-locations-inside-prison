@@ -5,6 +5,7 @@ import LocationFactory from '../testutils/factories/location'
 import { Services } from '../services'
 import AuthService from '../services/authService'
 import ManageUsersService from '../services/manageUsersService'
+import paths from '../utils/paths'
 
 jest.mock('../services/authService')
 jest.mock('../services/manageUsersService')
@@ -45,7 +46,7 @@ describe('view locations show', () => {
     await controller(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith('pages/locationHistory/show', {
-      backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+      backLink: paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
       minLayout: 'three-quarters',
       tableRows: [
         [
@@ -57,7 +58,6 @@ describe('view locations show', () => {
         ],
       ],
       title: 'Location history',
-      titleCaption: 'Cell A-1-001',
     })
   })
 
@@ -70,13 +70,12 @@ describe('view locations show', () => {
       await controller(deepReq as Request, deepRes as Response)
 
       expect(deepRes.render).toHaveBeenCalledWith('pages/locationHistory/show', {
-        backLink: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+        backLink: paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
         minLayout: 'three-quarters',
         tableRows: [
           [{ text: 'Location Type' }, { text: 'CELL' }, { text: 'WING' }, { text: 'Unknown' }, { text: '05/07/2021' }],
         ],
         title: 'Location history',
-        titleCaption: 'Cell A-1-001',
       })
     })
   })

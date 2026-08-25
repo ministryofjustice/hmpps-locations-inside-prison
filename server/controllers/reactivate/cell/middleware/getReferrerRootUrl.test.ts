@@ -3,6 +3,7 @@ import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import LocationFactory from '../../../../testutils/factories/location'
 import getReferrerRootUrl from './getReferrerRootUrl'
+import paths from '../../../../utils/paths'
 
 describe('getReferrerRootUrl', () => {
   let deepReq: DeepPartial<FormWizard.Request>
@@ -20,6 +21,7 @@ describe('getReferrerRootUrl', () => {
     }
     deepRes = {
       locals: {
+        prisonId: 'TST',
         decoratedLocation: LocationFactory.build(),
       },
     }
@@ -29,9 +31,7 @@ describe('getReferrerRootUrl', () => {
     it('sets the correct referrerRootUrl', async () => {
       await getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepRes.locals.referrerRootUrl).toEqual(
-        `/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001`,
-      )
+      expect(deepRes.locals.referrerRootUrl).toEqual(paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'))
     })
   })
 
@@ -45,7 +45,7 @@ describe('getReferrerRootUrl', () => {
         await getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.locals.referrerRootUrl).toEqual(
-          `/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001`,
+          paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
         )
       })
     })
@@ -59,13 +59,14 @@ describe('getReferrerRootUrl', () => {
         await getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.locals.referrerRootUrl).toEqual(
-          `/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001`,
+          paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
         )
       })
     })
 
     describe('when referrerLocationId is a valid UUID', () => {
       beforeEach(() => {
+        sessionModelValues.referrerPrisonId = 'TST'
         sessionModelValues.referrerLocationId = '7e570000-0000-1000-8000-000000000002'
       })
 
@@ -73,7 +74,7 @@ describe('getReferrerRootUrl', () => {
         await getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.locals.referrerRootUrl).toEqual(
-          `/reactivate/parent/7e570000-0000-1000-8000-000000000002?select=1`,
+          `${paths.location.reactivate.parent('TST', '7e570000-0000-1000-8000-000000000002')}?select=1`,
         )
       })
     })
@@ -89,7 +90,7 @@ describe('getReferrerRootUrl', () => {
       it('sets the correct getReferrerRootUrl', async () => {
         await getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(deepRes.locals.referrerRootUrl).toEqual(`/inactive-cells/TST2`)
+        expect(deepRes.locals.referrerRootUrl).toEqual(paths.location.inactiveCells('TST2'))
       })
     })
 
@@ -101,7 +102,7 @@ describe('getReferrerRootUrl', () => {
       it('sets the correct getReferrerRootUrl', async () => {
         await getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(deepRes.locals.referrerRootUrl).toEqual(`/inactive-cells/TST2`)
+        expect(deepRes.locals.referrerRootUrl).toEqual(paths.location.inactiveCells('TST2'))
       })
     })
 
@@ -113,7 +114,9 @@ describe('getReferrerRootUrl', () => {
       it('sets the correct getReferrerRootUrl', async () => {
         await getReferrerRootUrl(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(deepRes.locals.referrerRootUrl).toEqual(`/inactive-cells/TST2/7e570000-0000-1000-8000-000000000002`)
+        expect(deepRes.locals.referrerRootUrl).toEqual(
+          paths.location.inactiveCells('TST2', '7e570000-0000-1000-8000-000000000002'),
+        )
       })
     })
   })

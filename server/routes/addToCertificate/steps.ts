@@ -3,17 +3,17 @@ import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
-import AddToCertificateInit from '../../controllers/addToCertificate/addToCertificateInit'
+import FormStep from '../../controllers/base/formStep'
+import paths from '../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
-    backLink: (_req, res) =>
-      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedResidentialSummary.location),
     reset: true,
     resetJourney: true,
     skip: true,
-    controller: AddToCertificateInit,
+    controller: FormStep,
     next: 'cert-change-disclaimer',
   },
   ...CertChangeDisclaimer.getSteps({

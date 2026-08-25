@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class ChangeCellCapacityPage extends Page {
   constructor() {
     super('')
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/change-cell-capacity`)
+  static goTo = (locationId: string) => cy.visit(paths.location.changeCellCapacity('TST', locationId))
 
   cnaInput = (): PageElement => cy.get('#baselineCna')
 

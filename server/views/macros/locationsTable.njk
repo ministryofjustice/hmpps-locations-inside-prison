@@ -5,7 +5,7 @@
 {% from "./locationTables/draftOther.njk" import draftOther %}
 {% from "./locationTables/other.njk" import other %}
 
-{% macro locationsTable(createButton, decoratedResidentialSummary) %}
+{% macro locationsTable(createButton, decoratedResidentialSummary, paths) %}
   {% set locationType = decoratedResidentialSummary.subLocationName %}
   {% set locations = decoratedResidentialSummary.subLocations %}
 
@@ -18,15 +18,15 @@
   {% if locations | length %}
     {% if locationType == 'Cells' %}
       {% if decoratedResidentialSummary.location and decoratedResidentialSummary.location.status.includes('DRAFT') %}
-        {{ draftCells(locations) }}
+        {{ draftCells(locations, paths) }}
       {% else %}
-        {{ cells(locations) }}
+        {{ cells(locations, paths) }}
       {% endif %}
     {% else %}
       {% if decoratedResidentialSummary.location and decoratedResidentialSummary.location.status.includes('DRAFT') %}
-        {{ draftOther(locations) }}
+        {{ draftOther(locations, paths) }}
       {% else %}
-        {{ other(locations) }}
+        {{ other(locations, paths) }}
       {% endif %}
     {% endif %}
   {% else %}

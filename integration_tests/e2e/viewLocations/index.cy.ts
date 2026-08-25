@@ -3,8 +3,13 @@ import AuthSignInPage from '../../pages/authSignIn'
 import Page, { PageElement } from '../../pages/page'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
 import LocationFactory from '../../../server/testutils/factories/location'
+import paths from '../../../server/utils/paths'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
+import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 
-const residentialSummary = {
+const residentialSummary = PrisonResidentialSummaryFactory.build({
   prisonSummary: {
     workingCapacity: 8,
     signedOperationalCapacity: 10,
@@ -26,13 +31,13 @@ const residentialSummary = {
   ],
   topLevelLocationType: 'Wings',
   locationHierarchy: [],
-}
+})
 
 context('View Locations Index', () => {
   context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: [] })
+      AuthStubber.stub.stubSignIn({ roles: [] })
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -49,26 +54,27 @@ context('View Locations Index', () => {
   context('With the default role', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'ACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['VIEW_INTERNAL_LOCATION'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
     })
 
     it('Correctly presents the API data', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      indexPage.cards.manageLocations().find('a').click()
+      indexPage.cards.viewLocations().find('a').click()
       const viewLocationsIndexPage = Page.verifyOnPage(ViewLocationsIndexPage)
 
       viewLocationsIndexPage.capacity.working().contains('8')
@@ -81,7 +87,7 @@ context('View Locations Index', () => {
         {
           location: {
             text: 'A-1-001',
-            href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000001',
+            href: paths.location.view('TST', '7e570000-0000-0000-0000-000000000001'),
           },
           status: {
             text: 'Active',
@@ -105,7 +111,7 @@ context('View Locations Index', () => {
         {
           location: {
             text: 'A-1-002',
-            href: '/view-and-update-locations/TST/7e570000-0000-0000-0000-000000000002',
+            href: paths.location.view('TST', '7e570000-0000-0000-0000-000000000002'),
           },
           status: {
             text: 'Inactive',
@@ -118,7 +124,7 @@ context('View Locations Index', () => {
           },
           inactiveCells: {
             text: '1',
-            href: '/inactive-cells/TST/7e570000-0000-0000-0000-000000000002',
+            href: paths.location.inactiveCells('TST', '7e570000-0000-0000-0000-000000000002'),
           },
           accommodationType: {
             text: 'Normal accommodation',

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { TypedLocals } from '../../../@types/express'
+import paths from '../../../utils/paths'
 
 export default async (req: Request, res: Response) => {
   const { locationsService } = req.services
@@ -14,9 +15,9 @@ export default async (req: Request, res: Response) => {
     uploads,
     hasInProgress,
     prisonId,
-    listUrl: `/admin/${prisonId}/ingest-cert`,
-    newUploadUrl: `/admin/${prisonId}/ingest-cert/new`,
-    backLink: `/admin/${prisonId}`,
+    listUrl: paths.admin.ingestCert(prisonId),
+    newUploadUrl: `${paths.admin.ingestCert(prisonId)}/new`,
+    backLink: paths.admin.index(prisonId),
   }
 
   const success = req.flash('success')

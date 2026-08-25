@@ -1,5 +1,6 @@
 // server/middleware/redirectCurrentCertificate.ts
 import { NextFunction, Request, Response } from 'express'
+import paths from '../utils/paths'
 
 export default async function redirectCurrentCertificate(
   req: Request,
@@ -13,7 +14,7 @@ export default async function redirectCurrentCertificate(
   const certificate = await locationsService.getCellCertificate(systemToken, certificateId as string)
 
   if (certificate.current) {
-    res.redirect('./current')
+    res.redirect(paths.cellCertificate.view(certificate.prisonId))
     return
   }
 

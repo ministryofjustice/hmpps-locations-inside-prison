@@ -5,6 +5,8 @@ import fields from '../../../routes/reactivate/cell/fields'
 import ReactivateCellDetails from './details'
 import getReferrerRootUrl from './middleware/getReferrerRootUrl'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
+import paths from '../../../utils/paths'
+import { DecoratedLocation } from '../../../decorators/decoratedLocation'
 
 describe('ReactivateCellDetails', () => {
   const controller = new ReactivateCellDetails({ route: '/' })
@@ -27,7 +29,6 @@ describe('ReactivateCellDetails', () => {
         },
       },
       session: {
-        referrerUrl: '/referrer-url',
         systemToken: 'token',
       },
       sessionModel: {
@@ -110,13 +111,11 @@ describe('ReactivateCellDetails', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/referrer-url',
-        cancelLink: `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
+        backLink: paths.location.view(deepRes.locals.decoratedLocation as DecoratedLocation),
+        cancelLink: paths.location.view(deepRes.locals.decoratedLocation as DecoratedLocation),
         fields,
         insetText:
           'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
-        title: 'Check cell capacity',
-        titleCaption: 'Cell A-1-001',
         validationErrors: [
           {
             href: '#workingCapacity',

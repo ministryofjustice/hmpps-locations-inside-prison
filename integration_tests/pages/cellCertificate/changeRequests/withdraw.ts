@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../../page'
+import paths from '../../../../server/utils/paths'
 
 export default class CellCertificateChangeRequestsWithdrawPage extends Page {
   constructor() {
     super('Withdraw change request')
   }
 
-  static goTo = (id: string) => cy.visit(`/TST/cell-certificate/change-requests/${id}/withdraw`)
+  static goTo = (id: string) => cy.visit(paths.cellCertificate.changeRequest.withdraw('TST', id))
 
   explanationInput = (): PageElement => cy.get(`textarea[name$="explanation"]`)
 

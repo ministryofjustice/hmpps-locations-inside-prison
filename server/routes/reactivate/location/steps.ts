@@ -14,6 +14,8 @@ import UpdateSignedOpCap from '../../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../../commonTransactions/submitCertificationApprovalRequest'
 import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
 import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
+import paths from '../../../utils/paths'
+import RequestsPending from '../../../commonTransactions/requestsPending'
 
 export function isTemporaryDeactivation(_req: FormWizard.Request, res: Response) {
   const { prisonConfiguration, decoratedLocation } = res.locals
@@ -23,6 +25,9 @@ export function isTemporaryDeactivation(_req: FormWizard.Request, res: Response)
 
   return decoratedLocation.inactiveStatus !== 'INACTIVE_MATCHING_CELL_CERT'
 }
+
+const hasPendingApprovalsBelow = (_req: FormWizard.Request, res: Response) =>
+  res.locals.pendingApprovalsBelow.hasPendingBelow
 
 function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
   if (path === '/:cellId/set-cell-type/init') {
@@ -152,7 +157,9 @@ function wrapSetCellTypeController(path: string, step: FormWizard.Step) {
 
         const { parentId } = res.locals.cell
         res.redirect(
-          `/reactivate/location/${res.locals.decoratedLocation.id}/edit-capacity/${res.locals.decoratedLocation.id === cellId ? cellId : parentId}`,
+          `${paths.location.reactivate.location(
+            res.locals.decoratedLocation,
+          )}/edit-capacity/${res.locals.decoratedLocation.id === cellId ? cellId : parentId}`,
         )
       }
     }
@@ -184,12 +191,12 @@ const steps: FormWizard.Steps = {
     reset: true,
     resetJourney: true,
     skip: true,
-    backLink: (_req, res) => {
-      const { prisonId, id } = res.locals.decoratedLocation
-
-      return `/view-and-update-locations/${prisonId}/${id}`
-    },
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
     next: [
+      {
+        fn: hasPendingApprovalsBelow,
+        next: 'requests-pending',
+      },
       {
         fn: isTemporaryDeactivation,
         next: 'no-cert-change-confirm',
@@ -198,6 +205,7 @@ const steps: FormWizard.Steps = {
     ],
     controller: ReactivateLocationInit,
   },
+  ...RequestsPending.getSteps(),
   '/check-capacity': {
     next: [{ fn: hasAnyCertCapacityChange, next: 'cert-change-disclaimer' }, 'no-cert-change-confirm'],
     fields: ['baselineCna', 'workingCapacity'],

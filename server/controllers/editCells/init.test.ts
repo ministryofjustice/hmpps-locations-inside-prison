@@ -3,6 +3,7 @@ import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import EditCellsInit from './init'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('EditCellsInit', () => {
   const controller = new EditCellsInit({ route: '/' })
@@ -98,7 +99,7 @@ describe('EditCellsInit', () => {
 
         controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-        expect(deepRes.redirect).toHaveBeenCalledWith(`/view-and-update-locations/${prisonId}/${locationId}`)
+        expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view(prisonId, locationId))
       })
 
       it('sets values on the sessionModel', () => {

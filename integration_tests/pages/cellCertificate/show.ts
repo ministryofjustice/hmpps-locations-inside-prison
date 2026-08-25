@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class CellCertificateShowPage extends Page {
   constructor() {
     super('')
   }
 
-  static goTo = (id: string) => cy.visit(`/TST/cell-certificate/${id}`)
+  static goTo = (id: string) => cy.visit(paths.cellCertificate.view('TST', id))
 
   approvalText = (): PageElement => cy.get('p[data-qa="last-approval"]')
 

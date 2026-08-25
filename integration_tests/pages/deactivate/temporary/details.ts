@@ -1,11 +1,13 @@
 import Page, { PageElement } from '../../page'
+import paths from '../../../../server/utils/paths'
 
 export default class DeactivateTemporaryDetailsPage extends Page {
   constructor() {
     super('Deactivation details')
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/deactivate/temporary`)
+  static goTo = (prisonId: string, locationId: string) =>
+    cy.visit(paths.location.deactivateTemporary(prisonId, locationId))
 
   reasonRadioLabels = (): PageElement => cy.get('body').find('label.govuk-radios__label')
 

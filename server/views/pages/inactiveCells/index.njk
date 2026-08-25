@@ -8,7 +8,7 @@
 
 {% from "../../macros/multiSelectFooter.njk" import multiSelectFooter %}
 
-{% macro inactiveCellTable(inactiveCells) %}
+{% macro inactiveCellTable(inactiveCells, paths) %}
   {% set rows = [] %}
 
   {% if inactiveCells[0].inactiveStatus === 'INACTIVE_PEND_CHANGE_REQ' %}
@@ -16,7 +16,7 @@
       {% set approvalRequest = approvalRequestMap[cell.pendingApprovalRequestId] %}
       {% set rows = (rows.push(
         [
-          { html: '<a href="/view-and-update-locations/' + cell.prisonId + '/' + cell.id + '">' + cell.pathHierarchy + '</a>' },
+          { html: "<a href='" + paths.location.view(cell) + "'>" + cell.pathHierarchy + "</a>" },
           { text: approvalTypeDescription(approvalRequest, constants, locationMap[approvalRequest.locationId]) },
           { text: userMap[approvalRequest.requestedBy] + ' on ' + approvalRequest.requestedDate | formatDate },
           {
@@ -51,7 +51,7 @@
 
       {% set rows = (rows.push(
         [
-          { html: '<a href="/view-and-update-locations/' + cell.prisonId + '/' + cell.id + '">' + cell.pathHierarchy + '</a>' },
+          { html: "<a href='" + paths.location.view(cell) + "'>" + cell.pathHierarchy + "</a>" },
           { text: cell.deactivatedReason + deactivationDescription },
           { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
           { text: cell.planetFmReference or 'Not provided' },
@@ -91,7 +91,7 @@
     {{ multiSelectFooter({
       actions: [{
         text: 'Activate selected cells',
-        formAction: '/reactivate/cells',
+        formAction: paths.location.reactivate.cells(prisonId, locationId),
         form: 'reactivate-cells'
       }]
     }) }}
@@ -141,7 +141,7 @@
 
         <div class="govuk-grid-column-full">
           {% if tempCells.length > 0 %}
-            {{ inactiveCellTable(tempCells) }}
+            {{ inactiveCellTable(tempCells, paths) }}
           {% else %}
             {{ govukInsetText({
               text: 'There are no temporary inactive cells.'
@@ -164,7 +164,7 @@
           </div>
 
           <div class="govuk-grid-column-full">
-            {{ inactiveCellTable(certChangeCells) }}
+            {{ inactiveCellTable(certChangeCells, paths) }}
           </div>
         </div>
       {% endif %}
@@ -183,7 +183,7 @@
 
         <div class="govuk-grid-column-full">
           {% if capDecreasedCells.length > 0 %}
-            {{ inactiveCellTable(capDecreasedCells) }}
+            {{ inactiveCellTable(capDecreasedCells, paths) }}
           {% else %}
             {{ govukInsetText({
               text: 'There are no inactive cells with decreased capacity on the cell certificate.'
@@ -213,7 +213,7 @@
         {% endif %}
 
         {% set row = (row.push(
-          { html: "<a href='/view-and-update-locations/" + cell.prisonId + "/" + cell.id + "'>" + cell.pathHierarchy + "</a>", classes: 'govuk-table__header' },
+          { html: "<a href='" + paths.location.view(cell) + "'>" + cell.pathHierarchy + "</a>", classes: 'govuk-table__header' },
           { text: cell.deactivatedReason + deactivationDescription },
           { text: (cell.proposedReactivationDate | formatDate) or 'Not provided' },
           { text: cell.planetFmReference or 'Not provided' },

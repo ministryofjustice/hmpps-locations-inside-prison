@@ -1,18 +1,17 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import DeactivatePermanentConfirm from '../../controllers/deactivate/permanent/confirm'
-import DeactivatePermanentDetails from '../../controllers/deactivate/permanent/details'
-import DeactivatePermanentWarning from '../../controllers/deactivate/permanent/warning'
 import DeactivateTemporaryConfirm from '../../controllers/deactivate/temporary/confirm'
 import DeactivateTemporaryDetails from '../../controllers/deactivate/temporary/details'
-import DeactivateOccupied from '../../controllers/deactivate/occupied'
-import DeactivateType from '../../controllers/deactivate/type'
-import CellCertChange from '../../controllers/deactivate/cell-cert-change'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import TemporaryInactiveInit from '../../controllers/deactivate/temporaryInactiveInit'
+import paths from '../../utils/paths'
+import FormStep from '../../controllers/base/formStep'
+import DeactivatePermanentBase from '../../controllers/deactivate/permanent/base'
+import RequestsPending from '../../commonTransactions/requestsPending'
 
 function isCellOccupied(_req: FormWizard.Request, res: Response) {
   return res.locals.prisonerLocation?.prisoners?.length > 0
@@ -53,15 +52,18 @@ function permanentDeactivationForbidden(req: FormWizard.Request, _res: Response)
   return !req.canAccess('deactivate:permanent')
 }
 
+const hasPendingApprovalsBelow = (_req: FormWizard.Request, res: Response) =>
+  res.locals.pendingApprovalsBelow.hasPendingBelow
+
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
     reset: true,
     resetJourney: true,
     skip: true,
-    backLink: (_req, res) =>
-      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
     next: [
+      { fn: hasPendingApprovalsBelow, next: 'requests-pending' },
       { fn: isCellOccupied, next: 'occupied' },
       {
         fn: (_req, res) =>
@@ -80,10 +82,12 @@ const steps: FormWizard.Steps = {
       'type',
     ],
   },
+  ...RequestsPending.getSteps(),
   '/cell-cert-change': {
     fields: ['reduceWorkingCapacity'],
     next: [{ field: 'reduceWorkingCapacity', value: 'YES', next: 'cert-change-disclaimer' }, 'temporary/details'],
-    controller: CellCertChange,
+    controller: FormStep,
+    pageTitle: 'Does the cell’s certified working capacity need to be decreased to 0 on the cell certificate?',
   },
   '/temporary-inactive-init': {
     skip: true,
@@ -106,8 +110,9 @@ const steps: FormWizard.Steps = {
   '/type': {
     fields: ['deactivationType'],
     next: [{ field: 'deactivationType', value: 'temporary', next: 'temporary/details' }, 'permanent/warning'],
-    controller: DeactivateType,
+    pageTitle: 'Do you want to deactivate this location temporarily or permanently?',
     template: '../../partials/formStep',
+    controller: FormStep,
   },
   '/temporary': {
     entryPoint: true,
@@ -136,6 +141,7 @@ const steps: FormWizard.Steps = {
       'temporary/confirm',
     ],
     controller: DeactivateTemporaryDetails,
+    pageTitle: 'Deactivation details',
     template: '../../partials/formStep',
   },
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
@@ -143,6 +149,7 @@ const steps: FormWizard.Steps = {
   '/temporary/confirm': {
     fields: ['confirm'],
     controller: DeactivateTemporaryConfirm,
+    pageTitle: 'Check your answers before deactivating this location',
   },
   '/permanent': {
     entryPoint: true,
@@ -153,21 +160,24 @@ const steps: FormWizard.Steps = {
   },
   '/permanent/warning': {
     next: 'permanent/details',
-    controller: DeactivatePermanentWarning,
+    controller: DeactivatePermanentBase,
   },
   '/permanent/details': {
     fields: ['permanentDeactivationReason'],
     next: 'permanent/confirm',
-    controller: DeactivatePermanentDetails,
+    controller: DeactivatePermanentBase,
+    pageTitle: 'Permanent deactivation details',
     template: '../../partials/formStep',
   },
   '/permanent/confirm': {
     fields: ['confirm'],
     controller: DeactivatePermanentConfirm,
+    pageTitle: 'You are permanently deactivating this location',
   },
   '/occupied': {
     checkJourney: false,
-    controller: DeactivateOccupied,
+    controller: FormStep,
+    pageTitle: "You can't deactivate this location as it is currently occupied",
   },
 }
 

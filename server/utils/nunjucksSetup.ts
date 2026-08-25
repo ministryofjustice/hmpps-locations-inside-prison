@@ -24,6 +24,7 @@ import getLocationAttributesIncludePending from './getLocationAttributesIncludeP
 import dashIfUndefined from '../formatters/dashIfUndefined'
 import yesNo from '../formatters/yesNo'
 import sortByFirstPresentAttribute from '../formatters/sortByFirstPresentAttribute'
+import paths from './paths'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -103,6 +104,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('propEquals', (k: string, v: unknown, o: object) => get(o, k) === v)
   njkEnv.addGlobal('formatConstants', formatConstants)
   njkEnv.addGlobal('approvalTypeDescription', approvalTypeDescription)
+  njkEnv.addGlobal('paths', paths)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)

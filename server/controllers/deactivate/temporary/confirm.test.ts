@@ -6,6 +6,7 @@ import DeactivateTemporaryConfirm from './confirm'
 import LocationsService from '../../../services/locationsService'
 import AnalyticsService from '../../../services/analyticsService'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
+import paths from '../../../utils/paths'
 
 describe('DeactivateTemporaryConfirm', () => {
   const controller = new DeactivateTemporaryConfirm({ route: '/' })
@@ -175,7 +176,7 @@ This will reduce the establishment's total working capacity from 1020 to 980.`)
 
       it('redirects to the cell occupied page', () => {
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          '/location/e07effb3-905a-4f6b-acdc-fafbb43a1ee2/deactivate/occupied',
+          `${paths.location.deactivate('TST', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2')}/occupied`,
         )
       })
 

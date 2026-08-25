@@ -1,10 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
 
-export default class CellConversionUsedFor extends FormInitialStep {
+export default class CellConversionUsedFor extends FormStep {
   override async configure(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { prisonId } = res.locals.decoratedLocation
     const usedForTypes = await req.services.locationsService.getUsedForTypesForPrison(req.session.systemToken, prisonId)
@@ -32,8 +31,6 @@ export default class CellConversionUsedFor extends FormInitialStep {
     return {
       ...locals,
       fields,
-      title: 'Convert to cell',
-      titleCaption: capFirst(res.locals.decoratedLocation.displayName),
     }
   }
 }

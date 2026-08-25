@@ -5,14 +5,15 @@ import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
 import populatePrisonersInLocation from '../../middleware/populatePrisonersInLocation'
-import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 import middleware from '../../middleware/middleware'
+import paths from '../../utils/paths'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
 const redirectIfOccupied = middleware((req, res, next) => {
   if (res.locals.prisonerLocation?.prisoners?.length > 0 && req.path !== '/occupied') {
-    res.redirect(`/location/${res.locals.decoratedLocation.id}/non-residential-conversion/occupied`)
+    res.redirect(`${paths.location.nonResidentialConversion(res.locals.decoratedLocation)}/occupied`)
     return
   }
 
@@ -22,7 +23,7 @@ const redirectIfOccupied = middleware((req, res, next) => {
 router.use(
   protectRoute('convert_non_residential'),
   populateLocation({ decorate: true }),
-  populatePrisonConfiguration(),
+  populateTitleCaptionFromLocationOrPrison,
   populatePrisonersInLocation(),
   redirectIfOccupied,
   wizard(steps, fields, {

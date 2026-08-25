@@ -2,7 +2,7 @@
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% macro draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary) %}
+{% macro draftLocationBanner(decoratedResidentialSummary, canAccess, topLevelDraftLocationSummary, paths) %}
   {% set topLevelDraftLocation = topLevelDraftLocationSummary.parentLocation %}
   {% set location = decoratedResidentialSummary.location %}
   {% set locationName = location.displayName | capFirst %}
@@ -29,7 +29,7 @@
       {{ govukButton({
         text: "Add " + (topLevelDraftLocation.locationType | lower) + " to cell certificate",
         preventDoubleClick: true,
-        href: "/location/" + topLevelDraftLocation.id + "/add-to-certificate",
+        href: paths.location.addToCertificate(topLevelDraftLocation),
         attributes: {
           'data-qa': 'add-to-cell-certificate'
         }

@@ -5,6 +5,13 @@ import DeactivateOccupiedPage from '../../pages/deactivate/occupied'
 import DeactivateTemporaryDetailsPage from '../../pages/deactivate/temporary/details'
 import DeactivateTemporaryConfirmPage from '../../pages/deactivate/temporary/confirm'
 import DeactivateTypePage from '../../pages/deactivate/type'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import LocationsApiStubber from '../../mockApis/locationsApi'
+import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
+import AuthStubber from '../../mockApis/auth'
+import RequestsPendingPage from '../../pages/requestsPending'
+import ViewLocationsIndexPage from '../../pages/viewLocations'
+import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
 
 context('Deactivate temporary', () => {
   const location = LocationFactory.build({
@@ -20,33 +27,37 @@ context('Deactivate temporary', () => {
 
   beforeEach(() => {
     cy.task('reset')
-  })
-
-  context('without any roles', () => {
-    beforeEach(() => {
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+    LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+    LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+    LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(
+      PrisonResidentialSummaryFactory.build({
         prisonSummary: {
           workingCapacity: 9,
           signedOperationalCapacity: 11,
           maxCapacity: 10,
         },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      }),
+    )
+    LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+    LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
+  })
+
+  context('without any roles', () => {
+    beforeEach(() => {
+      AuthStubber.stub.stubSignIn()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: location,
       })
-      cy.task('stubLocations', location)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubLocations(location)
       cy.signIn()
     })
 
@@ -61,29 +72,11 @@ context('Deactivate temporary', () => {
     const cell = LocationFactory.build({ ...location, locationType: 'CELL', leafLevel: true })
 
     beforeEach(() => {
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: cell,
       })
-      cy.task('stubLocations', cell)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubLocations(cell)
       cy.signIn()
     })
 
@@ -98,29 +91,9 @@ context('Deactivate temporary', () => {
     const wing = LocationFactory.build({ ...location, locationType: 'WING' })
 
     beforeEach(() => {
-      cy.task('stubSignIn', { roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: wing,
-      })
-      cy.task('stubLocations', wing)
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: wing })
+      LocationsApiStubber.stub.stubLocations(wing)
       cy.signIn()
     })
 
@@ -133,31 +106,11 @@ context('Deactivate temporary', () => {
 
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummary', {
-        prisonSummary: {
-          workingCapacity: 9,
-          signedOperationalCapacity: 11,
-          maxCapacity: 10,
-        },
-      })
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-        parentLocation: location,
-      })
-      cy.task('stubLocations', location)
-      cy.task('stubPrisonerLocationsId', [])
-      cy.task('stubLocationsDeactivateTemporary')
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+      LocationsApiStubber.stub.stubLocations(location)
+      LocationsApiStubber.stub.stubPrisonerLocationsId([])
+      LocationsApiStubber.stub.stubLocationsDeactivateTemporary()
 
       cy.signIn()
     })
@@ -180,6 +133,51 @@ context('Deactivate temporary', () => {
         Page.verifyOnPage(ViewLocationsShowPage)
       })
     }
+
+    describe('requests pending page', () => {
+      beforeEach(() => {
+        LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        LocationsApiStubber.stub.stubPendingApprovalsBelow({
+          hasPendingBelow: true,
+          pendingLocations: [
+            {
+              id: '6bcfab2c-df86-467b-89ca-e1eb1bb84249',
+              key: 'LEI-A-1-016',
+              locationType: 'CELL',
+              parentId: 'd8ddb0a7-1e39-425c-a32f-d128e80ca05b',
+              parentKey: 'LEI-A-1',
+              parentLocationType: 'LANDING',
+            },
+          ],
+        })
+
+        ViewLocationsShowPage.goTo(location.prisonId, location.id)
+        const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
+        viewLocationsShowPage.actionsMenu().click()
+        viewLocationsShowPage.deactivateAction().click()
+      })
+
+      it('has a back link to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.backLink().click()
+
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a cancel link that leads to the view location page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.returnLink().click()
+
+        Page.verifyOnPage(ViewLocationsIndexPage)
+      })
+
+      it('has a link to the cert approvals page', () => {
+        const requestsPendingPage = Page.verifyOnPage(RequestsPendingPage)
+        requestsPendingPage.certApprovalsLink().click()
+
+        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
+      })
+    })
 
     context('when the cell is occupied', () => {
       beforeEach(() => {
@@ -209,8 +207,8 @@ context('Deactivate temporary', () => {
             ],
           },
         ]
-        cy.task('stubPrisonerLocationsId', prisonerLocations)
-        DeactivateTemporaryDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        LocationsApiStubber.stub.stubPrisonerLocationsId(prisonerLocations)
+        DeactivateTemporaryDetailsPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       itDisplaysTheCellOccupiedPage()
@@ -245,7 +243,7 @@ context('Deactivate temporary', () => {
 
     describe('details page', () => {
       beforeEach(() => {
-        DeactivateTemporaryDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivateTemporaryDetailsPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
       })
 
       it('has a back link to the view location page', () => {
@@ -389,7 +387,7 @@ context('Deactivate temporary', () => {
 
     describe('confirmation page', () => {
       beforeEach(() => {
-        DeactivateTemporaryDetailsPage.goTo('7e570000-0000-0000-0000-000000000001')
+        DeactivateTemporaryDetailsPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
         const detailsPage = Page.verifyOnPage(DeactivateTemporaryDetailsPage)
         detailsPage.reasonRadioItem('TEST2').click()
         detailsPage.descriptionFreeText('TEST2').clear().type('Test description')
@@ -496,7 +494,7 @@ context('Deactivate temporary', () => {
 
       context('when the cell becomes occupied during the process', () => {
         beforeEach(() => {
-          cy.task('stubLocationsDeactivateTemporaryOccupied')
+          LocationsApiStubber.stub.stubLocationsDeactivateTemporaryOccupied()
 
           const confirmationPage = Page.verifyOnPage(DeactivateTemporaryConfirmPage)
           confirmationPage.confirmButton().click()

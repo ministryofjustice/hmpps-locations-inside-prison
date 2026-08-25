@@ -3,11 +3,12 @@ import Review from '../../../../controllers/cellCertificate/changeRequests/revie
 import Approve from '../../../../controllers/cellCertificate/changeRequests/review/approve'
 import Reject from '../../../../controllers/cellCertificate/changeRequests/review/reject'
 import approvalCellWouldBeOvercrowded from './approvalCellWouldBeOvercrowded'
-import FormInitialStep from '../../../../controllers/base/formInitialStep'
+import FormStep from '../../../../controllers/base/formStep'
+import paths from '../../../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
-    backLink: (_req, res) => `/${res.locals.approvalRequest.prisonId}/cell-certificate/change-requests`,
+    backLink: (_req, res) => paths.cellCertificate.changeRequest.view(res.locals.approvalRequest.prisonId),
     entryPoint: true,
     reset: true,
     resetJourney: true,
@@ -37,7 +38,7 @@ const steps: FormWizard.Steps = {
   },
   '/too-many-occupants': {
     pageTitle: 'You can’t approve this change because too many people are occupying the cell',
-    controller: FormInitialStep,
+    controller: FormStep,
   },
 }
 

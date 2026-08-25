@@ -113,9 +113,7 @@ describe('ChangeUsedForDetails', () => {
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         removeHeadingSpacing: true,
-        backLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         buttonText: 'Save used for',
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         fields: {
           usedFor: {
             component: 'govukCheckboxes',
@@ -146,8 +144,6 @@ describe('ChangeUsedForDetails', () => {
           },
         },
         leafLevel: true,
-        title: 'Change what the location is used for',
-        titleCaption: 'A-1-001',
         validationErrors: [],
       })
     })

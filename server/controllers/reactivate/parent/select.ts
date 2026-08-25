@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import getLocationResidentialSummary from './middleware/getLocationResidentialSummary'
-import capFirst from '../../../formatters/capFirst'
+import paths from '../../../utils/paths'
 
-export default class ReactivateParentSelect extends FormInitialStep {
+export default class ReactivateParentSelect extends FormStep {
   override middlewareSetup() {
     this.use(getLocationResidentialSummary)
     this.use(this.populateItems)
@@ -35,8 +35,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response) {
-    const { decoratedLocation, locationResidentialSummary } = res.locals
-    const backLink = `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
+    const { locationResidentialSummary } = res.locals
 
     const { form } = req
     const { fields } = form.options
@@ -51,10 +50,7 @@ export default class ReactivateParentSelect extends FormInitialStep {
 
     return {
       ...super.locals(req, res),
-      backLink,
-      cancelLink: backLink,
       title: `Activate individual ${locationResidentialSummary.subLocationName.toLowerCase()}`,
-      titleCaption: capFirst(decoratedLocation.displayName),
       minLayout: 'one-half',
     }
   }
@@ -64,7 +60,10 @@ export default class ReactivateParentSelect extends FormInitialStep {
     const { selectLocations } = req.form.values as { selectLocations: string[] }
     if (locationResidentialSummary.subLocationName === 'Cells' && selectLocations.length === 1) {
       res.redirect(
-        `/reactivate/cell/${selectLocations[0]}?ref=parent&refPrisonId=${decoratedLocation.prisonId}&refLocationId=${decoratedLocation.id}`,
+        `${paths.location.reactivate.cell(
+          res.locals.prisonId,
+          selectLocations[0],
+        )}?ref=parent&refPrisonId=${decoratedLocation.prisonId}&refLocationId=${decoratedLocation.id}`,
       )
 
       return

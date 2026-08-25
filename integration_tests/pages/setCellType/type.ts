@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class SetCellTypeTypePage extends Page {
   constructor() {
     super('Is it a normal or special cell type?')
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/set-cell-type`)
+  static goTo = (locationId: string) => cy.visit(paths.location.setCellType('TST', locationId))
 
   normalAccommodationType = (): PageElement =>
     cy.get('input[name^=set-cell-type_accommodationType][value=NORMAL_ACCOMMODATION]')

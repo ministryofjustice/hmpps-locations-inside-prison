@@ -6,19 +6,18 @@ import logger from '../../logger'
 export default function populateInactiveCells({ locationsService, manageUsersService }: Services) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { systemToken } = req.session
-    const { user, prisonId } = res.locals
+    const { user, prisonId, locationId } = res.locals
 
     try {
       res.locals.inactiveCells = await Promise.all(
-        ((await locationsService.getInactiveCells(systemToken, prisonId, req.params.locationId as string)) || []).map(
-          location =>
-            decorateLocation({
-              location,
-              systemToken,
-              userToken: user.token,
-              manageUsersService,
-              locationsService,
-            }),
+        ((await locationsService.getInactiveCells(systemToken, prisonId, locationId)) || []).map(location =>
+          decorateLocation({
+            location,
+            systemToken,
+            userToken: user.token,
+            manageUsersService,
+            locationsService,
+          }),
         ),
       )
 

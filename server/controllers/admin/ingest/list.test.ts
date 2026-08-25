@@ -3,6 +3,7 @@ import { DeepPartial } from 'fishery'
 import ingestList from './list'
 import LocationsService from '../../../services/locationsService'
 import { CellCertificateUpload } from '../../../data/types/locationsApi/cellCertificateUpload'
+import paths from '../../../utils/paths'
 
 describe('Cell certificate uploads - list', () => {
   let deepReq: DeepPartial<Request>
@@ -47,7 +48,7 @@ describe('Cell certificate uploads - list', () => {
       expect.objectContaining({
         uploads: [finishedUpload],
         hasInProgress: false,
-        newUploadUrl: '/admin/TST/ingest-cert/new',
+        newUploadUrl: `${paths.admin.ingestCert('TST')}/new`,
       }),
     )
   })

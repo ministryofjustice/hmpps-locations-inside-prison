@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { ResponseError } from 'superagent'
 import logger from '../logger'
+import paths from './utils/paths'
 
 export default function createErrorHandler(production: boolean) {
   return (error: SanitisedError | ResponseError, req: Request, res: Response, next: NextFunction): void => {
@@ -25,7 +26,7 @@ export default function createErrorHandler(production: boolean) {
           )))
     ) {
       logger.info('Logging user out')
-      return res.redirect('/sign-out')
+      return res.redirect(paths.auth.signOut)
     }
 
     if ('code' in error && error.code === 'SESSION_TIMEOUT') {

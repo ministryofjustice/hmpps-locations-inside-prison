@@ -1,12 +1,13 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { TypedLocals } from '../../@types/express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import paths from '../../utils/paths'
 
-export default class ConfirmCreateCells extends FormInitialStep {
+export default class ConfirmCreateCells extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(unsetTempValues)
@@ -15,7 +16,6 @@ export default class ConfirmCreateCells extends FormInitialStep {
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { services, session, sessionModel } = req
-    const { locationId } = res.locals
 
     const { locationsService } = services
     const { systemToken } = session
@@ -24,7 +24,7 @@ export default class ConfirmCreateCells extends FormInitialStep {
     const accommodationType = sessionModel.get<string>('create-cells_accommodationType')
     const usedFor = sessionModel.get<string[]>('create-cells_usedFor')
 
-    res.locals.createRootLink = `/create-cells/${locationId}`
+    res.locals.createRootLink = paths.location.createCells(res.locals.decoratedResidentialSummary.location)
 
     res.locals.summaryListRows = [
       {
@@ -82,7 +82,6 @@ export default class ConfirmCreateCells extends FormInitialStep {
     const { localName, locationType, pathHierarchy } = res.locals.decoratedResidentialSummary.location
     locals.locationPathPrefix = pathHierarchy
 
-    locals.title = `Check and confirm the cell details`
     locals.titleCaption = `Create cells on ${locationType.toLowerCase()} ${localName || pathHierarchy}`
     locals.buttonText = `Create cells`
 
@@ -153,6 +152,6 @@ export default class ConfirmCreateCells extends FormInitialStep {
       content,
     })
 
-    res.redirect(`/view-and-update-locations/${location.prisonId}/${location.id}`)
+    res.redirect(paths.location.view(location))
   }
 }

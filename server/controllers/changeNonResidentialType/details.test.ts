@@ -7,6 +7,7 @@ import maxLength from '../../validators/maxLength'
 import ChangeNonResidentialTypeDetails from './details'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
+import paths from '../../utils/paths'
 
 describe('ChangeNonResidentialTypeDetails', () => {
   const controller = new ChangeNonResidentialTypeDetails({ route: '/' })
@@ -131,9 +132,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
   describe('locals', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        backLink: `/view-and-update-locations/TST/${locationId}`,
         buttonText: 'Save',
-        cancelLink: `/view-and-update-locations/TST/${locationId}`,
         fields: {
           convertedCellType: {
             component: 'govukRadios',
@@ -324,8 +323,6 @@ describe('ChangeNonResidentialTypeDetails', () => {
             'ignore-defaults': true,
           },
         },
-        title: 'Change non-residential room type',
-        titleCaption: 'A-1-001',
         validationErrors: [],
       })
     })
@@ -416,9 +413,7 @@ describe('ChangeNonResidentialTypeDetails', () => {
 
     it('redirects to the view location page', () => {
       controller.successHandler(reqSuccessHandler, resSuccessHandler, nextSuccessHandler)
-      expect(resSuccessHandler.redirect).toHaveBeenCalledWith(
-        `/view-and-update-locations/TST/${locationIdSuccessHandler}`,
-      )
+      expect(resSuccessHandler.redirect).toHaveBeenCalledWith(paths.location.view('TST', locationIdSuccessHandler))
     })
   })
 })

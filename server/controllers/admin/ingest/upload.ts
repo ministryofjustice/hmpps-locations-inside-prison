@@ -2,24 +2,15 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import fs from 'fs'
 import { TypedLocals } from '../../../@types/express'
-import backUrl from '../../../utils/backUrl'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { BulkCapacityUpdate, CapacitySummary } from '../../../data/types/locationsApi/bulkCapacityChanges'
 
-export default class IngestUpload extends FormInitialStep {
+export default class IngestUpload extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
-    const { prisonId } = res.locals.prisonConfiguration
-
-    const backLink = backUrl(req, {
-      fallbackUrl: `/admin/${prisonId}/ingest-cert`,
-    })
 
     return {
       ...locals,
-      backLink,
-      cancelLink: backLink,
-      title: 'Upload cell cert data',
       buttonText: 'Upload',
     }
   }
@@ -66,12 +57,12 @@ export default class IngestUpload extends FormInitialStep {
 
       req.sessionModel.set('capacityData', capacityData)
       req.sessionModel.set('capacitySummary', capacitySummary)
-      return next()
     } catch (error) {
-      return next(error)
+      next(error)
+      return
     }
 
-    return next()
+    next()
   }
 }
 

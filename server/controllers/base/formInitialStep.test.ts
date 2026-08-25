@@ -1,9 +1,9 @@
 import { DeepPartial } from 'fishery'
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from './formInitialStep'
+import FormStep from './formStep'
 
-const controller = new FormInitialStep({
+const controller = new FormStep({
   route: '/',
 })
 

@@ -89,6 +89,7 @@ services:
 
   manage-users-api:
     image: ghcr.io/ministryofjustice/hmpps-manage-users-api:latest
+    platform: linux/amd64
     container_name: manage-users-api
     networks:
       - hmpps
@@ -113,6 +114,7 @@ services:
 
   hmpps-external-users-api:
     image: ghcr.io/ministryofjustice/hmpps-external-users-api:latest
+    platform: linux/amd64
     container_name: hmpps-external-users-api
     networks:
       - hmpps
@@ -191,7 +193,7 @@ services:
       - ./wiremock:/home/wiremock
 
   redis:
-    image: 'redis:8.8'
+    image: 'redis:8.10'
     networks:
       - hmpps
     container_name: redis

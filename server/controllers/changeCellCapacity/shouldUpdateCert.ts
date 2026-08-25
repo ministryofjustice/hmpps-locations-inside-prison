@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 
-export default class ShouldUpdateCert extends FormInitialStep {
+export default class ShouldUpdateCert extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(this.setupDynamicFields)

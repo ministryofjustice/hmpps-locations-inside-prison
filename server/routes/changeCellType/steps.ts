@@ -1,11 +1,11 @@
 import FormWizard from 'hmpo-form-wizard'
 import ChangeCellType from '../../controllers/changeCellType'
+import paths from '../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
-    backLink: (_req, res) =>
-      `/view-and-update-locations/${[res.locals.prisonId, res.locals.locationId].filter(i => i).join('/')}`,
+    backLink: (_req, res) => paths.location.view(res.locals.decoratedLocation),
     reset: true,
     resetJourney: true,
     skip: true,

@@ -1,33 +1,32 @@
-{% extends "../../../partials/formStep.njk" %}
+{% extends "../../partials/formStep.njk" %}
 
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
-{% set certApprovalHtml %}
+{% set resiHtml %}
   <span class="hmpps-inactive-location-banner">
       {{ govukSummaryList({
-        rows: [
+        rows:[
           {
             key: { text: 'Prison' },
             value: { text: prisonConfiguration.prisonId }
           },
           {
-            key: { text: 'Certification approval required' },
-            value: { text: prisonConfiguration.certificationApprovalRequired }
+            key: { text: adminSubject.name | capFirst },
+            value: { text: prisonConfiguration[adminSubject.attribute] }
           }
         ],
-        classes: 'hmpps-inactive-location-banner-summary-list'
-      }) }}
+        classes: 'hmpps-inactive-location-banner-summary-list' }) }}
   </span>
 {% endset %}
 
 {% block fields %}
   {{ govukNotificationBanner({
-    html: certApprovalHtml,
+    html: resiHtml,
     classes: 'govuk-notification-banner__headerless'
   }) }}
 
-  <input type="hidden" name="activation" value="{{ 'IN' if prisonConfiguration.certificationApprovalRequired == 'ACTIVE' }}ACTIVE">
+  <input type="hidden" name="activation" value="{{ 'IN' if prisonConfiguration[adminSubject.attribute] === 'ACTIVE' }}ACTIVE">
 
   {{ super() }}
 {% endblock %}

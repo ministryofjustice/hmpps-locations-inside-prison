@@ -1,12 +1,11 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
-import backUrl from '../../../utils/backUrl'
+import FormStep from '../../base/formStep'
 import { Location } from '../../../data/types/locationsApi'
 import populateLocation from '../../../middleware/populateLocation'
-import capFirst from '../../../formatters/capFirst'
+import paths from '../../../utils/paths'
 
-export default class ReactivateParentChangeCapacity extends FormInitialStep {
+export default class ReactivateParentChangeCapacity extends FormStep {
   override middlewareSetup() {
     this.use(this.populateCell)
     super.middlewareSetup()
@@ -64,19 +63,14 @@ export default class ReactivateParentChangeCapacity extends FormInitialStep {
   }
 
   override locals(req: FormWizard.Request, res: Response) {
-    const locals = super.locals(req, res)
-    const { decoratedCell, decoratedLocation } = res.locals
-    const backLink = backUrl(req, { fallbackUrl: `/reactivate/parent/${decoratedLocation.id}/check-capacity` })
-    const cancelLink = `/view-and-update-locations/${[decoratedLocation.prisonId, decoratedLocation.id].join('/')}`
+    const { decoratedLocation } = res.locals
 
     return {
-      ...locals,
-      backLink,
-      cancelLink,
-      title: `Change cell capacity`,
+      ...super.locals(req, res),
+      // The back link has to be set explicitly here because this step has checkJourney: false
+      backLink: `${paths.location.reactivate.parent(decoratedLocation)}/check-capacity`,
       insetText:
         'Cells used for someone to stay in temporarily (such as care and separation, healthcare or special accommodation cells) should have a working capacity of 0.',
-      titleCaption: capFirst(decoratedCell.displayName),
     }
   }
 

@@ -4,6 +4,10 @@ import ReactivateParentSelectPage from '../../../pages/reactivate/parent/select'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import ReactivateCellConfirmPage from '../../../pages/reactivate/cell/confirm'
 import ReactivateCellDetailsPage from '../../../pages/reactivate/cell/details'
+import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
+import AuthStubber from '../../../mockApis/auth'
+import LocationsApiStubber from '../../../mockApis/locationsApi'
+import PrisonResidentialSummaryFactory from '../../../../server/testutils/factories/prisonResidentialSummary'
 
 const createCell = (id: number) => {
   return LocationFactory.build({
@@ -39,7 +43,7 @@ context('Reactivate cell (from reactivate parent)', () => {
     topLevelId: undefined,
   })
 
-  const residentialSummary = {
+  const residentialSummary = PrisonResidentialSummaryFactory.build({
     prisonSummary: {
       workingCapacity: 8,
       signedOperationalCapacity: 12,
@@ -49,7 +53,7 @@ context('Reactivate cell (from reactivate parent)', () => {
     subLocations: [],
     topLevelLocationType: 'Wings',
     locationHierarchy: [],
-  }
+  })
 
   const createLocations = () => {
     inactiveLanding = LocationFactory.build({
@@ -74,22 +78,24 @@ context('Reactivate cell (from reactivate parent)', () => {
     beforeEach(() => {
       createLocations()
       cy.task('reset')
-      cy.task('stubSignIn')
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+      AuthStubber.stub.stubSignIn()
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
         parentLocation: inactiveLanding,
         subLocations: [inactiveCell1, inactiveCell2, inactiveCell3],
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
       cy.signIn()
     })
 
@@ -107,29 +113,32 @@ context('Reactivate cell (from reactivate parent)', () => {
     beforeEach(() => {
       createLocations()
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
-      cy.task('stubManageUsers')
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubLocationsConstantsAccommodationType')
-      cy.task('stubLocationsConstantsConvertedCellType')
-      cy.task('stubLocationsConstantsDeactivatedReason')
-      cy.task('stubLocationsConstantsLocationType')
-      cy.task('stubLocationsConstantsApprovalType')
-      cy.task('stubLocationsConstantsSpecialistCellType')
-      cy.task('stubLocationsConstantsUsedForType')
-      locations.forEach(location => cy.task('stubLocations', location))
-      cy.task('stubLocationsBulkReactivate')
-      cy.task('stubLocationsLocationsResidentialSummary', residentialSummary)
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+      ManageUsersApiStubber.stub.stubManageUsers()
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+      LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+      LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+      LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+      LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+      LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+      LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+      LocationsApiStubber.stub.stubPendingApprovalsBelow({ hasPendingBelow: false, pendingLocations: [] })
+      LocationsApiStubber.stub.stubLocationsBulkReactivate()
+      LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary(residentialSummary)
       locations.forEach(location => {
+        LocationsApiStubber.stub.stubLocations(location)
+
         const subLocations = locations.filter(l => l.parentId === location.id)
-        cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
           parentLocation: location,
           subLocations,
           subLocationName: `${subLocations[0]?.locationType?.toLowerCase()?.replace(/^\w/, a => a.toUpperCase()) || 'subLocationName'}s`,
         })
       })
-      cy.task('stubGetPrisonConfiguration', { prisonId: 'TST', certificationActive: 'INACTIVE' })
       cy.signIn()
       ViewLocationsShowPage.goTo(inactiveLanding.prisonId, inactiveLanding.id)
       viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)

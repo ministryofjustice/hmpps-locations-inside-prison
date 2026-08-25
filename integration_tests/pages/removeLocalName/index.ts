@@ -5,8 +5,6 @@ export default class ChangeLocalNamePage extends Page {
     super(/Are you sure you want to remove the local name?/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/set-cell-type`)
-
   localNameTextInput = (): PageElement => cy.get('#localName')
 
   removeLocalNameButton = (): PageElement => cy.get('button:contains("Remove name")')

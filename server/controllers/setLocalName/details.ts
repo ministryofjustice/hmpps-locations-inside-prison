@@ -1,27 +1,14 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
-import backUrl from '../../utils/backUrl'
+import FormStep from '../base/formStep'
 import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
-import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class Details extends FormInitialStep {
+export default class Details extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const locals = super.locals(req, res)
-    const { decoratedLocation } = res.locals
-    const { id: locationId, prisonId } = decoratedLocation
-
-    const backLink = backUrl(req, {
-      fallbackUrl: `/view-and-update-locations/${prisonId}/${locationId}`,
-    })
-
     return {
-      ...locals,
-      backLink,
-      cancelLink: `/view-and-update-locations/${prisonId}/${locationId}`,
-      title: 'Add local name',
-      titleCaption: capFirst(decoratedLocation.displayName),
+      ...super.locals(req, res),
       insetText:
         'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
       buttonText: 'Save name',
@@ -84,7 +71,7 @@ export default class Details extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, prisonId } = res.locals.decoratedLocation
+    const { decoratedLocation } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -93,6 +80,7 @@ export default class Details extends FormInitialStep {
       title: 'Local name added',
       content: 'You have added a local name.',
     })
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

@@ -17,6 +17,7 @@ describe('RequestsPending', () => {
     deepReq = { session: {} }
     deepRes = {
       locals: {
+        prisonId: 'TST',
         decoratedLocation,
       },
     }
@@ -25,11 +26,7 @@ describe('RequestsPending', () => {
   describe('locals', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
-        cancelLink: '/view-and-update-locations/TST/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
         changeRequestsLink: '/TST/cell-certificate/change-requests',
-        decoratedLocation,
-        title: 'You can’t request a change to the certificate for this location currently',
-        titleCaption: 'Cell A-1-001',
       })
     })
   })

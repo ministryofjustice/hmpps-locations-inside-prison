@@ -1,14 +1,15 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { compact } from 'lodash'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import generateChangeSummary from '../../lib/generateChangeSummary'
 import getPrisonResidentialSummary from '../../middleware/getPrisonResidentialSummary'
 import { SummaryListRow } from '../../@types/govuk'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
+import paths from '../../utils/paths'
 
-export default class CellConversionConfirm extends FormInitialStep {
+export default class CellConversionConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(getPrisonResidentialSummary)
@@ -79,12 +80,11 @@ export default class CellConversionConfirm extends FormInitialStep {
       usedForTypes,
       workingCapacity,
     } = res.locals
-    const { id: locationId } = decoratedLocation
 
     sessionModel.unset('previousCellTypes')
     sessionModel.unset('previousAccommodationType')
 
-    const editLink = (step: string) => `/location/${locationId}/cell-conversion/${step}/edit`
+    const editLink = (step: string) => `${paths.location.cellConversion(decoratedLocation)}/${step}/edit`
 
     const summaryListRows: SummaryListRow[] = compact([
       this.toSummaryListRow('Accommodation type', accommodationType, editLink('accommodation-type')),
@@ -151,17 +151,16 @@ export default class CellConversionConfirm extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { id: locationId, localName, pathHierarchy, prisonId } = res.locals.decoratedLocation
-    const locationName = localName || pathHierarchy
+    const { decoratedLocation } = res.locals
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
     req.flash('success', {
       title: 'Non-residential room converted to a cell',
-      content: `You have converted ${locationName} into a cell.`,
+      content: `You have converted ${decoratedLocation.pathHierarchy} into a cell.`,
     })
 
-    res.redirect(`/view-and-update-locations/${prisonId}/${locationId}`)
+    res.redirect(paths.location.view(decoratedLocation))
   }
 }

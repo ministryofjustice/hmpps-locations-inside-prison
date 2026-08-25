@@ -4,15 +4,15 @@ import steps from './steps'
 import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
-import populatePrisonConfiguration from '../../middleware/populatePrisonConfiguration'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
 router.use(
   protectRoute('set_cell_type'),
   populateLocation({ decorate: true, includeCurrentCertificate: true }),
-  populatePrisonConfiguration(),
+  populateTitleCaptionFromLocationOrPrison,
   addConstantToLocals('specialistCellTypes'),
   wizard(steps, fields, {
     name: 'remove-cell-type',

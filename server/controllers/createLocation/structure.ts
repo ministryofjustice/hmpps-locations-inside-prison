@@ -1,10 +1,10 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
 import pluralize from '../../formatters/pluralize'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
 
-export default class Structure extends FormInitialStep {
+export default class Structure extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { values } = req.form

@@ -2,6 +2,7 @@ import AuthStubber from '../../mockApis/auth'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import { CellCertificateDashboardEntry } from '../../../server/data/types/locationsApi/cellCertificateDashboard'
+import paths from '../../../server/utils/paths'
 
 // TST is first so it is the active caseload (its prison configuration is stubbed below)
 const caseloads = [
@@ -67,6 +68,7 @@ context('Capacity management dashboard', () => {
     cy.task('reset')
     AuthStubber.stub.stubSignIn({ roles: ['RESI__CERT_VIEWER'] })
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads(caseloads)
+    ManageUsersApiStubber.stub.stubManageCaseloads()
     LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
     LocationsApiStubber.stub.stubLocationsCellCertificateDashboard(dashboard)
     cy.signIn()
@@ -90,7 +92,7 @@ context('Capacity management dashboard', () => {
     cy.get('[data-qa="capacity-management-dashboard-table"]')
       .contains('a', 'View')
       .should('have.attr', 'href')
-      .and('match', /\/cell-certificate\/current$/)
+      .and('equal', paths.cellCertificate.view('ALI'))
 
     cy.screenshot('capacity-management-dashboard', { capture: 'fullPage' })
   })

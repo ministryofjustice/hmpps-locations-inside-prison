@@ -2,12 +2,13 @@ import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import { uniq } from 'lodash'
 import { TypedLocals } from '../../@types/express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import LocationsApiClient from '../../data/locationsApiClient'
 import unsetTempValues from '../../middleware/unsetTempValues'
 import { DecoratedLocation } from '../../decorators/decoratedLocation'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
+import paths from '../../utils/paths'
 
 function changesMadeToCells(
   existingCells: DecoratedLocation[],
@@ -60,7 +61,7 @@ function changesMade(
   )
 }
 
-export default class EditCellsConfirm extends FormInitialStep {
+export default class EditCellsConfirm extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(unsetTempValues)
@@ -69,7 +70,6 @@ export default class EditCellsConfirm extends FormInitialStep {
 
   override async _locals(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { services, session, sessionModel } = req
-    const { locationId } = res.locals
 
     const { locationsService } = services
     const { systemToken } = session
@@ -78,7 +78,7 @@ export default class EditCellsConfirm extends FormInitialStep {
     const accommodationType = sessionModel.get<string>('create-cells_accommodationType')
     const usedFor = sessionModel.get<string[]>('create-cells_usedFor')
 
-    res.locals.createRootLink = `/edit-cells/${locationId}`
+    res.locals.createRootLink = paths.location.editCells(res.locals.decoratedResidentialSummary.location)
 
     res.locals.summaryListRows = [
       {
@@ -134,13 +134,11 @@ export default class EditCellsConfirm extends FormInitialStep {
     const locals = super.locals(req, res)
 
     const { location, subLocations } = res.locals.decoratedResidentialSummary
-    const { localName, locationType, pathHierarchy, id, prisonId } = location
+    const { pathHierarchy } = location
     locals.locationPathPrefix = pathHierarchy
 
-    locals.title = 'Edit cells'
-    locals.titleCaption = `${locationType} ${localName || pathHierarchy}`
     locals.buttonText = 'Update cells'
-    locals.backLink = `/view-and-update-locations/${[prisonId, id].join('/')}`
+    locals.backLink = paths.location.view(location)
 
     const hasAnyNonDraftCells = subLocations.some(l => l.status !== 'DRAFT')
     if (hasAnyNonDraftCells) {
@@ -222,6 +220,6 @@ export default class EditCellsConfirm extends FormInitialStep {
       content: `You have updated cells on ${location.localName || location.pathHierarchy}.`,
     })
 
-    res.redirect(`/view-and-update-locations/${location.prisonId}/${location.id}`)
+    res.redirect(paths.location.view(location))
   }
 }

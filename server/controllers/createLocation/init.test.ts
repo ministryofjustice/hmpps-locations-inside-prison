@@ -2,6 +2,7 @@ import { DeepPartial } from 'fishery'
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
 import CreateLocationInit from './init'
+import paths from '../../utils/paths'
 
 describe('CreateLocationInit', () => {
   const controller = new CreateLocationInit({ route: '/' })
@@ -43,7 +44,7 @@ describe('CreateLocationInit', () => {
 
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(deepRes.redirect).toHaveBeenCalledWith('/view-and-update-locations/TST')
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('TST'))
     })
 
     it('sets values on the sessionModel', () => {

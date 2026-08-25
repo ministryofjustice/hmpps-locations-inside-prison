@@ -6,6 +6,7 @@ import fields from '../../routes/changeCellCapacity/fields'
 import PrisonerFactory from '../../testutils/factories/prisoner'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 import mockModel from '../../testutils/mockModel'
+import paths from '../../utils/paths'
 
 describe('ChangeCellCapacity', () => {
   const controller = new ChangeCellCapacity({ route: '/' })
@@ -199,9 +200,7 @@ describe('ChangeCellCapacity', () => {
       deepRes.redirect = jest.fn()
       controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
-      expect(deepRes.redirect).toHaveBeenCalledWith(
-        '/view-and-update-locations/MDI/e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
-      )
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.location.view('MDI', 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2'))
     })
 
     it('does not redirect to the show location page when the only change is max capacity', () => {

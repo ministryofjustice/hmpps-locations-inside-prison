@@ -10,7 +10,7 @@ export default class CertApprovalConfirmPage extends Page {
     cy.get('.govuk-heading-l').contains('Update certification approval status')
     cy.get('.govuk-summary-list__key').eq(0).contains('Prison')
     cy.get('.govuk-summary-list__value').eq(0).contains('TST')
-    cy.get('.govuk-summary-list__key').eq(1).contains('Certification approval required')
+    cy.get('.govuk-summary-list__key').eq(1).contains('Certification approval')
     cy.get('.govuk-summary-list__value').eq(1).contains('INACTIVE')
   }
 

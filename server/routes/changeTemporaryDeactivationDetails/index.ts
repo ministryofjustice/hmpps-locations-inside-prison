@@ -5,6 +5,7 @@ import fields from './fields'
 import populateLocation from '../../middleware/populateLocation'
 import protectRoute from '../../middleware/protectRoute'
 import asyncMiddleware from '../../middleware/asyncMiddleware'
+import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 
 const router = express.Router({ mergeParams: true })
 
@@ -20,6 +21,7 @@ const checkSupportedLocationType = asyncMiddleware(async (req, res, next) => {
 router.use(
   protectRoute('change_temporary_deactivation_details'),
   populateLocation({ decorate: true }),
+  populateTitleCaptionFromLocationOrPrison,
   checkSupportedLocationType,
   wizard(steps, fields, {
     name: 'change-temporary-deactivate-details',

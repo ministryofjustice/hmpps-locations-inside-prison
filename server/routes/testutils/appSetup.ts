@@ -9,7 +9,6 @@ import type { Services } from '../../services'
 import AuditService from '../../services/auditService'
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import setUpWebSession from '../../middleware/setUpWebSession'
-import setCanAccess from '../../middleware/setCanAccess'
 import { ApplicationInfo } from '../../applicationInfo'
 
 jest.mock('../../services/auditService')
@@ -73,9 +72,8 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
     req.featureFlags = {}
     next()
   })
-  app.use(setCanAccess(services.locationsService))
   app.use(routes(services))
-  app.use((req, res, next) => next(new NotFound()))
+  app.use((_req, _res, next) => next(new NotFound()))
   app.use(errorHandler(production))
 
   return app

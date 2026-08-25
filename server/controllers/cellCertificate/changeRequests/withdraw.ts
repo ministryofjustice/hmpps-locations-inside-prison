@@ -1,13 +1,14 @@
 import { NextFunction, Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-import FormInitialStep from '../../base/formInitialStep'
+import FormStep from '../../base/formStep'
 import { getAllCertUserEmails, sendNotification } from '../../../utils/notificationHelpers'
 import { NotificationType } from '../../../services/notificationService'
 import formatDateWithTime from '../../../formatters/formatDateWithTime'
 import populateCertificationRequestDetails from '../../../middleware/populateCertificationRequestDetails'
 import config from '../../../config'
+import paths from '../../../utils/paths'
 
-export default class Withdraw extends FormInitialStep {
+export default class Withdraw extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(populateCertificationRequestDetails)
@@ -32,7 +33,7 @@ export default class Withdraw extends FormInitialStep {
     // Don't send emails in local dev (every deployed env counts as production)
     if (config.production || process.env.NODE_ENV === 'test') {
       // Send notifications to all cert roles
-      const emailAddresses = await getAllCertUserEmails(manageUsersService, systemToken, prisonId)
+      const emailAddresses = await getAllCertUserEmails(locationsService, manageUsersService, systemToken, prisonId)
 
       await sendNotification(
         notifyService,
@@ -65,6 +66,6 @@ export default class Withdraw extends FormInitialStep {
       content: `You have withdrawn the change request for ${bannerLocationText}.`,
     })
 
-    res.redirect(`/${prisonId}/cell-certificate/change-requests`)
+    res.redirect(paths.cellCertificate.changeRequest.view(prisonId))
   }
 }

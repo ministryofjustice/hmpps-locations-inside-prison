@@ -1,11 +1,12 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class RemoveCellTypePage extends Page {
   constructor() {
     super(/Are you sure you want to remove (all of )?the cell types?\?/)
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/remove-cell-type`)
+  static goTo = (locationId: string) => cy.visit(paths.location.removeCellType('TST', locationId))
 
   removeCellTypeButton = (): PageElement => cy.get('button:contains("Remove cell type")')
 

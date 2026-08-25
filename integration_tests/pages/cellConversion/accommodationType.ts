@@ -1,4 +1,5 @@
 import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class CellConversionAccommodationTypePage extends Page {
   constructor() {
@@ -10,7 +11,7 @@ export default class CellConversionAccommodationTypePage extends Page {
     cy.get('legend').contains('What type of accommodation is it?')
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/cell-conversion`)
+  static goTo = (locationId: string) => cy.visit(paths.location.cellConversion('TST', locationId))
 
   accommodationTypeRadioLabels = (): PageElement => cy.get('body').find('label.govuk-radios__label')
 

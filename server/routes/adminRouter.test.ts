@@ -7,16 +7,20 @@ import AuditService, { Page } from '../services/auditService'
 import AuthService from '../services/authService'
 import LocationsService from '../services/locationsService'
 import PrisonService from '../services/prisonService'
+import paths from '../utils/paths'
+import ManageUsersService from '../services/manageUsersService'
 
 jest.mock('../services/auditService')
 jest.mock('../services/authService')
 jest.mock('../services/locationsService')
 jest.mock('../services/prisonService')
+jest.mock('../services/manageUsersService')
 
 const auditService = new AuditService(null) as jest.Mocked<AuditService>
 const authService = new AuthService(null) as jest.Mocked<AuthService>
 const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 const prisonService = new PrisonService(null) as jest.Mocked<PrisonService>
+const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
 
 let app: Express
 
@@ -32,32 +36,19 @@ beforeEach(() => {
       authService,
       locationsService,
       prisonService,
+      manageUsersService,
     },
     userSupplier: () => adminUser,
   })
   authService.getSystemClientToken.mockResolvedValue('token')
+  manageUsersService.getCaseloads.mockResolvedValue([{ id: 'TST', name: 'Test' }])
 })
 
 afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('GET /admin', () => {
-  it('should redirect to /admin/PRISON_ID', () => {
-    auditService.logPageView.mockResolvedValue(null)
-    locationsService.getPrisonConfiguration.mockResolvedValue({
-      prisonId: 'TST',
-      resiLocationServiceActive: 'ACTIVE',
-      nonResiServiceActive: 'ACTIVE',
-      includeSegregationInRollCount: 'INACTIVE',
-      certificationApprovalRequired: 'INACTIVE',
-    })
-
-    return request(app).get('/admin').expect(302).expect('Location', '/admin/TST')
-  })
-})
-
-describe('GET /admin/PRISON_ID', () => {
+describe('GET /PRISON_ID/admin', () => {
   it('should render the admin index page', async () => {
     auditService.logPageView.mockResolvedValue(null)
     locationsService.getPrisonConfiguration.mockResolvedValue({
@@ -74,7 +65,7 @@ describe('GET /admin/PRISON_ID', () => {
       blockAccess: true,
     })
     return request(app)
-      .get('/admin/TST')
+      .get(paths.admin.index('TST'))
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -82,9 +73,9 @@ describe('GET /admin/PRISON_ID', () => {
         expect(res.text).toContain('govuk-breadcrumbs')
 
         // check links
-        expect(res.text).toContain('/admin/TST/change-resi-status')
-        expect(res.text).toContain('/admin/TST/change-certification-status')
-        expect(res.text).toContain('/admin/TST/change-include-seg-in-roll-count')
+        expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
+        expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
+        expect(res.text).toContain(paths.admin.changeIncludeSegInRollCount('TST'))
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
           correlationId: expect.any(String),
@@ -112,7 +103,7 @@ describe('GET /admin/PRISON_ID', () => {
       blockAccess: false,
     })
     return request(app)
-      .get('/admin/TST')
+      .get(paths.admin.index('TST'))
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -120,8 +111,8 @@ describe('GET /admin/PRISON_ID', () => {
         expect(res.text).toContain('govuk-breadcrumbs')
 
         // check links
-        expect(res.text).toContain('/admin/TST/change-resi-status')
-        expect(res.text).toContain('/admin/TST/change-certification-status')
+        expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
+        expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
 
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
@@ -152,7 +143,7 @@ describe('GET /admin/PRISON_ID', () => {
     })
 
     return request(app)
-      .get('/admin/TST')
+      .get(paths.admin.index('TST'))
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -166,8 +157,8 @@ describe('GET /admin/PRISON_ID', () => {
 
         // Check that the page was rendered with blockAccess=true from the fallback
         expect(res.text).toContain('govuk-breadcrumbs')
-        expect(res.text).toContain('/admin/TST/change-resi-status')
-        expect(res.text).toContain('/admin/TST/change-certification-status')
+        expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
+        expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
       })
   })
 
@@ -188,7 +179,7 @@ describe('GET /admin/PRISON_ID', () => {
     prisonService.getScreenStatus.mockImplementation(() => Promise.reject(notFound))
 
     return request(app)
-      .get('/admin/TST')
+      .get(paths.admin.index('TST'))
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -200,8 +191,8 @@ describe('GET /admin/PRISON_ID', () => {
 
         // Check that the page was rendered (blockAccess should default to false)
         expect(res.text).toContain('govuk-breadcrumbs')
-        expect(res.text).toContain('/admin/TST/change-resi-status')
-        expect(res.text).toContain('/admin/TST/change-certification-status')
+        expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
+        expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
       })
   })
 })

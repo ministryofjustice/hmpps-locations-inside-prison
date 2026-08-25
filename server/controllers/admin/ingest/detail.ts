@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { CapacityCell, TypedLocals } from '../../../@types/express'
+import paths from '../../../utils/paths'
 
 // Renders a "before -> after" string, handling 0 (a valid capacity) and missing previous values.
 export const changeText = (previous: number | undefined, current: number | undefined): string => {
@@ -62,11 +63,11 @@ export default async (req: Request, res: Response) => {
     upload,
     locationRows,
     inProgress,
-    listUrl: `/admin/${prisonId}/ingest-cert`,
-    backLink: `/admin/${prisonId}/ingest-cert`,
+    listUrl: paths.admin.ingestCert(prisonId),
+    backLink: paths.admin.ingestCert(prisonId),
     cellCertificateUrl:
       upload.status === 'FINISHED' && upload.cellCertificateId
-        ? `/${prisonId}/cell-certificate/${upload.cellCertificateId}`
+        ? paths.cellCertificate.view(prisonId, upload.cellCertificateId)
         : undefined,
   }
 

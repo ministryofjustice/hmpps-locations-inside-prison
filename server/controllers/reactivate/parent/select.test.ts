@@ -5,6 +5,7 @@ import ReactivateParentSelect from './select'
 import fields from '../../../routes/reactivate/parent/fields'
 import LocationFactory from '../../../testutils/factories/location'
 import buildDecoratedLocation from '../../../testutils/buildDecoratedLocation'
+import paths from '../../../utils/paths'
 
 describe('ReactivateParentSelect', () => {
   const controller = new ReactivateParentSelect({ route: '/' })
@@ -42,6 +43,7 @@ describe('ReactivateParentSelect', () => {
       locals: {
         user: { username: 'username' },
         errorlist: [],
+        prisonId: 'TST',
         decoratedLocation: buildDecoratedLocation({
           id: 'e07effb3-905a-4f6b-acdc-fafbb43a1ee2',
           prisonId: 'TST',
@@ -122,12 +124,6 @@ describe('ReactivateParentSelect', () => {
   describe('locals', () => {
     it('sets the correct locals', async () => {
       const locals: { [key: string]: any } = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-      expect(locals.backLink).toEqual(
-        `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
-      )
-      expect(locals.cancelLink).toEqual(
-        `/view-and-update-locations/${deepRes.locals.decoratedLocation.prisonId}/${deepRes.locals.decoratedLocation.id}`,
-      )
       expect(locals.fields).not.toEqual(undefined)
       expect(locals.validationErrors).toEqual([])
     })
@@ -144,7 +140,7 @@ describe('ReactivateParentSelect', () => {
         await controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
 
         expect(deepRes.redirect).toHaveBeenCalledWith(
-          `/reactivate/cell/id1?ref=parent&refPrisonId=${deepRes.locals.decoratedLocation.prisonId}&refLocationId=${deepRes.locals.decoratedLocation.id}`,
+          `${paths.location.reactivate.cell('TST', 'id1')}?ref=parent&refPrisonId=${deepRes.locals.decoratedLocation.prisonId}&refLocationId=${deepRes.locals.decoratedLocation.id}`,
         )
       })
     })

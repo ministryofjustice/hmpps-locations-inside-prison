@@ -1,6 +1,6 @@
 import { type NextFunction, Request, type Response } from 'express'
 import { rolesToPermissions } from '../lib/permissions'
-import LocationsService from '../services/locationsService'
+import middleware from './middleware'
 
 const rolePriority = [
   'MANAGE_RES_LOCATIONS_ADMIN',
@@ -10,44 +10,35 @@ const rolePriority = [
   'RESI_CERT_VIEWER',
 ]
 
-export default function setCanAccess(locationService: LocationsService) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const { userRoles } = res.locals.user
-    const { systemToken } = req.session
-    const permissions = rolesToPermissions(userRoles)
-    const prisonIdFromParams = req.params.prisonId || res.locals.user.activeCaseload.id
+export default middleware((req: Request, res: Response, next: NextFunction) => {
+  const { user, prisonConfiguration } = res.locals
+  const { userRoles } = user
+  const permissions = rolesToPermissions(userRoles)
 
-    // A map of permission overrides, false = always disabled, true = always enabled
-    const permissionOverrides: { [permission: string]: boolean | { [role: string]: boolean } } = {}
+  // A map of permission overrides, false = always disabled, true = always enabled
+  const permissionOverrides: { [permission: string]: boolean | { [role: string]: boolean } } = {}
 
-    if (prisonIdFromParams !== undefined) {
-      const prisonConfiguration = await locationService.getPrisonConfiguration(
-        systemToken,
-        prisonIdFromParams as string,
-      )
-      if (prisonConfiguration.certificationApprovalRequired === 'INACTIVE') {
-        permissionOverrides.create_location = false
-        permissionOverrides.archive_location = false
-      }
-    }
-
-    req.canAccess = permission => {
-      if (permission in permissionOverrides) {
-        const override = permissionOverrides[permission]
-        if (typeof override === 'boolean') {
-          return override
-        }
-
-        for (const role of rolePriority) {
-          if (userRoles.includes(role) && role in override) {
-            return override[role]
-          }
-        }
-      }
-      return permissions.includes(permission)
-    }
-    res.locals.canAccess = req.canAccess
-
-    next()
+  if (prisonConfiguration?.certificationApprovalRequired === 'INACTIVE') {
+    permissionOverrides.create_location = false
+    permissionOverrides.archive_location = false
   }
-}
+
+  req.canAccess = permission => {
+    if (permission in permissionOverrides) {
+      const override = permissionOverrides[permission]
+      if (typeof override === 'boolean') {
+        return override
+      }
+
+      for (const role of rolePriority) {
+        if (userRoles.includes(role) && role in override) {
+          return override[role]
+        }
+      }
+    }
+    return permissions.includes(permission)
+  }
+  res.locals.canAccess = req.canAccess
+
+  next()
+})

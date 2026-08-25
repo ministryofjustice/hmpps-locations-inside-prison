@@ -64,10 +64,14 @@ describe('adminResiSwitch', () => {
       const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(result).toEqual({
-        backLink: '/admin/MDI',
-        buttonText: 'Inactivate residential location',
-        cancelLink: '/admin/MDI',
-        title: 'Update residential location status',
+        adminSubject: {
+          attribute: 'resiLocationServiceActive',
+          name: 'residential locations',
+        },
+        backLink: '/MDI/admin',
+        buttonText: 'Deactivate residential locations',
+        cancelLink: '/MDI/admin',
+        title: 'Update residential locations status',
         validationErrors: [],
       })
     })

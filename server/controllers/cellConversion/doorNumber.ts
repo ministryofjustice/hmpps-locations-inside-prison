@@ -1,8 +1,8 @@
 import FormWizard from 'hmpo-form-wizard'
 import { Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 
-export default class CellConversionDoorNumber extends FormInitialStep {
+export default class CellConversionDoorNumber extends FormStep {
   override getInitialValues(_req: FormWizard.Request, res: Response): FormWizard.Values {
     return {
       doorNumber: res.locals.decoratedLocation.cellMark,

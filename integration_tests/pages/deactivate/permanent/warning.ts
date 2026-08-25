@@ -1,11 +1,13 @@
 import Page, { PageElement } from '../../page'
+import paths from '../../../../server/utils/paths'
 
 export default class DeactivatePermanentWarningPage extends Page {
   constructor() {
     super('You are about to permanently deactivate this location')
   }
 
-  static goTo = (locationId: string) => cy.visit(`/location/${locationId}/deactivate/permanent`)
+  static goTo = (prisonId: string, locationId: string) =>
+    cy.visit(paths.location.deactivatePermanent(prisonId, locationId))
 
   continueButton = (): PageElement => cy.get('button:contains("Continue with permanent deactivation")')
 

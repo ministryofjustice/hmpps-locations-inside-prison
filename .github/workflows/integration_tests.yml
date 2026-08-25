@@ -31,7 +31,7 @@ jobs:
     needs: get-timings
     services:
       redis:
-        image: redis:8.8
+        image: redis:8.10
         ports:
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
@@ -54,7 +54,7 @@ jobs:
       timings-10: ${{ steps.timings.outputs.t10 }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - uses: ministryofjustice/hmpps-assess-risks-and-needs-github-actions/.github/actions/cypress/create_timings_file@bd2ccc17cfc6c285638a4be7bbb280527a30c328 # v1
         with:
@@ -98,7 +98,7 @@ jobs:
           sleep 5
 
       - name: Run split Cypress tests 🧪
-        uses: cypress-io/github-action@fa4a118725a8f001170d49631ea89e5d66fee626 # v7.4.1
+        uses: cypress-io/github-action@c32f12761482a282d24ca0fd7466d8ae86f54ba8 # v7.4.2
         with:
           browser: chrome
         env:

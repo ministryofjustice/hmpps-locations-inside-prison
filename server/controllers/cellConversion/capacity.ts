@@ -1,13 +1,14 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import FormInitialStep from '../base/formInitialStep'
+import FormStep from '../base/formStep'
 import { TypedLocals } from '../../@types/express'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import populateModifiedLocationMap from './middleware/populateModifiedLocationMap'
+import paths from '../../utils/paths'
 
 const CELL_TYPE_REGEX = /^temp-cellTypes(?:-removed)?$/
 
-export default class CellConversionCapacity extends FormInitialStep {
+export default class CellConversionCapacity extends FormStep {
   override middlewareSetup() {
     super.middlewareSetup()
     this.use(addConstantToLocals('specialistCellTypes'))
@@ -68,7 +69,9 @@ export default class CellConversionCapacity extends FormInitialStep {
 
       const suffix = `${cellTypeAction === 'set' ? '/init' : ''}${req.isEditing ? '/edit' : ''}`
 
-      res.redirect(`/location/${res.locals.decoratedLocation.id}/cell-conversion/${cellTypeAction}-cell-type${suffix}`)
+      res.redirect(
+        `${paths.location.cellConversion(res.locals.decoratedLocation)}/${cellTypeAction}-cell-type${suffix}`,
+      )
 
       return
     }
