@@ -33,7 +33,7 @@ export default class Withdraw extends FormStep {
     // Don't send emails in local dev (every deployed env counts as production)
     if (config.production || process.env.NODE_ENV === 'test') {
       // Send notifications to all cert roles
-      const emailAddresses = await getAllCertUserEmails(manageUsersService, systemToken, prisonId)
+      const emailAddresses = await getAllCertUserEmails(locationsService, manageUsersService, systemToken, prisonId)
 
       await sendNotification(
         notifyService,

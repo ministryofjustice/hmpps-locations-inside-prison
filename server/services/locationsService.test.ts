@@ -464,6 +464,57 @@ describe('Locations service', () => {
     })
   })
 
+  describe('getNotificationMailboxEmails', () => {
+    it('returns the mailbox email addresses when configured', async () => {
+      locationsApiClient.prisonConfiguration.getNotificationMailbox.mockResolvedValue({
+        prisonId: 'MDI',
+        notificationGroup: 'CERT_VIEWER',
+        emailAddresses: ['mailbox@test.com'],
+        source: 'PRISON',
+      })
+
+      const result = await locationsService.getNotificationMailboxEmails('token', 'MDI', 'CERT_VIEWER')
+
+      expect(locationsApiClient.prisonConfiguration.getNotificationMailbox).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        notificationGroup: 'CERT_VIEWER',
+      })
+      expect(result).toEqual(['mailbox@test.com'])
+    })
+
+    it('returns undefined when no mailbox is configured (404)', async () => {
+      locationsApiClient.prisonConfiguration.getNotificationMailbox.mockRejectedValue({
+        responseStatus: 404,
+      })
+
+      const result = await locationsService.getNotificationMailboxEmails('token', 'MDI', 'CERT_VIEWER')
+
+      expect(result).toBeUndefined()
+    })
+
+    it('returns the default mailbox email addresses when no prison-specific mailbox is configured', async () => {
+      locationsApiClient.prisonConfiguration.getNotificationMailbox.mockResolvedValue({
+        notificationGroup: 'CERT_VIEWER',
+        emailAddresses: ['default-mailbox@test.com'],
+        source: 'DEFAULT',
+      })
+
+      const result = await locationsService.getNotificationMailboxEmails('token', 'MDI', 'CERT_VIEWER')
+
+      expect(result).toEqual(['default-mailbox@test.com'])
+    })
+
+    it('rethrows unexpected errors', async () => {
+      locationsApiClient.prisonConfiguration.getNotificationMailbox.mockRejectedValue({
+        responseStatus: 500,
+      })
+
+      await expect(locationsService.getNotificationMailboxEmails('token', 'MDI', 'CERT_VIEWER')).rejects.toEqual({
+        responseStatus: 500,
+      })
+    })
+  })
+
   describe('requestSpecialistCellTypeChange', () => {
     it('calls the correct client function', async () => {
       await locationsService.requestSpecialistCellTypeChange('token', 'location-id', {

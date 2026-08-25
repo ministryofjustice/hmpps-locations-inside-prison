@@ -1,7 +1,8 @@
 import { pickBy } from 'lodash'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import LocationsApiClient from '../data/locationsApiClient'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
-import { LocationType, StatusType } from '../data/types/locationsApi'
+import { LocationType, NotificationGroup, StatusType } from '../data/types/locationsApi'
 import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
 
 export default class LocationsService {
@@ -472,6 +473,27 @@ export default class LocationsService {
   async updateIncludeSegInRollCount(token: string, prisonId: string, status: StatusType) {
     await this.locationsApiClient.prisonConfiguration.updateIncludeSegInRollCount(token, { prisonId, status })
     await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
+  }
+
+  // Returns the configured functional mailbox for a prison and notification group (prison-specific or
+  // default, the API resolves precedence), or undefined if none is set
+  async getNotificationMailboxEmails(
+    token: string,
+    prisonId: string,
+    notificationGroup: NotificationGroup,
+  ): Promise<string[] | undefined> {
+    try {
+      const mailbox = await this.locationsApiClient.prisonConfiguration.getNotificationMailbox(token, {
+        prisonId,
+        notificationGroup,
+      })
+      return mailbox.emailAddresses?.length ? mailbox.emailAddresses : undefined
+    } catch (error) {
+      if ((error as SanitisedError).responseStatus === 404) {
+        return undefined
+      }
+      throw error
+    }
   }
 
   async createWing(

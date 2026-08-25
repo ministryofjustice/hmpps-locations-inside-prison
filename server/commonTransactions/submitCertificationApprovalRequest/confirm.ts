@@ -9,7 +9,7 @@ import { Location, LocationResidentialSummary } from '../../data/types/locations
 import { CertificateLocation } from '../../data/types/locationsApi/certificateLocation'
 import { notificationGroups, NotificationType } from '../../services/notificationService'
 import config from '../../config'
-import { getUserEmails, sendNotification } from '../../utils/notificationHelpers'
+import { getNotificationGroupEmails, sendNotification } from '../../utils/notificationHelpers'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import getLocationAttributesIncludePending from '../../utils/getLocationAttributesIncludePending'
 import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMap'
@@ -785,20 +785,30 @@ export default class Confirm extends FormStep {
           // Send notifications to both sets of relevant cert roles
           const [requestReceivedAddresses, requestSubmittedAddresses, requestSubmittedWithActiveCaseloadAddresses] =
             await Promise.all([
-              getUserEmails(manageUsersService, systemToken, prisonId, notificationGroups.requestReceivedUsers, false),
-              config.email.functionalMailboxCertViewers
-                ? Promise.resolve([config.email.functionalMailboxCertViewers])
-                : getUserEmails(
-                    manageUsersService,
-                    systemToken,
-                    prisonId,
-                    notificationGroups.requestSubmittedUsers,
-                    false,
-                  ),
-              getUserEmails(
+              getNotificationGroupEmails(
+                locationsService,
                 manageUsersService,
                 systemToken,
                 prisonId,
+                'CERT_REVIEWER',
+                notificationGroups.requestReceivedUsers,
+                false,
+              ),
+              getNotificationGroupEmails(
+                locationsService,
+                manageUsersService,
+                systemToken,
+                prisonId,
+                'CERT_VIEWER',
+                notificationGroups.requestSubmittedUsers,
+                false,
+              ),
+              getNotificationGroupEmails(
+                locationsService,
+                manageUsersService,
+                systemToken,
+                prisonId,
+                'CERT_ADMIN',
                 notificationGroups.requestSubmittedUsersWithActiveCaseload,
               ),
             ])

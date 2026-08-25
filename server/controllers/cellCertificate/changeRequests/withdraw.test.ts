@@ -83,7 +83,12 @@ describe('Withdraw', () => {
     it('gets user emails for withdrawn request notification group', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(notificationHelpers.getAllCertUserEmails).toHaveBeenCalledWith(manageUsersService, 'token', 'MDI')
+      expect(notificationHelpers.getAllCertUserEmails).toHaveBeenCalledWith(
+        locationsService,
+        manageUsersService,
+        'token',
+        'MDI',
+      )
     })
 
     it('sends REQUEST_WITHDRAW notification to all cert users', async () => {

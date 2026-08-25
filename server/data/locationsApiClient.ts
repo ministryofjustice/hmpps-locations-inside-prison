@@ -11,6 +11,8 @@ import {
   PrisonConfiguration,
   StatusType,
   LocationType,
+  NotificationGroup,
+  PrisonNotificationMailboxDto,
 } from './types/locationsApi'
 
 import { RedisClient } from './redisClient'
@@ -590,6 +592,13 @@ export default class LocationsApiClient extends BaseApiClient {
     updateIncludeSegInRollCount: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
       path: '/prison-configuration/:prisonId/include-seg-in-roll-count/:status',
       requestType: 'put',
+    }),
+    getNotificationMailbox: this.apiCall<
+      PrisonNotificationMailboxDto,
+      { prisonId: string; notificationGroup: NotificationGroup }
+    >({
+      path: '/prison-configuration/:prisonId/notification-mailboxes/:notificationGroup',
+      requestType: 'get',
     }),
   }
 }
