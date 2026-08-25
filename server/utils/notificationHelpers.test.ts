@@ -1,7 +1,7 @@
-import { getUserEmails, getAllCertUserEmails } from './notificationHelpers'
+import { getUserEmails, getNotificationGroupEmails, getAllCertUserEmails } from './notificationHelpers'
 import ManageUsersService from '../services/manageUsersService'
 import ManageUsersApiClient from '../data/manageUsersApiClient'
-import config from '../config'
+import LocationsService from '../services/locationsService'
 import { notificationGroups } from '../services/notificationService'
 
 describe('getUserEmails', () => {
@@ -65,53 +65,103 @@ describe('getUserEmails', () => {
   })
 })
 
-describe('getAllCertUserEmails', () => {
+describe('getNotificationGroupEmails', () => {
   const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
-  const originalFunctionalMailboxCertViewers = config.email.functionalMailboxCertViewers
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   beforeEach(() => {
-    config.email.functionalMailboxCertViewers = originalFunctionalMailboxCertViewers
-    manageUsersService.getAllUsersByActiveCaseload = jest
-      .fn()
-      .mockImplementation((_token: string, _prisonId: string, roles: string[]) =>
-        Promise.resolve({
-          content:
-            roles.length === 3
-              ? [
-                  { username: 'reviewer', email: 'reviewer@test.com' },
-                  { username: 'admin', email: 'admin@test.com' },
-                  { username: 'viewer', email: 'viewer@test.com' },
-                ]
-              : [
-                  { username: 'reviewer', email: 'reviewer@test.com' },
-                  { username: 'admin', email: 'admin@test.com' },
-                ],
-          totalPages: 1,
-        }),
-      )
+    manageUsersService.getAllUsersByActiveCaseload = jest.fn().mockResolvedValue({
+      content: [{ username: 'joe1', email: 'joe1@test.com' }],
+      totalPages: 1,
+    })
   })
 
-  it('combines non-viewer role emails and viewer role emails', async () => {
-    const result = await getAllCertUserEmails(manageUsersService, 'token', 'TST')
+  it('uses the API notification mailbox when one is configured', async () => {
+    locationsService.getNotificationMailboxEmails = jest.fn().mockResolvedValue(['mailbox@test.com'])
+
+    const result = await getNotificationGroupEmails(
+      locationsService,
+      manageUsersService,
+      'token',
+      'TST',
+      'CERT_REVIEWER',
+      notificationGroups.requestReceivedUsers,
+    )
+
+    expect(locationsService.getNotificationMailboxEmails).toHaveBeenCalledWith('token', 'TST', 'CERT_REVIEWER')
+    expect(manageUsersService.getAllUsersByActiveCaseload).not.toHaveBeenCalled()
+    expect(result).toEqual(['mailbox@test.com'])
+  })
+
+  it('falls back to user emails by role when no mailbox is configured', async () => {
+    locationsService.getNotificationMailboxEmails = jest.fn().mockResolvedValue(undefined)
+
+    const result = await getNotificationGroupEmails(
+      locationsService,
+      manageUsersService,
+      'token',
+      'TST',
+      'CERT_REVIEWER',
+      notificationGroups.requestReceivedUsers,
+    )
 
     expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledWith(
       'token',
       'TST',
-      notificationGroups.allCertUsers,
+      notificationGroups.requestReceivedUsers,
     )
-    expect(result).toEqual(['reviewer@test.com', 'admin@test.com', 'viewer@test.com'])
+    expect(result).toEqual(['joe1@test.com'])
+  })
+})
+
+describe('getAllCertUserEmails', () => {
+  const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
+
+  beforeEach(() => {
+    locationsService.getNotificationMailboxEmails = jest.fn().mockResolvedValue(undefined)
+    manageUsersService.getAllUsersByActiveCaseload = jest
+      .fn()
+      .mockImplementation((_token: string, _prisonId: string, roles: string[]) => {
+        let content
+        if (roles === notificationGroups.requestReceivedUsers) {
+          content = [{ username: 'reviewer', email: 'reviewer@test.com' }]
+        } else if (roles === notificationGroups.requestSubmittedUsersWithActiveCaseload) {
+          content = [{ username: 'admin', email: 'admin@test.com' }]
+        } else {
+          content = [{ username: 'viewer', email: 'viewer@test.com' }]
+        }
+        return Promise.resolve({ content, totalPages: 1 })
+      })
   })
 
-  it('uses the functional mailbox instead of fetching viewer role emails when configured', async () => {
-    config.email.functionalMailboxCertViewers = 'functional-mailbox@test.com'
+  it('combines emails for all cert notification groups', async () => {
+    const result = await getAllCertUserEmails(locationsService, manageUsersService, 'token', 'TST')
 
-    const result = await getAllCertUserEmails(manageUsersService, 'token', 'TST')
+    expect(locationsService.getNotificationMailboxEmails).toHaveBeenCalledWith('token', 'TST', 'CERT_REVIEWER')
+    expect(locationsService.getNotificationMailboxEmails).toHaveBeenCalledWith('token', 'TST', 'CERT_VIEWER')
+    expect(locationsService.getNotificationMailboxEmails).toHaveBeenCalledWith('token', 'TST', 'CERT_ADMIN')
+    expect(result).toEqual(['reviewer@test.com', 'viewer@test.com', 'admin@test.com'])
+  })
 
-    expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledTimes(1)
-    expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledWith('token', 'TST', [
-      'MANAGE_RES_LOCATIONS_OP_CAP',
-      'RESI__CERT_REVIEWER',
-    ])
-    expect(result).toEqual(['reviewer@test.com', 'admin@test.com', 'functional-mailbox@test.com'])
+  it('uses the functional mailbox for a notification group when the API returns one', async () => {
+    ;(locationsService.getNotificationMailboxEmails as jest.Mock).mockImplementation(
+      (_token: string, _prisonId: string, notificationGroup: string) =>
+        Promise.resolve(notificationGroup === 'CERT_VIEWER' ? ['mailbox@test.com'] : undefined),
+    )
+
+    const result = await getAllCertUserEmails(locationsService, manageUsersService, 'token', 'TST')
+
+    expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledWith(
+      'token',
+      'TST',
+      notificationGroups.requestReceivedUsers,
+    )
+    expect(manageUsersService.getAllUsersByActiveCaseload).toHaveBeenCalledWith(
+      'token',
+      'TST',
+      notificationGroups.requestSubmittedUsersWithActiveCaseload,
+    )
+    expect(result).toEqual(['reviewer@test.com', 'mailbox@test.com', 'admin@test.com'])
   })
 })

@@ -78,7 +78,12 @@ describe('Reject', () => {
     it('gets user emails for rejected request notification group', async () => {
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(notificationHelpers.getAllCertUserEmails).toHaveBeenCalledWith(manageUsersService, 'token', 'MDI')
+      expect(notificationHelpers.getAllCertUserEmails).toHaveBeenCalledWith(
+        locationsService,
+        manageUsersService,
+        'token',
+        'MDI',
+      )
     })
 
     it('sends REQUEST_REJECTED notification to all cert users', async () => {
