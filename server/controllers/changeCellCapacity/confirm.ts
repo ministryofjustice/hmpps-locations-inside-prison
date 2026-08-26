@@ -55,6 +55,7 @@ export default class ConfirmCellCapacity extends FormStep {
     const changeSummary = changeSummaries.join('\n<br/><br/>\n')
 
     const showCertMismatchWarning =
+      !req.sessionModel.get<boolean>('noChangeToCert') &&
       Boolean(req.sessionModel.get<boolean>('onlyWorkingCapChanged')) &&
       prisonConfiguration?.certificationApprovalRequired === 'ACTIVE' &&
       decoratedLocation.status !== 'DRAFT'

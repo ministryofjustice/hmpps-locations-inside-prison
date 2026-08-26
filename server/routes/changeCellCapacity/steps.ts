@@ -21,6 +21,10 @@ const steps: FormWizard.Steps = {
     fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
     next: [
       {
+        fn: (req, res) => isCertActiveAndNotDraft(res.locals) && req.sessionModel.get('noChangeToCert'),
+        next: 'confirm',
+      },
+      {
         fn: (req, res) => isCertActiveAndNotDraft(res.locals) && !req.sessionModel.get('onlyWorkingCapChanged'),
         next: 'cert-change-disclaimer',
       },

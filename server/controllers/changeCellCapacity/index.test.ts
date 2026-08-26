@@ -224,6 +224,18 @@ describe('ChangeCellCapacity', () => {
 
       expect(deepReq.sessionModel.set).toHaveBeenCalledWith('onlyWorkingCapChanged', true)
     })
+
+    it('sets noChangeToCert flag when new values match the current cert', () => {
+      deepRes.locals.decoratedLocation.currentCellCertificate = {
+        certifiedNormalAccommodation: 2,
+        maxCapacity: 2,
+        workingCapacity: 1,
+      }
+      deepReq.form.values = { baselineCna: '2', maxCapacity: '2', workingCapacity: '1' }
+      controller.validate(deepReq as FormWizard.Request, deepRes as Response, jest.fn())
+
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('noChangeToCert', true)
+    })
   })
 
   describe('locals', () => {
