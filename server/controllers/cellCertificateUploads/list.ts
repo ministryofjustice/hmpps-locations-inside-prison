@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { TypedLocals } from '../../../@types/express'
-import paths from '../../../utils/paths'
+import { TypedLocals } from '../../@types/express'
+import paths from '../../utils/paths'
 
 export default async (req: Request, res: Response) => {
   const { locationsService } = req.services
@@ -15,9 +15,9 @@ export default async (req: Request, res: Response) => {
     uploads,
     hasInProgress,
     prisonId,
-    listUrl: paths.admin.ingestCert(prisonId),
-    newUploadUrl: `${paths.admin.ingestCert(prisonId)}/new`,
-    backLink: paths.admin.index(prisonId),
+    listUrl: paths.prison.cellCertificateUploads(prisonId),
+    newUploadUrl: `${paths.prison.cellCertificateUploads(prisonId)}/new`,
+    backLink: paths.prison.home(prisonId),
   }
 
   const success = req.flash('success')
@@ -30,5 +30,5 @@ export default async (req: Request, res: Response) => {
     locals.validationErrors = [{ text: errors[0].content, href: '#' }]
   }
 
-  return res.render('pages/admin/ingest/list', locals)
+  return res.render('pages/cellCertificateUploads/list', locals)
 }

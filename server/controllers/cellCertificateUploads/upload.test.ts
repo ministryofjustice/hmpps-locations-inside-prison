@@ -2,8 +2,8 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { DeepPartial } from 'fishery'
 import IngestUpload, { invalidDataForPrison, parseCsvRow, summarizeCapacityByWing } from './upload'
-import { BulkCapacityUpdate, CapacitySummary } from '../../../data/types/locationsApi/bulkCapacityChanges'
-import fields from '../../../routes/changeLocalName/fields'
+import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
+import fields from '../../routes/changeLocalName/fields'
 
 describe('Upload file csv', () => {
   const controller = new IngestUpload({ route: '/' })

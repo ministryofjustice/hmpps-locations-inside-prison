@@ -13,7 +13,6 @@ import changeNonResiStatusRouter from './admin/nonResi'
 import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
 import changeCertApprovalStatusRouter from './admin/certApproval'
 import changeNomisScreenStatusRouter from './admin/nomisScreen'
-import ingestRouter from './admin/ingest'
 
 const controller = (services: Services) => {
   const router = express.Router({ mergeParams: true })
@@ -32,7 +31,6 @@ const controller = (services: Services) => {
   router.use('/change-include-seg-in-roll-count', changeIncludeSegInRollCountStatusRouter)
   router.use('/change-certification-status', changeCertApprovalStatusRouter)
   router.use('/change-nomis-screen-status/:moduleName', changeNomisScreenStatusRouter)
-  router.use('/ingest-cert', ingestRouter)
 
   return router
 }

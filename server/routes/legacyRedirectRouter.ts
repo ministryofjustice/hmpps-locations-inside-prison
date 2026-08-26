@@ -63,7 +63,14 @@ router.use(
 
 router.use(
   '/admin/:prisonId/ingest-cert',
-  redirect(req => paths.admin.ingestCert(req.params.prisonId as string)),
+  redirect(req => paths.prison.cellCertificateUploads(req.params.prisonId as string)),
+)
+
+// Cell certificate ingestion moved out from under /admin when it stopped being admin-only. Staff who
+// bookmarked it while it lived there land here.
+router.use(
+  '/:prisonId/admin/ingest-cert',
+  redirect(req => paths.prison.cellCertificateUploads(req.params.prisonId as string)),
 )
 
 router.use(

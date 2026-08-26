@@ -1,12 +1,12 @@
-import Page, { PageElement } from '../../page'
-import paths from '../../../../server/utils/paths'
+import Page, { PageElement } from '../page'
+import paths from '../../../server/utils/paths'
 
 export default class CellCertificateUploadsListPage extends Page {
   constructor() {
     super('Cell certificate uploads')
   }
 
-  static goTo = (prisonId: string) => cy.visit(paths.admin.ingestCert(prisonId))
+  static goTo = (prisonId: string) => cy.visit(paths.prison.cellCertificateUploads(prisonId))
 
   uploadNewButton = (): PageElement => cy.get('[data-qa=upload-new-button]')
 

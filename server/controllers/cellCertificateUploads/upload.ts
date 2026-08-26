@@ -1,9 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import fs from 'fs'
-import { TypedLocals } from '../../../@types/express'
-import FormStep from '../../base/formStep'
-import { BulkCapacityUpdate, CapacitySummary } from '../../../data/types/locationsApi/bulkCapacityChanges'
+import { TypedLocals } from '../../@types/express'
+import FormStep from '../base/formStep'
+import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 
 export default class IngestUpload extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {

@@ -1,9 +1,9 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
-import { TypedLocals } from '../../../@types/express'
-import FormStep from '../../base/formStep'
-import { BulkCapacityUpdate, CapacitySummary } from '../../../data/types/locationsApi/bulkCapacityChanges'
-import paths from '../../../utils/paths'
+import { TypedLocals } from '../../@types/express'
+import FormStep from '../base/formStep'
+import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
+import paths from '../../utils/paths'
 
 export default class IngestConfirm extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
@@ -52,7 +52,7 @@ export default class IngestConfirm extends FormStep {
 
     if (ingestError) {
       req.flash('error', { title: 'There is a problem', content: ingestError })
-      return res.redirect(paths.admin.ingestCert(prisonId))
+      return res.redirect(paths.prison.cellCertificateUploads(prisonId))
     }
 
     req.flash('success', {
@@ -60,6 +60,6 @@ export default class IngestConfirm extends FormStep {
       content: 'The cell certificate is being processed. This page shows its progress.',
     })
 
-    return res.redirect(`${paths.admin.ingestCert(prisonId)}/upload/${uploadId}`)
+    return res.redirect(`${paths.prison.cellCertificateUploads(prisonId)}/upload/${uploadId}`)
   }
 }

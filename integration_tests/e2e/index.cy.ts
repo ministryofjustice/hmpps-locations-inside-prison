@@ -41,6 +41,8 @@ context('Index', () => {
 
       indexPage.cards.viewLocations().contains('Manage residential locations')
       indexPage.cards.cellCertificate().should('not.exist')
+      // ingesting a certificate is what happens before certification is switched on, so this tile stays
+      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
     })
@@ -73,6 +75,7 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
+      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
     })
 
     it('has a feedback banner', () => {
@@ -131,6 +134,7 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
+      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
       indexPage.cards.capacityManagementDashboard().should('not.exist')
     })
   })

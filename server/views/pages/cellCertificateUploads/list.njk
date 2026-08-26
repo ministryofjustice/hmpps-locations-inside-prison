@@ -1,9 +1,9 @@
-{% extends "../../../partials/layout.njk" %}
+{% extends "../../partials/layout.njk" %}
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "../../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag %}
+{% from "../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag %}
 
 {% block head %}
   {{ super() }}
@@ -25,7 +25,7 @@
           <p class="govuk-body">
             <a class="govuk-link" href="{{ listUrl }}" data-qa="refresh-link">Refresh</a>
           </p>
-        {% else %}
+        {% elseif canAccess('cell_certificate_upload_create') %}
           {{ govukButton({
             text: "Upload a new cell certificate",
             href: newUploadUrl,
@@ -37,7 +37,7 @@
           {% set rows = [] %}
           {% for upload in uploads %}
             {% set rows = (rows.push([
-              { html: "<a class='govuk-link' href='" + paths.admin.ingestCert(prisonId) + "/upload/" + upload.id + "'>" + (upload.requestedDate | formatDateWithTime) + "</a>" },
+              { html: "<a class='govuk-link' href='" + listUrl + "/upload/" + upload.id + "'>" + (upload.requestedDate | formatDateWithTime) + "</a>" },
               { html: uploadStatusTag(upload.status) },
               { text: (upload.startTime | formatDateWithTime) if upload.startTime else "-" },
               { text: (upload.endTime | formatDateWithTime) if upload.endTime else "-" },

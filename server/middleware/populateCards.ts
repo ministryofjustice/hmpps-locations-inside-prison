@@ -2,6 +2,8 @@ import config from '../config'
 import paths from '../utils/paths'
 import middleware from './middleware'
 
+// Must stay in step with the roles granted `cell_certificate_upload_view` in server/lib/permissions.ts:
+// this list decides which tiles are shown, that permission decides what the routes will actually serve.
 const RESI_ROLES = [
   'VIEW_INTERNAL_LOCATION',
   'MANAGE_RESIDENTIAL_LOCATIONS',
@@ -54,6 +56,17 @@ export default middleware((req, res, next) => {
       href: paths.cellCertificate.view(prisonId),
       description: 'View the current certificate and requested changes.',
       'data-qa': 'cell-certificate-card',
+    },
+    {
+      clickable: true,
+      // Deliberately not gated on certificationEnabled: ingesting a certificate is the onboarding step that
+      // happens before certification is switched on, so gating it that way would hide it when it is needed.
+      visible: showResiCards,
+      heading: 'Cell certificate uploads',
+      href: paths.prison.cellCertificateUploads(prisonId),
+      description:
+        'View cell certificates that have been uploaded for this establishment and the results of each upload.',
+      'data-qa': 'cell-certificate-uploads-card',
     },
     {
       clickable: true,

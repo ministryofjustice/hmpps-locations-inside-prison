@@ -1,7 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
-import IngestUpload from '../../../controllers/admin/ingest/upload'
-import IngestConfirm from '../../../controllers/admin/ingest/confirm'
-import paths from '../../../utils/paths'
+import IngestUpload from '../../controllers/cellCertificateUploads/upload'
+import IngestConfirm from '../../controllers/cellCertificateUploads/confirm'
+import paths from '../../utils/paths'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -10,7 +10,7 @@ const steps: FormWizard.Steps = {
     resetJourney: true,
     skip: true,
     next: 'upload',
-    backLink: (_req, res) => paths.admin.index(res.locals.prisonId),
+    backLink: (_req, res) => paths.prison.cellCertificateUploads(res.locals.prisonId),
   },
   '/upload': {
     fields: ['file'],
