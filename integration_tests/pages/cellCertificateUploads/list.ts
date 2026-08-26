@@ -3,7 +3,7 @@ import paths from '../../../server/utils/paths'
 
 export default class CellCertificateUploadsListPage extends Page {
   constructor() {
-    super('Cell certificate uploads')
+    super('Import cell certificate')
   }
 
   static goTo = (prisonId: string) => cy.visit(paths.prison.cellCertificateUploads(prisonId))

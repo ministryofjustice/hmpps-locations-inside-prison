@@ -19,7 +19,7 @@
 
         {% if hasInProgress %}
           {{ govukInsetText({
-            text: "A cell certificate upload is in progress. You can upload a new certificate once it has finished. This page updates automatically.",
+            text: "A cell certificate import is in progress. You can import a new certificate once it has finished. This page updates automatically.",
             attributes: { "data-qa": "in-progress-message" }
           }) }}
           <p class="govuk-body">
@@ -27,7 +27,7 @@
           </p>
         {% else %}
           {{ govukButton({
-            text: "Upload a new cell certificate",
+            text: "Import a cell certificate",
             href: newUploadUrl,
             attributes: { "data-qa": "upload-new-button" }
           }) }}
@@ -63,7 +63,7 @@
             rows: rows
           }) }}
         {% else %}
-          <p class="govuk-body" data-qa="no-uploads">No cell certificate uploads have been made for this establishment.</p>
+          <p class="govuk-body" data-qa="no-uploads">No cell certificates have been imported for this establishment.</p>
         {% endif %}
 
       </div>

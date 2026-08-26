@@ -17,11 +17,11 @@ const steps: FormWizard.Steps = {
     controller: IngestUpload,
     next: 'confirm',
     enctype: 'multipart/form-data',
-    pageTitle: 'Upload cell cert data',
+    pageTitle: 'Import cell certificate data',
   },
   '/confirm': {
     controller: IngestConfirm,
-    pageTitle: 'Confirm cell certification ingest',
+    pageTitle: 'Confirm cell certificate import',
   },
 }
 

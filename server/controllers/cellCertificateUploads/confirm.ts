@@ -36,7 +36,7 @@ export default class IngestConfirm extends FormStep {
       const userMessage: string = error.data?.userMessage
       req.sessionModel.set(
         'ingestError',
-        userMessage || 'The cell certificate upload could not be started. Try again later.',
+        userMessage || 'The cell certificate import could not be started. Try again later.',
       )
       return next()
     }
@@ -56,7 +56,7 @@ export default class IngestConfirm extends FormStep {
     }
 
     req.flash('success', {
-      title: 'Cell certificate upload started',
+      title: 'Cell certificate import started',
       content: 'The cell certificate is being processed. This page shows its progress.',
     })
 

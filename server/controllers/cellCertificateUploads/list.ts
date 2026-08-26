@@ -11,7 +11,7 @@ export default async (req: Request, res: Response) => {
   const hasInProgress = uploads.some(upload => upload.status !== 'FINISHED')
 
   const locals: TypedLocals = {
-    title: 'Cell certificate uploads',
+    title: 'Import cell certificate',
     uploads,
     hasInProgress,
     prisonId,

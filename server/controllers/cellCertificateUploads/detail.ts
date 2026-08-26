@@ -59,7 +59,7 @@ export default async (req: Request, res: Response) => {
     .sort((a, b) => Number(b.needsReview) - Number(a.needsReview))
 
   const locals: TypedLocals = {
-    title: 'Cell certificate upload',
+    title: 'Cell certificate import',
     upload,
     locationRows,
     inProgress,

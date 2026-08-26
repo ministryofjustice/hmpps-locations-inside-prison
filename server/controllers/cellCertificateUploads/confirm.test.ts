@@ -111,7 +111,7 @@ describe('Ingest the cell cert data - confirm', () => {
       expect(deepReq.sessionModel.reset).toHaveBeenCalled()
       expect(deepReq.flash).toHaveBeenCalledWith(
         'success',
-        expect.objectContaining({ title: 'Cell certificate upload started' }),
+        expect.objectContaining({ title: 'Cell certificate import started' }),
       )
       expect(deepRes.redirect).toHaveBeenCalledWith(`${paths.prison.cellCertificateUploads('TST')}/upload/upload-1`)
     })
