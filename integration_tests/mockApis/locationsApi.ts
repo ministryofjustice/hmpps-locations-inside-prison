@@ -1501,6 +1501,17 @@ const stubCellCertificateUploadsList = (uploads: CellCertificateUpload[]) =>
     },
   })
 
+const stubCellCertificateUploadByApprovalRequest = (upload: CellCertificateUpload | null) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/locations-api/locations/bulk/update-cell-certificate/by-approval-request/[\\w-]+`,
+    },
+    response: upload
+      ? { status: 200, headers: { 'Content-Type': 'application/json;charset=UTF-8' }, jsonBody: upload }
+      : { status: 404, headers: { 'Content-Type': 'application/json;charset=UTF-8' }, jsonBody: {} },
+  })
+
 const stubCellCertificateUpload = (upload: CellCertificateUpload) =>
   stubFor({
     request: {
@@ -1545,6 +1556,7 @@ const stubPendingApprovalsBelow = (pendingApprovalsBelow: PendingApprovalsBelow)
 const allStubs = {
   stubCellCertificateUploadsList,
   stubCellCertificateUpload,
+  stubCellCertificateUploadByApprovalRequest,
   stubRequestCellCertificateUpload,
   stubGetPrisonConfiguration,
   stubLocations,

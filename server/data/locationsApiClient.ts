@@ -68,6 +68,10 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/bulk/update-cell-certificate/upload/:uploadId',
       requestType: 'get',
     }),
+    getByApprovalRequest: this.apiCall<CellCertificateUpload, { approvalRequestId: string }>({
+      path: '/locations/bulk/update-cell-certificate/by-approval-request/:approvalRequestId',
+      requestType: 'get',
+    }),
   }
 
   certification = {

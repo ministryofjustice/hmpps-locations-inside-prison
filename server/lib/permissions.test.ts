@@ -38,11 +38,23 @@ describe('rolesToPermissions', () => {
   })
 
   it('returns the correct permissions for RESI__CERT_VIEWER', () => {
-    expect(rolesToPermissions(['RESI__CERT_VIEWER']).sort()).toEqual(['certificate_view_management'])
+    expect(rolesToPermissions(['RESI__CERT_VIEWER']).sort()).toEqual([
+      'cell_certificate_upload',
+      'certificate_view_management',
+    ])
   })
 
   it('returns the correct permissions for MANAGE_RES_LOCATIONS_ADMIN', () => {
-    expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_ADMIN']).sort()).toEqual(['administer_residential'])
+    expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_ADMIN']).sort()).toEqual([
+      'administer_residential',
+      'cell_certificate_upload',
+    ])
+  })
+
+  // The import is a snapshot most roles cannot act on; its results appear on the import request details
+  // page instead, which carries no permission of its own.
+  it('grants VIEW_INTERNAL_LOCATION no permissions', () => {
+    expect(rolesToPermissions(['VIEW_INTERNAL_LOCATION']).sort()).toEqual([])
   })
 
   it('returns the correct permissions for all roles', () => {
@@ -57,6 +69,7 @@ describe('rolesToPermissions', () => {
     ).toEqual([
       'administer_residential',
       'archive_location',
+      'cell_certificate_upload',
       'certificate_change_request_create',
       'certificate_change_request_review',
       'certificate_change_request_withdraw',

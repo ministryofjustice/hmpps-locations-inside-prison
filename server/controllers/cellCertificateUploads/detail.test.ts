@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { DeepPartial } from 'fishery'
 import ingestDetail, { capacityCell, changeText } from './detail'
-import LocationsService from '../../../services/locationsService'
-import { CellCertificateUpload } from '../../../data/types/locationsApi/cellCertificateUpload'
+import LocationsService from '../../services/locationsService'
+import { CellCertificateUpload } from '../../data/types/locationsApi/cellCertificateUpload'
 
 describe('Cell certificate uploads - detail', () => {
   let deepReq: DeepPartial<Request>
@@ -92,7 +92,7 @@ describe('Cell certificate uploads - detail', () => {
 
     expect(locationsService.getCellCertificateUpload).toHaveBeenCalledWith('token', 'upload-1')
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/admin/ingest/detail',
+      'pages/cellCertificateUploads/detail',
       expect.objectContaining({
         upload,
         inProgress: false,
@@ -151,7 +151,7 @@ describe('Cell certificate uploads - detail', () => {
     await ingestDetail(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/admin/ingest/detail',
+      'pages/cellCertificateUploads/detail',
       expect.objectContaining({ inProgress: true, cellCertificateUrl: undefined }),
     )
   })

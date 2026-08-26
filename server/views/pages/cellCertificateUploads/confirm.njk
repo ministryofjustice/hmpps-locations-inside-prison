@@ -1,4 +1,4 @@
-{% extends "../../../partials/formStep.njk" %}
+{% extends "../../partials/formStep.njk" %}
 
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
@@ -48,7 +48,7 @@
           ],
           rows: rows
         }) }}
-        <h2 class="govuk-heading-m">Full upload details</h2>
+        <h2 class="govuk-heading-m">Full import details</h2>
         {{ govukTable({
           attributes: {
             "data-qa": "data-table"
@@ -72,6 +72,6 @@
 
 {% block fields %}
   {{ govukInsetText({
-    text: "It can take several minutes to run the ingestion, please wait for a response"
+    text: "It can take several minutes to run the import, please wait for a response"
   }) }}
 {% endblock %}

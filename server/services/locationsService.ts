@@ -208,6 +208,10 @@ export default class LocationsService {
     return this.locationsApiClient.cellCertificateUploads.getUpload(token, { uploadId })
   }
 
+  async getCellCertificateUploadByApprovalRequest(token: string, approvalRequestId: string) {
+    return this.locationsApiClient.cellCertificateUploads.getByApprovalRequest(token, { approvalRequestId })
+  }
+
   async getApprovalTypes(token: string) {
     return (await this.locationsApiClient.constants.getApprovalTypes(token)).approvalTypes
   }

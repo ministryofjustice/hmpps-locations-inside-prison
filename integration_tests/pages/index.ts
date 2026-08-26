@@ -13,6 +13,7 @@ export default class IndexPage extends Page {
     viewLocations: (): PageElement => cy.get('[data-qa=view-locations-card]'),
     inactiveCells: (): PageElement => cy.get('[data-qa=inactive-cells-card]'),
     cellCertificate: (): PageElement => cy.get('[data-qa=cell-certificate-card]'),
+    cellCertificateUploads: (): PageElement => cy.get('[data-qa=cell-certificate-uploads-card]'),
     capacityManagementDashboard: (): PageElement => cy.get('[data-qa=capacity-management-dashboard-card]'),
     archivedLocations: (): PageElement => cy.get('[data-qa=archived-locations-card]'),
     locationHistory: (): PageElement => cy.get('[data-qa=location-history-card]'),

@@ -53,7 +53,6 @@ const paths = {
     changeNonResidentialStatus: withPrison('admin/change-non-resi-status'),
     changeResidentialStatus: withPrison('admin/change-resi-status'),
     index: withPrison('admin'),
-    ingestCert: withPrison('admin/ingest-cert'),
   },
   auth: {
     signIn: '/sign-in',
@@ -113,6 +112,8 @@ const paths = {
   },
   prison: {
     archivedLocations: withPrison('archived-locations'),
+    home: withPrison(),
+    cellCertificateUploads: withPrison('cell-certificate-uploads'),
     changeSignedOperationalCapacity: withPrison('change-signed-operational-capacity'),
   },
 }

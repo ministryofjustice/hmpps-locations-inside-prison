@@ -2,9 +2,9 @@ import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { DeepPartial } from 'fishery'
 import IngestConfirm from './confirm'
-import fields from '../../../routes/changeLocalName/fields'
-import LocationsService from '../../../services/locationsService'
-import paths from '../../../utils/paths'
+import fields from '../../routes/changeLocalName/fields'
+import LocationsService from '../../services/locationsService'
+import paths from '../../utils/paths'
 
 describe('Ingest the cell cert data - confirm', () => {
   const controller = new IngestConfirm({ route: '/' })
@@ -111,9 +111,9 @@ describe('Ingest the cell cert data - confirm', () => {
       expect(deepReq.sessionModel.reset).toHaveBeenCalled()
       expect(deepReq.flash).toHaveBeenCalledWith(
         'success',
-        expect.objectContaining({ title: 'Cell certificate upload started' }),
+        expect.objectContaining({ title: 'Cell certificate import started' }),
       )
-      expect(deepRes.redirect).toHaveBeenCalledWith(`${paths.admin.ingestCert('TST')}/upload/upload-1`)
+      expect(deepRes.redirect).toHaveBeenCalledWith(`${paths.prison.cellCertificateUploads('TST')}/upload/upload-1`)
     })
 
     it('redirects to the list with an error when the upload failed to start', () => {
@@ -127,7 +127,7 @@ describe('Ingest the cell cert data - confirm', () => {
         title: 'There is a problem',
         content: 'Something went wrong',
       })
-      expect(deepRes.redirect).toHaveBeenCalledWith(paths.admin.ingestCert('TST'))
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.prison.cellCertificateUploads('TST'))
     })
   })
 })

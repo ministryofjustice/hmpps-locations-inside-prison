@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { CapacityCell, TypedLocals } from '../../../@types/express'
-import paths from '../../../utils/paths'
+import { CapacityCell, TypedLocals } from '../../@types/express'
+import paths from '../../utils/paths'
 
 // Renders a "before -> after" string, handling 0 (a valid capacity) and missing previous values.
 export const changeText = (previous: number | undefined, current: number | undefined): string => {
@@ -59,12 +59,12 @@ export default async (req: Request, res: Response) => {
     .sort((a, b) => Number(b.needsReview) - Number(a.needsReview))
 
   const locals: TypedLocals = {
-    title: 'Cell certificate upload',
+    title: 'Cell certificate import',
     upload,
     locationRows,
     inProgress,
-    listUrl: paths.admin.ingestCert(prisonId),
-    backLink: paths.admin.ingestCert(prisonId),
+    listUrl: paths.prison.cellCertificateUploads(prisonId),
+    backLink: paths.prison.cellCertificateUploads(prisonId),
     cellCertificateUrl:
       upload.status === 'FINISHED' && upload.cellCertificateId
         ? paths.cellCertificate.view(prisonId, upload.cellCertificateId)
@@ -76,5 +76,5 @@ export default async (req: Request, res: Response) => {
     locals.banner = { success: success[0] }
   }
 
-  return res.render('pages/admin/ingest/detail', locals)
+  return res.render('pages/cellCertificateUploads/detail', locals)
 }

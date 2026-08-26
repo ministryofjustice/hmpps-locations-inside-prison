@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { DeepPartial } from 'fishery'
 import ingestList from './list'
-import LocationsService from '../../../services/locationsService'
-import { CellCertificateUpload } from '../../../data/types/locationsApi/cellCertificateUpload'
-import paths from '../../../utils/paths'
+import LocationsService from '../../services/locationsService'
+import { CellCertificateUpload } from '../../data/types/locationsApi/cellCertificateUpload'
+import paths from '../../utils/paths'
 
 describe('Cell certificate uploads - list', () => {
   let deepReq: DeepPartial<Request>
@@ -44,11 +44,11 @@ describe('Cell certificate uploads - list', () => {
 
     expect(locationsService.getCellCertificateUploads).toHaveBeenCalledWith('token', 'TST')
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/admin/ingest/list',
+      'pages/cellCertificateUploads/list',
       expect.objectContaining({
         uploads: [finishedUpload],
         hasInProgress: false,
-        newUploadUrl: `${paths.admin.ingestCert('TST')}/new`,
+        newUploadUrl: `${paths.prison.cellCertificateUploads('TST')}/new`,
       }),
     )
   })
@@ -61,7 +61,7 @@ describe('Cell certificate uploads - list', () => {
     await ingestList(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/admin/ingest/list',
+      'pages/cellCertificateUploads/list',
       expect.objectContaining({ hasInProgress: true }),
     )
   })
@@ -77,7 +77,7 @@ describe('Cell certificate uploads - list', () => {
     await ingestList(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/admin/ingest/list',
+      'pages/cellCertificateUploads/list',
       expect.objectContaining({ validationErrors: [{ text: 'Upload already running', href: '#' }] }),
     )
   })

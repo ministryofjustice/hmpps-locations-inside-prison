@@ -1,11 +1,11 @@
-import Page from '../../../pages/page'
-import CellCertificateUploadsListPage from '../../../pages/admin/ingest/list'
-import CellCertificateUploadDetailPage from '../../../pages/admin/ingest/detail'
-import { CellCertificateUpload } from '../../../../server/data/types/locationsApi/cellCertificateUpload'
-import paths from '../../../../server/utils/paths'
-import ManageUsersApiStubber from '../../../mockApis/manageUsersApi'
-import AuthStubber from '../../../mockApis/auth'
-import LocationsApiStubber from '../../../mockApis/locationsApi'
+import Page from '../../pages/page'
+import CellCertificateUploadsListPage from '../../pages/cellCertificateUploads/list'
+import CellCertificateUploadDetailPage from '../../pages/cellCertificateUploads/detail'
+import { CellCertificateUpload } from '../../../server/data/types/locationsApi/cellCertificateUpload'
+import paths from '../../../server/utils/paths'
+import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
+import AuthStubber from '../../mockApis/auth'
+import LocationsApiStubber from '../../mockApis/locationsApi'
 
 const completedUpload: CellCertificateUpload = {
   id: 'upload-1',
@@ -93,7 +93,7 @@ context('Cell certificate uploads', () => {
   it('flags the cells whose working capacity does not match the certificate', () => {
     LocationsApiStubber.stub.stubCellCertificateUpload(completedUpload)
 
-    cy.visit(`${paths.admin.ingestCert('TST')}/upload/upload-1`)
+    cy.visit(`${paths.prison.cellCertificateUploads('TST')}/upload/upload-1`)
     const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
 
     detailPage.summary().should('contain', 'Cells needing review')
@@ -117,11 +117,19 @@ context('Cell certificate uploads', () => {
   it('shows the in-progress message on the detail page for an unfinished upload', () => {
     LocationsApiStubber.stub.stubCellCertificateUpload(inProgressUpload)
 
-    cy.visit(`${paths.admin.ingestCert('TST')}/upload/upload-2`)
+    cy.visit(`${paths.prison.cellCertificateUploads('TST')}/upload/upload-2`)
     const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
     detailPage.inProgressMessage().should('exist')
     detailPage.cellCertificateLink().should('not.exist')
     detailPage.summary().should('contain', 'Processing')
+  })
+
+  it('redirects the URL the pages used to live at', () => {
+    LocationsApiStubber.stub.stubCellCertificateUploadsList([])
+
+    cy.visit('/TST/admin/ingest-cert')
+    Page.verifyOnPage(CellCertificateUploadsListPage)
+    cy.location('pathname').should('eq', paths.prison.cellCertificateUploads('TST'))
   })
 
   it('shows a message when there are no uploads', () => {
@@ -131,5 +139,45 @@ context('Cell certificate uploads', () => {
     const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)
     listPage.noUploadsMessage().should('exist')
     listPage.uploadNewButton().should('exist')
+  })
+})
+
+context('Cell certificate uploads - capacity management', () => {
+  beforeEach(() => {
+    cy.task('reset')
+    AuthStubber.stub.stubSignIn({ roles: ['RESI__CERT_VIEWER'] })
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubPrisonConfiguration()
+    cy.signIn()
+  })
+
+  it('offers the upload button to a certificate viewer', () => {
+    LocationsApiStubber.stub.stubCellCertificateUploadsList([])
+
+    CellCertificateUploadsListPage.goTo('TST')
+    Page.verifyOnPage(CellCertificateUploadsListPage).uploadNewButton().should('exist')
+  })
+})
+
+context('Cell certificate uploads - a role that may not ingest', () => {
+  beforeEach(() => {
+    cy.task('reset')
+    AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
+    ManageUsersApiStubber.stub.stubManageUsers()
+    ManageUsersApiStubber.stub.stubManageUsersMe()
+    ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+    ManageUsersApiStubber.stub.stubManageCaseloads()
+    LocationsApiStubber.stub.stubPrisonConfiguration()
+    cy.signIn()
+  })
+
+  it('cannot reach the uploads page', () => {
+    LocationsApiStubber.stub.stubCellCertificateUploadsList([completedUpload])
+
+    cy.visit(paths.prison.cellCertificateUploads('TST'), { failOnStatusCode: false })
+    cy.location('pathname').should('not.eq', paths.prison.cellCertificateUploads('TST'))
   })
 })

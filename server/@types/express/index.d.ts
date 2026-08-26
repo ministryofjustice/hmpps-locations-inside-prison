@@ -216,6 +216,18 @@ interface AllLocals {
   newUploadUrl: string
   listUrl: string
   cellCertificateUrl: string
+  ingestion: {
+    upload: CellCertificateUpload
+    reportUrl: string
+    rows: {
+      locationKey: string
+      status: string
+      message?: string
+      maxCapacity: CapacityCell
+      workingCapacity: CapacityCell
+      certifiedNormalAccommodation: CapacityCell
+    }[]
+  }
   locationRows: {
     locationKey: string
     status: string
