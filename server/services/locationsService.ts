@@ -5,6 +5,12 @@ import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHier
 import { LocationType, NotificationGroup, StatusType } from '../data/types/locationsApi'
 import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
 
+// The API rejects an upload without a reason once a prison has certification approval turned on. The
+// ingestion is always the same act, and the API records its own fixed reason against the approval request
+// it raises, so this only needs to explain the upload on the report.
+export const CELL_CERTIFICATE_UPLOAD_REASON =
+  'Cell certificate imported when the prison started using Residential locations'
+
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
 
@@ -187,7 +193,11 @@ export default class LocationsService {
   }
 
   async requestCellCertificateUpload(token: string, prisonId: string, locations: BulkCapacityUpdate) {
-    return this.locationsApiClient.cellCertificateUploads.request(token, { prisonId }, { locations })
+    return this.locationsApiClient.cellCertificateUploads.request(
+      token,
+      { prisonId },
+      { locations, reasonForChange: CELL_CERTIFICATE_UPLOAD_REASON },
+    )
   }
 
   async getCellCertificateUploads(token: string, prisonId: string, status?: string) {

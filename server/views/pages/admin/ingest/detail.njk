@@ -3,7 +3,8 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "../../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag, uploadLocationStatusTag %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+{% from "../../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag, uploadLocationStatusTag, uploadLocationNeedsReviewTag %}
 
 {% block head %}
   {{ super() }}
@@ -13,6 +14,9 @@
 {% endblock %}
 
 {% block content %}
+  {# A capacity the location kept while the certificate took a different value is shown with both. #}
+  {% macro capacityCellHtml(capacity) %}{{ capacity.text }}{% if capacity.certifiedText %}<br><span class="govuk-hint govuk-!-margin-bottom-0">Certified {{ capacity.certifiedText }}</span>{% endif %}{% endmacro %}
+
   <div class="govuk-width-container">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
@@ -38,9 +42,21 @@
             { key: { text: "Total records" }, value: { text: upload.totalRecords } },
             { key: { text: "Processed" }, value: { text: upload.processedRecords } },
             { key: { text: "Skipped" }, value: { text: upload.skippedRecords } },
-            { key: { text: "Failed" }, value: { text: upload.failedRecords } }
+            { key: { text: "Failed" }, value: { text: upload.failedRecords } },
+            { key: { text: "Cells needing review" }, value: { text: upload.discrepancyRecords or 0 } }
           ]
         }) }}
+
+        {% if not inProgress and upload.discrepancyRecords %}
+          {{ mojAlert({
+            attributes: { "data-qa": "needs-review-alert" },
+            variant: "information",
+            title: "Check these cells’ working capacities",
+            showTitleAsHeading: true,
+            dismissible: false,
+            text: upload.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the uploaded file, so the two do not match until someone reviews them."
+          }) }}
+        {% endif %}
 
         {% if cellCertificateUrl %}
           <p class="govuk-body">
@@ -54,10 +70,10 @@
           {% for location in locationRows %}
             {% set rows = (rows.push([
               { text: location.locationKey },
-              { html: uploadLocationStatusTag(location.status) },
-              { text: location.maxCapacityText },
-              { text: location.workingCapacityText },
-              { text: location.certifiedNormalAccommodationText },
+              { html: uploadLocationStatusTag(location.status) + (uploadLocationNeedsReviewTag() if location.needsReview else "") },
+              { html: capacityCellHtml(location.maxCapacity) },
+              { html: capacityCellHtml(location.workingCapacity) },
+              { html: capacityCellHtml(location.certifiedNormalAccommodation) },
               { text: location.message or "" }
             ]), rows) %}
           {% endfor %}

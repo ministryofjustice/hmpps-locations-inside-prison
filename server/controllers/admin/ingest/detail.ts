@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { TypedLocals } from '../../../@types/express'
+import { CapacityCell, TypedLocals } from '../../../@types/express'
 import paths from '../../../utils/paths'
 
 // Renders a "before -> after" string, handling 0 (a valid capacity) and missing previous values.
@@ -7,6 +7,20 @@ export const changeText = (previous: number | undefined, current: number | undef
   if (current === undefined || current === null) return '-'
   if (previous === undefined || previous === null || previous === current) return String(current)
   return `${previous} → ${current}`
+}
+
+// Where the uploaded value could not be applied, the location kept the value it already had, so the "before"
+// is what it still holds and the uploaded value is what the certificate now records.
+export const capacityCell = (
+  previous: number | undefined,
+  uploaded: number | undefined,
+  mismatch: boolean | undefined,
+): CapacityCell => {
+  if (!mismatch) return { text: changeText(previous, uploaded) }
+  return {
+    text: previous === undefined || previous === null ? '-' : String(previous),
+    certifiedText: uploaded === undefined || uploaded === null ? '-' : String(uploaded),
+  }
 }
 
 export default async (req: Request, res: Response) => {
@@ -18,17 +32,31 @@ export default async (req: Request, res: Response) => {
   const upload = await locationsService.getCellCertificateUpload(systemToken, uploadId)
   const inProgress = upload.status !== 'FINISHED'
 
-  const locationRows = (upload.locations || []).map(location => ({
-    locationKey: location.locationKey,
-    status: location.status,
-    message: location.message,
-    maxCapacityText: changeText(location.previousMaxCapacity, location.maxCapacity),
-    workingCapacityText: changeText(location.previousWorkingCapacity, location.workingCapacity),
-    certifiedNormalAccommodationText: changeText(
-      location.previousCertifiedNormalAccommodation,
-      location.certifiedNormalAccommodation,
-    ),
-  }))
+  const locationRows = (upload.locations || [])
+    .map(location => ({
+      locationKey: location.locationKey,
+      status: location.status,
+      message: location.message,
+      needsReview: Boolean(
+        location.workingCapacityMismatch ||
+        location.maxCapacityMismatch ||
+        location.certifiedNormalAccommodationMismatch,
+      ),
+      maxCapacity: capacityCell(location.previousMaxCapacity, location.maxCapacity, location.maxCapacityMismatch),
+      workingCapacity: capacityCell(
+        location.previousWorkingCapacity,
+        location.workingCapacity,
+        location.workingCapacityMismatch,
+      ),
+      certifiedNormalAccommodation: capacityCell(
+        location.previousCertifiedNormalAccommodation,
+        location.certifiedNormalAccommodation,
+        location.certifiedNormalAccommodationMismatch,
+      ),
+    }))
+    // The cells needing review are the point of the report, so lift them above the rest. Array sort is stable,
+    // so everything else keeps the location order the API returned.
+    .sort((a, b) => Number(b.needsReview) - Number(a.needsReview))
 
   const locals: TypedLocals = {
     title: 'Cell certificate upload',

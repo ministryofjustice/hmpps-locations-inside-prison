@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals'
 import LocationsApiClient from '../data/locationsApiClient'
-import LocationsService from './locationsService'
+import LocationsService, { CELL_CERTIFICATE_UPLOAD_REASON } from './locationsService'
 
 function deepMock(object: any, returnValue?: any): object | jest.Mock {
   if (typeof object === 'object') {
@@ -30,6 +30,7 @@ describe('Locations service', () => {
       'prisonConfiguration',
       'certification',
       'cellCertificates',
+      'cellCertificateUploads',
     ].forEach(
       (
         k:
@@ -38,7 +39,8 @@ describe('Locations service', () => {
           | 'signedOperationalCapacity'
           | 'prisonConfiguration'
           | 'certification'
-          | 'cellCertificates',
+          | 'cellCertificates'
+          | 'cellCertificateUploads',
       ) => {
         locationsApiClient[k] = deepMock(locationsApiClient[k]) as any
       },
@@ -121,6 +123,22 @@ describe('Locations service', () => {
           reasonForChange: undefined,
           requiresApproval: false,
         },
+      )
+    })
+  })
+
+  describe('requestCellCertificateUpload', () => {
+    it('sends a reason for change, which the API requires once the prison needs certification approval', async () => {
+      const locations = {
+        'TST-A-1-001': { maxCapacity: 2, workingCapacity: 1, certifiedNormalAccommodation: 2, cellMark: 'A1' },
+      }
+
+      await locationsService.requestCellCertificateUpload('token', 'TST', locations)
+
+      expect(locationsApiClient.cellCertificateUploads.request).toHaveBeenCalledWith(
+        'token',
+        { prisonId: 'TST' },
+        { locations, reasonForChange: CELL_CERTIFICATE_UPLOAD_REASON },
       )
     })
   })
