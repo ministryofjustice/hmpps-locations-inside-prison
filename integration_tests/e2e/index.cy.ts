@@ -104,7 +104,7 @@ context('Index', () => {
 
       indexPage.cards.cellCertificate().contains('Cell certificate')
       // capacity management can run ingestions, so they get the uploads tile
-      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
+      indexPage.cards.cellCertificateUploads().contains('Import cell certificate')
       indexPage.cards.capacityManagementDashboard().contains('Capacity management dashboard')
       indexPage.cards
         .capacityManagementDashboard()
@@ -157,7 +157,7 @@ context('Index', () => {
 
       // ingesting a certificate is the onboarding step that precedes switching certification on
       indexPage.cards.cellCertificate().should('not.exist')
-      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
+      indexPage.cards.cellCertificateUploads().contains('Import cell certificate')
       indexPage.cards
         .cellCertificateUploads()
         .find('a')

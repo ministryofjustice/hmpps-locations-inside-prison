@@ -62,10 +62,9 @@ export default middleware((req, res, next) => {
       // Deliberately not gated on certificationEnabled: ingesting a certificate is the onboarding step that
       // happens before certification is switched on, so gating it that way would hide it when it is needed.
       visible: req.canAccess('cell_certificate_upload'),
-      heading: 'Cell certificate uploads',
+      heading: 'Import cell certificate',
       href: paths.prison.cellCertificateUploads(prisonId),
-      description:
-        'View cell certificates that have been uploaded for this establishment and the results of each upload.',
+      description: 'Import a certificate for this establishment or view previously imported certificates.',
       'data-qa': 'cell-certificate-uploads-card',
     },
     {
