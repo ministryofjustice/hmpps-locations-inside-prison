@@ -46,16 +46,8 @@ afterEach(() => {
 })
 
 describe('viewing cell certificate uploads', () => {
-  // Every residential role can see the history, including VIEW_INTERNAL_LOCATION, which holds no other
-  // permission at all.
-  it.each([
-    ['VIEW_INTERNAL_LOCATION'],
-    ['MANAGE_RESIDENTIAL_LOCATIONS'],
-    ['MANAGE_RES_LOCATIONS_OP_CAP'],
-    ['RESI__CERT_REVIEWER'],
-    ['RESI__CERT_VIEWER'],
-    ['MANAGE_RES_LOCATIONS_ADMIN'],
-  ])('is allowed for %s', async role => {
+  // Only the roles that can run an ingestion reach these pages at all.
+  it.each([['MANAGE_RES_LOCATIONS_ADMIN'], ['RESI__CERT_VIEWER']])('is allowed for %s', async role => {
     await request(buildApp([role]))
       .get(paths.prison.cellCertificateUploads('TST'))
       .expect(200)
@@ -68,8 +60,14 @@ describe('viewing cell certificate uploads', () => {
   })
 
   // A missing permission signs the user out rather than rendering a 403 page - see server/errorHandler.ts.
-  it('is refused without a residential role', async () => {
-    await request(buildApp(['SOME_OTHER_ROLE']))
+  it.each([
+    ['VIEW_INTERNAL_LOCATION'],
+    ['MANAGE_RESIDENTIAL_LOCATIONS'],
+    ['MANAGE_RES_LOCATIONS_OP_CAP'],
+    ['RESI__CERT_REVIEWER'],
+    ['SOME_OTHER_ROLE'],
+  ])('is refused for %s', async role => {
+    await request(buildApp([role]))
       .get(paths.prison.cellCertificateUploads('TST'))
       .expect(302)
       .expect('Location', paths.auth.signOut)
@@ -84,14 +82,10 @@ describe('starting a new cell certificate upload', () => {
       .expect('Location', `${paths.prison.cellCertificateUploads('TST')}/new/upload`)
   })
 
-  // These roles can see what has been uploaded but must not be able to start one.
-  it.each([['VIEW_INTERNAL_LOCATION'], ['MANAGE_RESIDENTIAL_LOCATIONS'], ['MANAGE_RES_LOCATIONS_OP_CAP']])(
-    'is refused for %s',
-    async role => {
-      await request(buildApp([role]))
-        .get(`${paths.prison.cellCertificateUploads('TST')}/new`)
-        .expect(302)
-        .expect('Location', paths.auth.signOut)
-    },
-  )
+  it.each([['MANAGE_RESIDENTIAL_LOCATIONS'], ['MANAGE_RES_LOCATIONS_OP_CAP']])('is refused for %s', async role => {
+    await request(buildApp([role]))
+      .get(`${paths.prison.cellCertificateUploads('TST')}/new`)
+      .expect(302)
+      .expect('Location', paths.auth.signOut)
+  })
 })

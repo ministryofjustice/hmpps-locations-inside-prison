@@ -41,8 +41,8 @@ context('Index', () => {
 
       indexPage.cards.viewLocations().contains('Manage residential locations')
       indexPage.cards.cellCertificate().should('not.exist')
-      // ingesting a certificate is what happens before certification is switched on, so this tile stays
-      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
+      // the import is a snapshot this role cannot act on - its results appear on the import request page
+      indexPage.cards.cellCertificateUploads().should('not.exist')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
     })
@@ -75,7 +75,7 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
-      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
+      indexPage.cards.cellCertificateUploads().should('not.exist')
     })
 
     it('has a feedback banner', () => {
@@ -103,6 +103,8 @@ context('Index', () => {
       const indexPage = Page.verifyOnPage(IndexPage)
 
       indexPage.cards.cellCertificate().contains('Cell certificate')
+      // capacity management can run ingestions, so they get the uploads tile
+      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
       indexPage.cards.capacityManagementDashboard().contains('Capacity management dashboard')
       indexPage.cards
         .capacityManagementDashboard()
@@ -134,8 +136,32 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
-      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
+      indexPage.cards.cellCertificateUploads().should('not.exist')
       indexPage.cards.capacityManagementDashboard().should('not.exist')
+    })
+  })
+
+  context('With MANAGE_RES_LOCATIONS_ADMIN role', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
+      LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
+      ManageUsersApiStubber.stub.stubManageUsersMe()
+      ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+      ManageUsersApiStubber.stub.stubManageCaseloads()
+    })
+
+    it('displays the cell certificate uploads tile even when certification is off', () => {
+      cy.signIn()
+      const indexPage = Page.verifyOnPage(IndexPage)
+
+      // ingesting a certificate is the onboarding step that precedes switching certification on
+      indexPage.cards.cellCertificate().should('not.exist')
+      indexPage.cards.cellCertificateUploads().contains('Cell certificate uploads')
+      indexPage.cards
+        .cellCertificateUploads()
+        .find('a')
+        .should('have.attr', 'href', paths.prison.cellCertificateUploads('TST'))
     })
   })
 

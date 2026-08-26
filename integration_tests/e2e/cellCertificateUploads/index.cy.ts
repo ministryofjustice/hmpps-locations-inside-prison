@@ -142,7 +142,7 @@ context('Cell certificate uploads', () => {
   })
 })
 
-context('Cell certificate uploads - a role that may start an upload', () => {
+context('Cell certificate uploads - capacity management', () => {
   beforeEach(() => {
     cy.task('reset')
     AuthStubber.stub.stubSignIn({ roles: ['RESI__CERT_VIEWER'] })
@@ -162,7 +162,7 @@ context('Cell certificate uploads - a role that may start an upload', () => {
   })
 })
 
-context('Cell certificate uploads - a role that may only view', () => {
+context('Cell certificate uploads - a role that may not ingest', () => {
   beforeEach(() => {
     cy.task('reset')
     AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
@@ -174,12 +174,10 @@ context('Cell certificate uploads - a role that may only view', () => {
     cy.signIn()
   })
 
-  it('shows the history but not the upload button', () => {
+  it('cannot reach the uploads page', () => {
     LocationsApiStubber.stub.stubCellCertificateUploadsList([completedUpload])
 
-    CellCertificateUploadsListPage.goTo('TST')
-    const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)
-    listPage.uploadsTable().should('contain', 'Complete')
-    listPage.uploadNewButton().should('not.exist')
+    cy.visit(paths.prison.cellCertificateUploads('TST'), { failOnStatusCode: false })
+    cy.location('pathname').should('not.eq', paths.prison.cellCertificateUploads('TST'))
   })
 })

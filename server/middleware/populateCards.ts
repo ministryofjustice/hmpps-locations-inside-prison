@@ -2,8 +2,6 @@ import config from '../config'
 import paths from '../utils/paths'
 import middleware from './middleware'
 
-// Must stay in step with the roles granted `cell_certificate_upload_view` in server/lib/permissions.ts:
-// this list decides which tiles are shown, that permission decides what the routes will actually serve.
 const RESI_ROLES = [
   'VIEW_INTERNAL_LOCATION',
   'MANAGE_RESIDENTIAL_LOCATIONS',
@@ -59,9 +57,11 @@ export default middleware((req, res, next) => {
     },
     {
       clickable: true,
+      // Only the roles that can run an ingestion get this tile - for everyone else the import is a snapshot
+      // they cannot act on, and its results are shown on the import request details page instead.
       // Deliberately not gated on certificationEnabled: ingesting a certificate is the onboarding step that
       // happens before certification is switched on, so gating it that way would hide it when it is needed.
-      visible: showResiCards,
+      visible: req.canAccess('cell_certificate_upload'),
       heading: 'Cell certificate uploads',
       href: paths.prison.cellCertificateUploads(prisonId),
       description:

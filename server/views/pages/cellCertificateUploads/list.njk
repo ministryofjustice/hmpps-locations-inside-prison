@@ -25,7 +25,7 @@
           <p class="govuk-body">
             <a class="govuk-link" href="{{ listUrl }}" data-qa="refresh-link">Refresh</a>
           </p>
-        {% elseif canAccess('cell_certificate_upload_create') %}
+        {% else %}
           {{ govukButton({
             text: "Upload a new cell certificate",
             href: newUploadUrl,

@@ -1,22 +1,11 @@
 import { uniq } from 'lodash'
 
-// Held by every residential role, including VIEW_INTERNAL_LOCATION which has no other permission. The set of
-// roles granted these must stay identical to RESI_ROLES in server/middleware/populateCards.ts, because tile
-// visibility and route access have to agree.
-const residentialUserPermissions: string[] = ['cell_certificate_upload_view']
+const cellStatusManagerPermissions: string[] = ['change_temporary_deactivation_details', 'reactivate', 'deactivate']
 
-const cellStatusManagerPermissions: string[] = [
-  ...residentialUserPermissions,
-  'change_temporary_deactivation_details',
-  'reactivate',
-  'deactivate',
-]
-
-const certificateViewerPermissions: string[] = [
-  ...residentialUserPermissions,
-  'certificate_view_management',
-  'cell_certificate_upload_create',
-]
+// Reaching the cell certificate ingestion pages at all means being able to run an ingestion, so a single
+// permission covers the area. The results of an ingestion are shown to a wider audience on the import
+// request details page instead, which carries no permission of its own.
+const certificateViewerPermissions: string[] = ['certificate_view_management', 'cell_certificate_upload']
 
 const certificateAdministratorPermissions: string[] = [
   ...cellStatusManagerPermissions,
@@ -38,16 +27,11 @@ const certificateAdministratorPermissions: string[] = [
   'archive_location',
 ]
 
-const certificateReviewerPermissions: string[] = [...residentialUserPermissions, 'certificate_change_request_review']
+const certificateReviewerPermissions: string[] = ['certificate_change_request_review']
 
-const administerResLocationsPermissions: string[] = [
-  ...residentialUserPermissions,
-  'administer_residential',
-  'cell_certificate_upload_create',
-]
+const administerResLocationsPermissions: string[] = ['administer_residential', 'cell_certificate_upload']
 
 const permissionsByRole: { [key: string]: string[] } = {
-  VIEW_INTERNAL_LOCATION: residentialUserPermissions,
   MANAGE_RESIDENTIAL_LOCATIONS: cellStatusManagerPermissions,
   MANAGE_RES_LOCATIONS_OP_CAP: certificateAdministratorPermissions,
   RESI__CERT_REVIEWER: certificateReviewerPermissions,

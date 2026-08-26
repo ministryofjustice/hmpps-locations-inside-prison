@@ -13,8 +13,9 @@ import { Page } from '../../services/auditService'
 export default function routes(services: Services): express.Router {
   const router = express.Router({ mergeParams: true })
 
-  // Every residential role can see what has been uploaded and how it turned out.
-  router.use(protectRoute('cell_certificate_upload_view'))
+  // Reaching these pages means being able to run an ingestion; the results are surfaced to a wider
+  // audience on the cell certificate import request details page instead.
+  router.use(protectRoute('cell_certificate_upload'))
 
   // Status of cell certificate uploads for the prison
   router.get('/', logPageView(services.auditService, Page.CELL_CERTIFICATE_UPLOADS), asyncMiddleware(uploadList))
@@ -26,10 +27,8 @@ export default function routes(services: Services): express.Router {
     asyncMiddleware(uploadDetail),
   )
 
-  // Starting an upload changes the prison's data, so it stays restricted to the roles that may run one.
   router.use(
     '/new',
-    protectRoute('cell_certificate_upload_create'),
     wizard(steps, fields, {
       name: 'ingest-cert',
       templatePath: 'pages/cellCertificateUploads',
