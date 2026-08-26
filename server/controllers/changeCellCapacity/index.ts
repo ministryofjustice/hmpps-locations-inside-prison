@@ -78,6 +78,7 @@ export default class ChangeCellCapacity extends FormStep {
 
   override validate(req: FormWizard.Request, res: Response, next: NextFunction) {
     const { decoratedLocation, prisonConfiguration } = res.locals
+    const { currentCellCertificate } = decoratedLocation
     const { maxCapacity: newMaxCap, workingCapacity: newWorkingCap, baselineCna: newBaselineCna } = req.form.values
     const { maxCapacity, workingCapacity, baselineCna } = this.getInitialValues(req, res)
 
@@ -86,6 +87,11 @@ export default class ChangeCellCapacity extends FormStep {
     const maxCapChanged = Number(newMaxCap) !== maxCapacity
     const workingCapChanged = Number(newWorkingCap) !== workingCapacity
     const onlyWorkingCapChanged = !cnaChanged && !maxCapChanged && workingCapChanged
+    const noChangeToCert =
+      currentCellCertificate?.certifiedNormalAccommodation === Number(newBaselineCna) &&
+      currentCellCertificate?.maxCapacity === Number(newMaxCap) &&
+      currentCellCertificate?.workingCapacity === Number(newWorkingCap)
+    req.sessionModel.set('noChangeToCert', noChangeToCert)
 
     if (!cnaChanged && !maxCapChanged && !workingCapChanged) {
       return res.redirect(paths.location.view(decoratedLocation))

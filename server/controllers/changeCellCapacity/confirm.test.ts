@@ -112,6 +112,18 @@ This will increase the establishment’s maximum capacity from 30 to 31.`,
         const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
         expect(result).not.toHaveProperty('showCertMismatchWarning')
       })
+
+      it('does not set showCertMismatchWarning when the new capacities match the cert', () => {
+        deepRes.locals.decoratedLocation.currentCellCertificate = {
+          certifiedNormalAccommodation: 2,
+          maxCapacity: 3,
+          workingCapacity: 1,
+        }
+        sessionModel.noChangeToCert = true
+
+        const result = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+        expect(result).not.toHaveProperty('showCertMismatchWarning')
+      })
     })
   })
 

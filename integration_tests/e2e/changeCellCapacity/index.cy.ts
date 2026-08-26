@@ -476,5 +476,62 @@ context('Change cell capacity', () => {
         cy.get('.govuk-notification-banner__content p').contains('You have updated the capacity of A-1-001.')
       })
     })
+
+    context('when certificationApprovalRequired is ACTIVE and the working cap is temporarily increased', () => {
+      beforeEach(() => {
+        location.currentCellCertificate = {
+          ...location.currentCellCertificate,
+          certifiedNormalAccommodation: 2,
+          maxCapacity: 2,
+          workingCapacity: 1,
+        }
+        location.capacity = {
+          certifiedNormalAccommodation: 2,
+          maxCapacity: 2,
+          workingCapacity: 2,
+        }
+        location.status = 'ACTIVE'
+
+        cy.task('reset')
+        AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_OP_CAP'] })
+        ManageUsersApiStubber.stub.stubManageUsers()
+        ManageUsersApiStubber.stub.stubManageUsersMe()
+        ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
+        ManageUsersApiStubber.stub.stubManageCaseloads()
+        LocationsApiStubber.stub.stubLocationsConstantsAccommodationType()
+        LocationsApiStubber.stub.stubLocationsConstantsConvertedCellType()
+        LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+        LocationsApiStubber.stub.stubLocationsConstantsLocationType()
+        LocationsApiStubber.stub.stubLocationsConstantsApprovalType()
+        LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
+        LocationsApiStubber.stub.stubLocationsConstantsUsedForType()
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummary()
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({ parentLocation: location })
+        LocationsApiStubber.stub.stubLocations(location)
+        LocationsApiStubber.stub.stubLocations(
+          LocationFactory.build({
+            id: '57718979-573c-433a-9e51-2d83f887c11c',
+            parentId: undefined,
+            topLevelId: undefined,
+          }),
+        )
+        LocationsApiStubber.stub.stubPrisonerLocationsId([])
+        LocationsApiStubber.stub.stubUpdateCapacity()
+        LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
+        cy.signIn()
+      })
+
+      it('skips to the confirmation page when there are no changes to the certified caps', () => {
+        ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
+        const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
+
+        changeCellCapacityPage.cnaInput().clear().type('2')
+        changeCellCapacityPage.maxCapacityInput().clear().type('2')
+        changeCellCapacityPage.workingCapacityInput().clear().type('1')
+        changeCellCapacityPage.continueButton().click()
+
+        cy.get('h1').contains('Confirm cell capacity')
+      })
+    })
   })
 })
