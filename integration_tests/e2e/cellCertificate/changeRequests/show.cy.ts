@@ -511,6 +511,65 @@ context('Cell Certificate - Change Requests - Show', () => {
         ])
       })
     })
+
+    context('When the approvalType is CELL_CERTIFICATE_UPLOAD', () => {
+      const upload = {
+        id: 'upload-1',
+        prisonId: 'TST',
+        status: 'FINISHED' as const,
+        totalRecords: 3,
+        processedRecords: 2,
+        skippedRecords: 1,
+        failedRecords: 0,
+        discrepancyRecords: 1,
+        requestedBy: 'USER1',
+        requestedDate: '2024-01-01T10:00:00',
+        locations: [
+          {
+            locationKey: 'TST-A-1-001',
+            status: 'PROCESSED' as const,
+            message: 'Working capacity and certified working capacity do not match',
+            maxCapacity: 2,
+            workingCapacity: 1,
+            previousMaxCapacity: 2,
+            previousWorkingCapacity: 2,
+            workingCapacityMismatch: true,
+          },
+          { locationKey: 'TST-A-1-002', status: 'SKIPPED' as const, maxCapacity: 2, workingCapacity: 2 },
+        ],
+      }
+
+      it('shows the import results below the request details', () => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({ approvalType: 'CELL_CERTIFICATE_UPLOAD', status: 'APPROVED' }),
+        )
+        LocationsApiStubber.stub.stubCellCertificateUploadByApprovalRequest(upload)
+
+        CellCertificateChangeRequestsShowPage.goTo('id1')
+        Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+
+        cy.get('[data-qa=ingestion-summary]').should('contain', 'Needing review')
+        cy.get('[data-qa=ingestion-needs-review-alert]').should('contain', 'Check these cells’ working capacities')
+
+        // only the cell needing review is listed - a prison's import covers every cell
+        cy.get('[data-qa=ingestion-results-table]').should('contain', 'TST-A-1-001')
+        cy.get('[data-qa=ingestion-results-table]').should('not.contain', 'TST-A-1-002')
+        cy.get('[data-qa=ingestion-results-table]').should('contain', 'Certified 1')
+      })
+
+      it('renders the page unchanged when there is no import behind the request', () => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({ approvalType: 'CELL_CERTIFICATE_UPLOAD', status: 'APPROVED' }),
+        )
+        LocationsApiStubber.stub.stubCellCertificateUploadByApprovalRequest(null)
+
+        CellCertificateChangeRequestsShowPage.goTo('id1')
+        Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+
+        cy.get('[data-qa=ingestion-summary]').should('not.exist')
+        cy.get('[data-qa=ingestion-results-table]').should('not.exist')
+      })
+    })
   })
 
   context('Review copy and withdraw button by status', () => {
