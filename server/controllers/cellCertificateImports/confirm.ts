@@ -5,7 +5,7 @@ import FormStep from '../base/formStep'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import paths from '../../utils/paths'
 
-export default class IngestConfirm extends FormStep {
+export default class ImportConfirm extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
 
@@ -16,7 +16,7 @@ export default class IngestConfirm extends FormStep {
       ...locals,
       capacityData,
       capacitySummary,
-      buttonText: 'Confirm ingestion',
+      buttonText: 'Confirm import',
     }
   }
 
@@ -28,14 +28,14 @@ export default class IngestConfirm extends FormStep {
     const capacityData: BulkCapacityUpdate = req.sessionModel.get('capacityData')
 
     try {
-      const upload = await locationsService.requestCellCertificateUpload(systemToken, prisonId, capacityData)
-      req.sessionModel.set('uploadId', upload.id)
+      const certificateImport = await locationsService.requestCellCertificateImport(systemToken, prisonId, capacityData)
+      req.sessionModel.set('importId', certificateImport.id)
       return next()
     } catch (error) {
-      // 409 = an upload is already in progress for this prison; 400 = validation (e.g. reason required)
+      // 409 = an import is already in progress for this prison; 400 = validation (e.g. reason required)
       const userMessage: string = error.data?.userMessage
       req.sessionModel.set(
-        'ingestError',
+        'importError',
         userMessage || 'The cell certificate import could not be started. Try again later.',
       )
       return next()
@@ -44,15 +44,15 @@ export default class IngestConfirm extends FormStep {
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
     const { prisonId } = res.locals.prisonConfiguration
-    const uploadId: string = req.sessionModel.get('uploadId')
-    const ingestError: string = req.sessionModel.get('ingestError')
+    const importId: string = req.sessionModel.get('importId')
+    const importError: string = req.sessionModel.get('importError')
 
     req.journeyModel.reset()
     req.sessionModel.reset()
 
-    if (ingestError) {
-      req.flash('error', { title: 'There is a problem', content: ingestError })
-      return res.redirect(paths.prison.cellCertificateUploads(prisonId))
+    if (importError) {
+      req.flash('error', { title: 'There is a problem', content: importError })
+      return res.redirect(paths.prison.cellCertificateImports(prisonId))
     }
 
     req.flash('success', {
@@ -60,6 +60,6 @@ export default class IngestConfirm extends FormStep {
       content: 'The cell certificate is being processed. This page shows its progress.',
     })
 
-    return res.redirect(`${paths.prison.cellCertificateUploads(prisonId)}/upload/${uploadId}`)
+    return res.redirect(`${paths.prison.cellCertificateImports(prisonId)}/import/${importId}`)
   }
 }

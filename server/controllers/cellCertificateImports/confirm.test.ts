@@ -1,13 +1,13 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import IngestConfirm from './confirm'
+import ImportConfirm from './confirm'
 import fields from '../../routes/changeLocalName/fields'
 import LocationsService from '../../services/locationsService'
 import paths from '../../utils/paths'
 
-describe('Ingest the cell cert data - confirm', () => {
-  const controller = new IngestConfirm({ route: '/' })
+describe('Import the cell cert data - confirm', () => {
+  const controller = new ImportConfirm({ route: '/' })
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   let next: NextFunction
@@ -67,34 +67,34 @@ describe('Ingest the cell cert data - confirm', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual(
         expect.objectContaining({
-          buttonText: 'Confirm ingestion',
+          buttonText: 'Confirm import',
         }),
       )
     })
   })
 
   describe('saveValues', () => {
-    it('requests an async cell certificate upload and stores the upload id', async () => {
+    it('requests an async cell certificate import and stores the import id', async () => {
       deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'capacityData' ? capacityData : null))
-      locationsService.requestCellCertificateUpload = jest.fn().mockResolvedValueOnce({ id: 'upload-1' })
+      locationsService.requestCellCertificateImport = jest.fn().mockResolvedValueOnce({ id: 'import-1' })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(locationsService.requestCellCertificateUpload).toHaveBeenCalledWith('token', 'TST', capacityData)
-      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('uploadId', 'upload-1')
+      expect(locationsService.requestCellCertificateImport).toHaveBeenCalledWith('token', 'TST', capacityData)
+      expect(deepReq.sessionModel.set).toHaveBeenCalledWith('importId', 'import-1')
       expect(next).toHaveBeenCalled()
     })
 
-    it('captures the API error message when the upload cannot be started', async () => {
+    it('captures the API error message when the import cannot be started', async () => {
       deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'capacityData' ? capacityData : null))
-      locationsService.requestCellCertificateUpload = jest.fn().mockRejectedValueOnce({
+      locationsService.requestCellCertificateImport = jest.fn().mockRejectedValueOnce({
         data: { userMessage: 'A cell certificate upload is already in progress for prison TST' },
       })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepReq.sessionModel.set).toHaveBeenCalledWith(
-        'ingestError',
+        'importError',
         'A cell certificate upload is already in progress for prison TST',
       )
       expect(next).toHaveBeenCalled()
@@ -102,8 +102,8 @@ describe('Ingest the cell cert data - confirm', () => {
   })
 
   describe('successHandler', () => {
-    it('redirects to the new upload detail page on success', () => {
-      deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'uploadId' ? 'upload-1' : undefined))
+    it('redirects to the new import detail page on success', () => {
+      deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'importId' ? 'import-1' : undefined))
 
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
@@ -113,13 +113,13 @@ describe('Ingest the cell cert data - confirm', () => {
         'success',
         expect.objectContaining({ title: 'Cell certificate import started' }),
       )
-      expect(deepRes.redirect).toHaveBeenCalledWith(`${paths.prison.cellCertificateUploads('TST')}/upload/upload-1`)
+      expect(deepRes.redirect).toHaveBeenCalledWith(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
     })
 
-    it('redirects to the list with an error when the upload failed to start', () => {
+    it('redirects to the list with an error when the import failed to start', () => {
       deepReq.sessionModel.get = jest
         .fn()
-        .mockImplementation(key => (key === 'ingestError' ? 'Something went wrong' : undefined))
+        .mockImplementation(key => (key === 'importError' ? 'Something went wrong' : undefined))
 
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
@@ -127,7 +127,7 @@ describe('Ingest the cell cert data - confirm', () => {
         title: 'There is a problem',
         content: 'Something went wrong',
       })
-      expect(deepRes.redirect).toHaveBeenCalledWith(paths.prison.cellCertificateUploads('TST'))
+      expect(deepRes.redirect).toHaveBeenCalledWith(paths.prison.cellCertificateImports('TST'))
     })
   })
 })

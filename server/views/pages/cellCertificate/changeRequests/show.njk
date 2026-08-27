@@ -5,7 +5,7 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
-{% from '../../../macros/cellCertificateUploadStatusTag.njk' import uploadLocationStatusTag %}
+{% from '../../../macros/cellCertificateImportStatusTag.njk' import importLocationStatusTag %}
 
 {% block content %}
   <div class="govuk-width-container">
@@ -29,7 +29,7 @@
 
     {{ certificationApprovalRequest(approvalRequest, false, 0, false, constants, locationMap, null, location) }}
 
-    {% if ingestion %}
+    {% if importResults %}
       {# A capacity the location kept while the certificate took a different value is shown with both. #}
       {% macro capacityCellHtml(capacity) %}{{ capacity.text }}{% if capacity.certifiedText %}<br><span class="govuk-hint govuk-!-margin-bottom-0">Certified {{ capacity.certifiedText }}</span>{% endif %}{% endmacro %}
 
@@ -38,35 +38,35 @@
           <h2 class="govuk-heading-m">Import results</h2>
 
           {{ govukSummaryList({
-            attributes: { "data-qa": "ingestion-summary" },
+            attributes: { "data-qa": "import-summary" },
             rows: [
-              { key: { text: "Cells in the import" }, value: { text: ingestion.upload.totalRecords } },
-              { key: { text: "Updated" }, value: { text: ingestion.upload.processedRecords } },
-              { key: { text: "Unchanged" }, value: { text: ingestion.upload.skippedRecords } },
-              { key: { text: "Failed" }, value: { text: ingestion.upload.failedRecords } },
-              { key: { text: "Needing review" }, value: { text: ingestion.upload.discrepancyRecords or 0 } }
+              { key: { text: "Cells in the import" }, value: { text: importResults.certificateImport.totalRecords } },
+              { key: { text: "Updated" }, value: { text: importResults.certificateImport.processedRecords } },
+              { key: { text: "Unchanged" }, value: { text: importResults.certificateImport.skippedRecords } },
+              { key: { text: "Failed" }, value: { text: importResults.certificateImport.failedRecords } },
+              { key: { text: "Needing review" }, value: { text: importResults.certificateImport.discrepancyRecords or 0 } }
             ]
           }) }}
 
-          {% if ingestion.upload.discrepancyRecords %}
+          {% if importResults.certificateImport.discrepancyRecords %}
             {{ mojAlert({
-              attributes: { "data-qa": "ingestion-needs-review-alert" },
+              attributes: { "data-qa": "import-needs-review-alert" },
               variant: "information",
               title: "Check these cells’ working capacities",
               showTitleAsHeading: true,
               dismissible: false,
-              text: ingestion.upload.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the imported file, so the two do not match until someone reviews them."
+              text: importResults.certificateImport.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the imported file, so the two do not match until someone reviews them."
             }) }}
           {% endif %}
         </div>
       </div>
 
-      {% if ingestion.rows.length %}
+      {% if importResults.rows.length %}
         {% set rows = [] %}
-        {% for row in ingestion.rows %}
+        {% for row in importResults.rows %}
           {% set rows = (rows.push([
             { text: row.locationKey },
-            { html: uploadLocationStatusTag(row.status) },
+            { html: importLocationStatusTag(row.status) },
             { html: capacityCellHtml(row.maxCapacity) },
             { html: capacityCellHtml(row.workingCapacity) },
             { html: capacityCellHtml(row.certifiedNormalAccommodation) },
@@ -75,7 +75,7 @@
         {% endfor %}
 
         {{ govukTable({
-          attributes: { "data-qa": "ingestion-results-table" },
+          attributes: { "data-qa": "import-results-table" },
           caption: "Cells needing review",
           captionClasses: "govuk-table__caption--m",
           head: [
@@ -89,14 +89,14 @@
           rows: rows
         }) }}
       {% else %}
-        <p class="govuk-body" data-qa="ingestion-no-review-needed">No cells from this import need reviewing.</p>
+        <p class="govuk-body" data-qa="import-no-review-needed">No cells from this import need reviewing.</p>
       {% endif %}
 
-      {# The full report lives behind the ingestion pages, which only the roles that can run an import may
+      {# The full report lives behind the import pages, which only the roles that can run an import may
          reach - following this link without that permission would sign the user out. #}
-      {% if canAccess('cell_certificate_upload') %}
+      {% if canAccess('cell_certificate_import') %}
         <p class="govuk-body">
-          <a class="govuk-link" href="{{ ingestion.reportUrl }}" data-qa="ingestion-full-report-link">View the full import report</a>
+          <a class="govuk-link" href="{{ importResults.reportUrl }}" data-qa="import-full-report-link">View the full import report</a>
         </p>
       {% endif %}
     {% endif %}

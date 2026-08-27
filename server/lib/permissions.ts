@@ -2,10 +2,10 @@ import { uniq } from 'lodash'
 
 const cellStatusManagerPermissions: string[] = ['change_temporary_deactivation_details', 'reactivate', 'deactivate']
 
-// Reaching the cell certificate ingestion pages at all means being able to run an ingestion, so a single
-// permission covers the area. The results of an ingestion are shown to a wider audience on the import
+// Reaching the cell certificate import pages at all means being able to run an import, so a single
+// permission covers the area. The results of an import are shown to a wider audience on the import
 // request details page instead, which carries no permission of its own.
-const certificateViewerPermissions: string[] = ['certificate_view_management', 'cell_certificate_upload']
+const certificateViewerPermissions: string[] = ['certificate_view_management', 'cell_certificate_import']
 
 const certificateAdministratorPermissions: string[] = [
   ...cellStatusManagerPermissions,
@@ -29,7 +29,7 @@ const certificateAdministratorPermissions: string[] = [
 
 const certificateReviewerPermissions: string[] = ['certificate_change_request_review']
 
-const administerResLocationsPermissions: string[] = ['administer_residential', 'cell_certificate_upload']
+const administerResLocationsPermissions: string[] = ['administer_residential', 'cell_certificate_import']
 
 const permissionsByRole: { [key: string]: string[] } = {
   MANAGE_RESIDENTIAL_LOCATIONS: cellStatusManagerPermissions,

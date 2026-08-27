@@ -1,20 +1,20 @@
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 
-{% macro uploadStatusTag(status) %}
+{% macro importStatusTag(status) %}
   {% if status == 'FINISHED' %}
-    {{ govukTag({ text: "Complete", classes: "govuk-tag--green", attributes: { "data-qa": "upload-status-tag" } }) }}
+    {{ govukTag({ text: "Complete", classes: "govuk-tag--green", attributes: { "data-qa": "import-status-tag" } }) }}
   {% elif status == 'STARTED' %}
-    {{ govukTag({ text: "Processing", classes: "govuk-tag--blue", attributes: { "data-qa": "upload-status-tag" } }) }}
+    {{ govukTag({ text: "Processing", classes: "govuk-tag--blue", attributes: { "data-qa": "import-status-tag" } }) }}
   {% else %}
-    {{ govukTag({ text: "Pending", classes: "govuk-tag--grey", attributes: { "data-qa": "upload-status-tag" } }) }}
+    {{ govukTag({ text: "Pending", classes: "govuk-tag--grey", attributes: { "data-qa": "import-status-tag" } }) }}
   {% endif %}
 {% endmacro %}
 
-{% macro uploadLocationNeedsReviewTag() %}
+{% macro importLocationNeedsReviewTag() %}
   {{ govukTag({ text: "Needs review", classes: "govuk-tag--blue", attributes: { "data-qa": "location-needs-review-tag" } }) }}
 {% endmacro %}
 
-{% macro uploadLocationStatusTag(status) %}
+{% macro importLocationStatusTag(status) %}
   {% if status == 'PROCESSED' %}
     {{ govukTag({ text: "Processed", classes: "govuk-tag--green", attributes: { "data-qa": "location-status-tag" } }) }}
   {% elif status == 'SKIPPED' %}

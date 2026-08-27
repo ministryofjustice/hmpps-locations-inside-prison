@@ -513,8 +513,8 @@ context('Cell Certificate - Change Requests - Show', () => {
     })
 
     context('When the approvalType is CELL_CERTIFICATE_UPLOAD', () => {
-      const upload = {
-        id: 'upload-1',
+      const certificateImport = {
+        id: 'import-1',
         prisonId: 'TST',
         status: 'FINISHED' as const,
         totalRecords: 3,
@@ -543,31 +543,31 @@ context('Cell Certificate - Change Requests - Show', () => {
         LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
           CertificationApprovalRequestFactory.build({ approvalType: 'CELL_CERTIFICATE_UPLOAD', status: 'APPROVED' }),
         )
-        LocationsApiStubber.stub.stubCellCertificateUploadByApprovalRequest(upload)
+        LocationsApiStubber.stub.stubCellCertificateImportByApprovalRequest(certificateImport)
 
         CellCertificateChangeRequestsShowPage.goTo('id1')
         Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
 
-        cy.get('[data-qa=ingestion-summary]').should('contain', 'Needing review')
-        cy.get('[data-qa=ingestion-needs-review-alert]').should('contain', 'Check these cells’ working capacities')
+        cy.get('[data-qa=import-summary]').should('contain', 'Needing review')
+        cy.get('[data-qa=import-needs-review-alert]').should('contain', 'Check these cells’ working capacities')
 
         // only the cell needing review is listed - a prison's import covers every cell
-        cy.get('[data-qa=ingestion-results-table]').should('contain', 'TST-A-1-001')
-        cy.get('[data-qa=ingestion-results-table]').should('not.contain', 'TST-A-1-002')
-        cy.get('[data-qa=ingestion-results-table]').should('contain', 'Certified 1')
+        cy.get('[data-qa=import-results-table]').should('contain', 'TST-A-1-001')
+        cy.get('[data-qa=import-results-table]').should('not.contain', 'TST-A-1-002')
+        cy.get('[data-qa=import-results-table]').should('contain', 'Certified 1')
       })
 
       it('renders the page unchanged when there is no import behind the request', () => {
         LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
           CertificationApprovalRequestFactory.build({ approvalType: 'CELL_CERTIFICATE_UPLOAD', status: 'APPROVED' }),
         )
-        LocationsApiStubber.stub.stubCellCertificateUploadByApprovalRequest(null)
+        LocationsApiStubber.stub.stubCellCertificateImportByApprovalRequest(null)
 
         CellCertificateChangeRequestsShowPage.goTo('id1')
         Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
 
-        cy.get('[data-qa=ingestion-summary]').should('not.exist')
-        cy.get('[data-qa=ingestion-results-table]').should('not.exist')
+        cy.get('[data-qa=import-summary]').should('not.exist')
+        cy.get('[data-qa=import-results-table]').should('not.exist')
       })
     })
   })
