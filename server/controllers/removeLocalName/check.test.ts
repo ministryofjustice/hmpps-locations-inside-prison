@@ -3,7 +3,7 @@ import FormWizard from 'hmpo-form-wizard'
 import { DeepPartial } from 'fishery'
 import Check from './check'
 import LocationsService from '../../services/locationsService'
-import fields from '../../routes/changeLocalName/fields'
+import fields from '../../routes/removeLocalName/fields'
 import AnalyticsService from '../../services/analyticsService'
 import buildDecoratedLocation from '../../testutils/buildDecoratedLocation'
 import paths from '../../utils/paths'
@@ -87,33 +87,7 @@ describe('RemoveLocalName', () => {
 
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual({
         buttonText: 'Remove name',
-        fields: {
-          localName: {
-            component: 'govukCharacterCount',
-            errorMessages: {
-              required: 'Enter a local name',
-              taken: 'A location with this name already exists',
-            },
-            validate: [
-              'required',
-              {
-                fn: expect.any(Function),
-                arguments: [30],
-              },
-            ],
-            id: 'localName',
-            name: 'localName',
-            classes: 'govuk-!-width-three-quarters local-name-text-input',
-            label: {
-              text: 'Local name',
-              classes: 'govuk-fieldset__legend--m govuk-!-display-none',
-            },
-            maxlength: 30,
-            rows: 1,
-            autocomplete: 'off',
-            value: null,
-          },
-        },
+        fields: {},
         validationErrors: [],
       })
     })

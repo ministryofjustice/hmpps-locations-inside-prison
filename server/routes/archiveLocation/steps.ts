@@ -33,6 +33,7 @@ const steps: FormWizard.Steps = {
     fields: ['reason'],
     controller: FormStep,
     next: 'update-signed-op-cap',
+    template: '../../partials/formStepNoTitle',
   },
   ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),

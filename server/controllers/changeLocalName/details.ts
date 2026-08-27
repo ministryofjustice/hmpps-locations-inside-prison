@@ -23,8 +23,6 @@ export default class Details extends FormStep {
 
     return {
       ...locals,
-      insetText:
-        'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
       buttonText: 'Save name',
     }
   }
