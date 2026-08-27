@@ -14,7 +14,7 @@ const steps: FormWizard.Steps = {
   '/details': {
     fields: ['localName'],
     controller: Details,
-    template: '../../partials/formStep',
+    template: '../../partials/formStepNoTitle',
     pageTitle: 'Change local name',
   },
 }

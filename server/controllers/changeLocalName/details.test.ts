@@ -91,6 +91,7 @@ describe('Change Local Name', () => {
           localName: {
             component: 'govukCharacterCount',
             errorMessages: {
+              maxLength: 'Local name must be 30 characters or less',
               required: 'Enter a local name',
               taken: 'A location with this name already exists',
             },
@@ -105,8 +106,17 @@ describe('Change Local Name', () => {
             name: 'localName',
             classes: 'govuk-!-width-three-quarters local-name-text-input',
             label: {
-              text: 'Local name',
-              classes: 'govuk-fieldset__legend--m govuk-!-display-none',
+              text: 'Change local name',
+              classes: 'govuk-label--l govuk-!-margin-bottom-6',
+              for: 'localName',
+              isPageHeading: true,
+            },
+            formGroup: {
+              beforeInput: {
+                html: expect.stringContaining(
+                  'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
+                ),
+              },
             },
             maxlength: 30,
             rows: 1,
@@ -114,8 +124,6 @@ describe('Change Local Name', () => {
             value: 'Local name',
           },
         },
-        insetText:
-          'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
         validationErrors: [],
       })
     })
