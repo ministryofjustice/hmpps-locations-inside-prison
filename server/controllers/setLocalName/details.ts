@@ -9,8 +9,6 @@ export default class Details extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     return {
       ...super.locals(req, res),
-      insetText:
-        'This will change how the name displays on location lists but won’t change the location code (for example A-1-001).',
       buttonText: 'Save name',
     }
   }
