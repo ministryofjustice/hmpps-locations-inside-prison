@@ -39,7 +39,7 @@ describe('rolesToPermissions', () => {
 
   it('returns the correct permissions for RESI__CERT_VIEWER', () => {
     expect(rolesToPermissions(['RESI__CERT_VIEWER']).sort()).toEqual([
-      'cell_certificate_upload',
+      'cell_certificate_import',
       'certificate_view_management',
     ])
   })
@@ -47,7 +47,7 @@ describe('rolesToPermissions', () => {
   it('returns the correct permissions for MANAGE_RES_LOCATIONS_ADMIN', () => {
     expect(rolesToPermissions(['MANAGE_RES_LOCATIONS_ADMIN']).sort()).toEqual([
       'administer_residential',
-      'cell_certificate_upload',
+      'cell_certificate_import',
     ])
   })
 
@@ -69,7 +69,7 @@ describe('rolesToPermissions', () => {
     ).toEqual([
       'administer_residential',
       'archive_location',
-      'cell_certificate_upload',
+      'cell_certificate_import',
       'certificate_change_request_create',
       'certificate_change_request_review',
       'certificate_change_request_withdraw',

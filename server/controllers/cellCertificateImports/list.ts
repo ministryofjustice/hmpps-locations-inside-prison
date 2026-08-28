@@ -7,16 +7,16 @@ export default async (req: Request, res: Response) => {
   const { systemToken } = req.session
   const { prisonId } = res.locals.prisonConfiguration
 
-  const uploads = await locationsService.getCellCertificateUploads(systemToken, prisonId)
-  const hasInProgress = uploads.some(upload => upload.status !== 'FINISHED')
+  const imports = await locationsService.getCellCertificateImports(systemToken, prisonId)
+  const hasInProgress = imports.some(certificateImport => certificateImport.status !== 'FINISHED')
 
   const locals: TypedLocals = {
     title: 'Import cell certificate',
-    uploads,
+    imports,
     hasInProgress,
     prisonId,
-    listUrl: paths.prison.cellCertificateUploads(prisonId),
-    newUploadUrl: `${paths.prison.cellCertificateUploads(prisonId)}/new`,
+    listUrl: paths.prison.cellCertificateImports(prisonId),
+    newImportUrl: `${paths.prison.cellCertificateImports(prisonId)}/new`,
     backLink: paths.prison.home(prisonId),
   }
 
@@ -30,5 +30,5 @@ export default async (req: Request, res: Response) => {
     locals.validationErrors = [{ text: errors[0].content, href: '#' }]
   }
 
-  return res.render('pages/cellCertificateUploads/list', locals)
+  return res.render('pages/cellCertificateImports/list', locals)
 }

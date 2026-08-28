@@ -1,10 +1,10 @@
-export type CellCertificateUploadStatus = 'PENDING' | 'STARTED' | 'FINISHED'
+export type CellCertificateImportStatus = 'PENDING' | 'STARTED' | 'FINISHED'
 
-export type CellCertificateUploadLocationStatus = 'PENDING' | 'PROCESSED' | 'SKIPPED' | 'FAILED'
+export type CellCertificateImportLocationStatus = 'PENDING' | 'PROCESSED' | 'SKIPPED' | 'FAILED'
 
-export declare interface CellCertificateUploadLocation {
+export declare interface CellCertificateImportLocation {
   locationKey: string
-  status: CellCertificateUploadLocationStatus
+  status: CellCertificateImportLocationStatus
   message?: string
   processedDate?: string
   maxCapacity: number
@@ -22,10 +22,10 @@ export declare interface CellCertificateUploadLocation {
   certifiedNormalAccommodationMismatch?: boolean
 }
 
-export declare interface CellCertificateUpload {
+export declare interface CellCertificateImport {
   id: string
   prisonId: string
-  status: CellCertificateUploadStatus
+  status: CellCertificateImportStatus
   totalRecords: number
   processedRecords: number
   skippedRecords: number
@@ -37,5 +37,5 @@ export declare interface CellCertificateUpload {
   endTime?: string
   cellCertificateId?: string
   reasonForChange?: string
-  locations?: CellCertificateUploadLocation[]
+  locations?: CellCertificateImportLocation[]
 }

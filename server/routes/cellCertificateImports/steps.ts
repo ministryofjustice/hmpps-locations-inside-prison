@@ -1,6 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
-import IngestUpload from '../../controllers/cellCertificateUploads/upload'
-import IngestConfirm from '../../controllers/cellCertificateUploads/confirm'
+import ImportUpload from '../../controllers/cellCertificateImports/upload'
+import ImportConfirm from '../../controllers/cellCertificateImports/confirm'
 import paths from '../../utils/paths'
 
 const steps: FormWizard.Steps = {
@@ -10,17 +10,17 @@ const steps: FormWizard.Steps = {
     resetJourney: true,
     skip: true,
     next: 'upload',
-    backLink: (_req, res) => paths.prison.cellCertificateUploads(res.locals.prisonId),
+    backLink: (_req, res) => paths.prison.cellCertificateImports(res.locals.prisonId),
   },
   '/upload': {
     fields: ['file'],
-    controller: IngestUpload,
+    controller: ImportUpload,
     next: 'confirm',
     enctype: 'multipart/form-data',
     pageTitle: 'Import cell certificate data',
   },
   '/confirm': {
-    controller: IngestConfirm,
+    controller: ImportConfirm,
     pageTitle: 'Confirm cell certificate import',
   },
 }

@@ -17,7 +17,7 @@ import changeSignedOperationalCapacityRouter from './changeSignedOperationalCapa
 import locationRouter from './locationRouter'
 import optionalLocationRouter from './optionalLocationRouter'
 import archivedLocationsRouter from './archivedLocationsRouter'
-import cellCertificateUploadsRouter from './cellCertificateUploads'
+import cellCertificateImportsRouter from './cellCertificateImports'
 
 const controller = (services: Services) => {
   const router = express.Router({ mergeParams: true })
@@ -54,7 +54,7 @@ const controller = (services: Services) => {
 
   router.use('/admin', adminRouter(services))
   router.use('/archived-locations', archivedLocationsRouter(services))
-  router.use('/cell-certificate-uploads', cellCertificateUploadsRouter(services))
+  router.use('/cell-certificate-imports', cellCertificateImportsRouter(services))
   router.use('/cell-certificate', cellCertificateRouter)
   router.use('/change-signed-operational-capacity', changeSignedOperationalCapacityRouter)
 

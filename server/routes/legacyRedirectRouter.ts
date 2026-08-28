@@ -63,14 +63,24 @@ router.use(
 
 router.use(
   '/admin/:prisonId/ingest-cert',
-  redirect(req => paths.prison.cellCertificateUploads(req.params.prisonId as string)),
+  redirect(req => paths.prison.cellCertificateImports(req.params.prisonId as string)),
 )
 
-// Cell certificate ingestion moved out from under /admin when it stopped being admin-only. Staff who
+// Cell certificate import moved out from under /admin when it stopped being admin-only. Staff who
 // bookmarked it while it lived there land here.
 router.use(
   '/:prisonId/admin/ingest-cert',
-  redirect(req => paths.prison.cellCertificateUploads(req.params.prisonId as string)),
+  redirect(req => paths.prison.cellCertificateImports(req.params.prisonId as string)),
+)
+
+// Renamed from "uploads" when the code caught up with the "import" wording. Unlike the redirects above
+// this one carries the tail, because staff bookmark the report for an individual import.
+router.use(
+  '/:prisonId/cell-certificate-uploads',
+  redirect(req => {
+    const tail = req.url === '/' ? '' : req.url.replace(/^\/upload\//, '/import/')
+    return `${paths.prison.cellCertificateImports(req.params.prisonId as string)}${tail}`
+  }),
 )
 
 router.use(
