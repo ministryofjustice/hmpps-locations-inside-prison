@@ -75,6 +75,8 @@ export function readCsvFile(path: string): string[] {
     .slice(1) // Skip header
 }
 
+const MAX_VALIDATION_ERRORS_SHOWN = 10
+
 export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
   const validationErrors: string[] = []
   const capacityData = rows.reduce<BulkCapacityUpdate>((acc, row, index) => {
@@ -98,20 +100,30 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
       : undefined
 
     const maxCapacityError = getNumericValidationError(maxCapacity, 'Max Cap', cellNumberValue)
+    const workingCapacityError = getNumericValidationError(workingCapacity, 'Working Cap', cellNumberValue)
     const cnaError = getNumericValidationError(certifiedNormalAccommodation, 'CNA', cellNumberValue)
     const cellMarkError = getCellMarkValidationError(cellMark, cellNumberValue, rowNumber)
+    // only worth comparing once both values are known to be numbers
+    const capacityError =
+      maxCapacityError || workingCapacityError
+        ? undefined
+        : getCapacityValidationError(workingCapacity, maxCapacity, cellNumberValue)
 
     if (maxCapacityError) validationErrors.push(maxCapacityError)
+    if (workingCapacityError) validationErrors.push(workingCapacityError)
     if (cnaError) validationErrors.push(cnaError)
     if (cellMarkError) validationErrors.push(cellMarkError)
+    if (capacityError) validationErrors.push(capacityError)
 
-    if (maxCapacityError || cnaError || cellMarkError) {
+    if (maxCapacityError || workingCapacityError || cnaError || cellMarkError || capacityError) {
       return acc
     }
 
     acc[cellNumberValue] = {
-      maxCapacity: parseInt(maxCapacity, 10) === 0 ? 1 : parseInt(maxCapacity, 10),
-      workingCapacity: parseInt(workingCapacity, 10) ? parseInt(workingCapacity, 10) : 0,
+      // sent as uploaded: the certificate must record what the prison stated. A location cannot hold a max
+      // capacity of zero, so the API raises the value it writes onto the location itself.
+      maxCapacity: parseInt(maxCapacity, 10),
+      workingCapacity: parseInt(workingCapacity, 10),
       certifiedNormalAccommodation: parseInt(certifiedNormalAccommodation, 10),
       cellMark,
       inCellSanitation: sanitation,
@@ -121,10 +133,25 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
   }, {})
 
   if (validationErrors.length) {
-    throw new Error(validationErrors.join('\n'))
+    // a spreadsheet can be wrong in hundreds of rows at once, and an error summary listing every one of
+    // them is no more useful than the first few
+    const shown = validationErrors.slice(0, MAX_VALIDATION_ERRORS_SHOWN)
+    const remaining = validationErrors.length - shown.length
+    if (remaining > 0) shown.push(`and ${remaining} more row(s) have errors.`)
+    throw new Error(shown.join('\n'))
   }
 
   return capacityData
+}
+
+// A cell cannot be certified to hold more prisoners than its max capacity allows, and the API rejects the
+// whole upload for it - so catch it here, where the message can name the cell.
+function getCapacityValidationError(workingCapacity: string, maxCapacity: string, cellNumber: string) {
+  if (Number(workingCapacity) > Number(maxCapacity)) {
+    return `The Working Cap value (${Number(workingCapacity)}) is more than the Max Cap value (${Number(maxCapacity)}) for cell ${cellNumber}`
+  }
+
+  return undefined
 }
 
 function getNumericValidationError(value: string | undefined, type: string, cellNumber: string) {
