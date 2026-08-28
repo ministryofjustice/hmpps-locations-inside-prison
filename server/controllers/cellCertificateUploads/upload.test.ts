@@ -83,7 +83,7 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'ingest', 'The CNA value is not numeric for cell LGI-S-0-032'),
+          file: controller.formError('file', 'ingest', 'The CNA value is not numeric for cell LGI-S-0-032.'),
         }),
       )
     })
@@ -98,7 +98,7 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'ingest', 'The Max Cap value is not numeric for cell LGI-S-0-032'),
+          file: controller.formError('file', 'ingest', 'The Max Cap value is not numeric for cell LGI-S-0-032.'),
         }),
       )
     })
@@ -116,7 +116,9 @@ describe('Upload file csv', () => {
           file: controller.formError(
             'file',
             'ingest',
-            'The Working Cap value (2) is more than the Max Cap value (0) for cell LPI-G-2-002',
+            'The Working Cap value is more than the Max Cap value for cell LPI-G-2-002. A cell cannot be ' +
+              'certified to hold more people than its maximum capacity, so check the "Maximum number of ' +
+              'prisoners" and "Number of places allocated" columns.',
           ),
         }),
       )
@@ -132,7 +134,7 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'ingest', 'The Working Cap value is not numeric for cell TST-HB1-1-005'),
+          file: controller.formError('file', 'ingest', 'The Working Cap value is not numeric for cell TST-HB1-1-005.'),
         }),
       )
     })
@@ -150,7 +152,7 @@ describe('Upload file csv', () => {
           file: controller.formError(
             'file',
             'ingest',
-            'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-H1-A1-001',
+            'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-H1-A1-001.',
           ),
         }),
       )
@@ -273,8 +275,8 @@ describe('Upload file csv', () => {
       ]
 
       expect(() => parseCsvRow(input)).toThrow(
-        'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-HB1-1-001\n' +
-          'Row 3: the Number or cell mark value "01-Feb" looks like a date for cell DNI-HB1-1-002',
+        'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-HB1-1-001. ' +
+          'Row 3: the Number or cell mark value "01-Feb" looks like a date for cell DNI-HB1-1-002.',
       )
     })
 
@@ -294,7 +296,7 @@ describe('Upload file csv', () => {
       const input = ['HB1,EYI-HB1-1-002,A1-02,2,0,2,Closed for refurb,FALSE']
 
       expect(() => parseCsvRow(input)).toThrow(
-        'The Working Cap value (2) is more than the Max Cap value (0) for cell EYI-HB1-1-002',
+        'The Working Cap value is more than the Max Cap value for cell EYI-HB1-1-002.',
       )
     })
 
@@ -311,13 +313,28 @@ describe('Upload file csv', () => {
       expect(() => parseCsvRow(input)).not.toThrow('is more than the Max Cap value')
     })
 
-    it('lists only the first ten errors, then a count of the rest', () => {
+    it('reports rows that failed the same way once, naming a few cells and counting the rest', () => {
       const input = Array.from(
-        { length: 12 },
-        (_, index) => `HB1,EYI-HB1-1-${String(index).padStart(3, '0')},A1-01,2,0,2,Closed for refurb,FALSE`,
+        { length: 8 },
+        (_, index) => `HB1,EYI-HB1-1-00${index},A1-01,2,0,2,Closed for refurb,FALSE`,
       )
 
-      expect(() => parseCsvRow(input)).toThrow(/and 2 more row\(s\) have errors\.$/)
+      expect(() => parseCsvRow(input)).toThrow(
+        'The Working Cap value is more than the Max Cap value for cells EYI-HB1-1-000, EYI-HB1-1-001, ' +
+          'EYI-HB1-1-002, EYI-HB1-1-003, EYI-HB1-1-004 and 3 others.',
+      )
+    })
+
+    it('reports each kind of problem separately', () => {
+      const input = [
+        'HB1,EYI-HB1-1-001,A1-01,2,0,2,Closed for refurb,FALSE',
+        'HB1,EYI-HB1-1-002,A1-02,x,2,2,Normal Accommodation,TRUE',
+      ]
+
+      expect(() => parseCsvRow(input)).toThrow('The CNA value is not numeric for cell EYI-HB1-1-002.')
+      expect(() => parseCsvRow(input)).toThrow(
+        'The Working Cap value is more than the Max Cap value for cell EYI-HB1-1-001.',
+      )
     })
 
     it('handles null inCellSanitation', () => {
