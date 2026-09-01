@@ -13,6 +13,7 @@ export declare interface CellCertificateImportLocation {
   cellMark?: string
   inCellSanitation?: boolean
   previousMaxCapacity?: number
+  appliedMaxCapacity?: number
   previousWorkingCapacity?: number
   previousCertifiedNormalAccommodation?: number
   previousCellMark?: string

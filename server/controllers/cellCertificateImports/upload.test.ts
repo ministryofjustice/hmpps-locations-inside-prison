@@ -83,7 +83,7 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'importFailure', 'The CNA value is not numeric for cell LGI-S-0-032'),
+          file: controller.formError('file', 'importFailure', 'The CNA value is not numeric for cell LGI-S-0-032.'),
         }),
       )
     })
@@ -98,7 +98,47 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'importFailure', 'The Max Cap value is not numeric for cell LGI-S-0-032'),
+          file: controller.formError('file', 'importFailure', 'The Max Cap value is not numeric for cell LGI-S-0-032.'),
+        }),
+      )
+    })
+
+    it('validation failure for a working capacity above the max capacity', async () => {
+      deepReq.file = {
+        path: 'uploads/testdata/working-cap-exceeds-max.csv',
+      } as unknown as Express.Multer.File
+
+      const callback = jest.fn()
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: controller.formError(
+            'file',
+            'importFailure',
+            'The Working Cap value is more than the Max Cap value for cell LPI-G-2-002. A cell cannot be ' +
+              'certified to hold more people than its maximum capacity, so check the "Maximum number of ' +
+              'prisoners" and "Number of places allocated" columns.',
+          ),
+        }),
+      )
+    })
+
+    it('validation failure for an incorrectly formatted working cap value in the file', async () => {
+      deepReq.file = {
+        path: 'uploads/testdata/bad-format.csv',
+      } as unknown as Express.Multer.File
+
+      const callback = jest.fn()
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: controller.formError(
+            'file',
+            'importFailure',
+            'The Working Cap value is not numeric for cell TST-HB1-1-005.',
+          ),
         }),
       )
     })
@@ -116,7 +156,7 @@ describe('Upload file csv', () => {
           file: controller.formError(
             'file',
             'importFailure',
-            'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-H1-A1-001',
+            'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-H1-A1-001.',
           ),
         }),
       )
@@ -239,21 +279,66 @@ describe('Upload file csv', () => {
       ]
 
       expect(() => parseCsvRow(input)).toThrow(
-        'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-HB1-1-001\n' +
-          'Row 3: the Number or cell mark value "01-Feb" looks like a date for cell DNI-HB1-1-002',
+        'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-HB1-1-001. ' +
+          'Row 3: the Number or cell mark value "01-Feb" looks like a date for cell DNI-HB1-1-002.',
       )
     })
 
-    it('defaults maxCapacity to 1 if 0 is provided', () => {
-      const input = ['HB1,EYI-HB1-1-002,A1-02,1,0,1,Normal Accommodation,FALSE']
+    it('keeps a max capacity of 0 as uploaded', () => {
+      const input = ['HB1,EYI-HB1-1-002,A1-02,1,0,0,Normal Accommodation,FALSE']
       const result = parseCsvRow(input)
-      expect(result['EYI-HB1-1-002'].maxCapacity).toBe(1)
+      expect(result['EYI-HB1-1-002'].maxCapacity).toBe(0)
     })
 
-    it('defaults workingCapacity to 0 if null is provided', () => {
+    it('rejects a working capacity that is not numeric', () => {
       const input = ['HB1,EYI-HB1-1-003,A1-03,3,3,null,Normal Accommodation,TRUE']
-      const result = parseCsvRow(input)
-      expect(result['EYI-HB1-1-003'].workingCapacity).toBe(0)
+
+      expect(() => parseCsvRow(input)).toThrow('The Working Cap value is not numeric for cell EYI-HB1-1-003')
+    })
+
+    it('rejects a working capacity above the max capacity', () => {
+      const input = ['HB1,EYI-HB1-1-002,A1-02,2,0,2,Closed for refurb,FALSE']
+
+      expect(() => parseCsvRow(input)).toThrow(
+        'The Working Cap value is more than the Max Cap value for cell EYI-HB1-1-002.',
+      )
+    })
+
+    it('allows a working capacity equal to the max capacity', () => {
+      const input = ['HB1,EYI-HB1-1-002,A1-02,2,2,2,Normal Accommodation,FALSE']
+
+      expect(() => parseCsvRow(input)).not.toThrow()
+    })
+
+    it('does not compare the capacities when either is not numeric', () => {
+      const input = ['HB1,EYI-HB1-1-002,A1-02,2,x,2,Normal Accommodation,FALSE']
+
+      expect(() => parseCsvRow(input)).toThrow('The Max Cap value is not numeric for cell EYI-HB1-1-002')
+      expect(() => parseCsvRow(input)).not.toThrow('is more than the Max Cap value')
+    })
+
+    it('reports rows that failed the same way once, naming a few cells and counting the rest', () => {
+      const input = Array.from(
+        { length: 8 },
+        (_, index) => `HB1,EYI-HB1-1-00${index},A1-01,2,0,2,Closed for refurb,FALSE`,
+      )
+
+      expect(() => parseCsvRow(input)).toThrow(
+        'The Working Cap value is more than the Max Cap value for cells EYI-HB1-1-000, EYI-HB1-1-001, ' +
+          'EYI-HB1-1-002, EYI-HB1-1-003, EYI-HB1-1-004 and 3 others.',
+      )
+    })
+
+    it('reports each kind of problem separately', () => {
+      const input = [
+        'HB1,EYI-HB1-1-001,A1-01,2,0,2,Closed for refurb,FALSE',
+        'HB1,EYI-HB1-1-002,A1-02,x,2,2,Normal Accommodation,TRUE',
+      ]
+
+      expect(() => parseCsvRow(input)).toThrow('The CNA value is not numeric for cell EYI-HB1-1-002.')
+      expect(() => parseCsvRow(input)).toThrow(
+        'The Working Cap value is more than the Max Cap value for cell EYI-HB1-1-001.',
+      )
     })
 
     it('handles null inCellSanitation', () => {
@@ -271,8 +356,8 @@ describe('Upload file csv', () => {
     it('parses multiple rows correctly', () => {
       const input = [
         'HB1,EYI-HB1-1-001,A1-01,2,2,1,Normal Accommodation,TRUE',
-        'HB1,EYI-HB1-1-002,A1-02,1,0,1,Normal Accommodation,FALSE',
-        'HB1,EYI-HB1-1-003,A1-03,3,3,null,Normal Accommodation,TRUE',
+        'HB1,EYI-HB1-1-002,A1-02,1,0,0,Normal Accommodation,FALSE',
+        'HB1,EYI-HB1-1-003,A1-03,3,3,0,Normal Accommodation,TRUE',
         'HB2,EYI-HB2-1-004,A1-04,1,1,1,Normal Accommodation,null',
         'HB2,EYI-HB2-1-005,A1-05,5,2,2,Normal Accommodation,TRUE',
       ]
@@ -288,15 +373,15 @@ describe('Upload file csv', () => {
           inCellSanitation: true,
         },
         'EYI-HB1-1-002': {
-          maxCapacity: 1, // 0 becomes 1
-          workingCapacity: 1,
+          maxCapacity: 0, // sent as uploaded
+          workingCapacity: 0,
           certifiedNormalAccommodation: 1,
           cellMark: 'A1-02',
           inCellSanitation: false,
         },
         'EYI-HB1-1-003': {
           maxCapacity: 3,
-          workingCapacity: 0, // null becomes 0
+          workingCapacity: 0,
           certifiedNormalAccommodation: 3,
           cellMark: 'A1-03',
           inCellSanitation: true,

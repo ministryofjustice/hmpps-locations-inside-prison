@@ -75,8 +75,17 @@ export function readCsvFile(path: string): string[] {
     .slice(1) // Skip header
 }
 
+/** How many cells to name before falling back to a count of the rest. */
+const MAX_CELLS_LISTED = 5
+
+/**
+ * One problem found on one row. The cell is held separately from the wording so that rows failing in the
+ * same way can be reported together - a spreadsheet is typically wrong in the same way many times over.
+ */
+type RowValidationError = { before: string; cell: string; after?: string }
+
 export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
-  const validationErrors: string[] = []
+  const validationErrors: RowValidationError[] = []
   const capacityData = rows.reduce<BulkCapacityUpdate>((acc, row, index) => {
     const [
       ,
@@ -98,20 +107,30 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
       : undefined
 
     const maxCapacityError = getNumericValidationError(maxCapacity, 'Max Cap', cellNumberValue)
+    const workingCapacityError = getNumericValidationError(workingCapacity, 'Working Cap', cellNumberValue)
     const cnaError = getNumericValidationError(certifiedNormalAccommodation, 'CNA', cellNumberValue)
     const cellMarkError = getCellMarkValidationError(cellMark, cellNumberValue, rowNumber)
+    // only worth comparing once both values are known to be numbers
+    const capacityError =
+      maxCapacityError || workingCapacityError
+        ? undefined
+        : getCapacityValidationError(workingCapacity, maxCapacity, cellNumberValue)
 
     if (maxCapacityError) validationErrors.push(maxCapacityError)
+    if (workingCapacityError) validationErrors.push(workingCapacityError)
     if (cnaError) validationErrors.push(cnaError)
     if (cellMarkError) validationErrors.push(cellMarkError)
+    if (capacityError) validationErrors.push(capacityError)
 
-    if (maxCapacityError || cnaError || cellMarkError) {
+    if (maxCapacityError || workingCapacityError || cnaError || cellMarkError || capacityError) {
       return acc
     }
 
     acc[cellNumberValue] = {
-      maxCapacity: parseInt(maxCapacity, 10) === 0 ? 1 : parseInt(maxCapacity, 10),
-      workingCapacity: parseInt(workingCapacity, 10) ? parseInt(workingCapacity, 10) : 0,
+      // sent as uploaded: the certificate must record what the prison stated. A location cannot hold a max
+      // capacity of zero, so the API raises the value it writes onto the location itself.
+      maxCapacity: parseInt(maxCapacity, 10),
+      workingCapacity: parseInt(workingCapacity, 10),
       certifiedNormalAccommodation: parseInt(certifiedNormalAccommodation, 10),
       cellMark,
       inCellSanitation: sanitation,
@@ -121,21 +140,80 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
   }, {})
 
   if (validationErrors.length) {
-    throw new Error(validationErrors.join('\n'))
+    throw new Error(summariseValidationErrors(validationErrors))
   }
 
   return capacityData
 }
 
-function getNumericValidationError(value: string | undefined, type: string, cellNumber: string) {
-  if (value === undefined || value.trim() === '' || Number.isNaN(Number(value))) {
-    return `The ${type} value is not numeric for cell ${cellNumber}`
+/**
+ * Turns the per-row problems into a message a user can act on. The error summary renders as plain text, so
+ * newlines would collapse into one run-on line - and 88 near-identical lines would not help anyone anyway.
+ * Rows that failed in the same way are reported once, naming the first few cells and counting the rest.
+ */
+function summariseValidationErrors(errors: RowValidationError[]): string {
+  const groups = new Map<string, { error: RowValidationError; cells: string[] }>()
+
+  errors.forEach(error => {
+    const key = `${error.before}|${error.after ?? ''}`
+    const group = groups.get(key) ?? { error, cells: [] }
+    group.cells.push(error.cell)
+    groups.set(key, group)
+  })
+
+  return [...groups.values()]
+    .map(({ error, cells }) => [`${error.before} ${listCells(cells)}.`, error.after].filter(Boolean).join(' '))
+    .join(' ')
+}
+
+function listCells(cells: string[]): string {
+  const shown = cells.slice(0, MAX_CELLS_LISTED)
+  const remaining = cells.length - shown.length
+
+  if (remaining === 0) {
+    return shown.length === 1 ? `cell ${shown[0]}` : `cells ${shown.join(', ')}`
+  }
+
+  return `cells ${shown.join(', ')} and ${remaining} ${remaining === 1 ? 'other' : 'others'}`
+}
+
+// A cell cannot be certified to hold more prisoners than its max capacity allows, and the API rejects the
+// whole upload for it - so catch it here, where the message can name the cells and the columns to check.
+function getCapacityValidationError(
+  workingCapacity: string,
+  maxCapacity: string,
+  cellNumber: string,
+): RowValidationError | undefined {
+  if (Number(workingCapacity) > Number(maxCapacity)) {
+    return {
+      before: 'The Working Cap value is more than the Max Cap value for',
+      cell: cellNumber,
+      after:
+        'A cell cannot be certified to hold more people than its maximum capacity, so check the ' +
+        '"Maximum number of prisoners" and "Number of places allocated" columns.',
+    }
   }
 
   return undefined
 }
 
-function getCellMarkValidationError(value: string | undefined, cellNumber: string, rowNumber: number) {
+function getNumericValidationError(
+  value: string | undefined,
+  type: string,
+  cellNumber: string,
+): RowValidationError | undefined {
+  if (value === undefined || value.trim() === '' || Number.isNaN(Number(value))) {
+    return { before: `The ${type} value is not numeric for`, cell: cellNumber }
+  }
+
+  return undefined
+}
+
+function getCellMarkValidationError(
+  value: string | undefined,
+  cellNumber: string,
+  rowNumber: number,
+): RowValidationError | undefined {
   const cellMark = value?.trim()
 
   if (!cellMark) {
@@ -143,7 +221,10 @@ function getCellMarkValidationError(value: string | undefined, cellNumber: strin
   }
 
   if (looksLikeDate(cellMark)) {
-    return `Row ${rowNumber}: the Number or cell mark value "${cellMark}" looks like a date for cell ${cellNumber}`
+    return {
+      before: `Row ${rowNumber}: the Number or cell mark value "${cellMark}" looks like a date for`,
+      cell: cellNumber,
+    }
   }
 
   return undefined

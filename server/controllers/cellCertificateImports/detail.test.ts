@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import importDetail, { capacityCell, changeText } from './detail'
+import importDetail, { capacityCell, changeText, heldAndCertifiedCell, maxCapacityCell } from './detail'
 import LocationsService from '../../services/locationsService'
 import { CellCertificateImport } from '../../data/types/locationsApi/cellCertificateImport'
 
@@ -75,6 +75,43 @@ describe('Cell certificate imports - detail', () => {
     })
   })
 
+  describe('heldAndCertifiedCell', () => {
+    it('shows the held value alone when the certificate agrees', () => {
+      expect(heldAndCertifiedCell(2, 2)).toEqual({ text: '2' })
+      expect(heldAndCertifiedCell(0, 0)).toEqual({ text: '0' })
+    })
+
+    it('shows the certified value beneath the held one when they differ', () => {
+      expect(heldAndCertifiedCell(1, 2)).toEqual({ text: '1', certifiedText: '2' })
+      expect(heldAndCertifiedCell(2, 0)).toEqual({ text: '2', certifiedText: '0' })
+      expect(heldAndCertifiedCell(undefined, 0)).toEqual({ text: '-', certifiedText: '0' })
+    })
+  })
+
+  describe('maxCapacityCell', () => {
+    it('shows the change the location took, with the certified value when it differs', () => {
+      // a certified max capacity of 0 the location had to take as 1
+      expect(maxCapacityCell({ previousMaxCapacity: 2, maxCapacity: 0, appliedMaxCapacity: 1 })).toEqual({
+        text: '2 → 1',
+        certifiedText: '0',
+      })
+    })
+
+    it('shows no change when the location took the certified value', () => {
+      expect(maxCapacityCell({ previousMaxCapacity: 2, maxCapacity: 3, appliedMaxCapacity: 3 })).toEqual({
+        text: '2 → 3',
+      })
+    })
+
+    it('falls back to the mismatch flag for uploads processed before the applied value was recorded', () => {
+      expect(maxCapacityCell({ previousMaxCapacity: 2, maxCapacity: 3 })).toEqual({ text: '2 → 3' })
+      expect(maxCapacityCell({ previousMaxCapacity: 2, maxCapacity: 1, maxCapacityMismatch: true })).toEqual({
+        text: '2',
+        certifiedText: '1',
+      })
+    })
+  })
+
   describe('changeText', () => {
     it('shows new value only when unchanged or no previous (handles 0)', () => {
       expect(changeText(undefined, 2)).toBe('2')
@@ -111,6 +148,41 @@ describe('Cell certificate imports - detail', () => {
             status: 'SKIPPED',
             needsReview: false,
             message: 'No changes required',
+          }),
+        ],
+      }),
+    )
+  })
+
+  it('never shows a working capacity as a change, because an import cannot make one', async () => {
+    // a temporarily deactivated cell: the mismatch flag is deliberately suppressed for these, but the
+    // location still did not move its working capacity to the uploaded value
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      locations: [
+        {
+          locationKey: 'TST-G-2-010',
+          status: 'PROCESSED',
+          maxCapacity: 0,
+          workingCapacity: 2,
+          previousMaxCapacity: 2,
+          appliedMaxCapacity: 1,
+          previousWorkingCapacity: 1,
+        },
+      ],
+    } as CellCertificateImport)
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    expect(deepRes.render).toHaveBeenCalledWith(
+      'pages/cellCertificateImports/detail',
+      expect.objectContaining({
+        locationRows: [
+          expect.objectContaining({
+            locationKey: 'TST-G-2-010',
+            needsReview: false,
+            workingCapacity: { text: '1', certifiedText: '2' },
+            maxCapacity: { text: '2 → 1', certifiedText: '0' },
           }),
         ],
       }),
