@@ -16,7 +16,7 @@ import { SummaryListRow } from '../govuk'
 import { LocationTree } from '../../controllers/reactivate/parent/middleware/populateLocationTree'
 import config from '../../config'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
-import { CellCertificateUpload } from '../../data/types/locationsApi/cellCertificateUpload'
+import { CellCertificateImport } from '../../data/types/locationsApi/cellCertificateImport'
 import {
   CertificationApprovalRequest,
   CertificationApprovalRequestType,
@@ -43,7 +43,7 @@ interface card {
   visible: boolean
 }
 
-// A capacity as shown on the cell certificate ingestion report: what the location now holds, plus the
+// A capacity as shown on the cell certificate import report: what the location now holds, plus the
 // certified value where the two differ.
 export declare interface CapacityCell {
   text: string
@@ -209,15 +209,15 @@ interface AllLocals {
   workingCapacity: string
   capacityData: BulkCapacityUpdate
   capacitySummary: CapacitySummary
-  uploads: CellCertificateUpload[]
-  upload: CellCertificateUpload
+  imports: CellCertificateImport[]
+  certificateImport: CellCertificateImport
   hasInProgress: boolean
   inProgress: boolean
-  newUploadUrl: string
+  newImportUrl: string
   listUrl: string
   cellCertificateUrl: string
-  ingestion: {
-    upload: CellCertificateUpload
+  importResults: {
+    certificateImport: CellCertificateImport
     reportUrl: string
     rows: {
       locationKey: string

@@ -42,7 +42,7 @@ context('Index', () => {
       indexPage.cards.viewLocations().contains('Manage residential locations')
       indexPage.cards.cellCertificate().should('not.exist')
       // the import is a snapshot this role cannot act on - its results appear on the import request page
-      indexPage.cards.cellCertificateUploads().should('not.exist')
+      indexPage.cards.cellCertificateImports().should('not.exist')
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
     })
@@ -75,7 +75,7 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
-      indexPage.cards.cellCertificateUploads().should('not.exist')
+      indexPage.cards.cellCertificateImports().should('not.exist')
     })
 
     it('has a feedback banner', () => {
@@ -103,8 +103,8 @@ context('Index', () => {
       const indexPage = Page.verifyOnPage(IndexPage)
 
       indexPage.cards.cellCertificate().contains('Cell certificate')
-      // capacity management can run ingestions, so they get the uploads tile
-      indexPage.cards.cellCertificateUploads().contains('Import cell certificate')
+      // capacity management can run imports, so they get the imports tile
+      indexPage.cards.cellCertificateImports().contains('Import cell certificate')
       indexPage.cards.capacityManagementDashboard().contains('Capacity management dashboard')
       indexPage.cards
         .capacityManagementDashboard()
@@ -136,7 +136,7 @@ context('Index', () => {
       indexPage.cards.inactiveCells().contains('View all inactive cells')
       indexPage.cards.archivedLocations().contains('Archived locations')
       indexPage.cards.cellCertificate().contains('Cell certificate')
-      indexPage.cards.cellCertificateUploads().should('not.exist')
+      indexPage.cards.cellCertificateImports().should('not.exist')
       indexPage.cards.capacityManagementDashboard().should('not.exist')
     })
   })
@@ -151,17 +151,17 @@ context('Index', () => {
       ManageUsersApiStubber.stub.stubManageCaseloads()
     })
 
-    it('displays the cell certificate uploads tile even when certification is off', () => {
+    it('displays the cell certificate imports tile even when certification is off', () => {
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
 
-      // ingesting a certificate is the onboarding step that precedes switching certification on
+      // importing a certificate is the onboarding step that precedes switching certification on
       indexPage.cards.cellCertificate().should('not.exist')
-      indexPage.cards.cellCertificateUploads().contains('Import cell certificate')
+      indexPage.cards.cellCertificateImports().contains('Import cell certificate')
       indexPage.cards
-        .cellCertificateUploads()
+        .cellCertificateImports()
         .find('a')
-        .should('have.attr', 'href', paths.prison.cellCertificateUploads('TST'))
+        .should('have.attr', 'href', paths.prison.cellCertificateImports('TST'))
     })
   })
 

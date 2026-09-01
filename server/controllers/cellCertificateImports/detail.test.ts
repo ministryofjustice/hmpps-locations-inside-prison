@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import ingestDetail, { capacityCell, changeText, heldAndCertifiedCell, maxCapacityCell } from './detail'
+import importDetail, { capacityCell, changeText, heldAndCertifiedCell, maxCapacityCell } from './detail'
 import LocationsService from '../../services/locationsService'
-import { CellCertificateUpload } from '../../data/types/locationsApi/cellCertificateUpload'
+import { CellCertificateImport } from '../../data/types/locationsApi/cellCertificateImport'
 
-describe('Cell certificate uploads - detail', () => {
+describe('Cell certificate imports - detail', () => {
   let deepReq: DeepPartial<Request>
   let deepRes: DeepPartial<Response>
 
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
-  const upload = {
-    id: 'upload-1',
+  const certificateImport = {
+    id: 'import-1',
     prisonId: 'TST',
     status: 'FINISHED',
     totalRecords: 2,
@@ -46,14 +46,14 @@ describe('Cell certificate uploads - detail', () => {
         certifiedNormalAccommodation: 2,
       },
     ],
-  } as CellCertificateUpload
+  } as CellCertificateImport
 
   beforeEach(() => {
     deepReq = {
       flash: jest.fn().mockReturnValue([]),
       session: { systemToken: 'token' },
       services: { locationsService },
-      params: { uploadId: 'upload-1' },
+      params: { importId: 'import-1' },
     }
     deepRes = {
       locals: { prisonConfiguration: { prisonId: 'TST' } },
@@ -64,7 +64,7 @@ describe('Cell certificate uploads - detail', () => {
   afterEach(() => jest.clearAllMocks())
 
   describe('capacityCell', () => {
-    it('shows the before → after change when the uploaded value was applied', () => {
+    it('shows the before → after change when the imported value was applied', () => {
       expect(capacityCell(2, 1, false)).toEqual({ text: '2 → 1' })
       expect(capacityCell(2, 2, false)).toEqual({ text: '2' })
     })
@@ -123,15 +123,15 @@ describe('Cell certificate uploads - detail', () => {
   })
 
   it('renders the detail page with summary, location rows and a cell certificate link when finished', async () => {
-    locationsService.getCellCertificateUpload = jest.fn().mockResolvedValue(upload)
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(certificateImport)
 
-    await ingestDetail(deepReq as Request, deepRes as Response)
+    await importDetail(deepReq as Request, deepRes as Response)
 
-    expect(locationsService.getCellCertificateUpload).toHaveBeenCalledWith('token', 'upload-1')
+    expect(locationsService.getCellCertificateImport).toHaveBeenCalledWith('token', 'import-1')
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/cellCertificateUploads/detail',
+      'pages/cellCertificateImports/detail',
       expect.objectContaining({
-        upload,
+        certificateImport,
         inProgress: false,
         cellCertificateUrl: '/TST/cell-certificate/cert-1',
         locationRows: [
@@ -154,11 +154,11 @@ describe('Cell certificate uploads - detail', () => {
     )
   })
 
-  it('never shows a working capacity as a change, because an ingestion cannot make one', async () => {
+  it('never shows a working capacity as a change, because an import cannot make one', async () => {
     // a temporarily deactivated cell: the mismatch flag is deliberately suppressed for these, but the
     // location still did not move its working capacity to the uploaded value
-    locationsService.getCellCertificateUpload = jest.fn().mockResolvedValue({
-      ...upload,
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
       locations: [
         {
           locationKey: 'TST-G-2-010',
@@ -170,12 +170,12 @@ describe('Cell certificate uploads - detail', () => {
           previousWorkingCapacity: 1,
         },
       ],
-    } as CellCertificateUpload)
+    } as CellCertificateImport)
 
-    await ingestDetail(deepReq as Request, deepRes as Response)
+    await importDetail(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/cellCertificateUploads/detail',
+      'pages/cellCertificateImports/detail',
       expect.objectContaining({
         locationRows: [
           expect.objectContaining({
@@ -190,8 +190,8 @@ describe('Cell certificate uploads - detail', () => {
   })
 
   it('lifts the cells needing review above the rest', async () => {
-    locationsService.getCellCertificateUpload = jest.fn().mockResolvedValue({
-      ...upload,
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
       locations: [
         { locationKey: 'TST-A-1-001', status: 'SKIPPED', maxCapacity: 2, workingCapacity: 2 },
         { locationKey: 'TST-A-1-002', status: 'SKIPPED', maxCapacity: 2, workingCapacity: 2 },
@@ -205,7 +205,7 @@ describe('Cell certificate uploads - detail', () => {
       ],
     })
 
-    await ingestDetail(deepReq as Request, deepRes as Response)
+    await importDetail(deepReq as Request, deepRes as Response)
 
     const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
     expect(locationRows.map((row: { locationKey: string }) => row.locationKey)).toEqual([
@@ -216,14 +216,14 @@ describe('Cell certificate uploads - detail', () => {
   })
 
   it('marks inProgress and omits the certificate link while not finished', async () => {
-    locationsService.getCellCertificateUpload = jest
+    locationsService.getCellCertificateImport = jest
       .fn()
-      .mockResolvedValue({ ...upload, status: 'STARTED', endTime: undefined, cellCertificateId: undefined })
+      .mockResolvedValue({ ...certificateImport, status: 'STARTED', endTime: undefined, cellCertificateId: undefined })
 
-    await ingestDetail(deepReq as Request, deepRes as Response)
+    await importDetail(deepReq as Request, deepRes as Response)
 
     expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/cellCertificateUploads/detail',
+      'pages/cellCertificateImports/detail',
       expect.objectContaining({ inProgress: true, cellCertificateUrl: undefined }),
     )
   })

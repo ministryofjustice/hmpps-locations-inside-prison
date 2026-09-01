@@ -4,7 +4,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
-{% from "../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag, uploadLocationStatusTag, uploadLocationNeedsReviewTag %}
+{% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag, importLocationStatusTag, importLocationNeedsReviewTag %}
 
 {% block head %}
   {{ super() }}
@@ -27,34 +27,34 @@
             attributes: { "data-qa": "in-progress-message" }
           }) }}
           <p class="govuk-body">
-            <a class="govuk-link" href="{{ listUrl }}/upload/{{ upload.id }}" data-qa="refresh-link">Refresh</a>
+            <a class="govuk-link" href="{{ listUrl }}/import/{{ certificateImport.id }}" data-qa="refresh-link">Refresh</a>
           </p>
         {% endif %}
 
         {{ govukSummaryList({
-          attributes: { "data-qa": "upload-summary" },
+          attributes: { "data-qa": "import-summary" },
           rows: [
-            { key: { text: "Status" }, value: { html: uploadStatusTag(upload.status) } },
-            { key: { text: "Requested by" }, value: { text: upload.requestedBy } },
-            { key: { text: "Requested" }, value: { text: upload.requestedDate | formatDateWithTime } },
-            { key: { text: "Started" }, value: { text: (upload.startTime | formatDateWithTime) if upload.startTime else "-" } },
-            { key: { text: "Completed" }, value: { text: (upload.endTime | formatDateWithTime) if upload.endTime else "-" } },
-            { key: { text: "Total records" }, value: { text: upload.totalRecords } },
-            { key: { text: "Processed" }, value: { text: upload.processedRecords } },
-            { key: { text: "Skipped" }, value: { text: upload.skippedRecords } },
-            { key: { text: "Failed" }, value: { text: upload.failedRecords } },
-            { key: { text: "Cells needing review" }, value: { text: upload.discrepancyRecords or 0 } }
+            { key: { text: "Status" }, value: { html: importStatusTag(certificateImport.status) } },
+            { key: { text: "Requested by" }, value: { text: certificateImport.requestedBy } },
+            { key: { text: "Requested" }, value: { text: certificateImport.requestedDate | formatDateWithTime } },
+            { key: { text: "Started" }, value: { text: (certificateImport.startTime | formatDateWithTime) if certificateImport.startTime else "-" } },
+            { key: { text: "Completed" }, value: { text: (certificateImport.endTime | formatDateWithTime) if certificateImport.endTime else "-" } },
+            { key: { text: "Total records" }, value: { text: certificateImport.totalRecords } },
+            { key: { text: "Processed" }, value: { text: certificateImport.processedRecords } },
+            { key: { text: "Skipped" }, value: { text: certificateImport.skippedRecords } },
+            { key: { text: "Failed" }, value: { text: certificateImport.failedRecords } },
+            { key: { text: "Cells needing review" }, value: { text: certificateImport.discrepancyRecords or 0 } }
           ]
         }) }}
 
-        {% if not inProgress and upload.discrepancyRecords %}
+        {% if not inProgress and certificateImport.discrepancyRecords %}
           {{ mojAlert({
             attributes: { "data-qa": "needs-review-alert" },
             variant: "information",
             title: "Check these cells’ working capacities",
             showTitleAsHeading: true,
             dismissible: false,
-            text: upload.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the uploaded file, so the two do not match until someone reviews them."
+            text: certificateImport.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the uploaded file, so the two do not match until someone reviews them."
           }) }}
         {% endif %}
 
@@ -70,7 +70,7 @@
           {% for location in locationRows %}
             {% set rows = (rows.push([
               { text: location.locationKey },
-              { html: uploadLocationStatusTag(location.status) + (uploadLocationNeedsReviewTag() if location.needsReview else "") },
+              { html: importLocationStatusTag(location.status) + (importLocationNeedsReviewTag() if location.needsReview else "") },
               { html: capacityCellHtml(location.maxCapacity) },
               { html: capacityCellHtml(location.workingCapacity) },
               { html: capacityCellHtml(location.certifiedNormalAccommodation) },
@@ -91,7 +91,7 @@
             rows: rows
           }) }}
         {% else %}
-          <p class="govuk-body" data-qa="no-locations">No cell results are available for this upload.</p>
+          <p class="govuk-body" data-qa="no-locations">No cell results are available for this import.</p>
         {% endif %}
 
       </div>

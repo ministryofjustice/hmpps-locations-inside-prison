@@ -113,7 +113,7 @@ const paths = {
   prison: {
     archivedLocations: withPrison('archived-locations'),
     home: withPrison(),
-    cellCertificateUploads: withPrison('cell-certificate-uploads'),
+    cellCertificateImports: withPrison('cell-certificate-imports'),
     changeSignedOperationalCapacity: withPrison('change-signed-operational-capacity'),
   },
 }

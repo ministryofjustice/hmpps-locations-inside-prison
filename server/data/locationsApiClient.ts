@@ -21,7 +21,7 @@ import { BulkCapacityUpdate, BulkCapacityUpdateChanges } from './types/locations
 import { CertificationApprovalRequest } from './types/locationsApi/certificationApprovalRequest'
 import { CellCertificate } from './types/locationsApi/cellCertificate'
 import { CellCertificateDashboardEntry } from './types/locationsApi/cellCertificateDashboard'
-import { CellCertificateUpload } from './types/locationsApi/cellCertificateUpload'
+import { CellCertificateImport } from './types/locationsApi/cellCertificateImport'
 import { PendingApprovalsBelow } from './types/locationsApi/pendingApprovalsBelow'
 
 export default class LocationsApiClient extends BaseApiClient {
@@ -50,25 +50,27 @@ export default class LocationsApiClient extends BaseApiClient {
     },
   }
 
-  cellCertificateUploads = {
+  // The API still calls this an upload: the paths, the `:uploadId` placeholder and the DTO field names
+  // below are its, and must keep matching it. Everything the rest of the UI sees is named "import".
+  cellCertificateImports = {
     request: this.apiCall<
-      CellCertificateUpload,
+      CellCertificateImport,
       { prisonId: string },
       { locations: BulkCapacityUpdate; reasonForChange?: string }
     >({
       path: '/locations/bulk/update-cell-certificate/:prisonId',
       requestType: 'post',
     }),
-    listForPrison: this.apiCall<CellCertificateUpload[], { prisonId: string; status?: string }>({
+    listForPrison: this.apiCall<CellCertificateImport[], { prisonId: string; status?: string }>({
       path: '/locations/bulk/update-cell-certificate/:prisonId',
       queryParams: ['status'],
       requestType: 'get',
     }),
-    getUpload: this.apiCall<CellCertificateUpload, { uploadId: string }>({
+    getById: this.apiCall<CellCertificateImport, { uploadId: string }>({
       path: '/locations/bulk/update-cell-certificate/upload/:uploadId',
       requestType: 'get',
     }),
-    getByApprovalRequest: this.apiCall<CellCertificateUpload, { approvalRequestId: string }>({
+    getByApprovalRequest: this.apiCall<CellCertificateImport, { approvalRequestId: string }>({
       path: '/locations/bulk/update-cell-certificate/by-approval-request/:approvalRequestId',
       requestType: 'get',
     }),

@@ -10,7 +10,7 @@ import {
 import LocationFactory from '../../server/testutils/factories/location'
 import TypedStubber from './typedStubber'
 import { CertificationApprovalRequest } from '../../server/data/types/locationsApi/certificationApprovalRequest'
-import { CellCertificateUpload } from '../../server/data/types/locationsApi/cellCertificateUpload'
+import { CellCertificateImport } from '../../server/data/types/locationsApi/cellCertificateImport'
 import { CellCertificateDashboardEntry } from '../../server/data/types/locationsApi/cellCertificateDashboard'
 import { PendingApprovalsBelow } from '../../server/data/types/locationsApi/pendingApprovalsBelow'
 
@@ -1488,7 +1488,7 @@ const stubLocationsDeleteLocation = () =>
     },
   })
 
-const stubCellCertificateUploadsList = (uploads: CellCertificateUpload[]) =>
+const stubCellCertificateImportsList = (imports: CellCertificateImport[]) =>
   stubFor({
     request: {
       method: 'GET',
@@ -1497,35 +1497,36 @@ const stubCellCertificateUploadsList = (uploads: CellCertificateUpload[]) =>
     response: {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-      jsonBody: uploads,
+      jsonBody: imports,
     },
   })
 
-const stubCellCertificateUploadByApprovalRequest = (upload: CellCertificateUpload | null) =>
+const stubCellCertificateImportByApprovalRequest = (certificateImport: CellCertificateImport | null) =>
   stubFor({
     request: {
       method: 'GET',
       urlPattern: `/locations-api/locations/bulk/update-cell-certificate/by-approval-request/[\\w-]+`,
     },
-    response: upload
-      ? { status: 200, headers: { 'Content-Type': 'application/json;charset=UTF-8' }, jsonBody: upload }
+    response: certificateImport
+      ? { status: 200, headers: { 'Content-Type': 'application/json;charset=UTF-8' }, jsonBody: certificateImport }
       : { status: 404, headers: { 'Content-Type': 'application/json;charset=UTF-8' }, jsonBody: {} },
   })
 
-const stubCellCertificateUpload = (upload: CellCertificateUpload) =>
+const stubCellCertificateImport = (certificateImport: CellCertificateImport) =>
   stubFor({
     request: {
       method: 'GET',
+      // The API still calls this an upload - the path is its, not ours.
       urlPattern: `/locations-api/locations/bulk/update-cell-certificate/upload/[\\w-]+`,
     },
     response: {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-      jsonBody: upload,
+      jsonBody: certificateImport,
     },
   })
 
-const stubRequestCellCertificateUpload = (upload: CellCertificateUpload) =>
+const stubRequestCellCertificateImport = (certificateImport: CellCertificateImport) =>
   stubFor({
     request: {
       method: 'POST',
@@ -1534,7 +1535,7 @@ const stubRequestCellCertificateUpload = (upload: CellCertificateUpload) =>
     response: {
       status: 202,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-      jsonBody: upload,
+      jsonBody: certificateImport,
     },
   })
 
@@ -1554,10 +1555,10 @@ const stubPendingApprovalsBelow = (pendingApprovalsBelow: PendingApprovalsBelow)
   })
 
 const allStubs = {
-  stubCellCertificateUploadsList,
-  stubCellCertificateUpload,
-  stubCellCertificateUploadByApprovalRequest,
-  stubRequestCellCertificateUpload,
+  stubCellCertificateImportsList,
+  stubCellCertificateImport,
+  stubCellCertificateImportByApprovalRequest,
+  stubRequestCellCertificateImport,
   stubGetPrisonConfiguration,
   stubLocations,
   stubLocationsBulkReactivate,

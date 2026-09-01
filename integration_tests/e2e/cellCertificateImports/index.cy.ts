@@ -1,14 +1,14 @@
 import Page from '../../pages/page'
-import CellCertificateUploadsListPage from '../../pages/cellCertificateUploads/list'
-import CellCertificateUploadDetailPage from '../../pages/cellCertificateUploads/detail'
-import { CellCertificateUpload } from '../../../server/data/types/locationsApi/cellCertificateUpload'
+import CellCertificateImportsListPage from '../../pages/cellCertificateImports/list'
+import CellCertificateImportDetailPage from '../../pages/cellCertificateImports/detail'
+import { CellCertificateImport } from '../../../server/data/types/locationsApi/cellCertificateImport'
 import paths from '../../../server/utils/paths'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import AuthStubber from '../../mockApis/auth'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 
-const completedUpload: CellCertificateUpload = {
-  id: 'upload-1',
+const completedImport: CellCertificateImport = {
+  id: 'import-1',
   prisonId: 'TST',
   status: 'FINISHED',
   totalRecords: 2,
@@ -45,8 +45,8 @@ const completedUpload: CellCertificateUpload = {
   ],
 }
 
-const inProgressUpload: CellCertificateUpload = {
-  id: 'upload-2',
+const inProgressImport: CellCertificateImport = {
+  id: 'import-2',
   prisonId: 'TST',
   status: 'STARTED',
   totalRecords: 5,
@@ -59,7 +59,7 @@ const inProgressUpload: CellCertificateUpload = {
   locations: [],
 }
 
-context('Cell certificate uploads', () => {
+context('Cell certificate imports', () => {
   beforeEach(() => {
     cy.task('reset')
     AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
@@ -71,17 +71,17 @@ context('Cell certificate uploads', () => {
     cy.signIn()
   })
 
-  it('lists completed uploads and drills into the detail with a cell certificate link', () => {
-    LocationsApiStubber.stub.stubCellCertificateUploadsList([completedUpload])
-    LocationsApiStubber.stub.stubCellCertificateUpload(completedUpload)
-    CellCertificateUploadsListPage.goTo('TST')
-    const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)
-    listPage.uploadNewButton().should('exist')
-    listPage.uploadsTable().should('contain', 'Complete')
+  it('lists completed imports and drills into the detail with a cell certificate link', () => {
+    LocationsApiStubber.stub.stubCellCertificateImportsList([completedImport])
+    LocationsApiStubber.stub.stubCellCertificateImport(completedImport)
+    CellCertificateImportsListPage.goTo('TST')
+    const listPage = Page.verifyOnPage(CellCertificateImportsListPage)
+    listPage.newImportButton().should('exist')
+    listPage.importsTable().should('contain', 'Complete')
 
-    listPage.firstUploadLink().click()
+    listPage.firstImportLink().click()
 
-    const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
+    const detailPage = Page.verifyOnPage(CellCertificateImportDetailPage)
     detailPage.summary().should('contain', 'Complete')
     detailPage.summary().should('contain', 'USER1')
     detailPage.locationsTable().should('contain', 'TST-A-1-001')
@@ -91,10 +91,10 @@ context('Cell certificate uploads', () => {
   })
 
   it('flags the cells whose working capacity does not match the certificate', () => {
-    LocationsApiStubber.stub.stubCellCertificateUpload(completedUpload)
+    LocationsApiStubber.stub.stubCellCertificateImport(completedImport)
 
-    cy.visit(`${paths.prison.cellCertificateUploads('TST')}/upload/upload-1`)
-    const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
+    const detailPage = Page.verifyOnPage(CellCertificateImportDetailPage)
 
     detailPage.summary().should('contain', 'Cells needing review')
     detailPage.needsReviewAlert().should('contain', 'Check these cells’ working capacities')
@@ -104,45 +104,57 @@ context('Cell certificate uploads', () => {
     detailPage.locationsTable().should('contain', 'Working capacity and certified working capacity do not match')
   })
 
-  it('hides the upload button and shows a message while an upload is in progress', () => {
-    LocationsApiStubber.stub.stubCellCertificateUploadsList([inProgressUpload])
+  it('hides the import button and shows a message while an import is in progress', () => {
+    LocationsApiStubber.stub.stubCellCertificateImportsList([inProgressImport])
 
-    CellCertificateUploadsListPage.goTo('TST')
-    const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)
+    CellCertificateImportsListPage.goTo('TST')
+    const listPage = Page.verifyOnPage(CellCertificateImportsListPage)
     listPage.inProgressMessage().should('exist')
-    listPage.uploadNewButton().should('not.exist')
-    listPage.uploadsTable().should('contain', 'Processing')
+    listPage.newImportButton().should('not.exist')
+    listPage.importsTable().should('contain', 'Processing')
   })
 
-  it('shows the in-progress message on the detail page for an unfinished upload', () => {
-    LocationsApiStubber.stub.stubCellCertificateUpload(inProgressUpload)
+  it('shows the in-progress message on the detail page for an unfinished import', () => {
+    LocationsApiStubber.stub.stubCellCertificateImport(inProgressImport)
 
-    cy.visit(`${paths.prison.cellCertificateUploads('TST')}/upload/upload-2`)
-    const detailPage = Page.verifyOnPage(CellCertificateUploadDetailPage)
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/import-2`)
+    const detailPage = Page.verifyOnPage(CellCertificateImportDetailPage)
     detailPage.inProgressMessage().should('exist')
     detailPage.cellCertificateLink().should('not.exist')
     detailPage.summary().should('contain', 'Processing')
   })
 
-  it('redirects the URL the pages used to live at', () => {
-    LocationsApiStubber.stub.stubCellCertificateUploadsList([])
+  it('redirects the URLs the pages used to live at', () => {
+    LocationsApiStubber.stub.stubCellCertificateImportsList([])
 
     cy.visit('/TST/admin/ingest-cert')
-    Page.verifyOnPage(CellCertificateUploadsListPage)
-    cy.location('pathname').should('eq', paths.prison.cellCertificateUploads('TST'))
+    Page.verifyOnPage(CellCertificateImportsListPage)
+    cy.location('pathname').should('eq', paths.prison.cellCertificateImports('TST'))
+
+    cy.visit('/TST/cell-certificate-uploads')
+    Page.verifyOnPage(CellCertificateImportsListPage)
+    cy.location('pathname').should('eq', paths.prison.cellCertificateImports('TST'))
   })
 
-  it('shows a message when there are no uploads', () => {
-    LocationsApiStubber.stub.stubCellCertificateUploadsList([])
+  it('redirects a bookmarked report from the old uploads URL', () => {
+    LocationsApiStubber.stub.stubCellCertificateImport(completedImport)
 
-    CellCertificateUploadsListPage.goTo('TST')
-    const listPage = Page.verifyOnPage(CellCertificateUploadsListPage)
-    listPage.noUploadsMessage().should('exist')
-    listPage.uploadNewButton().should('exist')
+    cy.visit('/TST/cell-certificate-uploads/upload/import-1')
+    Page.verifyOnPage(CellCertificateImportDetailPage)
+    cy.location('pathname').should('eq', `${paths.prison.cellCertificateImports('TST')}/import/import-1`)
+  })
+
+  it('shows a message when there are no imports', () => {
+    LocationsApiStubber.stub.stubCellCertificateImportsList([])
+
+    CellCertificateImportsListPage.goTo('TST')
+    const listPage = Page.verifyOnPage(CellCertificateImportsListPage)
+    listPage.noImportsMessage().should('exist')
+    listPage.newImportButton().should('exist')
   })
 })
 
-context('Cell certificate uploads - capacity management', () => {
+context('Cell certificate imports - capacity management', () => {
   beforeEach(() => {
     cy.task('reset')
     AuthStubber.stub.stubSignIn({ roles: ['RESI__CERT_VIEWER'] })
@@ -154,15 +166,15 @@ context('Cell certificate uploads - capacity management', () => {
     cy.signIn()
   })
 
-  it('offers the upload button to a certificate viewer', () => {
-    LocationsApiStubber.stub.stubCellCertificateUploadsList([])
+  it('offers the import button to a certificate viewer', () => {
+    LocationsApiStubber.stub.stubCellCertificateImportsList([])
 
-    CellCertificateUploadsListPage.goTo('TST')
-    Page.verifyOnPage(CellCertificateUploadsListPage).uploadNewButton().should('exist')
+    CellCertificateImportsListPage.goTo('TST')
+    Page.verifyOnPage(CellCertificateImportsListPage).newImportButton().should('exist')
   })
 })
 
-context('Cell certificate uploads - a role that may not ingest', () => {
+context('Cell certificate imports - a role that may not import', () => {
   beforeEach(() => {
     cy.task('reset')
     AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RESIDENTIAL_LOCATIONS'] })
@@ -174,10 +186,10 @@ context('Cell certificate uploads - a role that may not ingest', () => {
     cy.signIn()
   })
 
-  it('cannot reach the uploads page', () => {
-    LocationsApiStubber.stub.stubCellCertificateUploadsList([completedUpload])
+  it('cannot reach the imports page', () => {
+    LocationsApiStubber.stub.stubCellCertificateImportsList([completedImport])
 
-    cy.visit(paths.prison.cellCertificateUploads('TST'), { failOnStatusCode: false })
-    cy.location('pathname').should('not.eq', paths.prison.cellCertificateUploads('TST'))
+    cy.visit(paths.prison.cellCertificateImports('TST'), { failOnStatusCode: false })
+    cy.location('pathname').should('not.eq', paths.prison.cellCertificateImports('TST'))
   })
 })

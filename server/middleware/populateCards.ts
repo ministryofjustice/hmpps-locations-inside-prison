@@ -57,15 +57,15 @@ export default middleware((req, res, next) => {
     },
     {
       clickable: true,
-      // Only the roles that can run an ingestion get this tile - for everyone else the import is a snapshot
+      // Only the roles that can run an import get this tile - for everyone else the import is a snapshot
       // they cannot act on, and its results are shown on the import request details page instead.
-      // Deliberately not gated on certificationEnabled: ingesting a certificate is the onboarding step that
+      // Deliberately not gated on certificationEnabled: importing a certificate is the onboarding step that
       // happens before certification is switched on, so gating it that way would hide it when it is needed.
-      visible: req.canAccess('cell_certificate_upload'),
+      visible: req.canAccess('cell_certificate_import'),
       heading: 'Import cell certificate',
-      href: paths.prison.cellCertificateUploads(prisonId),
+      href: paths.prison.cellCertificateImports(prisonId),
       description: 'Import a certificate for this establishment or view previously imported certificates.',
-      'data-qa': 'cell-certificate-uploads-card',
+      'data-qa': 'cell-certificate-imports-card',
     },
     {
       clickable: true,

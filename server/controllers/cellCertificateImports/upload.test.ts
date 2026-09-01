@@ -1,12 +1,12 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import IngestUpload, { invalidDataForPrison, parseCsvRow, summarizeCapacityByWing } from './upload'
+import ImportUpload, { invalidDataForPrison, parseCsvRow, summarizeCapacityByWing } from './upload'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import fields from '../../routes/changeLocalName/fields'
 
 describe('Upload file csv', () => {
-  const controller = new IngestUpload({ route: '/' })
+  const controller = new ImportUpload({ route: '/' })
   let deepReq: DeepPartial<FormWizard.Request>
   let deepRes: DeepPartial<Response>
   let next: NextFunction
@@ -83,7 +83,7 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'ingest', 'The CNA value is not numeric for cell LGI-S-0-032.'),
+          file: controller.formError('file', 'importFailure', 'The CNA value is not numeric for cell LGI-S-0-032.'),
         }),
       )
     })
@@ -98,7 +98,7 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'ingest', 'The Max Cap value is not numeric for cell LGI-S-0-032.'),
+          file: controller.formError('file', 'importFailure', 'The Max Cap value is not numeric for cell LGI-S-0-032.'),
         }),
       )
     })
@@ -115,7 +115,7 @@ describe('Upload file csv', () => {
         expect.objectContaining({
           file: controller.formError(
             'file',
-            'ingest',
+            'importFailure',
             'The Working Cap value is more than the Max Cap value for cell LPI-G-2-002. A cell cannot be ' +
               'certified to hold more people than its maximum capacity, so check the "Maximum number of ' +
               'prisoners" and "Number of places allocated" columns.',
@@ -134,7 +134,11 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          file: controller.formError('file', 'ingest', 'The Working Cap value is not numeric for cell TST-HB1-1-005.'),
+          file: controller.formError(
+            'file',
+            'importFailure',
+            'The Working Cap value is not numeric for cell TST-HB1-1-005.',
+          ),
         }),
       )
     })
@@ -151,7 +155,7 @@ describe('Upload file csv', () => {
         expect.objectContaining({
           file: controller.formError(
             'file',
-            'ingest',
+            'importFailure',
             'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-H1-A1-001.',
           ),
         }),

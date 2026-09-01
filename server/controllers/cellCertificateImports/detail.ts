@@ -53,12 +53,12 @@ export default async (req: Request, res: Response) => {
   const { locationsService } = req.services
   const { systemToken } = req.session
   const { prisonId } = res.locals.prisonConfiguration
-  const uploadId = req.params.uploadId as string
+  const importId = req.params.importId as string
 
-  const upload = await locationsService.getCellCertificateUpload(systemToken, uploadId)
-  const inProgress = upload.status !== 'FINISHED'
+  const certificateImport = await locationsService.getCellCertificateImport(systemToken, importId)
+  const inProgress = certificateImport.status !== 'FINISHED'
 
-  const locationRows = (upload.locations || [])
+  const locationRows = (certificateImport.locations || [])
     .map(location => ({
       locationKey: location.locationKey,
       status: location.status,
@@ -69,7 +69,7 @@ export default async (req: Request, res: Response) => {
         location.certifiedNormalAccommodationMismatch,
       ),
       maxCapacity: maxCapacityCell(location),
-      // an ingestion never moves a location's working capacity, so this column shows what the location holds
+      // an import never moves a location's working capacity, so this column shows what the location holds
       // and what the certificate records - never a change
       workingCapacity: heldAndCertifiedCell(location.previousWorkingCapacity, location.workingCapacity),
       certifiedNormalAccommodation: capacityCell(
@@ -84,14 +84,14 @@ export default async (req: Request, res: Response) => {
 
   const locals: TypedLocals = {
     title: 'Cell certificate import',
-    upload,
+    certificateImport,
     locationRows,
     inProgress,
-    listUrl: paths.prison.cellCertificateUploads(prisonId),
-    backLink: paths.prison.cellCertificateUploads(prisonId),
+    listUrl: paths.prison.cellCertificateImports(prisonId),
+    backLink: paths.prison.cellCertificateImports(prisonId),
     cellCertificateUrl:
-      upload.status === 'FINISHED' && upload.cellCertificateId
-        ? paths.cellCertificate.view(prisonId, upload.cellCertificateId)
+      certificateImport.status === 'FINISHED' && certificateImport.cellCertificateId
+        ? paths.cellCertificate.view(prisonId, certificateImport.cellCertificateId)
         : undefined,
   }
 
@@ -100,5 +100,5 @@ export default async (req: Request, res: Response) => {
     locals.banner = { success: success[0] }
   }
 
-  return res.render('pages/cellCertificateUploads/detail', locals)
+  return res.render('pages/cellCertificateImports/detail', locals)
 }

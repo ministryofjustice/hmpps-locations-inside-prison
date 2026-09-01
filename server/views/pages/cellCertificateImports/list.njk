@@ -3,7 +3,7 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "../../macros/cellCertificateUploadStatusTag.njk" import uploadStatusTag %}
+{% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag %}
 
 {% block head %}
   {{ super() }}
@@ -28,28 +28,28 @@
         {% else %}
           {{ govukButton({
             text: "Import a cell certificate",
-            href: newUploadUrl,
-            attributes: { "data-qa": "upload-new-button" }
+            href: newImportUrl,
+            attributes: { "data-qa": "import-new-button" }
           }) }}
         {% endif %}
 
-        {% if uploads.length %}
+        {% if imports.length %}
           {% set rows = [] %}
-          {% for upload in uploads %}
+          {% for certificateImport in imports %}
             {% set rows = (rows.push([
-              { html: "<a class='govuk-link' href='" + listUrl + "/upload/" + upload.id + "'>" + (upload.requestedDate | formatDateWithTime) + "</a>" },
-              { html: uploadStatusTag(upload.status) },
-              { text: (upload.startTime | formatDateWithTime) if upload.startTime else "-" },
-              { text: (upload.endTime | formatDateWithTime) if upload.endTime else "-" },
-              { text: upload.totalRecords, format: "numeric" },
-              { text: upload.processedRecords, format: "numeric" },
-              { text: upload.skippedRecords, format: "numeric" },
-              { text: upload.failedRecords, format: "numeric" }
+              { html: "<a class='govuk-link' href='" + listUrl + "/import/" + certificateImport.id + "'>" + (certificateImport.requestedDate | formatDateWithTime) + "</a>" },
+              { html: importStatusTag(certificateImport.status) },
+              { text: (certificateImport.startTime | formatDateWithTime) if certificateImport.startTime else "-" },
+              { text: (certificateImport.endTime | formatDateWithTime) if certificateImport.endTime else "-" },
+              { text: certificateImport.totalRecords, format: "numeric" },
+              { text: certificateImport.processedRecords, format: "numeric" },
+              { text: certificateImport.skippedRecords, format: "numeric" },
+              { text: certificateImport.failedRecords, format: "numeric" }
             ]), rows) %}
           {% endfor %}
 
           {{ govukTable({
-            attributes: { "data-qa": "uploads-table" },
+            attributes: { "data-qa": "imports-table" },
             head: [
               { text: "Requested" },
               { text: "Status" },
@@ -63,7 +63,7 @@
             rows: rows
           }) }}
         {% else %}
-          <p class="govuk-body" data-qa="no-uploads">No cell certificates have been imported for this establishment.</p>
+          <p class="govuk-body" data-qa="no-imports">No cell certificates have been imported for this establishment.</p>
         {% endif %}
 
       </div>

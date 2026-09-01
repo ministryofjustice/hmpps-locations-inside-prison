@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { DeepPartial } from 'fishery'
 import show from './show'
 import LocationsService from '../../../services/locationsService'
-import { CellCertificateUpload } from '../../../data/types/locationsApi/cellCertificateUpload'
+import { CellCertificateImport } from '../../../data/types/locationsApi/cellCertificateImport'
 import { CertificationApprovalRequestType } from '../../../data/types/locationsApi/certificationApprovalRequest'
 
 jest.mock('../../../services/locationsService')
@@ -14,8 +14,8 @@ describe('Cell certificate change request - show', () => {
 
   const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
-  const upload = {
-    id: 'upload-1',
+  const certificateImport = {
+    id: 'import-1',
     prisonId: 'TST',
     status: 'FINISHED',
     totalRecords: 3,
@@ -38,7 +38,7 @@ describe('Cell certificate change request - show', () => {
       },
       { locationKey: 'TST-A-1-002', status: 'SKIPPED', maxCapacity: 2, workingCapacity: 2 },
     ],
-  } as CellCertificateUpload
+  } as CellCertificateImport
 
   const buildRes = (approvalType: CertificationApprovalRequestType): DeepPartial<Response> => ({
     locals: {
@@ -61,17 +61,17 @@ describe('Cell certificate change request - show', () => {
   afterEach(() => jest.clearAllMocks())
 
   it('shows only the cells needing review for an initial cell certificate import', async () => {
-    locationsService.getCellCertificateUploadByApprovalRequest = jest.fn().mockResolvedValue(upload)
+    locationsService.getCellCertificateImportByApprovalRequest = jest.fn().mockResolvedValue(certificateImport)
 
     await show(deepReq as Request, deepRes as Response)
 
-    expect(locationsService.getCellCertificateUploadByApprovalRequest).toHaveBeenCalledWith('token', 'request-1')
+    expect(locationsService.getCellCertificateImportByApprovalRequest).toHaveBeenCalledWith('token', 'request-1')
 
-    const { ingestion } = (deepRes.render as jest.Mock).mock.calls[0][1]
-    expect(ingestion.upload).toEqual(upload)
-    expect(ingestion.reportUrl).toBe('/TST/cell-certificate-uploads/upload/upload-1')
+    const { importResults } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(importResults.certificateImport).toEqual(certificateImport)
+    expect(importResults.reportUrl).toBe('/TST/cell-certificate-imports/import/import-1')
     // the unchanged cell is left out - a prison's import covers every cell
-    expect(ingestion.rows).toEqual([
+    expect(importResults.rows).toEqual([
       expect.objectContaining({
         locationKey: 'TST-A-1-001',
         workingCapacity: { text: '2', certifiedText: '1' },
@@ -80,19 +80,19 @@ describe('Cell certificate change request - show', () => {
     ])
   })
 
-  it('does not look for an ingestion for any other approval type', async () => {
-    locationsService.getCellCertificateUploadByApprovalRequest = jest.fn()
+  it('does not look for an import for any other approval type', async () => {
+    locationsService.getCellCertificateImportByApprovalRequest = jest.fn()
     deepRes = buildRes('CAPACITY_CHANGE')
 
     await show(deepReq as Request, deepRes as Response)
 
-    expect(locationsService.getCellCertificateUploadByApprovalRequest).not.toHaveBeenCalled()
-    expect((deepRes.render as jest.Mock).mock.calls[0][1].ingestion).toBeUndefined()
+    expect(locationsService.getCellCertificateImportByApprovalRequest).not.toHaveBeenCalled()
+    expect((deepRes.render as jest.Mock).mock.calls[0][1].importResults).toBeUndefined()
   })
 
-  // Imports that predate the link between an upload and its approval request have nothing to find.
-  it('renders the page unchanged when there is no ingestion behind the request', async () => {
-    locationsService.getCellCertificateUploadByApprovalRequest = jest
+  // Imports that predate the link between an import and its approval request have nothing to find.
+  it('renders the page unchanged when there is no import behind the request', async () => {
+    locationsService.getCellCertificateImportByApprovalRequest = jest
       .fn()
       .mockRejectedValue(Object.assign(new Error('Not Found'), { status: 404 }))
 
@@ -100,7 +100,7 @@ describe('Cell certificate change request - show', () => {
 
     expect(deepRes.render).toHaveBeenCalledWith(
       'pages/cellCertificate/changeRequests/show',
-      expect.objectContaining({ ingestion: undefined }),
+      expect.objectContaining({ importResults: undefined }),
     )
   })
 })

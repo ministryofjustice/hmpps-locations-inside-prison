@@ -5,7 +5,7 @@ import { TypedLocals } from '../../@types/express'
 import FormStep from '../base/formStep'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 
-export default class IngestUpload extends FormStep {
+export default class ImportUpload extends FormStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
 
@@ -39,7 +39,7 @@ export default class IngestUpload extends FormStep {
         } catch (error) {
           validationErrors.file =
             error instanceof Error && isCsvValidationError(error.message)
-              ? this.formError('file', 'ingest', error.message)
+              ? this.formError('file', 'importFailure', error.message)
               : this.formError('file', 'parseFailure')
         }
       }

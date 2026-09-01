@@ -5,10 +5,11 @@ import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHier
 import { LocationType, NotificationGroup, StatusType } from '../data/types/locationsApi'
 import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
 
-// The API rejects an upload without a reason once a prison has certification approval turned on. The
-// ingestion is always the same act, and the API records its own fixed reason against the approval request
-// it raises, so this only needs to explain the upload on the report.
-export const CELL_CERTIFICATE_UPLOAD_REASON =
+// The API rejects an import without a reason once a prison has certification approval turned on. The
+// import is always the same act, and the API records its own fixed reason against the approval request
+// it raises, so this only needs to explain the import on the report. The wording is stored against
+// existing records, so it stays as it is.
+export const CELL_CERTIFICATE_IMPORT_REASON =
   'Cell certificate imported when the prison started using Residential locations'
 
 export default class LocationsService {
@@ -192,24 +193,24 @@ export default class LocationsService {
     return this.locationsApiClient.cellCertificates.getById(token, { id })
   }
 
-  async requestCellCertificateUpload(token: string, prisonId: string, locations: BulkCapacityUpdate) {
-    return this.locationsApiClient.cellCertificateUploads.request(
+  async requestCellCertificateImport(token: string, prisonId: string, locations: BulkCapacityUpdate) {
+    return this.locationsApiClient.cellCertificateImports.request(
       token,
       { prisonId },
-      { locations, reasonForChange: CELL_CERTIFICATE_UPLOAD_REASON },
+      { locations, reasonForChange: CELL_CERTIFICATE_IMPORT_REASON },
     )
   }
 
-  async getCellCertificateUploads(token: string, prisonId: string, status?: string) {
-    return this.locationsApiClient.cellCertificateUploads.listForPrison(token, { prisonId, status })
+  async getCellCertificateImports(token: string, prisonId: string, status?: string) {
+    return this.locationsApiClient.cellCertificateImports.listForPrison(token, { prisonId, status })
   }
 
-  async getCellCertificateUpload(token: string, uploadId: string) {
-    return this.locationsApiClient.cellCertificateUploads.getUpload(token, { uploadId })
+  async getCellCertificateImport(token: string, importId: string) {
+    return this.locationsApiClient.cellCertificateImports.getById(token, { uploadId: importId })
   }
 
-  async getCellCertificateUploadByApprovalRequest(token: string, approvalRequestId: string) {
-    return this.locationsApiClient.cellCertificateUploads.getByApprovalRequest(token, { approvalRequestId })
+  async getCellCertificateImportByApprovalRequest(token: string, approvalRequestId: string) {
+    return this.locationsApiClient.cellCertificateImports.getByApprovalRequest(token, { approvalRequestId })
   }
 
   async getApprovalTypes(token: string) {
