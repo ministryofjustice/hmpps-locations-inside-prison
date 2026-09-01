@@ -120,11 +120,17 @@ describe('populateDeactivationReasonItems', () => {
         ...fields.deactivationReasonDescription,
         id: 'deactivationReasonDescription-ATEST1',
         name: 'deactivationReasonDescription-ATEST1',
+        label: {
+          html: 'Description <span class="govuk-visually-hidden">for A test 1</span> (optional)',
+        },
       },
       'deactivationReasonDescription-TEST2': {
         ...fields.deactivationReasonDescription,
         id: 'deactivationReasonDescription-TEST2',
         name: 'deactivationReasonDescription-TEST2',
+        label: {
+          html: 'Description <span class="govuk-visually-hidden">for Test 2</span> (optional)',
+        },
       },
     })
   })

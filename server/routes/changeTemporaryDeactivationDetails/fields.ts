@@ -14,7 +14,7 @@ const fields = {
     },
     fieldset: {
       legend: {
-        text: 'Deactivation reason',
+        html: 'Deactivation reason<span class="govuk-visually-hidden"> (Some options will reveal an additional description field when selected.)</span>',
         classes: 'govuk-fieldset__legend--m',
       },
     },
