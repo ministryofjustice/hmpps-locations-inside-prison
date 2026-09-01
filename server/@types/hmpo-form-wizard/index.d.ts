@@ -301,7 +301,8 @@ declare module 'hmpo-form-wizard' {
       type?: FieldType
       fieldset?: {
         legend: {
-          text: string
+          text?: string
+          html?: string
           classes: string
         }
       }
@@ -314,7 +315,8 @@ declare module 'hmpo-form-wizard' {
       invalidates?: string[]
       value?: string | string[]
       label?: {
-        text: string
+        text?: string
+        html?: string
         classes?: string
         for?: string
         isPageHeading?: boolean

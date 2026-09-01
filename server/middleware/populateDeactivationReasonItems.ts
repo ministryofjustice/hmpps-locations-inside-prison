@@ -34,6 +34,9 @@ export default async function populateDeactivationReasonItems(
         ...req.form.options.allFields.deactivationReasonDescription,
         id: `deactivationReasonDescription-${key}`,
         name: `deactivationReasonDescription-${key}`,
+        label: {
+          html: `Description <span class="govuk-visually-hidden">for ${deactivationReasons[key]}</span> (optional)`,
+        },
       }
     })
 
