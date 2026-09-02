@@ -90,6 +90,12 @@ module.exports = (applyButtonId, inputId, inputsToFillId, fillFunction, inputFor
       previousNumber = fillFunction(previousNumber)
     })
 
+    const lastNumber = previousNumber - 1
+
+    $('#cell-numbering-status').text(
+      `Cell numbers auto-populated from ${inputFormatter ? inputFormatter(numberToStartFrom) : numberToStartFrom} to ${inputFormatter ? inputFormatter(lastNumber) : lastNumber}`,
+    )
+
     return true
   })
 }
