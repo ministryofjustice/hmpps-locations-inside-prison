@@ -5,6 +5,13 @@
 {% from "moj/components/ticket-panel/macro.njk" import mojTicketPanel %}
 
 {% block fields %}
+  {% set startCreateCellNumberHintHtml %}
+    <div id="startCreateCellNumber-hint" class="govuk-visually-hidden">
+      Enter the first cell number. Selecting Apply will automatically populate
+      all cell number fields in sequence from this number.
+      For example, entering 01 will populate the fields as 001, 002 and 003.
+    </div>
+  {% endset %}
 
   {{ mojTicketPanel({
     attributes: {
@@ -17,6 +24,9 @@
         id: 'startCreateCellNumber',
         name: 'startCreateCellNumber',
         classes: 'govuk-input--width-5 ',
+        attributes: {
+          'aria-describedby': 'startCreateCellNumber-hint'
+        },
         rows: 1,
         label: {
           text: 'Start cell numbering from',
@@ -25,8 +35,11 @@
         },
         autocomplete: 'off',
         formGroup: {
+          beforeInput: {
+            html: startCreateCellNumberHintHtml
+          },
           afterInput: {
-            html: '<a href="" class="govuk-link govuk-link--no-visited-state govuk-input-suffix--plain" id="apply-cell-numbering">Apply</a>'
+            html: '<button type="button" class="govuk-link govuk-link--no-visited-state govuk-input-suffix--plain" id="apply-cell-numbering">Apply</button>'
           }
         }
       }),
@@ -56,6 +69,9 @@
           ],
           rows: rows
         }) }}
+        <div id="cell-numbering-status" class="govuk-visually-hidden" aria-live="polite">
+          <!-- Text will be dynamically inserted here to indicate cell numbering changes -->
+        </div>
       </div>
     </div>
   </div>
