@@ -77,8 +77,16 @@ function localNameRow(location: DecoratedLocation, req: Request): SummaryListRow
     if (showEditLocalNameLink(location, req)) {
       row.actions = {
         items: [
-          { href: paths.location.removeLocalName(location), text: 'Remove' },
-          { href: paths.location.changeLocalName(location), text: 'Change' },
+          {
+            href: paths.location.removeLocalName(location),
+            text: 'Remove',
+            attributes: { 'aria-label': 'Remove local name' },
+          },
+          {
+            href: paths.location.changeLocalName(location),
+            text: 'Change',
+            attributes: { 'aria-label': 'Change local name' },
+          },
         ],
       }
     }
@@ -106,6 +114,7 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
             href: paths.location.removeCellType(location),
             text: 'Remove',
             attributes: {
+              'aria-label': 'Remove cell type',
               'data-qa': 'remove-cell-type',
             },
           },
@@ -113,6 +122,7 @@ function cellTypesRow(location: DecoratedLocation, req: Request): SummaryListRow
             href: paths.location.changeCellType(location),
             text: 'Change',
             attributes: {
+              'aria-label': 'Change cell type',
               'data-qa': 'change-cell-type',
             },
           },
@@ -141,6 +151,9 @@ function usedForRow(location: DecoratedLocation, req: Request): SummaryListRow {
         {
           href: paths.location.changeUsedFor(location),
           text: 'Change',
+          attributes: {
+            'aria-label': 'Change used for',
+          },
         },
       ],
     }
@@ -162,6 +175,9 @@ function locationCodeRow(location: DecoratedLocation, req: Request): SummaryList
         {
           href: paths.location.changeLocationCode(location),
           text: 'Change',
+          attributes: {
+            'aria-label': 'Change location',
+          },
         },
       ],
     }
@@ -182,6 +198,9 @@ function doorNumberRow(location: DecoratedLocation, req: Request): SummaryListRo
         {
           href: paths.location.changeDoorNumber(location),
           text: 'Change',
+          attributes: {
+            'aria-label': 'Change door number',
+          },
         },
       ],
     }
@@ -202,6 +221,9 @@ function sanitationRow(location: DecoratedLocation, req: Request): SummaryListRo
         {
           href: paths.location.changeSanitation(location),
           text: 'Change',
+          attributes: {
+            'aria-label': 'Change sanitation',
+          },
         },
       ],
     }
@@ -224,6 +246,9 @@ function nonResCellTypeRow(location: DecoratedLocation, req: Request) {
         {
           href: paths.location.changeNonResidentialType(location),
           text: 'Change',
+          attributes: {
+            'aria-label': 'Change non-residential room',
+          },
         },
       ],
     }

@@ -10,7 +10,7 @@
   {{ govukSummaryList({
     card: {
       title: { text: "Capacity" },
-      actions: { items: [ { href: backLink, text: "Change" } ] }
+      actions: { items: [ { href: backLink, text: "Change", attributes: { "aria-label": "Change capacity" } } ] }
     },
     rows: [
       {

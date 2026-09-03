@@ -140,6 +140,9 @@ describe('CellConversionConfirm', () => {
                   href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/accommodation-type/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
+                  attributes: {
+                    'aria-label': 'Change accommodation type',
+                  },
                 },
               ],
             },
@@ -153,6 +156,9 @@ describe('CellConversionConfirm', () => {
                   href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/used-for/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
+                  attributes: {
+                    'aria-label': 'Change used for',
+                  },
                 },
               ],
             },
@@ -166,6 +172,9 @@ describe('CellConversionConfirm', () => {
                   href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/specific-cell-type/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
+                  attributes: {
+                    'aria-label': 'Change cell type',
+                  },
                 },
               ],
             },
@@ -179,6 +188,9 @@ describe('CellConversionConfirm', () => {
                   href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/set-cell-capacity/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
+                  attributes: {
+                    'aria-label': 'Change working capacity',
+                  },
                 },
               ],
             },
@@ -192,6 +204,9 @@ describe('CellConversionConfirm', () => {
                   href: `${paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001')}/set-cell-capacity/edit`,
                   text: 'Change',
                   classes: 'govuk-link--no-visited-state',
+                  attributes: {
+                    'aria-label': 'Change maximum capacity',
+                  },
                 },
               ],
             },

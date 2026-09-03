@@ -36,6 +36,9 @@ export default class ConfirmCreateCells extends FormStep {
               text: 'Change',
               href: `${res.locals.createRootLink}/create-cells/details/edit`,
               classes: 'govuk-link--no-visited-state',
+              attributes: {
+                'aria-label': 'Change number of cells',
+              },
             },
           ],
         },
@@ -49,6 +52,9 @@ export default class ConfirmCreateCells extends FormStep {
               text: 'Change',
               href: `${res.locals.createRootLink}/create-cells/details/edit`,
               classes: 'govuk-link--no-visited-state',
+              attributes: {
+                'aria-label': 'Change accommodation type',
+              },
             },
           ],
         },
@@ -67,6 +73,9 @@ export default class ConfirmCreateCells extends FormStep {
               text: 'Change',
               href: `${res.locals.createRootLink}/create-cells/used-for/edit`,
               classes: 'govuk-link--no-visited-state',
+              attributes: {
+                'aria-label': 'Change used for',
+              },
             },
           ],
         },
