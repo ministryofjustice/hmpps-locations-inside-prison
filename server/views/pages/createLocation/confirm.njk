@@ -26,7 +26,8 @@
             {
               href: createDetailsLink,
               text: "Change",
-              classes: "govuk-link--no-visited-state"
+              classes: "govuk-link--no-visited-state",
+              attributes: { "aria-label": "Change wing code" }
             }
           ]
         }
@@ -39,7 +40,8 @@
             {
               href: createDetailsLink,
               text: "Change",
-              classes: "govuk-link--no-visited-state"
+              classes: "govuk-link--no-visited-state",
+              attributes: { "aria-label": "Change local name" }
             }
           ]
         }
@@ -52,7 +54,8 @@
             {
               href: createStructureLink,
               text: "Change",
-              classes: "govuk-link--no-visited-state"
+              classes: "govuk-link--no-visited-state",
+              attributes: { "aria-label": "Change wing structure" }
             }
           ]
         }
@@ -73,7 +76,8 @@
             {
               text: 'Change',
               href: createDetailsLink,
-              classes: "govuk-link--no-visited-state"
+              classes: "govuk-link--no-visited-state",
+              attributes: { "aria-label": "Change location details" }
             }
           ]
         }
@@ -149,13 +153,13 @@
           "data-qa": "cell-information-table"
         },
         head: [
-          { html: "Cell number<br><a href='" + createRootLink + "/create-cells/cell-numbers/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
-          { html: "Cell door number<br><a href='" + createRootLink + "/create-cells/door-numbers/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
-          { html: "Baseline CNA<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
-          { html: "Working capacity<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
-          { html: "Maximum capacity<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
-          { html: "Cell type<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" },
-          { html: "Sanitation<br><a href='" + createRootLink + "/create-cells/bulk-sanitation/edit' class='govuk-link govuk-link--no-visited-state'>Change</a>" }
+          { html: "Cell number<br><a href='" + createRootLink + "/create-cells/cell-numbers/edit' class='govuk-link govuk-link--no-visited-state' aria-label='Change cell number'>Change</a>" },
+          { html: "Cell door number<br><a href='" + createRootLink + "/create-cells/door-numbers/edit' class='govuk-link govuk-link--no-visited-state' aria-label='Change cell door number'>Change</a>" },
+          { html: "Baseline CNA<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state' aria-label='Change baseline CNA'>Change</a>" },
+          { html: "Working capacity<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state' aria-label='Change working capacity'>Change</a>" },
+          { html: "Maximum capacity<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state' aria-label='Change maximum capacity'>Change</a>" },
+          { html: "Cell type<br><a href='" + createRootLink + "/create-cells/capacities/edit' class='govuk-link govuk-link--no-visited-state' aria-label='Change cell type'>Change</a>" },
+          { html: "Sanitation<br><a href='" + createRootLink + "/create-cells/bulk-sanitation/edit' class='govuk-link govuk-link--no-visited-state' aria-label='Change sanitation'>Change</a>" }
         ],
         rows: cellRows
       }) }}

@@ -40,7 +40,7 @@
               {
                 href: paths.location.changeTemporaryDeactivationDetails(location),
                 text: "Change",
-                visuallyHiddenText: "reason",
+                attributes: { "aria-label": "Change reason" },
                 classes: "govuk-link--no-visited-state"} if canAccess('deactivate') and isTemporaryDeactivation
             ]
           }
@@ -57,7 +57,7 @@
               {
                 href: paths.location.changeTemporaryDeactivationDetails(location),
                 text: "Change",
-                visuallyHiddenText: "estimatedReactivationDate",
+                attributes: { "aria-label": "Change estimated reactivation date" },
                 classes: "govuk-link--no-visited-state"} if canAccess('deactivate') and isTemporaryDeactivation
             ]
           }
@@ -74,7 +74,7 @@
               {
                 href: paths.location.changeTemporaryDeactivationDetails(location),
                 text: "Change",
-                visuallyHiddenText: "planetFMReferenceNumber",
+                attributes: { "aria-label": "Change facilities reference number" },
                 classes: "govuk-link--no-visited-state"
               } if canAccess('deactivate') and isTemporaryDeactivation
             ]

@@ -50,7 +50,8 @@
             text: 'Change',
             classes: 'govuk-link--no-visited-state',
             attributes: {
-              'data-qa': 'changeLink-' + request.approvalType + '-deactivatedReason'
+              'data-qa': 'changeLink-' + request.approvalType + '-deactivatedReason',
+              'aria-label': 'Change deactivated reason'
             }
           }] if changeLinks.deactivatedReason
         }
@@ -64,7 +65,8 @@
           text: 'Change',
           classes: 'govuk-link--no-visited-state',
           attributes: {
-            'data-qa': 'changeLink-' + request.approvalType + '-proposedReactivationDate'
+            'data-qa': 'changeLink-' + request.approvalType + '-proposedReactivationDate',
+            'aria-label': 'Change estimated reactivation date'
           }
         }] if changeLinks.proposedReactivationDate
       }
@@ -78,7 +80,8 @@
           text: 'Change',
           classes: 'govuk-link--no-visited-state',
           attributes: {
-            'data-qa': 'changeLink-' + request.approvalType + '-planetFmReference'
+            'data-qa': 'changeLink-' + request.approvalType + '-planetFmReference',
+            'aria-label': 'Change facilities reference number'
           }
         }] if changeLinks.planetFmReference
       }
@@ -92,7 +95,8 @@
           text: 'Change',
           classes: 'govuk-link--no-visited-state',
           attributes: {
-            'data-qa': 'changeLink-' + request.approvalType + '-nonResidentialRoom'
+            'data-qa': 'changeLink-' + request.approvalType + '-nonResidentialRoom',
+            'aria-label': 'Change non-residential room'
           }
         }] if changeLinks.nonResidentialRoom
       }
@@ -106,7 +110,8 @@
           text: 'Change',
           classes: 'govuk-link--no-visited-state',
           attributes: {
-            'data-qa': 'changeLink-' + request.approvalType + '-reasonForChange'
+            'data-qa': 'changeLink-' + request.approvalType + '-reasonForChange',
+            'aria-label': 'Change explanation'
           }
         }] if changeLinks.reasonForChange
       }

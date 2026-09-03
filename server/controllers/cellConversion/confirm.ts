@@ -44,12 +44,7 @@ export default class CellConversionConfirm extends FormStep {
     super.get(req, res, next)
   }
 
-  toSummaryListRow(
-    labelText: string,
-    formValue: string | string[] | undefined,
-    actionHref: string,
-    actionText = 'Change',
-  ) {
+  toSummaryListRow(labelText: string, formValue: string | string[] | undefined, actionHref: string) {
     const value = formValue && (typeof formValue === 'string' ? { text: formValue } : { html: formValue?.join('<br>') })
 
     return {
@@ -61,8 +56,11 @@ export default class CellConversionConfirm extends FormStep {
         items: [
           {
             href: actionHref,
-            text: actionText,
+            text: 'Change',
             classes: 'govuk-link--no-visited-state',
+            attributes: {
+              'aria-label': `Change ${labelText.toLowerCase()}`,
+            },
           },
         ],
       },
