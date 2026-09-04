@@ -127,8 +127,8 @@
     "uuid": "^14.0.1"
   },
   "devDependencies": {
-    "@cypress/webpack-batteries-included-preprocessor": "^3.1.2",
-    "@cypress/webpack-preprocessor": "^5.17.1",
+    "@cypress/webpack-batteries-included-preprocessor": "^5.0.0",
+    "@cypress/webpack-preprocessor": "^6.0.4",
     "@jest/globals": "^30.4.1",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.4",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
