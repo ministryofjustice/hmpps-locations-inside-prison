@@ -68,7 +68,7 @@
   {% endif %}
 {% endblock %}
 
-{% block header %}
+{% block govukHeader %}
   {% if feComponents.header %}
     {{ feComponents.header | safe }}
   {% else %}
@@ -76,7 +76,7 @@
   {% endif %}
 {% endblock %}
 
-{% block footer %}
+{% block govukFooter %}
   {% if feedbackFormUrl %}
     {{ feedbackBanner({
       feedbackBannerAdditionalClasses: feedbackBannerBackground,
@@ -101,7 +101,7 @@
   {% endif %}
 {% endblock %}
 
-{% block main %}
+{% block container %}
   {% block topBanner %}
     {% block topBannerContent %}
       {% if sandbox %}
