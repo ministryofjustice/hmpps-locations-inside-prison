@@ -5,7 +5,6 @@ const { sassPlugin } = require('esbuild-sass-plugin')
 const { cleanPlugin } = require('esbuild-clean-plugin')
 const manifestPlugin = require('esbuild-plugin-manifest')
 const esbuild = require('esbuild')
-const { glob } = require('glob')
 
 /**
  * Copy additional assets into distribution
