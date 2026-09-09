@@ -156,7 +156,7 @@
     "chokidar": "^3.6.0",
     "concurrently": "^9.2.4",
     "cookie-session": "^2.1.1",
-    "cypress": "15.21.1",
+    "cypress": "16.0.0",
     "cypress-axe": "^1.7.0",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-split": "^1.25.0",
