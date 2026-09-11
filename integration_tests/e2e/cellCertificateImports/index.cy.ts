@@ -11,8 +11,8 @@ const completedImport: CellCertificateImport = {
   id: 'import-1',
   prisonId: 'TST',
   status: 'FINISHED',
-  totalRecords: 2,
-  processedRecords: 1,
+  totalRecords: 3,
+  processedRecords: 2,
   skippedRecords: 1,
   failedRecords: 0,
   discrepancyRecords: 1,
@@ -41,6 +41,19 @@ const completedImport: CellCertificateImport = {
       maxCapacity: 2,
       workingCapacity: 2,
       certifiedNormalAccommodation: 2,
+    },
+    {
+      locationKey: 'TST-D-4-010',
+      status: 'PROCESSED',
+      message: 'Working capacity changed to match certified working capacity',
+      maxCapacity: 1,
+      workingCapacity: 1,
+      certifiedNormalAccommodation: 1,
+      previousMaxCapacity: 1,
+      appliedMaxCapacity: 1,
+      previousWorkingCapacity: 0,
+      appliedWorkingCapacity: 1,
+      previousCertifiedNormalAccommodation: 1,
     },
   ],
 }
@@ -102,6 +115,9 @@ context('Cell certificate imports', () => {
     // the location kept its working capacity of 2 while the certificate records 1
     detailPage.locationsTable().should('contain', 'Certified 1')
     detailPage.locationsTable().should('contain', 'Working capacity and certified working capacity do not match')
+    // a cell that held no working capacity took the certified one, which is a change and not a discrepancy
+    detailPage.locationsTable().should('contain', '0 → 1')
+    detailPage.locationsTable().should('contain', 'Working capacity changed to match certified working capacity')
   })
 
   it('hides the import button and shows a message while an import is in progress', () => {

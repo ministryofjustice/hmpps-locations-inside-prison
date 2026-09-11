@@ -1,6 +1,12 @@
 import { Request, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import importDetail, { capacityCell, changeText, heldAndCertifiedCell, maxCapacityCell } from './detail'
+import importDetail, {
+  capacityCell,
+  changeText,
+  heldAndCertifiedCell,
+  maxCapacityCell,
+  workingCapacityCell,
+} from './detail'
 import LocationsService from '../../services/locationsService'
 import { CellCertificateImport } from '../../data/types/locationsApi/cellCertificateImport'
 
@@ -112,6 +118,31 @@ describe('Cell certificate imports - detail', () => {
     })
   })
 
+  describe('workingCapacityCell', () => {
+    it('shows the change when a cell that held no working capacity took the certified value', () => {
+      expect(
+        workingCapacityCell({ previousWorkingCapacity: 0, workingCapacity: 1, appliedWorkingCapacity: 1 }),
+      ).toEqual({ text: '0 → 1' })
+    })
+
+    it('shows the held value with the certified one beneath when the location kept its own', () => {
+      expect(
+        workingCapacityCell({ previousWorkingCapacity: 2, workingCapacity: 1, appliedWorkingCapacity: 2 }),
+      ).toEqual({ text: '2', certifiedText: '1' })
+      expect(
+        workingCapacityCell({ previousWorkingCapacity: 2, workingCapacity: 2, appliedWorkingCapacity: 2 }),
+      ).toEqual({ text: '2' })
+    })
+
+    it('treats uploads processed before the applied value was recorded as having kept their own', () => {
+      expect(workingCapacityCell({ previousWorkingCapacity: 0, workingCapacity: 1 })).toEqual({
+        text: '0',
+        certifiedText: '1',
+      })
+      expect(workingCapacityCell({ previousWorkingCapacity: 2, workingCapacity: 2 })).toEqual({ text: '2' })
+    })
+  })
+
   describe('changeText', () => {
     it('shows new value only when unchanged or no previous (handles 0)', () => {
       expect(changeText(undefined, 2)).toBe('2')
@@ -154,7 +185,44 @@ describe('Cell certificate imports - detail', () => {
     )
   })
 
-  it('never shows a working capacity as a change, because an import cannot make one', async () => {
+  it('shows a working capacity the location took from the certificate as a change', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      locations: [
+        {
+          locationKey: 'TST-D-4-010',
+          status: 'PROCESSED',
+          message: 'Working capacity changed to match certified working capacity',
+          maxCapacity: 1,
+          workingCapacity: 1,
+          certifiedNormalAccommodation: 1,
+          previousMaxCapacity: 1,
+          appliedMaxCapacity: 1,
+          previousWorkingCapacity: 0,
+          appliedWorkingCapacity: 1,
+          previousCertifiedNormalAccommodation: 1,
+        },
+      ],
+    } as CellCertificateImport)
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    expect(deepRes.render).toHaveBeenCalledWith(
+      'pages/cellCertificateImports/detail',
+      expect.objectContaining({
+        locationRows: [
+          expect.objectContaining({
+            locationKey: 'TST-D-4-010',
+            needsReview: false,
+            workingCapacity: { text: '0 → 1' },
+            message: 'Working capacity changed to match certified working capacity',
+          }),
+        ],
+      }),
+    )
+  })
+
+  it('shows a working capacity the location kept without a mismatch flag as held, not as a change', async () => {
     // a temporarily deactivated cell: the mismatch flag is deliberately suppressed for these, but the
     // location still did not move its working capacity to the uploaded value
     locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
@@ -168,6 +236,7 @@ describe('Cell certificate imports - detail', () => {
           previousMaxCapacity: 2,
           appliedMaxCapacity: 1,
           previousWorkingCapacity: 1,
+          appliedWorkingCapacity: 1,
         },
       ],
     } as CellCertificateImport)
