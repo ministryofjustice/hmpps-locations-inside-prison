@@ -23,8 +23,7 @@ export const capacityCell = (
   }
 }
 
-// Shows what the location holds, with the certified value beneath it when the two differ. Used where the
-// uploaded value is never applied to the location, so the column can never show a change.
+// Shows what the location holds, with the certified value beneath it when the two differ.
 export const heldAndCertifiedCell = (held: number | undefined, certified: number | undefined): CapacityCell => {
   const text = held === undefined || held === null ? '-' : String(held)
   if (certified === undefined || certified === null || certified === held) return { text }
@@ -43,11 +42,33 @@ export const maxCapacityCell = (location: {
   const applied =
     location.appliedMaxCapacity ?? (location.maxCapacityMismatch ? location.previousMaxCapacity : location.maxCapacity)
 
-  return {
-    ...heldAndCertifiedCell(applied, location.maxCapacity),
-    text: changeText(location.previousMaxCapacity, applied),
-  }
+  return appliedCapacityCell(location.previousMaxCapacity, location.maxCapacity, applied)
 }
+
+// An import only moves a working capacity the location has never held (a cell arriving from NOMIS holds 0),
+// so the column normally shows the held value with the certified one beneath - but where the location did
+// take the certified value it must show the change. Uploads processed before the applied value was recorded
+// are treated as having kept their own: the mismatch flag cannot tell the two apart for them, and a change
+// that never happened is the worse thing to show.
+export const workingCapacityCell = (location: {
+  previousWorkingCapacity?: number
+  workingCapacity?: number
+  appliedWorkingCapacity?: number
+}): CapacityCell => {
+  const applied = location.appliedWorkingCapacity ?? location.previousWorkingCapacity
+
+  return appliedCapacityCell(location.previousWorkingCapacity, location.workingCapacity, applied)
+}
+
+// The change the location took, with the certified value beneath it where the location ended up elsewhere.
+const appliedCapacityCell = (
+  previous: number | undefined,
+  certified: number | undefined,
+  applied: number | undefined,
+): CapacityCell => ({
+  ...heldAndCertifiedCell(applied, certified),
+  text: changeText(previous, applied),
+})
 
 export default async (req: Request, res: Response) => {
   const { locationsService } = req.services
@@ -69,9 +90,7 @@ export default async (req: Request, res: Response) => {
         location.certifiedNormalAccommodationMismatch,
       ),
       maxCapacity: maxCapacityCell(location),
-      // an import never moves a location's working capacity, so this column shows what the location holds
-      // and what the certificate records - never a change
-      workingCapacity: heldAndCertifiedCell(location.previousWorkingCapacity, location.workingCapacity),
+      workingCapacity: workingCapacityCell(location),
       certifiedNormalAccommodation: capacityCell(
         location.previousCertifiedNormalAccommodation,
         location.certifiedNormalAccommodation,

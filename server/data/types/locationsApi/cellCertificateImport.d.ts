@@ -15,6 +15,7 @@ export declare interface CellCertificateImportLocation {
   previousMaxCapacity?: number
   appliedMaxCapacity?: number
   previousWorkingCapacity?: number
+  appliedWorkingCapacity?: number
   previousCertifiedNormalAccommodation?: number
   previousCellMark?: string
   previousInCellSanitation?: boolean
