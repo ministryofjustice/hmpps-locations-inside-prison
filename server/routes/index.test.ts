@@ -157,6 +157,29 @@ describe('GET /TST', () => {
     expect(res.text).toContain('/capacity-management-dashboard')
   })
 
+  it('should render the functional mailbox tile only for an administrator', async () => {
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
+    })
+    auditService.logPageView.mockResolvedValue(null)
+
+    app = appWithAllRoutes({
+      services: { auditService, locationsService, manageUsersService },
+      userSupplier: () => ({ ...user, userRoles: ['MANAGE_RES_LOCATIONS_ADMIN'] }),
+    })
+    expect((await request(app).get('/TST')).text).toContain('Manage functional mailboxes')
+
+    app = appWithAllRoutes({
+      services: { auditService, locationsService, manageUsersService },
+      userSupplier: () => ({ ...user, userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'] }),
+    })
+    expect((await request(app).get('/TST')).text).not.toContain('Manage functional mailboxes')
+  })
+
   it.each([['RESI__CERT_REVIEWER'], ['MANAGE_RES_LOCATIONS_OP_CAP']])(
     'should not render the "Capacity management dashboard" tile for the %s role',
     async role => {
