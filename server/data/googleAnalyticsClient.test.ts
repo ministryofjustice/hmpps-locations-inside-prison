@@ -65,8 +65,10 @@ describe('googleAnalyticsClient', () => {
 
     it('does not call the API when analytics is not configured', async () => {
       mockGoogleAnalyticsConfig.measurementId = ''
+      fakeGoogleAnalyticsClient.post('/mp/collect').reply(200, { data: 'data' })
 
-      await expect(googleAnalyticsClient.sendEvents('123456.7654321', [])).rejects.toThrow('ECONNREFUSED')
+      await expect(googleAnalyticsClient.sendEvents('123456.7654321', [])).resolves.toBeUndefined()
+      expect(fakeGoogleAnalyticsClient.isDone()).toBe(false)
     })
   })
 })
