@@ -30,10 +30,6 @@ function preprocessorOptions() {
   const replacementModulesPath = path.resolve(__dirname, './integration_tests/support/replacementModules')
   const options = webpackPreprocessor.defaultOptions
   options.typescript = require.resolve('typescript')
-  options.webpackOptions.resolve.alias = {
-    bunyan: path.join(replacementModulesPath, 'bunyan.ts'),
-    'bunyan-format': path.join(replacementModulesPath, 'bunyan-format.ts'),
-  }
   return options
 }
 

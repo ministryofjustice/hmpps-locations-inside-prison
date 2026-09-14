@@ -82,7 +82,7 @@ async function getFallbackScreenStatus(
 
 function handleScreenStatusError(error: SanitisedError, prisonId: string, next: NextFunction): void {
   if (error.responseStatus !== 404) {
-    logger.error(error, `Failed to check splash screen for prisonId: ${prisonId}`)
+    logger.error(`Failed to check splash screen for prisonId: ${prisonId}`, error)
     next(error)
   } else {
     next()

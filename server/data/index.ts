@@ -1,7 +1,7 @@
 /* eslint-disable import/first */
 /*
  * Do appinsights first as it does some magic instrumentation work, i.e. it affects other 'require's
- * In particular, applicationinsights automatically collects bunyan logs
+ * In particular, applicationinsights automatically collects winston logs
  */
 import { AuthenticationClient, InMemoryTokenStore, RedisTokenStore } from '@ministryofjustice/hmpps-auth-clients'
 import { NotifyClient } from 'notifications-node-client'

@@ -34,7 +34,7 @@ export default class GoogleAnalyticsClient {
       return result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error)
-      logger.warn({ ...sanitisedError }, `Error calling Google Analytics API, path: '/mp/collect', verb: 'POST'`)
+      logger.warn(`Error calling Google Analytics API, path: '/mp/collect', verb: 'POST'`, { ...sanitisedError })
       throw sanitisedError
     }
   }
