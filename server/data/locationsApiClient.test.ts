@@ -293,6 +293,65 @@ describe('locationsApiClient', () => {
       { prisonId: 'LEI', status: 'ACTIVE' },
       'put',
     )
+    testCall(
+      'getPrisonNotificationMailboxWithoutDefault',
+      '/prison-configuration/LEI/notification-mailboxes/CERT_REVIEWER?includeDefault=false',
+      false,
+      () => apiClient.prisonConfiguration.getNotificationMailbox,
+      { prisonId: 'LEI', notificationGroup: 'CERT_REVIEWER', includeDefault: 'false' },
+    )
+    testCall(
+      'getPrisonNotificationMailboxes',
+      '/prison-configuration/notification-mailboxes',
+      false,
+      () => apiClient.prisonConfiguration.getPrisonNotificationMailboxes,
+    )
+    testCall(
+      'replacePrisonNotificationMailbox',
+      '/prison-configuration/LEI/notification-mailboxes/CERT_REVIEWER',
+      false,
+      () => apiClient.prisonConfiguration.replaceNotificationMailbox,
+      { prisonId: 'LEI', notificationGroup: 'CERT_REVIEWER' },
+      'put',
+      { emailAddresses: ['reviewer@example.com'] },
+    )
+    testCall(
+      'getDefaultNotificationMailbox',
+      '/prison-configuration/notification-mailboxes/defaults/CERT_ADMIN',
+      false,
+      () => apiClient.prisonConfiguration.getDefaultNotificationMailbox,
+      { notificationGroup: 'CERT_ADMIN' },
+    )
+    testCall(
+      'replaceDefaultNotificationMailbox',
+      '/prison-configuration/notification-mailboxes/defaults/CERT_VIEWER',
+      false,
+      () => apiClient.prisonConfiguration.replaceDefaultNotificationMailbox,
+      { notificationGroup: 'CERT_VIEWER' },
+      'put',
+      { emailAddresses: ['viewer@example.com'] },
+    )
+
+    it('deletes prison-specific and default notification mailboxes', async () => {
+      fakeApiClient
+        .delete('/prison-configuration/LEI/notification-mailboxes/CERT_REVIEWER')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(204)
+      fakeApiClient
+        .delete('/prison-configuration/notification-mailboxes/defaults/CERT_ADMIN')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(204)
+
+      await apiClient.prisonConfiguration.deleteNotificationMailbox(token.access_token, {
+        prisonId: 'LEI',
+        notificationGroup: 'CERT_REVIEWER',
+      })
+      await apiClient.prisonConfiguration.deleteDefaultNotificationMailbox(token.access_token, {
+        notificationGroup: 'CERT_ADMIN',
+      })
+
+      expect(fakeApiClient.isDone()).toBe(true)
+    })
   })
 
   describe('prisonerLocations', () => {

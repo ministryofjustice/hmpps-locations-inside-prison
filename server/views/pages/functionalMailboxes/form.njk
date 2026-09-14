@@ -1,0 +1,66 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+      <form method="post" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {% if mode == 'add' %}
+          {% if type == 'prison' %}
+            {% set prisonItems = [{ value: "", text: "Select a prison" }] %}
+            {% for item in prisons %}
+              {% set prisonItems = (prisonItems.push({ value: item.id, text: item.name, selected: item.id == values.prisonId }), prisonItems) %}
+            {% endfor %}
+            {{ govukSelect({
+              id: "prisonId",
+              name: "prisonId",
+              label: { text: "Prison", classes: "govuk-label--m" },
+              items: prisonItems,
+              errorMessage: errors.prisonId
+            }) }}
+          {% endif %}
+
+          {% set roleItems = [{ value: "", text: "Select a role" }] %}
+          {% for item in notificationGroups %}
+            {% set roleItems = (roleItems.push({ value: item.value, text: item.text, selected: item.value == values.notificationGroup }), roleItems) %}
+          {% endfor %}
+          {{ govukSelect({
+            id: "notificationGroup",
+            name: "notificationGroup",
+            label: { text: "Role", classes: "govuk-label--m" },
+            items: roleItems,
+            errorMessage: errors.notificationGroup
+          }) }}
+        {% else %}
+          {% if type == 'prison' %}
+            <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Prison</h2>
+            <p class="govuk-body">{{ prison.name }}</p>
+          {% endif %}
+          <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Role</h2>
+          <p class="govuk-body">{{ role }}</p>
+        {% endif %}
+
+        {{ govukTextarea({
+          id: "emailAddresses",
+          name: "emailAddresses",
+          value: values.emailAddresses,
+          rows: 5,
+          label: { text: "Email addresses", classes: "govuk-label--m" },
+          hint: { text: "Enter one email address per line." },
+          errorMessage: errors.emailAddresses
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Save mailbox" }) }}
+          <a class="govuk-link" href="{{ backLink }}">Cancel</a>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

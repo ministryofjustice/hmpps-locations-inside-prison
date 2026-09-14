@@ -59,6 +59,21 @@ const paths = {
     signOut: '/sign-out',
   },
   capacityManagementDashboard: `/capacity-management-dashboard`,
+  functionalMailboxes: {
+    index: '/functional-mailboxes',
+    default: {
+      add: '/functional-mailboxes/default/add',
+      edit: (notificationGroup: string) => p('functional-mailboxes/default', notificationGroup, 'edit'),
+      delete: (notificationGroup: string) => p('functional-mailboxes/default', notificationGroup, 'delete'),
+    },
+    prison: {
+      add: '/functional-mailboxes/prison/add',
+      edit: (prisonId: string, notificationGroup: string) =>
+        p('functional-mailboxes/prison', prisonId, notificationGroup, 'edit'),
+      delete: (prisonId: string, notificationGroup: string) =>
+        p('functional-mailboxes/prison', prisonId, notificationGroup, 'delete'),
+    },
+  },
   cellCertificate: {
     changeRequest: {
       view: (prisonId: string, requestId?: string) => p(`${prisonId}/cell-certificate/change-requests`, requestId),

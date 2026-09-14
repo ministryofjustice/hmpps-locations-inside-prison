@@ -601,10 +601,48 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     getNotificationMailbox: this.apiCall<
       PrisonNotificationMailboxDto,
+      { prisonId: string; notificationGroup: NotificationGroup; includeDefault?: string }
+    >({
+      path: '/prison-configuration/:prisonId/notification-mailboxes/:notificationGroup',
+      queryParams: ['includeDefault'],
+      requestType: 'get',
+    }),
+    getPrisonNotificationMailboxes: this.apiCall<PrisonNotificationMailboxDto[], Record<string, never>>({
+      path: '/prison-configuration/notification-mailboxes',
+      requestType: 'get',
+    }),
+    replaceNotificationMailbox: this.apiCall<
+      PrisonNotificationMailboxDto,
+      { prisonId: string; notificationGroup: NotificationGroup },
+      { emailAddresses: string[] }
+    >({
+      path: '/prison-configuration/:prisonId/notification-mailboxes/:notificationGroup',
+      requestType: 'put',
+    }),
+    deleteNotificationMailbox: this.apiCall<
+      Record<string, never>,
       { prisonId: string; notificationGroup: NotificationGroup }
     >({
       path: '/prison-configuration/:prisonId/notification-mailboxes/:notificationGroup',
-      requestType: 'get',
+      requestType: 'delete',
+    }),
+    getDefaultNotificationMailbox: this.apiCall<PrisonNotificationMailboxDto, { notificationGroup: NotificationGroup }>(
+      {
+        path: '/prison-configuration/notification-mailboxes/defaults/:notificationGroup',
+        requestType: 'get',
+      },
+    ),
+    replaceDefaultNotificationMailbox: this.apiCall<
+      PrisonNotificationMailboxDto,
+      { notificationGroup: NotificationGroup },
+      { emailAddresses: string[] }
+    >({
+      path: '/prison-configuration/notification-mailboxes/defaults/:notificationGroup',
+      requestType: 'put',
+    }),
+    deleteDefaultNotificationMailbox: this.apiCall<Record<string, never>, { notificationGroup: NotificationGroup }>({
+      path: '/prison-configuration/notification-mailboxes/defaults/:notificationGroup',
+      requestType: 'delete',
     }),
   }
 }

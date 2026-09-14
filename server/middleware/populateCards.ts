@@ -85,6 +85,14 @@ export default middleware((req, res, next) => {
     },
     {
       clickable: true,
+      visible: req.canAccess('administer_residential'),
+      heading: 'Manage functional mailboxes',
+      href: paths.functionalMailboxes.index,
+      description: 'Add, change or remove email addresses used for location notifications.',
+      'data-qa': 'functional-mailboxes-card',
+    },
+    {
+      clickable: true,
       visible: config.developerMode,
       heading: '[DEV] Set permissions',
       href: paths.dev.setPermissions,

@@ -1,0 +1,39 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+      {% set rows = [] %}
+      {% if prison %}
+        {% set rows = (rows.push({ key: { text: "Prison" }, value: { text: prison.name } }), rows) %}
+      {% endif %}
+      {% set rows = (rows.push({ key: { text: "Role" }, value: { text: role } }), rows) %}
+      {% set emailHtml %}
+        <ul class="govuk-list govuk-!-margin-bottom-0">
+          {% for email in mailbox.emailAddresses %}<li>{{ email }}</li>{% endfor %}
+        </ul>
+      {% endset %}
+      {% set rows = (rows.push({ key: { text: "Email addresses" }, value: { html: emailHtml } }), rows) %}
+      {{ govukSummaryList({ rows: rows }) }}
+
+      {{ govukWarningText({
+        text: "Prison-specific mailboxes are unaffected. Notifications for prisons without a prison-specific mailbox will use the usual role-based recipients." if type == "default" else "Notifications for this prison and role will use the default mailbox, if one is configured; otherwise they will use the usual role-based recipients.",
+        iconFallbackText: "Warning"
+      }) }}
+
+      <form method="post">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Delete mailbox", classes: "govuk-button--warning" }) }}
+          <a class="govuk-link" href="{{ backLink }}">Cancel</a>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
