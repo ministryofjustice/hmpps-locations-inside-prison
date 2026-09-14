@@ -21,6 +21,7 @@ describe('googleAnalyticsClient', () => {
   let googleAnalyticsClient: GoogleAnalyticsClient
 
   beforeEach(() => {
+    mockGoogleAnalyticsConfig.measurementId = 'G-A1AA1A1AAA'
     fakeGoogleAnalyticsClient = nock(config.googleAnalytics.measurementApi.url)
     googleAnalyticsClient = new GoogleAnalyticsClient()
   })
