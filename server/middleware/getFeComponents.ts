@@ -1,4 +1,5 @@
 import { type NextFunction, Request, type Response } from 'express'
+import sanitiseError from '../sanitisedError'
 
 import logger from '../../logger'
 import { Services } from '../services'
@@ -26,7 +27,13 @@ export default function getFrontendComponents({ feComponentsService }: Services)
       }
       return next()
     } catch (error) {
-      logger.error(error, 'Failed to retrieve front end components')
+      const sanitisedError = sanitiseError(error)
+
+      if (sanitisedError.responseStatus === 404) {
+        return next()
+      }
+
+      logger.error('Failed to retrieve front end components', sanitisedError)
       return next()
     }
   }

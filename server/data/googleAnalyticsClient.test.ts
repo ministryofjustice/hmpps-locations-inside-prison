@@ -2,15 +2,17 @@ import nock from 'nock'
 import config from '../config'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
 
+const mockGoogleAnalyticsConfig = {
+  measurementId: 'G-A1AA1A1AAA',
+  measurementApi: {
+    secret: 'Aa-111AaAAaaAA1aAAA_Aa',
+    url: 'https://www.google-analytics.com',
+  },
+}
+
 jest.mock('../config', () => ({
   get googleAnalytics() {
-    return {
-      measurementId: 'G-A1AA1A1AAA',
-      measurementApi: {
-        secret: 'Aa-111AaAAaaAA1aAAA_Aa',
-        url: 'https://www.google-analytics.com',
-      },
-    }
+    return mockGoogleAnalyticsConfig
   },
 }))
 
@@ -19,6 +21,7 @@ describe('googleAnalyticsClient', () => {
   let googleAnalyticsClient: GoogleAnalyticsClient
 
   beforeEach(() => {
+    mockGoogleAnalyticsConfig.measurementId = 'G-A1AA1A1AAA'
     fakeGoogleAnalyticsClient = nock(config.googleAnalytics.measurementApi.url)
     googleAnalyticsClient = new GoogleAnalyticsClient()
   })
@@ -58,6 +61,14 @@ describe('googleAnalyticsClient', () => {
 
       const output = await googleAnalyticsClient.sendEvents(clientId, events)
       expect(output).toEqual(response)
+    })
+
+    it('does not call the API when analytics is not configured', async () => {
+      mockGoogleAnalyticsConfig.measurementId = ''
+      fakeGoogleAnalyticsClient.post('/mp/collect').reply(200, { data: 'data' })
+
+      await expect(googleAnalyticsClient.sendEvents('123456.7654321', [])).resolves.toBeUndefined()
+      expect(fakeGoogleAnalyticsClient.isDone()).toBe(false)
     })
   })
 })

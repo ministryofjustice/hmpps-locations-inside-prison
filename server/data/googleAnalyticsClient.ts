@@ -19,13 +19,16 @@ export default class GoogleAnalyticsClient {
   constructor() {}
 
   async post(data: GoogleAnalyticsPayload): Promise<unknown> {
-    logger.info(`Google Analytics API POST: /mp/collect`)
-
     const { measurementId, measurementApi } = config.googleAnalytics
+    if (!measurementId || !measurementApi.secret) {
+      return undefined
+    }
+
+    logger.info(`Google Analytics API POST: /mp/collect`)
 
     try {
       const result = await superagent
-        .post(`${config.googleAnalytics.measurementApi.url}/mp/collect`)
+        .post(`${measurementApi.url}/mp/collect`)
         .query({ measurement_id: measurementId, api_secret: measurementApi.secret })
         .send(data)
         .use(restClientMetricsMiddleware)
@@ -34,7 +37,7 @@ export default class GoogleAnalyticsClient {
       return result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error)
-      logger.warn({ ...sanitisedError }, `Error calling Google Analytics API, path: '/mp/collect', verb: 'POST'`)
+      logger.warn(`Error calling Google Analytics API, path: '/mp/collect', verb: 'POST'`, { ...sanitisedError })
       throw sanitisedError
     }
   }

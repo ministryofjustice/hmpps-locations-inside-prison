@@ -1,4 +1,4 @@
-// Require app insights before anything else to allow for instrumentation of bunyan and express
+// Require app insights before anything else to allow for instrumentation of winston and express
 import 'applicationinsights'
 
 import app from './server/index'

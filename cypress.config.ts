@@ -1,4 +1,3 @@
-import path from 'node:path'
 import { defineConfig } from 'cypress'
 import webpackPreprocessor from '@cypress/webpack-batteries-included-preprocessor'
 import cypressSplit from 'cypress-split'
@@ -27,13 +26,8 @@ async function resetFeatureFlags(): Promise<null> {
 }
 
 function preprocessorOptions() {
-  const replacementModulesPath = path.resolve(__dirname, './integration_tests/support/replacementModules')
   const options = webpackPreprocessor.defaultOptions
   options.typescript = require.resolve('typescript')
-  options.webpackOptions.resolve.alias = {
-    bunyan: path.join(replacementModulesPath, 'bunyan.ts'),
-    'bunyan-format': path.join(replacementModulesPath, 'bunyan-format.ts'),
-  }
   return options
 }
 
