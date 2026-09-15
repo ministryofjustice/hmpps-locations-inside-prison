@@ -1,0 +1,13 @@
+.app-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.app-table-scroll:focus {
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline-offset: 0;
+}
+
+.app-table-scroll .govuk-table {
+  min-width: 600px;
+}
