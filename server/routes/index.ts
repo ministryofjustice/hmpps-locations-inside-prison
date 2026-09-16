@@ -15,6 +15,7 @@ import devRouter from './devRouter'
 import setCanAccess from '../middleware/setCanAccess'
 import legacyRedirectRouter from './legacyRedirectRouter'
 import addRootBreadcrumb from '../middleware/addRootBreadcrumb'
+import functionalMailboxesRouter from './functionalMailboxesRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -34,6 +35,8 @@ export default function routes(services: Services): Router {
     logPageView(services.auditService, Page.CAPACITY_MANAGEMENT_DASHBOARD),
     asyncMiddleware(capacityManagementDashboard),
   )
+
+  router.use('/functional-mailboxes', functionalMailboxesRouter(services))
 
   router.use(legacyRedirectRouter)
 

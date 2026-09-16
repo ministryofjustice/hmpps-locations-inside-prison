@@ -2,7 +2,7 @@ import { pickBy } from 'lodash'
 import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import LocationsApiClient from '../data/locationsApiClient'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
-import { LocationType, NotificationGroup, StatusType } from '../data/types/locationsApi'
+import { LocationType, NotificationGroup, PrisonNotificationMailboxDto, StatusType } from '../data/types/locationsApi'
 import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
 
 // The API rejects an import without a reason once a prison has certification approval turned on. The
@@ -502,13 +502,69 @@ export default class LocationsService {
         prisonId,
         notificationGroup,
       })
-      return mailbox.emailAddresses?.length ? mailbox.emailAddresses : undefined
+      return mailbox?.emailAddresses?.length ? mailbox.emailAddresses : undefined
     } catch (error) {
       if ((error as SanitisedError).responseStatus === 404) {
         return undefined
       }
       throw error
     }
+  }
+
+  async getNotificationMailbox(
+    token: string,
+    notificationGroup: NotificationGroup,
+    prisonId?: string,
+  ): Promise<PrisonNotificationMailboxDto | undefined> {
+    try {
+      if (prisonId) {
+        return await this.locationsApiClient.prisonConfiguration.getNotificationMailbox(token, {
+          prisonId,
+          notificationGroup,
+          includeDefault: 'false',
+        })
+      }
+      return await this.locationsApiClient.prisonConfiguration.getDefaultNotificationMailbox(token, {
+        notificationGroup,
+      })
+    } catch (error) {
+      if ((error as SanitisedError).responseStatus === 404) return undefined
+      throw error
+    }
+  }
+
+  async getPrisonNotificationMailboxes(token: string) {
+    return this.locationsApiClient.prisonConfiguration.getPrisonNotificationMailboxes(token)
+  }
+
+  async replaceNotificationMailbox(
+    token: string,
+    notificationGroup: NotificationGroup,
+    emailAddresses: string[],
+    prisonId?: string,
+  ) {
+    if (prisonId) {
+      return this.locationsApiClient.prisonConfiguration.replaceNotificationMailbox(
+        token,
+        { prisonId, notificationGroup },
+        { emailAddresses },
+      )
+    }
+    return this.locationsApiClient.prisonConfiguration.replaceDefaultNotificationMailbox(
+      token,
+      { notificationGroup },
+      { emailAddresses },
+    )
+  }
+
+  async deleteNotificationMailbox(token: string, notificationGroup: NotificationGroup, prisonId?: string) {
+    if (prisonId) {
+      return this.locationsApiClient.prisonConfiguration.deleteNotificationMailbox(token, {
+        prisonId,
+        notificationGroup,
+      })
+    }
+    return this.locationsApiClient.prisonConfiguration.deleteDefaultNotificationMailbox(token, { notificationGroup })
   }
 
   async createWing(

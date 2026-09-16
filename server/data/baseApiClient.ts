@@ -28,7 +28,7 @@ export default class BaseApiClient extends RestClient {
     queryParams?: string[]
     requestType: 'get' | 'post' | 'put' | 'delete' | 'patch'
     options?: {
-      cacheDuration: number
+      cacheDuration?: number
     }
   }) {
     const func = async (
