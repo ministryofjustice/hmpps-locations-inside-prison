@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals'
 import LocationsApiClient from '../data/locationsApiClient'
+import { NotificationGroup } from '../data/types/locationsApi'
 import LocationsService, { CELL_CERTIFICATE_IMPORT_REASON } from './locationsService'
 
 function deepMock(object: any, returnValue?: any): object | jest.Mock {
@@ -510,6 +511,14 @@ describe('Locations service', () => {
       expect(result).toBeUndefined()
     })
 
+    it('returns undefined when the mailbox client resolves no mailbox', async () => {
+      locationsApiClient.prisonConfiguration.getNotificationMailbox.mockResolvedValue(undefined as never)
+
+      await expect(
+        locationsService.getNotificationMailboxEmails('token', 'MDI', 'CERT_VIEWER'),
+      ).resolves.toBeUndefined()
+    })
+
     it('returns the default mailbox email addresses when no prison-specific mailbox is configured', async () => {
       locationsApiClient.prisonConfiguration.getNotificationMailbox.mockResolvedValue({
         notificationGroup: 'CERT_VIEWER',
@@ -529,6 +538,77 @@ describe('Locations service', () => {
 
       await expect(locationsService.getNotificationMailboxEmails('token', 'MDI', 'CERT_VIEWER')).rejects.toEqual({
         responseStatus: 500,
+      })
+    })
+  })
+
+  describe('functional mailbox administration', () => {
+    it('gets a prison-specific mailbox without falling back to the default', async () => {
+      await locationsService.getNotificationMailbox('token', 'CERT_REVIEWER', 'MDI')
+
+      expect(locationsApiClient.prisonConfiguration.getNotificationMailbox).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        notificationGroup: 'CERT_REVIEWER',
+        includeDefault: 'false',
+      })
+    })
+
+    it('gets a default mailbox when no prison is specified', async () => {
+      await locationsService.getNotificationMailbox('token', 'CERT_VIEWER')
+
+      expect(locationsApiClient.prisonConfiguration.getDefaultNotificationMailbox).toHaveBeenCalledWith('token', {
+        notificationGroup: 'CERT_VIEWER',
+      })
+    })
+
+    it.each([
+      ['prison-specific', 'CERT_ADMIN', 'MDI'],
+      ['default', 'CERT_ADMIN', undefined],
+    ])('returns undefined when the %s mailbox is not configured', async (_type, notificationGroup, prisonId) => {
+      const apiCall = prisonId
+        ? locationsApiClient.prisonConfiguration.getNotificationMailbox
+        : locationsApiClient.prisonConfiguration.getDefaultNotificationMailbox
+      apiCall.mockRejectedValue({ responseStatus: 404 })
+
+      await expect(
+        locationsService.getNotificationMailbox('token', notificationGroup as NotificationGroup, prisonId),
+      ).resolves.toBeUndefined()
+    })
+
+    it('replaces a prison-specific mailbox using the prison endpoint', async () => {
+      await locationsService.replaceNotificationMailbox('token', 'CERT_REVIEWER', ['reviewer@example.com'], 'MDI')
+
+      expect(locationsApiClient.prisonConfiguration.replaceNotificationMailbox).toHaveBeenCalledWith(
+        'token',
+        { prisonId: 'MDI', notificationGroup: 'CERT_REVIEWER' },
+        { emailAddresses: ['reviewer@example.com'] },
+      )
+    })
+
+    it('replaces a default mailbox using the default endpoint', async () => {
+      await locationsService.replaceNotificationMailbox('token', 'CERT_VIEWER', ['viewer@example.com'])
+
+      expect(locationsApiClient.prisonConfiguration.replaceDefaultNotificationMailbox).toHaveBeenCalledWith(
+        'token',
+        { notificationGroup: 'CERT_VIEWER' },
+        { emailAddresses: ['viewer@example.com'] },
+      )
+    })
+
+    it('deletes a prison-specific mailbox using the prison endpoint', async () => {
+      await locationsService.deleteNotificationMailbox('token', 'CERT_ADMIN', 'MDI')
+
+      expect(locationsApiClient.prisonConfiguration.deleteNotificationMailbox).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        notificationGroup: 'CERT_ADMIN',
+      })
+    })
+
+    it('deletes a default mailbox using the default endpoint', async () => {
+      await locationsService.deleteNotificationMailbox('token', 'CERT_ADMIN')
+
+      expect(locationsApiClient.prisonConfiguration.deleteDefaultNotificationMailbox).toHaveBeenCalledWith('token', {
+        notificationGroup: 'CERT_ADMIN',
       })
     })
   })

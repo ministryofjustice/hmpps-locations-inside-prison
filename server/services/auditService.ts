@@ -10,6 +10,7 @@ export enum Page {
   LOCATION_CREATE = 'LOCATION_CREATE',
   LOCATION_ADMIN = 'LOCATION_ADMIN',
   CAPACITY_MANAGEMENT_DASHBOARD = 'CAPACITY_MANAGEMENT_DASHBOARD',
+  FUNCTIONAL_MAILBOXES = 'FUNCTIONAL_MAILBOXES',
   // Still "UPLOAD" while the rest of the UI says "import": these values are sent to the HMPPS Audit
   // service, and renaming them would split this journey's page views across two names (MAPA-326).
   CELL_CERTIFICATE_UPLOADS = 'CELL_CERTIFICATE_UPLOADS',
