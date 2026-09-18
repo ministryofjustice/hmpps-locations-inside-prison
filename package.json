@@ -125,7 +125,7 @@
     "validator": "13.15.35"
   },
   "devDependencies": {
-    "@cypress/webpack-batteries-included-preprocessor": "^3.1.2",
+    "@cypress/webpack-batteries-included-preprocessor": "^5.0.0",
     "@cypress/webpack-preprocessor": "^5.17.1",
     "@jest/globals": "^30.5.1",
     "@jgoz/esbuild-plugin-typecheck": "^5.0.0",
