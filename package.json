@@ -128,7 +128,7 @@
     "@cypress/webpack-batteries-included-preprocessor": "^3.1.2",
     "@cypress/webpack-preprocessor": "^5.17.1",
     "@jest/globals": "^30.5.1",
-    "@jgoz/esbuild-plugin-typecheck": "^4.0.4",
+    "@jgoz/esbuild-plugin-typecheck": "^5.0.0",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
     "@ministryofjustice/hmpps-precommit-hooks": "^3.0.2",
     "@tsconfig/node24": "^24.0.5",
