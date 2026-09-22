@@ -103,7 +103,7 @@
     "express-session": "^1.19.0",
     "govuk-frontend": "^6.5.0",
     "helmet": "^8.3.0",
-    "hmpo-form-wizard": "^17.0.1",
+    "hmpo-form-wizard": "^18.0.0",
     "http-errors": "^2.0.1",
     "jquery": "^4.0.0",
     "jwt-decode": "^4.0.0",
