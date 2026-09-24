@@ -90,6 +90,20 @@ describe('Cell certificate change request - show', () => {
     expect((deepRes.render as jest.Mock).mock.calls[0][1].importResults).toBeUndefined()
   })
 
+  it('resolves cells not on the uploaded certificate to their location page', async () => {
+    locationsService.getCellCertificateImportByApprovalRequest = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      notOnCertificateRecords: 1,
+      locationsNotOnCertificate: [{ locationKey: 'TST-A-1-003', locationId: 'location-3' }],
+    })
+
+    await show(deepReq as Request, deepRes as Response)
+
+    const { importResults } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(importResults.notOnCertificateRows).toEqual([{ locationKey: 'TST-A-1-003', url: '/TST/location-3/view' }])
+    expect(locationsService.getLocationByKey).not.toHaveBeenCalled()
+  })
+
   // Imports that predate the link between an import and its approval request have nothing to find.
   it('renders the page unchanged when there is no import behind the request', async () => {
     locationsService.getCellCertificateImportByApprovalRequest = jest

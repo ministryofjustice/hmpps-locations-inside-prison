@@ -24,6 +24,14 @@ export declare interface CellCertificateImportLocation {
   certifiedNormalAccommodationMismatch?: boolean
 }
 
+export declare interface CellCertificateImportOmittedLocation {
+  locationId?: string
+  locationKey: string
+  maxCapacity?: number
+  workingCapacity?: number
+  certifiedNormalAccommodation?: number
+}
+
 export declare interface CellCertificateImport {
   id: string
   prisonId: string
@@ -33,6 +41,8 @@ export declare interface CellCertificateImport {
   skippedRecords: number
   failedRecords: number
   discrepancyRecords?: number
+  notOnCertificateRecords?: number
+  locationsNotOnCertificate?: CellCertificateImportOmittedLocation[]
   requestedBy: string
   requestedDate: string
   startTime?: string
