@@ -70,6 +70,17 @@ const appliedCapacityCell = (
   text: changeText(previous, applied),
 })
 
+// Cells that had no row in the upload still went onto the certificate at their current values. We can link
+// directly to the location record by ID, which is exactly what the API includes in each omitted-location item.
+export const notOnCertificateRows = (
+  locationsNotOnCertificate: Array<{ locationId?: string; locationKey: string }> | undefined,
+  prisonId?: string,
+): { locationKey: string; url?: string }[] =>
+  (locationsNotOnCertificate || []).map(location => ({
+    locationKey: location.locationKey,
+    url: prisonId && location.locationId ? paths.location.view(prisonId, location.locationId) : undefined,
+  }))
+
 export default async (req: Request, res: Response) => {
   const { locationsService } = req.services
   const { systemToken } = req.session
@@ -112,6 +123,7 @@ export default async (req: Request, res: Response) => {
       certificateImport.status === 'FINISHED' && certificateImport.cellCertificateId
         ? paths.cellCertificate.view(prisonId, certificateImport.cellCertificateId)
         : undefined,
+    notOnCertificateRows: notOnCertificateRows(certificateImport.locationsNotOnCertificate, prisonId),
   }
 
   const success = req.flash('success')

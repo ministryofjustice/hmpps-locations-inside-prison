@@ -1,2 +1,2 @@
-Wing / Unit,P-Nomis Cell Number,Number or cell mark,Certified Normal Accommodation (Baseline CNA),Maximum number of prisoners,Number of places allocated,Used for,Cell Sanitation
-SEG,LGI-S-0-032,S32,,1,1,Segregation Unit,
+Wing,Cell no,Cell mark,CNA,Max Cap,Working Cap,Cell type,In cell sanitation
+HB1,LGI-S-0-032,A1-01,,2,1,Normal Accommodation,TRUE

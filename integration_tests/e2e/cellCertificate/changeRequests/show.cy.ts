@@ -6,6 +6,7 @@ import testGovukSummaryList from '../../../support/testGovukSummaryList'
 import LocationsApiStubber from '../../../mockApis/locationsApi'
 import CertificationApprovalRequestFactory from '../../../../server/testutils/factories/certificationApprovalRequest'
 import CertificateLocationFactory from '../../../../server/testutils/factories/certificateLocation'
+import paths from '../../../../server/utils/paths'
 
 context('Cell Certificate - Change Requests - Show', () => {
   context('With default access', () => {
@@ -555,6 +556,36 @@ context('Cell Certificate - Change Requests - Show', () => {
         cy.get('[data-qa=import-results-table]').should('contain', 'TST-A-1-001')
         cy.get('[data-qa=import-results-table]').should('not.contain', 'TST-A-1-002')
         cy.get('[data-qa=import-results-table]').should('contain', 'Certified 1')
+      })
+
+      it('flags cells that were not on the uploaded certificate and links through to them', () => {
+        LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          CertificationApprovalRequestFactory.build({ approvalType: 'CELL_CERTIFICATE_UPLOAD', status: 'APPROVED' }),
+        )
+        LocationsApiStubber.stub.stubCellCertificateImportByApprovalRequest({
+          ...certificateImport,
+          notOnCertificateRecords: 1,
+          locationsNotOnCertificate: [
+            { locationKey: 'TST-A-1-003', locationId: '7e570000-0000-0000-0000-000000000099' },
+          ],
+        })
+        LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryByKey({
+          id: '7e570000-0000-0000-0000-000000000099',
+          prisonId: 'TST',
+        })
+
+        CellCertificateChangeRequestsShowPage.goTo('id1')
+        Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
+
+        cy.get('[data-qa=import-summary]').should('contain', 'Not on the uploaded certificate')
+        cy.get('[data-qa=import-not-on-certificate-alert]').should(
+          'contain',
+          'were not on the uploaded certificate and have been added to the new certificate',
+        )
+        cy.get('[data-qa=import-not-on-certificate-alert]')
+          .find('a')
+          .should('contain', 'TST-A-1-003')
+          .and('have.attr', 'href', paths.location.view('TST', '7e570000-0000-0000-0000-000000000099'))
       })
 
       it('renders the page unchanged when there is no import behind the request', () => {

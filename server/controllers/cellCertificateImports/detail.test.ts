@@ -5,6 +5,7 @@ import importDetail, {
   changeText,
   heldAndCertifiedCell,
   maxCapacityCell,
+  notOnCertificateRows,
   workingCapacityCell,
 } from './detail'
 import LocationsService from '../../services/locationsService'
@@ -153,6 +154,25 @@ describe('Cell certificate imports - detail', () => {
     })
   })
 
+  describe('notOnCertificateRows', () => {
+    it('builds a link from the API location ID when it is present', async () => {
+      const rows = notOnCertificateRows([{ locationId: 'abc-123', locationKey: 'TST-A-1-003' }], 'TST')
+
+      expect(rows).toEqual([{ locationKey: 'TST-A-1-003', url: '/TST/abc-123/view' }])
+    })
+
+    it('returns an empty list when there is nothing to report', async () => {
+      expect(notOnCertificateRows(undefined, 'TST')).toEqual([])
+      expect(notOnCertificateRows([], 'TST')).toEqual([])
+    })
+
+    it('omits the url only when a prison id is unavailable', async () => {
+      const rows = notOnCertificateRows([{ locationKey: 'TST-A-1-003' }])
+
+      expect(rows).toEqual([{ locationKey: 'TST-A-1-003', url: undefined }])
+    })
+  })
+
   it('renders the detail page with summary, location rows and a cell certificate link when finished', async () => {
     locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(certificateImport)
 
@@ -181,6 +201,23 @@ describe('Cell certificate imports - detail', () => {
             message: 'No changes required',
           }),
         ],
+      }),
+    )
+  })
+
+  it('builds deterministic links from the API location ID for omitted cells', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      notOnCertificateRecords: 1,
+      locationsNotOnCertificate: [{ locationId: 'abc-123', locationKey: 'TST-A-1-003' }],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    expect(deepRes.render).toHaveBeenCalledWith(
+      'pages/cellCertificateImports/detail',
+      expect.objectContaining({
+        notOnCertificateRows: [{ locationKey: 'TST-A-1-003', url: '/TST/abc-123/view' }],
       }),
     )
   })

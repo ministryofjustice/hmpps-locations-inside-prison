@@ -120,6 +120,31 @@ context('Cell certificate imports', () => {
     detailPage.locationsTable().should('contain', 'Working capacity changed to match certified working capacity')
   })
 
+  it('flags cells that were not on the uploaded certificate and links through to them', () => {
+    LocationsApiStubber.stub.stubCellCertificateImport({
+      ...completedImport,
+      notOnCertificateRecords: 1,
+      locationsNotOnCertificate: [{ locationKey: 'TST-A-1-003', locationId: '7e570000-0000-0000-0000-000000000099' }],
+    })
+    LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryByKey({
+      id: '7e570000-0000-0000-0000-000000000099',
+      prisonId: 'TST',
+    })
+
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
+    const detailPage = Page.verifyOnPage(CellCertificateImportDetailPage)
+
+    detailPage.summary().should('contain', 'Cells not on the uploaded certificate')
+    detailPage
+      .notOnCertificateAlert()
+      .should('contain', 'were not on the uploaded certificate and have been added to the new certificate')
+    detailPage
+      .notOnCertificateAlert()
+      .find('a')
+      .should('contain', 'TST-A-1-003')
+      .and('have.attr', 'href', paths.location.view('TST', '7e570000-0000-0000-0000-000000000099'))
+  })
+
   it('hides the import button and shows a message while an import is in progress', () => {
     LocationsApiStubber.stub.stubCellCertificateImportsList([inProgressImport])
 

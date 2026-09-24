@@ -44,7 +44,8 @@
               { key: { text: "Updated" }, value: { text: importResults.certificateImport.processedRecords } },
               { key: { text: "Unchanged" }, value: { text: importResults.certificateImport.skippedRecords } },
               { key: { text: "Failed" }, value: { text: importResults.certificateImport.failedRecords } },
-              { key: { text: "Needing review" }, value: { text: importResults.certificateImport.discrepancyRecords or 0 } }
+              { key: { text: "Needing review" }, value: { text: importResults.certificateImport.discrepancyRecords or 0 } },
+              { key: { text: "Not on the uploaded certificate" }, value: { text: importResults.certificateImport.notOnCertificateRecords or 0 } }
             ]
           }) }}
 
@@ -56,6 +57,25 @@
               showTitleAsHeading: true,
               dismissible: false,
               text: importResults.certificateImport.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the imported file, so the two do not match until someone reviews them."
+            }) }}
+          {% endif %}
+
+          {% if importResults.certificateImport.notOnCertificateRecords %}
+            {% set notOnCertificateHtml %}
+              <p class="govuk-body">{{ importResults.certificateImport.notOnCertificateRecords }} cell(s) were not on the uploaded certificate and have been added to the new certificate using their current values:</p>
+              <ul class="govuk-list govuk-list--bullet">
+                {% for row in importResults.notOnCertificateRows %}
+                  <li>{% if row.url %}<a class="govuk-link" href="{{ row.url }}">{{ row.locationKey }}</a>{% else %}{{ row.locationKey }}{% endif %}</li>
+                {% endfor %}
+              </ul>
+            {% endset %}
+            {{ mojAlert({
+              attributes: { "data-qa": "import-not-on-certificate-alert" },
+              variant: "warning",
+              title: "Cells added to the certificate",
+              showTitleAsHeading: true,
+              dismissible: false,
+              html: notOnCertificateHtml
             }) }}
           {% endif %}
         </div>

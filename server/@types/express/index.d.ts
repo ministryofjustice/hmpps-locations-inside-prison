@@ -227,6 +227,7 @@ interface AllLocals {
       workingCapacity: CapacityCell
       certifiedNormalAccommodation: CapacityCell
     }[]
+    notOnCertificateRows: { locationKey: string; url?: string }[]
   }
   locationRows: {
     locationKey: string
@@ -237,6 +238,7 @@ interface AllLocals {
     workingCapacity: CapacityCell
     certifiedNormalAccommodation: CapacityCell
   }[]
+  notOnCertificateRows: { locationKey: string; url?: string }[]
   pendingApprovalsBelow: PendingApprovalsBelow
   changeRequestsLink: string
 }
