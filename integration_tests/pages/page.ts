@@ -3,6 +3,8 @@ import { Result } from 'axe-core'
 
 export type PageElement = Cypress.Chainable<JQuery>
 
+const skip = Cypress.expose('SKIP_AXE')
+
 export default abstract class Page {
   static verifyOnPage<T>(constructor: new (...args: unknown[]) => T, ...args: unknown[]): T {
     return new constructor(...args)
@@ -19,7 +21,7 @@ export default abstract class Page {
 
   checkOnPage(): void {
     cy.get('h1').contains(this.title)
-    if (!(Cypress.env('SKIP_AXE') || this.skipA11y)) {
+    if (!(skip || this.skipA11y)) {
       cy.injectAxe()
       cy.configureAxe({
         rules: [

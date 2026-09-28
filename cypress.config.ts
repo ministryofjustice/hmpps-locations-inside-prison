@@ -26,16 +26,17 @@ async function resetFeatureFlags(): Promise<null> {
 }
 
 function preprocessorOptions() {
-  const options = webpackPreprocessor.defaultOptions
-  options.typescript = require.resolve('typescript')
-  return options
+  return {
+    ...webpackPreprocessor.defaultOptions,
+    typescript: require.resolve('typescript'),
+  }
 }
 
 export default defineConfig({
   chromeWebSecurity: false,
   // Prevent headless Chrome from accumulating memory and hanging the runner in CI,
   // which intermittently stalls a single Cypress split container until the job timeout.
-  experimentalMemoryManagement: true,
+  manageBrowserMemory: true,
   retries: { runMode: 0, openMode: 0 },
   // Re-run flaky specs in CI (e.g. WireMock sign-in races) instead of failing the build.
   ...(process.env.CI && { numTestsKeptInMemory: 0, retries: { runMode: 2, openMode: 0 } }),
