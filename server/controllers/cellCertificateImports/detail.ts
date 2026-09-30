@@ -1,6 +1,13 @@
 import { Request, Response } from 'express'
 import { CapacityCell, TypedLocals } from '../../@types/express'
 import paths from '../../utils/paths'
+import { CellCertificateImportOmittedLocation } from '../../data/types/locationsApi/cellCertificateImport'
+
+/** The result given to a cell that was not in the uploaded file but still went onto the new certificate. */
+export const NOT_ON_FILE_STATUS = 'NOT_ON_FILE'
+
+export const NOT_ON_FILE_MESSAGE =
+  'Not on the uploaded file. Added to the new cell certificate using the values Residential locations holds.'
 
 // Renders a "before -> after" string, handling 0 (a valid capacity) and missing previous values.
 export const changeText = (previous: number | undefined, current: number | undefined): string => {
@@ -70,16 +77,32 @@ const appliedCapacityCell = (
   text: changeText(previous, applied),
 })
 
-// Cells that had no row in the upload still went onto the certificate at their current values. We can link
-// directly to the location record by ID, which is exactly what the API includes in each omitted-location item.
-export const notOnCertificateRows = (
-  locationsNotOnCertificate: Array<{ locationId?: string; locationKey: string }> | undefined,
+// Cells that had no row in the upload still went onto the certificate at the values the location holds. They are
+// shown as rows alongside the uploaded cells, with those values, so the person reviewing can judge whether they
+// should have been certified. There is no before and after for them, so each column shows the single value. The
+// key links to the location, which is why the API returns its id.
+export const notOnCertificateLocationRows = (
+  locationsNotOnCertificate: CellCertificateImportOmittedLocation[] | undefined,
   prisonId?: string,
-): { locationKey: string; url?: string }[] =>
+) =>
   (locationsNotOnCertificate || []).map(location => ({
     locationKey: location.locationKey,
     url: prisonId && location.locationId ? paths.location.view(prisonId, location.locationId) : undefined,
+    status: NOT_ON_FILE_STATUS,
+    message: NOT_ON_FILE_MESSAGE,
+    needsReview: false,
+    maxCapacity: heldAndCertifiedCell(location.maxCapacity, undefined),
+    workingCapacity: heldAndCertifiedCell(location.workingCapacity, undefined),
+    certifiedNormalAccommodation: heldAndCertifiedCell(location.certifiedNormalAccommodation, undefined),
   }))
+
+// Cells needing review first, then cells added from outside the file, then the rest. Array sort is stable, so each
+// group keeps the location order the API returned.
+const rowOrder = (row: { needsReview: boolean; status: string }) => {
+  if (row.needsReview) return 0
+  if (row.status === NOT_ON_FILE_STATUS) return 1
+  return 2
+}
 
 export default async (req: Request, res: Response) => {
   const { locationsService } = req.services
@@ -90,27 +113,28 @@ export default async (req: Request, res: Response) => {
   const certificateImport = await locationsService.getCellCertificateImport(systemToken, importId)
   const inProgress = certificateImport.status !== 'FINISHED'
 
-  const locationRows = (certificateImport.locations || [])
-    .map(location => ({
-      locationKey: location.locationKey,
-      status: location.status,
-      message: location.message,
-      needsReview: Boolean(
-        location.workingCapacityMismatch ||
-        location.maxCapacityMismatch ||
-        location.certifiedNormalAccommodationMismatch,
-      ),
-      maxCapacity: maxCapacityCell(location),
-      workingCapacity: workingCapacityCell(location),
-      certifiedNormalAccommodation: capacityCell(
-        location.previousCertifiedNormalAccommodation,
-        location.certifiedNormalAccommodation,
-        location.certifiedNormalAccommodationMismatch,
-      ),
-    }))
-    // The cells needing review are the point of the report, so lift them above the rest. Array sort is stable,
-    // so everything else keeps the location order the API returned.
-    .sort((a, b) => Number(b.needsReview) - Number(a.needsReview))
+  const uploadedRows = (certificateImport.locations || []).map(location => ({
+    locationKey: location.locationKey,
+    status: location.status,
+    message: location.message,
+    needsReview: Boolean(
+      location.workingCapacityMismatch || location.maxCapacityMismatch || location.certifiedNormalAccommodationMismatch,
+    ),
+    maxCapacity: maxCapacityCell(location),
+    workingCapacity: workingCapacityCell(location),
+    certifiedNormalAccommodation: capacityCell(
+      location.previousCertifiedNormalAccommodation,
+      location.certifiedNormalAccommodation,
+      location.certifiedNormalAccommodationMismatch,
+    ),
+  }))
+
+  // The cells needing review are the point of the report, so they come first, followed by the cells the upload
+  // did not include but the certificate now does.
+  const locationRows = [
+    ...uploadedRows,
+    ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, prisonId),
+  ].sort((a, b) => rowOrder(a) - rowOrder(b))
 
   const locals: TypedLocals = {
     title: 'Cell certificate import',
@@ -123,7 +147,6 @@ export default async (req: Request, res: Response) => {
       certificateImport.status === 'FINISHED' && certificateImport.cellCertificateId
         ? paths.cellCertificate.view(prisonId, certificateImport.cellCertificateId)
         : undefined,
-    notOnCertificateRows: notOnCertificateRows(certificateImport.locationsNotOnCertificate, prisonId),
   }
 
   const success = req.flash('success')

@@ -221,16 +221,17 @@ interface AllLocals {
     reportUrl: string
     rows: {
       locationKey: string
+      url?: string
       status: string
       message?: string
       maxCapacity: CapacityCell
       workingCapacity: CapacityCell
       certifiedNormalAccommodation: CapacityCell
     }[]
-    notOnCertificateRows: { locationKey: string; url?: string }[]
   }
   locationRows: {
     locationKey: string
+    url?: string
     status: string
     message?: string
     needsReview: boolean
@@ -238,7 +239,6 @@ interface AllLocals {
     workingCapacity: CapacityCell
     certifiedNormalAccommodation: CapacityCell
   }[]
-  notOnCertificateRows: { locationKey: string; url?: string }[]
   pendingApprovalsBelow: PendingApprovalsBelow
   changeRequestsLink: string
 }

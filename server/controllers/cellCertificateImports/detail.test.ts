@@ -5,7 +5,8 @@ import importDetail, {
   changeText,
   heldAndCertifiedCell,
   maxCapacityCell,
-  notOnCertificateRows,
+  NOT_ON_FILE_MESSAGE,
+  notOnCertificateLocationRows,
   workingCapacityCell,
 } from './detail'
 import LocationsService from '../../services/locationsService'
@@ -154,22 +155,46 @@ describe('Cell certificate imports - detail', () => {
     })
   })
 
-  describe('notOnCertificateRows', () => {
-    it('builds a link from the API location ID when it is present', async () => {
-      const rows = notOnCertificateRows([{ locationId: 'abc-123', locationKey: 'TST-A-1-003' }], 'TST')
+  describe('notOnCertificateLocationRows', () => {
+    it('shows each cell with the single values it was added to the certificate at, linked to its location', async () => {
+      const rows = notOnCertificateLocationRows(
+        [
+          {
+            locationId: 'abc-123',
+            locationKey: 'TST-A-1-003',
+            maxCapacity: 2,
+            workingCapacity: 0,
+            certifiedNormalAccommodation: 1,
+          },
+        ],
+        'TST',
+      )
 
-      expect(rows).toEqual([{ locationKey: 'TST-A-1-003', url: '/TST/abc-123/view' }])
+      expect(rows).toEqual([
+        {
+          locationKey: 'TST-A-1-003',
+          url: '/TST/abc-123/view',
+          status: 'NOT_ON_FILE',
+          message: NOT_ON_FILE_MESSAGE,
+          needsReview: false,
+          maxCapacity: { text: '2' },
+          // zero is a real value, not a missing one
+          workingCapacity: { text: '0' },
+          certifiedNormalAccommodation: { text: '1' },
+        },
+      ])
     })
 
     it('returns an empty list when there is nothing to report', async () => {
-      expect(notOnCertificateRows(undefined, 'TST')).toEqual([])
-      expect(notOnCertificateRows([], 'TST')).toEqual([])
+      expect(notOnCertificateLocationRows(undefined, 'TST')).toEqual([])
+      expect(notOnCertificateLocationRows([], 'TST')).toEqual([])
     })
 
     it('omits the url only when a prison id is unavailable', async () => {
-      const rows = notOnCertificateRows([{ locationKey: 'TST-A-1-003' }])
+      const [row] = notOnCertificateLocationRows([{ locationKey: 'TST-A-1-003' }])
 
-      expect(rows).toEqual([{ locationKey: 'TST-A-1-003', url: undefined }])
+      expect(row.url).toBeUndefined()
+      expect(row.maxCapacity).toEqual({ text: '-' })
     })
   })
 
@@ -205,19 +230,34 @@ describe('Cell certificate imports - detail', () => {
     )
   })
 
-  it('builds deterministic links from the API location ID for omitted cells', async () => {
+  it('lists cells added from outside the file after the cells needing review and before the rest', async () => {
     locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
       ...certificateImport,
       notOnCertificateRecords: 1,
-      locationsNotOnCertificate: [{ locationId: 'abc-123', locationKey: 'TST-A-1-003' }],
+      locationsNotOnCertificate: [
+        {
+          locationId: 'abc-123',
+          locationKey: 'TST-A-1-003',
+          maxCapacity: 1,
+          workingCapacity: 1,
+          certifiedNormalAccommodation: 1,
+        },
+      ],
     })
 
     await importDetail(deepReq as Request, deepRes as Response)
 
-    expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/cellCertificateImports/detail',
+    const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locationRows.map((row: { locationKey: string }) => row.locationKey)).toEqual([
+      'TST-A-1-001', // needs review
+      'TST-A-1-003', // added to the certificate
+      'TST-A-1-002', // unchanged
+    ])
+    expect(locationRows[1]).toEqual(
       expect.objectContaining({
-        notOnCertificateRows: [{ locationKey: 'TST-A-1-003', url: '/TST/abc-123/view' }],
+        status: 'NOT_ON_FILE',
+        url: '/TST/abc-123/view',
+        workingCapacity: { text: '1' },
       }),
     )
   })

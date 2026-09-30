@@ -90,17 +90,32 @@ describe('Cell certificate change request - show', () => {
     expect((deepRes.render as jest.Mock).mock.calls[0][1].importResults).toBeUndefined()
   })
 
-  it('resolves cells not on the uploaded certificate to their location page', async () => {
+  it('lists cells not on the uploaded file with their values, linked to their location page', async () => {
     locationsService.getCellCertificateImportByApprovalRequest = jest.fn().mockResolvedValue({
       ...certificateImport,
       notOnCertificateRecords: 1,
-      locationsNotOnCertificate: [{ locationKey: 'TST-A-1-003', locationId: 'location-3' }],
+      locationsNotOnCertificate: [
+        {
+          locationKey: 'TST-A-1-003',
+          locationId: 'location-3',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+        },
+      ],
     })
 
     await show(deepReq as Request, deepRes as Response)
 
     const { importResults } = (deepRes.render as jest.Mock).mock.calls[0][1]
-    expect(importResults.notOnCertificateRows).toEqual([{ locationKey: 'TST-A-1-003', url: '/TST/location-3/view' }])
+    expect(importResults.rows).toContainEqual(
+      expect.objectContaining({
+        locationKey: 'TST-A-1-003',
+        url: '/TST/location-3/view',
+        status: 'NOT_ON_FILE',
+        maxCapacity: { text: '2' },
+      }),
+    )
     expect(locationsService.getLocationByKey).not.toHaveBeenCalled()
   })
 

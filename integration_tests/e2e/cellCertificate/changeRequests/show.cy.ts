@@ -558,7 +558,7 @@ context('Cell Certificate - Change Requests - Show', () => {
         cy.get('[data-qa=import-results-table]').should('contain', 'Certified 1')
       })
 
-      it('flags cells that were not on the uploaded certificate and links through to them', () => {
+      it('lists cells that were not on the uploaded file and links through to them', () => {
         LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
           CertificationApprovalRequestFactory.build({ approvalType: 'CELL_CERTIFICATE_UPLOAD', status: 'APPROVED' }),
         )
@@ -566,7 +566,13 @@ context('Cell Certificate - Change Requests - Show', () => {
           ...certificateImport,
           notOnCertificateRecords: 1,
           locationsNotOnCertificate: [
-            { locationKey: 'TST-A-1-003', locationId: '7e570000-0000-0000-0000-000000000099' },
+            {
+              locationKey: 'TST-A-1-003',
+              locationId: '7e570000-0000-0000-0000-000000000099',
+              maxCapacity: 2,
+              workingCapacity: 2,
+              certifiedNormalAccommodation: 2,
+            },
           ],
         })
         LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryByKey({
@@ -580,12 +586,13 @@ context('Cell Certificate - Change Requests - Show', () => {
         cy.get('[data-qa=import-summary]').should('contain', 'Not on the uploaded certificate')
         cy.get('[data-qa=import-not-on-certificate-alert]').should(
           'contain',
-          'were not on the uploaded certificate and have been added to the new certificate',
+          'were not on the uploaded file but have been added to the new cell certificate',
         )
-        cy.get('[data-qa=import-not-on-certificate-alert]')
+        cy.get('[data-qa=import-results-table]')
+          .contains('tr', 'TST-A-1-003')
+          .should('contain', 'Added to certificate')
           .find('a')
-          .should('contain', 'TST-A-1-003')
-          .and('have.attr', 'href', paths.location.view('TST', '7e570000-0000-0000-0000-000000000099'))
+          .should('have.attr', 'href', paths.location.view('TST', '7e570000-0000-0000-0000-000000000099'))
       })
 
       it('renders the page unchanged when there is no import behind the request', () => {

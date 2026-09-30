@@ -4,7 +4,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
-{% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag, importLocationStatusTag, importLocationNeedsReviewTag %}
+{% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag, importLocationStatusTag, importLocationNeedsReviewTag, importLocationKey %}
 
 {% block head %}
   {{ super() }}
@@ -60,21 +60,13 @@
         {% endif %}
 
         {% if not inProgress and certificateImport.notOnCertificateRecords %}
-          {% set notOnCertificateHtml %}
-            <p class="govuk-body">{{ certificateImport.notOnCertificateRecords }} cell(s) were not on the uploaded certificate and have been added to the new certificate using their current values:</p>
-            <ul class="govuk-list govuk-list--bullet">
-              {% for row in notOnCertificateRows %}
-                <li>{% if row.url %}<a class="govuk-link" href="{{ row.url }}">{{ row.locationKey }}</a>{% else %}{{ row.locationKey }}{% endif %}</li>
-              {% endfor %}
-            </ul>
-          {% endset %}
           {{ mojAlert({
             attributes: { "data-qa": "not-on-certificate-alert" },
             variant: "warning",
             title: "Cells added to the certificate",
             showTitleAsHeading: true,
             dismissible: false,
-            html: notOnCertificateHtml
+            text: certificateImport.notOnCertificateRecords + " cell(s) were not on the uploaded file but have been added to the new cell certificate, using the values Residential locations holds. They are shown in the table below as ‘Added to certificate’. Check whether each one should be certified."
           }) }}
         {% endif %}
 
@@ -89,7 +81,7 @@
           {% set rows = [] %}
           {% for location in locationRows %}
             {% set rows = (rows.push([
-              { text: location.locationKey },
+              { html: importLocationKey(location) },
               { html: importLocationStatusTag(location.status) + (importLocationNeedsReviewTag() if location.needsReview else "") },
               { html: capacityCellHtml(location.maxCapacity) },
               { html: capacityCellHtml(location.workingCapacity) },
