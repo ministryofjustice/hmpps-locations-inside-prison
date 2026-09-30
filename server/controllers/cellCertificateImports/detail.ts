@@ -117,6 +117,7 @@ export const notOnCertificateLocationRows = (
       message: carriedForward ? carriedForwardMessage : addedMessage,
       needsReview: false,
       certificateChange: undefined as string | undefined,
+      suggestion: location.uploadedAsKey ? `Possibly listed in the file as ${location.uploadedAsKey}` : undefined,
       maxCapacity: heldAndCertifiedCell(location.maxCapacity, undefined),
       workingCapacity: heldAndCertifiedCell(location.workingCapacity, undefined),
       certifiedNormalAccommodation: heldAndCertifiedCell(location.certifiedNormalAccommodation, undefined),
@@ -160,6 +161,11 @@ export const certificateChangeText = (
 
   return changes.length ? `Certificate: ${changes.join(', ')}` : undefined
 }
+
+// A row that failed because its name was not found, where the name matches a cell not in the file once dropped leading
+// zeros are ignored (MAPA-403). Only a suggestion: nothing is applied.
+export const suggestionText = (location: CellCertificateImportLocation): string | undefined =>
+  location.suggestedLocationKey ? `Did you mean ${location.suggestedLocationKey}?` : undefined
 
 // Cells needing review first, then cells added from outside the file, then cells whose certified values change,
 // then failed rows, then the rest (unchanged cells and those carried forward). Array sort is stable, so each group
@@ -210,6 +216,7 @@ export default async (req: Request, res: Response) => {
     status: location.status,
     message: location.message,
     certificateChange: certificateChangeText(location, hasCurrentCertificate),
+    suggestion: suggestionText(location),
     needsReview: Boolean(
       location.workingCapacityMismatch || location.maxCapacityMismatch || location.certifiedNormalAccommodationMismatch,
     ),

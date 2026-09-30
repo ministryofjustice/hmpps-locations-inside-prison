@@ -25,8 +25,8 @@
   {% endif %}
 {% endmacro %}
 
-{# The row's message, with any change to the cell's certified values beneath it. #}
-{% macro importLocationDetails(row) %}{{ row.message or "" }}{% if row.certificateChange %}{% if row.message %}<br>{% endif %}<span class="govuk-!-font-weight-bold" data-qa="certificate-change">{{ row.certificateChange }}</span>{% endif %}{% endmacro %}
+{# The row's message, with any change to the cell's certified values and any suggested match beneath it. #}
+{% macro importLocationDetails(row) %}{{ row.message or "" }}{% if row.certificateChange %}{% if row.message %}<br>{% endif %}<span class="govuk-!-font-weight-bold" data-qa="certificate-change">{{ row.certificateChange }}</span>{% endif %}{% if row.suggestion %}{% if row.message or row.certificateChange %}<br>{% endif %}<span class="govuk-!-font-weight-bold" data-qa="location-suggestion">{{ row.suggestion }}</span>{% endif %}{% endmacro %}
 
 {% macro importLocationNeedsReviewTag() %}
   {{ govukTag({ text: "Needs review", classes: "govuk-tag--blue", attributes: { "data-qa": "location-needs-review-tag" } }) }}

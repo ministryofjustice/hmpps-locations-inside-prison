@@ -9,6 +9,7 @@ import {
   certificateChangeText,
   hasCurrentCertificateValues,
   notOnCertificateLocationRows,
+  suggestionText,
 } from '../../cellCertificateImports/detail'
 import LocationsService from '../../../services/locationsService'
 
@@ -57,6 +58,7 @@ const importResults = async (
             status: location.status,
             message: location.message,
             certificateChange,
+            suggestion: suggestionText(location),
             maxCapacity: capacityCell(location.previousMaxCapacity, location.maxCapacity, location.maxCapacityMismatch),
             workingCapacity: capacityCell(
               location.previousWorkingCapacity,

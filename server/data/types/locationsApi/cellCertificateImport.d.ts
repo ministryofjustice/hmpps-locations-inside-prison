@@ -26,6 +26,8 @@ export declare interface CellCertificateImportLocation {
   currentCertifiedMaxCapacity?: number
   currentCertifiedWorkingCapacity?: number
   currentCertifiedNormalAccommodation?: number
+  /** For a row whose location was not found: the cell it most likely meant (names differ only by leading zeros). */
+  suggestedLocationKey?: string
 }
 
 export declare interface CellCertificateImportOmittedLocation {
@@ -36,6 +38,8 @@ export declare interface CellCertificateImportOmittedLocation {
   certifiedNormalAccommodation?: number
   /** On the current certificate, so carried forward unchanged, rather than added to the certificate. */
   onCurrentCertificate?: boolean
+  /** The name a failed row most likely used for this cell (names differ only by leading zeros). */
+  uploadedAsKey?: string
 }
 
 /** Capacity totals across a whole cell certificate. */

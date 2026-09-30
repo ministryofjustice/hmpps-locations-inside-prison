@@ -205,6 +205,53 @@ context('Cell certificate import preview', () => {
       .should('contain', 'Certificate: working capacity 1 → 2')
   })
 
+  it('points a mistyped cell name at the cell it most likely meant', () => {
+    LocationsApiStubber.stub.stubCellCertificateImport({
+      ...finishedPreview,
+      failedRecords: 1,
+      notOnCertificateRecords: 1,
+      locations: [
+        {
+          locationKey: 'TST-A-1-5',
+          status: 'FAILED',
+          message: 'Location not found on Residential locations',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          suggestedLocationKey: 'TST-A-1-005',
+        },
+      ],
+      locationsNotOnCertificate: [
+        {
+          locationKey: 'TST-A-1-005',
+          locationId: '7e570000-0000-0000-0000-000000000097',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          uploadedAsKey: 'TST-A-1-5',
+        },
+      ],
+    })
+
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/preview-1`)
+    const previewPage = Page.verifyOnPage(CellCertificateImportPreviewPage)
+
+    // match the Location column exactly: the other row's Details also mention TST-A-1-5
+    previewPage
+      .locationsTable()
+      .find('tbody tr')
+      .filter((_, row: HTMLTableRowElement) => row.cells[0].innerText.trim() === 'TST-A-1-5')
+      .should('have.length', 1)
+      .and('contain', 'Will fail')
+      .find('[data-qa=location-suggestion]')
+      .should('contain', 'Did you mean TST-A-1-005?')
+    previewPage
+      .locationsTable()
+      .contains('tr', 'TST-A-1-005')
+      .find('[data-qa=location-suggestion]')
+      .should('contain', 'Possibly listed in the file as TST-A-1-5')
+  })
+
   it('cancels a preview without importing anything', () => {
     uploadAndPreview()
 

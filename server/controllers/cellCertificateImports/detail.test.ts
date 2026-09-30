@@ -633,4 +633,41 @@ describe('Cell certificate imports - detail', () => {
     ])
     expect(locals).toEqual(expect.objectContaining({ carriedForwardRecords: 1, addedRecords: 1 }))
   })
+
+  it('points a mistyped name and the cell it most likely meant at each other', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      notOnCertificateRecords: 1,
+      locations: [
+        {
+          locationKey: 'TST-B-1-5',
+          status: 'FAILED',
+          message: 'Location not found on Residential locations',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          suggestedLocationKey: 'TST-B-1-005',
+        },
+      ],
+      locationsNotOnCertificate: [{ locationKey: 'TST-B-1-005', maxCapacity: 2, uploadedAsKey: 'TST-B-1-5' }],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locationRows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ locationKey: 'TST-B-1-5', suggestion: 'Did you mean TST-B-1-005?' }),
+        expect.objectContaining({ locationKey: 'TST-B-1-005', suggestion: 'Possibly listed in the file as TST-B-1-5' }),
+      ]),
+    )
+  })
+
+  it('makes no suggestion when the API has none', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(certificateImport)
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locationRows.every((row: { suggestion?: string }) => row.suggestion === undefined)).toBe(true)
+  })
 })

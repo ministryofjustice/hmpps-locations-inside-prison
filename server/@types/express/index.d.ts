@@ -228,6 +228,7 @@ interface AllLocals {
       status: string
       message?: string
       certificateChange?: string
+      suggestion?: string
       maxCapacity: CapacityCell
       workingCapacity: CapacityCell
       certifiedNormalAccommodation: CapacityCell
@@ -239,6 +240,7 @@ interface AllLocals {
     status: string
     message?: string
     certificateChange?: string
+    suggestion?: string
     needsReview: boolean
     maxCapacity: CapacityCell
     workingCapacity: CapacityCell
