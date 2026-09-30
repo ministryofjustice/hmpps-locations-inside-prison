@@ -159,6 +159,31 @@ context('Cell certificate imports', () => {
       })
   })
 
+  it('marks previews on the list and links a continued preview to its import', () => {
+    LocationsApiStubber.stub.stubCellCertificateImportsList([
+      { ...completedImport, id: 'import-3', previewUploadId: 'preview-2' },
+      {
+        ...completedImport,
+        id: 'preview-2',
+        mode: 'PREVIEW',
+        cellCertificateId: undefined,
+        continuedAsUploadId: 'import-3',
+      },
+      { ...inProgressImport, id: 'preview-4', mode: 'PREVIEW' },
+    ])
+    CellCertificateImportsListPage.goTo('TST')
+    const listPage = Page.verifyOnPage(CellCertificateImportsListPage)
+
+    // a running preview changes nothing, so it does not stop a new import
+    listPage.newImportButton().should('exist')
+    cy.get('[data-qa=import-mode-tag]').should('have.length', 2).first().should('contain', 'Preview')
+    cy.get('[data-qa=continued-import-link]').should(
+      'have.attr',
+      'href',
+      `${paths.prison.cellCertificateImports('TST')}/import/import-3`,
+    )
+  })
+
   it('hides the import button and shows a message while an import is in progress', () => {
     LocationsApiStubber.stub.stubCellCertificateImportsList([inProgressImport])
 

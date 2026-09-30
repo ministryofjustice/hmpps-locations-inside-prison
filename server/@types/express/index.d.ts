@@ -212,6 +212,7 @@ interface AllLocals {
   imports: CellCertificateImport[]
   certificateImport: CellCertificateImport
   hasInProgress: boolean
+  autoRefresh: boolean
   inProgress: boolean
   newImportUrl: string
   listUrl: string

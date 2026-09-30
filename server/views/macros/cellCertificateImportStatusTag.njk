@@ -13,6 +13,18 @@
 {# A cell added to the certificate from outside the file links to its location, so the reviewer can check it. #}
 {% macro importLocationKey(row) %}{% if row.url %}<a class="govuk-link" href="{{ row.url }}">{{ row.locationKey }}</a>{% else %}{{ row.locationKey }}{% endif %}{% endmacro %}
 
+{# Previews change nothing, so they are marked apart from imports. A continued preview links to the import it became. #}
+{% macro importModeTag(certificateImport, listUrl) %}
+  {% if certificateImport.mode == 'PREVIEW' %}
+    {{ govukTag({ text: "Preview", classes: "govuk-tag--purple", attributes: { "data-qa": "import-mode-tag" } }) }}
+    {% if certificateImport.continuedAsUploadId %}
+      <br><a class="govuk-link" href="{{ listUrl }}/import/{{ certificateImport.continuedAsUploadId }}" data-qa="continued-import-link">View import</a>
+    {% endif %}
+  {% else %}
+    Import
+  {% endif %}
+{% endmacro %}
+
 {% macro importLocationNeedsReviewTag() %}
   {{ govukTag({ text: "Needs review", classes: "govuk-tag--blue", attributes: { "data-qa": "location-needs-review-tag" } }) }}
 {% endmacro %}
