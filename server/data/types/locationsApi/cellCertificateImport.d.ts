@@ -22,6 +22,10 @@ export declare interface CellCertificateImportLocation {
   workingCapacityMismatch?: boolean
   maxCapacityMismatch?: boolean
   certifiedNormalAccommodationMismatch?: boolean
+  /** What the current certificate held for this cell when the import ran; absent when the cell was not on it. */
+  currentCertifiedMaxCapacity?: number
+  currentCertifiedWorkingCapacity?: number
+  currentCertifiedNormalAccommodation?: number
 }
 
 export declare interface CellCertificateImportOmittedLocation {
@@ -30,6 +34,8 @@ export declare interface CellCertificateImportOmittedLocation {
   maxCapacity?: number
   workingCapacity?: number
   certifiedNormalAccommodation?: number
+  /** On the current certificate, so carried forward unchanged, rather than added to the certificate. */
+  onCurrentCertificate?: boolean
 }
 
 /** Capacity totals across a whole cell certificate. */
@@ -61,6 +67,8 @@ export declare interface CellCertificateImport {
   failedRecords: number
   discrepancyRecords?: number
   notOnCertificateRecords?: number
+  /** Of notOnCertificateRecords, those carried forward from the current certificate. */
+  carriedForwardRecords?: number
   locationsNotOnCertificate?: CellCertificateImportOmittedLocation[]
   requestedBy: string
   requestedDate: string

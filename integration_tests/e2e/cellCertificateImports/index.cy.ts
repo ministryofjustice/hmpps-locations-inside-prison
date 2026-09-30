@@ -142,10 +142,10 @@ context('Cell certificate imports', () => {
     cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
     const detailPage = Page.verifyOnPage(CellCertificateImportDetailPage)
 
-    detailPage.summary().should('contain', 'Cells not on the uploaded certificate')
+    detailPage.summary().should('contain', 'Cells added to the certificate')
     detailPage
       .notOnCertificateAlert()
-      .should('contain', 'were not on the uploaded file but have been added to the new cell certificate')
+      .should('contain', 'were not on the uploaded file or the current cell certificate, but have been added')
     detailPage
       .locationsTable()
       .contains('tr', 'TST-A-1-003')

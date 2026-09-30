@@ -5,7 +5,7 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
-{% from '../../../macros/cellCertificateImportStatusTag.njk' import importLocationStatusTag, importLocationKey %}
+{% from '../../../macros/cellCertificateImportStatusTag.njk' import importLocationStatusTag, importLocationKey, importLocationDetails %}
 
 {% block content %}
   <div class="govuk-width-container">
@@ -45,7 +45,8 @@
               { key: { text: "Unchanged" }, value: { text: importResults.certificateImport.skippedRecords } },
               { key: { text: "Failed" }, value: { text: importResults.certificateImport.failedRecords } },
               { key: { text: "Needing review" }, value: { text: importResults.certificateImport.discrepancyRecords or 0 } },
-              { key: { text: "Not on the uploaded certificate" }, value: { text: importResults.certificateImport.notOnCertificateRecords or 0 } }
+              { key: { text: "Carried forward" }, value: { text: importResults.carriedForwardRecords } },
+              { key: { text: "Added to the certificate" }, value: { text: importResults.addedRecords } }
             ]
           }) }}
 
@@ -60,14 +61,14 @@
             }) }}
           {% endif %}
 
-          {% if importResults.certificateImport.notOnCertificateRecords %}
+          {% if importResults.addedRecords %}
             {{ mojAlert({
               attributes: { "data-qa": "import-not-on-certificate-alert" },
               variant: "warning",
               title: "Cells added to the certificate",
               showTitleAsHeading: true,
               dismissible: false,
-              text: importResults.certificateImport.notOnCertificateRecords + " cell(s) were not on the uploaded file but have been added to the new cell certificate, using the values Residential locations holds. They are shown in the table below as ‘Added to certificate’. Check whether each one should be certified."
+              text: importResults.addedRecords + " cell(s) were not on the uploaded file or the current cell certificate, but have been added to the new cell certificate using the values Residential locations holds. They are shown in the table below as ‘Added to certificate’. Check whether each one should be certified."
             }) }}
           {% endif %}
         </div>
@@ -82,7 +83,7 @@
             { html: capacityCellHtml(row.maxCapacity) },
             { html: capacityCellHtml(row.workingCapacity) },
             { html: capacityCellHtml(row.certifiedNormalAccommodation) },
-            { text: row.message or "" }
+            { html: importLocationDetails(row) }
           ]), rows) %}
         {% endfor %}
 

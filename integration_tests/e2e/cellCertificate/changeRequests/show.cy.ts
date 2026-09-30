@@ -583,10 +583,10 @@ context('Cell Certificate - Change Requests - Show', () => {
         CellCertificateChangeRequestsShowPage.goTo('id1')
         Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
 
-        cy.get('[data-qa=import-summary]').should('contain', 'Not on the uploaded certificate')
+        cy.get('[data-qa=import-summary]').should('contain', 'Added to the certificate')
         cy.get('[data-qa=import-not-on-certificate-alert]').should(
           'contain',
-          'were not on the uploaded file but have been added to the new cell certificate',
+          'were not on the uploaded file or the current cell certificate, but have been added',
         )
         cy.get('[data-qa=import-results-table]')
           .contains('tr', 'TST-A-1-003')

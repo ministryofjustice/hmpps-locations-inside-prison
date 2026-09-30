@@ -6,7 +6,7 @@
 {% from "moj/components/alert/macro.njk" import mojAlert %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-{% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag, importLocationStatusTag, importLocationNeedsReviewTag, importLocationKey %}
+{% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag, importLocationStatusTag, importLocationNeedsReviewTag, importLocationKey, importLocationDetails %}
 
 {% block head %}
   {{ super() }}
@@ -60,7 +60,8 @@
             { key: { text: "No change" if isPreview else "Skipped" }, value: { text: certificateImport.skippedRecords } },
             { key: { text: "Will fail" if isPreview else "Failed" }, value: { text: certificateImport.failedRecords } },
             { key: { text: "Cells that would need review" if isPreview else "Cells needing review" }, value: { text: certificateImport.discrepancyRecords or 0 } },
-            { key: { text: "Cells that would be added to the certificate" if isPreview else "Cells not on the uploaded certificate" }, value: { text: certificateImport.notOnCertificateRecords or 0 } }
+            { key: { text: "Cells that would be carried forward" if isPreview else "Cells carried forward" }, value: { text: carriedForwardRecords } },
+            { key: { text: "Cells that would be added to the certificate" if isPreview else "Cells added to the certificate" }, value: { text: addedRecords } }
           ]
         }) }}
 
@@ -75,15 +76,21 @@
           }) }}
         {% endif %}
 
-        {% if not inProgress and certificateImport.notOnCertificateRecords %}
+        {% if not inProgress and addedRecords %}
           {{ mojAlert({
             attributes: { "data-qa": "not-on-certificate-alert" },
             variant: "warning",
             title: "Cells that would be added to the certificate" if isPreview else "Cells added to the certificate",
             showTitleAsHeading: true,
             dismissible: false,
-            text: (certificateImport.notOnCertificateRecords + " cell(s) are not on the uploaded file but would be added to the new cell certificate, using the values Residential locations holds. They are shown in the table below as ‘Would be added’. Check whether each one should be certified.") if isPreview else (certificateImport.notOnCertificateRecords + " cell(s) were not on the uploaded file but have been added to the new cell certificate, using the values Residential locations holds. They are shown in the table below as ‘Added to certificate’. Check whether each one should be certified.")
+            text: (addedRecords + " cell(s) are not on the uploaded file or the current cell certificate, but would be added to the new cell certificate using the values Residential locations holds. They are shown in the table below as ‘Would be added’. Check whether each one should be certified.") if isPreview else (addedRecords + " cell(s) were not on the uploaded file or the current cell certificate, but have been added to the new cell certificate using the values Residential locations holds. They are shown in the table below as ‘Added to certificate’. Check whether each one should be certified.")
           }) }}
+        {% endif %}
+
+        {% if not inProgress and carriedForwardRecords %}
+          <p class="govuk-body" data-qa="carried-forward-message">
+            {{ carriedForwardRecords }} cell(s) {{ "are" if isPreview else "were" }} not on the uploaded file but {{ "are" if isPreview else "were" }} already on the current cell certificate, so {{ "would be" if isPreview else "were" }} carried forward unchanged.
+          </p>
         {% endif %}
 
         {% if isPreview and not inProgress %}
@@ -130,7 +137,7 @@
               { html: capacityCellHtml(location.maxCapacity) },
               { html: capacityCellHtml(location.workingCapacity) },
               { html: capacityCellHtml(location.certifiedNormalAccommodation) },
-              { text: location.message or "" }
+              { html: importLocationDetails(location) }
             ]), rows) %}
           {% endfor %}
 

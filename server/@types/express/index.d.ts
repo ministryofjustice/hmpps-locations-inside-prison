@@ -220,11 +220,14 @@ interface AllLocals {
   importResults: {
     certificateImport: CellCertificateImport
     reportUrl: string
+    carriedForwardRecords: number
+    addedRecords: number
     rows: {
       locationKey: string
       url?: string
       status: string
       message?: string
+      certificateChange?: string
       maxCapacity: CapacityCell
       workingCapacity: CapacityCell
       certifiedNormalAccommodation: CapacityCell
@@ -235,12 +238,15 @@ interface AllLocals {
     url?: string
     status: string
     message?: string
+    certificateChange?: string
     needsReview: boolean
     maxCapacity: CapacityCell
     workingCapacity: CapacityCell
     certifiedNormalAccommodation: CapacityCell
   }[]
   isPreview: boolean
+  carriedForwardRecords: number
+  addedRecords: number
   certificateTotalsRows: { label: string; current: string; afterImport: string; changed: boolean }[]
   continueUrl: string
   continuedImportUrl: string

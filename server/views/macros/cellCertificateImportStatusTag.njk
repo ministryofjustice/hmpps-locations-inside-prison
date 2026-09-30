@@ -25,6 +25,9 @@
   {% endif %}
 {% endmacro %}
 
+{# The row's message, with any change to the cell's certified values beneath it. #}
+{% macro importLocationDetails(row) %}{{ row.message or "" }}{% if row.certificateChange %}{% if row.message %}<br>{% endif %}<span class="govuk-!-font-weight-bold" data-qa="certificate-change">{{ row.certificateChange }}</span>{% endif %}{% endmacro %}
+
 {% macro importLocationNeedsReviewTag() %}
   {{ govukTag({ text: "Needs review", classes: "govuk-tag--blue", attributes: { "data-qa": "location-needs-review-tag" } }) }}
 {% endmacro %}
@@ -37,8 +40,10 @@
     {{ govukTag({ text: "No change" if preview else "Skipped", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
   {% elif status == 'FAILED' %}
     {{ govukTag({ text: "Will fail" if preview else "Failed", classes: "govuk-tag--red", attributes: { "data-qa": "location-status-tag" } }) }}
-  {% elif status == 'NOT_ON_FILE' %}
+  {% elif status == 'ADDED' %}
     {{ govukTag({ text: "Would be added" if preview else "Added to certificate", classes: "govuk-tag--orange", attributes: { "data-qa": "location-status-tag" } }) }}
+  {% elif status == 'CARRIED_FORWARD' %}
+    {{ govukTag({ text: "Would be carried forward" if preview else "Carried forward", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
   {% else %}
     {{ govukTag({ text: "Pending", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
   {% endif %}

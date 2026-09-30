@@ -127,7 +127,7 @@ context('Cell certificate import preview', () => {
       .contains('tr', 'TST-A-1-003')
       .should('contain', 'Would be added')
       .and('contain', 'Not on the uploaded file. Would be added')
-    previewPage.notOnCertificateAlert().should('contain', 'would be added to the new cell certificate')
+    previewPage.notOnCertificateAlert().should('contain', 'but would be added to the new cell certificate')
 
     // and to the certificate as a whole
     previewPage.totalsTable().contains('tr', 'Max capacity').should('contain', '10').and('contain', '11')
@@ -139,6 +139,70 @@ context('Cell certificate import preview', () => {
     const importPage = Page.verifyOnPage(CellCertificateImportDetailPage)
     cy.get('.govuk-notification-banner').should('contain', 'Cell certificate import started')
     importPage.inProgressMessage().should('contain', 'This cell certificate is still being processed')
+  })
+
+  it('shows cells carried forward from the current certificate, and certificate changes for cells in the file', () => {
+    LocationsApiStubber.stub.stubCellCertificateImport({
+      ...finishedPreview,
+      notOnCertificateRecords: 2,
+      carriedForwardRecords: 1,
+      locations: [
+        {
+          locationKey: 'TST-A-1-002',
+          status: 'SKIPPED',
+          message: 'No changes required',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          previousMaxCapacity: 2,
+          previousWorkingCapacity: 2,
+          previousCertifiedNormalAccommodation: 2,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 1,
+          currentCertifiedNormalAccommodation: 2,
+        },
+      ],
+      locationsNotOnCertificate: [
+        {
+          locationKey: 'TST-A-1-003',
+          locationId: '7e570000-0000-0000-0000-000000000099',
+          maxCapacity: 2,
+          workingCapacity: 1,
+          certifiedNormalAccommodation: 2,
+          onCurrentCertificate: true,
+        },
+        {
+          locationKey: 'TST-A-1-004',
+          locationId: '7e570000-0000-0000-0000-000000000098',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          onCurrentCertificate: false,
+        },
+      ],
+    })
+
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/preview-1`)
+    const previewPage = Page.verifyOnPage(CellCertificateImportPreviewPage)
+
+    previewPage.summary().should('contain', 'Cells that would be carried forward')
+    cy.get('[data-qa=carried-forward-message]').should('contain', '1 cell(s) are not on the uploaded file')
+    previewPage
+      .notOnCertificateAlert()
+      .should('contain', '1 cell(s) are not on the uploaded file or the current cell certificate')
+    previewPage
+      .locationsTable()
+      .contains('tr', 'TST-A-1-003')
+      .should('contain', 'Would be carried forward')
+      .and('contain', 'carried forward unchanged from the current cell certificate')
+    previewPage.locationsTable().contains('tr', 'TST-A-1-004').should('contain', 'Would be added')
+    // 'No change' to Residential locations, but the certificate changes
+    previewPage
+      .locationsTable()
+      .contains('tr', 'TST-A-1-002')
+      .should('contain', 'No change')
+      .find('[data-qa=certificate-change]')
+      .should('contain', 'Certificate: working capacity 1 → 2')
   })
 
   it('cancels a preview without importing anything', () => {

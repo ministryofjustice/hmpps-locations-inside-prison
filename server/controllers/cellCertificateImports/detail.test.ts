@@ -5,8 +5,10 @@ import importDetail, {
   changeText,
   heldAndCertifiedCell,
   maxCapacityCell,
-  NOT_ON_FILE_MESSAGE,
-  NOT_ON_FILE_PREVIEW_MESSAGE,
+  ADDED_MESSAGE,
+  ADDED_PREVIEW_MESSAGE,
+  CARRIED_FORWARD_MESSAGE,
+  certificateChangeText,
   certificateTotalsRows,
   notOnCertificateLocationRows,
   workingCapacityCell,
@@ -176,15 +178,39 @@ describe('Cell certificate imports - detail', () => {
         {
           locationKey: 'TST-A-1-003',
           url: '/TST/abc-123/view',
-          status: 'NOT_ON_FILE',
-          message: NOT_ON_FILE_MESSAGE,
+          status: 'ADDED',
+          message: ADDED_MESSAGE,
           needsReview: false,
+          certificateChange: undefined,
           maxCapacity: { text: '2' },
           // zero is a real value, not a missing one
           workingCapacity: { text: '0' },
           certifiedNormalAccommodation: { text: '1' },
         },
       ])
+    })
+
+    it('shows a cell already on the current certificate as carried forward', async () => {
+      const [row] = notOnCertificateLocationRows(
+        [
+          {
+            locationKey: 'TST-A-1-003',
+            maxCapacity: 2,
+            workingCapacity: 1,
+            certifiedNormalAccommodation: 2,
+            onCurrentCertificate: true,
+          },
+        ],
+        'TST',
+      )
+
+      expect(row).toEqual(
+        expect.objectContaining({
+          status: 'CARRIED_FORWARD',
+          message: CARRIED_FORWARD_MESSAGE,
+          workingCapacity: { text: '1' },
+        }),
+      )
     })
 
     it('returns an empty list when there is nothing to report', async () => {
@@ -257,7 +283,7 @@ describe('Cell certificate imports - detail', () => {
     ])
     expect(locationRows[1]).toEqual(
       expect.objectContaining({
-        status: 'NOT_ON_FILE',
+        status: 'ADDED',
         url: '/TST/abc-123/view',
         workingCapacity: { text: '1' },
       }),
@@ -409,7 +435,7 @@ describe('Cell certificate imports - detail', () => {
         }),
       )
       expect(renderedLocals().locationRows).toContainEqual(
-        expect.objectContaining({ locationKey: 'TST-A-1-003', message: NOT_ON_FILE_PREVIEW_MESSAGE }),
+        expect.objectContaining({ locationKey: 'TST-A-1-003', message: ADDED_PREVIEW_MESSAGE }),
       )
     })
 
@@ -472,5 +498,139 @@ describe('Cell certificate imports - detail', () => {
     it('shows nothing when the totals could not be worked out', () => {
       expect(certificateTotalsRows(certificateImport)).toEqual([])
     })
+  })
+
+  describe('certificateChangeText', () => {
+    const row = {
+      locationKey: 'TST-A-1-002',
+      status: 'SKIPPED',
+      maxCapacity: 2,
+      workingCapacity: 2,
+      certifiedNormalAccommodation: 2,
+    } as const
+
+    it('shows a certified value that changes even when Residential locations does not', () => {
+      expect(
+        certificateChangeText(
+          {
+            ...row,
+            currentCertifiedMaxCapacity: 2,
+            currentCertifiedWorkingCapacity: 1,
+            currentCertifiedNormalAccommodation: 2,
+          },
+          true,
+        ),
+      ).toEqual('Certificate: working capacity 1 → 2')
+    })
+
+    it('lists every value that changes', () => {
+      expect(
+        certificateChangeText(
+          {
+            ...row,
+            currentCertifiedMaxCapacity: 3,
+            currentCertifiedWorkingCapacity: 1,
+            currentCertifiedNormalAccommodation: 1,
+          },
+          true,
+        ),
+      ).toEqual('Certificate: max capacity 3 → 2, working capacity 1 → 2, CNA 1 → 2')
+    })
+
+    it('says nothing when the certificate does not change', () => {
+      expect(
+        certificateChangeText(
+          {
+            ...row,
+            currentCertifiedMaxCapacity: 2,
+            currentCertifiedWorkingCapacity: 2,
+            currentCertifiedNormalAccommodation: 2,
+          },
+          true,
+        ),
+      ).toBeUndefined()
+    })
+
+    it('calls a cell new to the certificate only when the import recorded the current certificate', () => {
+      expect(certificateChangeText(row, true)).toEqual('New to the certificate')
+      // an import made before these values were recorded, or a prison with no certificate
+      expect(certificateChangeText(row, false)).toBeUndefined()
+    })
+
+    it('says nothing for a failed row or an archived location, which put nothing on the certificate', () => {
+      expect(certificateChangeText({ ...row, status: 'FAILED' }, true)).toBeUndefined()
+      expect(certificateChangeText({ ...row, message: 'Archived location' }, true)).toBeUndefined()
+    })
+  })
+
+  it('orders rows: needing review, added, certificate changes, failed, then the rest', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      carriedForwardRecords: 1,
+      notOnCertificateRecords: 2,
+      locations: [
+        {
+          locationKey: 'TST-A-1-010',
+          status: 'SKIPPED',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 2,
+          currentCertifiedNormalAccommodation: 2,
+          certifiedNormalAccommodation: 2,
+        },
+        { locationKey: 'TST-A-1-011', status: 'FAILED', maxCapacity: 2, workingCapacity: 2 },
+        {
+          locationKey: 'TST-A-1-012',
+          status: 'SKIPPED',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 1,
+          currentCertifiedNormalAccommodation: 2,
+          certifiedNormalAccommodation: 2,
+        },
+        {
+          locationKey: 'TST-A-1-013',
+          status: 'SKIPPED',
+          maxCapacity: 2,
+          workingCapacity: 1,
+          workingCapacityMismatch: true,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 1,
+          currentCertifiedNormalAccommodation: 2,
+          certifiedNormalAccommodation: 2,
+        },
+      ],
+      locationsNotOnCertificate: [
+        {
+          locationKey: 'TST-A-1-020',
+          onCurrentCertificate: true,
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+        },
+        {
+          locationKey: 'TST-A-1-021',
+          onCurrentCertificate: false,
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+        },
+      ],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const locals = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locals.locationRows.map((r: { locationKey: string }) => r.locationKey)).toEqual([
+      'TST-A-1-013', // needs review
+      'TST-A-1-021', // added
+      'TST-A-1-012', // certificate: working capacity 1 -> 2
+      'TST-A-1-011', // failed
+      'TST-A-1-010', // unchanged
+      'TST-A-1-020', // carried forward
+    ])
+    expect(locals).toEqual(expect.objectContaining({ carriedForwardRecords: 1, addedRecords: 1 }))
   })
 })

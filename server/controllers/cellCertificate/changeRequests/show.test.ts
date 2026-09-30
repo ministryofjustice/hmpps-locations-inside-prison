@@ -112,11 +112,45 @@ describe('Cell certificate change request - show', () => {
       expect.objectContaining({
         locationKey: 'TST-A-1-003',
         url: '/TST/location-3/view',
-        status: 'NOT_ON_FILE',
+        status: 'ADDED',
         maxCapacity: { text: '2' },
       }),
     )
     expect(locationsService.getLocationByKey).not.toHaveBeenCalled()
+  })
+
+  it('lists added cells and certificate changes, but only counts cells carried forward unchanged', async () => {
+    locationsService.getCellCertificateImportByApprovalRequest = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      notOnCertificateRecords: 2,
+      carriedForwardRecords: 1,
+      locations: [
+        {
+          locationKey: 'TST-A-1-012',
+          status: 'SKIPPED',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 1,
+          currentCertifiedNormalAccommodation: 2,
+        },
+      ],
+      locationsNotOnCertificate: [
+        { locationKey: 'TST-A-1-020', onCurrentCertificate: true, maxCapacity: 2 },
+        { locationKey: 'TST-A-1-021', onCurrentCertificate: false, maxCapacity: 2 },
+      ],
+    })
+
+    await show(deepReq as Request, deepRes as Response)
+
+    const { importResults } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(importResults.rows.map((r: { locationKey: string }) => r.locationKey)).toEqual([
+      'TST-A-1-012',
+      'TST-A-1-021',
+    ])
+    expect(importResults.rows[0].certificateChange).toEqual('Certificate: working capacity 1 → 2')
+    expect(importResults).toEqual(expect.objectContaining({ carriedForwardRecords: 1, addedRecords: 1 }))
   })
 
   // Imports that predate the link between an import and its approval request have nothing to find.
