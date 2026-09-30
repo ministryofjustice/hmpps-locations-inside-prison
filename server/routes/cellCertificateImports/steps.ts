@@ -21,7 +21,7 @@ const steps: FormWizard.Steps = {
   },
   '/confirm': {
     controller: ImportConfirm,
-    pageTitle: 'Confirm cell certificate import',
+    pageTitle: 'Check cell certificate data',
   },
 }
 

@@ -1,13 +1,19 @@
 import { Request, Response } from 'express'
 import { CapacityCell, TypedLocals } from '../../@types/express'
 import paths from '../../utils/paths'
-import { CellCertificateImportOmittedLocation } from '../../data/types/locationsApi/cellCertificateImport'
+import {
+  CellCertificateImport,
+  CellCertificateImportOmittedLocation,
+} from '../../data/types/locationsApi/cellCertificateImport'
 
 /** The result given to a cell that was not in the uploaded file but still went onto the new certificate. */
 export const NOT_ON_FILE_STATUS = 'NOT_ON_FILE'
 
 export const NOT_ON_FILE_MESSAGE =
   'Not on the uploaded file. Added to the new cell certificate using the values Residential locations holds.'
+
+export const NOT_ON_FILE_PREVIEW_MESSAGE =
+  'Not on the uploaded file. Would be added to the new cell certificate using the values Residential locations holds.'
 
 // Renders a "before -> after" string, handling 0 (a valid capacity) and missing previous values.
 export const changeText = (previous: number | undefined, current: number | undefined): string => {
@@ -84,12 +90,13 @@ const appliedCapacityCell = (
 export const notOnCertificateLocationRows = (
   locationsNotOnCertificate: CellCertificateImportOmittedLocation[] | undefined,
   prisonId?: string,
+  preview = false,
 ) =>
   (locationsNotOnCertificate || []).map(location => ({
     locationKey: location.locationKey,
     url: prisonId && location.locationId ? paths.location.view(prisonId, location.locationId) : undefined,
     status: NOT_ON_FILE_STATUS,
-    message: NOT_ON_FILE_MESSAGE,
+    message: preview ? NOT_ON_FILE_PREVIEW_MESSAGE : NOT_ON_FILE_MESSAGE,
     needsReview: false,
     maxCapacity: heldAndCertifiedCell(location.maxCapacity, undefined),
     workingCapacity: heldAndCertifiedCell(location.workingCapacity, undefined),
@@ -104,6 +111,27 @@ const rowOrder = (row: { needsReview: boolean; status: string }) => {
   return 2
 }
 
+// A preview compares the prison's current certificate with the one the import would create. A prison may have no
+// certificate yet, in which case there is nothing on the current side.
+export const certificateTotalsRows = (certificateImport: CellCertificateImport) => {
+  const current = certificateImport.currentCertificateTotals
+  const projected = certificateImport.projectedCertificateTotals
+  if (!projected) return []
+
+  const row = (label: string, key: 'maxCapacity' | 'workingCapacity' | 'certifiedNormalAccommodation') => ({
+    label,
+    current: current ? String(current[key]) : '-',
+    afterImport: String(projected[key]),
+    changed: !current || current[key] !== projected[key],
+  })
+
+  return [
+    row('Max capacity', 'maxCapacity'),
+    row('Working capacity', 'workingCapacity'),
+    row('CNA', 'certifiedNormalAccommodation'),
+  ]
+}
+
 export default async (req: Request, res: Response) => {
   const { locationsService } = req.services
   const { systemToken } = req.session
@@ -112,6 +140,8 @@ export default async (req: Request, res: Response) => {
 
   const certificateImport = await locationsService.getCellCertificateImport(systemToken, importId)
   const inProgress = certificateImport.status !== 'FINISHED'
+  const isPreview = certificateImport.mode === 'PREVIEW'
+  const listUrl = paths.prison.cellCertificateImports(prisonId)
 
   const uploadedRows = (certificateImport.locations || []).map(location => ({
     locationKey: location.locationKey,
@@ -133,16 +163,27 @@ export default async (req: Request, res: Response) => {
   // did not include but the certificate now does.
   const locationRows = [
     ...uploadedRows,
-    ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, prisonId),
+    ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, prisonId, isPreview),
   ].sort((a, b) => rowOrder(a) - rowOrder(b))
 
   const locals: TypedLocals = {
-    title: 'Cell certificate import',
+    title: isPreview ? 'Preview of cell certificate import' : 'Cell certificate import',
     certificateImport,
     locationRows,
     inProgress,
-    listUrl: paths.prison.cellCertificateImports(prisonId),
-    backLink: paths.prison.cellCertificateImports(prisonId),
+    isPreview,
+    certificateTotalsRows: isPreview ? certificateTotalsRows(certificateImport) : [],
+    // A finished preview can be continued once; after that it links to the import it became
+    continueUrl:
+      isPreview && !inProgress && !certificateImport.continuedAsUploadId
+        ? `${listUrl}/import/${certificateImport.id}/continue`
+        : undefined,
+    continuedImportUrl:
+      isPreview && certificateImport.continuedAsUploadId
+        ? `${listUrl}/import/${certificateImport.continuedAsUploadId}`
+        : undefined,
+    listUrl,
+    backLink: listUrl,
     cellCertificateUrl:
       certificateImport.status === 'FINISHED' && certificateImport.cellCertificateId
         ? paths.cellCertificate.view(prisonId, certificateImport.cellCertificateId)
@@ -152,6 +193,11 @@ export default async (req: Request, res: Response) => {
   const success = req.flash('success')
   if (success?.length) {
     locals.banner = { success: success[0] }
+  }
+
+  const errors = req.flash('error')
+  if (errors?.length) {
+    locals.validationErrors = [{ text: errors[0].content, href: '#' }]
   }
 
   return res.render('pages/cellCertificateImports/detail', locals)

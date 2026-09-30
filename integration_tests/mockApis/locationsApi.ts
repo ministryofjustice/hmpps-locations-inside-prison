@@ -1526,14 +1526,45 @@ const stubCellCertificateImport = (certificateImport: CellCertificateImport) =>
     },
   })
 
-const stubRequestCellCertificateImport = (certificateImport: CellCertificateImport) =>
+const stubRequestCellCertificatePreview = (preview: CellCertificateImport) =>
   stubFor({
     request: {
       method: 'POST',
-      urlPattern: `/locations-api/locations/bulk/update-cell-certificate/TST`,
+      urlPattern: `/locations-api/locations/bulk/update-cell-certificate/TST/preview`,
     },
     response: {
       status: 202,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: preview,
+    },
+  })
+
+// Either the import the preview became, or the error the API gives for a preview that cannot be continued.
+const stubContinueCellCertificatePreview = (
+  result: CellCertificateImport | { status: number; errorCode: number; userMessage: string },
+) =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern: `/locations-api/locations/bulk/update-cell-certificate/upload/[\\w-]+/import`,
+    },
+    response: {
+      status: 'id' in result ? 202 : result.status,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: result,
+    },
+  })
+
+// A single import by its id, for journeys that move between a preview and the import it became. WireMock prefers
+// the most recently added match, so this wins over stubCellCertificateImport for this id.
+const stubCellCertificateImportById = (certificateImport: CellCertificateImport) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/locations-api/locations/bulk/update-cell-certificate/upload/${certificateImport.id}`,
+    },
+    response: {
+      status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: certificateImport,
     },
@@ -1558,7 +1589,9 @@ const allStubs = {
   stubCellCertificateImportsList,
   stubCellCertificateImport,
   stubCellCertificateImportByApprovalRequest,
-  stubRequestCellCertificateImport,
+  stubRequestCellCertificatePreview,
+  stubContinueCellCertificatePreview,
+  stubCellCertificateImportById,
   stubGetPrisonConfiguration,
   stubLocations,
   stubLocationsBulkReactivate,

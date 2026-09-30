@@ -6,6 +6,7 @@ import protectRoute from '../../middleware/protectRoute'
 import asyncMiddleware from '../../middleware/asyncMiddleware'
 import importList from '../../controllers/cellCertificateImports/list'
 import importDetail from '../../controllers/cellCertificateImports/detail'
+import continuePreview from '../../controllers/cellCertificateImports/continuePreview'
 import logPageView from '../../middleware/logPageView'
 import { Services } from '../../services'
 import { Page } from '../../services/auditService'
@@ -27,6 +28,9 @@ export default function routes(services: Services): express.Router {
     logPageView(services.auditService, Page.CELL_CERTIFICATE_UPLOAD_DETAIL),
     asyncMiddleware(importDetail),
   )
+
+  // Continue a finished preview as a real import - the only way to start one
+  router.post('/import/:importId/continue', asyncMiddleware(continuePreview))
 
   router.use(
     '/new',

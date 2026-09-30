@@ -6,6 +6,8 @@ import importDetail, {
   heldAndCertifiedCell,
   maxCapacityCell,
   NOT_ON_FILE_MESSAGE,
+  NOT_ON_FILE_PREVIEW_MESSAGE,
+  certificateTotalsRows,
   notOnCertificateLocationRows,
   workingCapacityCell,
 } from './detail'
@@ -372,5 +374,103 @@ describe('Cell certificate imports - detail', () => {
       'pages/cellCertificateImports/detail',
       expect.objectContaining({ inProgress: true, cellCertificateUrl: undefined }),
     )
+  })
+
+  describe('previews', () => {
+    const preview = {
+      ...certificateImport,
+      mode: 'PREVIEW',
+      cellCertificateId: undefined,
+      currentCertificateTotals: { maxCapacity: 10, workingCapacity: 9, certifiedNormalAccommodation: 8 },
+      projectedCertificateTotals: { maxCapacity: 11, workingCapacity: 9, certifiedNormalAccommodation: 8 },
+      notOnCertificateRecords: 1,
+      locationsNotOnCertificate: [{ locationId: 'abc-123', locationKey: 'TST-A-1-003', maxCapacity: 1 }],
+    } as CellCertificateImport
+
+    const renderedLocals = () => (deepRes.render as jest.Mock).mock.calls[0][1]
+
+    it('renders a finished preview with its totals and the option to continue', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(preview)
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals()).toEqual(
+        expect.objectContaining({
+          title: 'Preview of cell certificate import',
+          isPreview: true,
+          continueUrl: '/TST/cell-certificate-imports/import/import-1/continue',
+          continuedImportUrl: undefined,
+          cellCertificateUrl: undefined,
+          certificateTotalsRows: [
+            { label: 'Max capacity', current: '10', afterImport: '11', changed: true },
+            { label: 'Working capacity', current: '9', afterImport: '9', changed: false },
+            { label: 'CNA', current: '8', afterImport: '8', changed: false },
+          ],
+        }),
+      )
+      expect(renderedLocals().locationRows).toContainEqual(
+        expect.objectContaining({ locationKey: 'TST-A-1-003', message: NOT_ON_FILE_PREVIEW_MESSAGE }),
+      )
+    })
+
+    it('does not offer to continue a preview that is still being worked out', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({ ...preview, status: 'STARTED' })
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals().continueUrl).toBeUndefined()
+      expect(renderedLocals().inProgress).toBe(true)
+    })
+
+    it('links a continued preview to the import it became instead of offering to continue it again', async () => {
+      locationsService.getCellCertificateImport = jest
+        .fn()
+        .mockResolvedValue({ ...preview, continuedAsUploadId: 'import-2' })
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals().continueUrl).toBeUndefined()
+      expect(renderedLocals().continuedImportUrl).toEqual('/TST/cell-certificate-imports/import/import-2')
+    })
+
+    it('shows why a preview could not be continued', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(preview)
+      deepReq.flash = jest
+        .fn()
+        .mockImplementation(type => (type === 'error' ? [{ title: 'There is a problem', content: 'Out of date' }] : []))
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals().validationErrors).toEqual([{ text: 'Out of date', href: '#' }])
+    })
+
+    it('never offers to continue an import', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(certificateImport)
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals()).toEqual(
+        expect.objectContaining({ isPreview: false, continueUrl: undefined, certificateTotalsRows: [] }),
+      )
+    })
+  })
+
+  describe('certificateTotalsRows', () => {
+    it('shows every total as changed when the prison has no certificate yet', () => {
+      const rows = certificateTotalsRows({
+        ...certificateImport,
+        projectedCertificateTotals: { maxCapacity: 3, workingCapacity: 2, certifiedNormalAccommodation: 1 },
+      })
+
+      expect(rows).toEqual([
+        { label: 'Max capacity', current: '-', afterImport: '3', changed: true },
+        { label: 'Working capacity', current: '-', afterImport: '2', changed: true },
+        { label: 'CNA', current: '-', afterImport: '1', changed: true },
+      ])
+    })
+
+    it('shows nothing when the totals could not be worked out', () => {
+      expect(certificateTotalsRows(certificateImport)).toEqual([])
+    })
   })
 })

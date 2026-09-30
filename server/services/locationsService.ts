@@ -193,12 +193,16 @@ export default class LocationsService {
     return this.locationsApiClient.cellCertificates.getById(token, { id })
   }
 
-  async requestCellCertificateImport(token: string, prisonId: string, locations: BulkCapacityUpdate) {
-    return this.locationsApiClient.cellCertificateImports.request(
+  async requestCellCertificatePreview(token: string, prisonId: string, locations: BulkCapacityUpdate) {
+    return this.locationsApiClient.cellCertificateImports.preview(
       token,
       { prisonId },
       { locations, reasonForChange: CELL_CERTIFICATE_IMPORT_REASON },
     )
+  }
+
+  async continueCellCertificatePreview(token: string, previewId: string) {
+    return this.locationsApiClient.cellCertificateImports.continuePreview(token, { uploadId: previewId })
   }
 
   async getCellCertificateImports(token: string, prisonId: string, status?: string) {

@@ -32,10 +32,29 @@ export declare interface CellCertificateImportOmittedLocation {
   certifiedNormalAccommodation?: number
 }
 
+/** Capacity totals across a whole cell certificate. */
+export declare interface CellCertificateTotals {
+  maxCapacity: number
+  workingCapacity: number
+  certifiedNormalAccommodation: number
+}
+
+/** A preview works out what the import would do without changing anything; an import changes the locations. */
+export type CellCertificateImportMode = 'PREVIEW' | 'IMPORT'
+
 export declare interface CellCertificateImport {
   id: string
   prisonId: string
   status: CellCertificateImportStatus
+  mode?: CellCertificateImportMode
+  /** On an import, the preview it was continued from. */
+  previewUploadId?: string
+  /** On a preview, the import it was continued as. */
+  continuedAsUploadId?: string
+  /** On a finished preview, the totals of the prison's current certificate, if it has one. */
+  currentCertificateTotals?: CellCertificateTotals
+  /** On a finished preview, the totals the new certificate would have if the import went ahead. */
+  projectedCertificateTotals?: CellCertificateTotals
   totalRecords: number
   processedRecords: number
   skippedRecords: number

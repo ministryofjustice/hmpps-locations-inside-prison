@@ -239,6 +239,10 @@ interface AllLocals {
     workingCapacity: CapacityCell
     certifiedNormalAccommodation: CapacityCell
   }[]
+  isPreview: boolean
+  certificateTotalsRows: { label: string; current: string; afterImport: string; changed: boolean }[]
+  continueUrl: string
+  continuedImportUrl: string
   pendingApprovalsBelow: PendingApprovalsBelow
   changeRequestsLink: string
 }

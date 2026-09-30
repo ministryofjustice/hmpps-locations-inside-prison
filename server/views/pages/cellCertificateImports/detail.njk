@@ -4,6 +4,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "moj/components/alert/macro.njk" import mojAlert %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag, importLocationStatusTag, importLocationNeedsReviewTag, importLocationKey %}
 
 {% block head %}
@@ -21,9 +23,23 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
 
+        {% if isPreview %}
+          {{ govukInsetText({
+            html: "This is a preview. <strong>Nothing has been changed yet.</strong> It shows what importing this file would do to Residential locations and the cell certificate." + (" Check the results, then choose whether to continue with the import at the bottom of this page." if continueUrl else ""),
+            attributes: { "data-qa": "preview-message" }
+          }) }}
+        {% endif %}
+
+        {% if continuedImportUrl %}
+          <p class="govuk-body" data-qa="continued-message">
+            This preview has been continued as an import.
+            <a class="govuk-link" href="{{ continuedImportUrl }}" data-qa="continued-import-link">View the import</a>
+          </p>
+        {% endif %}
+
         {% if inProgress %}
           {{ govukInsetText({
-            text: "This cell certificate is still being processed. This page updates automatically.",
+            text: ("The preview is still being worked out." if isPreview else "This cell certificate is still being processed.") + " This page updates automatically.",
             attributes: { "data-qa": "in-progress-message" }
           }) }}
           <p class="govuk-body">
@@ -40,11 +56,11 @@
             { key: { text: "Started" }, value: { text: (certificateImport.startTime | formatDateWithTime) if certificateImport.startTime else "-" } },
             { key: { text: "Completed" }, value: { text: (certificateImport.endTime | formatDateWithTime) if certificateImport.endTime else "-" } },
             { key: { text: "Total records" }, value: { text: certificateImport.totalRecords } },
-            { key: { text: "Processed" }, value: { text: certificateImport.processedRecords } },
-            { key: { text: "Skipped" }, value: { text: certificateImport.skippedRecords } },
-            { key: { text: "Failed" }, value: { text: certificateImport.failedRecords } },
-            { key: { text: "Cells needing review" }, value: { text: certificateImport.discrepancyRecords or 0 } },
-            { key: { text: "Cells not on the uploaded certificate" }, value: { text: certificateImport.notOnCertificateRecords or 0 } }
+            { key: { text: "Will change" if isPreview else "Processed" }, value: { text: certificateImport.processedRecords } },
+            { key: { text: "No change" if isPreview else "Skipped" }, value: { text: certificateImport.skippedRecords } },
+            { key: { text: "Will fail" if isPreview else "Failed" }, value: { text: certificateImport.failedRecords } },
+            { key: { text: "Cells that would need review" if isPreview else "Cells needing review" }, value: { text: certificateImport.discrepancyRecords or 0 } },
+            { key: { text: "Cells that would be added to the certificate" if isPreview else "Cells not on the uploaded certificate" }, value: { text: certificateImport.notOnCertificateRecords or 0 } }
           ]
         }) }}
 
@@ -55,7 +71,7 @@
             title: "Check these cells’ working capacities",
             showTitleAsHeading: true,
             dismissible: false,
-            text: certificateImport.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the uploaded file, so the two do not match until someone reviews them."
+            text: (certificateImport.discrepancyRecords + " cell(s) would keep the working capacity Residential locations already holds. The cell certificate would record the value from the uploaded file, so the two would not match until someone reviews them.") if isPreview else (certificateImport.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the uploaded file, so the two do not match until someone reviews them.")
           }) }}
         {% endif %}
 
@@ -63,11 +79,39 @@
           {{ mojAlert({
             attributes: { "data-qa": "not-on-certificate-alert" },
             variant: "warning",
-            title: "Cells added to the certificate",
+            title: "Cells that would be added to the certificate" if isPreview else "Cells added to the certificate",
             showTitleAsHeading: true,
             dismissible: false,
-            text: certificateImport.notOnCertificateRecords + " cell(s) were not on the uploaded file but have been added to the new cell certificate, using the values Residential locations holds. They are shown in the table below as ‘Added to certificate’. Check whether each one should be certified."
+            text: (certificateImport.notOnCertificateRecords + " cell(s) are not on the uploaded file but would be added to the new cell certificate, using the values Residential locations holds. They are shown in the table below as ‘Would be added’. Check whether each one should be certified.") if isPreview else (certificateImport.notOnCertificateRecords + " cell(s) were not on the uploaded file but have been added to the new cell certificate, using the values Residential locations holds. They are shown in the table below as ‘Added to certificate’. Check whether each one should be certified.")
           }) }}
+        {% endif %}
+
+        {% if isPreview and not inProgress %}
+          <h2 class="govuk-heading-m">Cell certificate totals</h2>
+          {% if certificateTotalsRows.length %}
+            {% set totalsRows = [] %}
+            {% for row in certificateTotalsRows %}
+              {% set totalsRows = (totalsRows.push([
+                { text: row.label },
+                { text: row.current },
+                { html: ("<strong>" + row.afterImport + "</strong>") if row.changed else row.afterImport }
+              ]), totalsRows) %}
+            {% endfor %}
+            {% if not certificateImport.currentCertificateTotals %}
+              <p class="govuk-body" data-qa="no-current-certificate">This prison does not have a cell certificate yet.</p>
+            {% endif %}
+            {{ govukTable({
+              attributes: { "data-qa": "certificate-totals-table" },
+              head: [
+                { text: "Total" },
+                { text: "Current certificate", format: "numeric" },
+                { text: "After this import", format: "numeric" }
+              ],
+              rows: totalsRows
+            }) }}
+          {% else %}
+            <p class="govuk-body" data-qa="no-certificate-totals">The certificate totals could not be worked out for this preview.</p>
+          {% endif %}
         {% endif %}
 
         {% if cellCertificateUrl %}
@@ -82,7 +126,7 @@
           {% for location in locationRows %}
             {% set rows = (rows.push([
               { html: importLocationKey(location) },
-              { html: importLocationStatusTag(location.status) + (importLocationNeedsReviewTag() if location.needsReview else "") },
+              { html: importLocationStatusTag(location.status, isPreview) + (importLocationNeedsReviewTag() if location.needsReview else "") },
               { html: capacityCellHtml(location.maxCapacity) },
               { html: capacityCellHtml(location.workingCapacity) },
               { html: capacityCellHtml(location.certifiedNormalAccommodation) },
@@ -104,6 +148,26 @@
           }) }}
         {% else %}
           <p class="govuk-body" data-qa="no-locations">No cell results are available for this import.</p>
+        {% endif %}
+
+        {% if continueUrl %}
+          <h2 class="govuk-heading-m">Do you want to continue with the import?</h2>
+          {{ govukWarningText({
+            text: "Continuing will change Residential locations and create a new cell certificate. The import checks everything again when it runs, so if anything has changed since this preview the results may be different.",
+            iconFallbackText: "Warning",
+            attributes: { "data-qa": "continue-warning" }
+          }) }}
+          <form method="post" action="{{ continueUrl }}" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <div class="govuk-button-group">
+              {{ govukButton({
+                text: "Continue with import",
+                preventDoubleClick: true,
+                attributes: { "data-qa": "continue-button" }
+              }) }}
+              <a class="govuk-link" href="{{ listUrl }}" data-qa="cancel-link">Cancel</a>
+            </div>
+          </form>
         {% endif %}
 
       </div>

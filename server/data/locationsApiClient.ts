@@ -53,12 +53,17 @@ export default class LocationsApiClient extends BaseApiClient {
   // The API still calls this an upload: the paths, the `:uploadId` placeholder and the DTO field names
   // below are its, and must keep matching it. Everything the rest of the UI sees is named "import".
   cellCertificateImports = {
-    request: this.apiCall<
+    // Every import is previewed first; continuing the preview is the only way to start an import.
+    preview: this.apiCall<
       CellCertificateImport,
       { prisonId: string },
       { locations: BulkCapacityUpdate; reasonForChange?: string }
     >({
-      path: '/locations/bulk/update-cell-certificate/:prisonId',
+      path: '/locations/bulk/update-cell-certificate/:prisonId/preview',
+      requestType: 'post',
+    }),
+    continuePreview: this.apiCall<CellCertificateImport, { uploadId: string }>({
+      path: '/locations/bulk/update-cell-certificate/upload/:uploadId/import',
       requestType: 'post',
     }),
     listForPrison: this.apiCall<CellCertificateImport[], { prisonId: string; status?: string }>({
