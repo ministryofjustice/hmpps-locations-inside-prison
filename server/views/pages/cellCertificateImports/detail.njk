@@ -93,8 +93,8 @@
             {% for row in certificateTotalsRows %}
               {% set totalsRows = (totalsRows.push([
                 { text: row.label },
-                { text: row.current },
-                { html: ("<strong>" + row.afterImport + "</strong>") if row.changed else row.afterImport }
+                { text: row.current, format: "numeric" },
+                { html: ("<strong>" + row.afterImport + "</strong>") if row.changed else row.afterImport, format: "numeric" }
               ]), totalsRows) %}
             {% endfor %}
             {% if not certificateImport.currentCertificateTotals %}
