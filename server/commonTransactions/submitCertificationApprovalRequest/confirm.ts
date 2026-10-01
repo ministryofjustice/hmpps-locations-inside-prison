@@ -388,7 +388,7 @@ export default class Confirm extends FormStep {
       const newBaselineCna = Number(sessionModel.get<string>('baselineCna'))
       const newWorkingCapacity = Number(sessionModel.get<string>('workingCapacity'))
       const newMaxCapacity = Number(sessionModel.get<string>('maxCapacity'))
-      const explanation = sessionModel.get<string>('explanation')
+      const explanation = sessionModel.get<string>('reason')
       const { certifiedNormalAccommodation, workingCapacity, maxCapacity } = getLocationAttributesIncludePending(
         locals.location,
       )
@@ -412,7 +412,7 @@ export default class Confirm extends FormStep {
         ],
       })
 
-      const changeLink = `${paths.location.changeCellCapacity(locals.location)}/details/edit`
+      const changeLink = `${paths.location.changeCellCapacity(locals.location)}/reason/edit`
       addChangeLinksToLocals(locals, 'CAPACITY_CHANGE', { reasonForChange: changeLink })
     } else if (req.form.options.name === 'working-capacity-mismatch') {
       const { location } = res.locals

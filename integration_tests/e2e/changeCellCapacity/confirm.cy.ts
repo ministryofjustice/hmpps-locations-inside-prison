@@ -7,6 +7,8 @@ import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import AuthStubber from '../../mockApis/auth'
 import ShouldUpdateCertPage from '../../pages/changeCellCapacity/shouldUpdateCert'
+import ChangeCellCapacityReasonPage from '../../pages/changeCellCapacity/reason'
+import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 
 context('Change cell capacity - confirm', () => {
   context('with the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -249,6 +251,20 @@ context('Change cell capacity - confirm', () => {
       cy.get('.govuk-inset-text').contains(
         "The cell's working capacity will not match the certified working capacity once you update the capacity.",
       )
+    })
+
+    it('asks for a reason when choosing to update the certificate', () => {
+      ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
+      const changeCellCapacityPage = Page.verifyOnPage(ChangeCellCapacityPage)
+      changeCellCapacityPage.workingCapacityInput().clear().type('2')
+      changeCellCapacityPage.continueButton().click()
+
+      Page.verifyOnPage(ShouldUpdateCertPage).submit({ updateCert: true })
+      new CertChangeDisclaimerPage("Changing the cell's capacity").submit()
+
+      Page.verifyOnPage(ChangeCellCapacityReasonPage).submit({ reason: 'Because the bed is broken' })
+      cy.get('.govuk-summary-list__key').contains('Explanation')
+      cy.get('.govuk-summary-list__value').contains('Because the bed is broken')
     })
   })
 })

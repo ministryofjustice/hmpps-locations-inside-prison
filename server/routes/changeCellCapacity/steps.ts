@@ -4,6 +4,7 @@ import ConfirmCellCapacity from '../../controllers/changeCellCapacity/confirm'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import ShouldUpdateCert from '../../controllers/changeCellCapacity/shouldUpdateCert'
+import FormStep from '../../controllers/base/formStep'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 import paths from '../../utils/paths'
 
@@ -57,9 +58,24 @@ const steps: FormWizard.Steps = {
     skip: true,
   },
   ...CertChangeDisclaimer.getSteps({
-    next: 'submit-certification-approval-request',
+    next: [
+      {
+        fn: req => req.sessionModel.get('onlyWorkingCapChanged') && req.sessionModel.get('updateCert') === 'YES',
+        next: 'reason',
+      },
+      'submit-certification-approval-request',
+    ],
     title: (_req, _res) => `Changing the cell's capacity`,
   }),
+  '/reason': {
+    pageTitle: 'Explain why you need to change the cell’s capacity',
+    editable: true,
+    editBackStep: 'submit-certification-approval-request',
+    fields: ['reason'],
+    controller: FormStep,
+    next: 'submit-certification-approval-request',
+    template: '../../partials/formStepNoTitle',
+  },
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 

@@ -781,6 +781,24 @@ describe('Confirm', () => {
     })
   })
 
+  describe('generateRequests - change-cell-capacity', () => {
+    it('uses the reason as the reasonForChange', async () => {
+      deepReq.form.options.name = 'change-cell-capacity'
+      deepReq.sessionModel.set('baselineCna', '2')
+      deepReq.sessionModel.set('workingCapacity', '1')
+      deepReq.sessionModel.set('maxCapacity', '2')
+      deepReq.sessionModel.set('reason', 'Broken bed')
+      locationsService.getLocation.mockResolvedValueOnce(deepRes.locals.location as any)
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.proposedCertificationApprovalRequests[0]).toMatchObject({
+        approvalType: 'CAPACITY_CHANGE',
+        reasonForChange: 'Broken bed',
+      })
+    })
+  })
+
   describe('saveValues - when creating every type of request', () => {
     beforeEach(() => {
       deepRes.locals.proposedCertificationApprovalRequests = approvalTypesData.map(d =>
