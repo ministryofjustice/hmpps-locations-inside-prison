@@ -5,7 +5,6 @@ import minLength from '../../validators/minLength'
 import numericString from '../../validators/numericString'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import { hasCertifiedWorkingCapacity, isCertChange } from './steps'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 const fields: FormWizard.Fields = {
   reduceWorkingCapacity: {
@@ -179,7 +178,6 @@ const fields: FormWizard.Fields = {
     'ignore-defaults': true,
   },
   ...SubmitCertificationApprovalRequest.getFields(),
-  ...UpdateSignedOpCap.getFields(),
 }
 
 fields['submit-certification-approval-request_confirmation'] = {

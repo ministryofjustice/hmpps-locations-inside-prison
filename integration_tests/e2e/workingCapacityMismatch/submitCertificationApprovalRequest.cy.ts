@@ -4,94 +4,44 @@ import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactio
 import goToSubmitCertificationApprovalRequest from './goToSubmitCertificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
 import { setupStubs } from './setupStubs'
-import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 
 context('Working Capacity Mismatch - Submit certification approval request', () => {
   let page: SubmitCertificationApprovalRequestPage
 
   beforeEach(() => {
     setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
+    page = goToSubmitCertificationApprovalRequest()
   })
 
-  context('with a signed op cap change', () => {
-    beforeEach(() => {
-      page = goToSubmitCertificationApprovalRequest({ opCap: 10, explanation: 'Op cap update was needed' })
-    })
+  it('has a cancel link', () => {
+    page.cancelLink().click()
 
-    it('has a cancel link', () => {
-      page.cancelLink().click()
+    Page.verifyOnPage(ViewLocationsShowPage)
+  })
 
-      Page.verifyOnPage(ViewLocationsShowPage)
-    })
+  it('has a back link', () => {
+    page.backLink().click()
 
-    it('has a back link', () => {
-      page.backLink().click()
+    Page.verifyOnPage(CertChangeDisclaimerPage, 'Changing the cell’s capacity')
+  })
 
-      Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-    })
+  context('validation errors', () => {
+    it('displays the correct error(s) for required', () => {
+      page.submit({})
 
-    context('validation errors', () => {
-      it('displays the correct error(s) for required', () => {
-        page.submit({})
-
-        Page.checkForError(
-          'submit-certification-approval-request_confirmation',
-          'Confirm that the cells meet the certification standards',
-        )
-      })
-    })
-
-    it('proceeds to the requests index and displays a success banner when the form is submitted with valid data', () => {
-      page.submit({
-        confirm: true,
-      })
-
-      Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-
-      Page.checkForSuccessBanner(
-        'Change requests sent',
-        'You have submitted 2 requests to update the cell certificate.',
+      Page.checkForError(
+        'submit-certification-approval-request_confirmation',
+        'Confirm that the cells meet the certification standards',
       )
     })
   })
 
-  context('without a signed op cap change', () => {
-    beforeEach(() => {
-      page = goToSubmitCertificationApprovalRequest()
-    })
+  it('proceeds to the requests index and displays a success banner when the form is submitted with valid data', () => {
+    page.submit({ confirm: true })
 
-    it('has a cancel link', () => {
-      page.cancelLink().click()
+    Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
 
-      Page.verifyOnPage(ViewLocationsShowPage)
-    })
-
-    it('has a back link', () => {
-      page.backLink().click()
-
-      Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-    })
-
-    context('validation errors', () => {
-      it('displays the correct error(s) for required', () => {
-        page.submit({})
-
-        Page.checkForError(
-          'submit-certification-approval-request_confirmation',
-          'Confirm that the cells meet the certification standards',
-        )
-      })
-    })
-
-    it('proceeds to the requests index and displays a success banner when the form is submitted with valid data', () => {
-      page.submit({
-        confirm: true,
-      })
-
-      Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-
-      Page.checkForSuccessBanner('Change request sent', 'You have submitted a request to update the cell certificate.')
-    })
+    Page.checkForSuccessBanner('Change request sent', 'You have submitted a request to update the cell certificate.')
   })
 })

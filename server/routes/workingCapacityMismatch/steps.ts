@@ -2,7 +2,6 @@ import FormWizard from 'hmpo-form-wizard'
 import DetailsController from '../../controllers/workingCapacityMismatch/details'
 import ConfirmController from '../../controllers/workingCapacityMismatch/confirm'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import paths from '../../utils/paths'
 
@@ -26,10 +25,9 @@ const steps: FormWizard.Steps = {
     controller: ConfirmController,
   },
   ...CertChangeDisclaimer.getSteps({
-    next: 'update-signed-op-cap',
+    next: 'submit-certification-approval-request',
     title: (_req, _res) => `Changing the cell’s capacity`,
   }),
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 

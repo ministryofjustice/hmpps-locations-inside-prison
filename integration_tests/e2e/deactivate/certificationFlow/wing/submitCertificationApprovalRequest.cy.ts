@@ -4,21 +4,17 @@ import SubmitCertificationApprovalRequestPage from '../../../../pages/commonTran
 import goToSubmitCertificationApprovalRequest from './goToSubmitCertificationApprovalRequest'
 import CellCertificateChangeRequestsIndexPage from '../../../../pages/cellCertificate/changeRequests'
 import { setupStubs } from './setupStubs'
-import UpdateSignedOpCapDetailsPage from '../../../../pages/commonTransactions/updateSignedOpCap/details'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import DeactivateTemporaryDetailsPage from '../../../../pages/deactivate/temporary/details'
 
 context('Certification Deactivation - Wing - Submit certification approval request', () => {
   let page: SubmitCertificationApprovalRequestPage
 
   beforeEach(() => {
     setupStubs('MANAGE_RES_LOCATIONS_OP_CAP')
+    page = goToSubmitCertificationApprovalRequest()
   })
 
-  context('Without a signed op cap change', () => {
-    beforeEach(() => {
-      page = goToSubmitCertificationApprovalRequest(false)
-    })
-
+  context('Submit approval request', () => {
     it('has a cancel link', () => {
       page.cancelLink().click()
 
@@ -28,7 +24,7 @@ context('Certification Deactivation - Wing - Submit certification approval reque
     it('has a back link', () => {
       page.backLink().click()
 
-      Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+      Page.verifyOnPage(DeactivateTemporaryDetailsPage)
     })
 
     context('validation errors', () => {
@@ -47,45 +43,6 @@ context('Certification Deactivation - Wing - Submit certification approval reque
       Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
 
       Page.checkForSuccessBanner('Change request sent', 'You have submitted a request to update the cell certificate.')
-    })
-  })
-
-  context('With a signed op cap change', () => {
-    beforeEach(() => {
-      page = goToSubmitCertificationApprovalRequest(true)
-    })
-
-    it('has a cancel link', () => {
-      page.cancelLink().click()
-
-      Page.verifyOnPage(ViewLocationsShowPage)
-    })
-
-    it('has a back link', () => {
-      page.backLink().click()
-
-      Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-    })
-
-    context('validation errors', () => {
-      it('displays the correct error(s) for required', () => {
-        page.submit({})
-
-        Page.checkForError('submit-certification-approval-request_confirmation', 'Confirm changes have been agreed')
-      })
-    })
-
-    it('proceeds to the requests index and displays a success banner when the form is submitted with valid data', () => {
-      page.submit({
-        confirm: true,
-      })
-
-      Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-
-      Page.checkForSuccessBanner(
-        'Change requests sent',
-        'You have submitted 2 requests to update the cell certificate.',
-      )
     })
   })
 })

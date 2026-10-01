@@ -9,12 +9,10 @@ import ReviewCellCapacityPage from '../../pages/removeCellType/review'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 import { Location } from '../../../server/data/types/locationsApi'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import AuthStubber from '../../mockApis/auth'
 import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
-import UpdateSignedOpCapDetailsPage from '../../pages/commonTransactions/updateSignedOpCap/details'
 import CellCertificateChangeRequestsIndexPage from '../../pages/cellCertificate/changeRequests'
 import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 
@@ -1256,7 +1254,7 @@ context('Remove cell type', () => {
             })
           })
 
-          it('progresses to the signed op cap change needed page', () => {
+          it('progresses to the certification approval request', () => {
             ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
             const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
             viewLocationsShowPage.removeCellTypeLink().click()
@@ -1264,7 +1262,7 @@ context('Remove cell type', () => {
             const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
             disclaimerPage.continueButton().click()
 
-            Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+            Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
           })
         })
 
@@ -1285,7 +1283,7 @@ context('Remove cell type', () => {
             })
           })
 
-          it('progresses to the signed op cap change needed page', () => {
+          it('progresses to the certification approval request', () => {
             ViewLocationsShowPage.goTo('TST', '7e570000-0000-0000-0000-000000000001')
             const viewLocationsShowPage = Page.verifyOnPage(ViewLocationsShowPage)
             viewLocationsShowPage.removeCellTypeLink().click()
@@ -1293,7 +1291,7 @@ context('Remove cell type', () => {
             const disclaimerPage = new CertChangeDisclaimerPage('Removing a special cell type')
             disclaimerPage.continueButton().click()
 
-            Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+            Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
           })
 
           const submitDisclaimer = () => {
@@ -1305,39 +1303,17 @@ context('Remove cell type', () => {
             disclaimerPage.continueButton().click()
           }
 
-          it('progresses to the op cap update needed page', () => {
+          it('progresses to the certification approval request', () => {
             submitDisclaimer()
-
-            Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-          })
-
-          it('progresses to the cert update details page when no is selected', () => {
-            submitDisclaimer()
-
-            const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-            isUpdateNeeded.submit({ updateNeeded: false })
 
             Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
           })
 
-          it('flows through to the cert update details page when yes is selected', () => {
-            submitDisclaimer()
-
-            const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-            isUpdateNeeded.submit({ updateNeeded: true })
-            const detailsPage = Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-
-            detailsPage.submit({ opCap: 9, explanation: 'Op cap update was needed' })
-            Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
-          })
-
-          context('Without a signed op cap change', () => {
+          context('Approval request', () => {
             let page: SubmitCertificationApprovalRequestPage
 
             beforeEach(() => {
               submitDisclaimer()
-              const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-              isUpdateNeeded.submit({ updateNeeded: false })
               page = Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
             })
 
@@ -1350,7 +1326,7 @@ context('Remove cell type', () => {
             it('has a back link', () => {
               page.backLink().click()
 
-              Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+              Page.verifyOnPage(CertChangeDisclaimerPage, 'Removing a special cell type')
             })
 
             context('validation errors', () => {
@@ -1390,86 +1366,6 @@ context('Remove cell type', () => {
               const cellTypeDataSelector = `${cellTypeTableSelector} .govuk-table__cell`
               cy.get(cellTypeDataSelector).eq(0).contains('A-1-001')
               cy.get(cellTypeDataSelector).eq(1).contains('Biohazard / dirty protest cell → None')
-            })
-          })
-
-          context('With a signed op cap change', () => {
-            let page: SubmitCertificationApprovalRequestPage
-
-            beforeEach(() => {
-              submitDisclaimer()
-              const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-              isUpdateNeeded.submit({ updateNeeded: true })
-              const detailsPage = Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-              detailsPage.submit({ opCap: 11, explanation: 'Op cap update was needed' })
-              page = Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
-            })
-
-            it('has a cancel link', () => {
-              page.cancelLink().click()
-
-              Page.verifyOnPage(ViewLocationsShowPage)
-            })
-
-            it('has a back link', () => {
-              page.backLink().click()
-
-              Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-            })
-
-            it('displays the correct change summaries', () => {
-              cy.get('[data-qa="approval-request-SPECIALIST_CELL_TYPE"] h2').contains(
-                'Change 1 - Remove special cell type',
-              )
-              const rowsSelector = '[data-qa="overview-list-SPECIALIST_CELL_TYPE"] .govuk-summary-list__value'
-              cy.get(rowsSelector).eq(0).contains('A-1-001')
-              cy.get(rowsSelector).eq(1).contains('Remove special cell type')
-
-              const cellTypeTableSelector = '[data-qa="specialist-cell-type-table"]'
-              const cellTypeHeaderSelector = `${cellTypeTableSelector} .govuk-table__header`
-              cy.get(cellTypeHeaderSelector).eq(0).contains('Location')
-              cy.get(cellTypeHeaderSelector).eq(1).contains('Cell type')
-
-              const cellTypeDataSelector = `${cellTypeTableSelector} .govuk-table__cell`
-              cy.get(cellTypeDataSelector).eq(0).contains('A-1-001')
-              cy.get(cellTypeDataSelector).eq(1).contains('Biohazard / dirty protest cell → None')
-
-              cy.get('[data-qa="approval-request-SIGNED_OP_CAP"] h2').contains(
-                'Change 2 - Change signed operational capacity',
-              )
-              const opCapRowsSelector = '[data-qa="overview-list-SIGNED_OP_CAP"] .govuk-summary-list__value'
-              cy.get(opCapRowsSelector).eq(0).contains('TST')
-              cy.get(opCapRowsSelector).eq(1).contains('Change signed operational capacity')
-              cy.get(opCapRowsSelector).eq(2).contains('Op cap update was needed')
-
-              const opCapChangesTableSelector = '[data-qa="cap-change-table"]'
-              const opCapChangesDataSelector = `${opCapChangesTableSelector} .govuk-table__cell`
-              cy.get(opCapChangesDataSelector).eq(0).contains('TST')
-              cy.get(opCapChangesDataSelector).eq(1).contains('10 → 11')
-            })
-
-            context('validation errors', () => {
-              it('displays the correct error(s) for required', () => {
-                page.submit({})
-
-                Page.checkForError(
-                  'submit-certification-approval-request_confirmation',
-                  'Confirm that the cells meet the certification standards',
-                )
-              })
-            })
-
-            it('proceeds to the requests index and displays a success banner when the form is submitted with valid data', () => {
-              page.submit({
-                confirm: true,
-              })
-
-              Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-
-              Page.checkForSuccessBanner(
-                'Change requests sent',
-                'You have submitted 2 requests to update the cell certificate.',
-              )
             })
           })
         })
@@ -1591,39 +1487,17 @@ context('Remove cell type', () => {
             reviewCellCapacityPage.continueButton().click()
           }
 
-          it('progresses to the op cap update needed page', () => {
+          it('progresses to the certification approval request', () => {
             submitCapacityUpdate()
-
-            Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-          })
-
-          it('progresses to the cert update details page when no is selected', () => {
-            submitCapacityUpdate()
-
-            const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-            isUpdateNeeded.submit({ updateNeeded: false })
 
             Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
           })
 
-          it('flows through to the cert update details page when yes is selected', () => {
-            submitCapacityUpdate()
-
-            const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-            isUpdateNeeded.submit({ updateNeeded: true })
-            const detailsPage = Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-
-            detailsPage.submit({ opCap: 9, explanation: 'Op cap update was needed' })
-            Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
-          })
-
-          context('Without a signed op cap change', () => {
+          context('Approval request', () => {
             let page: SubmitCertificationApprovalRequestPage
 
             beforeEach(() => {
               submitCapacityUpdate()
-              const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-              isUpdateNeeded.submit({ updateNeeded: false })
               page = Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
             })
 
@@ -1636,7 +1510,7 @@ context('Remove cell type', () => {
             it('has a back link', () => {
               page.backLink().click()
 
-              Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+              Page.verifyOnPage(ReviewCellCapacityPage)
             })
 
             context('validation errors', () => {
@@ -1680,90 +1554,6 @@ context('Remove cell type', () => {
               cy.get(cellTypeDataSelector).eq(1).contains('0 → 1')
               cy.get(cellTypeDataSelector).eq(2).contains('0 → 1')
               cy.get(cellTypeDataSelector).eq(3).contains('Biohazard / dirty protest cell → None')
-            })
-          })
-
-          context('With a signed op cap change', () => {
-            let page: SubmitCertificationApprovalRequestPage
-
-            beforeEach(() => {
-              submitCapacityUpdate()
-              const isUpdateNeeded = Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
-              isUpdateNeeded.submit({ updateNeeded: true })
-              const detailsPage = Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-              detailsPage.submit({ opCap: 11, explanation: 'Op cap update was needed' })
-              page = Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
-            })
-
-            it('has a cancel link', () => {
-              page.cancelLink().click()
-
-              Page.verifyOnPage(ViewLocationsShowPage)
-            })
-
-            it('has a back link', () => {
-              page.backLink().click()
-
-              Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-            })
-
-            it('displays the correct change summaries', () => {
-              cy.get('[data-qa="approval-request-SPECIALIST_CELL_TYPE"] h2').contains(
-                'Change 1 - Remove special cell type',
-              )
-              const rowsSelector = '[data-qa="overview-list-SPECIALIST_CELL_TYPE"] .govuk-summary-list__value'
-              cy.get(rowsSelector).eq(0).contains('A-1-001')
-              cy.get(rowsSelector).eq(1).contains('Remove special cell type')
-
-              const cellTypeTableSelector = '[data-qa="specialist-cell-type-table"]'
-              const cellTypeHeaderSelector = `${cellTypeTableSelector} .govuk-table__header`
-              cy.get(cellTypeHeaderSelector).eq(0).contains('Location')
-              cy.get(cellTypeHeaderSelector).eq(1).contains('Baseline CNA')
-              cy.get(cellTypeHeaderSelector).eq(2).contains('Certified working capacity')
-              cy.get(cellTypeHeaderSelector).eq(3).contains('Cell type')
-
-              const cellTypeDataSelector = `${cellTypeTableSelector} .govuk-table__cell`
-              cy.get(cellTypeDataSelector).eq(0).contains('A-1-001')
-              cy.get(cellTypeDataSelector).eq(1).contains('0 → 1')
-              cy.get(cellTypeDataSelector).eq(2).contains('0 → 1')
-              cy.get(cellTypeDataSelector).eq(3).contains('Biohazard / dirty protest cell → None')
-
-              cy.get('[data-qa="approval-request-SIGNED_OP_CAP"] h2').contains(
-                'Change 2 - Change signed operational capacity',
-              )
-              const opCapRowsSelector = '[data-qa="overview-list-SIGNED_OP_CAP"] .govuk-summary-list__value'
-              cy.get(opCapRowsSelector).eq(0).contains('TST')
-              cy.get(opCapRowsSelector).eq(1).contains('Change signed operational capacity')
-              cy.get(opCapRowsSelector).eq(2).contains('Op cap update was needed')
-
-              const opCapChangesTableSelector = '[data-qa="cap-change-table"]'
-              const opCapChangesDataSelector = `${opCapChangesTableSelector} .govuk-table__cell`
-              cy.get(opCapChangesDataSelector).eq(0).contains('TST')
-              cy.get(opCapChangesDataSelector).eq(1).contains('10 → 11')
-            })
-
-            context('validation errors', () => {
-              it('displays the correct error(s) for required', () => {
-                page.submit({})
-
-                Page.checkForError(
-                  'submit-certification-approval-request_confirmation',
-                  'Confirm that the cells meet the certification standards',
-                )
-              })
-            })
-
-            it('proceeds to the requests index and displays a success banner when the form is submitted with valid data', () => {
-              page.submit({
-                confirm: true,
-              })
-
-              Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-
-              Page.checkForSuccessBanner(
-                'Change requests sent',
-                'You have submitted 2 requests to update the cell certificate.',
-              )
             })
           })
         })

@@ -3,7 +3,6 @@ import greaterThan from '../../validators/greaterThan'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import canEditCna from '../../utils/canEditCna'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 
 const fields: FormWizard.Fields = {
   baselineCna: {
@@ -68,7 +67,6 @@ const fields: FormWizard.Fields = {
     items: [{ text: 'set at runtime', value: '' }],
     autocomplete: 'off',
   },
-  ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 

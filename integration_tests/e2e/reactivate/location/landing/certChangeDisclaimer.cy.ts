@@ -4,7 +4,7 @@ import CertChangeDisclaimerPage from '../../../../pages/commonTransactions/certC
 import goToCertChangeDisclaimer from '../goToCertChangeDisclaimer'
 import { setupStubs, location } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import SubmitCertificationApprovalRequestPage from '../../../../pages/commonTransactions/submitCertificationApprovalRequest'
 
 context('Certification Reactivation - Landing - Cert change disclaimer', () => {
   let page: CertChangeDisclaimerPage
@@ -27,9 +27,8 @@ context('Certification Reactivation - Landing - Cert change disclaimer', () => {
     Page.verifyOnPage(CheckCapacityPage)
   })
 
-  it('proceeds to update signed op cap on submit', () => {
+  it('proceeds to certification approval on submit', () => {
     page.submit()
-
-    Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+    Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
   })
 })

@@ -3,7 +3,7 @@ import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 import goToCertChangeDisclaimer from './goToCertChangeDisclaimer'
 import { setupStubs } from './setupStubs'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import SubmitCertificationApprovalRequestPage from '../../pages/commonTransactions/submitCertificationApprovalRequest'
 import WorkingCapacityMismatchDetails from '../../pages/workingCapacityMismatch/details'
 
 context('Working Capacity Mismatch - Cert change disclaimer', () => {
@@ -27,9 +27,9 @@ context('Working Capacity Mismatch - Cert change disclaimer', () => {
     Page.verifyOnPage(WorkingCapacityMismatchDetails)
   })
 
-  it('proceeds to update signed op cap on submit', () => {
+  it('proceeds to the certification approval request on submit', () => {
     page.submit()
 
-    Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+    Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
   })
 })

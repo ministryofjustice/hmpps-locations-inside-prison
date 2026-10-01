@@ -3,7 +3,7 @@ import Page from '../../../pages/page'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import NonResidentialConversionDetailsPage from '../../../pages/nonResidentialConversion/details'
 import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import SubmitCertificationApprovalRequestPage from '../../../pages/commonTransactions/submitCertificationApprovalRequest'
 import goToDetailsPage from './goToDetailsPage'
 
 context('Non-residential conversion - Cert flow - Details', () => {
@@ -61,10 +61,10 @@ context('Non-residential conversion - Cert flow - Details', () => {
       Page.checkForError('explanation', 'Enter a reason for this change')
     })
 
-    it('continues to the signed op cap update page when valid data is submitted', () => {
+    it('continues to the certification approval request when valid data is submitted', () => {
       page.submit({ convertedCellType: 'OFFICE', explanation: 'Want to change the room usage' })
 
-      Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+      Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
     })
   })
 })

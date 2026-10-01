@@ -1,15 +1,9 @@
 import Page from '../../../pages/page'
 import SubmitCertificationApprovalRequestPage from '../../../pages/commonTransactions/submitCertificationApprovalRequest'
-import goToUpdateSignedOpCapDetailsPage from './goToUpdateSignedOpCapDetailsPage'
-import goToUpdateSignedOpCapIsUpdateNeededPage from './goToUpdateSignedOpCapIsUpdateNeededPage'
+import goToDetailsPage from './goToDetailsPage'
 
-const goToSubmitCertificationApprovalRequestPage = (updateNeeded = false) => {
-  if (updateNeeded) {
-    goToUpdateSignedOpCapDetailsPage().submit({ opCap: 8, explanation: 'Updating the signed operational capacity' })
-  } else {
-    goToUpdateSignedOpCapIsUpdateNeededPage().submit({ updateNeeded: false })
-  }
-
+const goToSubmitCertificationApprovalRequestPage = () => {
+  goToDetailsPage().submit({ convertedCellType: 'OFFICE', explanation: 'Want to change the room usage' })
   return Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
 }
 

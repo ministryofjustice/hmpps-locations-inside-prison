@@ -4,50 +4,25 @@ import goToSubmitCertificationApprovalRequest from './goToSubmitCertificationApp
 import { Location } from '../../../../server/data/types/locationsApi'
 import Page from '../../../pages/page'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
-import UpdateSignedOpCapDetailsPage from '../../../pages/commonTransactions/updateSignedOpCap/details'
-import testGovukTable from '../../../support/testGovukTable'
-import testGovukSummaryList from '../../../support/testGovukSummaryList'
+import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
 import CellCertificateChangeRequestsIndexPage from '../../../pages/cellCertificate/changeRequests'
 
 const draftCellLocationId = '7e570000-0000-1000-8000-000000000221'
 
 function testRequests(
   page: SubmitCertificationApprovalRequestPage,
-  requests: [
-    { wing: Location; parentLanding: Location; draftCell: Location },
-    { oldOpCap: number; newOpCap: number; explanation: string }?,
-  ],
+  draftRequest: { wing: Location; parentLanding: Location; draftCell: Location },
 ) {
-  const draftRequest = requests[0]
-
-  if (requests.length > 1) {
-    page.request('DRAFT').find('h2').should('contain', 'Change 1 - Add new locations to certificate')
-    page.request('DRAFT').find('h3').should('contain', 'Proposed changes to the certificate')
-  } else {
-    page.request('DRAFT').find('h2').should('contain', 'Proposed changes to the certificate')
-    page.request('DRAFT').find('h3').should('contain', 'New wing usage')
-    page.request('DRAFT').find('h3').should('contain', 'New locations')
-  }
+  page.request('DRAFT').find('h2').should('contain', 'Proposed changes to the certificate')
+  page.request('DRAFT').find('h3').should('contain', 'New wing usage')
+  page.request('DRAFT').find('h3').should('contain', 'New locations')
 
   page.request('DRAFT').contains(draftRequest.wing.pathHierarchy)
   page.request('DRAFT').contains(draftRequest.parentLanding.pathHierarchy)
   page.request('DRAFT').contains(draftRequest.draftCell.pathHierarchy)
   page.request('DRAFT').contains(draftRequest.draftCell.cellMark)
 
-  if (requests.length === 1) {
-    page.request('SIGNED_OP_CAP').should('not.exist')
-  } else {
-    const capRequest = requests[1]
-
-    testGovukSummaryList('overview-list-SIGNED_OP_CAP', [
-      ['Location', 'TST'],
-      ['Change type', 'Change signed operational capacity'],
-      ['Explanation', capRequest.explanation],
-    ])
-
-    testGovukTable('cap-change-table', [['TST', `${capRequest.oldOpCap} → ${capRequest.newOpCap}`]])
-  }
+  page.request('SIGNED_OP_CAP').should('not.exist')
 }
 
 context('Add To Certificate - Draft Cell Existing Landing - Submit', () => {
@@ -56,61 +31,12 @@ context('Add To Certificate - Draft Cell Existing Landing - Submit', () => {
   context('With MANAGE_RES_LOCATIONS_OP_CAP role', () => {
     beforeEach(() => {
       setupStubs(['MANAGE_RES_LOCATIONS_OP_CAP'])
+      page = goToSubmitCertificationApprovalRequest(draftCellLocationId)
     })
 
-    context('When also updating signed op cap', () => {
-      beforeEach(() => {
-        page = goToSubmitCertificationApprovalRequest(draftCellLocationId, {
-          opCap: 210,
-          explanation: 'Dave told me to do it',
-        })
-      })
-
+    context('Submit approval request', () => {
       it('displays the correct information', () => {
-        testRequests(page, [
-          { wing: existingWing, parentLanding: existingLanding, draftCell },
-          { oldOpCap: 100, newOpCap: 210, explanation: 'Dave told me to do it' },
-        ])
-      })
-
-      it('displays the correct validation error when the checkbox is not checked', () => {
-        page.submit({})
-
-        Page.checkForError(
-          'submit-certification-approval-request_confirmation',
-          'Confirm that the cells meet the certification standards',
-        )
-      })
-
-      it('submits when the checkbox is checked', () => {
-        page.submit({ confirm: true })
-        Page.verifyOnPage(CellCertificateChangeRequestsIndexPage)
-
-        cy.get('#govuk-notification-banner-title').contains('Success')
-        cy.get('.govuk-notification-banner__content h3').contains('Change requests sent')
-        cy.get('.govuk-notification-banner__content p').contains(
-          'You have submitted 2 requests to update the cell certificate.',
-        )
-      })
-
-      it('has a back link to update signed op cap details', () => {
-        page.backLink().click()
-        Page.verifyOnPage(UpdateSignedOpCapDetailsPage)
-      })
-
-      it('has a cancel link to the view location show page', () => {
-        page.cancelLink().click()
-        Page.verifyOnPage(ViewLocationsShowPage)
-      })
-    })
-
-    context('When not updating signed op cap', () => {
-      beforeEach(() => {
-        page = goToSubmitCertificationApprovalRequest(draftCellLocationId)
-      })
-
-      it('displays the correct information', () => {
-        testRequests(page, [{ wing: existingWing, parentLanding: existingLanding, draftCell }])
+        testRequests(page, { wing: existingWing, parentLanding: existingLanding, draftCell })
       })
 
       it('displays the correct validation error when the checkbox is not checked', () => {
@@ -133,9 +59,9 @@ context('Add To Certificate - Draft Cell Existing Landing - Submit', () => {
         )
       })
 
-      it('has a back link to update signed op cap is update needed', () => {
+      it('has a back link to the certificate change disclaimer', () => {
         page.backLink().click()
-        Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+        Page.verifyOnPage(CertChangeDisclaimerPage, 'Adding new locations')
       })
 
       it('has a cancel link to the view location show page', () => {

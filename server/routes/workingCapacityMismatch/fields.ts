@@ -1,5 +1,4 @@
 import FormWizard from 'hmpo-form-wizard'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 
 const fields: FormWizard.Fields = {
@@ -21,7 +20,6 @@ const fields: FormWizard.Fields = {
     items: [{ text: 'set at runtime', value: '' }],
     autocomplete: 'off',
   },
-  ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 
