@@ -67,6 +67,28 @@ const fields: FormWizard.Fields = {
     items: [{ text: 'set at runtime', value: '' }],
     autocomplete: 'off',
   },
+  reason: {
+    validate: ['required'],
+    component: 'govukTextarea',
+    errorMessages: {
+      required: 'Explain why you need to change the cell’s capacity',
+    },
+    id: 'reason',
+    name: 'reason',
+    rows: 5,
+    label: {
+      text: 'Explain why you need to change the cell’s capacity',
+      classes: 'govuk-label--l govuk-!-margin-bottom-6',
+      for: 'reason',
+      isPageHeading: true,
+    },
+    hint: {
+      text: 'This will help the authorising director understand the need for the change to capacity.',
+    },
+    autocomplete: 'off',
+    // Don't strip newlines
+    'ignore-defaults': true,
+  },
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 
