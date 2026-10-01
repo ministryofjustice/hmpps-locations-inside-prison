@@ -5,6 +5,7 @@ import populateCertificationRequestDetails from '../../../middleware/populateCer
 import paths from '../../../utils/paths'
 import {
   ADDED_STATUS,
+  CONVERTED_CELL_CAPACITIES,
   capacityCell,
   certificateChangeText,
   hasCurrentCertificateValues,
@@ -59,17 +60,25 @@ const importResults = async (
             message: location.message,
             certificateChange,
             suggestion: suggestionText(location),
-            maxCapacity: capacityCell(location.previousMaxCapacity, location.maxCapacity, location.maxCapacityMismatch),
-            workingCapacity: capacityCell(
-              location.previousWorkingCapacity,
-              location.workingCapacity,
-              location.workingCapacityMismatch,
-            ),
-            certifiedNormalAccommodation: capacityCell(
-              location.previousCertifiedNormalAccommodation,
-              location.certifiedNormalAccommodation,
-              location.certifiedNormalAccommodationMismatch,
-            ),
+            ...(location.convertedCellType
+              ? CONVERTED_CELL_CAPACITIES
+              : {
+                  maxCapacity: capacityCell(
+                    location.previousMaxCapacity,
+                    location.maxCapacity,
+                    location.maxCapacityMismatch,
+                  ),
+                  workingCapacity: capacityCell(
+                    location.previousWorkingCapacity,
+                    location.workingCapacity,
+                    location.workingCapacityMismatch,
+                  ),
+                  certifiedNormalAccommodation: capacityCell(
+                    location.previousCertifiedNormalAccommodation,
+                    location.certifiedNormalAccommodation,
+                    location.certifiedNormalAccommodationMismatch,
+                  ),
+                }),
           })),
         ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, prisonId).filter(
           row => row.status === ADDED_STATUS,

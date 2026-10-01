@@ -97,6 +97,14 @@ const appliedCapacityCell = (
   text: changeText(previous, applied),
 })
 
+// A converted cell (an office, store, shower ...) holds no capacity, and the import certifies it at 0 whatever the file
+// says (MAPA-413), so its capacity columns show 0 rather than the file's values.
+export const CONVERTED_CELL_CAPACITIES = {
+  maxCapacity: { text: '0' },
+  workingCapacity: { text: '0' },
+  certifiedNormalAccommodation: { text: '0' },
+}
+
 // Cells that had no row in the upload still go onto the certificate, at the values shown: those they are certified at
 // when carried forward, or the values the location holds when added. They are rows alongside the uploaded cells so
 // the person reviewing can judge them. There is no before and after for them, so each column shows the single value.
@@ -151,10 +159,16 @@ export const certificateChangeText = (
     return hasCurrentCertificate ? 'New to the certificate' : undefined
   }
 
+  // A converted cell is certified at 0, whatever the file says
+  const converted = Boolean(location.convertedCellType)
   const changes = [
-    ['max capacity', current.max, location.maxCapacity],
-    ['working capacity', current.working, location.workingCapacity],
-    ['CNA', current.cna, location.certifiedNormalAccommodation ?? location.previousCertifiedNormalAccommodation],
+    ['max capacity', current.max, converted ? 0 : location.maxCapacity],
+    ['working capacity', current.working, converted ? 0 : location.workingCapacity],
+    [
+      'CNA',
+      current.cna,
+      converted ? 0 : (location.certifiedNormalAccommodation ?? location.previousCertifiedNormalAccommodation),
+    ],
   ]
     .filter(([, before, after]) => after !== undefined && after !== null && before !== after)
     .map(([label, before, after]) => `${label} ${before ?? '-'} → ${after}`)
@@ -220,13 +234,17 @@ export default async (req: Request, res: Response) => {
     needsReview: Boolean(
       location.workingCapacityMismatch || location.maxCapacityMismatch || location.certifiedNormalAccommodationMismatch,
     ),
-    maxCapacity: maxCapacityCell(location),
-    workingCapacity: workingCapacityCell(location),
-    certifiedNormalAccommodation: capacityCell(
-      location.previousCertifiedNormalAccommodation,
-      location.certifiedNormalAccommodation,
-      location.certifiedNormalAccommodationMismatch,
-    ),
+    ...(location.convertedCellType
+      ? CONVERTED_CELL_CAPACITIES
+      : {
+          maxCapacity: maxCapacityCell(location),
+          workingCapacity: workingCapacityCell(location),
+          certifiedNormalAccommodation: capacityCell(
+            location.previousCertifiedNormalAccommodation,
+            location.certifiedNormalAccommodation,
+            location.certifiedNormalAccommodationMismatch,
+          ),
+        }),
   }))
 
   const locationRows = [

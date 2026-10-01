@@ -670,4 +670,43 @@ describe('Cell certificate imports - detail', () => {
     const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
     expect(locationRows.every((row: { suggestion?: string }) => row.suggestion === undefined)).toBe(true)
   })
+
+  it('shows a converted cell at 0, as certified, and compares its certificate values with 0', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      discrepancyRecords: 1,
+      locations: [
+        {
+          locationKey: 'TST-A-1-007',
+          status: 'SKIPPED',
+          message: 'Converted cell (Office): it holds no capacity',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          appliedMaxCapacity: 0,
+          appliedWorkingCapacity: 0,
+          maxCapacityMismatch: true,
+          workingCapacityMismatch: true,
+          currentCertifiedMaxCapacity: 0,
+          currentCertifiedWorkingCapacity: 0,
+          currentCertifiedNormalAccommodation: 0,
+          convertedCellType: 'Office',
+        },
+      ],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const [row] = (deepRes.render as jest.Mock).mock.calls[0][1].locationRows
+    expect(row).toEqual(
+      expect.objectContaining({
+        needsReview: true,
+        maxCapacity: { text: '0' },
+        workingCapacity: { text: '0' },
+        certifiedNormalAccommodation: { text: '0' },
+        // certified at 0 before and after, whatever the file says
+        certificateChange: undefined,
+      }),
+    )
+  })
 })

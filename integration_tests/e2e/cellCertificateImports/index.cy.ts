@@ -110,7 +110,7 @@ context('Cell certificate imports', () => {
     const detailPage = Page.verifyOnPage(CellCertificateImportDetailPage)
 
     detailPage.summary().should('contain', 'Cells needing review')
-    detailPage.needsReviewAlert().should('contain', 'Check these cells’ working capacities')
+    detailPage.needsReviewAlert().should('contain', 'Check these cells')
     detailPage.needsReviewTags().should('have.length', 1)
     // the location kept its working capacity of 2 while the certificate records 1
     detailPage.locationsTable().should('contain', 'Certified 1')

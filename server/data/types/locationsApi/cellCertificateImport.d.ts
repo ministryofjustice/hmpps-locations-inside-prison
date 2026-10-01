@@ -28,6 +28,8 @@ export declare interface CellCertificateImportLocation {
   currentCertifiedNormalAccommodation?: number
   /** For a row whose location was not found: the cell it most likely meant (names differ only by leading zeros). */
   suggestedLocationKey?: string
+  /** Set when the cell is converted to another use, such as an office. It holds no capacity and is certified at 0. */
+  convertedCellType?: string
 }
 
 export declare interface CellCertificateImportOmittedLocation {

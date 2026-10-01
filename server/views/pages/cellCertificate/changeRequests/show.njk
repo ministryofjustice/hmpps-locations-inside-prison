@@ -54,10 +54,10 @@
             {{ mojAlert({
               attributes: { "data-qa": "import-needs-review-alert" },
               variant: "information",
-              title: "Check these cells’ working capacities",
+              title: "Check these cells",
               showTitleAsHeading: true,
               dismissible: false,
-              text: importResults.certificateImport.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the imported file, so the two do not match until someone reviews them."
+              text: importResults.certificateImport.discrepancyRecords + " cell(s) need review: the file gives a value the cell does not hold or cannot take. The table below shows the details for each."
             }) }}
           {% endif %}
 

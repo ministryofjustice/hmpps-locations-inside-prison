@@ -69,10 +69,10 @@
           {{ mojAlert({
             attributes: { "data-qa": "needs-review-alert" },
             variant: "information",
-            title: "Check these cells’ working capacities",
+            title: "Check these cells",
             showTitleAsHeading: true,
             dismissible: false,
-            text: (certificateImport.discrepancyRecords + " cell(s) would keep the working capacity Residential locations already holds. The cell certificate would record the value from the uploaded file, so the two would not match until someone reviews them.") if isPreview else (certificateImport.discrepancyRecords + " cell(s) kept the working capacity Residential locations already held. The cell certificate records the value from the uploaded file, so the two do not match until someone reviews them.")
+            text: (certificateImport.discrepancyRecords + " cell(s) would need review: the file gives a value the cell does not hold or cannot take. The table below shows the details for each.") if isPreview else (certificateImport.discrepancyRecords + " cell(s) need review: the file gives a value the cell does not hold or cannot take. The table below shows the details for each.")
           }) }}
         {% endif %}
 

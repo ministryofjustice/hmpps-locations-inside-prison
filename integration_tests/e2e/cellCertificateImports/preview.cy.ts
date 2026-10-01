@@ -252,6 +252,49 @@ context('Cell certificate import preview', () => {
       .should('contain', 'Possibly listed in the file as TST-A-1-5')
   })
 
+  it('shows a converted cell given a capacity as needing review, at 0', () => {
+    LocationsApiStubber.stub.stubCellCertificateImport({
+      ...finishedPreview,
+      discrepancyRecords: 1,
+      notOnCertificateRecords: 0,
+      locations: [
+        {
+          locationKey: 'TST-A-1-007',
+          status: 'SKIPPED',
+          message:
+            'Converted cell (Office): it holds no capacity, so the capacity in the file was not applied or certified. Convert it back to a cell before certifying capacity for it.',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          appliedMaxCapacity: 0,
+          appliedWorkingCapacity: 0,
+          maxCapacityMismatch: true,
+          workingCapacityMismatch: true,
+          certifiedNormalAccommodationMismatch: true,
+          convertedCellType: 'Office',
+        },
+      ],
+      locationsNotOnCertificate: [],
+    })
+
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/preview-1`)
+    const previewPage = Page.verifyOnPage(CellCertificateImportPreviewPage)
+
+    cy.get('[data-qa=needs-review-alert]')
+      .should('contain', 'Check these cells')
+      .and('contain', '1 cell(s) would need review')
+    previewPage
+      .locationsTable()
+      .contains('tr', 'TST-A-1-007')
+      .should('contain', 'Needs review')
+      .and('contain', 'Converted cell (Office)')
+      .within(() => {
+        cy.get('td').eq(2).should('have.text', '0')
+        cy.get('td').eq(3).should('have.text', '0')
+        cy.get('td').eq(4).should('have.text', '0')
+      })
+  })
+
   it('cancels a preview without importing anything', () => {
     uploadAndPreview()
 

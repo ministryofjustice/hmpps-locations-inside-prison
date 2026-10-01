@@ -550,7 +550,7 @@ context('Cell Certificate - Change Requests - Show', () => {
         Page.verifyOnPage(CellCertificateChangeRequestsShowPage)
 
         cy.get('[data-qa=import-summary]').should('contain', 'Needing review')
-        cy.get('[data-qa=import-needs-review-alert]').should('contain', 'Check these cells’ working capacities')
+        cy.get('[data-qa=import-needs-review-alert]').should('contain', 'Check these cells')
 
         // only the cell needing review is listed - a prison's import covers every cell
         cy.get('[data-qa=import-results-table]').should('contain', 'TST-A-1-001')
