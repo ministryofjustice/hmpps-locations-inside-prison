@@ -67,27 +67,27 @@ describe('Import the cell cert data - confirm', () => {
     it('returns the correct locals', () => {
       expect(controller.locals(deepReq as FormWizard.Request, deepRes as Response)).toEqual(
         expect.objectContaining({
-          buttonText: 'Confirm import',
+          buttonText: 'Preview import',
         }),
       )
     })
   })
 
   describe('saveValues', () => {
-    it('requests an async cell certificate import and stores the import id', async () => {
+    it('requests a preview of the import, never the import itself, and stores its id', async () => {
       deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'capacityData' ? capacityData : null))
-      locationsService.requestCellCertificateImport = jest.fn().mockResolvedValueOnce({ id: 'import-1' })
+      locationsService.requestCellCertificatePreview = jest.fn().mockResolvedValueOnce({ id: 'import-1' })
 
       await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(locationsService.requestCellCertificateImport).toHaveBeenCalledWith('token', 'TST', capacityData)
+      expect(locationsService.requestCellCertificatePreview).toHaveBeenCalledWith('token', 'TST', capacityData)
       expect(deepReq.sessionModel.set).toHaveBeenCalledWith('importId', 'import-1')
       expect(next).toHaveBeenCalled()
     })
 
-    it('captures the API error message when the import cannot be started', async () => {
+    it('captures the API error message when the preview cannot be started', async () => {
       deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'capacityData' ? capacityData : null))
-      locationsService.requestCellCertificateImport = jest.fn().mockRejectedValueOnce({
+      locationsService.requestCellCertificatePreview = jest.fn().mockRejectedValueOnce({
         data: { userMessage: 'A cell certificate upload is already in progress for prison TST' },
       })
 
@@ -102,17 +102,14 @@ describe('Import the cell cert data - confirm', () => {
   })
 
   describe('successHandler', () => {
-    it('redirects to the new import detail page on success', () => {
+    it('redirects to the preview page on success', () => {
       deepReq.sessionModel.get = jest.fn().mockImplementation(key => (key === 'importId' ? 'import-1' : undefined))
 
       controller.successHandler(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepReq.journeyModel.reset).toHaveBeenCalled()
       expect(deepReq.sessionModel.reset).toHaveBeenCalled()
-      expect(deepReq.flash).toHaveBeenCalledWith(
-        'success',
-        expect.objectContaining({ title: 'Cell certificate import started' }),
-      )
+      expect(deepReq.flash).toHaveBeenCalledWith('success', expect.objectContaining({ title: 'Preview started' }))
       expect(deepRes.redirect).toHaveBeenCalledWith(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
     })
 

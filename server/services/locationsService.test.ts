@@ -128,19 +128,29 @@ describe('Locations service', () => {
     })
   })
 
-  describe('requestCellCertificateImport', () => {
+  describe('requestCellCertificatePreview', () => {
     it('sends a reason for change, which the API requires once the prison needs certification approval', async () => {
       const locations = {
         'TST-A-1-001': { maxCapacity: 2, workingCapacity: 1, certifiedNormalAccommodation: 2, cellMark: 'A1' },
       }
 
-      await locationsService.requestCellCertificateImport('token', 'TST', locations)
+      await locationsService.requestCellCertificatePreview('token', 'TST', locations)
 
-      expect(locationsApiClient.cellCertificateImports.request).toHaveBeenCalledWith(
+      expect(locationsApiClient.cellCertificateImports.preview).toHaveBeenCalledWith(
         'token',
         { prisonId: 'TST' },
         { locations, reasonForChange: CELL_CERTIFICATE_IMPORT_REASON },
       )
+    })
+  })
+
+  describe('continueCellCertificatePreview', () => {
+    it('continues the preview by its id', async () => {
+      await locationsService.continueCellCertificatePreview('token', 'preview-1')
+
+      expect(locationsApiClient.cellCertificateImports.continuePreview).toHaveBeenCalledWith('token', {
+        uploadId: 'preview-1',
+      })
     })
   })
 

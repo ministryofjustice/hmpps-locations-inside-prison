@@ -5,7 +5,12 @@ import importDetail, {
   changeText,
   heldAndCertifiedCell,
   maxCapacityCell,
-  notOnCertificateRows,
+  ADDED_MESSAGE,
+  ADDED_PREVIEW_MESSAGE,
+  CARRIED_FORWARD_MESSAGE,
+  certificateChangeText,
+  certificateTotalsRows,
+  notOnCertificateLocationRows,
   workingCapacityCell,
 } from './detail'
 import LocationsService from '../../services/locationsService'
@@ -154,22 +159,70 @@ describe('Cell certificate imports - detail', () => {
     })
   })
 
-  describe('notOnCertificateRows', () => {
-    it('builds a link from the API location ID when it is present', async () => {
-      const rows = notOnCertificateRows([{ locationId: 'abc-123', locationKey: 'TST-A-1-003' }], 'TST')
+  describe('notOnCertificateLocationRows', () => {
+    it('shows each cell with the single values it was added to the certificate at, linked to its location', async () => {
+      const rows = notOnCertificateLocationRows(
+        [
+          {
+            locationId: 'abc-123',
+            locationKey: 'TST-A-1-003',
+            maxCapacity: 2,
+            workingCapacity: 0,
+            certifiedNormalAccommodation: 1,
+          },
+        ],
+        'TST',
+      )
 
-      expect(rows).toEqual([{ locationKey: 'TST-A-1-003', url: '/TST/abc-123/view' }])
+      expect(rows).toEqual([
+        {
+          locationKey: 'TST-A-1-003',
+          url: '/TST/abc-123/view',
+          status: 'ADDED',
+          message: ADDED_MESSAGE,
+          needsReview: false,
+          certificateChange: undefined,
+          maxCapacity: { text: '2' },
+          // zero is a real value, not a missing one
+          workingCapacity: { text: '0' },
+          certifiedNormalAccommodation: { text: '1' },
+        },
+      ])
+    })
+
+    it('shows a cell already on the current certificate as carried forward', async () => {
+      const [row] = notOnCertificateLocationRows(
+        [
+          {
+            locationKey: 'TST-A-1-003',
+            maxCapacity: 2,
+            workingCapacity: 1,
+            certifiedNormalAccommodation: 2,
+            onCurrentCertificate: true,
+          },
+        ],
+        'TST',
+      )
+
+      expect(row).toEqual(
+        expect.objectContaining({
+          status: 'CARRIED_FORWARD',
+          message: CARRIED_FORWARD_MESSAGE,
+          workingCapacity: { text: '1' },
+        }),
+      )
     })
 
     it('returns an empty list when there is nothing to report', async () => {
-      expect(notOnCertificateRows(undefined, 'TST')).toEqual([])
-      expect(notOnCertificateRows([], 'TST')).toEqual([])
+      expect(notOnCertificateLocationRows(undefined, 'TST')).toEqual([])
+      expect(notOnCertificateLocationRows([], 'TST')).toEqual([])
     })
 
     it('omits the url only when a prison id is unavailable', async () => {
-      const rows = notOnCertificateRows([{ locationKey: 'TST-A-1-003' }])
+      const [row] = notOnCertificateLocationRows([{ locationKey: 'TST-A-1-003' }])
 
-      expect(rows).toEqual([{ locationKey: 'TST-A-1-003', url: undefined }])
+      expect(row.url).toBeUndefined()
+      expect(row.maxCapacity).toEqual({ text: '-' })
     })
   })
 
@@ -205,19 +258,34 @@ describe('Cell certificate imports - detail', () => {
     )
   })
 
-  it('builds deterministic links from the API location ID for omitted cells', async () => {
+  it('lists cells added from outside the file after the cells needing review and before the rest', async () => {
     locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
       ...certificateImport,
       notOnCertificateRecords: 1,
-      locationsNotOnCertificate: [{ locationId: 'abc-123', locationKey: 'TST-A-1-003' }],
+      locationsNotOnCertificate: [
+        {
+          locationId: 'abc-123',
+          locationKey: 'TST-A-1-003',
+          maxCapacity: 1,
+          workingCapacity: 1,
+          certifiedNormalAccommodation: 1,
+        },
+      ],
     })
 
     await importDetail(deepReq as Request, deepRes as Response)
 
-    expect(deepRes.render).toHaveBeenCalledWith(
-      'pages/cellCertificateImports/detail',
+    const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locationRows.map((row: { locationKey: string }) => row.locationKey)).toEqual([
+      'TST-A-1-001', // needs review
+      'TST-A-1-003', // added to the certificate
+      'TST-A-1-002', // unchanged
+    ])
+    expect(locationRows[1]).toEqual(
       expect.objectContaining({
-        notOnCertificateRows: [{ locationKey: 'TST-A-1-003', url: '/TST/abc-123/view' }],
+        status: 'ADDED',
+        url: '/TST/abc-123/view',
+        workingCapacity: { text: '1' },
       }),
     )
   })
@@ -331,6 +399,314 @@ describe('Cell certificate imports - detail', () => {
     expect(deepRes.render).toHaveBeenCalledWith(
       'pages/cellCertificateImports/detail',
       expect.objectContaining({ inProgress: true, cellCertificateUrl: undefined }),
+    )
+  })
+
+  describe('previews', () => {
+    const preview = {
+      ...certificateImport,
+      mode: 'PREVIEW',
+      cellCertificateId: undefined,
+      currentCertificateTotals: { maxCapacity: 10, workingCapacity: 9, certifiedNormalAccommodation: 8 },
+      projectedCertificateTotals: { maxCapacity: 11, workingCapacity: 9, certifiedNormalAccommodation: 8 },
+      notOnCertificateRecords: 1,
+      locationsNotOnCertificate: [{ locationId: 'abc-123', locationKey: 'TST-A-1-003', maxCapacity: 1 }],
+    } as CellCertificateImport
+
+    const renderedLocals = () => (deepRes.render as jest.Mock).mock.calls[0][1]
+
+    it('renders a finished preview with its totals and the option to continue', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(preview)
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals()).toEqual(
+        expect.objectContaining({
+          title: 'Preview of cell certificate import',
+          isPreview: true,
+          continueUrl: '/TST/cell-certificate-imports/import/import-1/continue',
+          continuedImportUrl: undefined,
+          cellCertificateUrl: undefined,
+          certificateTotalsRows: [
+            { label: 'Max capacity', current: '10', afterImport: '11', changed: true },
+            { label: 'Working capacity', current: '9', afterImport: '9', changed: false },
+            { label: 'CNA', current: '8', afterImport: '8', changed: false },
+          ],
+        }),
+      )
+      expect(renderedLocals().locationRows).toContainEqual(
+        expect.objectContaining({ locationKey: 'TST-A-1-003', message: ADDED_PREVIEW_MESSAGE }),
+      )
+    })
+
+    it('does not offer to continue a preview that is still being worked out', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({ ...preview, status: 'STARTED' })
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals().continueUrl).toBeUndefined()
+      expect(renderedLocals().inProgress).toBe(true)
+    })
+
+    it('links a continued preview to the import it became instead of offering to continue it again', async () => {
+      locationsService.getCellCertificateImport = jest
+        .fn()
+        .mockResolvedValue({ ...preview, continuedAsUploadId: 'import-2' })
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals().continueUrl).toBeUndefined()
+      expect(renderedLocals().continuedImportUrl).toEqual('/TST/cell-certificate-imports/import/import-2')
+    })
+
+    it('shows why a preview could not be continued', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(preview)
+      deepReq.flash = jest
+        .fn()
+        .mockImplementation(type => (type === 'error' ? [{ title: 'There is a problem', content: 'Out of date' }] : []))
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals().validationErrors).toEqual([{ text: 'Out of date', href: '#' }])
+    })
+
+    it('never offers to continue an import', async () => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(certificateImport)
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedLocals()).toEqual(
+        expect.objectContaining({ isPreview: false, continueUrl: undefined, certificateTotalsRows: [] }),
+      )
+    })
+  })
+
+  describe('certificateTotalsRows', () => {
+    it('shows every total as changed when the prison has no certificate yet', () => {
+      const rows = certificateTotalsRows({
+        ...certificateImport,
+        projectedCertificateTotals: { maxCapacity: 3, workingCapacity: 2, certifiedNormalAccommodation: 1 },
+      })
+
+      expect(rows).toEqual([
+        { label: 'Max capacity', current: '-', afterImport: '3', changed: true },
+        { label: 'Working capacity', current: '-', afterImport: '2', changed: true },
+        { label: 'CNA', current: '-', afterImport: '1', changed: true },
+      ])
+    })
+
+    it('shows nothing when the totals could not be worked out', () => {
+      expect(certificateTotalsRows(certificateImport)).toEqual([])
+    })
+  })
+
+  describe('certificateChangeText', () => {
+    const row = {
+      locationKey: 'TST-A-1-002',
+      status: 'SKIPPED',
+      maxCapacity: 2,
+      workingCapacity: 2,
+      certifiedNormalAccommodation: 2,
+    } as const
+
+    it('shows a certified value that changes even when Residential locations does not', () => {
+      expect(
+        certificateChangeText(
+          {
+            ...row,
+            currentCertifiedMaxCapacity: 2,
+            currentCertifiedWorkingCapacity: 1,
+            currentCertifiedNormalAccommodation: 2,
+          },
+          true,
+        ),
+      ).toEqual('Certificate: working capacity 1 → 2')
+    })
+
+    it('lists every value that changes', () => {
+      expect(
+        certificateChangeText(
+          {
+            ...row,
+            currentCertifiedMaxCapacity: 3,
+            currentCertifiedWorkingCapacity: 1,
+            currentCertifiedNormalAccommodation: 1,
+          },
+          true,
+        ),
+      ).toEqual('Certificate: max capacity 3 → 2, working capacity 1 → 2, CNA 1 → 2')
+    })
+
+    it('says nothing when the certificate does not change', () => {
+      expect(
+        certificateChangeText(
+          {
+            ...row,
+            currentCertifiedMaxCapacity: 2,
+            currentCertifiedWorkingCapacity: 2,
+            currentCertifiedNormalAccommodation: 2,
+          },
+          true,
+        ),
+      ).toBeUndefined()
+    })
+
+    it('calls a cell new to the certificate only when the import recorded the current certificate', () => {
+      expect(certificateChangeText(row, true)).toEqual('New to the certificate')
+      // an import made before these values were recorded, or a prison with no certificate
+      expect(certificateChangeText(row, false)).toBeUndefined()
+    })
+
+    it('says nothing for a failed row or an archived location, which put nothing on the certificate', () => {
+      expect(certificateChangeText({ ...row, status: 'FAILED' }, true)).toBeUndefined()
+      expect(certificateChangeText({ ...row, message: 'Archived location' }, true)).toBeUndefined()
+    })
+  })
+
+  it('orders rows: needing review, added, certificate changes, failed, then the rest', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      carriedForwardRecords: 1,
+      notOnCertificateRecords: 2,
+      locations: [
+        {
+          locationKey: 'TST-A-1-010',
+          status: 'SKIPPED',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 2,
+          currentCertifiedNormalAccommodation: 2,
+          certifiedNormalAccommodation: 2,
+        },
+        { locationKey: 'TST-A-1-011', status: 'FAILED', maxCapacity: 2, workingCapacity: 2 },
+        {
+          locationKey: 'TST-A-1-012',
+          status: 'SKIPPED',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 1,
+          currentCertifiedNormalAccommodation: 2,
+          certifiedNormalAccommodation: 2,
+        },
+        {
+          locationKey: 'TST-A-1-013',
+          status: 'SKIPPED',
+          maxCapacity: 2,
+          workingCapacity: 1,
+          workingCapacityMismatch: true,
+          currentCertifiedMaxCapacity: 2,
+          currentCertifiedWorkingCapacity: 1,
+          currentCertifiedNormalAccommodation: 2,
+          certifiedNormalAccommodation: 2,
+        },
+      ],
+      locationsNotOnCertificate: [
+        {
+          locationKey: 'TST-A-1-020',
+          onCurrentCertificate: true,
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+        },
+        {
+          locationKey: 'TST-A-1-021',
+          onCurrentCertificate: false,
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+        },
+      ],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const locals = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locals.locationRows.map((r: { locationKey: string }) => r.locationKey)).toEqual([
+      'TST-A-1-013', // needs review
+      'TST-A-1-021', // added
+      'TST-A-1-012', // certificate: working capacity 1 -> 2
+      'TST-A-1-011', // failed
+      'TST-A-1-010', // unchanged
+      'TST-A-1-020', // carried forward
+    ])
+    expect(locals).toEqual(expect.objectContaining({ carriedForwardRecords: 1, addedRecords: 1 }))
+  })
+
+  it('points a mistyped name and the cell it most likely meant at each other', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      notOnCertificateRecords: 1,
+      locations: [
+        {
+          locationKey: 'TST-B-1-5',
+          status: 'FAILED',
+          message: 'Location not found on Residential locations',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          suggestedLocationKey: 'TST-B-1-005',
+        },
+      ],
+      locationsNotOnCertificate: [{ locationKey: 'TST-B-1-005', maxCapacity: 2, uploadedAsKey: 'TST-B-1-5' }],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locationRows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ locationKey: 'TST-B-1-5', suggestion: 'Did you mean TST-B-1-005?' }),
+        expect.objectContaining({ locationKey: 'TST-B-1-005', suggestion: 'Possibly listed in the file as TST-B-1-5' }),
+      ]),
+    )
+  })
+
+  it('makes no suggestion when the API has none', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue(certificateImport)
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locationRows.every((row: { suggestion?: string }) => row.suggestion === undefined)).toBe(true)
+  })
+
+  it('shows a converted cell at 0, as certified, and compares its certificate values with 0', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      discrepancyRecords: 1,
+      locations: [
+        {
+          locationKey: 'TST-A-1-007',
+          status: 'SKIPPED',
+          message: 'Converted cell (Office): it holds no capacity',
+          maxCapacity: 2,
+          workingCapacity: 2,
+          certifiedNormalAccommodation: 2,
+          appliedMaxCapacity: 0,
+          appliedWorkingCapacity: 0,
+          maxCapacityMismatch: true,
+          workingCapacityMismatch: true,
+          currentCertifiedMaxCapacity: 0,
+          currentCertifiedWorkingCapacity: 0,
+          currentCertifiedNormalAccommodation: 0,
+          convertedCellType: 'Office',
+        },
+      ],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const [row] = (deepRes.render as jest.Mock).mock.calls[0][1].locationRows
+    expect(row).toEqual(
+      expect.objectContaining({
+        needsReview: true,
+        maxCapacity: { text: '0' },
+        workingCapacity: { text: '0' },
+        certifiedNormalAccommodation: { text: '0' },
+        // certified at 0 before and after, whatever the file says
+        certificateChange: undefined,
+      }),
     )
   })
 })

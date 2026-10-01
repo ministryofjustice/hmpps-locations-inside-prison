@@ -10,17 +10,40 @@
   {% endif %}
 {% endmacro %}
 
+{# A cell added to the certificate from outside the file links to its location, so the reviewer can check it. #}
+{% macro importLocationKey(row) %}{% if row.url %}<a class="govuk-link" href="{{ row.url }}">{{ row.locationKey }}</a>{% else %}{{ row.locationKey }}{% endif %}{% endmacro %}
+
+{# Previews change nothing, so they are marked apart from imports. A continued preview links to the import it became. #}
+{% macro importModeTag(certificateImport, listUrl) %}
+  {% if certificateImport.mode == 'PREVIEW' %}
+    {{ govukTag({ text: "Preview", classes: "govuk-tag--purple", attributes: { "data-qa": "import-mode-tag" } }) }}
+    {% if certificateImport.continuedAsUploadId %}
+      <br><a class="govuk-link" href="{{ listUrl }}/import/{{ certificateImport.continuedAsUploadId }}" data-qa="continued-import-link">View import</a>
+    {% endif %}
+  {% else %}
+    Import
+  {% endif %}
+{% endmacro %}
+
+{# The row's message, with any change to the cell's certified values and any suggested match beneath it. #}
+{% macro importLocationDetails(row) %}{{ row.message or "" }}{% if row.certificateChange %}{% if row.message %}<br>{% endif %}<span class="govuk-!-font-weight-bold" data-qa="certificate-change">{{ row.certificateChange }}</span>{% endif %}{% if row.suggestion %}{% if row.message or row.certificateChange %}<br>{% endif %}<span class="govuk-!-font-weight-bold" data-qa="location-suggestion">{{ row.suggestion }}</span>{% endif %}{% endmacro %}
+
 {% macro importLocationNeedsReviewTag() %}
   {{ govukTag({ text: "Needs review", classes: "govuk-tag--blue", attributes: { "data-qa": "location-needs-review-tag" } }) }}
 {% endmacro %}
 
-{% macro importLocationStatusTag(status) %}
+{# A preview has changed nothing, so its results say what the import would do. #}
+{% macro importLocationStatusTag(status, preview = false) %}
   {% if status == 'PROCESSED' %}
-    {{ govukTag({ text: "Processed", classes: "govuk-tag--green", attributes: { "data-qa": "location-status-tag" } }) }}
+    {{ govukTag({ text: "Will change" if preview else "Processed", classes: "govuk-tag--green", attributes: { "data-qa": "location-status-tag" } }) }}
   {% elif status == 'SKIPPED' %}
-    {{ govukTag({ text: "Skipped", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
+    {{ govukTag({ text: "No change" if preview else "Skipped", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
   {% elif status == 'FAILED' %}
-    {{ govukTag({ text: "Failed", classes: "govuk-tag--red", attributes: { "data-qa": "location-status-tag" } }) }}
+    {{ govukTag({ text: "Will fail" if preview else "Failed", classes: "govuk-tag--red", attributes: { "data-qa": "location-status-tag" } }) }}
+  {% elif status == 'ADDED' %}
+    {{ govukTag({ text: "Would be added" if preview else "Added to certificate", classes: "govuk-tag--orange", attributes: { "data-qa": "location-status-tag" } }) }}
+  {% elif status == 'CARRIED_FORWARD' %}
+    {{ govukTag({ text: "Would be carried forward" if preview else "Carried forward", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
   {% else %}
     {{ govukTag({ text: "Pending", classes: "govuk-tag--grey", attributes: { "data-qa": "location-status-tag" } }) }}
   {% endif %}

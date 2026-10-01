@@ -212,6 +212,7 @@ interface AllLocals {
   imports: CellCertificateImport[]
   certificateImport: CellCertificateImport
   hasInProgress: boolean
+  autoRefresh: boolean
   inProgress: boolean
   newImportUrl: string
   listUrl: string
@@ -219,26 +220,38 @@ interface AllLocals {
   importResults: {
     certificateImport: CellCertificateImport
     reportUrl: string
+    carriedForwardRecords: number
+    addedRecords: number
     rows: {
       locationKey: string
+      url?: string
       status: string
       message?: string
+      certificateChange?: string
+      suggestion?: string
       maxCapacity: CapacityCell
       workingCapacity: CapacityCell
       certifiedNormalAccommodation: CapacityCell
     }[]
-    notOnCertificateRows: { locationKey: string; url?: string }[]
   }
   locationRows: {
     locationKey: string
+    url?: string
     status: string
     message?: string
+    certificateChange?: string
+    suggestion?: string
     needsReview: boolean
     maxCapacity: CapacityCell
     workingCapacity: CapacityCell
     certifiedNormalAccommodation: CapacityCell
   }[]
-  notOnCertificateRows: { locationKey: string; url?: string }[]
+  isPreview: boolean
+  carriedForwardRecords: number
+  addedRecords: number
+  certificateTotalsRows: { label: string; current: string; afterImport: string; changed: boolean }[]
+  continueUrl: string
+  continuedImportUrl: string
   pendingApprovalsBelow: PendingApprovalsBelow
   changeRequestsLink: string
 }

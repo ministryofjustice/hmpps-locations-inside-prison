@@ -3,13 +3,23 @@ import { TypedLocals } from '../../../@types/express'
 import approvalTypeDescription from '../../../formatters/approvalTypeDescription'
 import populateCertificationRequestDetails from '../../../middleware/populateCertificationRequestDetails'
 import paths from '../../../utils/paths'
-import { capacityCell, notOnCertificateRows } from '../../cellCertificateImports/detail'
+import {
+  ADDED_STATUS,
+  CONVERTED_CELL_CAPACITIES,
+  capacityCell,
+  certificateChangeText,
+  hasCurrentCertificateValues,
+  notOnCertificateLocationRows,
+  suggestionText,
+} from '../../cellCertificateImports/detail'
 import LocationsService from '../../../services/locationsService'
 
 /**
  * The results of the import behind an "Initial cell certificate import" request, so the people reviewing
  * the import can see which cells need attention without going looking for the report. Only the cells needing
- * review are listed - a prison's import covers every cell - with a link through to the full report.
+ * review, the rows that failed, the cells whose certified values change and the cells added from outside the
+ * uploaded file are listed - a prison's import covers every cell - with a link through to the full report. Cells
+ * carried forward unchanged from the current certificate are only counted.
  *
  * Returns undefined when there is no import to show: imports predating the link between an import and its
  * approval request have nothing to find, and that must leave the page as it was rather than break it.
@@ -26,34 +36,54 @@ const importResults = async (
       approvalRequestId,
     )
 
+    const hasCurrentCertificate = hasCurrentCertificateValues(certificateImport)
+
     return {
       certificateImport,
       reportUrl: `${paths.prison.cellCertificateImports(prisonId)}/import/${certificateImport.id}`,
-      rows: (certificateImport.locations || [])
-        .filter(
-          location =>
-            location.workingCapacityMismatch ||
-            location.maxCapacityMismatch ||
-            location.certifiedNormalAccommodationMismatch ||
-            location.status === 'FAILED',
-        )
-        .map(location => ({
-          locationKey: location.locationKey,
-          status: location.status,
-          message: location.message,
-          maxCapacity: capacityCell(location.previousMaxCapacity, location.maxCapacity, location.maxCapacityMismatch),
-          workingCapacity: capacityCell(
-            location.previousWorkingCapacity,
-            location.workingCapacity,
-            location.workingCapacityMismatch,
-          ),
-          certifiedNormalAccommodation: capacityCell(
-            location.previousCertifiedNormalAccommodation,
-            location.certifiedNormalAccommodation,
-            location.certifiedNormalAccommodationMismatch,
-          ),
-        })),
-      notOnCertificateRows: notOnCertificateRows(certificateImport.locationsNotOnCertificate, prisonId),
+      carriedForwardRecords: certificateImport.carriedForwardRecords || 0,
+      addedRecords: (certificateImport.notOnCertificateRecords || 0) - (certificateImport.carriedForwardRecords || 0),
+      rows: [
+        ...(certificateImport.locations || [])
+          .map(location => ({ location, certificateChange: certificateChangeText(location, hasCurrentCertificate) }))
+          .filter(
+            ({ location, certificateChange }) =>
+              location.workingCapacityMismatch ||
+              location.maxCapacityMismatch ||
+              location.certifiedNormalAccommodationMismatch ||
+              location.status === 'FAILED' ||
+              certificateChange,
+          )
+          .map(({ location, certificateChange }) => ({
+            locationKey: location.locationKey,
+            status: location.status,
+            message: location.message,
+            certificateChange,
+            suggestion: suggestionText(location),
+            ...(location.convertedCellType
+              ? CONVERTED_CELL_CAPACITIES
+              : {
+                  maxCapacity: capacityCell(
+                    location.previousMaxCapacity,
+                    location.maxCapacity,
+                    location.maxCapacityMismatch,
+                  ),
+                  workingCapacity: capacityCell(
+                    location.previousWorkingCapacity,
+                    location.workingCapacity,
+                    location.workingCapacityMismatch,
+                  ),
+                  certifiedNormalAccommodation: capacityCell(
+                    location.previousCertifiedNormalAccommodation,
+                    location.certifiedNormalAccommodation,
+                    location.certifiedNormalAccommodationMismatch,
+                  ),
+                }),
+          })),
+        ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, prisonId).filter(
+          row => row.status === ADDED_STATUS,
+        ),
+      ],
     }
   } catch {
     return undefined

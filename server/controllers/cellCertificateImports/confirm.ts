@@ -16,7 +16,7 @@ export default class ImportConfirm extends FormStep {
       ...locals,
       capacityData,
       capacitySummary,
-      buttonText: 'Confirm import',
+      buttonText: 'Preview import',
     }
   }
 
@@ -28,16 +28,18 @@ export default class ImportConfirm extends FormStep {
     const capacityData: BulkCapacityUpdate = req.sessionModel.get('capacityData')
 
     try {
-      const certificateImport = await locationsService.requestCellCertificateImport(systemToken, prisonId, capacityData)
+      // Every import is previewed first: nothing changes until the user continues from the preview
+      const certificateImport = await locationsService.requestCellCertificatePreview(
+        systemToken,
+        prisonId,
+        capacityData,
+      )
       req.sessionModel.set('importId', certificateImport.id)
       return next()
     } catch (error) {
       // 409 = an import is already in progress for this prison; 400 = validation (e.g. reason required)
       const userMessage: string = error.data?.userMessage
-      req.sessionModel.set(
-        'importError',
-        userMessage || 'The cell certificate import could not be started. Try again later.',
-      )
+      req.sessionModel.set('importError', userMessage || 'The preview could not be started. Try again later.')
       return next()
     }
   }
@@ -56,8 +58,8 @@ export default class ImportConfirm extends FormStep {
     }
 
     req.flash('success', {
-      title: 'Cell certificate import started',
-      content: 'The cell certificate is being processed. This page shows its progress.',
+      title: 'Preview started',
+      content: 'Nothing will change until you choose to continue with the import. This page shows its progress.',
     })
 
     return res.redirect(`${paths.prison.cellCertificateImports(prisonId)}/import/${importId}`)

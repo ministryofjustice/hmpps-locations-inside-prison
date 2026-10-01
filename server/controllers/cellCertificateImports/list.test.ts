@@ -66,6 +66,32 @@ describe('Cell certificate imports - list', () => {
     )
   })
 
+  it('does not let a running preview stop an import, but still refreshes until it finishes', async () => {
+    locationsService.getCellCertificateImports = jest
+      .fn()
+      .mockResolvedValue([finishedImport, { ...finishedImport, id: 'preview-1', status: 'STARTED', mode: 'PREVIEW' }])
+
+    await importList(deepReq as Request, deepRes as Response)
+
+    expect(deepRes.render).toHaveBeenCalledWith(
+      'pages/cellCertificateImports/list',
+      expect.objectContaining({ hasInProgress: false, autoRefresh: true }),
+    )
+  })
+
+  it('does not refresh when everything has finished', async () => {
+    locationsService.getCellCertificateImports = jest
+      .fn()
+      .mockResolvedValue([finishedImport, { ...finishedImport, id: 'preview-1', mode: 'PREVIEW' }])
+
+    await importList(deepReq as Request, deepRes as Response)
+
+    expect(deepRes.render).toHaveBeenCalledWith(
+      'pages/cellCertificateImports/list',
+      expect.objectContaining({ hasInProgress: false, autoRefresh: false }),
+    )
+  })
+
   it('surfaces a flashed error as a validation error', async () => {
     locationsService.getCellCertificateImports = jest.fn().mockResolvedValue([])
     deepReq.flash = jest
