@@ -6,7 +6,6 @@ import NonResidentialConversionConfirm from '../../controllers/nonResidentialCon
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import paths from '../../utils/paths'
 import FormStep from '../../controllers/base/formStep'
@@ -64,7 +63,7 @@ const steps: FormWizard.Steps = {
     next: [
       {
         fn: (_req, res) => res.locals.prisonConfiguration.certificationApprovalRequired === 'ACTIVE',
-        next: 'update-signed-op-cap',
+        next: 'submit-certification-approval-request',
       },
       'confirm',
     ],
@@ -72,7 +71,6 @@ const steps: FormWizard.Steps = {
     editable: true,
     editBackStep: 'submit-certification-approval-request',
   },
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   '/confirm': {
     controller: NonResidentialConversionConfirm,
     pageTitle: 'Confirm conversion to non-residential room',

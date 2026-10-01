@@ -10,7 +10,6 @@ import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 import isSpecialCell from '../../utils/isSpecialCell'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import paths from '../../utils/paths'
 
@@ -65,7 +64,7 @@ const steps: FormWizard.Steps = {
     next: [
       {
         fn: hasCertApprovalSteps,
-        next: 'update-signed-op-cap',
+        next: 'submit-certification-approval-request',
       },
       {
         fn: (_req, res) => canEditCna(res.locals.prisonConfiguration),
@@ -88,12 +87,11 @@ const steps: FormWizard.Steps = {
         fn: mustReviewCapacity,
         next: 'review',
       },
-      'update-signed-op-cap',
+      'submit-certification-approval-request',
     ],
     title: (_req, _res) => 'Removing a special cell type',
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 

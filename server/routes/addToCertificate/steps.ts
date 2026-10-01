@@ -1,7 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import FormStep from '../../controllers/base/formStep'
 import paths from '../../utils/paths'
@@ -17,11 +16,10 @@ const steps: FormWizard.Steps = {
     next: 'cert-change-disclaimer',
   },
   ...CertChangeDisclaimer.getSteps({
-    next: 'update-signed-op-cap',
+    next: 'submit-certification-approval-request',
     title: (_req, _res) => `Adding new locations`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedResidentialSummary.location.displayName)}`,
   }),
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 

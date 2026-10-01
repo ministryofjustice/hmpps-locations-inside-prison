@@ -6,7 +6,6 @@ import DeactivateTemporaryDetails from '../../controllers/deactivate/temporary/d
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import capFirst from '../../formatters/capFirst'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import TemporaryInactiveInit from '../../controllers/deactivate/temporaryInactiveInit'
 import paths from '../../utils/paths'
 import FormStep from '../../controllers/base/formStep'
@@ -136,7 +135,7 @@ const steps: FormWizard.Steps = {
       },
       {
         fn: (req, res) => isCertChange(req, res) && hasCertifiedWorkingCapacity(req, res),
-        next: 'update-signed-op-cap',
+        next: 'submit-certification-approval-request',
       },
       'temporary/confirm',
     ],
@@ -144,7 +143,6 @@ const steps: FormWizard.Steps = {
     pageTitle: 'Deactivation details',
     template: '../../partials/formStep',
   },
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
   '/temporary/confirm': {
     fields: ['confirm'],

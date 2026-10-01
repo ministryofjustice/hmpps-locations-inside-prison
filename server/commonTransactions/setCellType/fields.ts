@@ -1,7 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import capacityFields from '../../routes/changeCellCapacity/fields'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
-import UpdateSignedOpCap from '../updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../submitCertificationApprovalRequest'
 
 const fields: FormWizard.Fields = {
@@ -62,7 +61,6 @@ const fields: FormWizard.Fields = {
   maxCapacity: {
     ...capacityFields.maxCapacity,
   },
-  ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 

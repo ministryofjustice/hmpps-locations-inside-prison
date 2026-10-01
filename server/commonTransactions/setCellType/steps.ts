@@ -6,7 +6,6 @@ import BaseController from './baseController'
 import CertChangeDisclaimer from '../certChangeDisclaimer'
 import Review from './review'
 import SubmitCertificationApprovalRequest from '../submitCertificationApprovalRequest'
-import UpdateSignedOpCap from '../updateSignedOpCap'
 import isCellTypeCertChange from './isCellTypeCertChange'
 
 const commonSteps = {
@@ -79,9 +78,8 @@ const stepsWithCertChange: FormWizard.Steps = {
     fields: ['baselineCna', 'workingCapacity', 'maxCapacity'],
     controller: Review,
     pageTitle: 'Review cell capacity',
-    next: 'update-signed-op-cap',
+    next: 'submit-certification-approval-request',
   },
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 

@@ -4,7 +4,7 @@ import ViewLocationsIndexPage from '../../../pages/viewLocations'
 import ViewLocationsShowPage from '../../../pages/viewLocations/show'
 import CertChangeDisclaimerPage from '../../../pages/commonTransactions/certChangeDisclaimer'
 import goToCertChangeDisclaimer from './goToCertChangeDisclaimer'
-import UpdateSignedOpCapIsUpdateNeededPage from '../../../pages/commonTransactions/updateSignedOpCap/isUpdateNeeded'
+import SubmitCertificationApprovalRequestPage from '../../../pages/commonTransactions/submitCertificationApprovalRequest'
 
 context('Add To Certificate - Draft Cell Existing Landing - Cert Change Disclaimer', () => {
   let page: CertChangeDisclaimerPage
@@ -17,7 +17,7 @@ context('Add To Certificate - Draft Cell Existing Landing - Cert Change Disclaim
 
     it('continues to the next page', () => {
       page.submit()
-      Page.verifyOnPage(UpdateSignedOpCapIsUpdateNeededPage)
+      Page.verifyOnPage(SubmitCertificationApprovalRequestPage)
     })
 
     it('has a back link to the manage location page', () => {

@@ -10,7 +10,6 @@ import SetCellType from '../../../commonTransactions/setCellType'
 import modifyFieldName from '../../../helpers/field/modifyFieldName'
 import populateLocation from '../../../middleware/populateLocation'
 import RemoveCellType from '../../../controllers/reactivate/location/removeCellType'
-import UpdateSignedOpCap from '../../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../../commonTransactions/submitCertificationApprovalRequest'
 import NoCertChangeConfirm from '../../../controllers/reactivate/location/noCertChangeConfirm'
 import hasAnyCertCapacityChange from '../../../controllers/reactivate/location/util/hasAnyCertCapacityChange'
@@ -227,11 +226,10 @@ const steps: FormWizard.Steps = {
     continueOnEdit: true,
   },
   ...CertChangeDisclaimer.getSteps({
-    next: 'update-signed-op-cap',
+    next: 'submit-certification-approval-request',
     title: (_req, res) => `${res.locals.decoratedLocation.locationType} activation`,
     caption: (_req, res) => `${capFirst(res.locals.decoratedLocation.displayName)}`,
   }),
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
   '/no-cert-change-confirm': {
     controller: NoCertChangeConfirm,

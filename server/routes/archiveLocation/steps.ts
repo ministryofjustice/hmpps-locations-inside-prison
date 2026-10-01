@@ -3,7 +3,6 @@ import { Response } from 'express'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import RequestsPending from '../../commonTransactions/requestsPending'
 import FormStep from '../../controllers/base/formStep'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
 import paths from '../../utils/paths'
 
@@ -32,10 +31,9 @@ const steps: FormWizard.Steps = {
     editBackStep: 'submit-certification-approval-request',
     fields: ['reason'],
     controller: FormStep,
-    next: 'update-signed-op-cap',
+    next: 'submit-certification-approval-request',
     template: '../../partials/formStepNoTitle',
   },
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 

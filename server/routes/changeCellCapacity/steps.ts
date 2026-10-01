@@ -3,7 +3,6 @@ import ChangeCellCapacity from '../../controllers/changeCellCapacity'
 import ConfirmCellCapacity from '../../controllers/changeCellCapacity/confirm'
 import CertChangeDisclaimer from '../../commonTransactions/certChangeDisclaimer'
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import ShouldUpdateCert from '../../controllers/changeCellCapacity/shouldUpdateCert'
 import isCertActiveAndNotDraft from '../../utils/isCertActiveAndNotDraft'
 import paths from '../../utils/paths'
@@ -58,10 +57,9 @@ const steps: FormWizard.Steps = {
     skip: true,
   },
   ...CertChangeDisclaimer.getSteps({
-    next: 'update-signed-op-cap',
+    next: 'submit-certification-approval-request',
     title: (_req, _res) => `Changing the cell's capacity`,
   }),
-  ...UpdateSignedOpCap.getSteps({ next: 'submit-certification-approval-request' }),
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),
 }
 

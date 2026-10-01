@@ -2,7 +2,6 @@ import FormWizard from 'hmpo-form-wizard'
 import lessThanOrEqualTo from '../../../validators/lessThanOrEqualTo'
 import greaterThan from '../../../validators/greaterThan'
 import SetCellType from '../../../commonTransactions/setCellType'
-import UpdateSignedOpCap from '../../../commonTransactions/updateSignedOpCap'
 import SubmitCertificationApprovalRequest from '../../../commonTransactions/submitCertificationApprovalRequest'
 
 const fields: FormWizard.Fields = {
@@ -76,7 +75,6 @@ const fields: FormWizard.Fields = {
     },
   },
   ...new SetCellType().getFields(),
-  ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 

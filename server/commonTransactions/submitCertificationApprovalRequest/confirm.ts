@@ -451,9 +451,6 @@ export default class Confirm extends FormStep {
         nonResidentialRoom: changeLink,
         reasonForChange: changeLink,
       })
-      addChangeLinksToLocals(locals, 'SIGNED_OP_CAP', {
-        reasonForChange: `${paths.location.nonResidentialConversion(locals.location)}/update-signed-op-cap/details/edit`,
-      })
     } else if (req.form.options.name === 'set-cell-type') {
       const specialistCellTypesValue = sessionModel.get<string | string[]>('set-cell-type_specialistCellTypes')
       const newSpecialistCellTypes = Array.isArray(specialistCellTypesValue)

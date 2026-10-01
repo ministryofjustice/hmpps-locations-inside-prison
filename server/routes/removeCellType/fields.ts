@@ -1,5 +1,4 @@
 import SubmitCertificationApprovalRequest from '../../commonTransactions/submitCertificationApprovalRequest'
-import UpdateSignedOpCap from '../../commonTransactions/updateSignedOpCap'
 import greaterThan from '../../validators/greaterThan'
 import lessThanOrEqualTo from '../../validators/lessThanOrEqualTo'
 import capacityFields from '../changeCellCapacity/fields'
@@ -41,7 +40,6 @@ const fields = {
   maxCapacity: {
     ...capacityFields.maxCapacity,
   },
-  ...UpdateSignedOpCap.getFields(),
   ...SubmitCertificationApprovalRequest.getFields(),
 }
 
