@@ -799,6 +799,60 @@ describe('Confirm', () => {
     })
   })
 
+  describe('generateRequests - large wings', () => {
+    const cellCount = 40
+
+    const setUpWing = (status: 'DRAFT' | 'ACTIVE') => {
+      const wing = LocationFactory.build({ id: 'wing', topLevelId: 'wing', status, leafLevel: false })
+      const landing = LocationFactory.build({ id: 'landing', parentId: wing.id, status, leafLevel: false })
+      const cells = Array.from({ length: cellCount }, (_, i) =>
+        LocationFactory.build({ id: `cell-${i}`, parentId: landing.id, locationType: 'CELL', status, leafLevel: true }),
+      )
+      deepReq.form.options.name = 'add-to-certificate'
+      deepRes.locals.location = wing
+      deepRes.locals.locationMap = { [wing.id]: wing }
+      locationsService.getResidentialSummary.mockImplementation((_token, _prisonId, id) =>
+        Promise.resolve(
+          {
+            [wing.id]: LocationResidentialSummaryFactory.build({ parentLocation: wing, subLocations: [landing] }),
+            [landing.id]: LocationResidentialSummaryFactory.build({ parentLocation: landing, subLocations: cells }),
+          }[id],
+        ),
+      )
+      return cells
+    }
+
+    it('does not look up draft cells, which are not on the certificate yet', async () => {
+      setUpWing('DRAFT')
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.getLocation).not.toHaveBeenCalled()
+      const [wing] = deepRes.locals.proposedCertificationApprovalRequests[0].locations
+      expect(wing.subLocations[0].subLocations.length).toEqual(cellCount)
+    })
+
+    it('looks up no more than 5 cells at a time', async () => {
+      const cells = setUpWing('ACTIVE')
+      let running = 0
+      let maxRunning = 0
+      locationsService.getLocation.mockImplementation(async (_token, id) => {
+        running += 1
+        maxRunning = Math.max(maxRunning, running)
+        await new Promise(resolve => {
+          setTimeout(resolve, 1)
+        })
+        running -= 1
+        return cells.find(cell => cell.id === id)
+      })
+
+      await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(locationsService.getLocation).toHaveBeenCalledTimes(cellCount)
+      expect(maxRunning).toEqual(5)
+    })
+  })
+
   describe('saveValues - when creating every type of request', () => {
     beforeEach(() => {
       deepRes.locals.proposedCertificationApprovalRequests = approvalTypesData.map(d =>
