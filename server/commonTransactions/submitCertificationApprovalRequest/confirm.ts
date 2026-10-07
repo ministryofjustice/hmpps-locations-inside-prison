@@ -21,6 +21,7 @@ import {
 import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateTitleCaptionFromLocationOrPrison'
 import logger from '../../../logger'
 import paths from '../../utils/paths'
+import limitConcurrency from '../../utils/limitConcurrency'
 
 function findCells(location: CertificateLocation): CertificateLocation[] {
   if (location.locationType === 'CELL') {
@@ -42,10 +43,14 @@ function addChangeLinksToLocals(
   locals.changeLinks[requestType] = changeLinks
 }
 
+// A large wing has hundreds of cells. Requesting them all at once uses up the API's database connections (MAPA-426)
+const MAX_CONCURRENT_API_CALLS = 5
+
 async function locationToCertificationLocation(
   req: FormWizard.Request,
   location: Location,
   modifier?: (originalLocation: Location, certificateLocation: CertificateLocation) => CertificateLocation,
+  limit = limitConcurrency(MAX_CONCURRENT_API_CALLS),
 ): Promise<CertificateLocation> {
   let certifiedNormalAccommodation = 0
   let workingCapacity = 0
@@ -73,25 +78,21 @@ async function locationToCertificationLocation(
 
   let locationWithCertification: Location
   if (!location.leafLevel) {
-    const locationSummary = (await req.services.locationsService.getResidentialSummary(
-      req.session.systemToken,
-      location.prisonId,
-      location.id,
+    const locationSummary = (await limit(() =>
+      req.services.locationsService.getResidentialSummary(req.session.systemToken, location.prisonId, location.id),
     )) as LocationResidentialSummary
 
     locationWithCertification = locationSummary.parentLocation
 
     subLocations = await Promise.all(
       locationSummary.subLocations.map((subLocation: Location) =>
-        locationToCertificationLocation(req, subLocation, modifier),
+        locationToCertificationLocation(req, subLocation, modifier, limit),
       ),
     )
-  } else {
-    locationWithCertification = await req.services.locationsService.getLocation(
-      req.session.systemToken,
-      location.id,
-      false,
-      true,
+  } else if (!location.status.includes('DRAFT')) {
+    // A draft cell is not on the certificate yet, so there is no certificate to look up
+    locationWithCertification = await limit(() =>
+      req.services.locationsService.getLocation(req.session.systemToken, location.id, false, true),
     )
   }
 
