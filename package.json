@@ -200,7 +200,11 @@
       }
     },
     "diff": "9.0.0",
-    "tmp": "0.2.7"
+    "tmp": "0.2.7",
+    "@opentelemetry/core": "2.11.0",
+    "@opentelemetry/resources": "2.11.0",
+    "@opentelemetry/sdk-trace-base": "2.11.0",
+    "@opentelemetry/sdk-trace-web": "2.11.0"
   },
   "allowScripts": {
     "cypress@15.21.1": true,
