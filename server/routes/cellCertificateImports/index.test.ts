@@ -8,6 +8,7 @@ import LocationsService from '../../services/locationsService'
 import PrisonService from '../../services/prisonService'
 import ManageUsersService from '../../services/manageUsersService'
 import paths from '../../utils/paths'
+import config from '../../config'
 
 jest.mock('../../services/auditService')
 jest.mock('../../services/authService')
@@ -21,8 +22,9 @@ const locationsService = new LocationsService(null) as jest.Mocked<LocationsServ
 const prisonService = new PrisonService(null) as jest.Mocked<PrisonService>
 const manageUsersService = new ManageUsersService(null) as jest.Mocked<ManageUsersService>
 
-const buildApp = (userRoles: string[]): Express =>
+const buildApp = (userRoles: string[], production = false): Express =>
   appWithAllRoutes({
+    production,
     services: { auditService, authService, locationsService, prisonService, manageUsersService },
     userSupplier: () => ({ ...user, userRoles }),
   })
@@ -59,7 +61,6 @@ describe('viewing cell certificate imports', () => {
     })
   })
 
-  // A missing permission signs the user out rather than rendering a 403 page - see server/errorHandler.ts.
   it.each([
     ['VIEW_INTERNAL_LOCATION'],
     ['MANAGE_RESIDENTIAL_LOCATIONS'],
@@ -69,8 +70,26 @@ describe('viewing cell certificate imports', () => {
   ])('is refused for %s', async role => {
     await request(buildApp([role]))
       .get(paths.prison.cellCertificateImports('TST'))
-      .expect(302)
-      .expect('Location', paths.auth.signOut)
+      .expect(403)
+      .expect('Content-Type', /html/)
+      .expect(response => {
+        expect(response.headers.location).toBeUndefined()
+        expect(response.text).toContain('You do not have permission to access this page')
+      })
+  })
+
+  it.each([false, true])('renders the permission page with production=%s', async production => {
+    const response = await request(buildApp(['VIEW_INTERNAL_LOCATION'], production))
+      .get(paths.prison.cellCertificateImports('TST'))
+      .expect(403)
+
+    expect(response.text).toContain('You need permission to access this part of the Residential locations service.')
+    expect(response.text).toContain('If you think you should have access, email')
+    expect(response.text).toContain('href="mailto:moveaprisoner-gg@justice.gov.uk"')
+    expect(response.text).toContain('Go to Digital Prison Services')
+    expect(response.text).toContain(`href="${config.services.dps}"`)
+    expect(response.text).not.toContain('Missing permission')
+    expect(response.text).not.toContain('Any information you entered has not been saved')
   })
 })
 
@@ -135,7 +154,7 @@ describe('starting a new cell certificate import', () => {
   it.each([['MANAGE_RESIDENTIAL_LOCATIONS'], ['MANAGE_RES_LOCATIONS_OP_CAP']])('is refused for %s', async role => {
     await request(buildApp([role]))
       .get(`${paths.prison.cellCertificateImports('TST')}/new`)
-      .expect(302)
-      .expect('Location', paths.auth.signOut)
+      .expect(403)
+      .expect('Content-Type', /html/)
   })
 })

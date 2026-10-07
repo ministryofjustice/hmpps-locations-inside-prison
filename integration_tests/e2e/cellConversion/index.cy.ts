@@ -1,5 +1,6 @@
 import LocationFactory from '../../../server/testutils/factories/location'
-import AuthSignInPage from '../../pages/authSignIn'
+import PermissionDeniedPage from '../../pages/permissionDenied'
+import paths from '../../../server/utils/paths'
 import CellConversionAccommodationTypePage from '../../pages/cellConversion/accommodationType'
 import CellConversionConfirmPage from '../../pages/cellConversion/confirm'
 import CellConversionSetCellCapacityPage from '../../pages/cellConversion/setCellCapacity'
@@ -40,9 +41,9 @@ context('Cell conversion', () => {
       cy.signIn()
     })
 
-    it('redirects user to sign in page when accessed directly', () => {
-      CellConversionAccommodationTypePage.goTo('7e570000-0000-0000-0000-000000000001')
-      Page.verifyOnPage(AuthSignInPage)
+    it('shows a permission error when accessed directly', () => {
+      PermissionDeniedPage.goTo(paths.location.cellConversion('TST', '7e570000-0000-0000-0000-000000000001'))
+      Page.verifyOnPage(PermissionDeniedPage)
     })
 
     it('does not show the convert to cell button on the show location page', () => {

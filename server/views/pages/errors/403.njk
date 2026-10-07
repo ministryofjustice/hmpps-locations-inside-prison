@@ -1,0 +1,28 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set title = "You do not have permission to access this page" %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p>
+          You need permission to access this part of the Residential locations service.
+        </p>
+
+        <p>
+          If you think you should have access, email
+          <a class="govuk-link" href="mailto:moveaprisoner-gg@justice.gov.uk">moveaprisoner-gg@justice.gov.uk</a>
+        </p>
+
+        {{ govukButton({
+          text: "Go to Digital Prison Services",
+          href: dpsUrl,
+          classes: "govuk-!-margin-top-2"
+        }) }}
+      </div>
+    </div>
+  </div>
+{% endblock %}

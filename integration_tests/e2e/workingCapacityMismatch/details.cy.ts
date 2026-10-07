@@ -1,7 +1,7 @@
 import { cell, setupStubs } from './setupStubs'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import Page from '../../pages/page'
-import AuthSignInPage from '../../pages/authSignIn'
+import PermissionDeniedPage from '../../pages/permissionDenied'
 import goToDetails from './goToDetails'
 import CertChangeDisclaimerPage from '../../pages/commonTransactions/certChangeDisclaimer'
 import WorkingCapacityMismatchConfirm from '../../pages/workingCapacityMismatch/confirm'
@@ -21,9 +21,9 @@ context('Working Capacity Mismatch - Details', () => {
       viewLocationsShowPage.workingCapacityMismatchBanner().should('not.exist')
     })
 
-    it('redirects user to sign in page when visited directly', () => {
-      cy.visit(paths.location.workingCapacityMismatch(cell))
-      Page.verifyOnPage(AuthSignInPage)
+    it('shows a permission error when visited directly', () => {
+      PermissionDeniedPage.goTo(paths.location.workingCapacityMismatch(cell))
+      Page.verifyOnPage(PermissionDeniedPage)
     })
   })
 

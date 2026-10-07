@@ -1,5 +1,6 @@
 import LocationFactory from '../../../server/testutils/factories/location'
-import AuthSignInPage from '../../pages/authSignIn'
+import PermissionDeniedPage from '../../pages/permissionDenied'
+import paths from '../../../server/utils/paths'
 import Page from '../../pages/page'
 import ViewLocationsIndexPage from '../../pages/viewLocations'
 import ChangeSignedOperationalCapacityPage from '../../pages/changeSignedOperationalCapacity'
@@ -21,10 +22,10 @@ context('Change signed operational capacity', () => {
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
     })
 
-    it('redirects user to sign in page', () => {
+    it('shows a permission error', () => {
       cy.signIn()
-      ChangeSignedOperationalCapacityPage.goTo('TST')
-      Page.verifyOnPage(AuthSignInPage)
+      PermissionDeniedPage.goTo(paths.prison.changeSignedOperationalCapacity('TST'))
+      Page.verifyOnPage(PermissionDeniedPage)
     })
   })
 

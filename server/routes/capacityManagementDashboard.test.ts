@@ -84,19 +84,18 @@ describe('GET /capacity-management-dashboard', () => {
   it('denies access to a user without the certificate viewer permission', () => {
     app = buildApp(() => user)
 
-    // protectRoute raises a "Missing permission" 403, which the error handler turns into a sign-out redirect
-    return request(app).get('/capacity-management-dashboard').expect(302).expect('Location', '/sign-out')
+    return request(app).get('/capacity-management-dashboard').expect(403).expect('Content-Type', /html/)
   })
 
   it('denies access to a certificate reviewer', () => {
     app = buildApp(() => certificateReviewer)
 
-    return request(app).get('/capacity-management-dashboard').expect(302).expect('Location', '/sign-out')
+    return request(app).get('/capacity-management-dashboard').expect(403).expect('Content-Type', /html/)
   })
 
   it('denies access to a certificate administrator', () => {
     app = buildApp(() => certificateAdministrator)
 
-    return request(app).get('/capacity-management-dashboard').expect(302).expect('Location', '/sign-out')
+    return request(app).get('/capacity-management-dashboard').expect(403).expect('Content-Type', /html/)
   })
 })

@@ -1,11 +1,13 @@
 import LocationFactory from '../../../server/testutils/factories/location'
-import AuthSignInPage from '../../pages/authSignIn'
+import PermissionDeniedPage from '../../pages/permissionDenied'
 import ChangeCellCapacityPage from '../../pages/changeCellCapacity'
 import Page from '../../pages/page'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import LocationsApiStubber from '../../mockApis/locationsApi'
 import AuthStubber from '../../mockApis/auth'
+import IndexPage from '../../pages/index'
+import paths from '../../../server/utils/paths'
 
 context('Change cell capacity', () => {
   context('without the MANAGE_RES_LOCATIONS_OP_CAP role', () => {
@@ -30,10 +32,13 @@ context('Change cell capacity', () => {
       LocationsApiStubber.stub.stubLocations(location)
     })
 
-    it('redirects user to sign in page', () => {
+    it('shows a permission error without signing the user out', () => {
       cy.signIn()
-      ChangeCellCapacityPage.goTo('7e570000-0000-0000-0000-000000000001')
-      Page.verifyOnPage(AuthSignInPage)
+      PermissionDeniedPage.goTo(paths.location.changeCellCapacity(location))
+      Page.verifyOnPage(PermissionDeniedPage)
+
+      cy.visit('/')
+      Page.verifyOnPage(IndexPage)
     })
   })
 

@@ -19,14 +19,16 @@ export default function createErrorHandler(production: boolean) {
 
     if (
       (status === 401 || status === 403) &&
-      (error.message.includes('Missing permission') ||
-        ('headers' in error &&
-          ((error as SanitisedError).headers as { [header: string]: string })['www-authenticate']?.includes(
-            'invalid_token',
-          )))
+      'headers' in error &&
+      ((error as SanitisedError).headers as { [header: string]: string })['www-authenticate']?.includes('invalid_token')
     ) {
       logger.info('Logging user out')
       return res.redirect(paths.auth.signOut)
+    }
+
+    if ((status === 401 || status === 403) && error.message.includes('Missing permission')) {
+      res.status(403)
+      return res.render('pages/errors/403')
     }
 
     if ('code' in error && error.code === 'SESSION_TIMEOUT') {
