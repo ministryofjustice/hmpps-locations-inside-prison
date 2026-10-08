@@ -59,16 +59,23 @@ module.exports = () => {
 
     updateStructurePreview()
     updateButtonVisibility()
+    wrapperToShow.find('select').trigger('focus')
+    $('#level-status').text(`Level ${updatedWrappers.index(wrapperToShow) + 2} added`)
   }
 
   function removeLevel(removeLink) {
     // hides level wrapper and shows addLevel button
     const wrapper = $(removeLink).closest('.level-wrapper')
+    const visibleWrappers = getVisibleLevelWrappers()
+    const removedIndex = visibleWrappers.index(wrapper)
+    const focusTarget = visibleWrappers.eq(removedIndex - 1).find('select')
     wrapper.addClass('hidden').find('select').val('')
 
     $('#addLevel').show()
     relabelLevels()
     updateStructurePreview()
+    focusTarget.trigger('focus')
+    $('#level-status').text(`Level ${removedIndex + 2} removed`)
   }
 
   function relabelLevels() {
@@ -86,7 +93,7 @@ module.exports = () => {
       select.attr('id', `level-${newLevel}`)
       select.attr('name', `level-${newLevel}`)
 
-      wrapper.find('label').attr('for', `level-${newLevel}`)
+      wrapper.find('label').attr('for', `level-${newLevel}`).text(`Level ${newLevel} type`)
     })
   }
 

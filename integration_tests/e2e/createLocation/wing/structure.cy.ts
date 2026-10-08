@@ -70,11 +70,51 @@ context('Create  Structure', () => {
       // Remove level 3 and check updated preview
       page.removeLevel3().click()
 
+      page.level2Select().should('be.focused')
+      cy.get('#level-status').should('have.text', 'Level 3 removed')
+      cy.get('.level-wrapper:visible label[for="level-3"]').should('have.text', 'Level 3 type')
+
       page.structurePreviewLevel1().should('contain.text', 'Wing')
       page.structurePreviewLevel2().should('contain.text', 'Spurs')
       page.structurePreviewLevel3().should('contain.text', 'Cells')
       page.structurePreviewLevel4().should('not.contain.text', 'Landings')
       page.structurePreviewLevel4().should('not.contain.text', 'Cells')
+    })
+
+    it('focuses and announces newly added levels', () => {
+      cy.get('#level-status')
+        .should('have.class', 'govuk-visually-hidden')
+        .and('have.attr', 'aria-live', 'polite')
+        .and('have.attr', 'aria-atomic', 'true')
+        .and('have.text', '')
+
+      page.removeLevel3().click()
+      page.addLevelButton().click()
+
+      page.level3Select().should('be.visible').and('be.focused')
+      cy.get('#level-status').should('have.text', 'Level 3 added')
+
+      page.addLevelButton().click()
+
+      page.level4Select().should('be.visible').and('be.focused')
+      cy.get('#level-status').should('have.text', 'Level 4 added')
+      page.addLevelButton().should('not.be.visible')
+    })
+
+    it('focuses the previous level and announces removed levels', () => {
+      page.addLevelButton().click()
+      page.removeLevel4().click()
+
+      page.level4Select().should('not.be.visible')
+      page.level3Select().should('be.focused')
+      cy.get('#level-status').should('have.text', 'Level 4 removed')
+      page.addLevelButton().should('be.visible')
+
+      page.removeLevel3().click()
+
+      page.level3Select().should('not.be.visible')
+      page.level2Select().should('be.focused')
+      cy.get('#level-status').should('have.text', 'Level 3 removed')
     })
 
     it('has a back link to the enter details page', () => {
