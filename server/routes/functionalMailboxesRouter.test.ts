@@ -229,6 +229,6 @@ describe('functional mailbox routes', () => {
       userSupplier: () => user,
     })
 
-    return request(app).get('/functional-mailboxes').expect(302).expect('Location', '/sign-out')
+    return request(app).get('/functional-mailboxes').expect(403).expect('Content-Type', /html/)
   })
 })

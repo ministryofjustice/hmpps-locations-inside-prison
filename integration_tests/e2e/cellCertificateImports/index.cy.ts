@@ -1,4 +1,5 @@
 import Page from '../../pages/page'
+import PermissionDeniedPage from '../../pages/permissionDenied'
 import CellCertificateImportsListPage from '../../pages/cellCertificateImports/list'
 import CellCertificateImportDetailPage from '../../pages/cellCertificateImports/detail'
 import { CellCertificateImport } from '../../../server/data/types/locationsApi/cellCertificateImport'
@@ -269,7 +270,8 @@ context('Cell certificate imports - a role that may not import', () => {
   it('cannot reach the imports page', () => {
     LocationsApiStubber.stub.stubCellCertificateImportsList([completedImport])
 
-    cy.visit(paths.prison.cellCertificateImports('TST'), { failOnStatusCode: false })
-    cy.location('pathname').should('not.eq', paths.prison.cellCertificateImports('TST'))
+    PermissionDeniedPage.goTo(paths.prison.cellCertificateImports('TST'))
+    cy.location('pathname').should('eq', paths.prison.cellCertificateImports('TST'))
+    Page.verifyOnPage(PermissionDeniedPage)
   })
 })

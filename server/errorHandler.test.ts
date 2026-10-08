@@ -150,10 +150,12 @@ describe('error handler', () => {
         error.message = 'Missing permission'
       })
 
-      it('logs the user out', () => {
+      it('renders the permission error page without signing the user out', () => {
         errorHandler(error, req, res, undefined)
 
-        expect(res.redirect).toHaveBeenCalledWith('/sign-out')
+        expect(res.status).toHaveBeenCalledWith(403)
+        expect(res.render).toHaveBeenCalledWith('pages/errors/403')
+        expect(res.redirect).not.toHaveBeenCalled()
       })
     })
 
@@ -191,10 +193,12 @@ describe('error handler', () => {
         error.message = 'Missing permission'
       })
 
-      it('logs the user out', () => {
+      it('renders the permission error page without signing the user out', () => {
         errorHandler(error, req, res, undefined)
 
-        expect(res.redirect).toHaveBeenCalledWith('/sign-out')
+        expect(res.status).toHaveBeenCalledWith(403)
+        expect(res.render).toHaveBeenCalledWith('pages/errors/403')
+        expect(res.redirect).not.toHaveBeenCalled()
       })
     })
 
@@ -205,6 +209,17 @@ describe('error handler', () => {
         expect(res.render).toHaveBeenCalledWith('pages/errors/generic')
       })
     })
+  })
+
+  it.each([401, 403])('signs out for an invalid token even with missing permissions (status %s)', status => {
+    error.responseStatus = status
+    error.message = 'Missing permission'
+    error.headers = { 'www-authenticate': 'Bearer error="invalid_token"' }
+
+    errorHandler(error, req, res, undefined)
+
+    expect(res.redirect).toHaveBeenCalledWith(paths.auth.signOut)
+    expect(res.render).not.toHaveBeenCalled()
   })
 
   describe('GET 456', () => {

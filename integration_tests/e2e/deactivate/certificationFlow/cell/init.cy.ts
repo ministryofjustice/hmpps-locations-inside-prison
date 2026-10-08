@@ -2,7 +2,7 @@ import Page from '../../../../pages/page'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
 import DeactivateOccupiedPage from '../../../../pages/deactivate/occupied'
 import CellCertChangePage from '../../../../pages/deactivate/cell-cert-change'
-import AuthSignInPage from '../../../../pages/authSignIn'
+import PermissionDeniedPage from '../../../../pages/permissionDenied'
 import LocationsApiStubber from '../../../../mockApis/locationsApi'
 import { setupStubs, location } from './setupStubs'
 import DeactivateTemporaryDetailsPage from '../../../../pages/deactivate/temporary/details'
@@ -22,9 +22,9 @@ context('Certification Deactivation - Cell - Init', () => {
       viewLocationsShowPage.deactivateAction().should('not.exist')
     })
 
-    it('redirects user to sign in page when visited directly', () => {
-      cy.visit(paths.location.deactivate(location))
-      Page.verifyOnPage(AuthSignInPage)
+    it('shows a permission error when visited directly', () => {
+      PermissionDeniedPage.goTo(paths.location.deactivate(location))
+      Page.verifyOnPage(PermissionDeniedPage)
     })
   })
 

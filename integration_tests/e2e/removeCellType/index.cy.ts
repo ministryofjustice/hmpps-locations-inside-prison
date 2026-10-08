@@ -1,6 +1,7 @@
 import { DeepPartialObject } from 'fishery'
 import LocationFactory from '../../../server/testutils/factories/location'
-import AuthSignInPage from '../../pages/authSignIn'
+import PermissionDeniedPage from '../../pages/permissionDenied'
+import paths from '../../../server/utils/paths'
 import Page from '../../pages/page'
 import ConfirmRemoveCellTypePage from '../../pages/removeCellType/confirm'
 import CheckRemoveCellTypePage from '../../pages/removeCellType/check'
@@ -54,10 +55,10 @@ context('Remove cell type', () => {
       viewLocationsShowPage.removeCellTypeLink().should('not.exist')
     })
 
-    it('redirects user to sign in page if accessed directly', () => {
+    it('shows a permission error if accessed directly', () => {
       cy.signIn()
-      RemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
-      Page.verifyOnPage(AuthSignInPage)
+      PermissionDeniedPage.goTo(paths.location.removeCellType('TST', '7e570000-0000-0000-0000-000000000001'))
+      Page.verifyOnPage(PermissionDeniedPage)
     })
   })
 

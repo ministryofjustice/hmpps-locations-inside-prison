@@ -1,6 +1,6 @@
 import Page from '../../../../pages/page'
 import ViewLocationsShowPage from '../../../../pages/viewLocations/show'
-import AuthSignInPage from '../../../../pages/authSignIn'
+import PermissionDeniedPage from '../../../../pages/permissionDenied'
 import { setupStubs, location } from './setupStubs'
 import CheckCapacityPage from '../../../../pages/reactivate/location/checkCapacity'
 import paths from '../../../../../server/utils/paths'
@@ -19,9 +19,9 @@ context('Certification Reactivation - Wing - Init', () => {
       viewLocationsShowPage.inactiveBannerActivateEntireButton().should('not.exist')
     })
 
-    it('redirects user to sign in page when visited directly', () => {
-      cy.visit(paths.location.reactivate.location(location))
-      Page.verifyOnPage(AuthSignInPage)
+    it('shows a permission error when visited directly', () => {
+      PermissionDeniedPage.goTo(paths.location.reactivate.location(location))
+      Page.verifyOnPage(PermissionDeniedPage)
     })
   })
 

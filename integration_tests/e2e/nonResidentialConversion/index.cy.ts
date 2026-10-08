@@ -1,5 +1,6 @@
 import LocationFactory from '../../../server/testutils/factories/location'
-import AuthSignInPage from '../../pages/authSignIn'
+import PermissionDeniedPage from '../../pages/permissionDenied'
+import paths from '../../../server/utils/paths'
 import NonResidentialConversionConfirmPage from '../../pages/nonResidentialConversion/confirm'
 import NonResidentialConversionDetailsPage from '../../pages/nonResidentialConversion/details'
 import NonResidentialConversionOccupiedPage from '../../pages/nonResidentialConversion/occupied'
@@ -44,9 +45,9 @@ context('Non-residential conversion', () => {
       cy.signIn()
     })
 
-    it('redirects user to sign in page when accessed directly', () => {
-      NonResidentialConversionWarningPage.goTo('7e570000-0000-0000-0000-000000000001')
-      Page.verifyOnPage(AuthSignInPage)
+    it('shows a permission error when accessed directly', () => {
+      PermissionDeniedPage.goTo(paths.location.nonResidentialConversion('TST', '7e570000-0000-0000-0000-000000000001'))
+      Page.verifyOnPage(PermissionDeniedPage)
     })
 
     it('does not show the action in the menu on the show location page', () => {
