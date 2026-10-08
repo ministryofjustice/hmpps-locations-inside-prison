@@ -185,6 +185,29 @@ context('Change sanitation', () => {
         viewLocationsShowPage.changeSanitationLink().click()
       })
 
+      it('associates the sanitation question and hint with the radio group', () => {
+        Page.verifyOnPage(ChangeSanitationPage)
+
+        cy.get('h1').should('have.length', 1)
+        cy.get('fieldset').should('have.attr', 'aria-describedby', 'inCellSanitation-hint')
+        cy.get('fieldset > legend > h1').should('contain.text', 'Does the cell have in-cell sanitation?')
+        cy.get('#inCellSanitation-hint').should(
+          'contain.text',
+          'This means the cell includes both a toilet and wash basin.',
+        )
+        cy.get('fieldset input[type="radio"]').should('have.length', 2)
+      })
+
+      it('associates the validation error with the radio group', () => {
+        const page = Page.verifyOnPage(ChangeSanitationPage)
+
+        cy.get('input[name="inCellSanitation"]').invoke('prop', 'checked', false)
+        page.submit({})
+
+        Page.checkForError('inCellSanitation', 'Select yes if the cell has in-cell sanitation')
+        cy.get('fieldset').should('have.attr', 'aria-describedby', 'inCellSanitation-hint inCellSanitation-error')
+      })
+
       it('shows the success banner after submitting', () => {
         const page = Page.verifyOnPage(ChangeSanitationPage)
 

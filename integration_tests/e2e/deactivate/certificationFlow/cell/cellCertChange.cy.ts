@@ -17,10 +17,17 @@ context('Certification Deactivation - Cell - Cell cert change', () => {
 
   it('shows the correct content', () => {
     cy.get('.govuk-caption-m').contains('Cell A-1-001')
-    cy.get('p').contains(
+    cy.get('#reduceWorkingCapacity-hint').contains(
       'You should decrease the certified working capacity if a location will be unavailable long term or if it will ' +
         'result in a significant reduction to capacity.',
     )
+    cy.get('h1').should('have.length', 1)
+    cy.get('fieldset').should('have.attr', 'aria-describedby', 'reduceWorkingCapacity-hint')
+    cy.get('fieldset > legend > h1').should(
+      'contain.text',
+      'Does the cell’s certified working capacity need to be decreased to 0 on the cell certificate?',
+    )
+    cy.get('fieldset input[type="radio"]').should('have.length', 2)
   })
 
   it('has a cancel link', () => {
@@ -36,6 +43,7 @@ context('Certification Deactivation - Cell - Cell cert change', () => {
       'reduceWorkingCapacity',
       'Select yes if you want to reduce the cell’s certified working capacity to 0',
     )
+    cy.get('fieldset').should('have.attr', 'aria-describedby', 'reduceWorkingCapacity-hint reduceWorkingCapacity-error')
   })
 
   it('proceeds to cert change disclaimer if yes is ticked', () => {
