@@ -26,6 +26,7 @@ export const user: HmppsUser = {
   uuid: 'xxxx-xxxx-xxxx-xxxx',
   name: 'FIRST LAST',
   userId: 'id',
+  userUuid: '11111-11111-11111-11111-11111',
   token: 'token',
   username: 'user1',
   displayName: 'First Last',

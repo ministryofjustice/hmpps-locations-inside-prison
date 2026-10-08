@@ -58,6 +58,7 @@ describe('viewing cell certificate imports', () => {
     expect(auditService.logPageView).toHaveBeenCalledWith(Page.CELL_CERTIFICATE_UPLOADS, {
       who: user.username,
       correlationId: expect.any(String),
+      details: { userUuid: user.userUuid },
     })
   })
 

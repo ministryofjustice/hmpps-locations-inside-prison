@@ -79,6 +79,7 @@ describe('GET /PRISON_ID/admin', () => {
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
           correlationId: expect.any(String),
+          details: { userUuid: user.userUuid },
         })
       })
   })
@@ -117,6 +118,7 @@ describe('GET /PRISON_ID/admin', () => {
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
           correlationId: expect.any(String),
+          details: { userUuid: user.userUuid },
         })
       })
   })

@@ -79,6 +79,7 @@ describe('view locations show', () => {
         locationId: '7e570000-0000-1000-8001-000000000001',
         user: {
           username: 'test-user',
+          userUuid: '11111-11111-11111-11111-11111',
         },
       },
       render: jest.fn(),
@@ -91,6 +92,7 @@ describe('view locations show', () => {
     expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_SHOW, {
       who: 'test-user',
       correlationId: 'test-correlation-id',
+      details: { userUuid: '11111-11111-11111-11111-11111' },
     })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
@@ -111,6 +113,7 @@ describe('view locations show', () => {
     expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_SHOW, {
       who: 'test-user',
       correlationId: 'test-correlation-id',
+      details: { userUuid: '11111-11111-11111-11111-11111' },
     })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: {
@@ -593,6 +596,7 @@ describe('view locations index', () => {
         prisonId: 'TST',
         user: {
           username: 'test-user',
+          userUuid: '11111-11111-11111-11111-11111',
         },
       },
       render: jest.fn(),
@@ -607,6 +611,7 @@ describe('view locations index', () => {
     expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_INDEX, {
       who: 'test-user',
       correlationId: 'test-correlation-id',
+      details: { userUuid: '11111-11111-11111-11111-11111' },
     })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
       title: 'Manage residential locations',
@@ -622,6 +627,7 @@ describe('view locations index', () => {
     expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_INDEX, {
       who: 'test-user',
       correlationId: 'test-correlation-id',
+      details: { userUuid: '11111-11111-11111-11111-11111' },
     })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
       title: 'Manage residential locations',
