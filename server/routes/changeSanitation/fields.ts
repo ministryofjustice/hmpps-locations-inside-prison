@@ -10,6 +10,13 @@ const fields: FormWizard.Fields = {
     errorMessages: {
       required: 'Select yes if the cell has in-cell sanitation',
     },
+    fieldset: {
+      legend: {
+        text: 'Does the cell have in-cell sanitation?',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l govuk-!-margin-bottom-4',
+      },
+    },
     items: [
       { text: 'Yes', value: 'YES' },
       { text: 'No', value: 'NO' },

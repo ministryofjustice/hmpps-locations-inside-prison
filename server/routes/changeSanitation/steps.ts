@@ -28,7 +28,7 @@ const steps: FormWizard.Steps = {
   '/details': {
     fields: ['inCellSanitation', 'explanation'],
     controller: Details,
-    template: '../../partials/formStep',
+    template: '../../partials/formStepNoTitle',
     pageTitle: 'Does the cell have in-cell sanitation?',
     next: [
       {

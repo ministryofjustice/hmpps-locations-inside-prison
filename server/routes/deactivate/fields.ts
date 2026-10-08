@@ -15,6 +15,16 @@ const fields: FormWizard.Fields = {
     errorMessages: {
       required: 'Select yes if you want to reduce the cell’s certified working capacity to 0',
     },
+    fieldset: {
+      legend: {
+        text: 'Does the cell’s certified working capacity need to be decreased to 0 on the cell certificate?',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
+      },
+    },
+    hint: {
+      text: 'You should decrease the certified working capacity if a location will be unavailable long term or if it will result in a significant reduction to capacity.',
+    },
     items: [
       {
         text: "Yes, reduce the cell's certified working capacity to 0",

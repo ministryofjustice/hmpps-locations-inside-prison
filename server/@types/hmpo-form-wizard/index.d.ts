@@ -304,6 +304,7 @@ declare module 'hmpo-form-wizard' {
           text?: string
           html?: string
           classes: string
+          isPageHeading?: boolean
         }
       }
       errorMessages?: { [type: string]: string }
