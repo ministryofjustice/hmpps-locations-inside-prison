@@ -1,3 +1,4 @@
+import { UUID } from 'crypto'
 import { Caseload } from '../data/manageUsersApiClient'
 
 export type AuthSource = 'nomis' | 'delius' | 'external' | 'azuread'
@@ -11,6 +12,7 @@ export interface BaseUser {
   caseloads: Caseload[]
   username: string
   userId: string
+  userUuid: UUID
   name: string
   displayName: string
   userRoles: string[]

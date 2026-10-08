@@ -91,6 +91,7 @@ describe('GET /TST', () => {
     expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
       who: user.username,
       correlationId: expect.any(String),
+      details: { userUuid: user.userUuid },
     })
   })
 
@@ -128,6 +129,7 @@ describe('GET /TST', () => {
     expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
       who: user.username,
       correlationId: expect.any(String),
+      details: { userUuid: user.userUuid },
     })
   })
 
