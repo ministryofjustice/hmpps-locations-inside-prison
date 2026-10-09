@@ -89,6 +89,8 @@ context('Cell certificate import preview', () => {
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
     ManageUsersApiStubber.stub.stubManageCaseloads()
     LocationsApiStubber.stub.stubPrisonConfiguration()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
     LocationsApiStubber.stub.stubCellCertificateImportsList([])
     LocationsApiStubber.stub.stubCellCertificateImport(finishedPreview)
     cy.signIn()

@@ -18,4 +18,8 @@ export default class CellCertificateImportDetailPage extends Page {
   needsReviewTags = (): PageElement => cy.get('[data-qa=location-needs-review-tag]')
 
   notOnCertificateAlert = (): PageElement => cy.get('[data-qa=not-on-certificate-alert]')
+
+  inactiveTags = (): PageElement => cy.get('[data-qa=location-inactive-tag]')
+
+  copyLinkButton = (): PageElement => cy.get('[data-qa=copy-link-button]')
 }
