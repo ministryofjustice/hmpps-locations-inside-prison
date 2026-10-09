@@ -142,6 +142,69 @@ describe('rendering an import', () => {
     expect(response.text).toContain('TST-A-1-001')
     expect(response.text).toContain('Certified 1')
   })
+
+  // The central team shares a preview's link with the prison, whose staff may hold no Residential locations role
+  describe('a shared report', () => {
+    const sharedPreview = {
+      ...finishedImport,
+      mode: 'PREVIEW' as const,
+      locations: [
+        {
+          ...finishedImport.locations[0],
+          inactive: true,
+          deactivatedReason: 'REFURBISHMENT',
+          specialistCellTypes: ['DRY'],
+        },
+      ],
+    }
+
+    beforeEach(() => {
+      locationsService.getDeactivatedReasons.mockResolvedValue({ REFURBISHMENT: 'Refurbishment' })
+      locationsService.getSpecialistCellTypeDescriptions.mockResolvedValue({ DRY: 'Dry cell' })
+    })
+
+    it('opens for someone at the prison with no Residential locations role, without the option to continue', async () => {
+      locationsService.getCellCertificateImport.mockResolvedValue(sharedPreview)
+
+      const response = await request(buildApp([]))
+        .get(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
+        .expect(200)
+
+      expect(response.text).toContain('TST-A-1-001')
+      expect(response.text).toContain('data-qa="location-inactive-tag"')
+      expect(response.text).toContain('Refurbishment')
+      expect(response.text).toContain('Dry cell')
+      expect(response.text).toContain('data-qa="copy-link-button"')
+      expect(response.text).not.toContain('data-qa="continue-button"')
+      expect(auditService.logPageView).toHaveBeenCalledWith(Page.CELL_CERTIFICATE_UPLOAD_DETAIL, expect.anything())
+    })
+
+    it('offers to continue to someone who can run imports', async () => {
+      locationsService.getCellCertificateImport.mockResolvedValue(sharedPreview)
+
+      const response = await request(buildApp(['MANAGE_RES_LOCATIONS_ADMIN']))
+        .get(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
+        .expect(200)
+
+      expect(response.text).toContain('data-qa="continue-button"')
+    })
+
+    it('does not let someone who cannot run imports continue one', async () => {
+      await request(buildApp([]))
+        .post(`${paths.prison.cellCertificateImports('TST')}/import/import-1/continue`)
+        .expect(403)
+
+      expect(locationsService.continueCellCertificatePreview).not.toHaveBeenCalled()
+    })
+
+    it('is not found under a prison the import does not belong to', async () => {
+      locationsService.getCellCertificateImport.mockResolvedValue({ ...sharedPreview, prisonId: 'OTH' })
+
+      await request(buildApp([]))
+        .get(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
+        .expect(404)
+    })
+  })
 })
 
 describe('starting a new cell certificate import', () => {

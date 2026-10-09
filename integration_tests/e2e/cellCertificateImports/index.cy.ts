@@ -82,6 +82,8 @@ context('Cell certificate imports', () => {
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
     ManageUsersApiStubber.stub.stubManageCaseloads()
     LocationsApiStubber.stub.stubPrisonConfiguration()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
     cy.signIn()
   })
 
@@ -244,6 +246,8 @@ context('Cell certificate imports - capacity management', () => {
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
     ManageUsersApiStubber.stub.stubManageCaseloads()
     LocationsApiStubber.stub.stubPrisonConfiguration()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
     cy.signIn()
   })
 
@@ -264,6 +268,8 @@ context('Cell certificate imports - a role that may not import', () => {
     ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
     ManageUsersApiStubber.stub.stubManageCaseloads()
     LocationsApiStubber.stub.stubPrisonConfiguration()
+    LocationsApiStubber.stub.stubLocationsConstantsDeactivatedReason()
+    LocationsApiStubber.stub.stubLocationsConstantsSpecialistCellType()
     cy.signIn()
   })
 
@@ -273,5 +279,29 @@ context('Cell certificate imports - a role that may not import', () => {
     PermissionDeniedPage.goTo(paths.prison.cellCertificateImports('TST'))
     cy.location('pathname').should('eq', paths.prison.cellCertificateImports('TST'))
     Page.verifyOnPage(PermissionDeniedPage)
+  })
+
+  // The capacity management team shares a report's link with the prison (MAPA-428)
+  it('can open a shared report, showing why cells may differ from the certificate', () => {
+    LocationsApiStubber.stub.stubCellCertificateImport({
+      ...completedImport,
+      locations: [
+        {
+          ...completedImport.locations[0],
+          inactive: true,
+          deactivatedReason: 'TEST_TYPE',
+          deactivationReasonDescription: 'Roof repairs',
+          specialistCellTypes: ['ACCESSIBLE_CELL'],
+        },
+      ],
+    })
+
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/import-1`)
+    const detailPage = Page.verifyOnPage(CellCertificateImportDetailPage)
+    detailPage.inactiveTags().should('have.length', 1)
+    // reason descriptions are cached between specs, so check the free text that follows the reason
+    detailPage.locationsTable().should('contain', 'Roof repairs').and('contain', 'Accessible cell')
+    detailPage.copyLinkButton().should('be.visible')
+    cy.get('.govuk-back-link').should('not.exist')
   })
 })

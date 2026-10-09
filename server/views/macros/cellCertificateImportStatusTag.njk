@@ -10,8 +10,13 @@
   {% endif %}
 {% endmacro %}
 
-{# A cell added to the certificate from outside the file links to its location, so the reviewer can check it. #}
-{% macro importLocationKey(row) %}{% if row.url %}<a class="govuk-link" href="{{ row.url }}">{{ row.locationKey }}</a>{% else %}{{ row.locationKey }}{% endif %}{% endmacro %}
+{# A cell added to the certificate from outside the file links to its location, so the reviewer can check it. Beneath the
+   key: whether the cell was inactive when the import ran, and why, and its specialist cell types - both commonly
+   explain why its capacity differs from the certificate (MAPA-428). #}
+{% macro importLocationKey(row) %}{% if row.url %}<a class="govuk-link" href="{{ row.url }}">{{ row.locationKey }}</a>{% else %}{{ row.locationKey }}{% endif %}
+{%- if row.cellState and row.cellState.inactive %}<br>{{ govukTag({ text: "Inactive", classes: "govuk-tag--grey govuk-!-margin-top-1", attributes: { "data-qa": "location-inactive-tag" } }) }}{% if row.cellState.inactiveReason %}<br><span class="govuk-hint govuk-!-margin-bottom-0" data-qa="location-inactive-reason">{{ row.cellState.inactiveReason }}</span>{% endif %}{% endif %}
+{%- if row.cellState and row.cellState.specialistCellTypes.length %}<br><span class="govuk-hint govuk-!-margin-bottom-0" data-qa="location-specialist-cell-types">{{ row.cellState.specialistCellTypes | join(", ") }}</span>{% endif %}
+{%- endmacro %}
 
 {# Previews change nothing, so they are marked apart from imports. A continued preview links to the import it became. #}
 {% macro importModeTag(certificateImport, listUrl) %}

@@ -121,6 +121,18 @@
           {% endif %}
         {% endif %}
 
+        {# Shown once the page's script can copy the address; the link opens for anyone with this prison in their
+           caseload, so the central team can send it to the prison (MAPA-428). #}
+        <div class="govuk-!-margin-bottom-6" data-qa="share-link" data-copy-link hidden>
+          <p class="govuk-body">Anyone with access to this prison in Residential locations can open a link to this {{ "preview" if isPreview else "import" }}. They do not need permission to run imports.</p>
+          {{ govukButton({
+            text: "Copy link",
+            classes: "govuk-button--secondary govuk-!-margin-bottom-2",
+            attributes: { "data-qa": "copy-link-button", "data-copy-link-button": "" }
+          }) }}
+          <p class="govuk-body govuk-!-margin-bottom-0" data-copy-link-status role="status" aria-live="polite"></p>
+        </div>
+
         {% if cellCertificateUrl %}
           <p class="govuk-body">
             <a class="govuk-link" href="{{ cellCertificateUrl }}" data-qa="cell-certificate-link">View the cell certificate</a>

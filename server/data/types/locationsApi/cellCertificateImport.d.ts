@@ -2,7 +2,15 @@ export type CellCertificateImportStatus = 'PENDING' | 'STARTED' | 'FINISHED'
 
 export type CellCertificateImportLocationStatus = 'PENDING' | 'PROCESSED' | 'SKIPPED' | 'FAILED'
 
-export declare interface CellCertificateImportLocation {
+/** The cell's state when the import ran: whether it was inactive, and why, and its specialist cell types (MAPA-428). */
+export declare interface CellCertificateImportCellState {
+  inactive?: boolean
+  deactivatedReason?: string
+  deactivationReasonDescription?: string
+  specialistCellTypes?: string[]
+}
+
+export declare interface CellCertificateImportLocation extends CellCertificateImportCellState {
   locationKey: string
   status: CellCertificateImportLocationStatus
   message?: string
@@ -32,7 +40,7 @@ export declare interface CellCertificateImportLocation {
   convertedCellType?: string
 }
 
-export declare interface CellCertificateImportOmittedLocation {
+export declare interface CellCertificateImportOmittedLocation extends CellCertificateImportCellState {
   locationId?: string
   locationKey: string
   maxCapacity?: number

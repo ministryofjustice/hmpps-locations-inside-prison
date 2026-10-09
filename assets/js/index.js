@@ -8,6 +8,7 @@ import collapsibleTable from './collapsibleTable'
 import updateStructurePreview from './structurePreview'
 import structureAddRemoveLevel from './structureAddRemoveLevel'
 import autoFillNumbering from './autoFillNumbering'
+import copyLink from './copyLink'
 
 govukFrontend.initAll()
 mojFrontend.initAll()
@@ -18,6 +19,7 @@ localNameInputSubmit()
 collapsibleTable()
 updateStructurePreview()
 structureAddRemoveLevel()
+copyLink()
 autoFillNumbering(
   'apply-cell-numbering',
   'startCreateCellNumber',
