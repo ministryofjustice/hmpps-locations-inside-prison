@@ -10,6 +10,7 @@ import importDetail, {
   CARRIED_FORWARD_MESSAGE,
   certificateChangeText,
   certificateTotalsRows,
+  cellState,
   notOnCertificateLocationRows,
   workingCapacityCell,
 } from './detail'
@@ -60,8 +61,16 @@ describe('Cell certificate imports - detail', () => {
     ],
   } as CellCertificateImport
 
+  const descriptions = {
+    deactivatedReasons: { REFURBISHMENT: 'Refurbishment', OTHER: 'Other' },
+    specialistCellTypes: { DRY: 'Dry cell', ACCESSIBLE_CELL: 'Accessible cell' },
+  }
+
   beforeEach(() => {
+    locationsService.getDeactivatedReasons = jest.fn().mockResolvedValue(descriptions.deactivatedReasons)
+    locationsService.getSpecialistCellTypeDescriptions = jest.fn().mockResolvedValue(descriptions.specialistCellTypes)
     deepReq = {
+      canAccess: jest.fn().mockReturnValue(true),
       flash: jest.fn().mockReturnValue([]),
       session: { systemToken: 'token' },
       services: { locationsService },
@@ -171,6 +180,7 @@ describe('Cell certificate imports - detail', () => {
             certifiedNormalAccommodation: 1,
           },
         ],
+        descriptions,
         'TST',
       )
 
@@ -182,6 +192,7 @@ describe('Cell certificate imports - detail', () => {
           message: ADDED_MESSAGE,
           needsReview: false,
           certificateChange: undefined,
+          cellState: { inactive: false, inactiveReason: undefined, specialistCellTypes: [] },
           maxCapacity: { text: '2' },
           // zero is a real value, not a missing one
           workingCapacity: { text: '0' },
@@ -201,6 +212,7 @@ describe('Cell certificate imports - detail', () => {
             onCurrentCertificate: true,
           },
         ],
+        descriptions,
         'TST',
       )
 
@@ -214,16 +226,96 @@ describe('Cell certificate imports - detail', () => {
     })
 
     it('returns an empty list when there is nothing to report', async () => {
-      expect(notOnCertificateLocationRows(undefined, 'TST')).toEqual([])
-      expect(notOnCertificateLocationRows([], 'TST')).toEqual([])
+      expect(notOnCertificateLocationRows(undefined, descriptions, 'TST')).toEqual([])
+      expect(notOnCertificateLocationRows([], descriptions, 'TST')).toEqual([])
     })
 
     it('omits the url only when a prison id is unavailable', async () => {
-      const [row] = notOnCertificateLocationRows([{ locationKey: 'TST-A-1-003' }])
+      const [row] = notOnCertificateLocationRows([{ locationKey: 'TST-A-1-003' }], descriptions)
 
       expect(row.url).toBeUndefined()
       expect(row.maxCapacity).toEqual({ text: '-' })
     })
+  })
+
+  describe('cellState', () => {
+    it('shows an inactive cell with the description of its reason', () => {
+      expect(cellState({ inactive: true, deactivatedReason: 'REFURBISHMENT' }, descriptions)).toEqual({
+        inactive: true,
+        inactiveReason: 'Refurbishment',
+        specialistCellTypes: [],
+      })
+    })
+
+    it('adds the free text to the reason, as the location page does', () => {
+      expect(
+        cellState(
+          { inactive: true, deactivatedReason: 'OTHER', deactivationReasonDescription: 'Roof repairs' },
+          descriptions,
+        ).inactiveReason,
+      ).toEqual('Other - Roof repairs')
+    })
+
+    it('lists specialist cell types by their descriptions', () => {
+      expect(cellState({ specialistCellTypes: ['DRY', 'ACCESSIBLE_CELL'] }, descriptions).specialistCellTypes).toEqual([
+        'Dry cell',
+        'Accessible cell',
+      ])
+    })
+
+    it('shows nothing for a cell recorded before the state was, or an active one with no specialist types', () => {
+      expect(cellState({}, descriptions)).toEqual({
+        inactive: false,
+        inactiveReason: undefined,
+        specialistCellTypes: [],
+      })
+    })
+  })
+
+  it('shows the inactive reason and specialist cell types of each cell', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+      ...certificateImport,
+      locations: [
+        {
+          ...certificateImport.locations[0],
+          inactive: true,
+          deactivatedReason: 'REFURBISHMENT',
+          specialistCellTypes: ['DRY'],
+        },
+      ],
+      locationsNotOnCertificate: [{ locationKey: 'TST-A-1-003', inactive: true, deactivatedReason: 'OTHER' }],
+    })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locationRows[0].cellState).toEqual({
+      inactive: true,
+      inactiveReason: 'Refurbishment',
+      specialistCellTypes: ['Dry cell'],
+    })
+    expect(locationRows[1].cellState).toEqual(expect.objectContaining({ inactive: true, inactiveReason: 'Other' }))
+  })
+
+  it('does not show an import under another prison', async () => {
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({ ...certificateImport, prisonId: 'OTH' })
+
+    await expect(importDetail(deepReq as Request, deepRes as Response)).rejects.toThrow('Not Found')
+    expect(deepRes.render).not.toHaveBeenCalled()
+  })
+
+  it('lets someone who cannot run imports read a shared preview, but not continue it or reach the list', async () => {
+    deepReq.canAccess = jest.fn().mockReturnValue(false)
+    locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({ ...certificateImport, mode: 'PREVIEW' })
+
+    await importDetail(deepReq as Request, deepRes as Response)
+
+    expect(deepReq.canAccess).toHaveBeenCalledWith('cell_certificate_import')
+    const locals = (deepRes.render as jest.Mock).mock.calls[0][1]
+    expect(locals.canRunImports).toBe(false)
+    expect(locals.continueUrl).toBeUndefined()
+    expect(locals.backLink).toBeUndefined()
+    expect(locals.locationRows).toHaveLength(2)
   })
 
   it('renders the detail page with summary, location rows and a cell certificate link when finished', async () => {

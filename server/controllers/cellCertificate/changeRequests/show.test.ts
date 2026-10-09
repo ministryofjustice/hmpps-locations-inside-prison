@@ -51,6 +51,8 @@ describe('Cell certificate change request - show', () => {
   })
 
   beforeEach(() => {
+    locationsService.getDeactivatedReasons = jest.fn().mockResolvedValue({ REFURBISHMENT: 'Refurbishment' })
+    locationsService.getSpecialistCellTypeDescriptions = jest.fn().mockResolvedValue({ DRY: 'Dry cell' })
     deepReq = {
       session: { systemToken: 'token' },
       services: { locationsService },

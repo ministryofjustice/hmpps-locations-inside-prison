@@ -229,6 +229,11 @@ interface AllLocals {
       message?: string
       certificateChange?: string
       suggestion?: string
+      cellState?: {
+        inactive: boolean
+        inactiveReason?: string
+        specialistCellTypes: string[]
+      }
       maxCapacity: CapacityCell
       workingCapacity: CapacityCell
       certifiedNormalAccommodation: CapacityCell
@@ -241,6 +246,11 @@ interface AllLocals {
     message?: string
     certificateChange?: string
     suggestion?: string
+    cellState?: {
+      inactive: boolean
+      inactiveReason?: string
+      specialistCellTypes: string[]
+    }
     needsReview: boolean
     maxCapacity: CapacityCell
     workingCapacity: CapacityCell
@@ -250,6 +260,7 @@ interface AllLocals {
   carriedForwardRecords: number
   addedRecords: number
   certificateTotalsRows: { label: string; current: string; afterImport: string; changed: boolean }[]
+  canRunImports: boolean
   continueUrl: string
   continuedImportUrl: string
   pendingApprovalsBelow: PendingApprovalsBelow

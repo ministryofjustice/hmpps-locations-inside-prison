@@ -347,6 +347,10 @@ export default class LocationsService {
     return (await this.getConstantDataMap(token, 'getSpecialistCellTypes'))[key] || 'Unknown'
   }
 
+  async getSpecialistCellTypeDescriptions(token: string) {
+    return this.getConstantDataMap(token, 'getSpecialistCellTypes')
+  }
+
   async getSpecialistCellTypes(token: string) {
     return (await this.locationsApiClient.constants.getSpecialistCellTypes(token)).specialistCellTypes
   }

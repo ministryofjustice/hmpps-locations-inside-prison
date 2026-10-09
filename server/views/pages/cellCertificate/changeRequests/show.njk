@@ -105,13 +105,10 @@
         <p class="govuk-body" data-qa="import-no-review-needed">No cells from this import need reviewing.</p>
       {% endif %}
 
-      {# The full report lives behind the import pages, which only the roles that can run an import may
-         reach - following this link without that permission would sign the user out. #}
-      {% if canAccess('cell_certificate_import') %}
-        <p class="govuk-body">
-          <a class="govuk-link" href="{{ importResults.reportUrl }}" data-qa="import-full-report-link">View the full import report</a>
-        </p>
-      {% endif %}
+      {# Anyone at the prison can open the full report (MAPA-428). #}
+      <p class="govuk-body">
+        <a class="govuk-link" href="{{ importResults.reportUrl }}" data-qa="import-full-report-link">View the full import report</a>
+      </p>
     {% endif %}
   </div>
 {% endblock %}

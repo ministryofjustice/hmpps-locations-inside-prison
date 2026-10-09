@@ -1,11 +1,14 @@
 import { Request, Response } from 'express'
+import { NotFound } from 'http-errors'
 import { CapacityCell, TypedLocals } from '../../@types/express'
 import paths from '../../utils/paths'
 import {
   CellCertificateImport,
+  CellCertificateImportCellState,
   CellCertificateImportLocation,
   CellCertificateImportOmittedLocation,
 } from '../../data/types/locationsApi/cellCertificateImport'
+import LocationsService from '../../services/locationsService'
 
 /**
  * A cell not in the uploaded file still goes onto the new certificate. If it is on the current certificate it is
@@ -97,6 +100,41 @@ const appliedCapacityCell = (
   text: changeText(previous, applied),
 })
 
+/** Descriptions for the codes a cell's state is recorded in, looked up once per page. */
+export interface CellStateDescriptions {
+  deactivatedReasons: Record<string, string>
+  specialistCellTypes: Record<string, string>
+}
+
+export const cellStateDescriptions = async (
+  locationsService: LocationsService,
+  systemToken: string,
+): Promise<CellStateDescriptions> => {
+  const [deactivatedReasons, specialistCellTypes] = await Promise.all([
+    locationsService.getDeactivatedReasons(systemToken),
+    locationsService.getSpecialistCellTypeDescriptions(systemToken),
+  ])
+  return { deactivatedReasons, specialistCellTypes }
+}
+
+// Whether the cell was inactive when the import ran, and why, and its specialist cell types (MAPA-428). Both commonly
+// explain why a cell's capacity differs from the certificate, so they are shown against the cell rather than leaving
+// the reader to open each location. Imports made before these were recorded have none, and show nothing.
+export const cellState = (location: CellCertificateImportCellState, descriptions: CellStateDescriptions) => {
+  const reason = location.deactivatedReason
+    ? descriptions.deactivatedReasons[location.deactivatedReason] || location.deactivatedReason
+    : undefined
+  return {
+    inactive: Boolean(location.inactive),
+    inactiveReason: location.inactive
+      ? [reason, location.deactivationReasonDescription].filter(Boolean).join(' - ') || undefined
+      : undefined,
+    specialistCellTypes: (location.specialistCellTypes || []).map(
+      type => descriptions.specialistCellTypes[type] || type,
+    ),
+  }
+}
+
 // A converted cell (an office, store, shower ...) holds no capacity, and the import certifies it at 0 whatever the file
 // says (MAPA-413), so its capacity columns show 0 rather than the file's values.
 export const CONVERTED_CELL_CAPACITIES = {
@@ -111,6 +149,7 @@ export const CONVERTED_CELL_CAPACITIES = {
 // The key links to the location, which is why the API returns its id.
 export const notOnCertificateLocationRows = (
   locationsNotOnCertificate: CellCertificateImportOmittedLocation[] | undefined,
+  descriptions: CellStateDescriptions,
   prisonId?: string,
   preview = false,
 ) =>
@@ -126,6 +165,7 @@ export const notOnCertificateLocationRows = (
       needsReview: false,
       certificateChange: undefined as string | undefined,
       suggestion: location.uploadedAsKey ? `Possibly listed in the file as ${location.uploadedAsKey}` : undefined,
+      cellState: cellState(location, descriptions),
       maxCapacity: heldAndCertifiedCell(location.maxCapacity, undefined),
       workingCapacity: heldAndCertifiedCell(location.workingCapacity, undefined),
       certifiedNormalAccommodation: heldAndCertifiedCell(location.certifiedNormalAccommodation, undefined),
@@ -219,7 +259,17 @@ export default async (req: Request, res: Response) => {
   const { prisonId } = res.locals.prisonConfiguration
   const importId = req.params.importId as string
 
-  const certificateImport = await locationsService.getCellCertificateImport(systemToken, importId)
+  const [certificateImport, descriptions] = await Promise.all([
+    locationsService.getCellCertificateImport(systemToken, importId),
+    cellStateDescriptions(locationsService, systemToken),
+  ])
+  // The page is open to anyone at the prison, so an import is only shown under the prison it belongs to
+  if (certificateImport.prisonId !== prisonId) {
+    throw new NotFound()
+  }
+  // Prison staff can open a report shared with them, but only those who can run an import can continue one or reach
+  // the list of imports
+  const canRunImports = req.canAccess('cell_certificate_import')
   const inProgress = certificateImport.status !== 'FINISHED'
   const isPreview = certificateImport.mode === 'PREVIEW'
   const listUrl = paths.prison.cellCertificateImports(prisonId)
@@ -231,6 +281,7 @@ export default async (req: Request, res: Response) => {
     message: location.message,
     certificateChange: certificateChangeText(location, hasCurrentCertificate),
     suggestion: suggestionText(location),
+    cellState: cellState(location, descriptions),
     needsReview: Boolean(
       location.workingCapacityMismatch || location.maxCapacityMismatch || location.certifiedNormalAccommodationMismatch,
     ),
@@ -249,7 +300,7 @@ export default async (req: Request, res: Response) => {
 
   const locationRows = [
     ...uploadedRows,
-    ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, prisonId, isPreview),
+    ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, descriptions, prisonId, isPreview),
   ].sort((a, b) => rowOrder(a) - rowOrder(b))
 
   const locals: TypedLocals = {
@@ -261,9 +312,10 @@ export default async (req: Request, res: Response) => {
     carriedForwardRecords: certificateImport.carriedForwardRecords || 0,
     addedRecords: (certificateImport.notOnCertificateRecords || 0) - (certificateImport.carriedForwardRecords || 0),
     certificateTotalsRows: isPreview ? certificateTotalsRows(certificateImport) : [],
+    canRunImports,
     // A finished preview can be continued once; after that it links to the import it became
     continueUrl:
-      isPreview && !inProgress && !certificateImport.continuedAsUploadId
+      canRunImports && isPreview && !inProgress && !certificateImport.continuedAsUploadId
         ? `${listUrl}/import/${certificateImport.id}/continue`
         : undefined,
     continuedImportUrl:
@@ -271,7 +323,7 @@ export default async (req: Request, res: Response) => {
         ? `${listUrl}/import/${certificateImport.continuedAsUploadId}`
         : undefined,
     listUrl,
-    backLink: listUrl,
+    backLink: canRunImports ? listUrl : undefined,
     cellCertificateUrl:
       certificateImport.status === 'FINISHED' && certificateImport.cellCertificateId
         ? paths.cellCertificate.view(prisonId, certificateImport.cellCertificateId)

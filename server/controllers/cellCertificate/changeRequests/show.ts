@@ -7,6 +7,8 @@ import {
   ADDED_STATUS,
   CONVERTED_CELL_CAPACITIES,
   capacityCell,
+  cellState,
+  cellStateDescriptions,
   certificateChangeText,
   hasCurrentCertificateValues,
   notOnCertificateLocationRows,
@@ -31,10 +33,10 @@ const importResults = async (
   approvalRequestId: string,
 ) => {
   try {
-    const certificateImport = await locationsService.getCellCertificateImportByApprovalRequest(
-      systemToken,
-      approvalRequestId,
-    )
+    const [certificateImport, descriptions] = await Promise.all([
+      locationsService.getCellCertificateImportByApprovalRequest(systemToken, approvalRequestId),
+      cellStateDescriptions(locationsService, systemToken),
+    ])
 
     const hasCurrentCertificate = hasCurrentCertificateValues(certificateImport)
 
@@ -60,6 +62,7 @@ const importResults = async (
             message: location.message,
             certificateChange,
             suggestion: suggestionText(location),
+            cellState: cellState(location, descriptions),
             ...(location.convertedCellType
               ? CONVERTED_CELL_CAPACITIES
               : {
@@ -80,7 +83,7 @@ const importResults = async (
                   ),
                 }),
           })),
-        ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, prisonId).filter(
+        ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, descriptions, prisonId).filter(
           row => row.status === ADDED_STATUS,
         ),
       ],
