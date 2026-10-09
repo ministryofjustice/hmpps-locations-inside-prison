@@ -101,11 +101,11 @@
     Add level
   </button>
 
-  <h3 class="govuk-heading-m">Structure preview</h3>
+  <h3 class="govuk-heading-m" id="structure-preview-heading">Structure preview</h3>
 
   <div class="govuk-inset-text">
-    <div class="structurePreview" id="structurePreview">
-      <div class="structureLevel" id="level1"><p>{{ locationType | lower | capFirst }}</p></div>
+    <div class="structurePreview" id="structurePreview" aria-labelledby="structure-preview-heading">
+      <div class="structureLevel" id="level1"><p><span class="govuk-visually-hidden">Level 1: </span>{{ locationType | lower | capFirst }}</p></div>
       <div class="structureLevel" id="level2"><p></p></div>
       <div class="structureLevel" id="level3"><p></p></div>
       <div class="structureLevel" id="level4"><p></p></div>

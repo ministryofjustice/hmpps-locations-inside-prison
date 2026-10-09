@@ -14,9 +14,15 @@ module.exports = () => {
     const level3Text = levelWrappers.eq(1).find('select option:selected').text().trim() || ''
     const level4Text = levelWrappers.eq(2).find('select option:selected').text().trim() || ''
 
-    $('#level2 p').text(level2Text)
-    $('#level3 p').text(level3Text)
-    $('#level4 p').text(level4Text)
+    ;[level2Text, level3Text, level4Text].forEach((levelText, index) => {
+      const previewText = $(`#level${index + 2} p`).empty()
+      if (levelText) {
+        previewText.append(
+          $('<span>', { class: 'govuk-visually-hidden', text: `Level ${index + 2}: ` }),
+          document.createTextNode(levelText),
+        )
+      }
+    })
 
     // addresses issue for cypress tests not rendering structure preview
     if (typeof window.positionDivsAndLines === 'function') {
