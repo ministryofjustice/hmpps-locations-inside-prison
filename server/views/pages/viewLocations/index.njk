@@ -17,21 +17,27 @@
               {% for summary in decoratedResidentialSummary.summaryCards %}
                 <div class="govuk-grid-column-one-third" data-qa="{{ summary.type }}-card">
                   {{ miniSummary({bottomLabel: summary.type | title | replace('-', ' '), bottomClass: 'big', bottomContentLine1: summary.text,
-                  linkHref: summary.linkHref if summary.linkHref, linkLabel: summary.linkLabel if summary.linkLabel}) }}
+                  linkHref: summary.linkHref if summary.linkHref, linkLabel: summary.linkLabel if summary.linkLabel,
+                  linkAriaLabel: summary.linkAriaLabel if summary.linkAriaLabel}) }}
                 </div>
               {% endfor %}
             </div>
           </div>
         </div>
 
+        {% set detailHtml %}
+          <h3>Maximum capacity</h3>
+          The maximum capacity is the total number of people an establishment could hold if all potential spaces (including care and separation units and healthcare) are used for residential locations.<br><br>
+          <h3>Signed operational capacity</h3>
+          The signed operational capacity is approved by the prison governor. It is the establishment's maximum capacity minus the capacity of cells that are long term out of action or are not typically used for someone to live in permanently (for example care and separation units or healthcare).<br><br>
+          <h3>Working capacity</h3>
+          The working capacity is the operational capacity of all normal accommodation cells minus the capacity of any short term out of action normal accommodation cells.
+        {% endset %}
+
         {{ govukDetails({
           summaryText: "What the different types of capacity mean",
-          html: "<strong>Maximum capacity</strong><br>" +
-          "The maximum capacity is the total number of people an establishment could hold if all potential spaces (including care and separation units and healthcare) are used for residential locations.<br><br>" +
-          "<strong>Signed operational capacity</strong><br>" +
-          "The signed operational capacity is approved by the prison governor. It is the establishment's maximum capacity minus the capacity of cells that are long term out of action or are not typically used for someone to live in permanently (for example care and separation units or healthcare).<br><br>" +
-          "<strong>Working capacity</strong><br>" +
-          "The working capacity is the operational capacity of all normal accommodation cells minus the capacity of any short term out of action normal accommodation cells."
+          html: detailHtml,
+          classes: 'capacity-hint'
         }) }}
       </div>
     </div>

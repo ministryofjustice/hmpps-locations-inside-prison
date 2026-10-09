@@ -37,12 +37,20 @@ context('Create  Structure', () => {
       page.level4Select().should('not.be.visible')
 
       // Check preview
-      page.structurePreviewLevel2().find('p').should('have.text', 'Landings')
-      page.structurePreviewLevel3().find('p').should('have.text', 'Cells')
+      cy.get('#structurePreview').should('have.attr', 'aria-labelledby', 'structure-preview-heading')
+      cy.get('#structure-preview-heading').should('have.text', 'Structure preview')
+      page.structurePreviewLevel1().find('p').should('have.text', 'Level 1: Wing')
+      page.structurePreviewLevel2().find('p').should('have.text', 'Level 2: Landings')
+      page.structurePreviewLevel3().find('p').should('have.text', 'Level 3: Cells')
+      cy.get('#structurePreview .govuk-visually-hidden').should('have.length', 3)
+      page.structurePreviewLevel1().find('.govuk-visually-hidden').should('have.text', 'Level 1: ')
+      page.structurePreviewLevel2().find('.govuk-visually-hidden').should('have.text', 'Level 2: ')
+      page.structurePreviewLevel3().find('.govuk-visually-hidden').should('have.text', 'Level 3: ')
+      page.structurePreviewLevel4().find('p').should('be.empty')
 
       // Check updated preview
       page.level3Select().select('Landings')
-      page.structurePreviewLevel3().find('p').should('have.text', 'Landings')
+      page.structurePreviewLevel3().find('p').should('have.text', 'Level 3: Landings')
     })
 
     it('shows correct order and updates structure preview when removing a level', () => {
@@ -62,6 +70,8 @@ context('Create  Structure', () => {
       page.structurePreviewLevel2().should('contain.text', 'Spurs')
       page.structurePreviewLevel3().should('contain.text', 'Landings')
       page.structurePreviewLevel4().should('contain.text', 'Cells')
+      page.structurePreviewLevel4().find('p').should('have.text', 'Level 4: Cells')
+      page.structurePreviewLevel4().find('.govuk-visually-hidden').should('have.text', 'Level 4: ')
 
       page.level2Select().should('have.value', 'Spurs')
       page.level3Select().should('have.value', 'Landings')
@@ -79,6 +89,8 @@ context('Create  Structure', () => {
       page.structurePreviewLevel3().should('contain.text', 'Cells')
       page.structurePreviewLevel4().should('not.contain.text', 'Landings')
       page.structurePreviewLevel4().should('not.contain.text', 'Cells')
+      page.structurePreviewLevel3().find('p').should('have.text', 'Level 3: Cells')
+      page.structurePreviewLevel4().find('p').should('be.empty')
     })
 
     it('focuses and announces newly added levels', () => {
