@@ -70,16 +70,15 @@
   }) }}
 {% endmacro %}
 
+{% set detailHtml %}
+  {% include "../../partials/cellCapacityDefinitions.njk" %}
+{% endset %}
+
 {% block fields %}
   {{ govukDetails({
     summaryText: "What the different types of cell capacity mean",
-    html: "<strong>Baseline certified normal accommodation (CNA)</strong><br>" +
-    "The number of people that can live in a cell without it being considered overcrowded.<br><br>" +
-    "<strong>Working capacity</strong><br>" +
-    "The number of people that can currently live in this location based on available beds, furniture and sanitation.<br><br>" +
-    "<strong>Maximum capacity</strong><br>" +
-    "The maximum number of people that could potentially live in this location.",
-    classes: 'govuk-!-margin-top-3'
+    html: detailHtml,
+    classes: 'govuk-!-margin-top-3 capacity-hint'
   }) }}
 
   {{ capacityTable(decoratedLocation) }}
