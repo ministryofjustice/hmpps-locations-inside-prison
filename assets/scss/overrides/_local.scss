@@ -358,3 +358,10 @@ button.govuk-back-link {
   padding: 5px 0;
   margin: 0 0 0 10px;
 }
+
+.capacity-hint {
+  h3 {
+    @include govuk-font-size($size: 19);
+    margin: 0;
+  }
+}

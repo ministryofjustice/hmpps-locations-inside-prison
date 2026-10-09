@@ -5,9 +5,9 @@
     <div class="govuk-grid-row card-body {{ 'hmpps-summary-card__no-header' if not miniSummary.heading }}">
       <div class="govuk-grid-column-full">
         {% if miniSummary.topLabel %}
-          <h2 class="govuk-body card-label">
+          <h3 class="govuk-body card-label">
             {{ miniSummary.topLabel }}
-          </h2>
+          </h3>
         {% endif %}
         {% if miniSummary.topContent !== undefined %}
           <p
@@ -16,9 +16,9 @@
             {{ miniSummary.topContent if miniSummary.topContent !== undefined else '&nbsp;' | safe }}
           </p>
         {% endif %}
-        <h2 class="govuk-body card-label">
+        <h3 class="govuk-body card-label">
           {{ miniSummary.bottomLabel }}
-        </h2>
+        </h3>
         <p
             class="govuk-body hmpps-mini-card__{{ miniSummary.bottomClass }}"  data-qa="bottom-content-line-1"
         >
