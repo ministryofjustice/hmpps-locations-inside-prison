@@ -56,12 +56,14 @@ context('Create Wing Details', () => {
     })
 
     it('has a back link to the manage location page', () => {
+      page.backLink().should('have.attr', 'href', '/TST/view')
       page.backLink().click()
 
       Page.verifyOnPage(ViewLocationsIndexPage)
     })
 
     it('has a cancel link to the view location index page', () => {
+      page.cancelLink().should('have.attr', 'href', '/TST/view')
       page.cancelLink().click()
 
       Page.verifyOnPage(ViewLocationsIndexPage)

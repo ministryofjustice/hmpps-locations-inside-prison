@@ -9,7 +9,7 @@ import paths from '../../utils/paths'
 const steps: FormWizard.Steps = {
   '/': {
     entryPoint: true,
-    backLink: (_req, res) => paths.location.view(res.locals.decoratedResidentialSummary.location),
+    backLink: (_req, res) => paths.location.view(res.locals.prisonId, res.locals.locationId),
     reset: true,
     resetJourney: true,
     skip: true,
