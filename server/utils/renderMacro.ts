@@ -1,5 +1,6 @@
 import nunjucks from 'nunjucks'
 import path from 'path'
+import addFilters from './nunjucksFilters'
 
 // Own Environment with explicit search paths so this doesn't depend on nunjucks.configure()
 // having already run elsewhere (some callers render macros at module load time).
@@ -12,6 +13,7 @@ const env = new nunjucks.Environment(
   ]),
   { autoescape: true },
 )
+addFilters(env)
 
 export default function renderMacro(macroPath: string, macroName: string, params: object) {
   const macroParams = JSON.stringify(params, null, 2)
