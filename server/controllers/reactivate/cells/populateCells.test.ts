@@ -41,4 +41,25 @@ describe('populateCells', () => {
 
     expect(deepRes.locals.cells).toEqual(Object.values(locations))
   })
+
+  it('looks up no more than 10 cells at a time, keeping them in the order selected', async () => {
+    const cells = Array.from({ length: 40 }, (_, i) => LocationFactory.build({ id: `cell-${i}` }))
+    let running = 0
+    let maxRunning = 0
+    deepReq.sessionModel.get = jest.fn().mockReturnValue(cells.map(cell => cell.id))
+    deepReq.services.locationsService.getLocation = jest.fn(async (_token: string, id: string) => {
+      running += 1
+      maxRunning = Math.max(maxRunning, running)
+      await new Promise(resolve => {
+        setTimeout(resolve, 1)
+      })
+      running -= 1
+      return cells.find(cell => cell.id === id)
+    })
+
+    await populateCells(deepReq as FormWizard.Request, deepRes as Response, next)
+
+    expect(deepRes.locals.cells).toEqual(cells)
+    expect(maxRunning).toEqual(10)
+  })
 })
