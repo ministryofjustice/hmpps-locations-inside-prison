@@ -268,4 +268,66 @@ describe('populateLocationTree', () => {
       ])
     })
   })
+
+  describe('for a large wing', () => {
+    const landingIds = ['landing1', 'landing2']
+    const cellsPerLanding = 40
+    const wingSummaries: { [id: string]: ReturnType<typeof LocationResidentialSummaryFactory.build> } = {}
+    const wingCells: Location[] = []
+
+    landingIds.forEach(landingId => {
+      const landing = LocationFactory.build({ id: landingId, parentId: 'location', locationType: 'LANDING' })
+      const cells = Array.from({ length: cellsPerLanding }, (_, i) =>
+        LocationFactory.build({ id: `${landingId}-cell${i}`, parentId: landingId, locationType: 'CELL' }),
+      )
+      wingSummaries[landingId] = LocationResidentialSummaryFactory.build({
+        parentLocation: landing,
+        subLocations: cells,
+      })
+      cells.forEach(cell => {
+        wingSummaries[cell.id] = LocationResidentialSummaryFactory.build({ parentLocation: cell, subLocations: [] })
+      })
+      wingCells.push(...cells)
+    })
+
+    let running: number
+    let maxRunning: number
+
+    beforeEach(() => {
+      running = 0
+      maxRunning = 0
+      sessionModelValues.selectLocations = landingIds
+      deepReq.services.locationsService.getResidentialSummary = async (
+        _token: string,
+        _prisonId: string,
+        id: string,
+      ) => {
+        running += 1
+        maxRunning = Math.max(maxRunning, running)
+        await new Promise(resolve => {
+          setTimeout(resolve, 1)
+        })
+        running -= 1
+        return wingSummaries[id]
+      }
+    })
+
+    it('looks up no more than 10 locations at a time', async () => {
+      await populateLocationTreeFunc(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.cells.length).toEqual(wingCells.length)
+      expect(maxRunning).toEqual(10)
+    })
+
+    describe('when decorate: true', () => {
+      const populateLocationsDecorateFunc = populateLocationTree(true)
+
+      it('looks up no more than 10 locations at a time', async () => {
+        await populateLocationsDecorateFunc(deepReq as FormWizard.Request, deepRes as Response, next)
+
+        expect(deepRes.locals.decoratedCells.length).toEqual(wingCells.length)
+        expect(maxRunning).toEqual(10)
+      })
+    })
+  })
 })
