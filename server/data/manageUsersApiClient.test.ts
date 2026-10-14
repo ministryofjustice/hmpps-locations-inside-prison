@@ -14,6 +14,10 @@ const redisClient = {
     redisClient.cache[key] = value
     return Promise.resolve(true)
   },
+  async del(key: string) {
+    delete redisClient.cache[key]
+    return Promise.resolve(1)
+  },
 }
 
 describe('manageUsersApiClient', () => {
@@ -99,5 +103,82 @@ describe('manageUsersApiClient', () => {
       () => apiClient.users.getUsersByActiveCaseload,
       { caseload: 'CASELOAD', accessRoles: 'ROLE', page: '1', size: '50' },
     )
+
+    describe('get, when asked for the same user many times at once', () => {
+      const user = { username: 'USERNAME', name: 'Lyle Lanley' }
+
+      it('makes one call and gives every caller the result', async () => {
+        fakeApiClient.get('/users/USERNAME').once().reply(200, user)
+
+        const results = await Promise.all(
+          Array.from({ length: 20 }, () => apiClient.users.get(token.access_token, { username: 'USERNAME' })),
+        )
+
+        expect(results).toEqual(Array(20).fill(user))
+        expect(fakeApiClient.isDone()).toBe(true)
+      })
+
+      it('makes one call when redis is off', async () => {
+        const clientWithoutRedis = new ManageUsersApiClient(null, null)
+        fakeApiClient.get('/users/USERNAME').once().reply(200, user)
+
+        const results = await Promise.all(
+          Array.from({ length: 20 }, () => clientWithoutRedis.users.get(token.access_token, { username: 'USERNAME' })),
+        )
+
+        expect(results).toEqual(Array(20).fill(user))
+        expect(fakeApiClient.isDone()).toBe(true)
+      })
+
+      it('makes a new call when the cache is cleared while the first is still running', async () => {
+        fakeApiClient.get('/users/USERNAME').delay(50).reply(200, user)
+        fakeApiClient.get('/users/USERNAME').reply(200, { ...user, name: 'Updated' })
+
+        const first = apiClient.users.get(token.access_token, { username: 'USERNAME' })
+        await apiClient.users.get.clearCache({ username: 'USERNAME' })
+        const second = apiClient.users.get(token.access_token, { username: 'USERNAME' })
+
+        expect(await second).toEqual({ ...user, name: 'Updated' })
+        expect(await first).toEqual(user)
+        expect(fakeApiClient.isDone()).toBe(true)
+      })
+
+      it('makes a new call once the first has finished and the cache is empty', async () => {
+        fakeApiClient.get('/users/USERNAME').twice().reply(200, user)
+
+        await apiClient.users.get(token.access_token, { username: 'USERNAME' })
+        redisClient.cache = {}
+        await apiClient.users.get(token.access_token, { username: 'USERNAME' })
+
+        expect(fakeApiClient.isDone()).toBe(true)
+      })
+    })
+
+    describe('get, when the user is not found', () => {
+      beforeEach(() => {
+        fakeApiClient.get('/users/UNKNOWN').once().reply(404, { status: 404 })
+      })
+
+      it('remembers that the user was not found, without calling again', async () => {
+        await expect(apiClient.users.get(token.access_token, { username: 'UNKNOWN' })).rejects.toMatchObject({
+          responseStatus: 404,
+        })
+        await expect(apiClient.users.get(token.access_token, { username: 'UNKNOWN' })).rejects.toMatchObject({
+          responseStatus: 404,
+        })
+
+        expect(fakeApiClient.isDone()).toBe(true)
+        expect(redisClient.cache).toEqual({ '/users/UNKNOWN': '{"cachedNotFound":true}' })
+      })
+
+      it('makes one call for many callers at once', async () => {
+        const results = await Promise.allSettled(
+          Array.from({ length: 20 }, () => apiClient.users.get(token.access_token, { username: 'UNKNOWN' })),
+        )
+
+        expect(results.every(r => r.status === 'rejected' && r.reason.responseStatus === 404)).toBe(true)
+        expect(fakeApiClient.isDone()).toBe(true)
+      })
+    })
   })
 })

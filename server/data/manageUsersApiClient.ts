@@ -69,7 +69,8 @@ export default class ManageUsersApiClient extends BaseApiClient {
     get: this.apiCall<User, { username: string }>({
       path: '/users/:username',
       requestType: 'get',
-      options: { cacheDuration: 86_400 },
+      // System users and people who have left are not found; without this they are looked up on every page
+      options: { cacheDuration: 86_400, notFoundCacheDuration: 3_600 },
     }),
     getUsersByCaseload: this.apiCall<
       PaginatedUsers,
