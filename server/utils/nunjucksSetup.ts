@@ -6,25 +6,13 @@ import express from 'express'
 import fs from 'fs'
 import { get, isFunction } from 'lodash'
 
-import { initialiseName } from './utils'
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
-import formatDateWithTime from '../formatters/formatDateWithTime'
-import formatDate from '../formatters/formatDate'
-import formatTime from '../formatters/formatTime'
-import capFirst from '../formatters/capFirst'
-import nonOxfordJoin from '../formatters/nonOxfordJoin'
 import logger from '../../logger'
-import locationStatusTagClass from '../formatters/locationStatusTagClass'
-import locationStatusTagLabel from '../formatters/locationStatusTagLabel'
 import formatConstants from '../formatters/formatConstants'
-import formatDateWithTimeAndDay from '../formatters/formatDateWithTimeAndDay'
 import approvalTypeDescription from '../formatters/approvalTypeDescription'
-import getLocationAttributesIncludePending from './getLocationAttributesIncludePending'
-import dashIfUndefined from '../formatters/dashIfUndefined'
-import yesNo from '../formatters/yesNo'
-import sortByFirstPresentAttribute from '../formatters/sortByFirstPresentAttribute'
 import paths from './paths'
+import addFilters from './nunjucksFilters'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -106,30 +94,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('approvalTypeDescription', approvalTypeDescription)
   njkEnv.addGlobal('paths', paths)
 
-  njkEnv.addFilter('initialiseName', initialiseName)
+  addFilters(njkEnv)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
-
-  njkEnv.addFilter('capFirst', capFirst)
-  njkEnv.addFilter('formatDate', formatDate)
-  njkEnv.addFilter('formatTime', formatTime)
-  njkEnv.addFilter('formatDateWithTime', formatDateWithTime)
-  njkEnv.addFilter('formatDateWithTimeAndDay', formatDateWithTimeAndDay)
-  njkEnv.addFilter('locationStatusTagClass', locationStatusTagClass)
-  njkEnv.addFilter('locationStatusTagLabel', locationStatusTagLabel)
-  njkEnv.addFilter('nonOxfordJoin', nonOxfordJoin)
-  njkEnv.addFilter('isArray', function isArrayFilter(value) {
-    return Array.isArray(value)
-  })
-  njkEnv.addFilter('setAttribute', function setAttribute(dictionary, key, value) {
-    dictionary[key] = value
-    return dictionary
-  })
-  njkEnv.addFilter('keys', Object.keys)
-  njkEnv.addFilter('stripEmpty', function stripEmptyFilter(array: unknown[]) {
-    return array.filter(v => v)
-  })
-  njkEnv.addFilter('sortByFirstPresentAttribute', sortByFirstPresentAttribute)
-  njkEnv.addFilter('includePending', getLocationAttributesIncludePending)
-  njkEnv.addFilter('dashIfUndefined', dashIfUndefined)
-  njkEnv.addFilter('yesNo', yesNo)
 }
