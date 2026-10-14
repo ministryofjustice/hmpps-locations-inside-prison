@@ -61,6 +61,33 @@ describe('view locations show', () => {
     })
   })
 
+  describe('when the history includes a status change', () => {
+    beforeEach(() => {
+      deepRes.locals.location = LocationFactory.build({
+        changeHistory: [
+          {
+            attribute: 'Status',
+            oldValues: ['Active'],
+            newValues: ['Inactive'],
+            amendedBy: 'user',
+            amendedDate: '2021-07-05T10:35:17',
+          },
+        ],
+      })
+    })
+
+    it('renders the old and new status as tags', async () => {
+      await controller(deepReq as Request, deepRes as Response)
+
+      const [[, { tableRows }]] = (deepRes.render as jest.Mock).mock.calls
+      const [[, oldStatus, newStatus]] = tableRows
+      expect(oldStatus.html).toContain('data-qa="status-tag"')
+      expect(oldStatus.html).toContain('Active')
+      expect(newStatus.html).toContain('govuk-tag--grey')
+      expect(newStatus.html).toContain('Inactive')
+    })
+  })
+
   describe('when the user is not found', () => {
     beforeEach(() => {
       manageUsersService.getUser = jest.fn().mockResolvedValue(null)
