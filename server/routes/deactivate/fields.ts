@@ -84,6 +84,13 @@ const fields: FormWizard.Fields = {
     errorMessages: { required: 'Select if you want to deactivate the location temporarily or permanently' },
     id: 'deactivationType',
     name: 'deactivationType',
+    fieldset: {
+      legend: {
+        text: 'Do you want to deactivate this location temporarily or permanently?',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    },
     items: [
       {
         text: 'Temporarily deactivate',

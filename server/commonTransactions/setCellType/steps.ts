@@ -28,6 +28,7 @@ const steps: FormWizard.Steps = {
   ...commonSteps,
   '/type': {
     pageTitle: 'Is it a normal or special cell type?',
+    template: '../partials/formStepNoTitle',
     fields: ['accommodationType'],
     controller: BaseController,
     next: [{ field: 'accommodationType', op: '==', value: 'NORMAL_ACCOMMODATION', next: 'normal' }, 'special'],
@@ -45,6 +46,7 @@ const stepsWithCertChange: FormWizard.Steps = {
   ...commonSteps,
   '/type': {
     pageTitle: 'Is it a normal or special cell type?',
+    template: '../partials/formStepNoTitle',
     fields: ['accommodationType'],
     controller: BaseController,
     next: [

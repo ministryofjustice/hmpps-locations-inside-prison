@@ -180,6 +180,13 @@ const fields = {
     errorMessages: {
       required: 'Select yes if the cell has in-cell sanitation',
     },
+    fieldset: {
+      legend: {
+        text: 'Does the cell have in-cell sanitation?',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    },
     items: [
       { text: 'Yes', value: 'YES' },
       { text: 'No', value: 'NO' },

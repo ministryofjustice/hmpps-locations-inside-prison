@@ -55,6 +55,7 @@ const steps: FormWizard.Steps = {
   '/check': {
     fields: ['areYouSure'],
     controller: CheckRemoveCellType,
+    template: '../../partials/formStepNoTitle',
     next: 'review',
   },
   '/review': {

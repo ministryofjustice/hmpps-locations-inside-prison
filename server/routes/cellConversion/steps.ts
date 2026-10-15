@@ -227,6 +227,7 @@ const steps: FormWizard.Steps = {
     fields: ['inCellSanitation'],
     controller: FormStep,
     pageTitle: 'Convert to cell',
+    template: '../../partials/formStepNoTitle',
     next: 'submit-certification-approval-request',
   },
   ...SubmitCertificationApprovalRequest.getSteps({ next: '#' }),

@@ -18,12 +18,22 @@ export default class CheckRemoveCellType extends FormStep {
       ? 'Are you sure you want to remove all of the cell types?'
       : 'Are you sure you want to remove the cell type?'
 
+    res.locals.options.fields.areYouSure.fieldset = {
+      legend: {
+        text: title,
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    }
+
+    const locals = super.locals(req, res)
+
     const cellTypesLabel = multipleTypes ? 'Cell types:' : 'Cell type:'
 
     const cellTypesText = specialistCellTypes.join(', ')
 
     return {
-      ...super.locals(req, res),
+      ...locals,
       cellTypesLabel,
       cellTypesText,
       title,

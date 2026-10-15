@@ -10,6 +10,13 @@ const fields = {
     errorMessages: { required: 'Select yes if you want to remove the cell type' },
     id: 'areYouSure',
     name: 'areYouSure',
+    fieldset: {
+      legend: {
+        text: 'Are you sure you want to remove the cell type?',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    },
     items: [
       { text: 'Yes, I want to remove the cell type', value: 'yes' },
       { text: 'No, keep the cell type', value: 'no' },

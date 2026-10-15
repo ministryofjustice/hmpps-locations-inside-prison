@@ -26,6 +26,9 @@ context('Cell conversion - Cert flow - Sanitation', () => {
     })
 
     it('shows a hint about in-cell sanitation', () => {
+      cy.get('h1').should('have.length', 1)
+      cy.get('fieldset > legend > h1').should('contain.text', 'Does the cell have in-cell sanitation?')
+      cy.get('fieldset').should('have.attr', 'aria-describedby').and('contain', 'inCellSanitation-hint')
       cy.get('.govuk-hint').contains('This means a cell includes both a toilet and wash basin.')
     })
 
