@@ -9,6 +9,7 @@ import {
   CellCertificateImportOmittedLocation,
 } from '../../data/types/locationsApi/cellCertificateImport'
 import LocationsService from '../../services/locationsService'
+import { applyCellFilter, cellFilterView, omittedRowTypes, parseCellFilter, uploadedRowTypes } from './cellFilter'
 
 /**
  * A cell not in the uploaded file still goes onto the new certificate. If it is on the current certificate it is
@@ -163,6 +164,7 @@ export const notOnCertificateLocationRows = (
       status: carriedForward ? CARRIED_FORWARD_STATUS : ADDED_STATUS,
       message: carriedForward ? carriedForwardMessage : addedMessage,
       needsReview: false,
+      types: omittedRowTypes(carriedForward ? CARRIED_FORWARD_STATUS : ADDED_STATUS),
       certificateChange: undefined as string | undefined,
       suggestion: location.uploadedAsKey ? `Possibly listed in the file as ${location.uploadedAsKey}` : undefined,
       cellState: cellState(location, descriptions),
@@ -180,15 +182,16 @@ export const hasCurrentCertificateValues = (certificateImport: CellCertificateIm
     location => location.currentCertifiedMaxCapacity !== undefined && location.currentCertifiedMaxCapacity !== null,
   ) || Boolean(certificateImport.carriedForwardRecords)
 
-// For a cell in the file, how the new certificate differs from the current one. "No change" in the Result column is
-// about Residential locations; the certificate records the uploaded values whatever the location ends up holding,
-// so it can change when the location does not. A failed row and an archived location put nothing on the certificate.
-export const certificateChangeText = (
+// For a cell in the file, how the new certificate differs from the current one: each certified value that changes, or
+// 'new' when the cell is not on the current certificate. "No change" in the Result column is about Residential
+// locations; the certificate records the uploaded values whatever the location ends up holding, so it can change when
+// the location does not. A failed row and an archived location put nothing on the certificate.
+export const certificateChanges = (
   location: CellCertificateImportLocation,
   hasCurrentCertificate: boolean,
-): string | undefined => {
-  if (location.status === 'FAILED' || location.status === 'PENDING') return undefined
-  if (location.message === ARCHIVED_LOCATION_MESSAGE) return undefined
+): { label: string; before?: number; after: number }[] | 'new' => {
+  if (location.status === 'FAILED' || location.status === 'PENDING') return []
+  if (location.message === ARCHIVED_LOCATION_MESSAGE) return []
 
   const current = {
     max: location.currentCertifiedMaxCapacity,
@@ -196,24 +199,31 @@ export const certificateChangeText = (
     cna: location.currentCertifiedNormalAccommodation,
   }
   if ([current.max, current.working, current.cna].every(value => value === undefined || value === null)) {
-    return hasCurrentCertificate ? 'New to the certificate' : undefined
+    return hasCurrentCertificate ? 'new' : []
   }
 
   // A converted cell is certified at 0, whatever the file says
   const converted = Boolean(location.convertedCellType)
-  const changes = [
-    ['max capacity', current.max, converted ? 0 : location.maxCapacity],
-    ['working capacity', current.working, converted ? 0 : location.workingCapacity],
-    [
-      'CNA',
-      current.cna,
-      converted ? 0 : (location.certifiedNormalAccommodation ?? location.previousCertifiedNormalAccommodation),
-    ],
-  ]
-    .filter(([, before, after]) => after !== undefined && after !== null && before !== after)
-    .map(([label, before, after]) => `${label} ${before ?? '-'} → ${after}`)
+  return [
+    { label: 'max capacity', before: current.max, after: converted ? 0 : location.maxCapacity },
+    { label: 'working capacity', before: current.working, after: converted ? 0 : location.workingCapacity },
+    {
+      label: 'CNA',
+      before: current.cna,
+      after: converted ? 0 : (location.certifiedNormalAccommodation ?? location.previousCertifiedNormalAccommodation),
+    },
+  ].filter(({ before, after }) => after !== undefined && after !== null && before !== after)
+}
 
-  return changes.length ? `Certificate: ${changes.join(', ')}` : undefined
+export const certificateChangeText = (
+  location: CellCertificateImportLocation,
+  hasCurrentCertificate: boolean,
+): string | undefined => {
+  const changes = certificateChanges(location, hasCurrentCertificate)
+  if (changes === 'new') return 'New to the certificate'
+  return changes.length
+    ? `Certificate: ${changes.map(({ label, before, after }) => `${label} ${before ?? '-'} → ${after}`).join(', ')}`
+    : undefined
 }
 
 // A row that failed because its name was not found, where the name matches a cell not in the file once dropped leading
@@ -221,15 +231,43 @@ export const certificateChangeText = (
 export const suggestionText = (location: CellCertificateImportLocation): string | undefined =>
   location.suggestedLocationKey ? `Did you mean ${location.suggestedLocationKey}?` : undefined
 
-// Cells needing review first, then cells added from outside the file, then cells whose certified values change,
-// then failed rows, then the rest (unchanged cells and those carried forward). Array sort is stable, so each group
-// keeps the location order the API returned.
-const rowOrder = (row: { needsReview: boolean; status: string; certificateChange?: string }) => {
-  if (row.needsReview) return 0
-  if (row.status === ADDED_STATUS) return 1
-  if (row.certificateChange) return 2
-  if (row.status === 'FAILED') return 3
-  return 4
+const compareKeys = (a: string, b: string) => {
+  if (a === b) return 0
+  return a < b ? -1 : 1
+}
+
+// The cells are listed as the prison's certificate lists them (MAPA-457): the rows of the file in the file's order,
+// which the API keeps, with each cell not on the file placed by location after the nearest file row before it. A cell
+// that comes before every file row goes first. Both lists are compared by location key, as the API sorts them.
+export const inLocationOrder = <F extends { locationKey: string }, O extends { locationKey: string }>(
+  fileRows: F[],
+  omittedRows: O[],
+): (F | O)[] => {
+  const byKey = fileRows
+    .map((row, index) => ({ key: row.locationKey, index }))
+    .sort((a, b) => compareKeys(a.key, b.key))
+  const first: O[] = []
+  const after = new Map<number, O[]>()
+
+  omittedRows.forEach(row => {
+    // the last file row, by location, that comes before this cell
+    let low = 0
+    let high = byKey.length
+    while (low < high) {
+      const middle = Math.floor((low + high) / 2)
+      if (compareKeys(byKey[middle].key, row.locationKey) < 0) low = middle + 1
+      else high = middle
+    }
+    if (low === 0) {
+      first.push(row)
+    } else {
+      const placed = after.get(byKey[low - 1].index) ?? []
+      placed.push(row)
+      after.set(byKey[low - 1].index, placed)
+    }
+  })
+
+  return [...first, ...fileRows.flatMap((row, index) => [row, ...(after.get(index) || [])])]
 }
 
 // A preview compares the prison's current certificate with the one the import would create. A prison may have no
@@ -275,38 +313,51 @@ export default async (req: Request, res: Response) => {
   const listUrl = paths.prison.cellCertificateImports(prisonId)
 
   const hasCurrentCertificate = hasCurrentCertificateValues(certificateImport)
-  const uploadedRows = (certificateImport.locations || []).map(location => ({
-    locationKey: location.locationKey,
-    status: location.status,
-    message: location.message,
-    certificateChange: certificateChangeText(location, hasCurrentCertificate),
-    suggestion: suggestionText(location),
-    cellState: cellState(location, descriptions),
-    needsReview: Boolean(
+  const uploadedRows = (certificateImport.locations || []).map(location => {
+    const needsReview = Boolean(
       location.workingCapacityMismatch || location.maxCapacityMismatch || location.certifiedNormalAccommodationMismatch,
-    ),
-    ...(location.convertedCellType
-      ? CONVERTED_CELL_CAPACITIES
-      : {
-          maxCapacity: maxCapacityCell(location),
-          workingCapacity: workingCapacityCell(location),
-          certifiedNormalAccommodation: capacityCell(
-            location.previousCertifiedNormalAccommodation,
-            location.certifiedNormalAccommodation,
-            location.certifiedNormalAccommodationMismatch,
-          ),
-        }),
-  }))
+    )
+    const certificate = certificateChanges(location, hasCurrentCertificate)
+    return {
+      locationKey: location.locationKey,
+      status: location.status,
+      message: location.message,
+      certificateChange: certificateChangeText(location, hasCurrentCertificate),
+      suggestion: suggestionText(location),
+      cellState: cellState(location, descriptions),
+      needsReview,
+      types: uploadedRowTypes(
+        location,
+        needsReview,
+        certificate === 'new' ? 'new' : certificate.map(({ label }) => label),
+      ),
+      ...(location.convertedCellType
+        ? CONVERTED_CELL_CAPACITIES
+        : {
+            maxCapacity: maxCapacityCell(location),
+            workingCapacity: workingCapacityCell(location),
+            certifiedNormalAccommodation: capacityCell(
+              location.previousCertifiedNormalAccommodation,
+              location.certifiedNormalAccommodation,
+              location.certifiedNormalAccommodationMismatch,
+            ),
+          }),
+    }
+  })
 
-  const locationRows = [
-    ...uploadedRows,
-    ...notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, descriptions, prisonId, isPreview),
-  ].sort((a, b) => rowOrder(a) - rowOrder(b))
+  const allLocationRows = inLocationOrder(
+    uploadedRows,
+    notOnCertificateLocationRows(certificateImport.locationsNotOnCertificate, descriptions, prisonId, isPreview),
+  )
+  const pageUrl = `${listUrl}/import/${certificateImport.id}`
+  const filter = parseCellFilter(req.query)
+  const locationRows = applyCellFilter(allLocationRows, filter)
 
   const locals: TypedLocals = {
     title: isPreview ? 'Preview of cell certificate import' : 'Cell certificate import',
     certificateImport,
     locationRows,
+    cellFilter: cellFilterView(allLocationRows, filter, locationRows.length, pageUrl, isPreview),
     inProgress,
     isPreview,
     carriedForwardRecords: certificateImport.carriedForwardRecords || 0,

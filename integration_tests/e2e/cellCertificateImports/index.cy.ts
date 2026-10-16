@@ -155,9 +155,10 @@ context('Cell certificate imports', () => {
       .should('contain', 'Added to certificate')
       .and('contain', 'Not on the uploaded file. Added to the new cell certificate')
       .within(() => {
-        cy.get('td').eq(2).should('have.text', '3')
-        cy.get('td').eq(3).should('have.text', '2')
-        cy.get('td').eq(4).should('have.text', '1')
+        // CNA, max capacity, working capacity: the order of the certificate file
+        cy.get('td').eq(2).should('have.text', '1')
+        cy.get('td').eq(3).should('have.text', '3')
+        cy.get('td').eq(4).should('have.text', '2')
         cy.get('a').should('have.attr', 'href', paths.location.view('TST', '7e570000-0000-0000-0000-000000000099'))
       })
   })

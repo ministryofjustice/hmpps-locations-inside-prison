@@ -20,4 +20,8 @@ export default class CellCertificateImportPreviewPage extends Page {
   cancelLink = (): PageElement => cy.get('[data-qa=cancel-link]')
 
   continuedImportLink = (): PageElement => cy.get('[data-qa=continued-import-link]')
+
+  cellFilter = (): PageElement => cy.get('[data-qa=cell-filter]')
+
+  filterSummary = (): PageElement => cy.get('[data-qa=filter-summary]')
 }

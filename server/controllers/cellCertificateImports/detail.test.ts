@@ -4,6 +4,7 @@ import importDetail, {
   capacityCell,
   changeText,
   heldAndCertifiedCell,
+  inLocationOrder,
   maxCapacityCell,
   ADDED_MESSAGE,
   ADDED_PREVIEW_MESSAGE,
@@ -75,6 +76,7 @@ describe('Cell certificate imports - detail', () => {
       session: { systemToken: 'token' },
       services: { locationsService },
       params: { importId: 'import-1' },
+      query: {},
     }
     deepRes = {
       locals: { prisonConfiguration: { prisonId: 'TST' } },
@@ -168,6 +170,98 @@ describe('Cell certificate imports - detail', () => {
     })
   })
 
+  describe('inLocationOrder', () => {
+    const keys = (rows: { locationKey: string }[]) => rows.map(row => row.locationKey)
+    const rows = (...locationKeys: string[]) => locationKeys.map(locationKey => ({ locationKey }))
+
+    it('keeps the file order and places each other cell after the file row before it by location', () => {
+      expect(
+        keys(
+          inLocationOrder(
+            rows('TST-A-1-020', 'TST-A-1-010', 'TST-A-1-030'),
+            rows('TST-A-1-005', 'TST-A-1-015', 'TST-A-1-025', 'TST-A-1-040'),
+          ),
+        ),
+      ).toEqual([
+        'TST-A-1-005', // before every file row
+        'TST-A-1-020',
+        'TST-A-1-025',
+        'TST-A-1-010',
+        'TST-A-1-015',
+        'TST-A-1-030',
+        'TST-A-1-040',
+      ])
+    })
+
+    it('lists the other cells in location order when the file has no rows, and the file alone when it has them all', () => {
+      expect(keys(inLocationOrder([], rows('TST-A-1-001', 'TST-A-1-002')))).toEqual(['TST-A-1-001', 'TST-A-1-002'])
+      expect(keys(inLocationOrder(rows('TST-A-1-002', 'TST-A-1-001'), []))).toEqual(['TST-A-1-002', 'TST-A-1-001'])
+    })
+  })
+
+  describe('filtering the cells', () => {
+    const fromZero = {
+      status: 'PROCESSED',
+      maxCapacity: 2,
+      workingCapacity: 2,
+      certifiedNormalAccommodation: 2,
+      previousMaxCapacity: 2,
+      appliedMaxCapacity: 2,
+      previousWorkingCapacity: 0,
+      appliedWorkingCapacity: 2,
+      previousCertifiedNormalAccommodation: 2,
+    }
+
+    beforeEach(() => {
+      locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
+        ...certificateImport,
+        notOnCertificateRecords: 1,
+        locations: [
+          { ...fromZero, locationKey: 'TST-A-1-001' },
+          // the working capacity is not the only change
+          { ...fromZero, locationKey: 'TST-A-1-002', maxCapacity: 3, appliedMaxCapacity: 3 },
+          { ...fromZero, locationKey: 'TST-A-1-003' },
+          { locationKey: 'TST-A-1-004', status: 'FAILED', maxCapacity: 2, workingCapacity: 2 },
+        ],
+        locationsNotOnCertificate: [{ locationId: 'abc', locationKey: 'TST-A-1-005', maxCapacity: 1 }],
+      })
+    })
+
+    const renderedKeys = () =>
+      (deepRes.render as jest.Mock).mock.calls[0][1].locationRows.map((row: { locationKey: string }) => row.locationKey)
+
+    it('hides the cells whose only change is working capacity from 0, keeping those with other changes', async () => {
+      deepReq.query = { mode: 'hide', type: 'working-capacity-from-zero-only' }
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedKeys()).toEqual(['TST-A-1-002', 'TST-A-1-004', 'TST-A-1-005'])
+      expect((deepRes.render as jest.Mock).mock.calls[0][1].cellFilter).toEqual(
+        expect.objectContaining({ active: true, mode: 'hide', shownRows: 3, totalRows: 5 }),
+      )
+    })
+
+    it('shows only the cells that need attention', async () => {
+      deepReq.query = { mode: 'show', type: ['needs-review', 'failed', 'added'] }
+
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      expect(renderedKeys()).toEqual(['TST-A-1-004', 'TST-A-1-005'])
+    })
+
+    it('shows every cell, and offers the quick views, when no filter is chosen', async () => {
+      await importDetail(deepReq as Request, deepRes as Response)
+
+      const { cellFilter } = (deepRes.render as jest.Mock).mock.calls[0][1]
+      expect(renderedKeys()).toHaveLength(5)
+      expect(cellFilter.active).toBe(false)
+      expect(cellFilter.quickViews.map((view: { href: string }) => view.href)).toEqual([
+        '/TST/cell-certificate-imports/import/import-1?mode=hide&type=working-capacity-from-zero-only#cells',
+        '/TST/cell-certificate-imports/import/import-1?mode=show&type=needs-review&type=failed&type=added#cells',
+      ])
+    })
+  })
+
   describe('notOnCertificateLocationRows', () => {
     it('shows each cell with the single values it was added to the certificate at, linked to its location', async () => {
       const rows = notOnCertificateLocationRows(
@@ -191,6 +285,7 @@ describe('Cell certificate imports - detail', () => {
           status: 'ADDED',
           message: ADDED_MESSAGE,
           needsReview: false,
+          types: ['added'],
           certificateChange: undefined,
           cellState: { inactive: false, inactiveReason: undefined, specialistCellTypes: [] },
           maxCapacity: { text: '2' },
@@ -350,7 +445,7 @@ describe('Cell certificate imports - detail', () => {
     )
   })
 
-  it('lists cells added from outside the file after the cells needing review and before the rest', async () => {
+  it('places a cell added from outside the file by location among the rows of the file', async () => {
     locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
       ...certificateImport,
       notOnCertificateRecords: 1,
@@ -369,11 +464,11 @@ describe('Cell certificate imports - detail', () => {
 
     const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
     expect(locationRows.map((row: { locationKey: string }) => row.locationKey)).toEqual([
-      'TST-A-1-001', // needs review
+      'TST-A-1-001',
+      'TST-A-1-002',
       'TST-A-1-003', // added to the certificate
-      'TST-A-1-002', // unchanged
     ])
-    expect(locationRows[1]).toEqual(
+    expect(locationRows[2]).toEqual(
       expect.objectContaining({
         status: 'ADDED',
         url: '/TST/abc-123/view',
@@ -455,11 +550,10 @@ describe('Cell certificate imports - detail', () => {
     )
   })
 
-  it('lifts the cells needing review above the rest', async () => {
+  it('keeps the rows in the order of the file, with a cell needing review where the file has it', async () => {
     locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
       ...certificateImport,
       locations: [
-        { locationKey: 'TST-A-1-001', status: 'SKIPPED', maxCapacity: 2, workingCapacity: 2 },
         { locationKey: 'TST-A-1-002', status: 'SKIPPED', maxCapacity: 2, workingCapacity: 2 },
         {
           locationKey: 'TST-A-1-003',
@@ -468,6 +562,7 @@ describe('Cell certificate imports - detail', () => {
           workingCapacity: 1,
           workingCapacityMismatch: true,
         },
+        { locationKey: 'TST-A-1-001', status: 'SKIPPED', maxCapacity: 2, workingCapacity: 2 },
       ],
     })
 
@@ -475,9 +570,9 @@ describe('Cell certificate imports - detail', () => {
 
     const { locationRows } = (deepRes.render as jest.Mock).mock.calls[0][1]
     expect(locationRows.map((row: { locationKey: string }) => row.locationKey)).toEqual([
+      'TST-A-1-002',
       'TST-A-1-003',
       'TST-A-1-001',
-      'TST-A-1-002',
     ])
   })
 
@@ -655,7 +750,7 @@ describe('Cell certificate imports - detail', () => {
     })
   })
 
-  it('orders rows: needing review, added, certificate changes, failed, then the rest', async () => {
+  it('lists the rows in the order of the file whatever their result, with cells not on the file by location', async () => {
     locationsService.getCellCertificateImport = jest.fn().mockResolvedValue({
       ...certificateImport,
       carriedForwardRecords: 1,
@@ -716,12 +811,12 @@ describe('Cell certificate imports - detail', () => {
 
     const locals = (deepRes.render as jest.Mock).mock.calls[0][1]
     expect(locals.locationRows.map((r: { locationKey: string }) => r.locationKey)).toEqual([
-      'TST-A-1-013', // needs review
-      'TST-A-1-021', // added
-      'TST-A-1-012', // certificate: working capacity 1 -> 2
-      'TST-A-1-011', // failed
       'TST-A-1-010', // unchanged
+      'TST-A-1-011', // failed
+      'TST-A-1-012', // certificate: working capacity 1 -> 2
+      'TST-A-1-013', // needs review
       'TST-A-1-020', // carried forward
+      'TST-A-1-021', // added
     ])
     expect(locals).toEqual(expect.objectContaining({ carriedForwardRecords: 1, addedRecords: 1 }))
   })

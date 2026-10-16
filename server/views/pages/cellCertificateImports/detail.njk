@@ -6,6 +6,9 @@
 {% from "moj/components/alert/macro.njk" import mojAlert %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "../../macros/cellCertificateImportStatusTag.njk" import importStatusTag, importLocationStatusTag, importLocationNeedsReviewTag, importLocationKey, importLocationDetails %}
 
 {% block head %}
@@ -139,16 +142,76 @@
           </p>
         {% endif %}
 
-        <h2 class="govuk-heading-m">Cells</h2>
+        <h2 class="govuk-heading-m" id="cells">Cells</h2>
+        {# Most rows in a first import only set the working capacity from 0, so the cells can be filtered by result and
+           by what changes: shown only, or hidden. They stay in the order of the file either way (MAPA-457). #}
+        {% if not inProgress and cellFilter.totalRows %}
+          {% if cellFilter.quickViews.length %}
+            <ul class="govuk-list govuk-!-margin-bottom-4" data-qa="cell-quick-views">
+              {% for view in cellFilter.quickViews %}
+                <li><a class="govuk-link" href="{{ view.href }}">{{ view.text }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          {% call govukDetails({
+            summaryText: "Filter by result or by what changes",
+            classes: "govuk-!-margin-top-0",
+            attributes: { "data-qa": "cell-filter" }
+          }) %}
+            <form method="get" action="#cells" novalidate>
+              {{ govukCheckboxes({
+                name: "type",
+                idPrefix: "result-type",
+                classes: "govuk-checkboxes--small",
+                fieldset: { legend: { text: "Result", classes: "govuk-fieldset__legend--s" } },
+                items: cellFilter.resultItems
+              }) }}
+              {% if cellFilter.changeItems.length %}
+                {{ govukCheckboxes({
+                  name: "type",
+                  idPrefix: "change-type",
+                  classes: "govuk-checkboxes--small",
+                  fieldset: { legend: { text: "What changes", classes: "govuk-fieldset__legend--s" } },
+                  items: cellFilter.changeItems
+                }) }}
+              {% endif %}
+              {{ govukRadios({
+                name: "mode",
+                classes: "govuk-radios--small govuk-radios--inline",
+                fieldset: { legend: { text: "Cells with any of these", classes: "govuk-fieldset__legend--s" } },
+                items: [
+                  { value: "show", text: "Show only these cells", checked: cellFilter.mode == "show" },
+                  { value: "hide", text: "Hide these cells", checked: cellFilter.mode == "hide" }
+                ]
+              }) }}
+              <div class="govuk-button-group">
+                {{ govukButton({
+                  text: "Apply filter",
+                  classes: "govuk-button--secondary",
+                  attributes: { "data-qa": "apply-filter" }
+                }) }}
+              </div>
+            </form>
+          {% endcall %}
+
+          {% if cellFilter.active %}
+            <p class="govuk-body" data-qa="filter-summary">
+              {{ cellFilter.description }} Showing {{ cellFilter.shownRows }} of {{ cellFilter.totalRows }} cells.
+              <a class="govuk-link" href="{{ cellFilter.clearUrl }}" data-qa="clear-filter">Show all cells</a>
+            </p>
+          {% endif %}
+        {% endif %}
+
         {% if locationRows.length %}
           {% set rows = [] %}
           {% for location in locationRows %}
             {% set rows = (rows.push([
               { html: importLocationKey(location) },
               { html: importLocationStatusTag(location.status, isPreview) + (importLocationNeedsReviewTag() if location.needsReview else "") },
+              { html: capacityCellHtml(location.certifiedNormalAccommodation) },
               { html: capacityCellHtml(location.maxCapacity) },
               { html: capacityCellHtml(location.workingCapacity) },
-              { html: capacityCellHtml(location.certifiedNormalAccommodation) },
               { html: importLocationDetails(location) }
             ]), rows) %}
           {% endfor %}
@@ -158,13 +221,15 @@
             head: [
               { text: "Location" },
               { text: "Result" },
+              { text: "CNA" },
               { text: "Max capacity" },
               { text: "Working capacity" },
-              { text: "CNA" },
               { text: "Details" }
             ],
             rows: rows
           }) }}
+        {% elif cellFilter.active %}
+          <p class="govuk-body" data-qa="no-filtered-locations">No cells match this filter.</p>
         {% else %}
           <p class="govuk-body" data-qa="no-locations">No cell results are available for this import.</p>
         {% endif %}
