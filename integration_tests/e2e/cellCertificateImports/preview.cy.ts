@@ -331,4 +331,61 @@ context('Cell certificate import preview', () => {
       .continuedImportLink()
       .should('have.attr', 'href', `${paths.prison.cellCertificateImports('TST')}/import/import-2`)
   })
+  it('lists the cells in the order of the file and filters them', () => {
+    const fromZero = {
+      status: 'PROCESSED' as const,
+      maxCapacity: 2,
+      workingCapacity: 2,
+      certifiedNormalAccommodation: 2,
+      previousMaxCapacity: 2,
+      appliedMaxCapacity: 2,
+      previousWorkingCapacity: 0,
+      appliedWorkingCapacity: 2,
+      previousCertifiedNormalAccommodation: 2,
+    }
+    LocationsApiStubber.stub.stubCellCertificateImport({
+      ...finishedPreview,
+      locations: [
+        { ...fromZero, locationKey: 'TST-A-1-002' },
+        // the working capacity is not the only change
+        { ...fromZero, locationKey: 'TST-A-1-001', maxCapacity: 3, appliedMaxCapacity: 3 },
+      ],
+    })
+
+    cy.visit(`${paths.prison.cellCertificateImports('TST')}/import/preview-1`)
+    const previewPage = Page.verifyOnPage(CellCertificateImportPreviewPage)
+    const shownCells = (keys: string[]) =>
+      previewPage
+        .locationsTable()
+        .find('tbody tr')
+        .should('have.length', keys.length)
+        .each((row, index) => cy.wrap(row).find('td').first().should('contain', keys[index]))
+
+    previewPage
+      .locationsTable()
+      .find('thead th')
+      .then(headings => [...headings].map(heading => heading.innerText.trim()))
+      .should('deep.equal', ['Location', 'Result', 'CNA', 'Max capacity', 'Working capacity', 'Details'])
+    // the file's order, with the cell not on the file placed after the file row before it by location
+    shownCells(['TST-A-1-002', 'TST-A-1-003', 'TST-A-1-001'])
+
+    cy.get('[data-qa=cell-quick-views]')
+      .contains('a', 'Hide cells whose only change is working capacity from 0 (1)')
+      .click()
+    previewPage
+      .filterSummary()
+      .should('contain', 'Hiding cells with: Working capacity from 0 only.')
+      .and('contain', 'Showing 2 of 3 cells')
+    shownCells(['TST-A-1-003', 'TST-A-1-001'])
+
+    previewPage.cellFilter().find('summary').click()
+    previewPage.cellFilter().find('input[name=type]').uncheck()
+    previewPage.cellFilter().contains('label', 'Would be added (1)').click()
+    previewPage.cellFilter().contains('label', 'Show only these cells').click()
+    previewPage.cellFilter().find('[data-qa=apply-filter]').click()
+    shownCells(['TST-A-1-003'])
+
+    previewPage.filterSummary().find('[data-qa=clear-filter]').click()
+    shownCells(['TST-A-1-002', 'TST-A-1-003', 'TST-A-1-001'])
+  })
 })

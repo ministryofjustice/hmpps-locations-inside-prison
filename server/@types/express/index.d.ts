@@ -252,10 +252,22 @@ interface AllLocals {
       specialistCellTypes: string[]
     }
     needsReview: boolean
+    types: string[]
     maxCapacity: CapacityCell
     workingCapacity: CapacityCell
     certifiedNormalAccommodation: CapacityCell
   }[]
+  cellFilter: {
+    active: boolean
+    mode: 'show' | 'hide'
+    resultItems: { value: string; text: string; hint?: { text: string }; checked: boolean }[]
+    changeItems: { value: string; text: string; hint?: { text: string }; checked: boolean }[]
+    quickViews: { text: string; href: string }[]
+    description?: string
+    shownRows: number
+    totalRows: number
+    clearUrl: string
+  }
   isPreview: boolean
   carriedForwardRecords: number
   addedRecords: number
