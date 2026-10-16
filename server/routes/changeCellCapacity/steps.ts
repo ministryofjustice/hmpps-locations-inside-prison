@@ -47,7 +47,7 @@ const steps: FormWizard.Steps = {
     fields: ['updateCert'],
     next: [{ field: 'updateCert', value: 'YES', next: 'cert-change-disclaimer' }, 'confirm'],
     pageTitle: 'Do you also want to change the certified working capacity on the cell certificate?',
-    template: '../../partials/formStep',
+    template: '../../partials/formStepNoTitle',
   },
   '/confirm': {
     controller: ConfirmCellCapacity,

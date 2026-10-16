@@ -136,6 +136,11 @@ context('Deactivate permanent', () => {
       viewLocationsShowPage.actionsMenu().click()
       viewLocationsShowPage.deactivateAction().click()
       const deactivateTypePage = Page.verifyOnPage(DeactivateTypePage)
+      cy.get('h1').should('have.length', 1)
+      cy.get('fieldset > legend > h1').should(
+        'contain.text',
+        'Do you want to deactivate this location temporarily or permanently?',
+      )
       deactivateTypePage.permRadioButton().click()
       deactivateTypePage.continueButton().click()
       Page.verifyOnPage(DeactivatePermanentWarningPage)

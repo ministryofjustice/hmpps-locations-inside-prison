@@ -2,12 +2,12 @@ import Page, { PageElement } from '../../page'
 
 export default class CellConversionCertFlowSanitationPage extends Page {
   constructor() {
-    super('Convert to cell')
+    super('Does the cell have in-cell sanitation?')
   }
 
   checkOnPage(): void {
     super.checkOnPage()
-    cy.get('h2').contains('Does the cell have in-cell sanitation?')
+    cy.get('fieldset > legend > h1').contains('Does the cell have in-cell sanitation?')
   }
 
   radioButton = (value: string): PageElement => cy.get(`input[name="inCellSanitation"][value="${value}"]`)

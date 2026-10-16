@@ -245,7 +245,13 @@ context('Change cell capacity - confirm', () => {
       changeCellCapacityPage.workingCapacityInput().clear().type('2')
       changeCellCapacityPage.continueButton().click()
 
-      Page.verifyOnPage(ShouldUpdateCertPage).submit({ updateCert: false })
+      const shouldUpdateCertPage = Page.verifyOnPage(ShouldUpdateCertPage)
+      cy.get('h1').should('have.length', 1)
+      cy.get('fieldset > legend > h1').should(
+        'contain.text',
+        'Do you also want to change the certified working capacity on the cell certificate?',
+      )
+      shouldUpdateCertPage.submit({ updateCert: false })
 
       Page.verifyOnPage(ConfirmCellCapacityPage)
       cy.get('.govuk-inset-text').contains(

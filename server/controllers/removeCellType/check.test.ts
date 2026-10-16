@@ -66,7 +66,19 @@ describe('CheckRemoveCellType', () => {
       expect(result).toEqual({
         cellTypesLabel: 'Cell type:',
         cellTypesText: 'Accessible cell',
-        fields,
+        fields: {
+          ...fields,
+          areYouSure: {
+            ...fields.areYouSure,
+            fieldset: {
+              legend: {
+                text: 'Are you sure you want to remove the cell type?',
+                isPageHeading: true,
+                classes: 'govuk-fieldset__legend--l',
+              },
+            },
+          },
+        },
         title: 'Are you sure you want to remove the cell type?',
         validationErrors: [
           {
@@ -84,7 +96,19 @@ describe('CheckRemoveCellType', () => {
       expect(result).toEqual({
         cellTypesLabel: 'Cell types:',
         cellTypesText: 'Dry cell, Escape list cell',
-        fields,
+        fields: {
+          ...fields,
+          areYouSure: {
+            ...fields.areYouSure,
+            fieldset: {
+              legend: {
+                text: 'Are you sure you want to remove all of the cell types?',
+                isPageHeading: true,
+                classes: 'govuk-fieldset__legend--l',
+              },
+            },
+          },
+        },
         title: 'Are you sure you want to remove all of the cell types?',
         validationErrors: [
           {

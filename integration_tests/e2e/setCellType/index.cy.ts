@@ -114,7 +114,8 @@ context('Set cell type - normal', () => {
         SetCellTypeTypePage.goTo('7e570000-0000-0000-0000-000000000001')
         Page.verifyOnPage(SetCellTypeTypePage)
 
-        cy.get('h1').contains('Is it a normal or special cell type?')
+        cy.get('h1').should('have.length', 1)
+        cy.get('fieldset > legend > h1').should('contain.text', 'Is it a normal or special cell type?')
         cy.get('.govuk-caption-m').contains('Cell A-1-001')
       })
 
@@ -134,6 +135,8 @@ context('Set cell type - normal', () => {
 
           typePage.submit({ normal: true })
           const normalPage = Page.verifyOnPage(SetCellTypeNormalPage)
+          cy.get('h1').should('have.length', 1)
+          cy.get('fieldset > legend > h1').should('contain.text', 'Select normal cell type')
 
           normalPage.submit({ types: [] })
 
@@ -161,6 +164,8 @@ context('Set cell type - normal', () => {
 
           typePage.submit({ special: true })
           const specialPage = Page.verifyOnPage(SetCellTypeSpecialPage)
+          cy.get('h1').should('have.length', 1)
+          cy.get('fieldset > legend > h1').should('contain.text', 'Select special cell type')
 
           specialPage.submit({ type: '' })
 

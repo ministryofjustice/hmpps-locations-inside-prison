@@ -12,6 +12,13 @@ const fields: FormWizard.Fields = {
     errorMessages: {
       required: 'Select if it is a normal or special cell type',
     },
+    fieldset: {
+      legend: {
+        text: 'Is it a normal or special cell type?',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    },
     items: [
       {
         text: 'Normal cell type',
@@ -38,6 +45,13 @@ const fields: FormWizard.Fields = {
     errorMessages: {
       required: 'Select a cell type',
     },
+    fieldset: {
+      legend: {
+        text: 'Select special cell type',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    },
     items: [{ text: 'set at runtime', value: '' }],
   },
   normalCellTypes: {
@@ -47,6 +61,13 @@ const fields: FormWizard.Fields = {
     name: 'normalCellTypes',
     validate: ['required'],
     errorMessages: { required: 'Select a cell type' },
+    fieldset: {
+      legend: {
+        text: 'Select normal cell type',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    },
     hint: { text: 'Select all that apply.' },
     items: [{ text: 'set at runtime', value: '' }],
   },

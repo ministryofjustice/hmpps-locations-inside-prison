@@ -34,7 +34,7 @@ context('Cell conversion - Cert flow - Remove cell type', () => {
       page = Page.verifyOnPage(CellConversionCertFlowCapacityPage)
 
       page.submit({ baselineCna: '1', workingCapacity: '1', maximumCapacity: '2' })
-      cy.get('h2').contains('Does the cell have in-cell sanitation?')
+      cy.get('fieldset > legend > h1').contains('Does the cell have in-cell sanitation?')
     })
   })
 })

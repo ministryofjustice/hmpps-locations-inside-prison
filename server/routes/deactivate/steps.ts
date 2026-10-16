@@ -110,7 +110,7 @@ const steps: FormWizard.Steps = {
     fields: ['deactivationType'],
     next: [{ field: 'deactivationType', value: 'temporary', next: 'temporary/details' }, 'permanent/warning'],
     pageTitle: 'Do you want to deactivate this location temporarily or permanently?',
-    template: '../../partials/formStep',
+    template: '../../partials/formStepNoTitle',
     controller: FormStep,
   },
   '/temporary': {

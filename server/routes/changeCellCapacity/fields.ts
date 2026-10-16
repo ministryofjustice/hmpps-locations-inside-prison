@@ -64,6 +64,13 @@ const fields: FormWizard.Fields = {
     errorMessages: {
       required: 'Select yes if want to change the certified working capacity',
     },
+    fieldset: {
+      legend: {
+        text: 'Do you also want to change the certified working capacity on the cell certificate?',
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    },
     items: [{ text: 'set at runtime', value: '' }],
     autocomplete: 'off',
   },

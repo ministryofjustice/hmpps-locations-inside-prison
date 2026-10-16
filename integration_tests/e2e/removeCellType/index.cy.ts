@@ -197,6 +197,7 @@ context('Remove cell type', () => {
           RemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
           Page.verifyOnPage(RemoveCellTypePage)
 
+          cy.get('h1').should('have.length', 1)
           cy.get('h1').contains('Are you sure you want to remove all of the cell types?')
           cy.get('.govuk-caption-m').contains('1-1-001')
         })
@@ -305,7 +306,7 @@ context('Remove cell type', () => {
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             Page.verifyOnPage(CheckRemoveCellTypePage)
 
-            cy.get('h1').contains('Are you sure you want to remove all of the cell types?')
+            cy.get('fieldset > legend > h1').contains('Are you sure you want to remove all of the cell types?')
             cy.get('.govuk-caption-m').contains('1-1-001')
           })
 
@@ -325,7 +326,7 @@ context('Remove cell type', () => {
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             Page.verifyOnPage(CheckRemoveCellTypePage)
 
-            cy.get('h1').contains('Are you sure you want to remove the cell type?')
+            cy.get('fieldset > legend > h1').contains('Are you sure you want to remove the cell type?')
           })
 
           it('shows the correct validation error when nothing is selected', () => {
@@ -839,7 +840,7 @@ context('Remove cell type', () => {
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             Page.verifyOnPage(CheckRemoveCellTypePage)
 
-            cy.get('h1').contains('Are you sure you want to remove all of the cell types?')
+            cy.get('fieldset > legend > h1').contains('Are you sure you want to remove all of the cell types?')
             cy.get('.govuk-caption-m').contains('1-1-001')
           })
 
@@ -860,7 +861,7 @@ context('Remove cell type', () => {
             CheckRemoveCellTypePage.goTo('7e570000-0000-0000-0000-000000000001')
             Page.verifyOnPage(CheckRemoveCellTypePage)
 
-            cy.get('h1').contains('Are you sure you want to remove the cell type?')
+            cy.get('fieldset > legend > h1').contains('Are you sure you want to remove the cell type?')
           })
 
           it('shows the correct validation error when nothing is selected', () => {
