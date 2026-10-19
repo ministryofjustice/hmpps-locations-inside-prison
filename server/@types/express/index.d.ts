@@ -82,7 +82,6 @@ interface AllLocals {
   resiCards: card[]
   nonResiCards: card[]
   resiPermissionMessage: string
-  nonResiPermissionMessage: string
   cell: Location
   cellCount: number
   cells: Location[]
@@ -174,12 +173,6 @@ interface AllLocals {
   prisonNonHousingDisabled: boolean
   nestedBaseUrl: string
   nomisScreenBlocked: boolean
-  nomisLocationScreenBlocked: boolean
-  nomisUsageScreenBlocked: boolean
-  moduleName: string
-  currentScreenStatus: string
-  screenLabel: string
-  currentStatusDescription: string
   prisonId: string
   prisonerLocation: PrisonerLocation
   prisonResidentialSummary: PrisonResidentialSummary

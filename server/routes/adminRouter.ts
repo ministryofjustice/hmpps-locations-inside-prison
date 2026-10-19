@@ -9,10 +9,8 @@ import getServicePrisonsNonHousingDisplay, {
 } from '../middleware/getServicePrisonsNonHousingDisplay'
 import protectRoute from '../middleware/protectRoute'
 import changeResiStatusRouter from './admin/resi'
-import changeNonResiStatusRouter from './admin/nonResi'
 import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
 import changeCertApprovalStatusRouter from './admin/certApproval'
-import changeNomisScreenStatusRouter from './admin/nomisScreen'
 
 const controller = (services: Services) => {
   const router = express.Router({ mergeParams: true })
@@ -27,10 +25,8 @@ const controller = (services: Services) => {
     adminIndex,
   )
   router.use('/change-resi-status', changeResiStatusRouter)
-  router.use('/change-non-resi-status', changeNonResiStatusRouter)
   router.use('/change-include-seg-in-roll-count', changeIncludeSegInRollCountStatusRouter)
   router.use('/change-certification-status', changeCertApprovalStatusRouter)
-  router.use('/change-nomis-screen-status/:moduleName', changeNomisScreenStatusRouter)
 
   return router
 }

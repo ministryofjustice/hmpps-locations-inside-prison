@@ -48,9 +48,6 @@ const paths = {
   admin: {
     changeCertificationStatus: withPrison('admin/change-certification-status'),
     changeIncludeSegInRollCount: withPrison('admin/change-include-seg-in-roll-count'),
-    changeNomisScreenStatus: (prisonId: string, screenId: string) =>
-      p(`${prisonId}/admin/change-nomis-screen-status/${screenId}`),
-    changeNonResidentialStatus: withPrison('admin/change-non-resi-status'),
     changeResidentialStatus: withPrison('admin/change-resi-status'),
     index: withPrison('admin'),
   },
