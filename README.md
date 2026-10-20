@@ -65,14 +65,13 @@ docker compose -f docker-compose.yml --profile include-frontend up --build
 | Certificate administrator                            | MANAGE_RES_LOCATIONS_OP_CAP    | View and approve cell certificates, request changes to residential attributes. Previously included archiving locations and changing signed operational capacity.               |
 | Certificate reviewer                                 | RESI__CERT_REVIEWER            | Role for PGD and Ops Managers to review certificate change requests and decide on approval or rejection.                                                                       |
 | Certificate viewer                                   | RESI__CERT_VIEWER              | View-only role for certificate management, allowing capacity management team to view cell certificates and change requests across all establishments.                          |
-| View location information                            | VIEW_INTERNAL_LOCATION         | Provides read-only access to users with an establishment in their caseload, reducing the need for role administration.                                                         |
 | View residential location reports                    | REPORTING_LOCATION_INFORMATION | Allows access to reports                                                                                                                                                       |
 
 #### Dev logins
 
 | username               | password       | roles                                                                                         |
 |------------------------|----------------|-----------------------------------------------------------------------------------------------|
-| LOCATION_RO            | password123456 | VIEW_INTERNAL_LOCATION                                                                        |
+| LOCATION_RO            | password123456 | None - viewing needs only the prison in the user's caseload                                   |
 | LOCATION_CAP           | password123456 | MANAGE_RES_LOCATIONS_OP_CAP                                                                   |
 | LOCATION_MAINTAIN      | password123456 | MANAGE_RESIDENTIAL_LOCATIONS                                                                  |
 | LOCATION_CERT_REVIEWER | password123456 | RESI__CERT_REVIEWER                                                                           |

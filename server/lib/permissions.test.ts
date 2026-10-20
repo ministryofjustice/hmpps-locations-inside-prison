@@ -51,10 +51,9 @@ describe('rolesToPermissions', () => {
     ])
   })
 
-  // The import is a snapshot most roles cannot act on; its results appear on the import request details
-  // page instead, which carries no permission of its own.
-  it('grants VIEW_INTERNAL_LOCATION no permissions', () => {
-    expect(rolesToPermissions(['VIEW_INTERNAL_LOCATION']).sort()).toEqual([])
+  // Viewing locations needs no role, so a user without one gets no permissions.
+  it('grants no permissions to a user without a locations role', () => {
+    expect(rolesToPermissions([]).sort()).toEqual([])
   })
 
   it('returns the correct permissions for all roles', () => {

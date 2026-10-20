@@ -25,10 +25,10 @@ context('Index', () => {
     })
   })
 
-  context('With the default role but certification inactive', () => {
+  context('With no roles but certification inactive', () => {
     beforeEach(() => {
       cy.task('reset')
-      AuthStubber.stub.stubSignIn({ roles: ['VIEW_INTERNAL_LOCATION'] })
+      AuthStubber.stub.stubSignIn({ roles: [] })
       LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'INACTIVE' })
       ManageUsersApiStubber.stub.stubManageUsersMe()
       ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()

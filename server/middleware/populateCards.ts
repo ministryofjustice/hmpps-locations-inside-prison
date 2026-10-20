@@ -2,29 +2,18 @@ import config from '../config'
 import paths from '../utils/paths'
 import middleware from './middleware'
 
-const RESI_ROLES = [
-  'VIEW_INTERNAL_LOCATION',
-  'MANAGE_RESIDENTIAL_LOCATIONS',
-  'MANAGE_RES_LOCATIONS_OP_CAP',
-  'MANAGE_RES_LOCATIONS_ADMIN',
-  'RESI__CERT_VIEWER',
-  'RESI__CERT_REVIEWER',
-]
-
 export default middleware((req, res, next) => {
   const { user, prisonConfiguration, prisonId } = res.locals
   const certificationEnabled = prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
   const resiActive = prisonConfiguration?.resiLocationServiceActive === 'ACTIVE'
   const userRoles = user.userRoles || []
-  const hasResiRole = userRoles.some(role => RESI_ROLES.includes(role))
-  const showResiCards = resiActive && hasResiRole
 
   const manageResiDescription = `View and update information about existing locations${certificationEnabled ? ' or create new residential locations' : ''}.`
 
   res.locals.resiCards = [
     {
       clickable: true,
-      visible: showResiCards,
+      visible: resiActive,
       heading: `Manage residential locations`,
       href: paths.location.view(prisonId),
       description: manageResiDescription,
@@ -32,7 +21,7 @@ export default middleware((req, res, next) => {
     },
     {
       clickable: true,
-      visible: showResiCards,
+      visible: resiActive,
       heading: 'View all inactive cells',
       href: paths.location.inactiveCells(prisonId),
       description: 'View details of all inactive cells in the establishment and reactivate them.',
@@ -40,7 +29,7 @@ export default middleware((req, res, next) => {
     },
     {
       clickable: true,
-      visible: showResiCards,
+      visible: resiActive,
       heading: 'Archived locations',
       href: paths.prison.archivedLocations(prisonId),
       description: 'View locations that have been permanently deactivated as residential locations.',
@@ -48,7 +37,7 @@ export default middleware((req, res, next) => {
     },
     {
       clickable: true,
-      visible: showResiCards && certificationEnabled,
+      visible: resiActive && certificationEnabled,
       heading: 'Cell certificate',
       href: paths.cellCertificate.view(prisonId),
       description: 'View the current certificate and requested changes.',
@@ -108,13 +97,7 @@ export default middleware((req, res, next) => {
     },
   ]
 
-  if (!resiActive) {
-    res.locals.resiPermissionMessage = 'You do not have permission to view Residential locations.'
-  } else if (!hasResiRole) {
-    res.locals.resiPermissionMessage = 'You do not have permission to manage Residential locations.'
-  } else {
-    res.locals.resiPermissionMessage = null
-  }
+  res.locals.resiPermissionMessage = resiActive ? null : 'You do not have permission to view Residential locations.'
 
   // Non-residential locations cards
   // Check for non-resi specific roles (these are used by the non-resi app)
