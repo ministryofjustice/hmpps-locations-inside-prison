@@ -209,7 +209,7 @@ describe('GET /TST', () => {
     },
   )
 
-  it('should render permission message when resi service is active but user has no residential role', async () => {
+  it('should render the residential cards for a user with no roles when resi service is active', async () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
       resiLocationServiceActive: 'ACTIVE',
@@ -230,12 +230,16 @@ describe('GET /TST', () => {
     auditService.logPageView.mockResolvedValue(null)
     const res = await request(app).get('/TST')
 
-    expect(res.text).toContain('Residential locations')
-    expect(res.text).toContain('You do not have permission to manage Residential locations.')
+    expect(res.text).not.toContain('permission to view Residential locations')
+    expect(res.text).not.toContain('permission to manage Residential locations')
 
-    expect(res.text).not.toContain('Manage residential locations')
-    expect(res.text).not.toContain('View all inactive cells')
-    expect(res.text).not.toContain('Archived locations')
-    expect(res.text).not.toContain('Cell certificate')
+    expect(res.text).toContain('Manage residential locations')
+    expect(res.text).toContain('View all inactive cells')
+    expect(res.text).toContain('Archived locations')
+    expect(res.text).toContain('View the current certificate and requested changes.')
+
+    expect(res.text).not.toContain('Import cell certificate')
+    expect(res.text).not.toContain('Capacity management dashboard')
+    expect(res.text).not.toContain('Administer residential locations.')
   })
 })

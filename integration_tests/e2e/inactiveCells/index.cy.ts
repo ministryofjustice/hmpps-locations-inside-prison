@@ -66,7 +66,7 @@ context('Inactive Cells Index', () => {
       beforeEach(() => {
         cy.task('reset')
 
-        AuthStubber.stub.stubSignIn({ roles: ['VIEW_INTERNAL_LOCATION'] })
+        AuthStubber.stub.stubSignIn({ roles: [] })
         ManageUsersApiStubber.stub.stubManageUsers()
         ManageUsersApiStubber.stub.stubManageUsersMe()
         ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()
@@ -276,7 +276,7 @@ context('Inactive Cells Index', () => {
       beforeEach(() => {
         cy.task('reset')
 
-        AuthStubber.stub.stubSignIn({ roles: ['VIEW_INTERNAL_LOCATION'] })
+        AuthStubber.stub.stubSignIn({ roles: [] })
         ManageUsersApiStubber.stub.stubManageUsers()
         ManageUsersApiStubber.stub.stubManageUsersMe()
         ManageUsersApiStubber.stub.stubManageUsersMeCaseloads()

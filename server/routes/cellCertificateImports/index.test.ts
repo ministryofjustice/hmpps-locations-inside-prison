@@ -63,7 +63,6 @@ describe('viewing cell certificate imports', () => {
   })
 
   it.each([
-    ['VIEW_INTERNAL_LOCATION'],
     ['MANAGE_RESIDENTIAL_LOCATIONS'],
     ['MANAGE_RES_LOCATIONS_OP_CAP'],
     ['RESI__CERT_REVIEWER'],
@@ -80,9 +79,7 @@ describe('viewing cell certificate imports', () => {
   })
 
   it.each([false, true])('renders the permission page with production=%s', async production => {
-    const response = await request(buildApp(['VIEW_INTERNAL_LOCATION'], production))
-      .get(paths.prison.cellCertificateImports('TST'))
-      .expect(403)
+    const response = await request(buildApp([], production)).get(paths.prison.cellCertificateImports('TST')).expect(403)
 
     expect(response.text).toContain('You need permission to access this part of the Residential locations service.')
     expect(response.text).toContain('If you think you should have access, email')
