@@ -7,7 +7,6 @@
   [
     { text: prisonConfiguration.prisonId },
     { text: prisonConfiguration.resiLocationServiceActive },
-    { text: prisonConfiguration.nonResiServiceActive },
     { text: prisonConfiguration.includeSegregationInRollCount },
     { text: prisonConfiguration.certificationApprovalRequired }
   ]
@@ -23,22 +22,6 @@
 
 {% set screenBlocked %}
   {% if nomisScreenBlocked %}
-    Blocked
-  {% else %}
-    Not-Blocked
-  {% endif %}
-{% endset %}
-
-{% set locationScreenBlocked %}
-  {% if nomisLocationScreenBlocked %}
-    Blocked
-  {% else %}
-    Not-Blocked
-  {% endif %}
-{% endset %}
-
-{% set usageScreenBlocked %}
-  {% if nomisUsageScreenBlocked %}
     Blocked
   {% else %}
     Not-Blocked
@@ -69,23 +52,6 @@
                 href: paths.admin.changeResidentialStatus(prisonConfiguration.prisonId),
                 text: "Change",
                 visuallyHiddenText: "resi",
-                classes: "govuk-link--no-visited-state"}
-            ]
-          }
-        },
-        {
-          key: {
-            text: 'Non-residential locations'
-          },
-          value: {
-            text: prisonConfiguration.nonResiServiceActive
-          },
-          actions: {
-            items: [
-              {
-                href: paths.admin.changeNonResidentialStatus(prisonConfiguration.prisonId),
-                text: "Change",
-                visuallyHiddenText: "non-resi",
                 classes: "govuk-link--no-visited-state"}
             ]
           }
@@ -138,40 +104,6 @@
         },
           value: {
             text: screenBlocked
-          }
-        },
-        {
-          key: {
-            text: 'OIMILOCA (internal locations) screen blocked'
-          },
-          value: {
-            text: locationScreenBlocked
-          },
-          actions: {
-            items: [
-              {
-                href: paths.admin.changeNomisScreenStatus(prisonConfiguration.prisonId, 'OIMILOCA'),
-                text: "Change",
-                visuallyHiddenText: "OIMILOCA NOMIS screen",
-                classes: "govuk-link--no-visited-state"}
-            ]
-          }
-        },
-        {
-          key: {
-            text: 'OIMULOCA (internal usage) screen blocked'
-          },
-          value: {
-            text: usageScreenBlocked
-          },
-          actions: {
-            items: [
-              {
-                href: paths.admin.changeNomisScreenStatus(prisonConfiguration.prisonId, 'OIMULOCA'),
-                text: "Change",
-                visuallyHiddenText: "OIMULOCA NOMIS screen",
-                classes: "govuk-link--no-visited-state"}
-            ]
           }
         }
         ],

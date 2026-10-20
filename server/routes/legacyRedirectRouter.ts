@@ -47,16 +47,6 @@ router.use(
 )
 
 router.use(
-  '/admin/:prisonId/change-nomis-screen-status/:screenId',
-  redirect(req => paths.admin.changeNomisScreenStatus(req.params.prisonId as string, req.params.screenId as string)),
-)
-
-router.use(
-  '/admin/:prisonId/change-non-resi-status',
-  redirect(req => paths.admin.changeNonResidentialStatus(req.params.prisonId as string)),
-)
-
-router.use(
   '/admin/:prisonId/change-resi-status',
   redirect(req => paths.admin.changeResidentialStatus(req.params.prisonId as string)),
 )

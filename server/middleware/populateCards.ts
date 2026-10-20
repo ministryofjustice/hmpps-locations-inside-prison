@@ -6,7 +6,6 @@ export default middleware((req, res, next) => {
   const { user, prisonConfiguration, prisonId } = res.locals
   const certificationEnabled = prisonConfiguration?.certificationApprovalRequired === 'ACTIVE'
   const resiActive = prisonConfiguration?.resiLocationServiceActive === 'ACTIVE'
-  const nonResiActive = prisonConfiguration?.nonResiServiceActive === 'ACTIVE'
   const userRoles = user.userRoles || []
 
   const manageResiDescription = `View and update information about existing locations${certificationEnabled ? ' or create new residential locations' : ''}.`
@@ -100,35 +99,29 @@ export default middleware((req, res, next) => {
 
   res.locals.resiPermissionMessage = resiActive ? null : 'You do not have permission to view Residential locations.'
 
-  // Non-residential locations cards and permission message
-  if (nonResiActive) {
-    // Check for non-resi specific roles (these are used by the non-resi app)
-    const hasEditRole = userRoles.includes('NONRESI__MAINTAIN_LOCATION')
+  // Non-residential locations cards
+  // Check for non-resi specific roles (these are used by the non-resi app)
+  const hasEditRole = userRoles.includes('NONRESI__MAINTAIN_LOCATION')
 
-    res.locals.nonResiCards = [
-      hasEditRole
-        ? {
-            clickable: true,
-            visible: true,
-            heading: 'Edit non-residential locations',
-            href: config.services.nonResidentialLocations,
-            description: 'Add, change or archive non-residential locations.',
-            'data-qa': 'non-resi-edit-card',
-          }
-        : {
-            clickable: true,
-            visible: true,
-            heading: 'View non-residential locations',
-            href: config.services.nonResidentialLocations,
-            description: 'View non-residential locations and the services that use them.',
-            'data-qa': 'non-resi-view-card',
-          },
-    ]
-    res.locals.nonResiPermissionMessage = null
-  } else {
-    res.locals.nonResiCards = null
-    res.locals.nonResiPermissionMessage = 'You do not have permission to view non-residential locations.'
-  }
+  res.locals.nonResiCards = [
+    hasEditRole
+      ? {
+          clickable: true,
+          visible: true,
+          heading: 'Edit non-residential locations',
+          href: config.services.nonResidentialLocations,
+          description: 'Add, change or archive non-residential locations.',
+          'data-qa': 'non-resi-edit-card',
+        }
+      : {
+          clickable: true,
+          visible: true,
+          heading: 'View non-residential locations',
+          href: config.services.nonResidentialLocations,
+          description: 'View non-residential locations and the services that use them.',
+          'data-qa': 'non-resi-view-card',
+        },
+  ]
 
   next()
 })

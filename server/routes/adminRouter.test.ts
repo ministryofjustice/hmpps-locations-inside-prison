@@ -76,6 +76,8 @@ describe('GET /PRISON_ID/admin', () => {
         expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
         expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
         expect(res.text).toContain(paths.admin.changeIncludeSegInRollCount('TST'))
+        expect(res.text).not.toContain('change-non-resi-status')
+        expect(res.text).not.toContain('change-nomis-screen-status')
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
           correlationId: expect.any(String),
@@ -136,7 +138,7 @@ describe('GET /PRISON_ID/admin', () => {
 
     const notFound: SanitisedError<object> = new Error('Not Found')
     notFound.responseStatus = 404
-    // Primary lookup (per-prison) returns 404 for every module, fallback (**ALL**) succeeds with blockAccess=true
+    // Primary lookup (per-prison) returns 404, fallback (**ALL**) succeeds with blockAccess=true
     prisonService.getScreenStatus.mockImplementation(async (_token, prisonId) => {
       if (prisonId === '**ALL**') {
         return { conditionType: 'CASELOAD', conditionValue: '**ALL**', blockAccess: true }
@@ -149,13 +151,10 @@ describe('GET /PRISON_ID/admin', () => {
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        // 3 modules × (primary + fallback) = 6 calls
-        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(6)
+        // primary + fallback = 2 calls
+        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
         const callsByPrison = prisonService.getScreenStatus.mock.calls.map(args => args[1])
-        expect(callsByPrison.filter(p => p === 'TST')).toHaveLength(3)
-        expect(callsByPrison.filter(p => p === '**ALL**')).toHaveLength(3)
-        const modulesCalled = prisonService.getScreenStatus.mock.calls.map(args => args[2])
-        expect(modulesCalled).toEqual(expect.arrayContaining(['OIMMHOLO', 'OIMILOCA', 'OIMULOCA']))
+        expect(callsByPrison).toEqual(['TST', '**ALL**'])
 
         // Check that the page was rendered with blockAccess=true from the fallback
         expect(res.text).toContain('govuk-breadcrumbs')
@@ -177,7 +176,7 @@ describe('GET /PRISON_ID/admin', () => {
 
     const notFound: SanitisedError<object> = new Error('Not Found')
     notFound.responseStatus = 404
-    // Both per-prison and fallback return 404 for every module
+    // Both per-prison and fallback return 404
     prisonService.getScreenStatus.mockImplementation(() => Promise.reject(notFound))
 
     return request(app)
@@ -185,11 +184,10 @@ describe('GET /PRISON_ID/admin', () => {
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        // 3 modules × (primary + fallback) = 6 calls
-        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(6)
+        // primary + fallback = 2 calls
+        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
         const callsByPrison = prisonService.getScreenStatus.mock.calls.map(args => args[1])
-        expect(callsByPrison.filter(p => p === 'TST')).toHaveLength(3)
-        expect(callsByPrison.filter(p => p === '**ALL**')).toHaveLength(3)
+        expect(callsByPrison).toEqual(['TST', '**ALL**'])
 
         // Check that the page was rendered (blockAccess should default to false)
         expect(res.text).toContain('govuk-breadcrumbs')

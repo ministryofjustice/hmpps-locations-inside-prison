@@ -998,29 +998,6 @@ const stubPrisonConfigurationActivateResi = (
     },
   })
 
-const stubPrisonConfigurationActivateNonResi = (
-  returnData = {
-    prisonId: 'TST',
-    resiLocationServiceActive: 'INACTIVE',
-    nonResiServiceActive: 'ACTIVE',
-    certificationApprovalRequired: 'INACTIVE',
-    includeSegregationInRollCount: 'INACTIVE',
-  },
-) =>
-  stubFor({
-    request: {
-      method: 'PUT',
-      urlPattern: '/locations-api/prison-configuration/\\w+/non-resi-service/ACTIVE',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: returnData,
-    },
-  })
-
 const stubPrisonConfigurationIncludeSegInRollCount = (
   returnData = {
     prisonId: 'TST',
@@ -1648,7 +1625,6 @@ const allStubs = {
   stubPatchLocation,
   stubPendingApprovalsBelow,
   stubPrisonConfiguration,
-  stubPrisonConfigurationActivateNonResi,
   stubPrisonConfigurationActivateResi,
   stubPrisonConfigurationCertApproval,
   stubPrisonConfigurationDeactivateResi,
