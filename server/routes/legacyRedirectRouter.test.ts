@@ -57,8 +57,6 @@ describe('legacyRedirectRouter', () => {
       ['/admin/TST', '/TST/admin'],
       ['/admin/TST/change-certification-status', '/TST/admin/change-certification-status'],
       ['/admin/TST/change-include-seg-in-roll-count', '/TST/admin/change-include-seg-in-roll-count'],
-      ['/admin/TST/change-nomis-screen-status/A', '/TST/admin/change-nomis-screen-status/A'],
-      ['/admin/TST/change-non-resi-status', '/TST/admin/change-non-resi-status'],
       ['/admin/TST/change-resi-status', '/TST/admin/change-resi-status'],
       ['/admin/TST/ingest-cert', '/TST/cell-certificate-imports'],
       ['/TST/admin/ingest-cert', '/TST/cell-certificate-imports'],
