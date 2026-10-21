@@ -1,5 +1,4 @@
 import { StatusType } from '../../../data/types/locationsApi'
-import { ServiceCode } from '../../../data/types/locationsApi/serviceCode'
 import adminController from '../adminController'
 
 const ResiStatusChangeConfirm = adminController({
@@ -13,13 +12,6 @@ const ResiStatusChangeConfirm = adminController({
     const status = activation as StatusType
 
     await locationsService.updateResiStatus(req.session.systemToken, prisonId, status)
-
-    const serviceCode: ServiceCode = 'DISPLAY_HOUSING_CHECKBOX'
-    if (status === 'ACTIVE') {
-      await prisonService.activatePrisonService(req.session.systemToken, prisonId, serviceCode)
-    } else {
-      await prisonService.deactivatePrisonService(req.session.systemToken, prisonId, serviceCode)
-    }
 
     // block or unblock the screen
     try {

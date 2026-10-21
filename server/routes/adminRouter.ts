@@ -4,9 +4,7 @@ import { Page } from '../services/auditService'
 import type { Services } from '../services'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import adminIndex from '../controllers/adminIndex'
-import getServicePrisonsNonHousingDisplay, {
-  getSplashScreenStatus,
-} from '../middleware/getServicePrisonsNonHousingDisplay'
+import getSplashScreenStatus from '../middleware/getSplashScreenStatus'
 import protectRoute from '../middleware/protectRoute'
 import changeResiStatusRouter from './admin/resi'
 import changeIncludeSegInRollCountStatusRouter from './admin/segInRollCount'
@@ -19,7 +17,6 @@ const controller = (services: Services) => {
     '/',
     protectRoute('administer_residential'),
     addBreadcrumb({ title: '', href: '/' }),
-    getServicePrisonsNonHousingDisplay(),
     getSplashScreenStatus(),
     logPageView(services.auditService, Page.LOCATION_ADMIN),
     adminIndex,

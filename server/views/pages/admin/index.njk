@@ -12,14 +12,6 @@
   ]
 ), rows) %}
 
-{% set housingMessage %}
-  {% if prisonNonHousingDisabled %}
-    Disabled
-  {% else %}
-    Enabled
-  {% endif %}
-{% endset %}
-
 {% set screenBlocked %}
   {% if nomisScreenBlocked %}
     Blocked
@@ -88,14 +80,6 @@
                 visuallyHiddenText: "resi",
                 classes: "govuk-link--no-visited-state"}
             ]
-          }
-        },
-        {
-          key: {
-            text: 'Prison non housing checkboxes'
-          },
-          value: {
-            text: housingMessage
           }
         },
         {

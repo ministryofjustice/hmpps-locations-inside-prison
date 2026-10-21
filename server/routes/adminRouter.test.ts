@@ -58,7 +58,6 @@ describe('GET /PRISON_ID/admin', () => {
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
-    prisonService.getServiceStatus.mockResolvedValue('')
     prisonService.getScreenStatus.mockResolvedValue({
       conditionType: 'CASELOAD',
       conditionValue: 'TST',
@@ -78,45 +77,7 @@ describe('GET /PRISON_ID/admin', () => {
         expect(res.text).toContain(paths.admin.changeIncludeSegInRollCount('TST'))
         expect(res.text).not.toContain('change-non-resi-status')
         expect(res.text).not.toContain('change-nomis-screen-status')
-        expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
-          who: user.username,
-          correlationId: expect.any(String),
-          details: { userUuid: user.userUuid },
-        })
-      })
-  })
-
-  it('should render the admin index page when NOMIS housing checkboxes are disabled', async () => {
-    auditService.logPageView.mockResolvedValue(null)
-    locationsService.getPrisonConfiguration.mockResolvedValue({
-      prisonId: 'TST',
-      resiLocationServiceActive: 'ACTIVE',
-      nonResiServiceActive: 'ACTIVE',
-      includeSegregationInRollCount: 'INACTIVE',
-      certificationApprovalRequired: 'INACTIVE',
-    })
-
-    // a 404 is returned when the NOMIS screen is switched off
-    const error: SanitisedError<object> = new Error('Not Found')
-    error.responseStatus = 404
-    prisonService.getServiceStatus.mockImplementationOnce(() => Promise.reject(error))
-    prisonService.getScreenStatus.mockResolvedValue({
-      conditionType: 'CASELOAD',
-      conditionValue: 'TST',
-      blockAccess: false,
-    })
-    return request(app)
-      .get(paths.admin.index('TST'))
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        // Check that breadcrumbs are present
-        expect(res.text).toContain('govuk-breadcrumbs')
-
-        // check links
-        expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
-        expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
-
+        expect(res.text).not.toContain('Prison non housing checkboxes')
         expect(auditService.logPageView).toHaveBeenCalledWith(Page.LOCATION_ADMIN, {
           who: user.username,
           correlationId: expect.any(String),
@@ -134,7 +95,6 @@ describe('GET /PRISON_ID/admin', () => {
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
-    prisonService.getServiceStatus.mockResolvedValue('')
 
     const notFound: SanitisedError<object> = new Error('Not Found')
     notFound.responseStatus = 404
@@ -172,7 +132,6 @@ describe('GET /PRISON_ID/admin', () => {
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
-    prisonService.getServiceStatus.mockResolvedValue('')
 
     const notFound: SanitisedError<object> = new Error('Not Found')
     notFound.responseStatus = 404
