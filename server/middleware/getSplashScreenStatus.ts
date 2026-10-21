@@ -17,25 +17,26 @@ export default function getSplashScreenStatus() {
   }
 }
 
+// In NOMIS the **ALL** condition takes priority over a prison's own condition
 async function getScreenBlockStatus(prisonService: PrisonService, token: string, prisonId: string): Promise<boolean> {
-  try {
-    const condition = await prisonService.getScreenStatus(token, prisonId)
-    return condition.blockAccess
-  } catch (error) {
-    if (error.responseStatus === 404) {
-      return getFallbackScreenStatus(prisonService, token)
-    }
-    throw error
-  }
+  return (
+    (await getConditionBlockAccess(prisonService, token, '**ALL**')) ??
+    (await getConditionBlockAccess(prisonService, token, prisonId)) ??
+    false
+  )
 }
 
-async function getFallbackScreenStatus(prisonService: PrisonService, token: string): Promise<boolean> {
+async function getConditionBlockAccess(
+  prisonService: PrisonService,
+  token: string,
+  conditionValue: string,
+): Promise<boolean | undefined> {
   try {
-    const condition = await prisonService.getScreenStatus(token, '**ALL**')
+    const condition = await prisonService.getScreenStatus(token, conditionValue)
     return condition.blockAccess
   } catch (error) {
     if (error.responseStatus === 404) {
-      return false
+      return undefined
     }
     throw error
   }
