@@ -474,6 +474,10 @@ export default class LocationsService {
     return this.locationsApiClient.locations.updateNonResCell(token, { locationId }, params)
   }
 
+  async getAllPrisonConfigurations(token: string) {
+    return this.locationsApiClient.prisonConfiguration.getAll(token, {})
+  }
+
   async getPrisonConfiguration(token: string, prisonId: string) {
     return this.locationsApiClient.prisonConfiguration.get(token, { prisonId })
   }
@@ -485,11 +489,6 @@ export default class LocationsService {
 
   async updateCertificationApproval(token: string, prisonId: string, status: StatusType) {
     await this.locationsApiClient.prisonConfiguration.updateCertificationApproval(token, { prisonId, status })
-    await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
-  }
-
-  async updateIncludeSegInRollCount(token: string, prisonId: string, status: StatusType) {
-    await this.locationsApiClient.prisonConfiguration.updateIncludeSegInRollCount(token, { prisonId, status })
     await this.locationsApiClient.prisonConfiguration.get.clearCache({ prisonId })
   }
 

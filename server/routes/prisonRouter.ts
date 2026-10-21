@@ -11,7 +11,6 @@ import type { Services } from '../services'
 import validateCaseload from '../middleware/validateCaseload'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 
-import adminRouter from './adminRouter'
 import cellCertificateRouter from './cellCertificate'
 import changeSignedOperationalCapacityRouter from './changeSignedOperationalCapacity'
 import locationRouter from './locationRouter'
@@ -52,7 +51,6 @@ const controller = (services: Services) => {
     }),
   )
 
-  router.use('/admin', adminRouter(services))
   router.use('/archived-locations', archivedLocationsRouter(services))
   router.use('/cell-certificate-imports', cellCertificateImportsRouter(services))
   router.use('/cell-certificate', cellCertificateRouter)

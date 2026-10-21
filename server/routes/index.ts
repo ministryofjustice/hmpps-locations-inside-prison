@@ -16,6 +16,7 @@ import setCanAccess from '../middleware/setCanAccess'
 import legacyRedirectRouter from './legacyRedirectRouter'
 import addRootBreadcrumb from '../middleware/addRootBreadcrumb'
 import functionalMailboxesRouter from './functionalMailboxesRouter'
+import prisonConfigurationRouter from './prisonConfigurationRouter'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -37,6 +38,7 @@ export default function routes(services: Services): Router {
   )
 
   router.use('/functional-mailboxes', functionalMailboxesRouter(services))
+  router.use('/prison-configuration', prisonConfigurationRouter(services))
 
   router.use(legacyRedirectRouter)
 

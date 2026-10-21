@@ -67,8 +67,8 @@ export default middleware((req, res, next) => {
       clickable: true,
       visible: req.canAccess('administer_residential'),
       heading: 'Admin',
-      href: paths.admin.index(prisonId),
-      description: 'Administer residential locations.',
+      href: paths.prisonConfiguration.index,
+      description: 'Switch MVP1 or certification on or off for each prison.',
       'data-qa': 'admin-card',
     },
     {

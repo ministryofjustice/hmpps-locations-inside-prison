@@ -79,8 +79,6 @@
           <a href="{{ cancelLink }}" class="govuk-link {{ cancelClasses or 'govuk-link--no-visited-state' }}">
             {% if r/\/\w+\/[\w-]+\/view/.test(cancelLink) %}
               Cancel and return to location details
-            {% elseif r/\/\w+\/admin/.test(cancelLink) %}
-              Cancel and return to prison configuration details
             {% elseif cancelLink.endsWith('/change-requests') %}
               Cancel and return to change requests
             {% else %}
