@@ -86,72 +86,67 @@ describe('GET /PRISON_ID/admin', () => {
       })
   })
 
-  it('should use getFallbackScreenStatus when getScreenStatus returns 404 for specific prison', async () => {
-    auditService.logPageView.mockResolvedValue(null)
-    locationsService.getPrisonConfiguration.mockResolvedValue({
-      prisonId: 'TST',
-      resiLocationServiceActive: 'ACTIVE',
-      nonResiServiceActive: 'ACTIVE',
-      includeSegregationInRollCount: 'INACTIVE',
-      certificationApprovalRequired: 'INACTIVE',
-    })
-
+  describe('OIMMHOLO screen status', () => {
     const notFound: SanitisedError<object> = new Error('Not Found')
     notFound.responseStatus = 404
-    // Primary lookup (per-prison) returns 404, fallback (**ALL**) succeeds with blockAccess=true
-    prisonService.getScreenStatus.mockImplementation(async (_token, prisonId) => {
-      if (prisonId === '**ALL**') {
-        return { conditionType: 'CASELOAD', conditionValue: '**ALL**', blockAccess: true }
-      }
-      throw notFound
+
+    const conditions = (blockAccessByValue: Record<string, boolean>) =>
+      prisonService.getScreenStatus.mockImplementation(async (_token, conditionValue) => {
+        if (conditionValue in blockAccessByValue) {
+          return { conditionType: 'CASELOAD', conditionValue, blockAccess: blockAccessByValue[conditionValue] }
+        }
+        throw notFound
+      })
+
+    beforeEach(() => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getPrisonConfiguration.mockResolvedValue({
+        prisonId: 'TST',
+        resiLocationServiceActive: 'ACTIVE',
+        nonResiServiceActive: 'ACTIVE',
+        includeSegregationInRollCount: 'INACTIVE',
+        certificationApprovalRequired: 'INACTIVE',
+      })
     })
 
-    return request(app)
-      .get(paths.admin.index('TST'))
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        // primary + fallback = 2 calls
-        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
-        const callsByPrison = prisonService.getScreenStatus.mock.calls.map(args => args[1])
-        expect(callsByPrison).toEqual(['TST', '**ALL**'])
+    const lookups = () => prisonService.getScreenStatus.mock.calls.map(args => args[1])
 
-        // Check that the page was rendered with blockAccess=true from the fallback
-        expect(res.text).toContain('govuk-breadcrumbs')
-        expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
-        expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
-      })
-  })
+    it('uses the **ALL** condition over the prison condition when both exist', async () => {
+      conditions({ '**ALL**': true, TST: false })
 
-  it('should default to blockAccess=false when both specific prison and **ALL** return 404', async () => {
-    auditService.logPageView.mockResolvedValue(null)
-    locationsService.getPrisonConfiguration.mockResolvedValue({
-      prisonId: 'TST',
-      resiLocationServiceActive: 'ACTIVE',
-      nonResiServiceActive: 'ACTIVE',
-      includeSegregationInRollCount: 'INACTIVE',
-      certificationApprovalRequired: 'INACTIVE',
+      const res = await request(app).get(paths.admin.index('TST')).expect(200)
+
+      expect(lookups()).toEqual(['**ALL**'])
+      expect(res.text).toContain('Blocked')
+      expect(res.text).not.toContain('Not-Blocked')
     })
 
-    const notFound: SanitisedError<object> = new Error('Not Found')
-    notFound.responseStatus = 404
-    // Both per-prison and fallback return 404
-    prisonService.getScreenStatus.mockImplementation(() => Promise.reject(notFound))
+    it('shows not blocked when **ALL** is not blocked, even if the prison condition is blocked', async () => {
+      conditions({ '**ALL**': false, TST: true })
 
-    return request(app)
-      .get(paths.admin.index('TST'))
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        // primary + fallback = 2 calls
-        expect(prisonService.getScreenStatus).toHaveBeenCalledTimes(2)
-        const callsByPrison = prisonService.getScreenStatus.mock.calls.map(args => args[1])
-        expect(callsByPrison).toEqual(['TST', '**ALL**'])
+      const res = await request(app).get(paths.admin.index('TST')).expect(200)
 
-        // Check that the page was rendered (blockAccess should default to false)
-        expect(res.text).toContain('govuk-breadcrumbs')
-        expect(res.text).toContain(paths.admin.changeResidentialStatus('TST'))
-        expect(res.text).toContain(paths.admin.changeCertificationStatus('TST'))
-      })
+      expect(lookups()).toEqual(['**ALL**'])
+      expect(res.text).toContain('Not-Blocked')
+    })
+
+    it('uses the prison condition when there is no **ALL** condition', async () => {
+      conditions({ TST: true })
+
+      const res = await request(app).get(paths.admin.index('TST')).expect(200)
+
+      expect(lookups()).toEqual(['**ALL**', 'TST'])
+      expect(res.text).toContain('Blocked')
+      expect(res.text).not.toContain('Not-Blocked')
+    })
+
+    it('shows not blocked when there is no **ALL** or prison condition', async () => {
+      conditions({})
+
+      const res = await request(app).get(paths.admin.index('TST')).expect(200)
+
+      expect(lookups()).toEqual(['**ALL**', 'TST'])
+      expect(res.text).toContain('Not-Blocked')
+    })
   })
 })
