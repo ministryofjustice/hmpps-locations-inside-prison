@@ -9,50 +9,58 @@ describe('Prison service', () => {
 
   beforeEach(() => {
     apiClient = new PrisonApiClient(null, null) as jest.Mocked<PrisonApiClient>
-    apiClient.servicePrisons = {
-      activatePrisonService: jest.fn() as jest.Mocked<any>,
-      deactivatePrisonService: jest.fn() as jest.Mocked<any>,
-      getServiceStatus: jest.fn() as jest.Mocked<any>,
+    apiClient.splashScreen = {
+      getScreenStatus: jest.fn() as jest.Mocked<any>,
+      addCondition: jest.fn() as jest.Mocked<any>,
+      removeCondition: jest.fn() as jest.Mocked<any>,
+      updateScreen: jest.fn() as jest.Mocked<any>,
     }
 
     service = new PrisonService(apiClient)
   })
 
-  describe('getServiceStatus', () => {
-    describe('when a prison and serviceCode are specified', () => {
-      it('calls the correct client function', async () => {
-        await service.getServiceStatus('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
+  describe('getScreenStatus', () => {
+    it('calls the correct client function', async () => {
+      await service.getScreenStatus('token', 'MDI')
 
-        expect(apiClient.servicePrisons.getServiceStatus).toHaveBeenCalledWith('token', {
-          prisonId: 'MDI',
-          serviceCode: 'DISPLAY_HOUSING_CHECKBOX',
-        })
+      expect(apiClient.splashScreen.getScreenStatus).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        moduleName: 'OIMMHOLO',
       })
     })
   })
 
-  describe('activatePrisonService', () => {
-    describe('when a prison and serviceCode are specified', () => {
-      it('when a prison and serviceCode are specified', async () => {
-        await service.activatePrisonService('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
+  describe('addCondition', () => {
+    it('calls the correct client function', async () => {
+      await service.addCondition('token', 'MDI', false)
 
-        expect(apiClient.servicePrisons.activatePrisonService).toHaveBeenCalledWith('token', {
-          prisonId: 'MDI',
-          serviceCode: 'DISPLAY_HOUSING_CHECKBOX',
-        })
+      expect(apiClient.splashScreen.addCondition).toHaveBeenCalledWith(
+        'token',
+        { prisonId: 'MDI', moduleName: 'OIMMHOLO' },
+        { conditionType: 'CASELOAD', conditionValue: 'MDI', blockAccess: false },
+      )
+    })
+  })
+
+  describe('removeCondition', () => {
+    it('calls the correct client function', async () => {
+      await service.removeCondition('token', 'MDI')
+
+      expect(apiClient.splashScreen.removeCondition).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        moduleName: 'OIMMHOLO',
       })
     })
   })
 
-  describe('deactivatePrisonService', () => {
-    describe('when a prison and serviceCode are specified', () => {
-      it('when a prison and serviceCode are specified', async () => {
-        await service.deactivatePrisonService('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
+  describe('updateScreen', () => {
+    it('calls the correct client function', async () => {
+      await service.updateScreen('token', 'MDI', true)
 
-        expect(apiClient.servicePrisons.deactivatePrisonService).toHaveBeenCalledWith('token', {
-          prisonId: 'MDI',
-          serviceCode: 'DISPLAY_HOUSING_CHECKBOX',
-        })
+      expect(apiClient.splashScreen.updateScreen).toHaveBeenCalledWith('token', {
+        prisonId: 'MDI',
+        moduleName: 'OIMMHOLO',
+        blockScreen: 'true',
       })
     })
   })

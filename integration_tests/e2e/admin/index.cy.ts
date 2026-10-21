@@ -34,7 +34,7 @@ context('Admin Index', () => {
     })
   })
 
-  context('With the MANAGE_RES_LOCATIONS_ADMIN role and NOMIS screen disabled', () => {
+  context('With the MANAGE_RES_LOCATIONS_ADMIN role and residential locations inactive', () => {
     beforeEach(() => {
       cy.task('reset')
       AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
@@ -46,8 +46,6 @@ context('Admin Index', () => {
       LocationsApiStubber.stub.stubPrisonConfigurationActivateResi()
       LocationsApiStubber.stub.stubPrisonConfigurationCertApproval()
       LocationsApiStubber.stub.stubPrisonConfigurationIncludeSegInRollCount()
-      PrisonApiStubber.stub.stubDisplayHousingCheckboxesDisabled()
-      PrisonApiStubber.stub.stubDisplayHousingCheckboxesPost()
       PrisonApiStubber.stub.stubGetSplashScreenCondition()
       PrisonApiStubber.stub.stubCreateSplashScreenCondition()
       PrisonApiStubber.stub.stubUpdateSplashScreenCondition()
@@ -114,7 +112,7 @@ context('Admin Index', () => {
     })
   })
 
-  context('With the MANAGE_RES_LOCATIONS_ADMIN role and NOMIS checkboxes enabled', () => {
+  context('With the MANAGE_RES_LOCATIONS_ADMIN role and residential locations active', () => {
     beforeEach(() => {
       cy.task('reset')
       AuthStubber.stub.stubSignIn({ roles: ['MANAGE_RES_LOCATIONS_ADMIN'] })
@@ -124,8 +122,6 @@ context('Admin Index', () => {
       ManageUsersApiStubber.stub.stubManageCaseloads()
       LocationsApiStubber.stub.stubPrisonConfigurationResiActive()
       LocationsApiStubber.stub.stubPrisonConfigurationDeactivateResi()
-      PrisonApiStubber.stub.stubDisplayHousingCheckboxesEnabled()
-      PrisonApiStubber.stub.stubDisplayHousingCheckboxesDelete()
       PrisonApiStubber.stub.stubGetSplashScreenCondition()
       PrisonApiStubber.stub.stubCreateSplashScreenCondition()
       PrisonApiStubber.stub.stubUpdateSplashScreenCondition()

@@ -54,8 +54,6 @@ describe('adminResiSwitch', () => {
     next = jest.fn()
 
     locationsService.updateResiStatus = jest.fn()
-    prisonService.activatePrisonService = jest.fn()
-    prisonService.deactivatePrisonService = jest.fn()
     analyticsService.sendEvent = jest.fn()
   })
 
@@ -85,7 +83,6 @@ describe('adminResiSwitch', () => {
 
     it('calls locationsService', () => {
       expect(locationsService.updateResiStatus).toHaveBeenCalledWith('token', 'MDI', 'ACTIVE')
-      expect(prisonService.activatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
     })
 
     it('sends an analytics event', async () => {
@@ -110,7 +107,6 @@ describe('adminResiSwitch', () => {
 
     it('calls locationsService', () => {
       expect(locationsService.updateResiStatus).toHaveBeenCalledWith('token', 'MDI', 'INACTIVE')
-      expect(prisonService.deactivatePrisonService).toHaveBeenCalledWith('token', 'MDI', 'DISPLAY_HOUSING_CHECKBOX')
     })
 
     it('sends an analytics event', async () => {

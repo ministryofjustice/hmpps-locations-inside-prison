@@ -170,7 +170,6 @@ interface AllLocals {
   options: FormWizard.Request['form']['options']
   pathSuffix: string
   prisonConfiguration: PrisonConfiguration
-  prisonNonHousingDisabled: boolean
   nestedBaseUrl: string
   nomisScreenBlocked: boolean
   prisonId: string
