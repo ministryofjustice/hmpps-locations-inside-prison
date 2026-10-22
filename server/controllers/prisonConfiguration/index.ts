@@ -30,6 +30,24 @@ const isSetting = (value: unknown): value is Setting => typeof value === 'string
 
 const isStatus = (value: unknown): value is StatusType => value === 'ACTIVE' || value === 'INACTIVE'
 
+/**
+ * Whole-number percentage that never reads 0% while any prison is switched on, or 100% while any is still off, so the
+ * rollout figure is not overstated or understated by rounding.
+ */
+const percentage = (count: number, total: number) => {
+  if (!total || !count) return 0
+  if (count === total) return 100
+  return Math.min(99, Math.max(1, Math.round((count / total) * 100)))
+}
+
+/** How far each setting has been rolled out across every prison, regardless of any search. */
+const rolloutSummary = (prisons: PrisonConfiguration[]) =>
+  (Object.keys(settings) as Setting[]).map(setting => {
+    const { label, attribute } = settings[setting]
+    const count = prisons.filter(prison => prison[attribute] === 'ACTIVE').length
+    return { setting, label, count, total: prisons.length, percentage: percentage(count, prisons.length) }
+  })
+
 /** Back to the list, keeping the admin on the same filtered view they acted from. */
 const backToList = (search: unknown) => {
   const query = typeof search === 'string' && search ? `?${new URLSearchParams({ q: search })}` : ''
@@ -73,9 +91,7 @@ const list = async (req: Request, res: Response) => {
     title: 'Manage prisons',
     prisons: filtered,
     search,
-    residentialCount: prisons.filter(prison => prison.resiLocationServiceActive === 'ACTIVE').length,
-    certificationCount: prisons.filter(prison => prison.certificationApprovalRequired === 'ACTIVE').length,
-    totalCount: prisons.length,
+    rolloutSummary: rolloutSummary(prisons),
     banner: success ? { success } : undefined,
     errorBanner: error,
     paths,

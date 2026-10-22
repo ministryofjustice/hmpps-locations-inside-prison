@@ -44,7 +44,10 @@ context('Manage prisons', () => {
       Page.verifyOnPage(IndexPage).cards.adminster().find('a').click()
 
       const page = Page.verifyOnPage(PrisonConfigurationIndexPage)
-      page.counts().contains('MVP1 is switched on for 1 of 2 prisons.')
+      page.rolloutSummary('residential').contains('50%')
+      page.rolloutSummary('residential').contains('1 of 2 prisons')
+      page.rolloutSummary('certification').contains('50%')
+      page.rolloutSummary('certification').contains('1 of 2 prisons')
       page.prisonName('MDI').contains('Moorland (HMP & YOI)')
       page.residentialStatus('MDI').contains('On')
       page.certificationStatus('MDI').contains('On')

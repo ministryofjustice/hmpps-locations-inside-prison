@@ -8,7 +8,7 @@ export default class PrisonConfigurationIndexPage extends Page {
 
   static goTo = () => cy.visit(paths.prisonConfiguration.index)
 
-  counts = (): PageElement => cy.get('[data-qa=prison-counts]')
+  rolloutSummary = (setting: 'residential' | 'certification'): PageElement => cy.get(`[data-qa=${setting}-rollout]`)
 
   prisonName = (prisonId: string): PageElement => cy.get(`[data-qa=name-${prisonId}]`)
 

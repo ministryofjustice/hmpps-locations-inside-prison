@@ -59,8 +59,10 @@ describe('GET /prison-configuration', () => {
   it('lists every prison with its MVP1 and certification status', async () => {
     const res = await request(app).get('/prison-configuration').expect(200)
 
-    expect(res.text).toContain('MVP1 is switched on for 2 of 3 prisons.')
-    expect(res.text).toContain('Certification is switched on for\n      1 of 3 prisons.')
+    expect(res.text).toMatch(/data-qa="residential-rollout"[\s\S]*MVP1 switched on[\s\S]*67%[\s\S]*2 of 3 prisons/)
+    expect(res.text).toMatch(
+      /data-qa="certification-rollout"[\s\S]*Certification switched on[\s\S]*33%[\s\S]*1 of 3 prisons/,
+    )
     expect(res.text).toContain('data-qa="name-BXI"')
     expect(res.text).toContain('Moorland (HMP &amp; YOI)')
     expect(res.text).toContain('action="/prison-configuration/BXI/residential"')
@@ -70,6 +72,32 @@ describe('GET /prison-configuration', () => {
     expect(res.text).toMatch(/data-qa="certification-toggle-MDI"[^>]*>\s*Turn on/)
     expect(res.text).not.toContain('seg in roll count')
     expect(locationsService.getAllPrisonConfigurations).toHaveBeenCalledWith(undefined)
+  })
+
+  it.each([
+    ['none', 0, 0],
+    ['one of many', 1, 1],
+    ['all but one of many', 299, 99],
+    ['all', 300, 100],
+  ])('shows the MVP1 rollout percentage when %s are switched on', async (_, switchedOn, expected) => {
+    locationsService.getAllPrisonConfigurations.mockResolvedValue(
+      Array.from({ length: 300 }, (__, i) =>
+        configuration(`P${i}`, `Prison ${i}`, i < switchedOn ? 'ACTIVE' : 'INACTIVE', 'INACTIVE'),
+      ),
+    )
+
+    const res = await request(app).get('/prison-configuration').expect(200)
+
+    expect(res.text).toMatch(
+      new RegExp(`data-qa="residential-rollout"[\\s\\S]*?${expected}%[\\s\\S]*?${switchedOn} of 300 prisons`),
+    )
+  })
+
+  it('shows the rollout for every prison, not just those matching the search', async () => {
+    const res = await request(app).get('/prison-configuration?q=Leeds').expect(200)
+
+    expect(res.text).not.toContain('data-qa="name-BXI"')
+    expect(res.text).toMatch(/data-qa="residential-rollout"[\s\S]*2 of 3 prisons/)
   })
 
   it('filters by prison name or ID', async () => {
