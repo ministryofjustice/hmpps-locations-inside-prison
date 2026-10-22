@@ -4,6 +4,7 @@ import {
   CellCertificate,
   Location,
   LocationResidentialSummary,
+  PrisonConfiguration,
   PrisonerLocation,
   PrisonResidentialSummary,
 } from '../../server/data/types/locationsApi'
@@ -906,6 +907,40 @@ const stubPrisonerLocations = (prisonerLocations: PrisonerLocation[]) =>
     },
   })
 
+const stubAllPrisonConfigurations = (
+  returnData: PrisonConfiguration[] = [
+    {
+      prisonId: 'MDI',
+      prisonName: 'Moorland (HMP & YOI)',
+      resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'ACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+    },
+    {
+      prisonId: 'TST',
+      prisonName: 'Test (HMP)',
+      resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'ACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+    },
+  ],
+) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: '/locations-api/prison-configuration',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: returnData,
+    },
+  })
+
 const stubPrisonConfiguration = (
   returnData = {
     prisonId: 'TST',
@@ -988,29 +1023,6 @@ const stubPrisonConfigurationActivateResi = (
     request: {
       method: 'PUT',
       urlPattern: '/locations-api/prison-configuration/\\w+/resi-service/ACTIVE',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: returnData,
-    },
-  })
-
-const stubPrisonConfigurationIncludeSegInRollCount = (
-  returnData = {
-    prisonId: 'TST',
-    resiLocationServiceActive: 'ACTIVE',
-    nonResiServiceActive: 'INACTIVE',
-    certificationApprovalRequired: 'INACTIVE',
-    includeSegregationInRollCount: 'INACTIVE',
-  },
-) =>
-  stubFor({
-    request: {
-      method: 'PUT',
-      urlPattern: '/locations-api/prison-configuration/\\w+/include-seg-in-roll-count/ACTIVE',
     },
     response: {
       status: 200,
@@ -1624,11 +1636,11 @@ const allStubs = {
   stubLocationsUpdateNonResCell,
   stubPatchLocation,
   stubPendingApprovalsBelow,
+  stubAllPrisonConfigurations,
   stubPrisonConfiguration,
   stubPrisonConfigurationActivateResi,
   stubPrisonConfigurationCertApproval,
   stubPrisonConfigurationDeactivateResi,
-  stubPrisonConfigurationIncludeSegInRollCount,
   stubPrisonConfigurationResiActive,
   stubPrisonerLocations,
   stubPrisonerLocationsId,

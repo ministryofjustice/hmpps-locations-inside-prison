@@ -1,5 +1,7 @@
 export declare interface PrisonConfiguration {
   prisonId: string
+  // Only returned when listing every prison
+  prisonName?: string
   resiLocationServiceActive: string
   nonResiServiceActive: string
   includeSegregationInRollCount: string

@@ -37,21 +37,6 @@ const redirect = (redirectPathGetter: (req: Parameters<Parameters<typeof asyncMi
   })
 
 router.use(
-  '/admin/:prisonId/change-certification-status',
-  redirect(req => paths.admin.changeCertificationStatus(req.params.prisonId as string)),
-)
-
-router.use(
-  '/admin/:prisonId/change-include-seg-in-roll-count',
-  redirect(req => paths.admin.changeIncludeSegInRollCount(req.params.prisonId as string)),
-)
-
-router.use(
-  '/admin/:prisonId/change-resi-status',
-  redirect(req => paths.admin.changeResidentialStatus(req.params.prisonId as string)),
-)
-
-router.use(
   '/admin/:prisonId/ingest-cert',
   redirect(req => paths.prison.cellCertificateImports(req.params.prisonId as string)),
 )
@@ -73,12 +58,8 @@ router.use(
   }),
 )
 
-router.use(
-  '/admin/:prisonId?',
-  populatePrisonAndLocationId,
-  redirectToAddPrisonId,
-  redirect(req => paths.admin.index(req.params.prisonId as string)),
-)
+// The per-prison admin page and its change journeys were replaced by one national list of prisons (MAPA-467).
+router.use(['/admin', '/:prisonId/admin'], (_req, res) => res.redirect(paths.prisonConfiguration.index))
 
 router.use(
   '/archived-locations/:prisonId?',

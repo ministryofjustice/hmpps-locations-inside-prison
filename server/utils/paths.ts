@@ -45,12 +45,6 @@ function withPrison(...pathSegments: unknown[]) {
 }
 
 const paths = {
-  admin: {
-    changeCertificationStatus: withPrison('admin/change-certification-status'),
-    changeIncludeSegInRollCount: withPrison('admin/change-include-seg-in-roll-count'),
-    changeResidentialStatus: withPrison('admin/change-resi-status'),
-    index: withPrison('admin'),
-  },
   auth: {
     signIn: '/sign-in',
     signOut: '/sign-out',
@@ -127,6 +121,11 @@ const paths = {
     home: withPrison(),
     cellCertificateImports: withPrison('cell-certificate-imports'),
     changeSignedOperationalCapacity: withPrison('change-signed-operational-capacity'),
+  },
+  prisonConfiguration: {
+    index: '/prison-configuration',
+    update: (prisonId: string, setting: 'residential' | 'certification') =>
+      p('prison-configuration', prisonId, setting),
   },
 }
 

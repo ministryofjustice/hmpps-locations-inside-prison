@@ -42,7 +42,6 @@ describe('legacyRedirectRouter', () => {
 
   describe('routes with optional prison id when none is provided', () => {
     it.each([
-      ['/admin', `/admin/${PRISON_ID}`],
       ['/archived-locations', `/archived-locations/${PRISON_ID}`],
       ['/inactive-cells', `/inactive-cells/${PRISON_ID}`],
       ['/reactivate/cells', `/reactivate/cells/${PRISON_ID}`],
@@ -54,10 +53,6 @@ describe('legacyRedirectRouter', () => {
 
   describe('routes that redirect using an explicit prison id', () => {
     it.each([
-      ['/admin/TST', '/TST/admin'],
-      ['/admin/TST/change-certification-status', '/TST/admin/change-certification-status'],
-      ['/admin/TST/change-include-seg-in-roll-count', '/TST/admin/change-include-seg-in-roll-count'],
-      ['/admin/TST/change-resi-status', '/TST/admin/change-resi-status'],
       ['/admin/TST/ingest-cert', '/TST/cell-certificate-imports'],
       ['/TST/admin/ingest-cert', '/TST/cell-certificate-imports'],
       ['/TST/cell-certificate-uploads', '/TST/cell-certificate-imports'],
@@ -85,11 +80,18 @@ describe('legacyRedirectRouter', () => {
       await request(app).get(legacyPath).expect(302).expect('Location', newPath)
     })
 
-    it('does not allow the base admin route to swallow admin sub-routes', async () => {
-      await request(app)
-        .get('/admin/TST/change-certification-status')
-        .expect(302)
-        .expect('Location', '/TST/admin/change-certification-status')
+    it.each([
+      '/admin',
+      '/admin/TST',
+      '/admin/TST/change-certification-status',
+      '/admin/TST/change-include-seg-in-roll-count',
+      '/admin/TST/change-resi-status',
+      '/TST/admin',
+      '/TST/admin/change-certification-status',
+      '/TST/admin/change-include-seg-in-roll-count/confirm',
+      '/TST/admin/change-resi-status',
+    ])('redirects the retired admin page %s to the list of prisons', async legacyPath => {
+      await request(app).get(legacyPath).expect(302).expect('Location', '/prison-configuration')
     })
 
     it('does not look up location details when prison id is supplied in prisonOrLocationId', async () => {

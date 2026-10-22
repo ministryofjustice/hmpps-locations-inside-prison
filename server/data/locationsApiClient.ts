@@ -583,6 +583,10 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   prisonConfiguration = {
+    getAll: this.apiCall<PrisonConfiguration[], Record<string, never>>({
+      path: '/prison-configuration',
+      requestType: 'get',
+    }),
     get: this.apiCall<PrisonConfiguration, { prisonId: string }>({
       path: '/prison-configuration/:prisonId',
       requestType: 'get',
@@ -594,10 +598,6 @@ export default class LocationsApiClient extends BaseApiClient {
     }),
     updateCertificationApproval: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
       path: '/prison-configuration/:prisonId/certification-approval-required/:status',
-      requestType: 'put',
-    }),
-    updateIncludeSegInRollCount: this.apiCall<PrisonConfiguration, { prisonId: string; status: StatusType }>({
-      path: '/prison-configuration/:prisonId/include-seg-in-roll-count/:status',
       requestType: 'put',
     }),
     getNotificationMailbox: this.apiCall<

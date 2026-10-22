@@ -76,7 +76,7 @@ describe('error handler', () => {
   describe('GET 404', () => {
     it('should render content with stack in dev mode', () => {
       return request(app)
-        .get(`${paths.admin.index('TST')}/unknown`)
+        .get(`${paths.prison.archivedLocations('TST')}/unknown/path`)
         .expect(404)
         .expect('Content-Type', /html/)
         .expect(r => {
@@ -95,7 +95,7 @@ describe('error handler', () => {
           },
         }),
       )
-        .get(`${paths.admin.index('TST')}/unknown`)
+        .get(`${paths.prison.archivedLocations('TST')}/unknown/path`)
         .expect(404)
         .expect('Content-Type', /html/)
         .expect(r => {

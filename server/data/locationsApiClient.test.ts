@@ -262,6 +262,14 @@ describe('locationsApiClient', () => {
 
   describe('prisonConfiguration', () => {
     testCall(
+      'getAllPrisonConfigurations',
+      '/prison-configuration',
+      false,
+      () => apiClient.prisonConfiguration.getAll,
+      {},
+      'get',
+    )
+    testCall(
       'getPrisonConfiguration',
       '/prison-configuration/LEI',
       true,
@@ -282,14 +290,6 @@ describe('locationsApiClient', () => {
       '/prison-configuration/LEI/certification-approval-required/ACTIVE',
       false,
       () => apiClient.prisonConfiguration.updateCertificationApproval,
-      { prisonId: 'LEI', status: 'ACTIVE' },
-      'put',
-    )
-    testCall(
-      'updateSegInRollCount',
-      '/prison-configuration/LEI/include-seg-in-roll-count/ACTIVE',
-      false,
-      () => apiClient.prisonConfiguration.updateIncludeSegInRollCount,
       { prisonId: 'LEI', status: 'ACTIVE' },
       'put',
     )

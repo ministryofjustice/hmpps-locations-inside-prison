@@ -240,6 +240,6 @@ describe('GET /TST', () => {
 
     expect(res.text).not.toContain('Import cell certificate')
     expect(res.text).not.toContain('Capacity management dashboard')
-    expect(res.text).not.toContain('Administer residential locations.')
+    expect(res.text).not.toContain('Switch MVP1 or certification on or off for each prison.')
   })
 })

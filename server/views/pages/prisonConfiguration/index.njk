@@ -1,0 +1,110 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "../../macros/miniSummary.njk" import miniSummary %}
+
+{% set minLayout = 'full' %}
+
+{% macro statusTag(status) %}
+  {% if status == 'ACTIVE' %}
+    {{ govukTag({ text: "On", classes: "govuk-tag--green" }) }}
+  {% else %}
+    {{ govukTag({ text: "Off", classes: "govuk-tag--grey" }) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro toggle(prison, setting, label, status) %}
+  <form method="post" action="{{ paths.prisonConfiguration.update(prison.prisonId, setting) }}" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <input type="hidden" name="status" value="{{ 'INACTIVE' if status == 'ACTIVE' else 'ACTIVE' }}">
+    <input type="hidden" name="name" value="{{ prison.prisonName }}">
+    <input type="hidden" name="q" value="{{ search }}">
+    {{ govukButton({
+      html: ("Turn off" if status == 'ACTIVE' else "Turn on") + '<span class="govuk-visually-hidden"> ' + label + ' for ' + (prison.prisonName | escape) + '</span>',
+      classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+      preventDoubleClick: true,
+      attributes: { "data-qa": setting + "-toggle-" + prison.prisonId }
+    }) }}
+  </form>
+{% endmacro %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    {% if errorBanner %}
+      {{ govukNotificationBanner({
+        titleText: "There is a problem",
+        html: '<h3 class="govuk-notification-banner__heading">' + (errorBanner.title | escape) + '</h3><p class="govuk-body">' + (errorBanner.content | escape) + '</p>',
+        attributes: { "data-qa": "error-banner" }
+      }) }}
+    {% endif %}
+
+    <h2 class="govuk-heading-m">Rollout progress</h2>
+    <div class="govuk-grid-row hmpps-miniSummaryWrapper" data-qa="rollout-summary">
+      {% for summary in rolloutSummary %}
+        <div class="govuk-grid-column-one-third" data-qa="{{ summary.setting }}-rollout">
+          {{ miniSummary({
+            bottomLabel: summary.label + " switched on",
+            bottomClass: "big",
+            bottomContentLine1: summary.percentage + "%",
+            bottomContentLine3: summary.count + " of " + summary.total + " prisons"
+          }) }}
+        </div>
+      {% endfor %}
+    </div>
+    <p class="govuk-body">
+      Switching MVP1 on also blocks the NOMIS residential screen for that prison. Switching it off unblocks the screen.
+    </p>
+
+    <form method="get" action="{{ paths.prisonConfiguration.index }}" class="govuk-!-margin-bottom-6">
+      {{ govukInput({
+        id: "q",
+        name: "q",
+        value: search,
+        label: { text: "Search by prison name or ID", classes: "govuk-label--s" },
+        classes: "govuk-input--width-20",
+        formGroup: { classes: "govuk-!-margin-bottom-2" },
+        attributes: { "data-qa": "prison-search" }
+      }) }}
+      {{ govukButton({
+        text: "Search",
+        classes: "govuk-!-margin-bottom-0",
+        attributes: { "data-qa": "prison-search-button" }
+      }) }}
+    </form>
+
+    {% if prisons.length %}
+      {% set rows = [] %}
+      {% for prison in prisons %}
+        {% set rows = (rows.push([
+          { text: prison.prisonName, attributes: { "data-qa": "name-" + prison.prisonId } },
+          { text: prison.prisonId },
+          { html: statusTag(prison.resiLocationServiceActive), attributes: { "data-qa": "residential-status-" + prison.prisonId } },
+          { html: toggle(prison, 'residential', 'MVP1', prison.resiLocationServiceActive) },
+          { html: statusTag(prison.certificationApprovalRequired), attributes: { "data-qa": "certification-status-" + prison.prisonId } },
+          { html: toggle(prison, 'certification', 'certification', prison.certificationApprovalRequired) }
+        ]), rows) %}
+      {% endfor %}
+
+      <div class="app-table-scroll" role="region" aria-label="Prisons" tabindex="0">
+        {{ govukTable({
+          attributes: { "data-qa": "prisons-table" },
+          head: [
+            { text: "Prison" },
+            { text: "ID" },
+            { text: "MVP1" },
+            { html: '<span class="govuk-visually-hidden">MVP1 action</span>' },
+            { text: "Certification" },
+            { html: '<span class="govuk-visually-hidden">Certification action</span>' }
+          ],
+          rows: rows
+        }) }}
+      </div>
+    {% else %}
+      <p class="govuk-body" data-qa="no-results">No prisons match your search.</p>
+    {% endif %}
+  </div>
+{% endblock %}
