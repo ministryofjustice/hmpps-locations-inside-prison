@@ -10,6 +10,7 @@ export default async function decorateLocation({
   manageUsersService,
   locationsService,
   limited = false,
+  lookUpUsers = true,
 }: {
   location: Location
   systemToken: string
@@ -17,6 +18,7 @@ export default async function decorateLocation({
   manageUsersService: ManageUsersService
   locationsService: LocationsService
   limited?: boolean
+  lookUpUsers?: boolean
 }): Promise<DecoratedLocation> {
   const locationType = await locationsService.getLocationType(systemToken, location.locationType)
 
@@ -31,7 +33,7 @@ export default async function decorateLocation({
       : location.convertedCellType,
     displayName: location.localName || `${locationType.toLowerCase()} ${location.pathHierarchy}`,
     deactivatedBy:
-      location.deactivatedBy && !limited
+      location.deactivatedBy && !limited && lookUpUsers
         ? (await manageUsersService.getUser(userToken, location.deactivatedBy))?.name || location.deactivatedBy
         : location.deactivatedBy,
     deactivatedReason:
@@ -39,7 +41,7 @@ export default async function decorateLocation({
         ? await locationsService.getDeactivatedReason(systemToken, location.deactivatedReason)
         : location.deactivatedReason,
     lastModifiedBy:
-      location.lastModifiedBy && !limited
+      location.lastModifiedBy && !limited && lookUpUsers
         ? (await manageUsersService.getUser(userToken, location.lastModifiedBy))?.name || location.lastModifiedBy
         : location.lastModifiedBy,
     locationType,

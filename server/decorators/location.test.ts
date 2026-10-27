@@ -81,4 +81,27 @@ describe('decorateLocation', () => {
       expect(decoratedLocation.usedFor).toEqual(location.usedFor.map(s => `Resolved ${s}`))
     })
   })
+
+  describe('when lookUpUsers = false', () => {
+    it('decorates everything except the user names', async () => {
+      const location = LocationFactory.build({
+        deactivatedBy: 'DEACTIVATE_USER',
+        deactivatedReason: 'DEACTIVATED',
+        lastModifiedBy: 'MODIFIED_USER',
+      })
+      const decoratedLocation = await decorateLocation({
+        location,
+        systemToken: 'token',
+        userToken: 'token',
+        manageUsersService,
+        locationsService,
+        lookUpUsers: false,
+      })
+
+      expect(decoratedLocation.deactivatedBy).toEqual(location.deactivatedBy)
+      expect(decoratedLocation.deactivatedReason).toEqual(`Resolved ${location.deactivatedReason}`)
+      expect(decoratedLocation.lastModifiedBy).toEqual(location.lastModifiedBy)
+      expect(decoratedLocation.locationType).toEqual(`Resolved ${location.locationType}`)
+    })
+  })
 })
