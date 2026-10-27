@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { TypedLocals } from '../../@types/express'
 import addUsersToUserMap from '../../middleware/addUsersToUserMap'
-import addLocationsToLocationMap from '../../middleware/addLocationsToLocationMap'
 import addConstantToLocals from '../../middleware/addConstantToLocals'
 import paths from '../../utils/paths'
 
@@ -25,11 +24,6 @@ export default async (req: Request, res: Response) => {
   locals.certificates = await locationsService.getCellCertificates(systemToken, res.locals.prisonId)
 
   await addUsersToUserMap(locals.certificates.map(r => r.approvedRequest.approvedOrRejectedBy))(req, res, null)
-  await addLocationsToLocationMap(
-    locals.certificates
-      .filter(r => ['DEACTIVATION', 'REACTIVATION'].includes(r.approvedRequest.approvalType))
-      .map(r => r.approvedRequest.locationId),
-  )(req, res, null)
   await addConstantToLocals(['approvalTypes', 'locationTypes'])(req, res, null)
 
   return res.render('pages/cellCertificate/history', locals)

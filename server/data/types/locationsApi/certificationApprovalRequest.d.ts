@@ -1,3 +1,5 @@
+import { LocationType } from './locationType'
+
 export declare type CertificationApprovalRequestType =
   | 'SIGNED_OP_CAP'
   | 'DRAFT'
@@ -20,6 +22,7 @@ export declare interface CertificationApprovalRequest {
   approvalType: CertificationApprovalRequestType
   prisonId: string
   locationKey: string
+  locationType?: LocationType
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'
   requestedBy: string
   requestedDate: string

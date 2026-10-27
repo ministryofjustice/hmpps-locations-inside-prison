@@ -382,6 +382,7 @@ context('Inactive Cells Index', () => {
               id: 'pendingApprovalRequestId',
               locationId: '7e570000-0000-000a-0002-000000000001',
               approvalType: 'DEACTIVATION',
+              locationType: 'CELL',
             }),
           ])
           LocationsApiStubber.stub.stubLocations(locations[3])

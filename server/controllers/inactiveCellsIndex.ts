@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import capFirst from '../formatters/capFirst'
 import addUsersToUserMap from '../middleware/addUsersToUserMap'
 import addConstantToLocals from '../middleware/addConstantToLocals'
-import addLocationsToLocationMap from '../middleware/addLocationsToLocationMap'
 
 export default async (req: Request, res: Response) => {
   const banner: {
@@ -36,13 +35,8 @@ export default async (req: Request, res: Response) => {
     )
     res.locals.approvalRequestMap = Object.fromEntries(approvalRequests.map(request => [request.id, request]))
 
-    // Most requests are for one of the cells already listed, so only look up the others
-    const requestLocationIds = new Set(approvalRequests.map(r => r.locationId))
-    await addLocationsToLocationMap(inactiveCells.map(c => c.raw).filter(l => requestLocationIds.has(l.id)))(req, res)
-
     await Promise.all([
       addUsersToUserMap(approvalRequests.map(r => r.requestedBy))(req, res, null),
-      addLocationsToLocationMap(approvalRequests.map(r => r.locationId))(req, res, null),
       addConstantToLocals(['approvalTypes', 'locationTypes'])(req, res, null),
     ])
   }

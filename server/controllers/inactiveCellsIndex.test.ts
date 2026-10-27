@@ -55,12 +55,11 @@ describe('inactiveCellsIndex', () => {
     expect(deepRes.locals.approvalRequestMap).toEqual({ 'request-1': request1, 'request-2': request2 })
   })
 
-  it('only looks up request locations that are not already listed', async () => {
+  it('makes no location calls, as each request carries its location type', async () => {
     await inactiveCellsIndex(deepReq as Request, deepRes as Response)
 
-    expect(deepReq.services.locationsService.getLocation).toHaveBeenCalledTimes(1)
-    expect(deepReq.services.locationsService.getLocation).toHaveBeenCalledWith('token', 'wing')
-    expect(deepRes.locals.locationMap).toEqual({ 'cell-1': cell1, wing })
+    expect(deepReq.services.locationsService.getLocation).not.toHaveBeenCalled()
+    expect(deepRes.locals.locationMap).toBeUndefined()
   })
 
   it('looks up a request that is no longer pending on its own', async () => {
