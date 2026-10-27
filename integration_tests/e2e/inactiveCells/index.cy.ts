@@ -377,13 +377,13 @@ context('Inactive Cells Index', () => {
             locationHierarchy: [],
           })
           LocationsApiStubber.stub.stubLocationsPrisonInactiveCells(locations)
-          LocationsApiStubber.stub.stubLocationsCertificationRequestApprovals(
+          LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([
             CertificationApprovalRequestFactory.build({
               id: 'pendingApprovalRequestId',
               locationId: '7e570000-0000-000a-0002-000000000001',
               approvalType: 'DEACTIVATION',
             }),
-          )
+          ])
           LocationsApiStubber.stub.stubLocations(locations[3])
         })
 
