@@ -2,6 +2,7 @@ import { type NextFunction, Request, type Response } from 'express'
 import { Services } from '../services'
 import decorateLocation from '../decorators/location'
 import logger from '../../logger'
+import addUsersToUserMap from './addUsersToUserMap'
 
 export default function populateArchivedLocations({ locationsService, manageUsersService }: Services) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -9,7 +10,7 @@ export default function populateArchivedLocations({ locationsService, manageUser
     const { user, prisonId } = res.locals
 
     try {
-      res.locals.archivedLocations = await Promise.all(
+      const locations = await Promise.all(
         ((await locationsService.getArchivedLocations(systemToken, prisonId)) || []).map(location =>
           decorateLocation({
             location,
@@ -17,9 +18,16 @@ export default function populateArchivedLocations({ locationsService, manageUser
             userToken: user.token,
             manageUsersService,
             locationsService,
+            lookUpUsers: false,
           }),
         ),
       )
+
+      await addUsersToUserMap(locations.map(l => l.deactivatedBy).filter(u => u))(req, res)
+      res.locals.archivedLocations = locations.map(l => ({
+        ...l,
+        deactivatedBy: l.deactivatedBy && res.locals.userMap[l.deactivatedBy],
+      }))
 
       next()
     } catch (error) {

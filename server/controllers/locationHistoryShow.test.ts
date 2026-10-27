@@ -106,4 +106,29 @@ describe('view locations show', () => {
       })
     })
   })
+
+  describe('when the same user made several changes', () => {
+    beforeEach(() => {
+      const change = { oldValues: ['A'], newValues: ['B'], amendedBy: 'user', amendedDate: '2021-07-05T10:35:17' }
+      deepRes.locals.location = LocationFactory.build({
+        changeHistory: [
+          { ...change, attribute: 'Local name' },
+          { ...change, attribute: 'Used for' },
+          { ...change, attribute: 'Comments' },
+        ],
+      })
+    })
+
+    it('looks the user up once', async () => {
+      await controller(deepReq as Request, deepRes as Response)
+
+      expect(manageUsersService.getUser).toHaveBeenCalledTimes(1)
+      const [[, { tableRows }]] = (deepRes.render as jest.Mock).mock.calls
+      expect(tableRows.map((row: { text: string }[]) => row[3].text)).toEqual([
+        'Lyle Lanley',
+        'Lyle Lanley',
+        'Lyle Lanley',
+      ])
+    })
+  })
 })
