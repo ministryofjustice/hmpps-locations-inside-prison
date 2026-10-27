@@ -38,4 +38,5 @@ export function setupStubs(role: string, hasCertChange = true) {
   LocationsApiStubber.stub.stubLocationsLocationsResidentialSummaryForLocation({
     parentLocation: stubLocation,
   })
+  LocationsApiStubber.stub.stubLocationsCellCertificatesPrisonCurrentFor([stubLocation])
 }

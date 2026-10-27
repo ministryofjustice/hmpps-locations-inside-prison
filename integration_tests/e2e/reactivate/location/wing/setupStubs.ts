@@ -243,4 +243,13 @@ export function setupStubs(role: string, hasCertChange = true) {
   LocationsApiStubber.stub.stubLocations(stubCell2)
   LocationsApiStubber.stub.stubLocations(stubCell3)
   LocationsApiStubber.stub.stubLocations(stubCell4)
+  LocationsApiStubber.stub.stubLocationsCellCertificatesPrisonCurrentFor([
+    stubLocation,
+    stubLanding1,
+    stubLanding2,
+    stubCell1,
+    stubCell2,
+    stubCell3,
+    stubCell4,
+  ])
 }
