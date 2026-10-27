@@ -247,7 +247,11 @@ context('Reactivate cells', () => {
 
     describe('when a cell has oldWorkingCapacity of 0', () => {
       it('shows an error when the user tries to continue', () => {
-        LocationsApiStubber.stub.stubLocations({ ...locations[1], oldWorkingCapacity: 0 })
+        const cellWithNoOldCapacity = { ...locations[1], oldWorkingCapacity: 0 }
+        LocationsApiStubber.stub.stubLocations(cellWithNoOldCapacity)
+        LocationsApiStubber.stub.stubLocationsPrisonInactiveCells(
+          locations.map(l => (l.id === cellWithNoOldCapacity.id ? cellWithNoOldCapacity : l)),
+        )
 
         InactiveCellsIndexPage.goTo()
         const page = Page.verifyOnPage(InactiveCellsIndexPage)
