@@ -50,20 +50,22 @@ export default ({ manageUsersService }: Services) =>
     const { location } = res.locals
     const { changeHistory }: Location = location
 
-    const tableRows = await Promise.all(
-      changeHistory.map(async ({ amendedBy, amendedDate, attribute, newValues, oldValues }) => {
-        const user = await manageUsersService.getUser(systemToken, amendedBy)
-        const name = user?.name || 'Unknown'
-
-        return [
-          { text: attribute },
-          formatValue(attribute, oldValues),
-          formatValue(attribute, newValues),
-          { text: name },
-          { text: format(amendedDate, 'dd/MM/yyyy') },
-        ]
-      }),
+    const names = Object.fromEntries(
+      await Promise.all(
+        _.uniq(changeHistory.map(h => h.amendedBy)).map(async username => [
+          username,
+          (await manageUsersService.getUser(systemToken, username))?.name || 'Unknown',
+        ]),
+      ),
     )
+
+    const tableRows = changeHistory.map(({ amendedBy, amendedDate, attribute, newValues, oldValues }) => [
+      { text: attribute },
+      formatValue(attribute, oldValues),
+      formatValue(attribute, newValues),
+      { text: names[amendedBy] },
+      { text: format(amendedDate, 'dd/MM/yyyy') },
+    ])
 
     return res.render('pages/locationHistory/show', {
       backLink: paths.location.view(location),
