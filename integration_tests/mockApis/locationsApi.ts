@@ -9,6 +9,7 @@ import {
   PrisonResidentialSummary,
 } from '../../server/data/types/locationsApi'
 import LocationFactory from '../../server/testutils/factories/location'
+import CellCertificateFactory from '../../server/testutils/factories/cellCertificate'
 import TypedStubber from './typedStubber'
 import { CertificationApprovalRequest } from '../../server/data/types/locationsApi/certificationApprovalRequest'
 import { CellCertificateImport } from '../../server/data/types/locationsApi/cellCertificateImport'
@@ -444,6 +445,16 @@ const stubLocationsCellCertificatesPrisonCurrent = (certificate: CellCertificate
       jsonBody: certificate,
     },
   })
+
+// The prison's current certificate, holding the given locations' certificate entries, as the API matches them by path
+const stubLocationsCellCertificatesPrisonCurrentFor = (locations: Location[]) =>
+  stubLocationsCellCertificatesPrisonCurrent(
+    CellCertificateFactory.build({
+      locations: locations
+        .filter(l => l.currentCellCertificate)
+        .map(l => ({ ...l.currentCellCertificate, pathHierarchy: l.pathHierarchy, subLocations: [] })),
+    }),
+  )
 
 const stubLocationsCellCertificateDashboard = (entries: CellCertificateDashboardEntry[]) =>
   stubFor({
@@ -1589,6 +1600,7 @@ const allStubs = {
   stubLocationsCellCertificatesPrison,
   stubLocationsCellCertificatesPrisonCurrent,
   stubLocationsCellCertificatesPrisonCurrent404,
+  stubLocationsCellCertificatesPrisonCurrentFor,
   stubLocationsCellCertificateDashboard,
   stubLocationsCertificationPrisonSignedOpCapChange,
   stubLocationsCertificationLocationApprove,
