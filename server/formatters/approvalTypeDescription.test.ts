@@ -162,4 +162,32 @@ describe('approvalTypeDescription', () => {
       ),
     ).toBe('Landing2 deactivation (decrease certified working capacity)')
   })
+
+  it("uses the request's own location type when the API gives it", () => {
+    expect(
+      approvalTypeDescription(
+        CertificationApprovalRequestFactory.build({ approvalType: 'REACTIVATION', locationType: 'WING' }),
+        mockConstants,
+        baseLocation,
+      ),
+    ).toBe('Wing activation (increase certified working capacity)')
+  })
+
+  it('uses the request location type without a location', () => {
+    expect(
+      approvalTypeDescription(
+        CertificationApprovalRequestFactory.build({ approvalType: 'DEACTIVATION', locationType: 'LANDING' }),
+        mockConstants,
+      ),
+    ).toBe('Landing deactivation (decrease certified working capacity)')
+  })
+
+  it('falls back to "Location" when there is no location type at all', () => {
+    expect(
+      approvalTypeDescription(
+        CertificationApprovalRequestFactory.build({ approvalType: 'DEACTIVATION' }),
+        mockConstants,
+      ),
+    ).toBe('Location deactivation (decrease certified working capacity)')
+  })
 })

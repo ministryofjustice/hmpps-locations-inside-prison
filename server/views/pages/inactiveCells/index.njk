@@ -17,7 +17,7 @@
       {% set rows = (rows.push(
         [
           { html: "<a href='" + paths.location.view(cell) + "'>" + cell.pathHierarchy + "</a>" },
-          { text: approvalTypeDescription(approvalRequest, constants, locationMap[approvalRequest.locationId]) },
+          { text: approvalTypeDescription(approvalRequest, constants) },
           { text: userMap[approvalRequest.requestedBy] + ' on ' + approvalRequest.requestedDate | formatDate },
           {
             html: '<a class="govuk-link" href="/' + approvalRequest.prisonId + '/cell-certificate/change-requests/' +

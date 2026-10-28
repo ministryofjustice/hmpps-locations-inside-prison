@@ -21,12 +21,14 @@ context('Cell Certificate - History', () => {
             approvedRequest: CertificationApprovalRequestFactory.build({
               approvalType: 'DEACTIVATION',
               locationKey: 'A-1-001',
+              locationType: 'CELL',
             }),
           }),
           CellCertificateFactory.build({
             approvedRequest: CertificationApprovalRequestFactory.build({
               approvalType: 'DEACTIVATION',
               locationKey: 'A',
+              locationType: 'WING',
               locationId: '7e570000-0000-1000-8000-000000000002',
             }),
           }),
