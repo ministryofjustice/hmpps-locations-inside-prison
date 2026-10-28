@@ -172,6 +172,40 @@ describe('Locations service', () => {
     })
   })
 
+  describe('getCurrentCellCertificateLocations', () => {
+    it('returns every location on the current certificate by path, without sub-locations', async () => {
+      const cell = { pathHierarchy: 'A-1-001', workingCapacity: 1, subLocations: [] as unknown[] }
+      const landing = { pathHierarchy: 'A-1', workingCapacity: 1, subLocations: [cell] }
+      const wing = { pathHierarchy: 'A', workingCapacity: 1, subLocations: [landing] }
+      locationsApiClient.cellCertificates.prison.getCurrentForPrisonId.mockResolvedValue({ locations: [wing] } as never)
+
+      const certificateLocations = await locationsService.getCurrentCellCertificateLocations('token', 'TST')
+
+      expect(locationsApiClient.cellCertificates.prison.getCurrentForPrisonId).toHaveBeenCalledWith('token', {
+        prisonId: 'TST',
+      })
+      expect(certificateLocations).toEqual({
+        A: { pathHierarchy: 'A', workingCapacity: 1 },
+        'A-1': { pathHierarchy: 'A-1', workingCapacity: 1 },
+        'A-1-001': { pathHierarchy: 'A-1-001', workingCapacity: 1 },
+      })
+    })
+
+    it('returns no locations when the prison has no certificate (404)', async () => {
+      locationsApiClient.cellCertificates.prison.getCurrentForPrisonId.mockRejectedValue({ responseStatus: 404 })
+
+      expect(await locationsService.getCurrentCellCertificateLocations('token', 'TST')).toEqual({})
+    })
+
+    it('rethrows other errors', async () => {
+      locationsApiClient.cellCertificates.prison.getCurrentForPrisonId.mockRejectedValue({ responseStatus: 500 })
+
+      await expect(locationsService.getCurrentCellCertificateLocations('token', 'TST')).rejects.toEqual({
+        responseStatus: 500,
+      })
+    })
+  })
+
   describe('getInactiveCells', () => {
     it('calls the correct client function', async () => {
       await locationsService.getInactiveCells('token', 'TST')

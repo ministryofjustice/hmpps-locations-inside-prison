@@ -5,9 +5,10 @@ import { Location, LocationResidentialSummary } from '../../../../data/types/loc
 import LocationsService from '../../../../services/locationsService'
 import decorateLocation from '../../../../decorators/location'
 import limitConcurrency from '../../../../utils/limitConcurrency'
+import getCurrentCertificateLocation from '../../../../utils/getCurrentCertificateLocation'
 
-// A wing has hundreds of cells and the tree needs one API call per location. Requesting them all at once uses up the
-// API's database connections, so a whole-wing reactivation fails and every other caller of the API fails with it
+// The tree needs one API call per landing or wing. Requesting them all at once uses up the API's database connections,
+// so a whole-wing reactivation fails and every other caller of the API fails with it
 const MAX_CONCURRENT_API_CALLS = 10
 
 export interface LocationTree {
@@ -20,12 +21,22 @@ export interface DecoratedLocationTree {
   decoratedSubLocations: DecoratedLocationTree[]
 }
 
+// A cell has no sub-locations, so it is taken from its parent's summary rather than fetched on its own. Its certificate
+// entry, which only a location's own summary carries, comes from the prison's current certificate instead
+async function cellWithCurrentCertificate(req: FormWizard.Request, cell: Location): Promise<Location> {
+  return {
+    ...cell,
+    currentCellCertificate: await getCurrentCertificateLocation(req, cell.prisonId, cell.pathHierarchy),
+  }
+}
+
 async function buildLocationTree({
   cells,
   id,
   limit,
   locationsService,
   prisonId,
+  req,
   systemToken,
 }: {
   cells: Location[]
@@ -33,6 +44,7 @@ async function buildLocationTree({
   limit: ReturnType<typeof limitConcurrency>
   locationsService: LocationsService
   prisonId: string
+  req: FormWizard.Request
   systemToken: string
 }): Promise<LocationTree> {
   const residentialSummary = (await limit(() =>
@@ -40,8 +52,10 @@ async function buildLocationTree({
   )) as LocationResidentialSummary
   const { parentLocation } = residentialSummary
   const subLocations = await Promise.all(
-    residentialSummary.subLocations.map(l =>
-      buildLocationTree({ cells, id: l.id, limit, locationsService, prisonId, systemToken }),
+    residentialSummary.subLocations.map(async (l): Promise<LocationTree> =>
+      l.locationType === 'CELL'
+        ? { location: await cellWithCurrentCertificate(req, l), subLocations: [] }
+        : buildLocationTree({ cells, id: l.id, limit, locationsService, prisonId, req, systemToken }),
     ),
   )
 
@@ -68,6 +82,7 @@ async function buildDecoratedLocationTree({
   limit,
   locationsService,
   prisonId,
+  req,
   systemToken,
 }: {
   decoratedCells: DecoratedLocation[]
@@ -75,6 +90,7 @@ async function buildDecoratedLocationTree({
   limit: ReturnType<typeof limitConcurrency>
   locationsService: LocationsService
   prisonId: string
+  req: FormWizard.Request
   systemToken: string
 }): Promise<DecoratedLocationTree> {
   const residentialSummary = (await limit(() =>
@@ -89,8 +105,20 @@ async function buildDecoratedLocationTree({
     limited: true,
   })
   const subLocations = await Promise.all(
-    residentialSummary.subLocations.map(l =>
-      buildDecoratedLocationTree({ decoratedCells, id: l.id, limit, locationsService, prisonId, systemToken }),
+    residentialSummary.subLocations.map(async (l): Promise<DecoratedLocationTree> =>
+      l.locationType === 'CELL'
+        ? {
+            decoratedLocation: await decorateLocation({
+              location: await cellWithCurrentCertificate(req, l),
+              systemToken,
+              userToken: '', // not required when limited: true
+              manageUsersService: null, // not required when limited: true
+              locationsService,
+              limited: true,
+            }),
+            decoratedSubLocations: [],
+          }
+        : buildDecoratedLocationTree({ decoratedCells, id: l.id, limit, locationsService, prisonId, req, systemToken }),
     ),
   )
 
@@ -100,7 +128,7 @@ async function buildDecoratedLocationTree({
 
   decoratedCells.push(
     ...subLocations
-      .filter(l => l.decoratedLocation.locationType === 'CELL')
+      .filter(l => l.decoratedLocation.raw.locationType === 'CELL')
       .filter(l => !decoratedCells.includes(l.decoratedLocation))
       .map(l => l.decoratedLocation),
   )
@@ -139,6 +167,7 @@ export default function populateLocationTree(decorate: boolean) {
             limit,
             locationsService,
             prisonId,
+            req,
             systemToken,
           }),
         ),
@@ -154,6 +183,7 @@ export default function populateLocationTree(decorate: boolean) {
             limit,
             locationsService,
             prisonId,
+            req,
             systemToken,
           }),
         ),

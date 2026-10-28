@@ -22,6 +22,7 @@ import populateTitleCaptionFromLocationOrPrison from '../../middleware/populateT
 import logger from '../../../logger'
 import paths from '../../utils/paths'
 import limitConcurrency from '../../utils/limitConcurrency'
+import getCurrentCertificateLocation from '../../utils/getCurrentCertificateLocation'
 
 function findCells(location: CertificateLocation): CertificateLocation[] {
   if (location.locationType === 'CELL') {
@@ -43,7 +44,7 @@ function addChangeLinksToLocals(
   locals.changeLinks[requestType] = changeLinks
 }
 
-// A large wing has hundreds of cells. Requesting them all at once uses up the API's database connections (MAPA-426)
+// A large wing has many landings. Requesting them all at once uses up the API's database connections (MAPA-426)
 const MAX_CONCURRENT_API_CALLS = 5
 
 async function locationToCertificationLocation(
@@ -90,10 +91,14 @@ async function locationToCertificationLocation(
       ),
     )
   } else if (!location.status.includes('DRAFT')) {
-    // A draft cell is not on the certificate yet, so there is no certificate to look up
-    locationWithCertification = await limit(() =>
-      req.services.locationsService.getLocation(req.session.systemToken, location.id, false, true),
-    )
+    // A draft cell is not on the certificate yet, so there is no certificate to look up. A single cell journey already
+    // has the cell's entry. Otherwise it comes from one copy of the current certificate, not one API call per cell
+    locationWithCertification = {
+      ...location,
+      currentCellCertificate:
+        location.currentCellCertificate ??
+        (await getCurrentCertificateLocation(req, location.prisonId, location.pathHierarchy)),
+    }
   }
 
   // Populate capacity values and cell types from current certificate

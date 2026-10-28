@@ -7,6 +7,7 @@ import LocationResidentialSummaryFactory from '../../../../testutils/factories/l
 import { Location } from '../../../../data/types/locationsApi'
 import decorateLocation from '../../../../decorators/location'
 import LocationsService from '../../../../services/locationsService'
+import CertificateLocationFactory from '../../../../testutils/factories/certificateLocation'
 
 const populateLocationTreeFunc = populateLocationTree(false)
 
@@ -163,8 +164,12 @@ describe('populateLocationTree', () => {
       params: {},
       services: {
         locationsService: {
-          getResidentialSummary: (_token: string, prisonId: string, id: string) =>
+          getResidentialSummary: jest.fn((_token: string, prisonId: string, id: string) =>
             Promise.resolve(residentialSummaries[prisonId][id]),
+          ),
+          getCurrentCellCertificateLocations: jest.fn().mockResolvedValue({
+            'A-1-001': CertificateLocationFactory.build(),
+          }),
           getAccommodationType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
           getConvertedCellType: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
           getDeactivatedReason: (_token: string, type: string) => Promise.resolve(`Resolved ${type}`),
@@ -203,6 +208,27 @@ describe('populateLocationTree', () => {
           ],
         },
       ])
+    })
+
+    it('takes the cells from their parent and their certificate entries from one certificate call', async () => {
+      await populateLocationTreeFunc(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      const { locationsService } = deepReq.services
+      expect((locationsService.getResidentialSummary as jest.Mock).mock.calls.map(([, , id]) => id).sort()).toEqual([
+        'location1',
+        'location1a',
+        'location1b',
+      ])
+      expect(locationsService.getCurrentCellCertificateLocations).toHaveBeenCalledTimes(1)
+      expect(locationsService.getCurrentCellCertificateLocations).toHaveBeenCalledWith('token', 'TST')
+    })
+
+    it('leaves out the certificate entry of a cell that is not on the certificate', async () => {
+      deepReq.services.locationsService.getCurrentCellCertificateLocations = jest.fn().mockResolvedValue({})
+
+      await populateLocationTreeFunc(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepRes.locals.cells).toEqual([{ ...location1b1, currentCellCertificate: undefined }])
     })
 
     describe('when decorate: true', () => {
@@ -270,7 +296,7 @@ describe('populateLocationTree', () => {
   })
 
   describe('for a large wing', () => {
-    const landingIds = ['landing1', 'landing2']
+    const landingIds = Array.from({ length: 20 }, (_, i) => `landing${i}`)
     const cellsPerLanding = 40
     const wingSummaries: { [id: string]: ReturnType<typeof LocationResidentialSummaryFactory.build> } = {}
     const wingCells: Location[] = []
@@ -284,24 +310,24 @@ describe('populateLocationTree', () => {
         parentLocation: landing,
         subLocations: cells,
       })
-      cells.forEach(cell => {
-        wingSummaries[cell.id] = LocationResidentialSummaryFactory.build({ parentLocation: cell, subLocations: [] })
-      })
       wingCells.push(...cells)
     })
 
     let running: number
     let maxRunning: number
+    let summaryCalls: number
 
     beforeEach(() => {
       running = 0
       maxRunning = 0
+      summaryCalls = 0
       sessionModelValues.selectLocations = landingIds
       deepReq.services.locationsService.getResidentialSummary = async (
         _token: string,
         _prisonId: string,
         id: string,
       ) => {
+        summaryCalls += 1
         running += 1
         maxRunning = Math.max(maxRunning, running)
         await new Promise(resolve => {
@@ -312,21 +338,25 @@ describe('populateLocationTree', () => {
       }
     })
 
-    it('looks up no more than 10 locations at a time', async () => {
+    it('looks up each landing but not each cell, no more than 10 at a time', async () => {
       await populateLocationTreeFunc(deepReq as FormWizard.Request, deepRes as Response, next)
 
       expect(deepRes.locals.cells.length).toEqual(wingCells.length)
+      expect(summaryCalls).toEqual(landingIds.length)
       expect(maxRunning).toEqual(10)
+      expect(deepReq.services.locationsService.getCurrentCellCertificateLocations).toHaveBeenCalledTimes(1)
     })
 
     describe('when decorate: true', () => {
       const populateLocationsDecorateFunc = populateLocationTree(true)
 
-      it('looks up no more than 10 locations at a time', async () => {
+      it('looks up each landing but not each cell, no more than 10 at a time', async () => {
         await populateLocationsDecorateFunc(deepReq as FormWizard.Request, deepRes as Response, next)
 
         expect(deepRes.locals.decoratedCells.length).toEqual(wingCells.length)
+        expect(summaryCalls).toEqual(landingIds.length)
         expect(maxRunning).toEqual(10)
+        expect(deepReq.services.locationsService.getCurrentCellCertificateLocations).toHaveBeenCalledTimes(1)
       })
     })
   })

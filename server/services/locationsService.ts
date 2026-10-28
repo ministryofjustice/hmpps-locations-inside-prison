@@ -4,6 +4,7 @@ import LocationsApiClient from '../data/locationsApiClient'
 import { ResidentialHierarchy } from '../data/types/locationsApi/residentialHierarchy'
 import { LocationType, NotificationGroup, PrisonNotificationMailboxDto, StatusType } from '../data/types/locationsApi'
 import { BulkCapacityUpdate } from '../data/types/locationsApi/bulkCapacityChanges'
+import { CertificateLocation } from '../data/types/locationsApi/certificateLocation'
 
 // The API rejects an import without a reason once a prison has certification approval turned on. The
 // import is always the same act, and the API records its own fixed reason against the approval request
@@ -187,6 +188,30 @@ export default class LocationsService {
 
   async getCurrentCellCertificate(token: string, prisonId: string) {
     return this.locationsApiClient.cellCertificates.prison.getCurrentForPrisonId(token, { prisonId })
+  }
+
+  // Every location on the prison's current certificate, by path hierarchy, as the API gives a single location's
+  // currentCellCertificate: matched on prison and path, without its sub-locations. Empty if there is no certificate
+  async getCurrentCellCertificateLocations(
+    token: string,
+    prisonId: string,
+  ): Promise<Record<string, CertificateLocation>> {
+    let certificate
+    try {
+      certificate = await this.getCurrentCellCertificate(token, prisonId)
+    } catch (error) {
+      if ((error as SanitisedError).responseStatus === 404) return {}
+      throw error
+    }
+
+    const certificateLocations: Record<string, CertificateLocation> = {}
+    const addLocation = ({ subLocations, ...location }: CertificateLocation) => {
+      certificateLocations[location.pathHierarchy] = location as CertificateLocation
+      subLocations?.forEach(addLocation)
+    }
+    certificate.locations?.forEach(addLocation)
+
+    return certificateLocations
   }
 
   async getCellCertificate(token: string, id: string) {

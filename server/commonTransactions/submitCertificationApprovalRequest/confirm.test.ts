@@ -10,6 +10,7 @@ import LocationFactory from '../../testutils/factories/location'
 import { CertificationApprovalRequest } from '../../data/types/locationsApi/certificationApprovalRequest'
 import CertificationApprovalRequestFactory from '../../testutils/factories/certificationApprovalRequest'
 import CertificateLocationFactory from '../../testutils/factories/certificateLocation'
+import { CertificateLocation } from '../../data/types/locationsApi/certificateLocation'
 import mockModel from '../../testutils/mockModel'
 import LocationResidentialSummaryFactory from '../../testutils/factories/locationResidentialSummary'
 
@@ -654,6 +655,7 @@ describe('Confirm', () => {
     locationsService = {
       getAccommodationTypes: jest.fn().mockResolvedValue([]),
       getLocation: jest.fn(),
+      getCurrentCellCertificateLocations: jest.fn().mockResolvedValue({}),
       getSpecialistCellTypes: jest.fn().mockResolvedValue([]),
       getUsedForTypes: jest.fn().mockResolvedValue([]),
       getResidentialSummary: jest.fn().mockResolvedValue({
@@ -832,24 +834,30 @@ describe('Confirm', () => {
       expect(wing.subLocations[0].subLocations.length).toEqual(cellCount)
     })
 
-    it('looks up no more than 5 cells at a time', async () => {
-      const cells = setUpWing('ACTIVE')
-      let running = 0
-      let maxRunning = 0
-      locationsService.getLocation.mockImplementation(async (_token, id) => {
-        running += 1
-        maxRunning = Math.max(maxRunning, running)
-        await new Promise(resolve => {
-          setTimeout(resolve, 1)
-        })
-        running -= 1
-        return cells.find(cell => cell.id === id)
+    it('takes every cell certificate entry from one certificate call, not one call per cell', async () => {
+      const cells = setUpWing('ACTIVE').map((cell, i) => {
+        // Cells from a residential summary do not carry their certificate entry
+        Object.assign(cell, { currentCellCertificate: undefined, pathHierarchy: `A-1-${i}` })
+        return cell
       })
+      locationsService.getCurrentCellCertificateLocations.mockResolvedValue(
+        Object.fromEntries(
+          cells.map((cell, i) => [
+            cell.pathHierarchy,
+            CertificateLocationFactory.build({ pathHierarchy: cell.pathHierarchy, workingCapacity: i % 3 }),
+          ]),
+        ),
+      )
 
       await controller.generateRequests(deepReq as FormWizard.Request, deepRes as Response, next)
 
-      expect(locationsService.getLocation).toHaveBeenCalledTimes(cellCount)
-      expect(maxRunning).toEqual(5)
+      expect(locationsService.getLocation).not.toHaveBeenCalled()
+      expect(locationsService.getCurrentCellCertificateLocations).toHaveBeenCalledTimes(1)
+      expect(locationsService.getCurrentCellCertificateLocations).toHaveBeenCalledWith('token', 'TST')
+      const [wing] = deepRes.locals.proposedCertificationApprovalRequests[0].locations
+      expect(wing.subLocations[0].subLocations.map((c: CertificateLocation) => c.currentWorkingCapacity)).toEqual(
+        cells.map((_, i) => i % 3),
+      )
     })
   })
 
