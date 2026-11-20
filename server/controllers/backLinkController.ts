@@ -1,7 +1,13 @@
 import type { Request, RequestHandler } from 'express'
+import { BadRequest } from 'http-errors'
 import config from '../config'
 
-const sanitizeUrl = (url: string) => (url.endsWith('/') ? url.substring(0, url.length - 1) : url)
+const sanitizeUrl = (url: string) => url.replace(/\/+$/, '')
+const isLocalPath = (path: string) =>
+  path.startsWith('/') &&
+  !path.startsWith('//') &&
+  !path.includes('\\') &&
+  !Array.from(path).some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)
 
 export interface RegisteredService {
   name: string
@@ -12,17 +18,17 @@ export interface RegisteredService {
 export const registeredBackLinkServices: RegisteredService[] = [
   {
     name: 'digital-prison-services',
-    hostname: sanitizeUrl(config.services.dps),
+    hostname: config.services.dps,
     defaultBackLinkText: 'View most recent search',
   },
   {
     name: 'non-residential-locations',
-    hostname: sanitizeUrl(config.services.nonResidentialLocations),
+    hostname: config.services.nonResidentialLocations,
     defaultBackLinkText: 'Back to Non-residential locations',
   },
   {
     name: 'prison-roll-count',
-    hostname: sanitizeUrl(config.services.establishmentRoll),
+    hostname: config.services.establishmentRoll,
     defaultBackLinkText: 'Back to Establishment roll',
   },
 ]
@@ -40,13 +46,19 @@ export const saveBackLink =
     const redirectPath = getQueryString(req, 'redirectPath')
     const backLinkText = getQueryString(req, 'backLinkText')
 
-    if (!service || !returnPath || !redirectPath) throw new Error('Required query parameters missing')
+    if (!service || !returnPath || !redirectPath) throw new BadRequest('Required query parameters missing')
+    if (req.query.backLinkText !== undefined && backLinkText === undefined) {
+      throw new BadRequest('Invalid back link text')
+    }
 
     const registeredService = registeredServices.find(item => item.name === service)
-    if (!registeredService) throw new Error(`Could not find service: [${service}]`)
+    if (!registeredService) throw new BadRequest(`Could not find service: [${service}]`)
+    if (!isLocalPath(returnPath) || !isLocalPath(redirectPath)) {
+      throw new BadRequest('Return and redirect paths must be local paths')
+    }
 
     req.session.userBackLink = {
-      url: registeredService.hostname + returnPath,
+      url: sanitizeUrl(registeredService.hostname) + returnPath,
       text: backLinkText || registeredService.defaultBackLinkText,
     }
 

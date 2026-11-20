@@ -24,6 +24,10 @@ export default function routes(services: Services): Router {
 
   router.use(addServicesToRequest(services))
   router.use(setCanAccess)
+  router.use((req, res, next) => {
+    res.locals.userBackLink = req.session.userBackLink
+    next()
+  })
 
   if (config.developerMode) {
     router.use('/dev', devRouter)

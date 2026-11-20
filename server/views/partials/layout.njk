@@ -151,6 +151,11 @@
                 href: backLink
               }) }}
             {% endblock %}
+          {% elif userBackLink %}
+            {{ govukBackLink({
+              text: userBackLink.text,
+              href: userBackLink.url
+            }) }}
           {% else %}
             {{ breadcrumb('', breadcrumbs, false) }}
           {% endif %}
