@@ -31,6 +31,7 @@ export declare module 'express-session' {
     referrerUrl: string
     returnTo: string
     systemToken: string
+    userBackLink?: { url: string; text: string }
   }
 }
 
@@ -195,6 +196,7 @@ interface AllLocals {
   validationErrors: { text: string; href: string }[]
   values: FormWizard.Values
   valuesHaveChanged: boolean
+  userBackLink: { url: string; text: string }
   viewChangeRequestLink: string
   workingCapacity: string
   capacityData: BulkCapacityUpdate

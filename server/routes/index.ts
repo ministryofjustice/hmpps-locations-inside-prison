@@ -17,12 +17,17 @@ import legacyRedirectRouter from './legacyRedirectRouter'
 import addRootBreadcrumb from '../middleware/addRootBreadcrumb'
 import functionalMailboxesRouter from './functionalMailboxesRouter'
 import prisonConfigurationRouter from './prisonConfigurationRouter'
+import { saveBackLink } from '../controllers/backLinkController'
 
 export default function routes(services: Services): Router {
   const router = Router()
 
   router.use(addServicesToRequest(services))
   router.use(setCanAccess)
+  router.use((req, res, next) => {
+    res.locals.userBackLink = req.session.userBackLink
+    next()
+  })
 
   if (config.developerMode) {
     router.use('/dev', devRouter)
@@ -41,6 +46,8 @@ export default function routes(services: Services): Router {
   router.use('/prison-configuration', prisonConfigurationRouter(services))
 
   router.use(legacyRedirectRouter)
+
+  router.get('/save-backlink', saveBackLink())
 
   router.use('/:prisonId?', prisonRouter(services))
 

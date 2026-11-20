@@ -13,12 +13,19 @@ generic-service:
   env:
     INGRESS_URL: "https://locations-inside-prison-preprod.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
+    ENVIRONMENT_NAME: PRE-PRODUCTION
+
+    # APIs
     MANAGE_USERS_API_URL: "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
     COMPONENT_API_URL: "https://frontend-components-preprod.hmpps.service.justice.gov.uk"
-    DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
-    SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-preprod.hmpps.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-preprod.hmpps.service.justice.gov.uk"
     PRISON_API_URL: "https://prison-api-preprod.prison.service.justice.gov.uk"
-    ENVIRONMENT_NAME: PRE-PRODUCTION
+
+    # Service URLs
+    DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
+    SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-preprod.hmpps.service.justice.gov.uk"
+    ESTABLISHMENT_ROLL_URL: "https://prison-roll-count-preprod.hmpps.service.justice.gov.uk"
+
+
     AUDIT_ENABLED: "false"
