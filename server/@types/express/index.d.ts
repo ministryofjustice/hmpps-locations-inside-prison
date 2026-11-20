@@ -31,6 +31,7 @@ export declare module 'express-session' {
     referrerUrl: string
     returnTo: string
     systemToken: string
+    userBackLink: { url: string; text: string }
   }
 }
 
