@@ -134,6 +134,7 @@ export default {
       'http://localhost:3000',
       requiredInProduction,
     ),
+    establishmentRoll: get('ESTABLISHMENT_ROLL_URL', 'http://localhost:3000', requiredInProduction),
   },
   ingressUrl: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName,

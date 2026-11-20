@@ -11,14 +11,21 @@ generic-service:
   env:
     INGRESS_URL: "https://locations-inside-prison-train.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
+    ENVIRONMENT_NAME: Training
+
+    # APIs
     MANAGE_USERS_API_URL: "http://hmpps-locations-inside-prison-api:8090"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
-    COMMON_COMPONENTS_ENABLED: false
     COMPONENT_API_URL: "http://not-used"
-    DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
-    SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-preprod.hmpps.service.justice.gov.uk"
     LOCATIONS_API_URL: "https://locations-inside-prison-api-train.hmpps.service.justice.gov.uk"
     PRISON_API_URL: "http://hmpps-locations-inside-prison-api:8090"
-    ENVIRONMENT_NAME: Training
+
+    # Service URLs
+    DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk"
+    SERVICE_NON_RESIDENTIAL_LOCATIONS_URL: "https://non-residential-locations-preprod.hmpps.service.justice.gov.uk"
+    ESTABLISHMENT_ROLL_URL: "https://prison-roll-count-preprod.hmpps.service.justice.gov.uk"
+
+    COMMON_COMPONENTS_ENABLED: false
+
     AUDIT_ENABLED: "false"
     PRODUCTION_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
