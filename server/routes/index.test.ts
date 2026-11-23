@@ -4,6 +4,7 @@ import { appWithAllRoutes, user } from './testutils/appSetup'
 import AuditService, { Page } from '../services/auditService'
 import LocationsService from '../services/locationsService'
 import ManageUsersService from '../services/manageUsersService'
+import config from '../config'
 
 jest.mock('../services/auditService')
 jest.mock('../services/locationsService')
@@ -58,6 +59,67 @@ describe('GET /', () => {
 })
 
 describe('GET /TST', () => {
+  it('displays the saved backlink and keeps page-specific back links when navigating', async () => {
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'ACTIVE',
+      nonResiServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'ACTIVE',
+    })
+    auditService.logPageView.mockResolvedValue(null)
+    app = appWithAllRoutes({
+      services: { auditService, locationsService, manageUsersService },
+      userSupplier: () => ({ ...user, userRoles: ['MANAGE_RES_LOCATIONS_ADMIN'] }),
+    })
+    const agent = request.agent(app)
+
+    await agent
+      .get('/save-backlink')
+      .query({
+        service: 'prison-roll-count',
+        returnPath: '/in-reception?sort=name',
+        redirectPath: '/TST',
+        backLinkText: 'Back to In reception',
+      })
+      .expect(302)
+      .expect('Location', `${config.ingressUrl}/TST`)
+
+    const landingPage = await agent.get('/TST').expect(200)
+    expect(landingPage.text).toContain(`href="${config.services.establishmentRoll}/in-reception?sort=name"`)
+    expect(landingPage.text).toContain('Back to In reception')
+
+    const formPage = await agent.get('/functional-mailboxes/default/add').expect(200)
+    expect(formPage.text).toContain('href="/functional-mailboxes" class="govuk-back-link">Back</a>')
+    expect(formPage.text).not.toContain('Back to In reception')
+  })
+
+  it('rejects unsafe return paths without replacing the saved backlink', async () => {
+    locationsService.getPrisonConfiguration.mockResolvedValue({
+      prisonId: 'TST',
+      resiLocationServiceActive: 'INACTIVE',
+      nonResiServiceActive: 'INACTIVE',
+      includeSegregationInRollCount: 'INACTIVE',
+      certificationApprovalRequired: 'INACTIVE',
+    })
+    auditService.logPageView.mockResolvedValue(null)
+    const agent = request.agent(app)
+
+    await agent
+      .get('/save-backlink')
+      .query({ service: 'prison-roll-count', returnPath: '/in-reception', redirectPath: '/TST' })
+      .expect(302)
+
+    await agent
+      .get('/save-backlink')
+      .query({ service: 'prison-roll-count', returnPath: '@example.com', redirectPath: '/TST' })
+      .expect(400)
+
+    const landingPage = await agent.get('/TST').expect(200)
+    expect(landingPage.text).toContain(`href="${config.services.establishmentRoll}/in-reception"`)
+    expect(landingPage.text).toContain('Back to Establishment roll')
+  })
+
   it('should render index page with permission message when resiLocationServiceActive is INACTIVE', async () => {
     locationsService.getPrisonConfiguration.mockResolvedValue({
       prisonId: 'TST',
