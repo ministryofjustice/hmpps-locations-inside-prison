@@ -2,8 +2,8 @@ generic-service:
   nameOverride: hmpps-locations-inside-prison
   productId: "DPS038" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
 
-  # the IRSA service account name for accessing AWS resources
-  # serviceAccountName: "hmpps-template-typescript"
+  # The IRSA service account, which lets the app send to the HMPPS Audit queue, is set per environment
+  # in values-<env>.yaml. The train namespace has no such account, so it is not set here.
 
   replicaCount: 4
 
@@ -64,7 +64,7 @@ generic-service:
     REDIS_TLS_ENABLED: 'true'
     TOKEN_VERIFICATION_ENABLED: 'true'
     AUDIT_SQS_REGION: 'eu-west-2'
-    AUDIT_SERVICE_NAME: 'UNASSIGNED' # Your audit service name
+    AUDIT_SERVICE_NAME: 'hmpps-locations-inside-prison'
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -95,9 +95,7 @@ generic-service:
     elasticache-redis:
       REDIS_HOST: 'primary_endpoint_address'
       REDIS_AUTH_TOKEN: 'auth_token'
-    #sqs-hmpps-audit-secret:
-    #  AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
-    #  AUDIT_SQS_QUEUE_NAME: "sqs_queue_name"
+    # sqs-hmpps-audit-secret is mapped per environment in values-<env>.yaml; it does not exist in train
 
   allowlist:
     groups:
