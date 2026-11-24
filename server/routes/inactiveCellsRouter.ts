@@ -1,6 +1,4 @@
 import express from 'express'
-import logPageView from '../middleware/logPageView'
-import { Page } from '../services/auditService'
 import type { Services } from '../services'
 import populateInactiveCells from '../middleware/populateInactiveCells'
 import inactiveCellsIndex from '../controllers/inactiveCellsIndex'
@@ -28,7 +26,6 @@ const controller = (services: Services) => {
     populateBreadcrumbsForLocation,
     addBreadcrumb({ title: '', href: '/' }),
     populateInactiveCells(services),
-    logPageView(services.auditService, Page.INACTIVE_CELLS),
     inactiveCellsIndex,
   )
 

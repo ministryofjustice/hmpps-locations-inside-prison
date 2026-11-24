@@ -1,8 +1,8 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { jest } from '@jest/globals'
+import { AuditService } from '@ministryofjustice/hmpps-audit-client'
 import { appWithAllRoutes, user } from '../testutils/appSetup'
-import AuditService, { Page } from '../../services/auditService'
 import AuthService from '../../services/authService'
 import LocationsService from '../../services/locationsService'
 import PrisonService from '../../services/prisonService'
@@ -10,7 +10,7 @@ import ManageUsersService from '../../services/manageUsersService'
 import paths from '../../utils/paths'
 import config from '../../config'
 
-jest.mock('../../services/auditService')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('../../services/authService')
 jest.mock('../../services/locationsService')
 jest.mock('../../services/prisonService')
@@ -32,7 +32,6 @@ const buildApp = (userRoles: string[], production = false): Express =>
 beforeEach(() => {
   authService.getSystemClientToken.mockResolvedValue('token')
   manageUsersService.getCaseloads.mockResolvedValue([{ id: 'TST', name: 'Test' }])
-  auditService.logPageView.mockResolvedValue(null)
   locationsService.getPrisonConfiguration.mockResolvedValue({
     prisonId: 'TST',
     resiLocationServiceActive: 'ACTIVE',
@@ -54,12 +53,6 @@ describe('viewing cell certificate imports', () => {
       .get(paths.prison.cellCertificateImports('TST'))
       .expect(200)
       .expect('Content-Type', /html/)
-
-    expect(auditService.logPageView).toHaveBeenCalledWith(Page.CELL_CERTIFICATE_UPLOADS, {
-      who: user.username,
-      correlationId: expect.any(String),
-      details: { userUuid: user.userUuid },
-    })
   })
 
   it.each([
@@ -173,7 +166,6 @@ describe('rendering an import', () => {
       expect(response.text).toContain('Dry cell')
       expect(response.text).toContain('data-qa="copy-link-button"')
       expect(response.text).not.toContain('data-qa="continue-button"')
-      expect(auditService.logPageView).toHaveBeenCalledWith(Page.CELL_CERTIFICATE_UPLOAD_DETAIL, expect.anything())
     })
 
     it('offers to continue to someone who can run imports', async () => {

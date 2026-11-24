@@ -1,13 +1,13 @@
 import type { Express } from 'express'
 import request from 'supertest'
 
+import { AuditService } from '@ministryofjustice/hmpps-audit-client'
 import { NotificationGroup, PrisonNotificationMailboxDto } from '../data/types/locationsApi'
-import AuditService from '../services/auditService'
 import LocationsService from '../services/locationsService'
 import ManageUsersService from '../services/manageUsersService'
 import { appWithAllRoutes, flashProvider, user } from './testutils/appSetup'
 
-jest.mock('../services/auditService')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('../services/locationsService')
 jest.mock('../services/manageUsersService')
 
@@ -34,7 +34,6 @@ beforeEach(() => {
     services: { auditService, locationsService, manageUsersService },
     userSupplier: () => adminUser,
   })
-  auditService.logPageView.mockResolvedValue(null)
   manageUsersService.getCaseloads.mockResolvedValue([
     { id: 'LEI', name: 'Leeds (HMP)' },
     { id: 'MDI', name: 'Moorland (HMP & YOI)' },

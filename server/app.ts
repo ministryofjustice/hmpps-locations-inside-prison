@@ -25,6 +25,7 @@ import config from './config'
 import setUpFeatureFlags from './middleware/setUpFeatureFlags'
 import refreshSystemToken from './middleware/refreshSystemToken'
 import setUpMultipartFormDataParsing from './middleware/setUpMultipartFormDataParsing'
+import auditPageView from './middleware/auditPageView'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -44,6 +45,8 @@ export default function createApp(services: Services): express.Application {
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpFeatureFlags())
   app.use(setUpAuthentication())
+  // before any route's permission checks, so that refused requests are still audited as access attempts
+  app.get('*', auditPageView(services.auditService))
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))

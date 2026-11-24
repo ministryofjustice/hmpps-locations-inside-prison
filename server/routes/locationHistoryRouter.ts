@@ -1,6 +1,4 @@
 import express from 'express'
-import logPageView from '../middleware/logPageView'
-import { Page } from '../services/auditService'
 import type { Services } from '../services'
 import locationHistoryShow from '../controllers/locationHistoryShow'
 import populateLocation from '../middleware/populateLocation'
@@ -13,7 +11,6 @@ const controller = (services: Services) => {
     '/',
     populateLocation({ includeHistory: true }),
     populateTitleCaptionFromLocationOrPrison,
-    logPageView(services.auditService, Page.LOCATION_HISTORY),
     locationHistoryShow(services),
   )
 
