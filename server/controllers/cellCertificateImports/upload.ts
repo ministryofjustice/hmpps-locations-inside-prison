@@ -1,6 +1,7 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import fs from 'fs'
+import { parse } from 'csv-parse/sync'
 import { TypedLocals } from '../../@types/express'
 import FormStep from '../base/formStep'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
@@ -26,8 +27,8 @@ export default class ImportUpload extends FormStep {
         validationErrors.file = this.formError('file', 'required')
       } else {
         try {
-          const csvText = readCsvFile(uploadedFile.path)
-          const capacityData = parseCsvRow(csvText)
+          const csvRows = readCsvFile(uploadedFile.path)
+          const capacityData = parseCsvRow(csvRows)
 
           if (Object.keys(capacityData).length === 0) {
             validationErrors.file = this.formError('file', 'noData')
@@ -51,8 +52,8 @@ export default class ImportUpload extends FormStep {
     const uploadedFile: Express.Multer.File = req.file as Express.Multer.File
 
     try {
-      const csvText = readCsvFile(uploadedFile.path)
-      const capacityData: BulkCapacityUpdate = parseCsvRow(csvText)
+      const csvRows = readCsvFile(uploadedFile.path)
+      const capacityData: BulkCapacityUpdate = parseCsvRow(csvRows)
       const capacitySummary: CapacitySummary = summarizeCapacityByWing(capacityData)
 
       req.sessionModel.set('capacityData', capacityData)
@@ -66,13 +67,9 @@ export default class ImportUpload extends FormStep {
   }
 }
 
-export function readCsvFile(path: string): string[] {
+export function readCsvFile(path: string): string[][] {
   const data = fs.readFileSync(path, 'utf8')
-  return data
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .slice(1) // Skip header
+  return parse(data, { bom: true, skip_empty_lines: true, relax_column_count: true }).slice(1)
 }
 
 /** How many cells to name before falling back to a count of the rest. */
@@ -84,7 +81,7 @@ const MAX_CELLS_LISTED = 5
  */
 type RowValidationError = { before: string; cell: string; after?: string }
 
-export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
+export function parseCsvRow(rows: string[][]): BulkCapacityUpdate {
   const validationErrors: RowValidationError[] = []
   const capacityData = rows.reduce<BulkCapacityUpdate>((acc, row, index) => {
     const [
@@ -98,7 +95,7 @@ export function parseCsvRow(rows: string[]): BulkCapacityUpdate {
       ,
       // usedFor (ignored)
       inCellSanitation,
-    ] = row.split(',')
+    ] = row
 
     const rowNumber = index + 2 // account for the CSV header row
     const cellNumberValue = cellNumber ?? ''
@@ -231,11 +228,11 @@ function getCellMarkValidationError(
 }
 
 function looksLikeDate(value: string) {
+  // Numeric marks such as 01-02 are legitimate; only flag month-name formats indicating Excel conversion.
   const monthNames = '(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)'
   const monthNameDate = new RegExp(`^\\d{1,2}[-/ ]${monthNames}$|^${monthNames}[-/ ]\\d{1,2}$`, 'i')
-  const numericDate = /^\d{1,2}[-/]\d{1,2}([-/]\d{2,4})?$/
 
-  return monthNameDate.test(value) || numericDate.test(value)
+  return monthNameDate.test(value)
 }
 
 function isCsvValidationError(message: string) {

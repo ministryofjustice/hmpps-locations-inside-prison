@@ -1,9 +1,12 @@
 import FormWizard from 'hmpo-form-wizard'
 import { NextFunction, Response } from 'express'
 import { DeepPartial } from 'fishery'
-import ImportUpload, { invalidDataForPrison, parseCsvRow, summarizeCapacityByWing } from './upload'
+import { parse } from 'csv-parse/sync'
+import ImportUpload, { invalidDataForPrison, parseCsvRow as parseRecords, summarizeCapacityByWing } from './upload'
 import { BulkCapacityUpdate, CapacitySummary } from '../../data/types/locationsApi/bulkCapacityChanges'
 import fields from '../../routes/changeLocalName/fields'
+
+const parseCsvRow = (rows: string[]) => parseRecords(parse(rows.join('\n'), { relax_column_count: true }))
 
 describe('Upload file csv', () => {
   const controller = new ImportUpload({ route: '/' })
@@ -202,9 +205,67 @@ describe('Upload file csv', () => {
 
       expect(callback).toHaveBeenCalledWith(expect.objectContaining({}))
     })
+
+    it('accepts quoted fields containing commas, escaped quotes and line breaks', async () => {
+      deepReq.file = {
+        path: 'uploads/testdata/quoted-fields.csv',
+      } as unknown as Express.Multer.File
+      deepRes.locals.prisonConfiguration.prisonId = 'PNI'
+
+      const callback = jest.fn()
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith({})
+    })
+
+    it('reports an invalid CSV when a quoted field is not closed', async () => {
+      deepReq.file = {
+        path: 'uploads/testdata/unclosed-quoted-field.csv',
+      } as unknown as Express.Multer.File
+
+      const callback = jest.fn()
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({ file: controller.formError('file', 'parseFailure') }),
+      )
+    })
   })
 
   describe('saveValues', () => {
+    it('saves correctly decoded quoted fields', async () => {
+      deepReq.file = {
+        path: 'uploads/testdata/quoted-fields.csv',
+      } as unknown as Express.Multer.File
+
+      await controller.saveValues(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(next).toHaveBeenCalledWith()
+      expect(deepReq.sessionModel.set).toHaveBeenNthCalledWith(1, 'capacityData', {
+        'PNI-A2-2-022': {
+          cellMark: 'A2-022',
+          certifiedNormalAccommodation: 1,
+          maxCapacity: 2,
+          workingCapacity: 1,
+          inCellSanitation: true,
+        },
+        'PNI-A-3-001': {
+          cellMark: 'A3,"001"',
+          certifiedNormalAccommodation: 1,
+          maxCapacity: 2,
+          workingCapacity: 2,
+          inCellSanitation: true,
+        },
+        'PNI-A-3-002': {
+          cellMark: 'A3-002',
+          certifiedNormalAccommodation: 0,
+          maxCapacity: 0,
+          workingCapacity: 0,
+          inCellSanitation: false,
+        },
+      })
+    })
+
     it('the csv is transformed and the data saved in the session', async () => {
       deepReq.file = {
         path: 'uploads/testdata/correct-format.csv',
@@ -258,13 +319,31 @@ describe('Upload file csv', () => {
       })
     })
 
-    it('rejects a cell mark that can be parsed as a date', () => {
-      const input = ['HB1,DNI-HB1-1-001,01-Jan,2,2,1,Normal Accommodation,TRUE']
+    it.each(['01-Jan', 'Jan-02', '02-jan', 'Jan/02', '02 Jan'])(
+      'rejects a cell mark containing a month name: %s',
+      cellMark => {
+        const input = [`HB1,DNI-HB1-1-001,${cellMark},2,2,1,Normal Accommodation,TRUE`]
 
-      expect(() => parseCsvRow(input)).toThrow(
-        'Row 2: the Number or cell mark value "01-Jan" looks like a date for cell DNI-HB1-1-001',
-      )
+        expect(() => parseCsvRow(input)).toThrow(
+          `Row 2: the Number or cell mark value "${cellMark}" looks like a date for cell DNI-HB1-1-001`,
+        )
+      },
+    )
+
+    it('validates a quoted date-like cell mark after decoding it', () => {
+      const input = ['"A Wing (A3,4 & 5)",DNI-HB1-1-001,"Jan-02",2,2,1,Normal Accommodation,TRUE']
+
+      expect(() => parseCsvRow(input)).toThrow('cell mark value "Jan-02" looks like a date')
     })
+
+    it.each(['72-02', '01-02', '31-12', '72/02', '01/02'])(
+      'preserves a numeric cell mark without treating it as a date: %s',
+      cellMark => {
+        const input = [`HB1,DNI-HB1-1-001,${cellMark},2,2,1,Normal Accommodation,TRUE`]
+
+        expect(parseCsvRow(input)['DNI-HB1-1-001'].cellMark).toBe(cellMark)
+      },
+    )
 
     it('allows a dotted cell mark such as 1.04', () => {
       const input = ['HB1,DNI-H1-A1-004,1.04,1,2,2,VP Unit ,']

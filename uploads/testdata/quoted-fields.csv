@@ -1,0 +1,5 @@
+Wing,Cell no,Cell mark,CNA,Max Cap,Working Cap,Cell type,In cell sanitation
+A2,PNI-A2-2-022,A2-022,1,2,1,Normal Accommodation,TRUE
+"A Wing (A3,4 & 5)","PNI-A-3-001","A3,""001""","1","2","2",Normal Accommodation,"TRUE"
+"A Wing
+(A3,4 & 5)",PNI-A-3-002,A3-002,0,0,0,Servery,FALSE
