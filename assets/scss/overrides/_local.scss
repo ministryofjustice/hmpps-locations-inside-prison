@@ -353,6 +353,17 @@ button.govuk-back-link {
   }
 }
 
+.locations-breadcrumb__right-divider {
+  display: inline;
+  float: left;
+
+  a {
+    border-right: 1px solid $govuk-secondary-text-colour;
+    padding-right: govuk-spacing(3);
+    margin-right: govuk-spacing(3);
+  }
+}
+
 #apply-cell-numbering {
   @include govuk-font-size($size: 16);
   padding: 5px 0;
