@@ -89,6 +89,13 @@ describe('GET /TST', () => {
     expect(landingPage.text).toContain(`href="${config.services.establishmentRoll}/in-reception?sort=name"`)
     expect(landingPage.text).toContain('Back to In reception')
 
+    locationsService.getPrisonNotificationMailboxes.mockResolvedValue([])
+    const mailboxesPage = await agent.get('/functional-mailboxes').expect(200)
+    expect(mailboxesPage.text).toContain(`href="${config.services.establishmentRoll}/in-reception?sort=name"`)
+    expect(mailboxesPage.text).toContain('Back to In reception')
+    expect(mailboxesPage.text).toMatch(/<nav[^>]+class="govuk-breadcrumbs/)
+    expect(mailboxesPage.text).toMatch(/<a[^>]+class="govuk-breadcrumbs__link"[^>]+href="\/"[^>]*>\s*Locations\s*<\/a>/)
+
     const formPage = await agent.get('/functional-mailboxes/default/add').expect(200)
     expect(formPage.text).toContain('href="/functional-mailboxes" class="govuk-back-link">Back</a>')
     expect(formPage.text).not.toContain('Back to In reception')

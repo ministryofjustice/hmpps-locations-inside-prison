@@ -152,10 +152,13 @@
               }) }}
             {% endblock %}
           {% elif userBackLink %}
+            <div class="locations-breadcrumb__right-divider">
             {{ govukBackLink({
               text: userBackLink.text,
               href: userBackLink.url
             }) }}
+            </div>
+            {{ breadcrumb('', breadcrumbs, false) }}
           {% else %}
             {{ breadcrumb('', breadcrumbs, false) }}
           {% endif %}
