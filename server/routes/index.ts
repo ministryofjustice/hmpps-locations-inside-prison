@@ -2,9 +2,7 @@ import { Router } from 'express'
 
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
-import { Page } from '../services/auditService'
 import addBreadcrumb from '../middleware/addBreadcrumb'
-import logPageView from '../middleware/logPageView'
 import addServicesToRequest from '../middleware/addServicesToRequest'
 
 import capacityManagementDashboard from '../controllers/capacityManagementDashboard'
@@ -38,7 +36,6 @@ export default function routes(services: Services): Router {
     protectRoute('certificate_view_management'),
     addRootBreadcrumb,
     addBreadcrumb({ title: '', href: '/' }),
-    logPageView(services.auditService, Page.CAPACITY_MANAGEMENT_DASHBOARD),
     asyncMiddleware(capacityManagementDashboard),
   )
 

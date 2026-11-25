@@ -2,6 +2,9 @@
 # Per environment values which override defaults in hmpps-locations-inside-prison/values.yaml
 
 generic-service:
+  # service account with permission to send to the HMPPS Audit queue (cloud-platform-environments irsa.tf)
+  serviceAccountName: "hmpps-locations-inside-prison"
+
   replicaCount: 2
 
   ingress:
@@ -28,4 +31,8 @@ generic-service:
     ESTABLISHMENT_ROLL_URL: "https://prison-roll-count-preprod.hmpps.service.justice.gov.uk"
 
 
-    AUDIT_ENABLED: "false"
+    AUDIT_ENABLED: "true"
+
+  namespace_secrets:
+    sqs-hmpps-audit-secret:
+      AUDIT_SQS_QUEUE_URL: "sqs_queue_url"

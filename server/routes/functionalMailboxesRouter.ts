@@ -6,19 +6,16 @@ import functionalMailboxDelete from '../controllers/functionalMailboxes/delete'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 import addRootBreadcrumb from '../middleware/addRootBreadcrumb'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import logPageView from '../middleware/logPageView'
 import protectRoute from '../middleware/protectRoute'
 import type { Services } from '../services'
-import { Page } from '../services/auditService'
 
-export default function functionalMailboxesRouter(services: Services): Router {
+export default function functionalMailboxesRouter(_services: Services): Router {
   const router = Router()
 
   router.use(protectRoute('administer_residential'), addRootBreadcrumb)
   router.get(
     '/',
     addBreadcrumb({ title: 'Manage functional mailboxes', href: '/functional-mailboxes' }),
-    logPageView(services.auditService, Page.FUNCTIONAL_MAILBOXES),
     asyncMiddleware(functionalMailboxesIndex),
   )
   router.get('/default/add', asyncMiddleware(functionalMailboxForm.addDefault))

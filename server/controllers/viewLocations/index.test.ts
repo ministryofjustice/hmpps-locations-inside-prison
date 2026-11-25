@@ -6,7 +6,6 @@ import paths from '../../utils/paths'
 import LocationResidentialSummaryFactory from '../../testutils/factories/locationResidentialSummary'
 import { LocationResidentialSummary } from '../../data/types/locationsApi'
 import LocationFactory from '../../testutils/factories/location'
-import { Page } from '../../services/auditService'
 
 describe('view locations show', () => {
   let deepReq: DeepPartial<Request>
@@ -53,9 +52,6 @@ describe('view locations show', () => {
         systemToken: 'token',
       },
       services: {
-        auditService: {
-          logPageView: jest.fn().mockResolvedValue(undefined),
-        },
         locationsService: {
           getPrisonConfiguration: jest.fn().mockResolvedValue({}),
           getResidentialSummary: jest.fn().mockResolvedValue(locationResidentialSummary),
@@ -89,11 +85,6 @@ describe('view locations show', () => {
   it('renders the page', async () => {
     await controller(deepReq as Request, deepRes as Response)
 
-    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_SHOW, {
-      who: 'test-user',
-      correlationId: 'test-correlation-id',
-      details: { userUuid: '11111-11111-11111-11111-11111' },
-    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: undefined,
       minLayout: 'three-quarters',
@@ -110,11 +101,6 @@ describe('view locations show', () => {
     deepReq.flash = jest.fn(_param => [success])
     await controller(deepReq as Request, deepRes as Response)
 
-    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_SHOW, {
-      who: 'test-user',
-      correlationId: 'test-correlation-id',
-      details: { userUuid: '11111-11111-11111-11111-11111' },
-    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/show', {
       banner: {
         success,
@@ -571,9 +557,6 @@ describe('view locations index', () => {
         systemToken: 'token',
       },
       services: {
-        auditService: {
-          logPageView: jest.fn().mockResolvedValue(undefined),
-        },
         locationsService: {
           getPrisonConfiguration: jest.fn().mockResolvedValue({}),
           getResidentialSummary: jest.fn().mockResolvedValue(LocationResidentialSummaryFactory.build()),
@@ -608,11 +591,6 @@ describe('view locations index', () => {
 
     await controller(deepReq as Request, deepRes as Response)
 
-    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_INDEX, {
-      who: 'test-user',
-      correlationId: 'test-correlation-id',
-      details: { userUuid: '11111-11111-11111-11111-11111' },
-    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
       title: 'Manage residential locations',
       minLayout: 'three-quarters',
@@ -624,11 +602,6 @@ describe('view locations index', () => {
 
     await controller(deepReq as Request, deepRes as Response)
 
-    expect(deepReq.services.auditService.logPageView).toHaveBeenCalledWith(Page.LOCATIONS_INDEX, {
-      who: 'test-user',
-      correlationId: 'test-correlation-id',
-      details: { userUuid: '11111-11111-11111-11111-11111' },
-    })
     expect(deepRes.render).toHaveBeenCalledWith('pages/viewLocations/index', {
       title: 'Manage residential locations',
       minLayout: 'three-quarters',

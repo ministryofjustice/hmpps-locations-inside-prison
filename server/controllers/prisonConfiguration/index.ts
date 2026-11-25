@@ -117,14 +117,18 @@ const update = async (req: Request, res: Response) => {
   }
 
   analyticsService.sendEvent(req, analyticsEvent, { prison_id: prisonId, status })
-  await auditService.logAuditEvent({
-    what: auditEvent,
-    who: res.locals.user.username,
-    subjectId: prisonId,
-    subjectType: 'PRISON_ID',
-    correlationId: req.id,
-    details: { status },
-  })
+  // the setting is already saved, so a failure to audit must not fail the request
+  await auditService.logAuditEvent(
+    {
+      what: auditEvent,
+      who: res.locals.user.username,
+      subjectId: prisonId,
+      subjectType: 'PRISON_ID',
+      correlationId: req.id,
+      details: { status },
+    },
+    { throwOnError: false, logOnError: true },
+  )
 
   if (setting === 'residential') {
     try {

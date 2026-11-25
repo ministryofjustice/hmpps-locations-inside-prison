@@ -5,8 +5,6 @@ import paths from '../../utils/paths'
 import addAction from '../../middleware/addAction'
 import populateTopLevelDraftLocationSummary from '../../middleware/populateTopLevelDraftLocationSummary'
 import populateBreadcrumbsForLocation from '../../middleware/populateBreadcrumbsForLocation'
-import logPageView from '../../middleware/logPageView'
-import { Page } from '../../services/auditService'
 import addBreadcrumb from '../../middleware/addBreadcrumb'
 import middleware from '../../middleware/middleware'
 import populateDecoratedResidentialSummary from '../../middleware/populateDecoratedResidentialSummary'
@@ -78,7 +76,6 @@ export default async (req: Request, res: Response) => {
   if (isShowView) {
     await populateTopLevelDraftLocationSummary(req, res)
     populateBreadcrumbsForLocation(req, res)
-    await logPageView(req.services.auditService, Page.LOCATIONS_SHOW)(req, res)
     addActions(req, res)
 
     const { decoratedResidentialSummary: summary } = res.locals
@@ -138,7 +135,6 @@ export default async (req: Request, res: Response) => {
     }
   } else {
     addBreadcrumb({ title: '', href: '/' })(req, res)
-    await logPageView(req.services.auditService, Page.LOCATIONS_INDEX)(req, res)
 
     if (req.canAccess('create_location')) {
       const { decoratedResidentialSummary: summary, prisonId } = res.locals

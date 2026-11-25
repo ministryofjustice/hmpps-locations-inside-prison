@@ -1,15 +1,15 @@
 import type { Express } from 'express'
 import request from 'supertest'
 
+import { AuditService } from '@ministryofjustice/hmpps-audit-client'
 import { PrisonConfiguration } from '../data/types/locationsApi'
 import AnalyticsService from '../services/analyticsService'
-import AuditService from '../services/auditService'
 import LocationsService from '../services/locationsService'
 import PrisonService from '../services/prisonService'
 import { appWithAllRoutes, flashProvider, user } from './testutils/appSetup'
 
 jest.mock('../services/analyticsService')
-jest.mock('../services/auditService')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('../services/locationsService')
 jest.mock('../services/prisonService')
 
@@ -43,7 +43,6 @@ const createApp = (userRoles: string[]) =>
 
 beforeEach(() => {
   app = createApp(adminUser.userRoles)
-  auditService.logPageView.mockResolvedValue(null)
   auditService.logAuditEvent.mockResolvedValue(null)
   locationsService.getAllPrisonConfigurations.mockResolvedValue([
     configuration('BXI', 'Brixton (HMP)', 'INACTIVE', 'INACTIVE'),
@@ -148,6 +147,7 @@ describe('POST /prison-configuration/:prisonId/:setting', () => {
         subjectId: 'BXI',
         details: { status: 'ACTIVE' },
       }),
+      { throwOnError: false, logOnError: true },
     )
     expect(flashProvider).toHaveBeenCalledWith('success', {
       title: 'MVP1 switched on',

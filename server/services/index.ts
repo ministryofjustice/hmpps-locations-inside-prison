@@ -1,5 +1,7 @@
+import { AuditServiceFactory, type SubjectType } from '@ministryofjustice/hmpps-audit-client'
 import { dataAccess } from '../data'
-import AuditService from './auditService'
+import config from '../config'
+import logger from '../../logger'
 import FeComponentsService from './feComponentsService'
 import LocationsService from './locationsService'
 import AuthService from './authService'
@@ -11,7 +13,6 @@ import NotificationService from './notificationService'
 export const services = () => {
   const {
     applicationInfo,
-    hmppsAuditClient,
     hmppsAuthClient,
     feComponentsClient,
     googleAnalyticsClient,
@@ -22,7 +23,8 @@ export const services = () => {
   } = dataAccess()
   const notificationService = new NotificationService(notificationClient)
   const analyticsService = new AnalyticsService(googleAnalyticsClient)
-  const auditService = new AuditService(hmppsAuditClient)
+  // PRISON_ID is this service's own subject type, used when a prison's settings are changed
+  const auditService = AuditServiceFactory.createInstance<string, SubjectType | 'PRISON_ID'>(config.sqs.audit, logger)
   const authService = new AuthService(hmppsAuthClient)
   const feComponentsService = new FeComponentsService(feComponentsClient)
   const locationsService = new LocationsService(locationsApiClient)

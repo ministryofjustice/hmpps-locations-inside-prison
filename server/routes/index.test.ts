@@ -1,12 +1,12 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import { AuditService } from '@ministryofjustice/hmpps-audit-client'
 import { appWithAllRoutes, user } from './testutils/appSetup'
-import AuditService, { Page } from '../services/auditService'
 import LocationsService from '../services/locationsService'
 import ManageUsersService from '../services/manageUsersService'
 import config from '../config'
 
-jest.mock('../services/auditService')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('../services/locationsService')
 jest.mock('../services/manageUsersService')
 
@@ -52,8 +52,6 @@ describe('GET /', () => {
       userSupplier: () => user,
     })
 
-    auditService.logPageView.mockResolvedValue(null)
-
     await request(app).get('/').expect(302).expect('Location', '/TST')
   })
 })
@@ -67,7 +65,6 @@ describe('GET /TST', () => {
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'ACTIVE',
     })
-    auditService.logPageView.mockResolvedValue(null)
     app = appWithAllRoutes({
       services: { auditService, locationsService, manageUsersService },
       userSupplier: () => ({ ...user, userRoles: ['MANAGE_RES_LOCATIONS_ADMIN'] }),
@@ -102,7 +99,6 @@ describe('GET /TST', () => {
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'INACTIVE',
     })
-    auditService.logPageView.mockResolvedValue(null)
     const agent = request.agent(app)
 
     await agent
@@ -138,7 +134,6 @@ describe('GET /TST', () => {
       userSupplier: () => user,
     })
 
-    auditService.logPageView.mockResolvedValue(null)
     const res = await request(app).get('/TST')
 
     expect(res.text).toContain('govuk-breadcrumbs')
@@ -149,12 +144,6 @@ describe('GET /TST', () => {
     expect(res.text).not.toContain('View all inactive cells')
     expect(res.text).not.toContain('Archived locations')
     expect(res.text).not.toContain('Cell certificate')
-
-    expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
-      who: user.username,
-      correlationId: expect.any(String),
-      details: { userUuid: user.userUuid },
-    })
   })
 
   it('should render index page with "Manage residential locations" when user has a residential role and certificationApprovalRequired is ACTIVE', async () => {
@@ -175,7 +164,6 @@ describe('GET /TST', () => {
       userSupplier: () => ({ ...user, userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'] }),
     })
 
-    auditService.logPageView.mockResolvedValue(null)
     const res = await request(app).get('/TST')
 
     expect(res.text).toContain('govuk-breadcrumbs')
@@ -187,12 +175,6 @@ describe('GET /TST', () => {
 
     // MANAGE_RESIDENTIAL_LOCATIONS does not grant certificate_view_management
     expect(res.text).not.toContain('Capacity management dashboard')
-
-    expect(auditService.logPageView).toHaveBeenCalledWith(Page.INDEX, {
-      who: user.username,
-      correlationId: expect.any(String),
-      details: { userUuid: user.userUuid },
-    })
   })
 
   it('should render the "Capacity management dashboard" tile for a certificate viewer', async () => {
@@ -213,7 +195,6 @@ describe('GET /TST', () => {
       userSupplier: () => ({ ...user, userRoles: ['RESI__CERT_VIEWER'] }),
     })
 
-    auditService.logPageView.mockResolvedValue(null)
     const res = await request(app).get('/TST')
 
     expect(res.text).toContain('Capacity management dashboard')
@@ -229,7 +210,6 @@ describe('GET /TST', () => {
       includeSegregationInRollCount: 'INACTIVE',
       certificationApprovalRequired: 'ACTIVE',
     })
-    auditService.logPageView.mockResolvedValue(null)
 
     app = appWithAllRoutes({
       services: { auditService, locationsService, manageUsersService },
@@ -264,7 +244,6 @@ describe('GET /TST', () => {
         userSupplier: () => ({ ...user, userRoles: [role] }),
       })
 
-      auditService.logPageView.mockResolvedValue(null)
       const res = await request(app).get('/TST')
 
       expect(res.text).not.toContain('Capacity management dashboard')
@@ -289,7 +268,6 @@ describe('GET /TST', () => {
       userSupplier: () => user,
     })
 
-    auditService.logPageView.mockResolvedValue(null)
     const res = await request(app).get('/TST')
 
     expect(res.text).not.toContain('permission to view Residential locations')

@@ -1,12 +1,10 @@
 import express from 'express'
 import addRootBreadcrumb from '../middleware/addRootBreadcrumb'
-import logPageView from '../middleware/logPageView'
 import populatePrisonAndLocationId from '../middleware/populatePrisonAndLocationId'
 import redirectToAddPrisonId from '../middleware/redirectToAddPrisonId'
 import setCanAccess from '../middleware/setCanAccess'
 import populateCards from '../middleware/populateCards'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import { Page } from '../services/auditService'
 import type { Services } from '../services'
 import validateCaseload from '../middleware/validateCaseload'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
@@ -33,7 +31,6 @@ const controller = (services: Services) => {
   router.get(
     '/',
     populateCards,
-    logPageView(services.auditService, Page.INDEX),
     asyncMiddleware(async (req, res) => {
       const success = req.flash('success')
       if (success?.length) {

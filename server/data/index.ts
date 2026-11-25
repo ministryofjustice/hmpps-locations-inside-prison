@@ -16,7 +16,6 @@ import ManageUsersApiClient from './manageUsersApiClient'
 import { redisClient } from './redisClient'
 import config from '../config'
 import FeComponentsClient from './feComponentsClient'
-import HmppsAuditClient from './hmppsAuditClient'
 import LocationsApiClient from './locationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
 import logger from '../../logger'
@@ -35,7 +34,6 @@ export const dataAccess = () => {
     feComponentsClient: new FeComponentsClient(hmppsAuthClient),
     googleAnalyticsClient: new GoogleAnalyticsClient(),
     hmppsAuthClient,
-    hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
     locationsApiClient: new LocationsApiClient(redisClient, hmppsAuthClient),
     manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
     prisonApiClient: new PrisonApiClient(redisClient, hmppsAuthClient),
@@ -46,4 +44,4 @@ export const dataAccess = () => {
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
-export { AuthenticationClient, FeComponentsClient, HmppsAuditClient, LocationsApiClient, ManageUsersApiClient }
+export { AuthenticationClient, FeComponentsClient, LocationsApiClient, ManageUsersApiClient }

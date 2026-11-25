@@ -1,12 +1,12 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import { AuditService } from '@ministryofjustice/hmpps-audit-client'
 import { appWithAllRoutes, user } from './testutils/appSetup'
-import AuditService from '../services/auditService'
 import AuthService from '../services/authService'
 import LocationsService from '../services/locationsService'
 import { HmppsUser } from '../interfaces/hmppsUser'
 
-jest.mock('../services/auditService')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('../services/authService')
 jest.mock('../services/locationsService')
 
@@ -42,7 +42,6 @@ const buildApp = (userSupplier: () => HmppsUser) =>
   })
 
 beforeEach(() => {
-  auditService.logPageView.mockResolvedValue(null)
   locationsService.getPrisonConfiguration.mockResolvedValue({
     prisonId: 'TST',
     resiLocationServiceActive: 'INACTIVE',
