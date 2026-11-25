@@ -354,9 +354,14 @@ button.govuk-back-link {
 }
 
 .locations-breadcrumb__right-divider {
-  border-right: 1px solid $govuk-secondary-text-colour;
-  padding-right: govuk-spacing(3);
-  margin-right: govuk-spacing(3);
+  display: inline;
+  float: left;
+
+  a {
+    border-right: 1px solid $govuk-secondary-text-colour;
+    padding-right: govuk-spacing(3);
+    margin-right: govuk-spacing(3);
+  }
 }
 
 #apply-cell-numbering {
