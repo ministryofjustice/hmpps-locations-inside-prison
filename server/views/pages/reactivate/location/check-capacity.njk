@@ -46,26 +46,27 @@
       ],
       rows: rows
     }) }}
-  {% else %}
-    {% for subData in data.decoratedSubLocations %}
-      {{ explodeLocation(subData, false) }}
-    {% endfor %}
   {% endif %}
 {% endmacro %}
 
-{% macro explodeLocation(data, paths) %}
+{% macro explodeLocation(data, paths, depth, isRoot) %}
   {% if data.decoratedSubLocations.length %}
-    {% if data.decoratedSubLocations[0].decoratedLocation.leafLevel %}
-      <h2 class="govuk-heading-m">
+    {% set cells = data.decoratedSubLocations.filter(propEquals.bind(null, 'decoratedLocation.raw.locationType', 'CELL')) %}
+    {% set showHeading = not isRoot or cells.length %}
+    {% if showHeading %}
+      <h{{ depth }} class="govuk-heading-m">
         {{ data.decoratedLocation.displayName | capFirst }}
-      </h2>
-
-      {{ capacityTable(data.decoratedSubLocations, data.decoratedLocation, paths) }}
-    {% else %}
-      {% for subLocation in data.decoratedSubLocations %}
-        {{ explodeLocation(subLocation, paths) }}
-      {% endfor %}
+      </h{{ depth }}>
     {% endif %}
+
+    {% if cells.length %}
+      {{ capacityTable(cells, data.decoratedLocation, paths) }}
+    {% endif %}
+    {% for subLocation in data.decoratedSubLocations %}
+      {% if subLocation.decoratedLocation.raw.locationType != 'CELL' %}
+        {{ explodeLocation(subLocation, paths, depth + 1 if showHeading and depth < 6 else depth, false) }}
+      {% endif %}
+    {% endfor %}
   {% endif %}
 {% endmacro %}
 
@@ -74,7 +75,7 @@
     {{ capacityTable(decoratedLocationTree, decoratedLocation, paths) }}
   {% else %}
     {% for data in decoratedLocationTree %}
-      {{ explodeLocation(data, paths) }}
+      {{ explodeLocation(data, paths, 2, true) }}
     {% endfor %}
   {% endif %}
 {% endblock %}
