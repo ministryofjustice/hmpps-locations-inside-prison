@@ -106,4 +106,3 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-locations-inside-prison
-  alertSeverity: move-a-prisoner-alerts-nonprod
