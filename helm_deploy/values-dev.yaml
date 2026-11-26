@@ -36,6 +36,3 @@ generic-service:
   namespace_secrets:
     sqs-hmpps-audit-secret:
       AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
-
-generic-prometheus-alerts:
-  alertSeverity: digital-prison-service-dev
