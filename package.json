@@ -158,7 +158,7 @@
     "chokidar": "^3.6.0",
     "concurrently": "^9.2.5",
     "cookie-session": "^2.1.1",
-    "cypress": "15.21.1",
+    "cypress": "15.21.2",
     "cypress-axe": "^1.7.0",
     "cypress-multi-reporters": "^2.1.0",
     "cypress-split": "^1.25.0",
@@ -213,7 +213,7 @@
     "@opentelemetry/sdk-trace-web": "2.12.0"
   },
   "allowScripts": {
-    "cypress@15.21.1": true,
+    "cypress@15.21.2": true,
     "@parcel/watcher@2.6.0": true,
     "dtrace-provider@0.8.8": false,
     "fsevents@2.3.3": true,
