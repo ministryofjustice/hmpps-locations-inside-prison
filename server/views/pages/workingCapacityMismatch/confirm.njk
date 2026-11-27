@@ -3,18 +3,23 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% block fields %}
+  {% set rows = [
+    {
+      key: { text: "Working capacity" },
+      value: { text: locationResidentialSummary.parentLocation.currentCellCertificate.workingCapacity }
+    }
+  ] %}
+  {% for difference in otherCertificateDifferences %}
+    {% set rows = (rows.push({ key: { text: difference.label }, value: { text: difference.certified } }), rows) %}
+  {% endfor %}
+
   {{ govukSummaryList({
     card: {
       title: {
         text: "Capacity"
       }
     },
-    rows: [
-      {
-        key: { text: "Working capacity" },
-        value: { text: locationResidentialSummary.parentLocation.currentCellCertificate.workingCapacity }
-      }
-    ]
+    rows: rows
   }) }}
 
   <div class="govuk-!-padding-bottom-2 change-summary">

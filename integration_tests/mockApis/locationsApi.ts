@@ -1067,7 +1067,9 @@ const stubPrisonConfigurationDeactivateResi = (
     },
   })
 
-const stubUpdateCapacity = () =>
+const stubUpdateCapacity = (
+  updatedLocation: Partial<Location> = { pendingApprovalRequestId: 'pending-update-capacity-request-id' },
+) =>
   stubFor({
     request: {
       method: 'PUT',
@@ -1078,9 +1080,7 @@ const stubUpdateCapacity = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: {
-        pendingApprovalRequestId: 'pending-update-capacity-request-id',
-      },
+      jsonBody: updatedLocation,
     },
   })
 

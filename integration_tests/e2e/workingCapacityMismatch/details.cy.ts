@@ -1,4 +1,4 @@
-import { cell, setupStubs } from './setupStubs'
+import { cell, cellWithMaxCapacityMismatch, setupStubs } from './setupStubs'
 import ViewLocationsShowPage from '../../pages/viewLocations/show'
 import Page from '../../pages/page'
 import PermissionDeniedPage from '../../pages/permissionDenied'
@@ -74,6 +74,24 @@ context('Working Capacity Mismatch - Details', () => {
       goToDetails().cancelLink().click()
 
       Page.verifyOnPage(ViewLocationsShowPage)
+    })
+  })
+
+  context('when the maximum capacity also differs from the certificate', () => {
+    beforeEach(() => {
+      setupStubs('MANAGE_RES_LOCATIONS_OP_CAP', cellWithMaxCapacityMismatch)
+    })
+
+    it('shows the maximum capacities and says matching the certificate will change it', () => {
+      const page = goToDetails()
+
+      page.testTable([
+        ['Working capacity', '0'],
+        ['Certified working capacity', '1'],
+        ['Maximum capacity', '3'],
+        ['Certified maximum capacity', '2'],
+      ])
+      cy.get('.govuk-radios__hint').should('contain.text', 'This will also change the maximum capacity from 3 to 2.')
     })
   })
 })

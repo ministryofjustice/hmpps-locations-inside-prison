@@ -5,20 +5,26 @@
 {% block fields %}
   <p>The cell’s working capacity is different to the certified working capacity on the cell certificate.</p>
 
+  {% set rows = [
+    [
+      { text: 'Working capacity', classes: "govuk-!-width-one-third" },
+      { text: location.capacity.workingCapacity }
+    ],
+    [
+      { text: 'Certified working capacity' },
+      { text: locationResidentialSummary.parentLocation.currentCellCertificate.workingCapacity }
+    ]
+  ] %}
+  {% for difference in otherCertificateDifferences %}
+    {% set rows = (rows.push([{ text: difference.label }, { text: difference.current }]), rows) %}
+    {% set rows = (rows.push([{ text: difference.certifiedLabel }, { text: difference.certified }]), rows) %}
+  {% endfor %}
+
   {{ govukTable({
     attributes: {
       'data-qa': 'working-capacity-table'
     },
-    rows: [
-      [
-        { text: 'Working capacity', classes: "govuk-!-width-one-third" },
-        { text: location.capacity.workingCapacity }
-      ],
-      [
-        { text: 'Certified working capacity' },
-        { text: locationResidentialSummary.parentLocation.currentCellCertificate.workingCapacity }
-      ]
-    ],
+    rows: rows,
     firstCellIsHeader: true
   }) }}
 

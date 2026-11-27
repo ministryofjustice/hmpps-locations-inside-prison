@@ -3,6 +3,7 @@ import LocationsApiStubber from '../../mockApis/locationsApi'
 import ManageUsersApiStubber from '../../mockApis/manageUsersApi'
 import PrisonResidentialSummaryFactory from '../../../server/testutils/factories/prisonResidentialSummary'
 import LocationFactory from '../../../server/testutils/factories/location'
+import { Location } from '../../../server/data/types/locationsApi'
 
 export const wing = LocationFactory.build({
   id: '7e570000-0000-000a-0001-000000000100',
@@ -69,7 +70,17 @@ export const cell = LocationFactory.build({
   status: 'ACTIVE',
 })
 
-export function setupStubs(role: string) {
+// Swinfen Hall (MAPA-543): the certificate also records a lower maximum capacity than the cell holds
+export const cellWithMaxCapacityMismatch = LocationFactory.build({
+  ...cell,
+  capacity: {
+    certifiedNormalAccommodation: 1,
+    maxCapacity: 3,
+    workingCapacity: 0,
+  },
+})
+
+export function setupStubs(role: string, location: Location = cell) {
   cy.task('reset')
   AuthStubber.stub.stubSignIn({ roles: [role] })
   ManageUsersApiStubber.stub.stubManageUsers()
@@ -93,15 +104,15 @@ export function setupStubs(role: string) {
     }),
   )
   cy.task('stubLocationsLocationsResidentialSummaryForLocation', {
-    parentLocation: cell,
+    parentLocation: location,
   })
   LocationsApiStubber.stub.stubLocations(wing)
   LocationsApiStubber.stub.stubLocations(landing)
-  LocationsApiStubber.stub.stubLocations(cell)
+  LocationsApiStubber.stub.stubLocations(location)
   LocationsApiStubber.stub.stubPrisonerLocationsId([])
   LocationsApiStubber.stub.stubLocationsCertificationPrisonSignedOpCapChange()
   LocationsApiStubber.stub.stubLocationsBulkReactivate()
-  LocationsApiStubber.stub.stubUpdateCapacity()
+  LocationsApiStubber.stub.stubUpdateCapacity(location)
   LocationsApiStubber.stub.stubGetPrisonConfiguration({ prisonId: 'TST', certificationActive: 'ACTIVE' })
   LocationsApiStubber.stub.stubLocationsCertificationRequestApprovalsPrison([])
 }
