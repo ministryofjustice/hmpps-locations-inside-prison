@@ -73,7 +73,10 @@ describe('auditPageView', () => {
   it('logs a page view and an access attempt when a page renders', async () => {
     await request(appWithAuditing()).get(locationPage).expect(200).expect(renderedHtml)
 
-    expect(loggedEvents()).toEqual(['PAGE_VIEW', 'PAGE_VIEW_ACCESS_ATTEMPT'])
+    expect(loggedEvents()).toEqual([
+      'VIEW_LOCATIONS_INSIDE_PRISON_PAGE_SUCCESS',
+      'VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT',
+    ])
   })
 
   it('passes the username, correlation id and page url, and nothing else, to the audit service', async () => {
@@ -81,7 +84,7 @@ describe('auditPageView', () => {
 
     expect(auditService.logAuditEvent).toHaveBeenCalledWith(
       {
-        what: 'PAGE_VIEW',
+        what: 'VIEW_LOCATIONS_INSIDE_PRISON_PAGE_SUCCESS',
         who: 'user1',
         correlationId: 'request123',
         subjectType: 'NOT_APPLICABLE',
@@ -94,19 +97,19 @@ describe('auditPageView', () => {
   it('logs only an attempt when a request does not render a page', async () => {
     await request(appWithAuditing()).get('/MDI/no-such-page').expect(404)
 
-    expect(loggedEvents()).toEqual(['PAGE_VIEW_ACCESS_ATTEMPT'])
+    expect(loggedEvents()).toEqual(['VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT'])
   })
 
   it('logs only an attempt when a request is redirected', async () => {
     await request(appWithAuditing()).get('/redirects').expect(302)
 
-    expect(loggedEvents()).toEqual(['PAGE_VIEW_ACCESS_ATTEMPT'])
+    expect(loggedEvents()).toEqual(['VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT'])
   })
 
   it('logs only an attempt when a forbidden page is rendered', async () => {
     await request(appWithAuditing()).get('/forbidden').expect(403)
 
-    expect(loggedEvents()).toEqual(['PAGE_VIEW_ACCESS_ATTEMPT'])
+    expect(loggedEvents()).toEqual(['VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT'])
   })
 
   it('does not audit when there is no signed-in user', async () => {
@@ -126,7 +129,7 @@ describe('auditPageView', () => {
   it('leaves renders with their own callback alone, auditing only the attempt', async () => {
     await request(appWithAuditing()).get('/rendered-for-someone-else').expect(200).expect(`wrapped ${renderedHtml}`)
 
-    expect(loggedEvents()).toEqual(['PAGE_VIEW_ACCESS_ATTEMPT'])
+    expect(loggedEvents()).toEqual(['VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT'])
   })
 
   it('still serves the page when auditing fails', async () => {
@@ -140,6 +143,6 @@ describe('auditPageView', () => {
       .get(locationPage)
       .expect(500)
 
-    expect(loggedEvents()).toEqual(['PAGE_VIEW_ACCESS_ATTEMPT'])
+    expect(loggedEvents()).toEqual(['VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT'])
   })
 })

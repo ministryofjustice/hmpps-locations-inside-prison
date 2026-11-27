@@ -26,6 +26,7 @@ import setUpFeatureFlags from './middleware/setUpFeatureFlags'
 import refreshSystemToken from './middleware/refreshSystemToken'
 import setUpMultipartFormDataParsing from './middleware/setUpMultipartFormDataParsing'
 import auditPageView from './middleware/auditPageView'
+import accessibilityStatementRouter from './routes/accessibilityStatementRouter'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -43,6 +44,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
   nunjucksSetup(app, services.applicationInfo)
+  app.use(accessibilityStatementRouter)
   app.use(setUpFeatureFlags())
   app.use(setUpAuthentication())
   // before any route's permission checks, so that refused requests are still audited as access attempts
