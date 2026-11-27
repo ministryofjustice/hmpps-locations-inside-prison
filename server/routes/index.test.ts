@@ -283,3 +283,56 @@ describe('GET /TST', () => {
     expect(res.text).not.toContain('Switch MVP1 or certification on or off for each prison.')
   })
 })
+
+describe('caseload switch from the DPS header', () => {
+  const switched = 'caseload-switched-from=TST&caseload-switched-to=CFI'
+  const userAtCardiff = {
+    ...user,
+    activeCaseload: { id: 'CFI', name: 'Cardiff (HMP)' },
+    caseloads: [
+      { id: 'TST', name: 'Test (HMP)' },
+      { id: 'CFI', name: 'Cardiff (HMP)' },
+    ],
+  }
+
+  const appFor = (userSupplier: () => typeof user) =>
+    appWithAllRoutes({ services: { auditService, locationsService, manageUsersService }, userSupplier })
+
+  it.each([
+    { scenario: 'the prison home page', path: '/TST' },
+    { scenario: 'a location page', path: '/TST/7e570000-0000-0000-0000-000000000001' },
+    { scenario: 'a section page', path: '/TST/archived-locations?sort=name' },
+  ])('sends the user from $scenario to the new prison home page', async ({ path }) => {
+    const separator = path.includes('?') ? '&' : '?'
+
+    await request(appFor(() => userAtCardiff))
+      .get(`${path}${separator}${switched}`)
+      .expect(302)
+      .expect('Location', '/CFI')
+
+    expect(locationsService.getPrisonConfiguration).not.toHaveBeenCalled()
+  })
+
+  it('redirects rather than failing when the user no longer has the old prison', async () => {
+    await request(appFor(() => ({ ...userAtCardiff, caseloads: [{ id: 'CFI', name: 'Cardiff (HMP)' }] })))
+      .get(`/TST?${switched}`)
+      .expect(302)
+      .expect('Location', '/CFI')
+  })
+
+  it('only strips the switch parameters when the url already matches the active caseload', async () => {
+    await request(appFor(() => user))
+      .get('/TST/archived-locations?sort=name&caseload-switched-from=CFI&caseload-switched-to=TST')
+      .expect(302)
+      .expect('Location', '/TST/archived-locations?sort=name')
+  })
+
+  it('resolves a switch on the service root, for users without the header javascript', async () => {
+    // Without header.js there is no backUrl, so DPS falls back to the referer, which browsers reduce
+    // to our origin. The root adds the active caseload, then the switch parameters are stripped.
+    const agent = request(appFor(() => userAtCardiff))
+
+    await agent.get(`/?${switched}`).expect(302).expect('Location', `/CFI?${switched}`)
+    await agent.get(`/CFI?${switched}`).expect(302).expect('Location', '/CFI')
+  })
+})

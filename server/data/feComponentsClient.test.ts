@@ -32,12 +32,22 @@ describe('feComponentsClient', () => {
       }
 
       fakeComponentsApi
-        .get('/components?component=header')
+        .get('/components?component=header&caseloadChangeNotification=true')
         .matchHeader('x-user-token', token.access_token)
         .reply(200, response)
 
       const output = await componentsClient.getComponents(['header'], token.access_token)
       expect(output).toEqual(response)
+    })
+
+    it('should ask for the caseload change notice alongside several components', async () => {
+      fakeComponentsApi
+        .get('/components?component=header&component=footer&caseloadChangeNotification=true')
+        .matchHeader('x-user-token', token.access_token)
+        .reply(200, {})
+
+      await componentsClient.getComponents(['header', 'footer'], token.access_token)
+      expect(fakeComponentsApi.isDone()).toBe(true)
     })
   })
 })
