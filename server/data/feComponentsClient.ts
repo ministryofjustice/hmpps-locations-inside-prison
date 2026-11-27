@@ -43,10 +43,15 @@ export default class FeComponentsClient extends RestClient {
     super('FeComponentsClient', config.apis.frontendComponents, logger, authenticationClient)
   }
 
+  /**
+   * `caseloadChangeNotification=true` asks for the header's change caseload link to carry
+   * `caseloadChanged=true`, so that after a switch DPS sends the user back with
+   * `caseload-switched-from` and `caseload-switched-to` (see `handleCaseloadChange`).
+   */
   getComponents<T extends AvailableComponent[]>(components: T, userToken: string): Promise<FeComponentsResponse> {
     return this.get<FeComponentsResponse>({
       path: `/components`,
-      query: `component=${components.join('&component=')}`,
+      query: `component=${components.join('&component=')}&caseloadChangeNotification=true`,
       headers: { 'x-user-token': userToken },
     })
   }

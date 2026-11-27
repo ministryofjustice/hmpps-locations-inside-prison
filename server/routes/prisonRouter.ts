@@ -7,6 +7,7 @@ import populateCards from '../middleware/populateCards'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import validateCaseload from '../middleware/validateCaseload'
+import handleCaseloadChange from '../middleware/handleCaseloadChange'
 import populatePrisonConfiguration from '../middleware/populatePrisonConfiguration'
 
 import cellCertificateRouter from './cellCertificate'
@@ -22,6 +23,7 @@ const controller = (services: Services) => {
   router.use(
     populatePrisonAndLocationId,
     redirectToAddPrisonId,
+    handleCaseloadChange,
     validateCaseload,
     populatePrisonConfiguration,
     setCanAccess,
