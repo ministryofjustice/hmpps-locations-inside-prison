@@ -9,9 +9,11 @@ type ResRender = (view: string, options?: object, callback?: RenderCallback) => 
 /**
  * Audits page views to HMPPS Audit.
  *
- * Emits PAGE_VIEW_ACCESS_ATTEMPT once the response closes – covering redirects, errors and
- * requests refused downstream by a route's permission or caseload checks – and PAGE_VIEW when a
- * page renders successfully.
+ * Emits VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT once the response closes – covering redirects,
+ * errors and requests refused downstream by a route's permission or caseload checks – and
+ * VIEW_LOCATIONS_INSIDE_PRISON_PAGE_SUCCESS when a page renders successfully.
+ *
+ * The event names are service-specific (VIEW_<SERVICE>_PAGE_*), as HMPPS Audit asked.
  *
  * Mount after authentication but before the routes, so that refused requests are still recorded
  * as attempts. Health checks, static resources and the sign-in routes are mounted earlier in
@@ -36,7 +38,7 @@ export default function auditPageView(auditService: Pick<AuditService, 'logAudit
     }
 
     res.prependOnceListener('close', () => {
-      logPageView(auditService, auditEvent, 'PAGE_VIEW_ACCESS_ATTEMPT')
+      logPageView(auditService, auditEvent, 'VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT')
     })
 
     const resRender = res.render as ResRender
@@ -55,7 +57,7 @@ export default function auditPageView(auditService: Pick<AuditService, 'logAudit
         res.send(html)
         // error and forbidden pages are rendered too, but are not successful page views
         if (res.statusCode < 400) {
-          logPageView(auditService, auditEvent, 'PAGE_VIEW')
+          logPageView(auditService, auditEvent, 'VIEW_LOCATIONS_INSIDE_PRISON_PAGE_SUCCESS')
         }
       })
     }) as typeof res.render
@@ -67,7 +69,7 @@ export default function auditPageView(auditService: Pick<AuditService, 'logAudit
 function logPageView(
   auditService: Pick<AuditService, 'logAuditEvent'>,
   auditEvent: PageViewEventDetails,
-  what: 'PAGE_VIEW' | 'PAGE_VIEW_ACCESS_ATTEMPT',
+  what: 'VIEW_LOCATIONS_INSIDE_PRISON_PAGE_SUCCESS' | 'VIEW_LOCATIONS_INSIDE_PRISON_PAGE_ATTEMPT',
 ): void {
   // auditing must not be able to break page rendering, so never throw
   auditService.logAuditEvent({ ...auditEvent, what }, { throwOnError: false, logOnError: true }).catch(error => {
